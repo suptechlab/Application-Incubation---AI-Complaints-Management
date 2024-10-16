@@ -1,0 +1,184 @@
+@import '../../assets/css/variables';
+
+.sidebarMenu {
+    width: $theme-sidebar-width;
+    transition: width .3s ease-in-out;
+    position: relative;
+    height: 100%;
+
+    @include below-xl() {
+        top: $theme-header-height;
+        position: fixed;
+        z-index: 9;
+        left: -$theme-sidebar-width;
+        transition: left .3s ease-in-out;
+        height: calc(100% - $theme-header-height) !important;
+    }
+    .sub-menu-arrow{
+        margin-left: 7px;
+        margin-right: 0px;
+    }
+    .toogle-button {
+        border-color:  $info !important;
+        &.w-20 {
+            width: 20px;
+
+            @include below-xl() {
+                width: 30px;
+            }
+        }
+
+        &.h-20 {
+            height: 20px;
+
+            @include below-xl() {
+                height: 30px;
+            }
+        }
+
+        svg {
+            color:  $info !important;
+            @include below-xl() {
+                width: 20px;
+                height: 20px;
+                transform: rotate(-180deg);
+            }
+        }
+    }
+
+    .sidebarList {
+        >ul {
+            li {
+                margin-top: 2px;
+
+                a,
+                .btn-link {
+                    min-height: 3.125rem;
+                    color: var(--bs-white);
+                    padding-right: 10px;
+
+                    &.active,
+                    &:hover {
+                        background-color: $primary;
+                        color: $body-color;
+                    }
+
+                    svg {
+                        display: block;
+                        margin: auto;
+                    }
+
+                    .min-w-44 {
+                        min-width: 44px;
+                    }
+                }
+
+                >ul {
+                    li {
+
+                        a,
+                        .btn-link {
+                            padding-left: 53px !important;
+                            padding-right: 15px;
+                            line-height: 15px;
+
+                            .min-w-44 {
+                                min-width: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &.sidebarAction {
+        @include below-xl() {
+            left: 0;
+        }
+
+        @include above-xl() {
+            width: 4rem;
+
+            .sidebarLink,
+            .navHeader,
+            .sidebarLogo {
+                justify-content: center;
+            }
+
+            .hideInSmallSidebar,
+            .showInSidebar {
+                display: none;
+            }
+
+            .showInSmallSidebar {
+                display: block;
+            }
+
+            .navHeader,
+            .sidebarLogo {
+                padding-left: .5rem !important;
+                padding-right: .5rem !important;
+            }
+
+            .sidebarList {
+
+                ul {
+                    li {
+                        .sub-menu-arrow {
+                            position: absolute;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            right: -0.25rem;
+                        }
+
+                        position: relative;
+
+                        >ul {
+                            position: fixed;
+                            left: 4rem;
+                            z-index: 9;
+                            background-color: $primary;
+                            width: 200px;
+                            padding: 0.5rem !important;
+                            box-shadow: var(--bs-box-shadow);
+                            overflow: auto;
+                            max-height: 350px;
+                            border: 1px solid $primary;
+                            margin-top: -3rem;
+
+                            li {
+
+                                a,
+                                .btn-link {
+                                    padding: 0 0.5rem !important;
+                                    justify-content: start;
+
+                                    .min-w-44 {
+                                        display: none;
+                                    }
+
+                                    .hideInSmallSidebar {
+                                        display: block;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//Sidebar Menu Backdrop showing below the 1199px screen size
+.backdrop {
+    display: none;
+
+    @include below-xl() {
+        display: block;
+        z-index: 7;
+        top: $theme-header-height;
+    }
+}

@@ -1,0 +1,199 @@
+$enable-negative-margins: true;
+$font-family-base: 'Source Sans Pro', sans-serif;
+$body-tertiary-bg: #F8F6F4;
+$body-secondary-bg: #F5F5F5;
+$body-color: #000000;
+$primary: #812227;
+$dark:#20222C;
+$secondary: #999999;
+$danger: #DC3545;
+$info: #A12B31;
+$warning: #DE8500;
+$success: #2EA950;
+$light: #0088FF;
+$table-striped-order:         even;
+$table-cell-padding-y:        1rem;
+$table-cell-padding-x:        1rem;
+$table-cell-padding-y-sm:     1rem;
+$table-cell-padding-x-sm:     1rem;
+$table-border-width:          0;
+
+$border-color: #A0A0A0;
+$input-border-color: #A0A0A0;
+$input-focus-border-color:#2F61A8;
+$input-disabled-border-color:  #AEAEAE;
+$input-disabled-bg: none;
+$input-focus-width:  0;
+$input-focus-box-shadow: none;
+// $tooltip-max-width: 300px;
+// $btn-font-weight: 600;
+// $btn-padding-y: 0.688rem;
+// $btn-padding-x: 1.875rem;
+ $btn-border-radius: .25rem;
+// $btn-padding-y-sm: 0.407rem;
+// $btn-padding-x-sm: 1.25rem;
+// $input-placeholder-color: #BDBDBD;
+// $input-padding-y-sm: 0.407rem;
+// $input-padding-x-sm: 1rem;
+// $input-padding-y: 0.782rem;
+// $input-padding-x: 1rem;
+// $input-font-size: 0.875rem;
+// $input-font-weight: $btn-font-weight;
+// $input-border-radius: $btn-border-radius;
+// $h3-font-size: 30px;
+// $h4-font-size: 22px;
+// $h5-font-size: 18px;
+// $border-color: #DADADA;
+// $form-check-input-border-radius: 2px;
+// $form-check-input-checked-color: #FFFFFF;
+// $form-check-input-checked-bg-image: url("data:image/svg+xml,<svg width='12' height='10' viewBox='0 0 12 9' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M4.44443 8.8889L0.555542 5.00001L1.65221 3.90334L4.44443 6.68779L10.3478 0.784454L11.4444 1.8889L4.44443 8.8889Z' fill='#{$form-check-input-checked-color}'/></svg>");
+// $primary-text-emphasis: #004C4C;
+// $modal-inner-padding: 1.25rem;
+// $modal-header-padding-y: .75rem;
+// $form-switch-checked-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3.25' fill='#{$primary}'/></svg>");
+// $accordion-button-active-color: $body-color;
+// $accordion-icon-active-color: $body-color;
+// $accordion-padding-x: 1rem;
+// $form-check-label-cursor: pointer;
+// $nav-tabs-border-radius: 0;
+// $nav-tabs-link-active-color: $primary;
+// $nav-tabs-link-active-border-color: $primary;
+// $nav-link-color: rgba($body-color, .75);
+
+
+// Custom Variables
+$font-family-secondary: 'Montserrat', sans-serif;
+$theme-size-10: 0.625rem;
+$theme-size-11: 0.6875rem;
+$theme-size-12: 0.75rem;
+$theme-size-13: 0.8125rem;
+$theme-size-14: 0.875rem;
+$theme-size-15: 0.9375rem;
+$theme-sidebar-width: 15rem;
+$theme-sidebar-brand-height: 5em;
+$theme-header-height: 4rem;
+
+// Generate custom classes for width, min-width, height, min-height
+@mixin custom-class($property, $value) {
+  .custom-#{$property}-#{$value} {
+    #{$property}: #{$value}+px;
+  }
+}
+
+//Responsive Mixins
+$below-xsm: 374px;
+$below-sm: 575px;
+$below-md: 767px;
+$below-lg: 991px;
+$below-xl: 1199px;
+$below-1300: 1299px;
+$below-1400: 1399px;
+$below-1600: 1600px;
+$below-1800: 1800px;
+
+$maxheight600: 600px;
+$maxheight400: 400px;
+
+$above-sm: 576px;
+$above-md: 768px;
+$above-lg: 992px;
+$above-xl: 1200px;
+$above-1300: 1300px;
+
+@mixin below-xsm {
+  @media only screen and (max-width: $below-xsm) {
+    @content;
+  }
+}
+
+@mixin below-sm {
+  @media only screen and (max-width: $below-sm) {
+    @content;
+  }
+}
+
+@mixin below-md {
+  @media only screen and (max-width: $below-md) {
+    @content;
+  }
+}
+
+@mixin below-lg {
+  @media only screen and (max-width: $below-lg) {
+    @content;
+  }
+}
+
+@mixin below-xl {
+  @media only screen and (max-width: $below-xl) {
+    @content;
+  }
+}
+
+@mixin below-1300 {
+  @media only screen and (max-width: $below-1300) {
+    @content;
+  }
+}
+
+@mixin below-1400 {
+  @media only screen and (max-width: $below-1400) {
+    @content;
+  }
+}
+
+@mixin below-1600 {
+  @media only screen and (max-width: $below-1600) {
+    @content;
+  }
+}
+
+@mixin below-1800 {
+  @media only screen and (max-width: $below-1800) {
+    @content;
+  }
+}
+
+@mixin maxheight600 {
+  @media only screen and (max-height: $maxheight600) {
+    @content;
+  }
+}
+
+@mixin maxheight400 {
+  @media only screen and (max-height: $maxheight400) {
+    @content;
+  }
+}
+
+@mixin above-sm {
+  @media only screen and (min-width: $above-sm) {
+    @content;
+  }
+}
+
+@mixin above-md {
+  @media only screen and (min-width: $above-md) {
+    @content;
+  }
+}
+
+@mixin above-lg {
+  @media only screen and (min-width: $above-lg) {
+    @content;
+  }
+}
+
+@mixin above-xl {
+  @media only screen and (min-width: $above-xl) {
+    @content;
+  }
+}
+
+@mixin above-1300 {
+  @media only screen and (min-width: $above-1300) {
+    @content;
+  }
+}
+
+//End of Responsive Mixins

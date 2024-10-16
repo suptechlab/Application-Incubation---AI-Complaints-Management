@@ -1,0 +1,30 @@
+import React from 'react';
+import { Button, Stack } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+
+const Header = ({ toggle }) => {
+    return (
+        <div className="contentHeader p-1">
+            <Stack
+                direction="horizontal"
+                gap={2}
+                className="flex-wrap justify-content-between custom-min-height-42"
+            >
+                <h1 className="fw-semibold h4 mb-0 fs-22">
+                Master Management
+                </h1>
+                {/* <Button
+                    color="primary"
+                    className="fw-semibold fs-14"
+                    onClick={toggle}
+                >
+                    Add New
+                </Button> */}
+                {/* <Link to={`/states/add`} className="fw-semibold fs-14 btn  custom-width-130 btn btn-outline-dark fs-14 text-decoration-none rounded-2 p-2 text-center"  type="button"  size="sm">Reset Password</Link> */}
+                <Link to={`/states/add`} className="fw-semibold fs-14 custom-width-85 bg-info text-white text-decoration-none rounded-2 p-2 text-center"  type="button" variant="info" size="sm">Add New</Link>
+            </Stack>
+        </div>
+    );
+};
+
+export default Header;

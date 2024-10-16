@@ -1,0 +1,35 @@
+.table-bordered td,
+.table-bordered th {
+    border: none;
+    user-select: none;
+    border-bottom: none !important;
+}
+
+thead tr {
+    background-color: #0000000D;
+    height: 50px;
+
+}
+
+tbody tr {
+    height: 50px;
+}
+
+tbody tr:nth-of-type(odd) {
+    background-color: #ffffff !important;
+
+}
+
+tbody tr:nth-of-type(even) {
+    background-color: #0000000D !important;
+}
+
+.sort-desc {
+    margin: 5px;
+}
+
+.sort-asc {
+    // image rotate by 180 degree
+    transform: rotate(180deg);
+    margin: 5px;
+}
