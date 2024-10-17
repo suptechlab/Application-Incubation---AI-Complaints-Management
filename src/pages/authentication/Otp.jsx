@@ -20,7 +20,7 @@ export default function Otp() {
     const [captcha, setCaptcha] = useState("");
     const { login, OtpVerify } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
-    const [username, setUsername] = useState(location?.state?.username ? location?.state?.username : 'ongcadmin@yopmail.com');
+    const [username, setUsername] = useState(location?.state?.username ? location?.state?.username : 'admin@yopmail.com');
     const [otp, setOtp] = useState("");
     const navigate = useNavigate()
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { Button, Nav, Navbar } from "react-bootstrap"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
+import { MdOutlineArrowDropDown, MdOutlineArrowRight } from "react-icons/md"
 import { NavLink, useNavigate } from "react-router-dom"
 import { FaChevronDown } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
@@ -9,7 +10,7 @@ import "./sidebar.scss"
 import { isAdminUser, getPermissionsModuleNameList } from "../../utils/authorisedmodule"
 import { getLocalStorage } from "../../utils/storage"
 
-const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
+  const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
   const navigate = useNavigate()
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null)
 
@@ -30,31 +31,16 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
   useEffect(() => {
     isAdminUser().then(response => {
       if (response) {
-        permission.current.isAdmin = true;
+            permission.current.isAdmin = true;
       } else {
         getPermissionsModuleNameList().then(response => {
-          permission.current.list = response;
-          if (response.includes("Financial Year Master") || response.includes("State Master") || response.includes("District Master") || response.includes("Consumer Category Master")) {
-            permission.current.list.push("Master Management");
-          }
-          if(response.includes("TEMPLATE_VIEW")){
-            permission.current.list.push("Template Management");
-          }
-          if(!response.includes("Dashboard")){
-            permission.current.list.push("Dashboard");  // If dashboard not existing then include
-          }
-          if(companyTitle==='ONGC' || companyTitle==='OIL'){
-            permission.current.list.push("REPORT_OIL_INDIA_SUMMARY_DATA");
-          }
-          if(companyTitle==='ONGC' || companyTitle==='OIL' || companyTitle==='Ministry' || companyTitle==='PPAC'){
-            permission.current.list.push("REPORT_RECONCILIATION");
-          }
+            permission.current.list = response;
         }).catch(error => {
-          console.error("Error fetching permissions:", error);
+            console.error("Error fetching permissions:", error);
         });
       }
     }).catch(error => {
-      console.error("Error get during to fetch User Type", error);
+            console.error("Error get during to fetch User Type", error);
     })
 
   }, []);
@@ -97,13 +83,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
               {NavItems.map(elem => {
                 const { id, menuName, title, menuIcon, path, subMenu, disabled, roleName } = elem
 
-                if ((companyTitle === 'ONGC' || companyTitle === 'OIL') && id === 5) {
-                  return null; // Hide "Subsidy Vendor Data Management" for ONGC or OIL
-                }
-
-                if (!(companyTitle === 'ONGC' || companyTitle === 'OIL' || companyTitle === 'GAIL') && id === 4) {
-                  return null; // Hide "Subsidy Data Management" for non-ONGC and non-OIL
-                }  
+                 
 
                 return (
                   <Nav.Item as="li" key={id}>

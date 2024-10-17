@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Stack } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const Header = () => {
+const Header = ({ toggle }) => {
     return (
         <div className="contentHeader p-1">
             <Stack

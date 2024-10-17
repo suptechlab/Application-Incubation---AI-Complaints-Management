@@ -14,7 +14,7 @@ export const NavItems = [
     menuIcon: SvgIcons.dashboardIcon,
     path: "/",
     disabled: false,
-    roleName: "admin"
+    roleName: "Dashboard"
   },
   {
     id: 2,
@@ -27,69 +27,17 @@ export const NavItems = [
     subMenu: [
       {
         id: 1,
-        menuName: "Claim Type",
+        menuName: "State Master ",
         // menuIcon: SvgIcons.allpatients,
-        path: "/claim-type",
-        moduleName: ["Master Management"],
-        roleName: "admin"
-      },
-      {
-        id: 2,
-        menuName: "Claim Sub Type",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/claim-subtype",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 3,
-        menuName: "Complaint Category",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/complaint-category",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 4,
-        menuName: "Inquiry Type",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/inquiry-type",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 5,
-        menuName: "Inquiry Sub type",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/inquiry-subtype",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 6,
-        menuName: "Province Master",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/province-master",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 7,
-        menuName: "City Master",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/city-master",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 8,
-        menuName: "Template Master",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/template-master",
-        moduleName: ["Master management"],
-        roleName: "admin"
+        path: "/states",
+        moduleName: ["States", "Appointment"],
+        roleName: "State Master"
       }
       
     ],
   },
+  
+  
+  
+
 ]

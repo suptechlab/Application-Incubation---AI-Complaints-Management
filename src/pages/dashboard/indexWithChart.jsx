@@ -214,14 +214,8 @@ export default function Dashboard() {
       let companiesList = [];
       if (response.data?.data?.length > 0) {
         response.data?.data?.forEach((category) => {
-          if (loginCompanyTitle === 'PPAC' || loginCompanyTitle === 'Ministry') {
-            if (category.title === 'ONGC' || category.title === 'OIL' || category.title === 'AGCL' || category.title === 'TNGC' || category.title === 'GAIL') {
               companiesList.push({ value: category?.id, label: category?.title });
-            }
-          }
-          else if (category.title === 'ONGC' || category.title === 'OIL') {
-            companiesList.push({ value: category?.id, label: category?.title });
-          }
+          
         });
       }
       setCompanyOptions(companiesList);
@@ -290,52 +284,7 @@ export default function Dashboard() {
       },
     ];
 
-    if (loginCompanyTitle === "ONGC" || loginCompanyTitle === "TNGC") {
-      cols.push({
-        accessorFn: (row) => (row.ONGC !== "" ? row.ONGC : "-"),
-        id: "ONGC",
-        header: () => "ONGC",
-        enableSorting: false,
-      });
-    }
-
-    if (loginCompanyTitle === "OIL") {
-      cols.push({
-        accessorFn: (row) => (row.OIL !== "" ? row.OIL : "-"),
-        id: "OIL",
-        header: () => "Oil India",
-        enableSorting: false,
-      });
-    }
-    if (loginCompanyTitle === "GAIL") {
-      cols.push({
-        accessorFn: (row) => (row.GAIL !== "" ? row.GAIL : "-"),
-        id: "GAIL",
-        header: () => "Subsidy Amount",
-        enableSorting: false,
-      });
-    }
-    if (loginCompanyTitle === "AGCL" || loginCompanyTitle === "PPAC" || loginCompanyTitle === "Ministry") {
-      cols.push({
-        accessorFn: (row) => (row.ONGC !== "" ? row.ONGC : "-"),
-        id: "ONGC",
-        header: () => "ONGC",
-        enableSorting: false,
-      });
-      cols.push({
-        accessorFn: (row) => (row.OIL !== "" ? row.OIL : "-"),
-        id: "OIL",
-        header: () => "Oil India",
-        enableSorting: false,
-      });
-      cols.push({
-        accessorFn: (row) => (row.total !== "" ? row.total : "0"),
-        id: "total",
-        header: () => "Total",
-        enableSorting: false,
-      });
-    }
-
+      
     return cols;
   }, [loginCompanyTitle]);
 

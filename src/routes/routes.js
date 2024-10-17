@@ -11,14 +11,6 @@ import UserList from "../pages/users";
 import StatesList from "../pages/states";
 import Otp from "../pages/authentication/Otp";
 import RoleRightsList from "../pages/role-rights";
-import ClaimType from "../pages/master management/claimtype";
-import ClaimSubtype from "../pages/master management/claimSubType";
-import ComplaintCategory from "../pages/master management/complaintCategory";
-import InquiryType from "../pages/master management/inquiryType";
-import InquirySubtype from "../pages/master management/inquirySubtype";
-import ProvinceMaster from "../pages/master management/provinceMaster";
-import CityMaster from "../pages/master management/cityMaster";
-import TemplateMaster from "../pages/master management/TemplateMaster";
 
 const UserForm = React.lazy(() => import("../pages/users/Edit"));
 
@@ -34,6 +26,7 @@ const AddEditRoleRights = React.lazy(() => import("../pages/role-rights/RoleRigh
 
 
 const routes = [
+
     {
         path: "/",
         element: <Dashboard />,
@@ -46,6 +39,7 @@ const routes = [
         isPrivate: false,
         layoutType: "Auth",
     },
+    
     {
         path: "/districtdata",
         element: <DistrictdataPage />,
@@ -55,54 +49,6 @@ const routes = [
     {
         path: "/dashboard",
         element: <DashboardPage />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/claim-type",
-        element: <ClaimType />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/claim-subtype",
-        element: <ClaimSubtype />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/complaint-category",
-        element: <ComplaintCategory />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/inquiry-type",
-        element: <InquiryType />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/inquiry-subtype",
-        element: <InquirySubtype />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/province-master",
-        element: <ProvinceMaster />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/city-master",
-        element: <CityMaster />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/template-master",
-        element: <TemplateMaster />,
         isPrivate: true,
         layoutType: "Auth",
     },
@@ -136,12 +82,15 @@ const routes = [
         isPrivate: true,
         layoutType: "Auth",
     },
+    
+    
     {
         path: "/users",
         element: <UserList />,
         isPrivate: true,
         layoutType: "Auth",
     },
+   
     {
         path: "/states",
         element: <StatesList />,
@@ -192,6 +141,8 @@ const routes = [
         isPrivate: true,
         layoutType: "Auth",
     },
+
+    
     {
         path: "/role-rights",
         element: <RoleRightsList/>,
