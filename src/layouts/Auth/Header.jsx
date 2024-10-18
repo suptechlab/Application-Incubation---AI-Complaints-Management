@@ -6,7 +6,7 @@ import Logo from '../../assets/images/logo.png';
 import NotificationIcon from "../../assets/images/notifications.svg";
 import { AuthenticationContext } from '../../contexts/authentication.context';
 import './header.scss';
-import { handleGetNotifications, handleMarkNotificationById, handleMarkAllNotifications, handleDeleteNotification, handleDeleteAllNotification, handleCountNotifications } from '../../services/notification.service';
+import { handleGetNotifications, handleMarkAllNotifications, handleDeleteNotification, handleCountNotifications } from '../../services/notification.service';
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     const { logout } = useContext(AuthenticationContext);
@@ -80,8 +80,6 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                         className="img-fluid"
                         src={Logo}
                         alt={`Logo`}
-                        width={42}
-                        height={40}
                     />
                 </Link>
                 <Nav className="ms-auto align-items-center order-md-last ">
@@ -109,26 +107,6 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                                         </div>
                                     </Dropdown.Item>
                                 ))}
-
-
-                                
-                                    
-                                        {/* <div className='d-flex justify-content-between align-items-center'>
-                                             <div>
-                                                <div className='fs-14 fw-bolder'>{notification.title}</div>
-                                                <p className='fs-14 mb-0'>{notification.message}</p>
-                                            </div> 
-                                            <div>
-                                                <div className='fs-14 fw-bolder'>dslkfdsjlksfldjfjdflkjlkjdslkfdsjlksfldjfjdflkjlkjdslkfdsjlksfldjfjdflkjlkjdslkfdsjlksfldjfjdflkjlkj</div>
-                                                <p className='fs-14 mb-0'>;'sdf;';lklkv;lkv;'vc;v;cx'lv</p>
-                                            </div>
-
-                                            
-                                            <div>
-                                                <FaTrash className='text-primary' onClick={() => deleteNotification(1)} />
-                                            </div>
-                                        </div> */}
-                                    
                                
                             </Dropdown.Menu>
                         </Dropdown>

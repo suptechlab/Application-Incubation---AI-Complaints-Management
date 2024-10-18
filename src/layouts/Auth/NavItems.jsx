@@ -36,6 +36,18 @@ export const NavItems = [
       
     ],
   },
+  {
+    id: 3,
+    menuIcon: SvgIcons.allpatients,
+    moduleName: ["States", "Appointment"],
+    menuName: "Role & Rights",
+    title: "Role & Rights",
+    path: "/role-rights",
+    menuIcon: SvgIcons.userManagementIcon,
+    //moduleName: "Non Domestic Consumer",
+    disabled: false,
+    roleName: "RoleRights"
+  }
   
   
   
