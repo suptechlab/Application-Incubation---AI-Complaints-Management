@@ -7,13 +7,13 @@ import { Button } from "react-bootstrap";
 import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
-import { useNavigate } from "react-router-dom";
+import ReactSelect from '../../../components/ReactSelect';
 
 
-const ClaimTypeEdit = ({ modal, toggle }) => {
+const Edit = ({ modal, toggle }) => {
     const handleSubmit = async (values) => {
         console.log("values::", values);
-        toast.success("Claim type added successfully.")
+        toast.success("Inquiry sub type added successfully.")
 
         // handleAddDistrict(values).then(response => {
         //     console.log("Add District::", response);
@@ -30,14 +30,13 @@ const ClaimTypeEdit = ({ modal, toggle }) => {
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Claim Type Edit</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Edit Sub Inquiry Type</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
-                        claimTypeName: "",
+                        inquirySubCategory: "",
                         description: ""
                     }}
-                    validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
                         actions.setSubmitting(false);
                         handleSubmit(values, actions);
@@ -55,17 +54,35 @@ const ClaimTypeEdit = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimTypeName}
-                                id="claimTypeName"
-                                key={"claimTypeName"}
-                                label="Name of Claim Type"
-                                name="claimTypeName"
+                                error={errors.inquirySubCategory}
+                                id="inquirySubCategory"
+                                key={"inquirySubCategory"}
+                                label="Name of Inquiry Sub Type"
+                                name="inquirySubCategory"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.claimTypeName}
+                                touched={touched.inquirySubCategory}
                                 type="text"
-                                value={values.claimTypeName || ""}
+                                value={values.inquirySubCategory || ""}
+                            />
+                             <ReactSelect
+                                error={errors?.inquiryType}
+                                options={[{
+                                    value: 1,
+                                    label: 'Corporate Governance'
+                                },
+                                {
+                                    value: 2,
+                                    label: 'Non-Profit Organizations'
+                                }]}
+                                value={values?.inquiryType}
+                                onChange={(option) => { setFieldValue('inquiryType', option?.target?.value ?? '') }}
+                                name="inquiryType"
+                                label="Inquiry Type"
+                                className={`${touched?.inquiryType && errors?.inquiryType ? "is-invalid" : ""} mb-3`}
+                                onBlur={handleBlur}
+                                touched={touched?.inquiryType}
                             />
                             <FormInput
                                 error={errors.description}
@@ -98,4 +115,4 @@ const ClaimTypeEdit = ({ modal, toggle }) => {
     );
 };
 
-export default ClaimTypeEdit;
+export default Edit;

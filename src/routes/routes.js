@@ -13,7 +13,6 @@ import Otp from "../pages/authentication/Otp";
 import RoleRightsList from "../pages/role-rights";
 import ClaimType from "../pages/master management/claimtype";
 import ClaimSubtype from "../pages/master management/claimSubType";
-import ComplaintCategory from "../pages/master management/complaintCategory";
 import InquiryType from "../pages/master management/inquiryType";
 import InquirySubtype from "../pages/master management/inquirySubtype";
 import ProvinceMaster from "../pages/master management/provinceMaster";
@@ -67,12 +66,6 @@ const routes = [
     {
         path: "/claim-subtype",
         element: <ClaimSubtype />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/complaint-category",
-        element: <ComplaintCategory />,
         isPrivate: true,
         layoutType: "Auth",
     },

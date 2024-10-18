@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 
 
-const ClaimTypeAdd = ({ modal, toggle }) => {
+const Add = ({ modal, toggle }) => {
     const navigate = useNavigate();
     const handleSubmit = async (values) => {
         console.log("values::", values);
@@ -99,4 +99,4 @@ const ClaimTypeAdd = ({ modal, toggle }) => {
     );
 };
 
-export default ClaimTypeAdd;
+export default Add;

@@ -43,14 +43,6 @@ export const NavItems = [
       },
       {
         id: 3,
-        menuName: "Complaint Category",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/complaint-category",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 4,
         menuName: "Inquiry Type",
         // menuIcon: SvgIcons.allpatients,
         path: "/inquiry-type",
@@ -58,7 +50,7 @@ export const NavItems = [
         roleName: "admin"
       },
       {
-        id: 5,
+        id: 4,
         menuName: "Inquiry Sub type",
         // menuIcon: SvgIcons.allpatients,
         path: "/inquiry-subtype",
@@ -66,7 +58,7 @@ export const NavItems = [
         roleName: "admin"
       },
       {
-        id: 6,
+        id: 5,
         menuName: "Province Master",
         // menuIcon: SvgIcons.allpatients,
         path: "/province-master",
@@ -74,7 +66,7 @@ export const NavItems = [
         roleName: "admin"
       },
       {
-        id: 7,
+        id: 6,
         menuName: "City Master",
         // menuIcon: SvgIcons.allpatients,
         path: "/city-master",
@@ -82,14 +74,13 @@ export const NavItems = [
         roleName: "admin"
       },
       {
-        id: 8,
+        id: 7,
         menuName: "Template Master",
         // menuIcon: SvgIcons.allpatients,
         path: "/template-master",
         moduleName: ["Master management"],
         roleName: "admin"
       }
-      
     ],
   },
 ]

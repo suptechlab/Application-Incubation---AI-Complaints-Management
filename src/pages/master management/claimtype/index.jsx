@@ -12,8 +12,8 @@ import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodu
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
-import ClaimTypeAdd from "./ClaimTypeAdd";
-import ClaimTypeEdit from "./ClaimTypeEdit";
+import Add from "./Add";
+import Edit from "./Edit";
 const ClaimType = () => {
 
   const location = useLocation();
@@ -63,11 +63,9 @@ const ClaimType = () => {
     })
 
   }, []);
-
-  const editDistricts = async (id) => {
+  const editClaimType = async (id) => {
     setEditModal({id : id , open : !editModal?.open })
   };
-
   const deleteDistrict = async (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -95,7 +93,6 @@ const ClaimType = () => {
       }
     })
   };
-
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
@@ -151,7 +148,6 @@ const ClaimType = () => {
       toast.error("Error updating state status");
     }
   };
-
   useEffect(() => {
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
@@ -172,7 +168,7 @@ const ClaimType = () => {
       {
         accessorFn: (row) => row.claimDescription != null ? row.claimDescription : '-',
         id: "claimDescription",
-        header: () => "Claim Description",
+        header: () => "Description",
         enableSorting: false,
       },
       {
@@ -203,8 +199,7 @@ const ClaimType = () => {
               {permission.current.editModule ?
                 <div
                   onClick={() => {
-                    console.log("Info::", info.row.original.id);
-                    editDistricts(info.row.original.id);
+                    editClaimType(info?.row?.original?.id);
                   }}
                 >
                   <span className=''>{SvgIcons.editIcon}</span>
@@ -242,8 +237,8 @@ const ClaimType = () => {
         />
       </Card>
     </div>
-    <ClaimTypeAdd modal={modal} toggle={toggle} />
-    <ClaimTypeEdit modal={editModal?.open} toggle={editToggle} />
+    <Add modal={modal} toggle={toggle} />
+    <Edit modal={editModal?.open} toggle={editToggle} />
   </div>
 };
 
