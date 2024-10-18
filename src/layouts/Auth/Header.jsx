@@ -77,7 +77,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 </Button>
                 <Link to="/dashboard" className="me-3">
                     <Image
-                        className="img-fluid"
+                        // className="img-fluid"
                         src={Logo}
                         alt={`Logo`}
                     />
