@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import ClaimTypeAdd from "./ClaimTypeAdd";
+import ClaimTypeEdit from "./ClaimTypeEdit";
 const ClaimType = () => {
 
   const location = useLocation();
@@ -20,16 +21,19 @@ const ClaimType = () => {
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
+  const [editModal , setEditModal] = useState({id :'' , open : false})
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
   });
 
   const toggle = () => setModal(!modal);
+
+  const editToggle = () => setEditModal({id : '' , open : !editModal?.open});
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
@@ -61,7 +65,7 @@ const ClaimType = () => {
   }, []);
 
   const editDistricts = async (id) => {
-    navigate(`/districts/edit/${id}`);
+    setEditModal({id : id , open : !editModal?.open })
   };
 
   const deleteDistrict = async (id) => {
@@ -92,6 +96,7 @@ const ClaimType = () => {
     })
   };
 
+
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: () => {
@@ -102,13 +107,13 @@ const ClaimType = () => {
       return [
         {
           id: 1,
-          claimType: 'claim Type 1',
-          claimDescription: 'claim description for claim type 1',
+          claimType: 'Credit Portfolio',
+          claimDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
         },
         {
           id: 2,
-          claimType: 'claim Type 2',
-          claimDescription: 'claim description for claim type 2',
+          claimType: 'Assets Acquired Through Payment',
+          claimDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
         },
       ];
     },
@@ -238,8 +243,8 @@ const ClaimType = () => {
       </Card>
     </div>
     <ClaimTypeAdd modal={modal} toggle={toggle} />
+    <ClaimTypeEdit modal={editModal?.open} toggle={editToggle} />
   </div>
-
 };
 
 export default ClaimType;

@@ -10,8 +10,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 
 
-const ClaimTypeAdd = ({ modal, toggle }) => {
-    const navigate = useNavigate();
+const ClaimTypeEdit = ({ modal, toggle }) => {
     const handleSubmit = async (values) => {
         console.log("values::", values);
         toast.success("Claim type added successfully.")
@@ -31,7 +30,7 @@ const ClaimTypeAdd = ({ modal, toggle }) => {
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Create Claim Type</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Claim Type Edit</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
@@ -99,4 +98,4 @@ const ClaimTypeAdd = ({ modal, toggle }) => {
     );
 };
 
-export default ClaimTypeAdd;
+export default ClaimTypeEdit;

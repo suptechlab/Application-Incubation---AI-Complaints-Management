@@ -13,7 +13,7 @@ const PageHeader = ({title, toggle }) => {
                     {title}
                 </h1>
                 <Button
-                    color="primary"
+                    variant="warning"
                     className="fw-semibold fs-14"
                     onClick={toggle}
                 >

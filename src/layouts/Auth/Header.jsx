@@ -77,11 +77,11 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 </Button>
                 <Link to="/dashboard" className="me-3">
                     <Image
-                        className="img-fluid"
+                        // className="img-fluid"
                         src={Logo}
                         alt={`Logo`}
-                        width={42}
-                        height={40}
+                        width={220}
+                        height={'auto'}
                     />
                 </Link>
                 <Nav className="ms-auto align-items-center order-md-last ">
