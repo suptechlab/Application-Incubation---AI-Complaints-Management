@@ -63,8 +63,6 @@ export default function ResetPassword() {
                                         className="img-fluid"
                                         src={Logo}
                                         alt={`Logo`}
-                                        width={67}
-                                        height={64}
                                     />
                                 </Link>
                                 
