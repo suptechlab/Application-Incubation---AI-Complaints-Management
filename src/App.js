@@ -9,7 +9,7 @@ function App() {
 
   const { i18n } = useTranslation()
 
-  const currentLanguage = i18n?.language ?? getLocalStorage('langKey') ?? 'en'
+  // const currentLanguage = i18n?.language ?? getLocalStorage('langKey') ?? 'en'
 
   const { isLoading } = useContext(AuthenticationContext);
 

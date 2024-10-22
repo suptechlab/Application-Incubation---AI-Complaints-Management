@@ -26,11 +26,11 @@ export default function Login() {
         if (values.rememberMe) {
             localStorage.setItem("email", values.email);
             localStorage.setItem("password", values.password);
-            localStorage.setItem("langKey", 'en');
+            localStorage.setItem("langKey", "en");
         } else {
             localStorage.removeItem("email");
             localStorage.removeItem("password");
-            localStorage.removeItem("langKey", 'en');
+            localStorage.removeItem("langKey","en");
         }
 
         delete values.rememberMe;
