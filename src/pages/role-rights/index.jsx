@@ -140,7 +140,7 @@ export default function RoleRightsList() {
                         {/* <pre>{JSON.stringify(dataQuery.data.data,null,2)}</pre> */}
                         <RoleRightsTable
                             columns={columns}
-                            dataQuery={dataQuery.data.data}
+                            dataQuery={dataQuery?.data?.data}
                             pagination={pagination}
                             setPagination={setPagination}
                             sorting={sorting}

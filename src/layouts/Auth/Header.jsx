@@ -120,7 +120,6 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                             <Image className="object-fit-cover rounded-circle" src={imageUrl != null ? imageUrl : "https://dummyimage.com/40"} width={40} height={40} />
                             <span className="align-middle text-start d-none d-md-inline-block ms-1 px-2 text-truncate custom-max-width-150">
                                 <span className='w-100 user-name'>{firstName}</span>
-                                <span className='compnany-name'>{companyTitle}</span>
                             </span>
                             <FaCaretDown size={16} />
                         </Dropdown.Toggle>
