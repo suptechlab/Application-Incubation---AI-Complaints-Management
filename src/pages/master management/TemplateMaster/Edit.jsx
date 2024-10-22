@@ -3,15 +3,17 @@ import React from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
 import { Button } from "react-bootstrap";
-import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
-import { validationSchema } from '../../../validations/inquiryType.validation';
+import { useNavigate } from "react-router-dom";
+import { validationSchema } from '../../../validations/templateMaster.validation';
+
 
 const Edit = ({ modal, toggle }) => {
+    const navigate = useNavigate();
     const handleSubmit = async (values) => {
         console.log("values::", values);
-        toast.success("Inquiry type updated successfully.")
+        toast.success("Template master updated successfully.")
 
         // handleAddDistrict(values).then(response => {
         //     console.log("Add District::", response);
@@ -28,12 +30,11 @@ const Edit = ({ modal, toggle }) => {
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Edit Inquiry Type</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Edit Template Master</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
-                        inquiryName: "",
-                        description: ""
+                        templateName: ""
                     }}
                     onSubmit={(values, actions) => {
                         actions.setSubmitting(false);
@@ -53,32 +54,17 @@ const Edit = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimTypeName}
-                                id="inquiryName"
-                                key={"inquiryName"}
-                                label="Name of Inquiry"
-                                name="inquiryName"
+                                error={errors.templateName}
+                                id="templateName"
+                                key={"templateName"}
+                                label="Name of Template Master"
+                                name="templateName"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.inquiryName}
+                                touched={touched.templateName}
                                 type="text"
-                                value={values.inquiryName || ""}
-                            />
-                            <FormInput
-                                error={errors.description}
-                                isTextarea={true}
-                                id="description"
-                                key={"description"}
-                                label="Description"
-                                name="description"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                // placeholder="Enter district name"
-                                touched={touched?.description}
-                                rows={4}
-                                type="text"
-                                value={values?.description || ""}
+                                value={values.templateName || ""}
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>

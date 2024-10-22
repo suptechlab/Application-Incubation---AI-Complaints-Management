@@ -4,14 +4,10 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
 import { validationSchema } from '../../../validations/claimType.validation'; // CLAIM TYPE VALIDATION SCHEMA
 import { Button } from "react-bootstrap";
-import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
-import { useNavigate } from "react-router-dom";
-
 
 const Add = ({ modal, toggle }) => {
-    const navigate = useNavigate();
     const handleSubmit = async (values) => {
         console.log("values::", values);
         toast.success("Claim type added successfully.")
