@@ -2,6 +2,11 @@ import React from 'react'
 
 export default function NotFoundPage() {
     return (
-        <div>NotFoundPage</div>
+        <center>
+            <h4>
+                <br></br>
+            <div>Page Not Found</div>
+            </h4>
+        </center>
     )
 }

@@ -130,15 +130,17 @@ export default function RoleRightsList() {
     }, [filter]);
 
     return (
+
         <React.Fragment>
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
                 <Header toggle={toggle} />
                 <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
                     <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
                         <SearchForm filter={filter} setFilter={setFilter} />
+                        {/* <pre>{JSON.stringify(dataQuery.data.data,null,2)}</pre> */}
                         <RoleRightsTable
                             columns={columns}
-                            dataQuery={dataQuery}
+                            dataQuery={dataQuery.data.data}
                             pagination={pagination}
                             setPagination={setPagination}
                             sorting={sorting}
