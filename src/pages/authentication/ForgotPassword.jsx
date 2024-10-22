@@ -64,8 +64,6 @@ export default function ForgotPassword() {
                                         className="img-fluid"
                                         src={Logo}
                                         alt={`Logo`}
-                                        width={60}
-                                        height={60}
                                     />
                                 </Link>
                                 

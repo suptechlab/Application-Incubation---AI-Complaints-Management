@@ -14,7 +14,7 @@ export const NavItems = [
     menuIcon: SvgIcons.dashboardIcon,
     path: "/",
     disabled: false,
-    roleName: "admin"
+    roleName: "Dashboard"
   },
   {
     id: 2,
@@ -27,7 +27,7 @@ export const NavItems = [
     subMenu: [
       {
         id: 1,
-        menuName: "Claim Type",
+        menuName: "State Master ",
         // menuIcon: SvgIcons.allpatients,
         path: "/claim-type",
         moduleName: ["Master Management"],
@@ -83,4 +83,20 @@ export const NavItems = [
       }
     ],
   },
+  {
+    id: 3,
+    menuIcon: SvgIcons.allpatients,
+    moduleName: ["States", "Appointment"],
+    menuName: "Role & Rights",
+    title: "Role & Rights",
+    path: "/role-rights",
+    menuIcon: SvgIcons.userManagementIcon,
+    //moduleName: "Non Domestic Consumer",
+    disabled: false,
+    roleName: "RoleRights"
+  }
+  
+  
+  
+
 ]
