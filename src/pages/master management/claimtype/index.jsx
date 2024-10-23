@@ -6,7 +6,7 @@ import qs from "qs";
 import ListingSearchForm from "../../../components/ListingSearchForm";
 import CommonDataTable from "../../../components/CommonDataTable";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import SvgIcons from "../../../components/SVGIcons"
 import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Swal from "sweetalert2";
@@ -14,11 +14,13 @@ import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
+import { useTranslation } from "react-i18next";
 const ClaimType = () => {
 
   const location = useLocation();
-  const navigate = useNavigate();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+
+  const {t} = useTranslation()
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
@@ -163,12 +165,12 @@ const ClaimType = () => {
       {
         accessorFn: (row) => row.claimType,
         id: "claimType",
-        header: () => "Claim Type",
+        header: () => t("CLAIM TYPE"),
       },
       {
         accessorFn: (row) => row.claimDescription != null ? row.claimDescription : '-',
         id: "claimDescription",
-        header: () => "Description",
+        header: () => t("DESCRIPTION"),
         enableSorting: false,
       },
       {
@@ -188,7 +190,7 @@ const ClaimType = () => {
           )
         },
         id: "status",
-        header: () => "Status",
+        header: () => t("STATUS"),
       },
       {
         id: "actions",
@@ -207,7 +209,7 @@ const ClaimType = () => {
             </div>
           );
         },
-        header: () => <div className="d-flex justify-content-center">Actions</div>,
+        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
       },
     ],
@@ -223,7 +225,7 @@ const ClaimType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={"Claim Type"} toggle={toggle} />
+    <PageHeader title={t("CLAIM TYPE")} toggle={toggle} />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

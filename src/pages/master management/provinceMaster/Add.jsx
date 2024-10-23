@@ -7,9 +7,12 @@ import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
 import { validationSchema } from '../../../validations/provinceMaster.validation';
+import { useTranslation } from 'react-i18next';
 
 
 const Add = ({ modal, toggle }) => {
+
+    const {t}  = useTranslation()
     const handleSubmit = async (values) => {
         console.log("values::", values);
         toast.success("Province master added successfully.")
@@ -29,7 +32,7 @@ const Add = ({ modal, toggle }) => {
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Create Province Master</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("CREATE PROVINCE MASTER")}</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
@@ -57,7 +60,7 @@ const Add = ({ modal, toggle }) => {
                                 error={errors?.provinceName}
                                 id="provinceName"
                                 key={"provinceName"}
-                                label="Name of Province"
+                                label={t("NAME OF PROVINCE")}
                                 name="provinceName"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -68,10 +71,10 @@ const Add = ({ modal, toggle }) => {
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    Cancel
+                                    {t("CANCEL")}
                                 </Button>{' '}
                                 <Button type="submit" onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
-                                    Submit
+                                    {t("SUBMIT")}
                                 </Button>
                             </ModalFooter>
                         </Form>

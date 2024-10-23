@@ -12,10 +12,13 @@ import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import Edit from "./Edit";
 import Add from "./Add";
+import { useTranslation } from "react-i18next";
 
 
 
 const TemplateMaster = () => {
+
+  const {t} = useTranslation()
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -134,7 +137,7 @@ const TemplateMaster = () => {
       {
         accessorFn: (row) => row.templateMaster,
         id: "templateMaster",
-        header: () => "Template Master",
+        header: () => t("TEMPLATE MASTER"),
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -152,7 +155,7 @@ const TemplateMaster = () => {
           )
         },
         id: "status",
-        header: () => "Status",
+        header: () => {t("STATUS")},
       },
       {
         id: "actions",
@@ -171,7 +174,7 @@ const TemplateMaster = () => {
             </div>
           );
         },
-        header: () => <div className="d-flex justify-content-center">Actions</div>,
+        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
       },
     ],
@@ -187,7 +190,7 @@ const TemplateMaster = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={"Template Master"} toggle={toggle} />
+    <PageHeader title={t("TEMPLATE MASTER")} toggle={toggle} />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

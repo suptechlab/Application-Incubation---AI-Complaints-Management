@@ -9,30 +9,38 @@ import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import ReactSelect from "../../../components/ReactSelect";
 import { validationSchema } from "../../../validations/claimSubType.validation";
+import { useTranslation } from "react-i18next";
+import { editClaimSubType } from "../../../services/claimSubType.service";
 
 
 const Edit = ({ modal, toggle }) => {
-    const navigate = useNavigate();
-    const handleSubmit = async (values) => {
-        console.log("values::", values);
-        toast.success("Claim sub type updated successfully.")
+    const {t} = useTranslation()
+    const handleSubmit = async (values, actions) => {
+        const formData = {
+            name: "",
+            claimType: "",
+            SLABreachDay: "",
+            description: "",
+        }
 
-        // handleAddDistrict(values).then(response => {
-        //     console.log("Add District::", response);
-        //     toast.success(response.data.message);
-        //     navigate("/districts");
-        // }).catch((error) => {
-        //     if(error.response.data.fieldErrors){
-        //         toast.error(error.response.data.fieldErrors[0].message);
-        //     }else{
-        //         toast.error(error.response.data.detail);
-        //     }
-        // });
+        editClaimSubType(formData).then(response => {
+            toast.success(response?.data?.message);
+            toggle()
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message);
+            }
+        }).finally(() => {
+            actions.setSubmitting(false);
+        });
     };
+
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Edit Claim Sub Type</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("EDIT CLAIM SUB TYPE")}</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
@@ -43,7 +51,7 @@ const Edit = ({ modal, toggle }) => {
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
-                        actions.setSubmitting(false);
+                        actions.setSubmitting(true);
                         handleSubmit(values, actions);
                     }}
                 >
@@ -62,7 +70,7 @@ const Edit = ({ modal, toggle }) => {
                                 error={errors.claimSubTypeName}
                                 id="claimSubTypeName"
                                 key={"claimSubTypeName"}
-                                label="Name of Claim Type"
+                                label={t("NAME OF CLAIM SUB TYPE")}
                                 name="claimSubTypeName"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -93,7 +101,7 @@ const Edit = ({ modal, toggle }) => {
                                 error={errors.SLABreachDay}
                                 id="SLABreachDay"
                                 key={"SLABreachDay"}
-                                label="SLA Breach Days"
+                                label={t("SLA BREACH DAY")}
                                 name="SLABreachDay"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -106,7 +114,7 @@ const Edit = ({ modal, toggle }) => {
                                 error={errors?.description}
                                 id="description"
                                 key={"description"}
-                                label="Description"
+                                label={t("DESCRIPTION")}
                                 name="description"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -119,10 +127,10 @@ const Edit = ({ modal, toggle }) => {
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    Cancel
+                                    {t("CANCEL")}
                                 </Button>
-                                <Button type="submit" className="fs-14 fw-semibold" variant="warning" onClick={handleSubmit}>
-                                    Submit
+                                <Button type="submit" disabled={isSubmitting ?? false} className="fs-14 fw-semibold" variant="warning" onClick={handleSubmit}>
+                                    {t("SUBMIT")}
                                 </Button>
                             </ModalFooter>
                         </Form>

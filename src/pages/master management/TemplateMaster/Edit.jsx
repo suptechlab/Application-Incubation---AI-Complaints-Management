@@ -7,9 +7,11 @@ import { Button } from "react-bootstrap";
 import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { validationSchema } from '../../../validations/templateMaster.validation';
+import { useTranslation } from 'react-i18next';
 
 
 const Edit = ({ modal, toggle }) => {
+    const {t} = useTranslation()
     const navigate = useNavigate();
     const handleSubmit = async (values) => {
         console.log("values::", values);
@@ -30,7 +32,7 @@ const Edit = ({ modal, toggle }) => {
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Edit Template Master</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("EDIT TEMPLATE MASTER")}</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
@@ -57,7 +59,7 @@ const Edit = ({ modal, toggle }) => {
                                 error={errors.templateName}
                                 id="templateName"
                                 key={"templateName"}
-                                label="Name of Template Master"
+                                label={t("NAME OF TEMPLATE MASTER")}
                                 name="templateName"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -68,10 +70,10 @@ const Edit = ({ modal, toggle }) => {
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    Cancel
+                                    {t("CANCEL")}
                                 </Button>{' '}
                                 <Button type="submit" onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
-                                    Submit
+                                    {t("SUBMIT")}
                                 </Button>
                             </ModalFooter>
                         </Form>

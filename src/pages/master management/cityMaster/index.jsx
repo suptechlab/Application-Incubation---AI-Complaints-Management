@@ -12,9 +12,12 @@ import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
+import { useTranslation } from "react-i18next";
 
 
 const CityMaster = () => {
+
+  const {t} = useTranslation()
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -133,7 +136,7 @@ const CityMaster = () => {
       {
         accessorFn: (row) => row.cityMaster,
         id: "cityMaster",
-        header: () => "City Master",
+        header: () => t("CITY MASTER"),
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -151,7 +154,7 @@ const CityMaster = () => {
           )
         },
         id: "status",
-        header: () => "Status",
+        header: () => t("STATUS"),
       },
       {
         id: "actions",
@@ -170,7 +173,7 @@ const CityMaster = () => {
             </div>
           );
         },
-        header: () => <div className="d-flex justify-content-center">Actions</div>,
+        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
       },
     ],
@@ -186,7 +189,7 @@ const CityMaster = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={"City Master"} toggle={toggle} />
+    <PageHeader title={t("CITY MASTER")} toggle={toggle} />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

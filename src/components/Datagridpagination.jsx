@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useTranslation } from "react-i18next"
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa"
 import ReactPaginate from "react-paginate"
 
@@ -25,9 +26,11 @@ const DataGridPagination = ({
     //console.log("pagenum", page)
     setCurrentPage(page.selected + 1)
   }
+
+  const {t} = useTranslation()
   return (
     <div className="align-items-center d-flex flex-column flex-md-row justify-content-end mb-2 mt-3">
-      <span className="fs-14  pageShowText mb-md-0 me-4">Rows per page: 
+      <span className="fs-14  pageShowText mb-md-0 me-4">{t("ROWS PER PAGE")}: 
         <select className="border-0 ms-2" onChange={(event) => {
           setLimit(event.target.value)
         }}>

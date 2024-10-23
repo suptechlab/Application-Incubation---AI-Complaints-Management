@@ -2,9 +2,11 @@ import React from 'react';
 import { Col, Row, Stack } from 'react-bootstrap';
 import FormInput from "../components/FormInput";
 import ReactSelect from './ReactSelect';
+import { useTranslation } from 'react-i18next';
 
 
 const ListingSearchForm = ({ filter, setFilter }) => {
+  const {t} = useTranslation()
   return (
     <div className="theme-card-header px-1 header-search">
       <Stack
@@ -20,7 +22,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
                   key={"search"}
                   //label="Search"
                   name="search"
-                  placeholder="Search"
+                  placeholder={t("SEARCH")}
                   type="text"
                   onChange={(event) => {
                     if (event.target.value === "") {
@@ -49,21 +51,21 @@ const ListingSearchForm = ({ filter, setFilter }) => {
                   <ReactSelect
                     label={""}
                     class="form-select "
-                    placeholder="All Status"
+                    placeholder={t("ALL STATUS")}
                     id="floatingSelect"
                     //aria-label="Floating label select example"
                     options={[
                       {
-                        label: "All Status",
+                        label: t("ALL STATUS"),
                         value: "",
                         class: "label-class"
                       },
                       {
-                        label: "Active",
+                        label: t("ACTIVE"),
                         value: true,
                       },
                       {
-                        label: "Inactive",
+                        label: t("INACTIVE"),
                         value: false,
                       },
                     ]}
@@ -77,12 +79,9 @@ const ListingSearchForm = ({ filter, setFilter }) => {
                     }}
                     value={filter.status}
                   />
-
-
                 </div>
               </div>
             </Col>
-
           </Row>
         </div>
       </Stack>

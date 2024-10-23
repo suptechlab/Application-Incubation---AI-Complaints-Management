@@ -8,43 +8,51 @@ import Toggle from '../../../components/Toggle';
 import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { validationSchema } from '../../../validations/inquiryType.validation';
+import { useTranslation } from 'react-i18next';
+import { createNewInquiryType } from '../../../services/inquiryType.service';
 
 
 const Add = ({ modal, toggle }) => {
-    const navigate = useNavigate();
-    const handleSubmit = async (values) => {
-        console.log("values::", values);
-        toast.success("Inquiry type added successfully.")
 
-        // handleAddDistrict(values).then(response => {
-        //     console.log("Add District::", response);
-        //     toast.success(response.data.message);
-        //     navigate("/districts");
-        // }).catch((error) => {
-        //     if(error.response.data.fieldErrors){
-        //         toast.error(error.response.data.fieldErrors[0].message);
-        //     }else{
-        //         toast.error(error.response.data.detail);
-        //     }
-        // });
+    const {t} = useTranslation()
+    
+    const handleSubmit = async (values,actions) => {
+        const formData = {
+            name : values?.name,
+            description : values?.description
+        }
+
+        createNewInquiryType(formData).then(response => {
+            toast.success(response?.data?.message);
+            toggle()
+        }).catch((error) => {
+            if(error?.response?.data?.errorDescription){
+                toast.error(error?.response?.data?.errorDescription);
+            }else{
+                toast.error(error?.message);
+            }
+        }).finally(()=>{
+            actions.setSubmitting(false);
+        });
     };
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Create Inquiry Type</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("CREATE INQUIRY TYPE")}</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
-                        inquiryName: "",
+                        name: "",
                         description: ""
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
-                        actions.setSubmitting(false);
+                        actions.setSubmitting(true);
                         handleSubmit(values, actions);
                     }}
                 >
                     {({
+                        isSubmitting,
                         handleChange,
                         handleBlur,
                         values,
@@ -57,23 +65,23 @@ const Add = ({ modal, toggle }) => {
                         <Form>
                             <FormInput
                                 error={errors?.inquiryName}
-                                id="inquiryName"
-                                key={"inquiryName"}
-                                label="Name of Inquiry"
-                                name="inquiryName"
+                                id="name"
+                                key={"name"}
+                                label={t("NAME OF INQUIRY")}
+                                name="name"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched?.inquiryName}
+                                touched={touched?.name}
                                 type="text"
-                                value={values?.inquiryName}
+                                value={values?.name}
                             />
                             <FormInput
                                 error={errors?.description}
                                 isTextarea={true}
                                 id="description"
                                 key={"description"}
-                                label="Description"
+                                label={t("DESCRIPTION")}
                                 name="description"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -85,10 +93,10 @@ const Add = ({ modal, toggle }) => {
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    Cancel
+                                    {t("CANCEL")}
                                 </Button>
-                                <Button type="submit" onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
-                                    Submit
+                                <Button type="submit" disabled={isSubmitting ?? false} onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
+                                    {t("SUBMIT")}
                                 </Button>
                             </ModalFooter>
                         </Form>

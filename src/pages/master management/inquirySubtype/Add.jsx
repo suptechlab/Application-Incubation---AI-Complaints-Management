@@ -8,9 +8,12 @@ import Toggle from '../../../components/Toggle';
 import toast from 'react-hot-toast';
 import ReactSelect from '../../../components/ReactSelect';
 import { validationSchema } from '../../../validations/inquirySubType.validation';
+import { useTranslation } from 'react-i18next';
 
 
 const Add = ({ modal, toggle }) => {
+
+    const {t} = useTranslation()
     const handleSubmit = async (values) => {
         console.log("values::", values);
         toast.success("Inquiry sub type added successfully.")
@@ -30,7 +33,7 @@ const Add = ({ modal, toggle }) => {
 
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>Create Sub Inquiry Type</ModalHeader>
+            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("CREATE SUB INQUIRY TYPE")}</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
@@ -59,7 +62,7 @@ const Add = ({ modal, toggle }) => {
                                 error={errors.inquirySubCategory}
                                 id="inquirySubCategory"
                                 key={"inquirySubCategory"}
-                                label="Name of Inquiry Sub Type"
+                                label={t("NAME OF INQUIRY SUB TYPE")}
                                 name="inquirySubCategory"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -81,7 +84,7 @@ const Add = ({ modal, toggle }) => {
                                 value={values?.inquiryType}
                                 onChange={(option) => { setFieldValue('inquiryType', option?.target?.value ?? '') }}
                                 name="inquiryType"
-                                label="Inquiry Type"
+                                label={t("INQUIRY TYPE")}
                                 className={`${touched?.inquiryType && errors?.inquiryType ? "is-invalid" : ""} mb-3`}
                                 onBlur={handleBlur}
                                 touched={touched?.inquiryType}
@@ -91,7 +94,7 @@ const Add = ({ modal, toggle }) => {
                                 isTextarea={true}
                                 id="description"
                                 key={"description"}
-                                label="Description"
+                                label={t("DESCRIPTION")}
                                 name="description"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -103,10 +106,10 @@ const Add = ({ modal, toggle }) => {
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    Cancel
-                                </Button>{' '}
+                                    {t("CANCEL")}
+                                </Button>
                                 <Button type="submit" onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
-                                    Submit
+                                    {t("SUBMIT")}
                                 </Button>
                             </ModalFooter>
                         </Form>
@@ -116,5 +119,4 @@ const Add = ({ modal, toggle }) => {
         </Modal>
     );
 };
-
 export default Add;

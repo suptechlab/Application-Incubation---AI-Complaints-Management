@@ -6,28 +6,35 @@ import { Button } from "react-bootstrap";
 import Toggle from '../../../components/Toggle';
 import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
-import { useNavigate } from "react-router-dom";
 import ReactSelect from "../../../components/ReactSelect";
 import { validationSchema } from "../../../validations/claimSubType.validation";
+import { useTranslation } from "react-i18next";
+import { createNewClaimSubType } from "../../../services/claimSubType.service";
 
 
 const Add = ({ modal, toggle }) => {
-    const navigate = useNavigate();
-    const handleSubmit = async (values) => {
-        console.log("values::", values);
-        toast.success("Claim sub type added successfully.")
 
-        // handleAddDistrict(values).then(response => {
-        //     console.log("Add District::", response);
-        //     toast.success(response.data.message);
-        //     navigate("/districts");
-        // }).catch((error) => {
-        //     if(error.response.data.fieldErrors){
-        //         toast.error(error.response.data.fieldErrors[0].message);
-        //     }else{
-        //         toast.error(error.response.data.detail);
-        //     }
-        // });
+    const { t } = useTranslation()
+    const handleSubmit = async (values, actions) => {
+        const formData = {
+            name: "",
+            claimType: "",
+            SLABreachDay: "",
+            description: "",
+        }
+
+        createNewClaimSubType(formData).then(response => {
+            toast.success(response?.data?.message);
+            toggle()
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message);
+            }
+        }).finally(() => {
+            actions.setSubmitting(false);
+        });
     };
 
     return (
@@ -36,14 +43,14 @@ const Add = ({ modal, toggle }) => {
             <ModalBody >
                 <Formik
                     initialValues={{
-                        claimSubTypeName: "",
+                        name: "",
                         claimType: "",
                         SLABreachDay: "",
                         description: "",
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
-                        actions.setSubmitting(false);
+                        actions.setSubmitting(true);
                         handleSubmit(values, actions);
                     }}
                 >
@@ -62,7 +69,7 @@ const Add = ({ modal, toggle }) => {
                                 error={errors.claimSubTypeName}
                                 id="claimSubTypeName"
                                 key={"claimSubTypeName"}
-                                label="Name of Claim Type"
+                                label={t("NAME OF CLAIM SUB TYPE")}
                                 name="claimSubTypeName"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -93,7 +100,7 @@ const Add = ({ modal, toggle }) => {
                                 error={errors.SLABreachDay}
                                 id="SLABreachDay"
                                 key={"SLABreachDay"}
-                                label="SLA Breach Days"
+                                label={t("SLA BREACH DAY")}
                                 name="SLABreachDay"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -106,7 +113,7 @@ const Add = ({ modal, toggle }) => {
                                 error={errors?.description}
                                 id="description"
                                 key={"description"}
-                                label="Description"
+                                label={t("DESCRIPTION")}
                                 name="description"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -118,11 +125,11 @@ const Add = ({ modal, toggle }) => {
                                 value={values.description || ""}
                             />
                             <ModalFooter className='border-0'>
-                                <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    Cancel
+                                <Button disabled={isSubmitting ?? false} className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
+                                    {t("CANCEL")}
                                 </Button>
                                 <Button type="submit" className="fs-14 fw-semibold" variant="warning" onClick={handleSubmit}>
-                                    Submit
+                                    {t("SUBMIT")}
                                 </Button>
                             </ModalFooter>
                         </Form>

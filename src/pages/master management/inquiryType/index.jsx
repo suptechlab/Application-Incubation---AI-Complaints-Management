@@ -12,10 +12,12 @@ import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
+import { useTranslation } from "react-i18next";
 const InquiryType = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+  const {t} = useTranslation()
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
@@ -133,12 +135,12 @@ const InquiryType = () => {
       {
         accessorFn: (row) => row.inquiryCategory,
         id: "inquiryCategory",
-        header: () => "Inquiry Category",
+        header: () => t("INQUIRY CATEGORY"),
       },
       {
         accessorFn: (row) => row.description != null ? row.description : '-',
         id: "description",
-        header: () => "Description",
+        header: () => t("DESCRIPTION"),
         enableSorting: false,
       },
       {
@@ -157,7 +159,7 @@ const InquiryType = () => {
           )
         },
         id: "status",
-        header: () => "Status",
+        header: () => t("STATUS"),
       },
       {
         id: "actions",
@@ -176,7 +178,7 @@ const InquiryType = () => {
             </div>
           );
         },
-        header: () => <div className="d-flex justify-content-center">Actions</div>,
+        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
       },
     ],
@@ -192,7 +194,7 @@ const InquiryType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={"Inquiry Type"} toggle={toggle} />
+    <PageHeader title={t("INQUIRY TYPE")} toggle={toggle} />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

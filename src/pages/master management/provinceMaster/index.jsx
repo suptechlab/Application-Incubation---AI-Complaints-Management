@@ -12,11 +12,14 @@ import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
+import { useTranslation } from "react-i18next";
 
 const ProvinceMaster = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+
+  const {t} = useTranslation()
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
@@ -132,7 +135,7 @@ const ProvinceMaster = () => {
       {
         accessorFn: (row) => row.provinceMaster,
         id: "provinceMaster",
-        header: () => "Province Master",
+        header: () => t("PROVINCE MASTER"),
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -150,7 +153,7 @@ const ProvinceMaster = () => {
           )
         },
         id: "status",
-        header: () => "Status",
+        header: () => t("STATUS"),
       },
       {
         id: "actions",
@@ -169,7 +172,7 @@ const ProvinceMaster = () => {
             </div>
           );
         },
-        header: () => <div className="d-flex justify-content-center">Actions</div>,
+        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
       },
     ],
@@ -185,7 +188,7 @@ const ProvinceMaster = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={"Province Master"} toggle={toggle} />
+    <PageHeader title={t("PROVINCE MASTER")} toggle={toggle} />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

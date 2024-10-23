@@ -14,9 +14,11 @@ import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
+import { useTranslation } from "react-i18next";
 const ClaimSubType = () => {
 
   const location = useLocation();
+  const {t} = useTranslation()
   const navigate = useNavigate();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
@@ -171,22 +173,22 @@ const ClaimSubType = () => {
       {
         accessorFn: (row) => row.claimSubType,
         id: "claimSubType",
-        header: () => "Claim Sub Type",
+        header: () => t("CLAIM SUB TYPE"),
       },
       {
         accessorFn: (row) => row.claimType,
         id: "claimType",
-        header: () => "Claim Type",
+        header: () => t("CLAIM TYPE"),
       },
       {
         accessorFn: (row) => row.slaBreach,
         id: "slaBreach",
-        header: () => "SLA Breach",
+        header: () => t("SLA BREACH"),
       },
       {
         accessorFn: (row) => row.description != null ? row.description : '-',
         id: "description",
-        header: () => "Description",
+        header: () => t("DESCRIPTION"),
         enableSorting: false,
       },
       {
@@ -206,7 +208,7 @@ const ClaimSubType = () => {
           )
         },
         id: "status",
-        header: () => "Status",
+        header: () => t("STATUS"),
       },
       {
         id: "actions",
@@ -226,7 +228,7 @@ const ClaimSubType = () => {
             </div>
           );
         },
-        header: () => <div className="d-flex justify-content-center">Actions</div>,
+        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
       },
     ],
@@ -242,7 +244,7 @@ const ClaimSubType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={"Claim Sub Type"} toggle={toggle} />
+    <PageHeader title={t("CLAIM SUB TYPE")} toggle={toggle} />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />
