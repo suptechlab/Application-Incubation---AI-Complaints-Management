@@ -2,101 +2,91 @@ import { MdDashboard, MdVisibility } from "react-icons/md"
 
 import SvgIcons from "../../components/SVGIcons"
 import { getLocalStorage } from "../../utils/storage";
+import { useTranslation } from "react-i18next";
 
 const companyTitle = getLocalStorage("companyTitle");
 
-export const NavItems = [
-  {
-    id: 1,
-    menuName: "Dashboard",
-    title: "Dashboard",
-    //menuIcon: <MdDashboard size={14} />,
-    menuIcon: SvgIcons.dashboardIcon,
-    path: "/",
-    disabled: false,
-    roleName: "Dashboard"
-  },
-  {
-    id: 2,
-    menuName: "States",
-    title: "Master Management",
-    menuIcon: SvgIcons.mastermanage,
-    path: '#',
-    moduleName: ["States", "Appointment"],
-    roleName: "Master Management",
-    subMenu: [
-      {
-        id: 1,
-        menuName: "State Master ",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/claim-type",
-        moduleName: ["Master Management"],
-        roleName: "admin"
-      },
-      {
-        id: 2,
-        menuName: "Claim Sub Type",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/claim-subtype",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 3,
-        menuName: "Inquiry Type",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/inquiry-type",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 4,
-        menuName: "Inquiry Sub type",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/inquiry-subtype",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 5,
-        menuName: "Province Master",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/province-master",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 6,
-        menuName: "City Master",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/city-master",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      },
-      {
-        id: 7,
-        menuName: "Template Master",
-        // menuIcon: SvgIcons.allpatients,
-        path: "/template-master",
-        moduleName: ["Master management"],
-        roleName: "admin"
-      }
-    ],
-  },
-  {
-    id: 3,
-    menuIcon: SvgIcons.allpatients,
-    moduleName: ["States", "Appointment"],
-    menuName: "Role & Rights",
-    title: "Role & Rights",
-    path: "/role-rights",
-    menuIcon: SvgIcons.userManagementIcon,
-    //moduleName: "Non Domestic Consumer",
-    disabled: false,
-    roleName: "RoleRights"
-  }
-  
-  
-  
+export const NavItems = () => {
+  const { t } = useTranslation(); // use the translation hook
 
-]
+  return [
+    {
+      id: 1,
+      menuName: t("DASHBOARD"),
+      title: t("DASHBOARD"),
+      menuIcon: SvgIcons.dashboardIcon,
+      path: "/",
+      disabled: false,
+      roleName: "Dashboard"
+    },
+    {
+      id: 2,
+      menuName: t("MASTER MANAGEMENT"),
+      title: t("MASTER MANAGEMENT"),
+      menuIcon: SvgIcons.mastermanage,
+      path: '#',
+      moduleName: ["States", "Appointment"],
+      roleName: "Master Management",
+      subMenu: [
+        {
+          id: 1,
+          menuName: t("CLAIM TYPE"),
+          path: "/claim-type",
+          moduleName: ["Master Management"],
+          roleName: "admin"
+        },
+        {
+          id: 2,
+          menuName: t("CLAIM SUB TYPE"),
+          path: "/claim-subtype",
+          moduleName: ["Master Management"],
+          roleName: "admin"
+        },
+        {
+          id: 3,
+          menuName: t("INQUIRY TYPE"),
+          path: "/inquiry-type",
+          moduleName: ["Master Management"],
+          roleName: "admin"
+        },
+        {
+          id: 4,
+          menuName: t("INQUIRY SUB TYPE"),
+          path: "/inquiry-subtype",
+          moduleName: ["Master Management"],
+          roleName: "admin"
+        },
+        {
+          id: 5,
+          menuName: t("PROVINCE MASTER"),
+          path: "/province-master",
+          moduleName: ["Master Management"],
+          roleName: "admin"
+        },
+        {
+          id: 6,
+          menuName: t("CITY MASTER"),
+          path: "/city-master",
+          moduleName: ["Master Management"],
+          roleName: "admin"
+        },
+        {
+          id: 7,
+          menuName: t("TEMPLATE MASTER"),
+          path: "/template-master",
+          moduleName: ["Master Management"],
+          roleName: "admin"
+        }
+      ],
+    },
+    {
+      id: 3,
+      menuName: t("ROLES AND RIGHTS LIST"),
+      title: t("ROLES AND RIGHTS LIST"),
+      menuIcon: SvgIcons.userManagementIcon,
+      path: "/role-rights",
+      disabled: false,
+      roleName: "RoleRights"
+    }
+  ];
+}

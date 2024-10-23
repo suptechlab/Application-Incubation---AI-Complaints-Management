@@ -51,6 +51,8 @@ import { getLocalStorage } from "../../utils/storage"
     }
   }, [navigate])
 
+  const navItemsArr = NavItems()
+
   return (
     <div className={`sidebarMenu ${isActiveSidebar ? "sidebarAction" : ""}`}>
       <Button
@@ -65,7 +67,6 @@ import { getLocalStorage } from "../../utils/storage"
           <IoIosArrowBack color="#ABABAB" size={12} />
         )}
       </Button>
-
       <Navbar
         bg="dark"
         data-bs-theme="dark"
@@ -80,11 +81,8 @@ import { getLocalStorage } from "../../utils/storage"
               as="ul"
               className="flex-column p-2"
             >
-              {NavItems.map(elem => {
+              {navItemsArr.map(elem => {
                 const { id, menuName, title, menuIcon, path, subMenu, disabled, roleName } = elem
-
-                 
-
                 return (
                   <Nav.Item as="li" key={id}>
                     {(permission.current.isAdmin || permission.current.list.includes(roleName)) ? !subMenu && (

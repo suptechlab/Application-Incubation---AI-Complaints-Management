@@ -9,7 +9,7 @@ import { getLocalStorage } from '../utils/storage';
 
 
 // const userLanguage = getLocalStorage('langKey')  ? getLocalStorage('langKey') : 'en';
-const userLanguage = "en";
+const userLanguage = "es";
 
 // console.log(userLanguage)
 
@@ -23,7 +23,7 @@ i18n
       en: {
         translation: englishLang
       },
-      sp : {
+      es : {
         translation : spanishLang
       }
       // add more languages as needed
