@@ -1,7 +1,7 @@
 // i18n.js
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { hindiLang } from './hindi';
+import { spanishLang } from './spanish';
 import { englishLang } from './english';
 import { assameseLang } from './assamese';
 import { getLocalStorage } from '../utils/storage';
@@ -23,11 +23,8 @@ i18n
       en: {
         translation: englishLang
       },
-      hi : {
-        translation : hindiLang
-      },
-      as : {
-        translation : assameseLang
+      sp : {
+        translation : spanishLang
       }
       // add more languages as needed
     },

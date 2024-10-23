@@ -3,7 +3,9 @@ import { Col, Row, Stack } from 'react-bootstrap';
 import FormInput from "../../components/FormInput";
 import { HiMiniUsers } from 'react-icons/hi2';
 import SvgIcons from "../../components/SVGIcons"
+import { useTranslation } from "react-i18next"
 const SearchForm = ({ filter, setFilter }) => {
+    const { t } = useTranslation()
     return (
         <div className="theme-card-header px-1 header-search">
             <Stack
@@ -14,7 +16,7 @@ const SearchForm = ({ filter, setFilter }) => {
                     <div className="align-items-center bg-black d-inline-flex custom-height-60 justify-content-center position-absolute rounded start-0 text-white theme-icon-box custom-width-60 z-1">
                     <span className='page-header-user-icon'>{SvgIcons.userManagementIcon}</span>
                     </div>
-                    Roles & Rights List
+                    {t("ROLES AND RIGHTS LIST")}
                 </h5>
                 <div className="w-100">
                     <Row className="g-3">
