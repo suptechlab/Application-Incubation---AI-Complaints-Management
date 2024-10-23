@@ -2,12 +2,12 @@ import { Form, Formik } from 'formik'
 import React from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
-import { validationSchema } from '../../../validations/claimType.validation'; // CLAIM TYPE VALIDATION SCHEMA
 import { Button } from "react-bootstrap";
-import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
+import ReactSelect from '../../../components/ReactSelect';
+import { validationSchema } from '../../../validations/cityMaster.validation';
 
 
 const Add = ({ modal, toggle }) => {
@@ -36,12 +36,13 @@ const Add = ({ modal, toggle }) => {
                 <Formik
                     initialValues={{
                         cityName: "",
-                        description: ""
+                        province: ""
                     }}
                     onSubmit={(values, actions) => {
                         actions.setSubmitting(false);
                         handleSubmit(values, actions);
                     }}
+                    validationSchema={validationSchema}
                 >
                     {({
                         handleChange,
@@ -55,7 +56,7 @@ const Add = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimTypeName}
+                                error={errors.cityName}
                                 id="cityName"
                                 key={"cityName"}
                                 label="Name of the City"
@@ -66,6 +67,24 @@ const Add = ({ modal, toggle }) => {
                                 touched={touched.cityName}
                                 type="text"
                                 value={values.cityName || ""}
+                            />
+                            <ReactSelect
+                                error={errors?.province}
+                                options={[{
+                                    value: 1,
+                                    label: 'Azuay'
+                                },
+                                {
+                                    value: 2,
+                                    label: 'Bolivar'
+                                }]}
+                                value={values?.province}
+                                onChange={(option) => { setFieldValue('province', option?.target?.value ?? '') }}
+                                name="province"
+                                label="Province"
+                                className={`${touched?.province && errors?.province ? "is-invalid" : ""} mb-3`}
+                                onBlur={handleBlur}
+                                touched={touched?.province}
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>

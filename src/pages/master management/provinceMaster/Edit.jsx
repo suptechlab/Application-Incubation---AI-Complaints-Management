@@ -2,12 +2,11 @@ import { Form, Formik } from 'formik'
 import React from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
-import { validationSchema } from '../../../validations/claimType.validation'; // CLAIM TYPE VALIDATION SCHEMA
 import { Button } from "react-bootstrap";
-import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
+import { validationSchema } from '../../../validations/provinceMaster.validation';
 
 
 const Edit = ({ modal, toggle }) => {
@@ -35,13 +34,13 @@ const Edit = ({ modal, toggle }) => {
             <ModalBody >
                 <Formik
                     initialValues={{
-                        inquiryName: "",
-                        description: ""
+                        provinceName: ""
                     }}
                     onSubmit={(values, actions) => {
                         actions.setSubmitting(false);
                         handleSubmit(values, actions);
                     }}
+                    validationSchema={validationSchema}
                 >
                     {({
                         handleChange,
@@ -55,7 +54,7 @@ const Edit = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimTypeName}
+                                error={errors.provinceName}
                                 id="provinceName"
                                 key={"provinceName"}
                                 label="Name of Province"

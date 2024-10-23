@@ -2,12 +2,12 @@ import { Form, Formik } from 'formik'
 import React from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
-import { validationSchema } from '../../../validations/claimType.validation'; // CLAIM TYPE VALIDATION SCHEMA
 import { Button } from "react-bootstrap";
 import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
+import { validationSchema } from '../../../validations/inquiryType.validation';
 
 
 const Add = ({ modal, toggle }) => {
@@ -38,6 +38,7 @@ const Add = ({ modal, toggle }) => {
                         inquiryName: "",
                         description: ""
                     }}
+                    validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
                         actions.setSubmitting(false);
                         handleSubmit(values, actions);
@@ -55,7 +56,7 @@ const Add = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimTypeName}
+                                error={errors?.inquiryName}
                                 id="inquiryName"
                                 key={"inquiryName"}
                                 label="Name of Inquiry"
@@ -63,12 +64,12 @@ const Add = ({ modal, toggle }) => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.inquiryName}
+                                touched={touched?.inquiryName}
                                 type="text"
-                                value={values.inquiryName || ""}
+                                value={values?.inquiryName}
                             />
                             <FormInput
-                                error={errors.description}
+                                error={errors?.description}
                                 isTextarea={true}
                                 id="description"
                                 key={"description"}
@@ -80,12 +81,12 @@ const Add = ({ modal, toggle }) => {
                                 touched={touched?.description}
                                 rows={4}
                                 type="text"
-                                value={values?.description || ""}
+                                value={values?.description}
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
                                     Cancel
-                                </Button>{' '}
+                                </Button>
                                 <Button type="submit" onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
                                     Submit
                                 </Button>

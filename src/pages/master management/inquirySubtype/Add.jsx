@@ -2,12 +2,12 @@ import { Form, Formik } from 'formik'
 import React from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
-import { validationSchema } from '../../../validations/claimType.validation'; // CLAIM TYPE VALIDATION SCHEMA
 import { Button } from "react-bootstrap";
 import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
 import ReactSelect from '../../../components/ReactSelect';
+import { validationSchema } from '../../../validations/inquirySubType.validation';
 
 
 const Add = ({ modal, toggle }) => {
@@ -35,8 +35,10 @@ const Add = ({ modal, toggle }) => {
                 <Formik
                     initialValues={{
                         inquirySubCategory: "",
+                        inquiryType:"",
                         description: ""
                     }}
+                    validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
                         actions.setSubmitting(false);
                         handleSubmit(values, actions);

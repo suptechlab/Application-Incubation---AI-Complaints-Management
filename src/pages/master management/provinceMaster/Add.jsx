@@ -2,16 +2,14 @@ import { Form, Formik } from 'formik'
 import React from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
-import { validationSchema } from '../../../validations/claimType.validation'; // CLAIM TYPE VALIDATION SCHEMA
 import { Button } from "react-bootstrap";
 import Toggle from '../../../components/Toggle';
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
-import { useNavigate } from "react-router-dom";
+import { validationSchema } from '../../../validations/provinceMaster.validation';
 
 
 const Add = ({ modal, toggle }) => {
-    const navigate = useNavigate();
     const handleSubmit = async (values) => {
         console.log("values::", values);
         toast.success("Province master added successfully.")
@@ -42,6 +40,7 @@ const Add = ({ modal, toggle }) => {
                         actions.setSubmitting(false);
                         handleSubmit(values, actions);
                     }}
+                    validationSchema={validationSchema}
                 >
                     {({
                         handleChange,
@@ -55,7 +54,7 @@ const Add = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimTypeName}
+                                error={errors?.provinceName}
                                 id="provinceName"
                                 key={"provinceName"}
                                 label="Name of Province"
@@ -63,9 +62,9 @@ const Add = ({ modal, toggle }) => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.provinceName}
+                                touched={touched?.provinceName}
                                 type="text"
-                                value={values.provinceName || ""}
+                                value={values?.provinceName || ""}
                             />
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>

@@ -2,13 +2,13 @@ import { Formik, Form } from "formik";
 import React from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
-import { validationSchema } from '../../../validations/districts.validation'; // Update to district validation schema
 import { Button } from "react-bootstrap";
 import Toggle from '../../../components/Toggle';
 import { handleAddDistrict } from "../../../services/district.service";
 import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import ReactSelect from "../../../components/ReactSelect";
+import { validationSchema } from "../../../validations/claimSubType.validation";
 
 
 const Add = ({ modal, toggle }) => {
@@ -41,7 +41,7 @@ const Add = ({ modal, toggle }) => {
                         SLABreachDay: "",
                         description: "",
                     }}
-                    // validationSchema={validationSchema}
+                    validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
                         actions.setSubmitting(false);
                         handleSubmit(values, actions);
@@ -99,8 +99,8 @@ const Add = ({ modal, toggle }) => {
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
                                 touched={touched.SLABreachDay}
-                                type="text"
-                                value={values.SLABreachDay || ""}
+                                type="number"
+                                value={values?.SLABreachDay}
                             />
                             <FormInput
                                 error={errors?.description}
