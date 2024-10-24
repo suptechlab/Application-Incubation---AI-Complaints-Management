@@ -8,5 +8,5 @@ variables:
 
 include:
   - project: 'admincicd/seps-gitlab-runner-pipeline-shared-lib'
-    file: 'java/.springBootServicePipeline.yml'
-    ref: master
+    file: 'maven/.mavenServicePipeline.yml'
+    ref: develop
