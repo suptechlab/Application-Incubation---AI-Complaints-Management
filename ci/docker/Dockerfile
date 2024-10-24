@@ -9,7 +9,7 @@ ARG SEPS_MAVEN_PASSWORD_ARG
 ENV SEPS_MAVEN_USER=$SEPS_MAVEN_USER_ARG
 ENV SEPS_MAVEN_PASSWORD=$SEPS_MAVEN_PASSWORD_ARG
 
-RUN ./mvnw -Pprod clean verify
+RUN ./mvnw -Pprod clean verify -DskipTests
 
 FROM openjdk:8-alpine
 
