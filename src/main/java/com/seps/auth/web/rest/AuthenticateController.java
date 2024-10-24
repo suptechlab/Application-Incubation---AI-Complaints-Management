@@ -6,10 +6,12 @@ import static com.seps.auth.security.SecurityUtils.JWT_ALGORITHM;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seps.auth.web.rest.vm.LoginVM;
 import jakarta.validation.Valid;
+
 import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,6 +102,20 @@ public class AuthenticateController {
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JWTToken> login(@Valid @RequestBody LoginVM loginVM) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            loginVM.getUsername(),
+            loginVM.getPassword()
+        );
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = this.createToken(authentication, loginVM.isRememberMe());
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setBearerAuth(jwt);
+        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
     /**

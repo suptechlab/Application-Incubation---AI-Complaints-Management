@@ -16,6 +16,8 @@ public class LoginVM {
     @Size(min = 4, max = 100)
     private String password;
 
+    private String recaptchaToken;
+
     private boolean rememberMe;
 
     public String getUsername() {
