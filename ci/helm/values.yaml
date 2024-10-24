@@ -1,0 +1,169 @@
+global:
+  appVersion: 1.0.0-SNAPSHOT
+  name: ms-seps-base-service
+deployment:
+  # Default values for deployment.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+  namespace: deployment-name
+  replicaCount: 1
+
+  image:
+    registry: nexus.seps.gob.ec:4000
+    repository: ms-seps-base-service
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  containerPorts:
+    http:
+      port: 8080
+      protocol: TCP
+    https:
+      disabled: true
+
+  livenessProbe:
+    httpGet:
+      path: /ms-seps-base-service/actuator/health
+      port: 8080
+    initialDelaySeconds: 20
+    periodSeconds: 180
+    timeoutSeconds: 21
+  readinessProbe:
+    httpGet:
+      path: /ms-seps-base-service/actuator/health
+      port: 8080
+    initialDelaySeconds: 20
+    periodSeconds: 180
+    timeoutSeconds: 21
+
+  imagePullSecrets:
+    - seps-regcred
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+
+  ingress:
+    enabled: false
+    className: "nginx"
+    annotations:
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: seps.local
+        paths:
+          - path: /
+            pathType: Prefix
+             
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    requests:
+      cpu: 1m
+      memory: 1024Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  envVars:
+#    logging.level.root: INFO
+    JAVA_TOOL_OPTIONS: -Xms256m -Xmx2g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Dvariable=value # read from System.getProperty("variable")
+    TZ: America/Guayaquil
+    # Variable to localize the id_rsa, and connect to ftp server
+  # SFTP_PATH_PRIVATE_KEY: /home/.ssh/id_rsa
+
+  configmap:
+    enabled: false
+#    name: env
+#    data:
+#      - key: SEPS_JDBC_URL
+#        value: change_me
+#      - key: SEPS_JDBC_USER
+#        value: change_me
+
+  configMaps:
+    env: #name of configmap
+      environment: #set items like environment variables
+        items:
+          CURRENT_PROFILE:
+            envVarName: SPRING_PROFILES_ACTIVE
+          SEPS_JDBC_ORACLE_URL:
+            envVarName: seps.jdbc.oracle.url
+          SEPS_JDBC_ORACLE_USER:
+            envVarName: seps.jdbc.oracle.user
+    # env:
+  #   envVarName: env
+  #      volume: # set items like file in volume
+  #        mountPath: /var/smx/env/
+  #        items:
+  #          ID_RSA:
+  #            filePath: id_rsa_config
+  #            fileMode: 644
+
+  secrets:
+    seps-secrets:
+      environment: # Items set like environment variable
+        items:
+          SEPS_JDBC_ORACLE_PASSWORD:
+            envVarName: seps.jdbc.oracle.password
+          JASYPT_ENCRYPTOR_PASSWORD:
+            envVarName: jasypt.encryptor.password
+
+      # Mount a file id_rsa to connect a ftp server
+  #      volume: # Items set like file in volume
+  #        mountPath: /home/.ssh/
+  #        items:
+  #          id-rsa:
+  #            filePath: id_rsa
+  #            fileMode: 644
+
+  persistence:
+    enabled: false
+    path: /var/seps/archivos/base
+    storageclass: managed-nfs-storage
+    size: 1Gi
