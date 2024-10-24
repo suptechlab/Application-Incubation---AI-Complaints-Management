@@ -44,6 +44,14 @@ public class LoginVM {
         this.rememberMe = rememberMe;
     }
 
+    public String getRecaptchaToken() {
+        return recaptchaToken;
+    }
+
+    public void setRecaptchaToken(String recaptchaToken) {
+        this.recaptchaToken = recaptchaToken;
+    }
+
     // prettier-ignore
     @Override
     public String toString() {
