@@ -61,7 +61,7 @@ const Add = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimTypeName}
+                                error={errors?.name}
                                 id="name"
                                 key={"name"}
                                 label={t("NAME OF CLAIM TYPE")}

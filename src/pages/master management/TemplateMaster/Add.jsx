@@ -8,11 +8,12 @@ import toast from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { validationSchema } from '../../../validations/templateMaster.validation';
 import { useTranslation } from 'react-i18next';
+import SunEditorReact from '../../../components/SuneditorReact';
 
 
 const Add = ({ modal, toggle }) => {
 
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const navigate = useNavigate();
     const handleSubmit = async (values) => {
         console.log("values::", values);
@@ -32,7 +33,7 @@ const Add = ({ modal, toggle }) => {
     };
 
     return (
-        <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
+        <Modal className="district-modal-cover" size='lg' isOpen={modal} toggle={toggle} centered>
             <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("CREATE TEMPLATE MASTER")}</ModalHeader>
             <ModalBody >
                 <Formik
@@ -69,10 +70,24 @@ const Add = ({ modal, toggle }) => {
                                 type="text"
                                 value={values.templateName || ""}
                             />
+                            <SunEditorReact
+                                id="description"
+                                name="description"
+                                content={values.description}
+                                error={errors?.description}
+                                touched={touched?.description}
+                                handleBlur={handleBlur}
+                                handleChange={(value) => {
+                                    if (value === "<p><br></p>") {
+                                        setFieldValue("description", '')
+                                    } else {
+                                        setFieldValue("description", value)
+                                    }
+                                }} />
                             {/* NEED TO ADD TEXT EDITOR HERE */}
                             <ModalFooter className='border-0'>
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    {("CANCEL")}
+                                    {t("CANCEL")}
                                 </Button>{' '}
                                 <Button type="submit" onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
                                     {t("SUBMIT")}

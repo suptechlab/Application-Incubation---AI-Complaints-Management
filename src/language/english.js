@@ -49,5 +49,6 @@ export const englishLang = {
     "PROVINCE" : "Province",
     "CREATE TEMPLATE MASTER":"Create Template Master",
     "EDIT TEMPLATE MASTER":"Edit Template Master",
-    "NAME OF TEMPLATE MASTER":"Name of Template Master"
+    "NAME OF TEMPLATE MASTER":"Name of Template Master",
+
 }
