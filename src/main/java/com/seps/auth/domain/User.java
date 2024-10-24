@@ -7,11 +7,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
 
@@ -83,11 +85,24 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @ManyToMany
     @JoinTable(
         name = "jhi_user_authority",
-        joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
-        inverseJoinColumns = { @JoinColumn(name = "authority_name", referencedColumnName = "name") }
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")}
     )
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
+
+    @Column(name = "otp_code", length = 6)
+    private String otpCode;
+
+    @Column(name = "otp_code_expiration_time")
+    private Instant otpCodeExpirationTime;
+
+    @Column(name = "otp_token", length = 36)
+    private String otpToken;
+
+    @Column(name = "otp_token_expiration_time")
+    private Instant otpTokenExpirationTime;
+
 
     public Long getId() {
         return id;
@@ -192,6 +207,38 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
+    }
+
+    public String getOtpCode() {
+        return otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
+    }
+
+    public Instant getOtpCodeExpirationTime() {
+        return otpCodeExpirationTime;
+    }
+
+    public void setOtpCodeExpirationTime(Instant otpCodeExpirationTime) {
+        this.otpCodeExpirationTime = otpCodeExpirationTime;
+    }
+
+    public String getOtpToken() {
+        return otpToken;
+    }
+
+    public void setOtpToken(String otpToken) {
+        this.otpToken = otpToken;
+    }
+
+    public Instant getOtpTokenExpirationTime() {
+        return otpTokenExpirationTime;
+    }
+
+    public void setOtpTokenExpirationTime(Instant otpTokenExpirationTime) {
+        this.otpTokenExpirationTime = otpTokenExpirationTime;
     }
 
     @Override

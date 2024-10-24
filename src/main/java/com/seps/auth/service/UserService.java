@@ -8,11 +8,16 @@ import com.seps.auth.repository.UserRepository;
 import com.seps.auth.security.AuthoritiesConstants;
 import com.seps.auth.security.SecurityUtils;
 import com.seps.auth.service.dto.AdminUserDTO;
+import com.seps.auth.service.dto.OTPResponse;
 import com.seps.auth.service.dto.UserDTO;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.seps.auth.web.rest.errors.CustomException;
+import com.seps.auth.web.rest.errors.SepsStatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,6 +26,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
 
 /**
@@ -287,10 +293,29 @@ public class UserService {
 
     /**
      * Gets a list of all the authorities.
+     *
      * @return a list of all the authorities.
      */
     @Transactional(readOnly = true)
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).toList();
+    }
+
+    public User updateUserOtpInfo(String username) {
+        User user = userRepository.findOneByLogin(username)
+            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND, null, null));
+        // Generate OTP data using OtpService
+        OtpService otpService = new OtpService();
+        String otpCode = otpService.generateOtpCode();
+        Instant otpExpirationTime = otpService.getOtpExpirationTime();
+        String otpToken = otpService.generateOtpToken();
+        Instant otpTokenExpirationTime = otpService.getOtpTokenExpirationTime();
+        // Update user's OTP information
+        user.setOtpCode(otpCode);
+        user.setOtpCodeExpirationTime(otpExpirationTime);
+        user.setOtpToken(otpToken);
+        user.setOtpTokenExpirationTime(otpTokenExpirationTime);
+        // Save user with updated OTP information
+        return userRepository.save(user);
     }
 }

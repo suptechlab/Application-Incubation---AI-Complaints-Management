@@ -8,7 +8,7 @@ public class OtpService {
 
     private static final int OTP_LENGTH = 6; // Length of the OTP
     private static final long OTP_EXPIRATION_DURATION = 5; // OTP expiration duration in minutes
-    private static final long OTP_TOKEN_EXPIRATION_DURATION = 10; // OTP token expiration duration in minutes
+    private static final long OTP_TOKEN_EXPIRATION_DURATION = 15; // OTP token expiration duration in minutes
     private static final SecureRandom random = new SecureRandom();
 
     /**

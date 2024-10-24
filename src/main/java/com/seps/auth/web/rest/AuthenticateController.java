@@ -4,6 +4,7 @@ import static com.seps.auth.security.SecurityUtils.AUTHORITIES_KEY;
 import static com.seps.auth.security.SecurityUtils.JWT_ALGORITHM;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.seps.auth.domain.User;
 import com.seps.auth.service.MailService;
 import com.seps.auth.service.OtpService;
 import com.seps.auth.service.RecaptchaService;
@@ -121,37 +122,6 @@ public class AuthenticateController {
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
-
-    @PostMapping("/login")
-    public ResponseEntity<OTPResponse> login(@Valid @RequestBody LoginVM loginVM) {
-        try {
-            if(!recaptchaService.verifyRecaptcha(loginVM.getRecaptchaToken())){
-                LOG.error("Error while verifying recaptcha token");
-                throw new CustomException(Status.BAD_REQUEST,SepsStatusCode.RECAPTCHA_FAILED,null,null);
-            }
-        } catch (IOException e) {
-            LOG.error("Error while verifying recaptcha token :{}",e.getMessage());
-            throw new CustomException(Status.BAD_REQUEST,SepsStatusCode.RECAPTCHA_FAILED,null,null);
-        }
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            loginVM.getUsername(),
-            loginVM.getPassword()
-        );
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = this.createToken(authentication, loginVM.isRememberMe());
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setBearerAuth(jwt);
-        // Generate OTP and retrieve its expiration time
-        OtpService otpService = new OtpService();
-        String otpCode = otpService.generateOtpCode();
-        Instant otpExpirationTime = otpService.getOtpExpirationTime();
-        String otpToken = otpService.generateOtpToken();
-        Instant otpTokenExpirationTime = otpService.getOtpTokenExpirationTime();
-        return new ResponseEntity<>(new OTPResponse(otpToken, otpTokenExpirationTime),HttpStatus.OK);
-    }
-
     /**
      * Object to return as body in JWT Authentication.
      */
@@ -170,6 +140,36 @@ public class AuthenticateController {
 
         void setIdToken(String idToken) {
             this.idToken = idToken;
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<OTPResponse> login(@Valid @RequestBody LoginVM loginVM) {
+        // Verify the recaptcha token
+        if (!isRecaptchaValid(loginVM.getRecaptchaToken())) {
+            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
+        // Authenticate the user using UsernamePasswordAuthenticationToken
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        // Update OTP info for the user and send OTP email
+        User user = userService.updateUserOtpInfo(loginVM.getUsername());
+        mailService.sendLoginOtpEmail(user);
+        // Return OTP token and expiration in response
+        return new ResponseEntity<>(new OTPResponse(user.getOtpToken(), user.getOtpTokenExpirationTime()), HttpStatus.OK);
+    }
+
+    /**
+     * Helper method to verify the Recaptcha token and handle exceptions
+     */
+    private boolean isRecaptchaValid(String recaptchaToken) {
+        try {
+            return recaptchaService.verifyRecaptcha(recaptchaToken);
+        } catch (IOException e) {
+            LOG.error("Error while verifying recaptcha token: {}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
         }
     }
 }
