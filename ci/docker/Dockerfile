@@ -20,5 +20,5 @@ RUN apk add --no-cache tzdata
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-COPY --from=backend-compiler /app/target/service-$VERSION.jar /app/opt/service.jar
-ENTRYPOINT ["/usr/bin/java", "-jar", "/app/opt/service.jar"]
+COPY --from=backend-compiler /app/target/auth-0.0.1-SNAPSHOT.jar /app/opt/auth-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["/usr/bin/java", "-jar", "auth-0.0.1-SNAPSHOT.jar"]
