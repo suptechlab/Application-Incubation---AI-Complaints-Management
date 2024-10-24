@@ -1,14 +1,15 @@
-FROM maven:3.8.5-jdk-11 AS backend-compiler
+FROM maven:3.8.5-openjdk-17 AS backend-compiler
 LABEL mantainer="usuario.seps@seps.gob.ec"
 WORKDIR /app
 COPY . .
 
-ARG SEPS_MAVEN_USER_ARG
-ARG SEPS_MAVEN_PASSWORD_ARG
+# ARG SEPS_MAVEN_USER_ARG
+# ARG SEPS_MAVEN_PASSWORD_ARG
 
-ENV SEPS_MAVEN_USER=$SEPS_MAVEN_USER_ARG
-ENV SEPS_MAVEN_PASSWORD=$SEPS_MAVEN_PASSWORD_ARG
+# ENV SEPS_MAVEN_USER=$SEPS_MAVEN_USER_ARG
+# ENV SEPS_MAVEN_PASSWORD=$SEPS_MAVEN_PASSWORD_ARG
 
+RUN chmod +x ./mvnw
 RUN ./mvnw -Pprod clean verify -DskipTests
 
 FROM openjdk:8-alpine
@@ -20,5 +21,5 @@ RUN apk add --no-cache tzdata
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-COPY --from=backend-compiler /app/target/auth-0.0.1-SNAPSHOT.jar /app/opt/auth-0.0.1-SNAPSHOT.jar
-ENTRYPOINT ["/usr/bin/java", "-jar", "auth-0.0.1-SNAPSHOT.jar"]
+COPY --from=backend-compiler /app/target/auth-${VERSION}.jar /app/opt/auth.jar
+ENTRYPOINT ["/usr/bin/java", "-jar", "/app/opt/auth.jar"]
