@@ -64,7 +64,7 @@ const Add = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors?.inquiryName}
+                                error={errors?.name}
                                 id="name"
                                 key={"name"}
                                 label={t("NAME OF INQUIRY")}

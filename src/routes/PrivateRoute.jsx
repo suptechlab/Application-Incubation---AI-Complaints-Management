@@ -6,7 +6,9 @@ import { AuthenticationContext } from "../contexts/authentication.context";
 const PrivateRoute = ({ element }) => {
     const { isAuthenticated } = useContext(AuthenticationContext);
 
-    if (isAuthenticated) {
+
+    // CHANGE CONDITION HERE TO if(isAuthenticated) FOR NOW I'VE BYPASS LOGIN
+    if (!isAuthenticated) {
         return element;
     } else {
         return <Navigate to='/login' replace />;
