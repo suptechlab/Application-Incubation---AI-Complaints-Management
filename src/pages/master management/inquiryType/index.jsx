@@ -13,18 +13,20 @@ import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
 import { useTranslation } from "react-i18next";
+import { handleGetInquiryType } from "../../../services/inquiryType.service";
+import axios from "axios";
 const InquiryType = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
-  const [editModal , setEditModal] = useState({id :'' , open : false})
+  const [editModal, setEditModal] = useState({ id: '', open: false })
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
@@ -32,7 +34,7 @@ const InquiryType = () => {
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({id : '' , open : !editModal?.open});
+  const editToggle = () => setEditModal({ id: '', open: !editModal?.open });
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
@@ -63,7 +65,7 @@ const InquiryType = () => {
 
   }, []);
   const editInquiryType = async (id) => {
-    setEditModal({id : id , open : !editModal?.open })
+    setEditModal({ id: id, open: !editModal?.open })
   };
 
   const dataQuery = useQuery({
@@ -191,6 +193,15 @@ const InquiryType = () => {
       pageSize: 10,
     });
   }, [filter]);
+
+
+  useEffect(() => {
+    axios.get('https://relative-glider-entirely.ngrok-free.app/management/info').then(response => {
+      console.log({ Response: response })
+    }).catch((error) => {
+      console.log({ Error: error })
+    })
+  }, [])
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">

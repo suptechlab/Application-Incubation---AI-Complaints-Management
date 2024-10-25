@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { validationSchema } from '../../../validations/inquiryType.validation';
 import { useTranslation } from 'react-i18next';
 import { createNewInquiryType } from '../../../services/inquiryType.service';
+import axios from 'axios';
 
 
 const Add = ({ modal, toggle }) => {
@@ -22,7 +23,7 @@ const Add = ({ modal, toggle }) => {
             description : values?.description
         }
 
-        createNewInquiryType(formData).then(response => {
+        axios.post('https://relative-glider-entirely.ngrok-free.app/api/v1/inquiry-types',formData).then(response => {
             toast.success(response?.data?.message);
             toggle()
         }).catch((error) => {

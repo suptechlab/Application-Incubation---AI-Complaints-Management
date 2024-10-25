@@ -2,7 +2,7 @@ import instance from "../utils/instance";
 
 // GET ALL INQUIRY TYPES
 export const handleGetInquiryType = async (params) => {
-  return await instance.get('/v1/inquiry-type', {
+  return await instance.get('/management/info', {
     params
   });
 }
