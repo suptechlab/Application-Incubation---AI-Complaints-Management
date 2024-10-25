@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery,useQueryClient } from "@tanstack/react-query";
 import PageHeader from "../../../components/PageHeader";
 import { Card } from "reactstrap";
 import qs from "qs";
@@ -18,6 +18,8 @@ import { changeClaimTypeStatus, downloadClaimTypes, handleGetClaimTypes } from "
 const ClaimType = () => {
 
   const location = useLocation();
+  const queryClient = useQueryClient();
+
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
   const { t } = useTranslation()
@@ -96,6 +98,8 @@ const ClaimType = () => {
         });
       }
     },
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
   });
 
   // STATUS UPDATE FUNCTION
@@ -163,6 +167,7 @@ const ClaimType = () => {
         accessorFn: (row) => row?.name,
         id: "name",
         header: () => t("CLAIM TYPE"),
+        enableSorting: true
       },
       {
         accessorFn: (row) => row?.description != null ? row?.description : '-',
@@ -216,8 +221,27 @@ const ClaimType = () => {
       pageSize: 10,
     });
   }, [filter]);
+
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
+
+
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={t("CLAIM TYPE")} toggle={toggle} download={handleDownload} />
+    {/* <PageHeader title={t("CLAIM TYPE")} toggle={toggle} download={handleDownload} /> */}
+    <PageHeader
+      title={t("CLAIM TYPE")}
+      actions={[
+        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
+        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
+        // { label: "Help", to: "/help", variant: "outline-dark" },
+        // { label: "Learn More", onClick: handleAdd, variant: "primary" },
+
+      ]}
+    />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

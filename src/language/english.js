@@ -52,7 +52,6 @@ export const englishLang = {
     "NAME OF TEMPLATE MASTER":"Name of Template Master",
     "EXPORT TO CSV" : "Export To CSV",
 
-
     // MESSAGES
     "STATUS UPDATED" : "Status updated successfully.",
     "STATUS UPDATE ERROR" : "Error in  updating status"
