@@ -1,9 +1,7 @@
 package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.service.InquirySubTypeService;
-import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.InquirySubTypeDTO;
-import com.seps.admin.service.dto.InquiryTypeDTO;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

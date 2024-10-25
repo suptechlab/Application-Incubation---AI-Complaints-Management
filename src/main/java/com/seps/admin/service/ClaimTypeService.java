@@ -165,7 +165,7 @@ public class ClaimTypeService {
         }
     }
 
-    public List<DropdownListDTO> listActiveInquiryTypes() {
+    public List<DropdownListDTO> listActiveClaimTypes() {
         return claimTypeRepository.findAllByStatus(true)
             .stream()
             .map(claimTypeMapper::toDropDownDTO)

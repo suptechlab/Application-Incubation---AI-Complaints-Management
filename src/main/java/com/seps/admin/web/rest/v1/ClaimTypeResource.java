@@ -88,8 +88,8 @@ public class ClaimTypeResource {
     }
 
     @GetMapping("/dropdown-list")
-    public ResponseEntity<List<DropdownListDTO>> listActiveInquiryTypes() {
-        List<DropdownListDTO> claimTypes = claimTypeService.listActiveInquiryTypes();
+    public ResponseEntity<List<DropdownListDTO>> listActiveClaimTypes() {
+        List<DropdownListDTO> claimTypes = claimTypeService.listActiveClaimTypes();
         return ResponseEntity.ok(claimTypes);
     }
 }
