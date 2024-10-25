@@ -64,11 +64,7 @@ tbody tr {
 }
 
 .table-bordered th {
-	background: #f2f2f2;
 	font-size: 15px;
-	line-height: 15px;
-	padding-top: 10px;
-	padding-bottom: 10px;
 }
 
 .table-bordered td {
@@ -79,11 +75,6 @@ tbody tr {
 .table-bordered th:last-child,
 .table-bordered td:last-child {
 	width: 110px;
-	text-align: right !important;
-}
-
-.table-bordered td:last-child>div {
-	justify-content: center;
 }
 
 .pagination .page-item .page-link {

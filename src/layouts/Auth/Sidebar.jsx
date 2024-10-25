@@ -9,53 +9,75 @@ import { NavItems } from "./NavItems"
 import "./sidebar.scss"
 
   const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
-  const navigate = useNavigate()
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(null)
+    const sidebarRef = useRef(null);
+    const navigate = useNavigate()
+    const [isSubMenuOpen, setIsSubMenuOpen] = useState(null)
 
-  const handleSubmenu = idx => {
-    if (isSubMenuOpen === idx) {
-      setIsSubMenuOpen(null)
-    } else {
-      setIsSubMenuOpen(idx)
-    }
-  }
-  const companyTitle = getLocalStorage("companyTitle");
-
-  const permission = useRef({
-    list: [],
-    isAdmin: false
-  });
-
-  useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-            permission.current.isAdmin = true;
+    const handleSubmenu = idx => {
+      if (isSubMenuOpen === idx) {
+        setIsSubMenuOpen(null)
       } else {
-        getPermissionsModuleNameList().then(response => {
-            permission.current.list = response;
-        }).catch(error => {
-            console.error("Error fetching permissions:", error);
-        });
+        setIsSubMenuOpen(idx)
       }
-    }).catch(error => {
-            console.error("Error get during to fetch User Type", error);
-    })
-
-  }, []);
-
-  useEffect(() => {
-    if (isActiveSidebar) {
-      toggleSidebarButton()
     }
-  }, [navigate])
 
-  const navItemsArr = NavItems()
+    const handleToggleSidebar = () => {
+      if (isSubMenuOpen !== null && isActiveSidebar === false) {
+          setIsSubMenuOpen(null);
+      }
+      toggleSidebarButton();
+    }
+
+    const handleNavLinkClick = () => {
+      if (isActiveSidebar) {
+          setIsSubMenuOpen(null);
+      }
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isActiveSidebar && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+                setIsSubMenuOpen(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isActiveSidebar]);
+
+    const companyTitle = getLocalStorage("companyTitle");
+
+    const permission = useRef({
+      list: [],
+      isAdmin: false
+    });
+
+    useEffect(() => {
+      isAdminUser().then(response => {
+        if (response) {
+              permission.current.isAdmin = true;
+        } else {
+          getPermissionsModuleNameList().then(response => {
+              permission.current.list = response;
+          }).catch(error => {
+              console.error("Error fetching permissions:", error);
+          });
+        }
+      }).catch(error => {
+              console.error("Error get during to fetch User Type", error);
+      })
+
+    }, []);
+
+    const navItemsArr = NavItems()
 
   return (
-    <div className={`sidebarMenu ${isActiveSidebar ? "sidebarAction" : ""}`}>
+    <div ref={sidebarRef} className={`sidebarMenu ${isActiveSidebar ? "sidebarAction" : ""}`}>
       <Button
         variant="link"
-        onClick={toggleSidebarButton}
+        onClick={handleToggleSidebar}
         className="align-items-center bg-white border border-1 btn d-xl-flex h-20 justify-content-center mt-2 p-0 position-absolute rounded-circle start-100 top-0 translate-middle-x w-20 z-2 toogle-button d-none"
         aria-label="Toggle Sidebar Menu"
       >
@@ -85,7 +107,7 @@ import "./sidebar.scss"
                         to={path}
                         className={`align-items-center d-flex px-0 sidebarLink rounded ${disabled ? "disabled" : ""
                           }`}
-                        onClick={() => setIsSubMenuOpen(null)}
+                        onClick={handleNavLinkClick}
                       >
                         <span className="py-1 text-center min-w-44 sidebarIcon">
                           {menuIcon}

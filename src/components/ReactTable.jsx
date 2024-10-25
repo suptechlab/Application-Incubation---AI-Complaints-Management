@@ -120,7 +120,7 @@ export default function ReactTable({
 
                                                     header.column.getCanSort()
 
-                                                        ? "cursor-pointer select-none"
+                                                        ? "cursor-pointer user-select-none"
 
                                                         : ""
 

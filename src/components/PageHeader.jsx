@@ -12,9 +12,9 @@ const PageHeader = ({ title, actions }) => {
             <Stack
                 direction="horizontal"
                 gap={2}
-                className="flex-wrap justify-content-between custom-min-height-38"
+                className="flex-wrap custom-min-height-38"
             >
-                <h1 className="fw-semibold fs-4 mb-0">
+                <h1 className="fw-semibold fs-4 mb-0 me-auto">
                     {title}
                 </h1>
 

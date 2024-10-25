@@ -2,6 +2,8 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom height and width classes
+@include custom-class('height', 26);
+@include custom-class('width', 26);
 @include custom-class('min-height', 38);
 @include custom-class('height', 38);
 @include custom-class('width', 38);
@@ -14,6 +16,7 @@
 @include custom-class('min-width', 100);
 @include custom-class('width', 110);
 @include custom-class('width', 130);
+@include custom-class('width', 120);
 @include custom-class('width', 150);
 @include custom-class('max-width', 150);
 @include custom-class('width', 160);
@@ -106,7 +109,7 @@
     z-index: 1002 !important;
 }
 
-.pointer {
+.cursor-pointer {
     cursor: pointer;
 }
 
