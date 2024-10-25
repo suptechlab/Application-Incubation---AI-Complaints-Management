@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Badge, Button, Container, Dropdown, Image, Nav, Navbar } from 'react-bootstrap';
-import { FaBell, FaCaretDown, FaTrash } from "react-icons/fa";
+import { FaCaretDown, FaTrash } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from '../../assets/images/logo.png';
-import NotificationIcon from "../../assets/images/notifications.svg";
+import Logo from '../../assets/images/logo.svg';
 import { AuthenticationContext } from '../../contexts/authentication.context';
 import './header.scss';
 import { handleGetNotifications, handleMarkAllNotifications, handleDeleteNotification, handleCountNotifications } from '../../services/notification.service';
+import { MdOutlineNotifications } from 'react-icons/md';
+import defaultAvatar from '../../assets/images/default-avatar.jpg';
+import AppTooltip from '../../components/tooltip';
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     const { logout } = useContext(AuthenticationContext);
@@ -70,34 +72,47 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     };
 
     return (
-        <Navbar bg='white' data-bs-theme='light' variant='light' className="py-0 px-md-1 shadow-sm z-2 theme-top-header">
+        <Navbar bg='white' data-bs-theme='light' variant='light' className="py-0 shadow-sm theme-top-header">
             <Container fluid className="h-100">
-                <Button onClick={toggleSidebarButton} variant="link" className="align-items-center d-flex d-xl-none justify-content-center me-3 navMenuBtn p-0 py-3">
-                    <span className={`bg-info d-inline-block menuTrigger position-relative text-center ${isActiveSidebar ? 'active' : ''}`}></span>
+                <Button onClick={toggleSidebarButton} variant="link" className="align-items-center d-flex d-xl-none justify-content-center me-3 navMenuBtn p-0 py-3" aria-label='Sidebar Toggle Button'>
+                    <span className={`bg-dark d-inline-block menuTrigger position-relative text-center ${isActiveSidebar ? 'active' : ''}`}></span>
                 </Button>
                 <Link to="/dashboard" className="me-3">
                     <Image
-                        // className="img-fluid"
+                        fluid
                         src={Logo}
-                        alt={`Logo`}
+                        alt="Logo"
+                        width={219}
+                        height={46}
                     />
                 </Link>
-                <Nav className="ms-auto align-items-center order-md-last ">
-                    <Button variant="link" className="text-body position-relative py-0 mt-1 mx-2 px-2">
-                        <Dropdown>
-                            <Dropdown.Toggle variant="" id="dropdown-basic">
-                                <Image className="" src={NotificationIcon} alt={`Notification Icon`} />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className='notification-modal min-height'>
-                                <div className='fs-14 fw-bolder text-center px-3'>
-                                    { notificationsCount.count>0 ? <a href='#' onClick={markAllAsRead} className='text-decoration-none'>Mark As Read</a> 
+                <Nav className="ms-auto align-items-center order-md-last">
+                    <Dropdown className="notificationDropdown me-sm-1">
+                        <Dropdown.Toggle variant='link' id="notifications-dropdown" className='link-dark p-1 position-relative my-1'>
+                            <AppTooltip title="Notifications" placement="auto">
+                                <span>
+                                    <MdOutlineNotifications size={24} className={notificationsCount.count>0 ? 'ring': ''} />
+                                </span>
+                            </AppTooltip>
+                            { notificationsCount.count>0 &&
+                            <Badge bg="dark" className="border border-white fw-semibold rounded-pill notification-count position-absolute top-0 start-100 translate-middle mt-2 ms-n1">
+                                {notificationsCount.count}
+                                <span className="visually-hidden">Unread Notifications</span>
+                            </Badge>
+                            }
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu align="end" className="shadow border-0 mt-3 theme-notification-menu">
+                            <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0">
+                                <li className='fs-14 text-center px-3 py-1'>
+                                    { notificationsCount.count>0 ? <Link onClick={markAllAsRead} className='text-decoration-none'>Mark As Read</Link> 
                                     : 'No notification found' }
-                                </div>
-                                 {notifications.map(notification => (
-                                    <Dropdown.Item key={notification.id} href="#/action-1">
+                                </li>
+                                {notifications.map(notification => (
+                                    <li key={notification.id}>
+                                        <Dropdown.Item as={Link} to="/">
                                         <div className='d-flex justify-content-between align-items-center'>
                                             <div>
-                                                <div className='fs-14 fw-bolder'>{notification.title}</div>
+                                                <div className='fs-14 fw-semibold'>{notification.title}</div>
                                                 <p className='fs-14 mb-0'>{notification.message}</p>
                                             </div>
                                             
@@ -106,27 +121,28 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                                             </div>
                                         </div>
                                     </Dropdown.Item>
+                                    </li>
                                 ))}
-                               
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <Badge bg="dark" className="border border-white fw-semibold position-absolute rounded-pill notification-count translate-middle ms-n1">
-                            {notificationsCount.count}
-                            <span className="visually-hidden">Notification</span>
-                        </Badge>
-                    </Button>
-                    <Dropdown className="profileDropdown ms-4">
-                        <Dropdown.Toggle variant="link" id="dropdown-profile" className="border-0 fw-semibold text-decoration-none p-0 text-body">
-                            <Image className="object-fit-cover rounded-circle" src={imageUrl != null ? imageUrl : "https://dummyimage.com/40"} width={40} height={40} />
-                            <span className="align-middle text-start d-none d-md-inline-block ms-1 px-2 text-truncate custom-max-width-150">
-                                <span className='w-100 user-name'>{firstName}</span>
+                            </ul>
+                        </Dropdown.Menu>
+                    </Dropdown>   
+                    <Dropdown className="profileDropdown ms-3 ms-sm-4">
+                        <Dropdown.Toggle
+                            variant="link"
+                            id="dropdown-profile"
+                            className="border-0 fw-semibold text-decoration-none p-0 text-body"
+                        >
+                            <Image className="object-fit-cover rounded-circle" src={imageUrl != null ? imageUrl : defaultAvatar} width={40} height={40} alt={firstName} />
+                            <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-150 fs-6 lh-sm">
+                                {firstName} <br />
+                                <Badge bg='light-green-custom' className='fs-normal'>FI Agent</Badge>
                             </span>
-                            <FaCaretDown size={16} />
+                            <FaCaretDown size={16} className='ms-1' />
                         </Dropdown.Toggle>
-                        <Dropdown.Menu align="end" className="shadow-sm">
-                            <Dropdown.Item onClick={logout} className="fw-medium gap-2 d-flex align-items-center">
-                                Logout
-                            </Dropdown.Item>
+                        <Dropdown.Menu align="end" className="shadow border-0 mt-3">
+                            <Dropdown.Item as={Link} to="/profile" disabled>Profile</Dropdown.Item>
+                            <Dropdown.Item as={Link} to="/change-password" disabled>Change Password</Dropdown.Item>
+                            <Dropdown.Item as={Link} onClick={logout}>Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Nav>

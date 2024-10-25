@@ -14,12 +14,11 @@
         transition: left .3s ease-in-out;
         height: calc(100% - $theme-header-height) !important;
     }
-    .sub-menu-arrow{
-        margin-left: 7px;
-        margin-right: 0px;
-    }
+
     .toogle-button {
-        border-color:  $info !important;
+        border-color: rgba($body-color, .20) !important;
+        color: rgba($body-color, .20);
+
         &.w-20 {
             width: 20px;
 
@@ -37,7 +36,6 @@
         }
 
         svg {
-            color:  $info !important;
             @include below-xl() {
                 width: 20px;
                 height: 20px;
@@ -51,16 +49,21 @@
             li {
                 margin-top: 2px;
 
+                &:has(.active) {
+                    .btn {
+                        &.sidebarLink {
+                            background-color: $custom-bg-light-blue;
+                        }
+                    }
+                }
+
                 a,
                 .btn-link {
                     min-height: 3.125rem;
-                    color: var(--bs-white);
-                    padding-right: 10px;
 
                     &.active,
                     &:hover {
-                        background-color: $primary;
-                        color: $body-color;
+                        background-color: $custom-bg-light-blue;
                     }
 
                     svg {
@@ -78,9 +81,7 @@
 
                         a,
                         .btn-link {
-                            padding-left: 53px !important;
-                            padding-right: 15px;
-                            line-height: 15px;
+                            padding-left: 44px !important;
 
                             .min-w-44 {
                                 min-width: 0;
@@ -143,8 +144,7 @@
                             padding: 0.5rem !important;
                             box-shadow: var(--bs-box-shadow);
                             overflow: auto;
-                            max-height: 350px;
-                            border: 1px solid $primary;
+                            max-height: calc(100vh - 30.5rem);
                             margin-top: -3rem;
 
                             li {
@@ -170,7 +170,6 @@
         }
     }
 }
-
 
 //Sidebar Menu Backdrop showing below the 1199px screen size
 .backdrop {

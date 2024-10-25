@@ -1,11 +1,8 @@
-import { MdDashboard, MdVisibility } from "react-icons/md"
-
-import SvgIcons from "../../components/SVGIcons"
-import { getLocalStorage } from "../../utils/storage";
 import { useTranslation } from "react-i18next";
+import { MdConfirmationNumber, MdDashboard, MdFolder, MdPerson, MdSchema, MdSupervisorAccount } from "react-icons/md";
+import { getLocalStorage } from "../../utils/storage";
 
 const companyTitle = getLocalStorage("companyTitle");
-
 export const NavItems = () => {
   const { t } = useTranslation(); // use the translation hook
 
@@ -14,79 +11,138 @@ export const NavItems = () => {
       id: 1,
       menuName: t("DASHBOARD"),
       title: t("DASHBOARD"),
-      menuIcon: SvgIcons.dashboardIcon,
+      menuIcon: <MdDashboard size={20} />,
       path: "/",
+      roleName: "admin",
       disabled: false,
-      roleName: "Dashboard"
     },
     {
       id: 2,
-      menuName: t("MASTER MANAGEMENT"),
-      title: t("MASTER MANAGEMENT"),
-      menuIcon: SvgIcons.mastermanage,
+      menuName: t("USER MANAGEMENT"),
+      title: t("User Management"),
+      menuIcon: <MdPerson size={20} />,
       path: '#',
-      moduleName: ["States", "Appointment"],
-      roleName: "Master Management",
+      roleName: "admin",
       subMenu: [
         {
-          id: 1,
-          menuName: t("CLAIM TYPE"),
-          path: "/claim-type",
-          moduleName: ["Master Management"],
-          roleName: "admin"
+          id: 21,
+          menuName: t("SEPS Users"),
+          title: t("SEPS Users"),
+          path: "/seps-users",
+          roleName: "admin",
+          disabled: true,
         },
         {
-          id: 2,
-          menuName: t("CLAIM SUB TYPE"),
-          path: "/claim-subtype",
-          moduleName: ["Master Management"],
-          roleName: "admin"
+          id: 22,
+          menuName: t("FI Users"),
+          title: t("FI Users"),
+          path: "/fi-users",
+          roleName: "admin",
+          disabled: true,
         },
         {
-          id: 3,
-          menuName: t("INQUIRY TYPE"),
-          path: "/inquiry-type",
-          moduleName: ["Master Management"],
-          roleName: "admin"
+          id: 23,
+          menuName: t("Roles & Rights"),
+          title: t("Roles & Rights"),
+          path: "/role-rights",
+          roleName: "admin",
+          disabled: false,
         },
-        {
-          id: 4,
-          menuName: t("INQUIRY SUB TYPE"),
-          path: "/inquiry-subtype",
-          moduleName: ["Master Management"],
-          roleName: "admin"
-        },
-        {
-          id: 5,
-          menuName: t("PROVINCE MASTER"),
-          path: "/province-master",
-          moduleName: ["Master Management"],
-          roleName: "admin"
-        },
-        {
-          id: 6,
-          menuName: t("CITY MASTER"),
-          path: "/city-master",
-          moduleName: ["Master Management"],
-          roleName: "admin"
-        },
-        {
-          id: 7,
-          menuName: t("TEMPLATE MASTER"),
-          path: "/template-master",
-          moduleName: ["Master Management"],
-          roleName: "admin"
-        }
       ],
     },
     {
       id: 3,
-      menuName: t("ROLES AND RIGHTS LIST"),
-      title: t("ROLES AND RIGHTS LIST"),
-      menuIcon: SvgIcons.userManagementIcon,
-      path: "/role-rights",
-      disabled: false,
-      roleName: "RoleRights"
-    }
+      menuName: t("Team Management"),
+      title: t("Team Management"),
+      menuIcon: <MdSupervisorAccount size={20} />,
+      path: "/team-management",
+      roleName: "admin",
+      disabled: true,
+    },
+    {
+      id: 4,
+      menuName: t("MASTER MANAGEMENT"),
+      title: t("MASTER MANAGEMENT"),
+      menuIcon: <MdFolder size={20} />,
+      path: '#',
+      moduleName: ["States", "Appointment"],
+      roleName: "admin",
+      subMenu: [
+        {
+          id: 41,
+          menuName: t("CLAIM TYPE"),
+          path: "/claim-type",
+          moduleName: ["Master Management"],
+          roleName: "admin",
+          disabled: false,
+        },
+        {
+          id: 42,
+          menuName: t("CLAIM SUB TYPE"),
+          path: "/claim-subtype",
+          moduleName: ["Master Management"],
+          roleName: "admin",
+          disabled: false,
+        },
+        {
+          id: 43,
+          menuName: t("INQUIRY TYPE"),
+          path: "/inquiry-type",
+          moduleName: ["Master Management"],
+          roleName: "admin",
+          disabled: false,
+        },
+        {
+          id: 44,
+          menuName: t("INQUIRY SUB TYPE"),
+          path: "/inquiry-subtype",
+          moduleName: ["Master Management"],
+          roleName: "admin",
+          disabled: false,
+        },
+        {
+          id: 45,
+          menuName: t("PROVINCE MASTER"),
+          path: "/province-master",
+          moduleName: ["Master Management"],
+          roleName: "admin",
+          disabled: false,
+        },
+        {
+          id: 46,
+          menuName: t("CITY MASTER"),
+          path: "/city-master",
+          moduleName: ["Master Management"],
+          roleName: "admin",
+          disabled: false,
+        },
+        {
+          id: 47,
+          menuName: t("TEMPLATE MASTER"),
+          path: "/template-master",
+          moduleName: ["Master Management"],
+          roleName: "admin",
+          disabled: false,
+        }
+      ],
+    },
+    {
+      id: 5,
+      menuName: t("Tickets"),
+      title: t("Tickets"),
+      menuIcon: <MdConfirmationNumber size={20} />,
+      path: "/tickets",
+      roleName: "admin",
+      disabled: true,
+    },
+    {
+      id: 6,
+      menuName: t("Ticket Workflow"),
+      title: t("Ticket Workflow"),
+      menuIcon: <MdSchema size={20} />,
+      path: "/tickets-workflow",
+      roleName: "admin",
+      disabled: true,
+    },
   ];
 }

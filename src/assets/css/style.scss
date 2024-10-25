@@ -1,0 +1,135 @@
+@import "./variables";
+@import '~bootstrap/scss/bootstrap';
+
+// Custom height and width classes
+@include custom-class('min-height', 38);
+@include custom-class('height', 38);
+@include custom-class('width', 38);
+@include custom-class('height', 42);
+@include custom-class('width', 42);
+@include custom-class('height', 60);
+@include custom-class('width', 60);
+@include custom-class('width', 85);
+@include custom-class('min-width', 85);
+@include custom-class('min-width', 100);
+@include custom-class('width', 110);
+@include custom-class('width', 130);
+@include custom-class('width', 150);
+@include custom-class('max-width', 150);
+@include custom-class('width', 160);
+@include custom-class('width', 190);
+@include custom-class('width', 200);
+@include custom-class('width', 250);
+@include custom-class('max-width', 320);
+
+// Bootstrap Custom CSS
+.tooltip {
+    position: fixed !important;
+
+    .tooltip-arrow {
+        display: none;
+    }
+
+    &.tooltip-sm {
+        --bs-tooltip-max-width: 200px;
+    }
+}
+
+.form-control {
+    &.is-invalid {
+        background-image: none !important;
+    }
+}
+
+.btn-outline-primary {
+    @include btn-outline-styles($primary);
+}
+
+.btn-outline-dark {
+    @include btn-outline-styles($dark);
+}
+
+.btn-outline-secondary {
+    @include btn-outline-styles($secondary);
+}
+
+.btn-outline-success {
+    @include btn-outline-styles($success);
+}
+
+.btn-outline-danger {
+    @include btn-outline-styles($danger);
+}
+
+// Custom CSS
+.fs-14 {
+    font-size: 14px;
+}
+
+.fs-15 {
+    font-size: 15px;
+}
+
+.fs-16 {
+    font-size: 16px;
+}
+
+.fs-20 {
+    font-size: 20px;
+}
+
+.fs-22 {
+    font-size: 22px;
+}
+
+.fs-24 {
+    font-size: 24px;
+}
+
+.fs-26 {
+    font-size: 26px;
+}
+
+.fs-30 {
+    font-size: 30px;
+}
+
+.fs-40 {
+    font-size: 40px;
+}
+
+.mw-1 {
+    min-width: 1px;
+}
+
+.theme-loader-z-index {
+    z-index: 1002 !important;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.bg-light-green-custom {
+    background-color: $custom-bg-light-green;
+}
+
+.theme-card-header {
+    h5 {
+        padding-left: 70px;
+
+        .theme-icon-box {
+            top: -36px;
+
+            .theme-icon-box-inner {
+                width: 35px;
+                height: 24px;
+
+                svg {
+                    width: auto;
+                    height: 100%;
+                }
+            }
+        }
+    }
+}
