@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Image, Stack } from "react-bootstrap";
+import { Card, Image } from "react-bootstrap";
 import comingSoonImage from "../../assets/images/coming-soon.svg";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
@@ -30,7 +30,7 @@ export default function Dashboard() {
             //   { label: "EDIT", onClick: handleEdit, variant: "outline-primary" },
             // ]}
           />
-          <Card className="border-0 flex-grow-1 d-flex flex-column">
+          <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
             <div className="m-auto text-center">
               <div>
                 <Image
