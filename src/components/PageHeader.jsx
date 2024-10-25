@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 
-const PageHeader = ({title, toggle }) => {
-    const {t} = useTranslation()
+const PageHeader = ({ title, toggle, download }) => {
+    const { t } = useTranslation()
     return (
         <div className="contentHeader p-1">
             <Stack
@@ -14,13 +14,23 @@ const PageHeader = ({title, toggle }) => {
                 <h1 className="fw-semibold h4 mb-0 fs-22">
                     {title}
                 </h1>
-                <Button
-                    variant="warning"
-                    className="fw-semibold fs-14"
-                    onClick={toggle}
-                >
-                    {t("ADD NEW")}
-                </Button>
+                <div>
+                    <Button
+                        variant="outline-dark"
+                        className="fw-semibold fs-14 me-2"
+                        onClick={download}
+                    >
+                        {t("EXPORT TO CSV")}
+                    </Button>
+                    <Button
+                        variant="warning"
+                        className="fw-semibold fs-14"
+                        onClick={toggle}
+                    >
+                        {t("ADD NEW")}
+                    </Button>
+
+                </div>
                 {/* <Link to={`/districts/add`} className="fw-semibold fs-14 custom-width-85 bg-info text-white text-decoration-none rounded-2 p-2 text-center" type="button" variant="info" size="sm">Add New</Link> */}
             </Stack>
         </div>

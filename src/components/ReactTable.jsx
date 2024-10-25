@@ -39,12 +39,11 @@ export default function ReactTable({
 
     const totalRecords = dataQuery?.data?.headers?.['x-total-count'] ?? 2 ;
 
- 
     const table = useReactTable({
 
-        // data: dataQuery.data?.data?.data ?? defaultData,
+        data: dataQuery.data?.data ?? defaultData,
 
-        data : dataQuery?.data ?? defaultData,
+        // data : dataQuery?.data ?? defaultData,
 
         columns,
 

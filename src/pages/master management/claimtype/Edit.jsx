@@ -10,36 +10,37 @@ import { useTranslation } from 'react-i18next';
 import { editClaimType } from '../../../services/claimType.service';
 
 
-const Edit = ({ modal, toggle }) => {
-    const {t} = useTranslation()
+const Edit = ({ modal, toggle, rowData,dataQuery }) => {
+    const { t } = useTranslation()
 
-    const handleSubmit = async (values,actions) => {
+    // HANDLE FORM SUBMIT
+    const handleSubmit = async (values, actions) => {
         const formData = {
-            name : values?.name,
-            description : values?.description
+            name: values?.name,
+            description: values?.description
         }
-        editClaimType(formData).then(response => {
+        editClaimType(rowData?.id , formData).then(response => {
             toast.success(response?.data?.message);
+            dataQuery.refetch();
             toggle()
         }).catch((error) => {
-            if(error?.response?.data?.errorDescription){
+            if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);
-            }else{
+            } else {
                 toast.error(error?.message);
             }
-        }).finally(()=>{
+        }).finally(() => {
             actions.setSubmitting(false);
         });
     };
-
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
             <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{("EDIT CLAIM TYPE")}</ModalHeader>
-            <ModalBody >
+            <ModalBody>
                 <Formik
                     initialValues={{
-                        name: "",
-                        description: ""
+                        name: rowData?.name ?? "",
+                        description: rowData?.description ?? ""
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
@@ -102,5 +103,4 @@ const Edit = ({ modal, toggle }) => {
         </Modal>
     );
 };
-
 export default Edit;

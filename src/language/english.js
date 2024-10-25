@@ -21,7 +21,7 @@ export const englishLang = {
     "ACTIONS": "Actions",
     "ROWS PER PAGE": "Rows per page",
     "NAME OF CLAIM TYPE": "Name of Claim Type",
-    "CREATE CLAIM TYPE": "Create claim type",
+    "CREATE CLAIM TYPE": "Create Claim Type",
     "EDIT CLAIM TYPE": "Edit claim type",
     "NAME OF CLAIM SUB TYPE": "Name of Claim Sub Type",
     "SLA BREACH": "SLA Breach",
@@ -50,5 +50,11 @@ export const englishLang = {
     "CREATE TEMPLATE MASTER":"Create Template Master",
     "EDIT TEMPLATE MASTER":"Edit Template Master",
     "NAME OF TEMPLATE MASTER":"Name of Template Master",
+    "EXPORT TO CSV" : "Export To CSV",
+
+
+    // MESSAGES
+    "STATUS UPDATED" : "Status updated successfully.",
+    "STATUS UPDATE ERROR" : "Error in  updating status"
 
 }

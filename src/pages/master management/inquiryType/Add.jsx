@@ -15,24 +15,26 @@ import axios from 'axios';
 
 const Add = ({ modal, toggle }) => {
 
-    const {t} = useTranslation()
-    
-    const handleSubmit = async (values,actions) => {
+    const { t } = useTranslation()
+
+    const handleSubmit = async (values, actions) => {
         const formData = {
-            name : values?.name,
-            description : values?.description
+            name: values?.name,
+            description: values?.description
         }
 
-        axios.post('https://relative-glider-entirely.ngrok-free.app/api/v1/inquiry-types',formData).then(response => {
+        // axios.post('https://relative-glider-entirely.ngrok-free.app/api/v1/inquiry-types',formData)
+
+        createNewInquiryType(formData).then(response => {
             toast.success(response?.data?.message);
             toggle()
         }).catch((error) => {
-            if(error?.response?.data?.errorDescription){
+            if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);
-            }else{
+            } else {
                 toast.error(error?.message);
             }
-        }).finally(()=>{
+        }).finally(() => {
             actions.setSubmitting(false);
         });
     };

@@ -48,6 +48,8 @@ export const spanishLang = {
     "PROVINCE": "Provincia",
     "CREATE TEMPLATE MASTER": "Crear maestro de plantillas",
     "EDIT TEMPLATE MASTER": "Editar maestro de plantillas",
-    "NAME OF TEMPLATE MASTER": "Nombre del maestro de plantillas"
+    "NAME OF TEMPLATE MASTER": "Nombre del maestro de plantillas",
+
+    "STATUS UPDATED" : "Estado actualizado con éxito."
 
 }

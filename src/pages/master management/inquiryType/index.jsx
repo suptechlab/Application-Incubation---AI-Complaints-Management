@@ -196,7 +196,7 @@ const InquiryType = () => {
 
 
   useEffect(() => {
-    axios.get('https://relative-glider-entirely.ngrok-free.app/management/info').then(response => {
+    axios.get('http://10.10.201.37:8081/management/info').then(response => {
       console.log({ Response: response })
     }).catch((error) => {
       console.log({ Error: error })
