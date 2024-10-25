@@ -2,6 +2,7 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom height and width classes
+@include custom-class('min-height', 38);
 @include custom-class('height', 38);
 @include custom-class('width', 38);
 @include custom-class('height', 42);
@@ -38,6 +39,26 @@
     &.is-invalid {
         background-image: none !important;
     }
+}
+
+.btn-outline-primary {
+    @include btn-outline-styles($primary);
+}
+
+.btn-outline-dark {
+    @include btn-outline-styles($dark);
+}
+
+.btn-outline-secondary {
+    @include btn-outline-styles($secondary);
+}
+
+.btn-outline-success {
+    @include btn-outline-styles($success);
+}
+
+.btn-outline-danger {
+    @include btn-outline-styles($danger);
 }
 
 // Custom CSS

@@ -23,9 +23,12 @@ $btn-font-weight: 600;
 $btn-padding-y: 0.469rem;
 $btn-padding-x: 1.085rem;
 $box-shadow-sm: 0px 3px 5px 0px rgba($body-color, 0.05);
+$box-shadow: 0px 2px 2px 0px rgba($body-color, 0.15);
 $navbar-dark-color: $white;
 $nav-link-font-size: 15px;
 $navbar-dark-disabled-color: rgba($white, .5);
+$card-box-shadow: $box-shadow;
+$card-border-radius: 0.375rem;
 
 $table-striped-order: even;
 $table-cell-padding-y: 1rem;
@@ -44,14 +47,23 @@ $theme-size-15: 0.9375rem;
 $theme-sidebar-width: 14.375rem;
 $theme-sidebar-brand-height: 5em;
 $theme-header-height: 4rem;
-$custom-bg-light-green:#28A745;
-$custom-bg-light-blue:#1B7ACE;
+$custom-bg-light-green: #28A745;
+$custom-bg-light-blue: #1B7ACE;
 
 // Generate custom classes for width, min-width, height, min-height
 @mixin custom-class($property, $value) {
   .custom-#{$property}-#{$value} {
     #{$property}: #{$value}+px;
   }
+}
+
+//Custom Outline Buttons hover Changes
+@mixin btn-outline-styles($color) {
+  --bs-btn-hover-color: #{$color};
+  --bs-btn-hover-bg: #{rgba($color, .10)};
+  --bs-btn-hover-border-color: #{$color};
+  --bs-btn-active-color: #{$color};
+  --bs-btn-active-bg: #{rgba($color, .20)};
 }
 
 //Responsive Mixins
