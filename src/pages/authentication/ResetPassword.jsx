@@ -91,7 +91,7 @@ export default function ResetPassword() {
                                                 error={errors.otp}
                                                 id="otp"
                                                 key={'otp'}
-                                                label="OTP"
+                                                label="OTP *"
                                                 name="otp"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
@@ -129,7 +129,7 @@ export default function ResetPassword() {
                                                 value={values.confirmPassword}
                                             />
 
-                                            <Form.Group className="mb-3 pb-1">
+                                            <Form.Group className="mb-4 pt-1">
                                                 <Captcha
                                                     reCaptchaRef={reCaptchaRef}
                                                     onChangeCaptchaCode={(

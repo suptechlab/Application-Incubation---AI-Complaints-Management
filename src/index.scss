@@ -1,42 +1,4 @@
 @import "../src/assets/css/variables";
-@import '~bootstrap/scss/bootstrap';
-
-// Custom height and width classes
-@include custom-class('height', 38);
-@include custom-class('width', 38);
-@include custom-class('height', 42);
-@include custom-class('width', 42);
-@include custom-class('height', 60);
-@include custom-class('width', 60);
-@include custom-class('width', 85);
-@include custom-class('min-width', 85);
-@include custom-class('min-width', 100);
-@include custom-class('width', 110);
-@include custom-class('width', 130);
-@include custom-class('width', 150);
-@include custom-class('width', 160);
-@include custom-class('width', 190);
-@include custom-class('width', 200);
-@include custom-class('width', 250);
-@include custom-class('max-width', 320);
-
-.tooltip {
-    position: fixed !important;
-
-    .tooltip-arrow {
-        display: none;
-    }
-
-    &.tooltip-sm {
-        --bs-tooltip-max-width: 200px;
-    }
-}
-
-.form-control {
-	&.is-invalid {
-		background-image: none !important;
-	}
-}
 
 .form-floating {
 
@@ -78,57 +40,6 @@
 	font-weight: 600;
 }
 
-.fs-14 {
-	font-size: 14px;
-}
-
-.fs-15 {
-	font-size: 15px;
-}
-
-.fs-16 {
-	font-size: 16px;
-}
-
-.fs-20 {
-	font-size: 20px;
-}
-
-.fs-22 {
-	font-size: 22px;
-}
-
-.fs-24 {
-	font-size: 24px;
-}
-
-.fs-26 {
-	font-size: 26px;
-}
-
-.fs-30 {
-	font-size: 30px;
-}
-
-.theme-card-header {
-	h5 {
-		padding-left: 70px;
-
-		.theme-icon-box {
-			top: -36px;
-
-			.theme-icon-box-inner {
-				width: 35px;
-				height: 24px;
-
-				svg {
-					width: auto;
-					height: 100%;
-				}
-			}
-		}
-	}
-}
 
 .table>thead {
 	vertical-align: middle;
@@ -150,14 +61,6 @@ tbody tr {
 		margin: 1px 5px;
 		height: 37px;
 	}
-}
-
-.hideInSmallSidebar {
-	font-size: 13px;
-	font-weight: 600;
-	white-space: normal;
-	text-align: left;
-	margin-right: auto;
 }
 
 .table-bordered th {
@@ -403,18 +306,6 @@ select {
 	width: 70%;
 }
 
-.pointer {
-	cursor: pointer;
-}
-
-.user-name {
-	display: block;
-	max-width: 129px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
 .page-header-icon {
 	svg {
 		width: 30px;
@@ -467,19 +358,16 @@ select {
 	}
 
 	input.form-control::-webkit-input-placeholder {
-		/* Chrome/Opera/Safari */
 		color: #000;
 		opacity: .5
 	}
 
 	input.form-control::-moz-placeholder {
-		/* Firefox 19+ */
 		color: #000;
 		opacity: .5
 	}
 
 	input.form-control:-ms-input-placeholder {
-		/* IE 10+ */
 		color: #000;
 		opacity: .5
 	}
@@ -543,11 +431,6 @@ input[type='radio']:checked:after {
 
 }
 
-.add-claim-list {
-	list-style: none;
-	margin-top: 10px;
-	padding: 0px;
-}
 
 .link-text {
 	font-size: 14px;
@@ -557,6 +440,10 @@ input[type='radio']:checked:after {
 }
 
 .add-claim-list {
+	list-style: none;
+	margin-top: 10px;
+	padding: 0px;
+
 	.link-text {
 		margin-bottom: 5px;
 
@@ -619,14 +506,6 @@ input[type='radio']:checked:after {
 	border-color: #2F7735 !important;
 }
 
-.mw-1 {
-	min-width: 1px;
-}
-
-.min-width-155 {
-	min-width: 155px;
-}
-
 .down-color {
 	color: #0088FF;
 	text-decoration: none !important;
@@ -660,10 +539,6 @@ input[type='radio']:checked:after {
 	display: initial;
 	font-size: 12px;
 	font-weight: 600;
-}
-
-.width-85 {
-	min-width: 85px;
 }
 
 .multiselect .react-select__indicators,
@@ -736,16 +611,12 @@ input[type='radio']:checked:after {
 }
 
 .custom-table tbody tr:nth-of-type(even) {
-	background-color: rgba(0, 0, 0, .05) !important;
+	background-color: rgba(0, 0, 0, 0.0509803922) !important;
 }
 
 .custom-table td,
 .custom-table th {
 	padding: 1rem 1rem;
-}
-
-.custom-table tbody tr:nth-of-type(even) {
-	background-color: rgba(0, 0, 0, 0.0509803922) !important;
 }
 
 .min-width-200 {
@@ -781,14 +652,6 @@ input[type='radio']:checked:after {
 .max-w-776 {
 	max-width: 776px;
 	margin: 0 auto;
-}
-
-.fs-40 {
-	font-size: 40px;
-}
-
-.h-44 {
-	height: 44px;
 }
 
 .header-new-menu {
@@ -916,35 +779,32 @@ input[type='radio']:checked:after {
 
 .left-one {
 	min-width: 71px;
+	max-width: 100px;
 }
 
 .notification-modal {
 	min-width: 400px;
 	right: 0 !important;
 	left: inherit !important;
-
-}
-
-.notification-modal .dropdown-item {
-	border-bottom: 1px solid #ddd;
-	white-space: normal;
-}
-
-.notification-modal .dropdown-item:hover {
-	background: $primary;
-	color: #fff !important;
-}
-
-.notification-modal .dropdown-item:hover .text-primary {
-	color: #fff !important;
-}
-
-.notification-modal .dropdown-item:last-child {
-	border: none;
-}
-
-.notification-modal {
 	appearance: none;
+
+	.dropdown-item {
+		border-bottom: 1px solid #ddd;
+		white-space: normal;
+
+		&:hover {
+			background: $primary;
+			color: #fff !important;
+
+			.text-primary {
+				color: #fff !important;
+			}
+		}
+
+		&:last-child {
+			border: none;
+		}
+	}
 }
 
 .notification-count {
@@ -1010,7 +870,6 @@ input[type='radio']:checked:after {
 
 .dashbord-rotate-text {
 	width: 20px;
-	/* height: 5px; */
 	display: inline-block;
 	vertical-align: middle;
 	margin-top: 40px;
@@ -1036,6 +895,7 @@ input[type='radio']:checked:after {
 
 .dashboard-table th:first-child {
 	border-right: 1px solid #A0A0A0;
+	width: 180px;
 }
 
 .dashboard-table tr {
@@ -1045,10 +905,6 @@ input[type='radio']:checked:after {
 .dashboard-table th,
 .dashboard-table td {
 	padding: 6px !important;
-}
-
-.dashboard-table th:first-child {
-	width: 180px;
 }
 
 .dashboard-bottom-table table {
@@ -1067,8 +923,6 @@ input[type='radio']:checked:after {
 
 .dashboard-bottom-table table tr:last-child td:first-child {
 	font-weight: bold;
-
-
 }
 
 .dashboard-bottom-table table tr:last-child td {
@@ -1136,13 +990,6 @@ input[type='radio']:checked:after {
 	object-position: right;
 }
 
-
-
-
-
-
-
-
 @media only screen and (max-width: 991px) {
 	.pad-right-70 {
 		padding-right: 15px;
@@ -1165,41 +1012,20 @@ input[type='radio']:checked:after {
 
 
 /**slider css**/
-
 .slider {
-	margin: 0 20px;
 	overflow: "hidden";
-	padding: 2rem 0;
+	margin: 0;
+	padding: 8px;
+
+	img {
+		max-width: 100%;
+		border-radius: 10px;
+		max-height: 173px;
+		width: 100%;
+		object-fit: contain;
+
+	}
 }
-
-.slider img {
-	max-width: 100%;
-	border-radius: 10px;
-	max-height: 173px;
-	width: 100%;
-	object-fit: contain;
-
-}
-
-
-
-.custom-dot-list-style button {
-	border: none;
-	background: #fff(255, 68, 68);
-}
-
-.react-multi-carousel-dot.react-multi-carousel-dot--active button {
-	background: #fff(255, 68, 68) !important;
-}
-
-.react-multiple-carousel__arrow--left {
-	left: 2px;
-}
-
-.react-multiple-carousel__arrow--right {
-	right: 2px;
-}
-
 
 .slider-bg {
 	padding: 3px;
@@ -1210,9 +1036,22 @@ input[type='radio']:checked:after {
 	height: 100%;
 }
 
-.slider {
-	margin: 0;
-	padding: 8px;
+.custom-dot-list-style button {
+	border: none;
+	background: #fff(255, 68, 68);
+}
+
+.react-multi-carousel-dot.react-multi-carousel-dot--active button {
+	width: 23px;
+	background: rgba(255, 255, 255, 1);
+}
+
+.react-multiple-carousel__arrow--left {
+	left: 2px;
+}
+
+.react-multiple-carousel__arrow--right {
+	right: 2px;
 }
 
 .react-multiple-carousel__arrow {
@@ -1232,11 +1071,6 @@ input[type='radio']:checked:after {
 	height: 5px;
 	border-radius: 3px;
 	background: rgba(255, 255, 255, .1);
-}
-
-.react-multi-carousel-dot.react-multi-carousel-dot--active button {
-	width: 23px;
-	background: rgba(255, 255, 255, 1);
 }
 
 .truncate {
@@ -1291,10 +1125,6 @@ input[type='radio']:checked:after {
 .bar_width_height>div {
 	width: 100%;
 	height: 290px;
-}
-
-.left-one {
-	max-width: 100px;
 }
 
 .section-contact ul {

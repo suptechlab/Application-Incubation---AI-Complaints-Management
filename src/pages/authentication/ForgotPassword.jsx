@@ -95,7 +95,7 @@ export default function ForgotPassword() {
                                             onChange={handleChange}
                                         />
 
-                                        <Form.Group className="mb-3 pb-1">
+                                        <Form.Group className="mb-4 pt-1">
                                             <Captcha
                                                 reCaptchaRef={reCaptchaRef}
                                                 onChangeCaptchaCode={(

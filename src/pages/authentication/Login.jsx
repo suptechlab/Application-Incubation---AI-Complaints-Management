@@ -147,7 +147,7 @@ export default function Login() {
                                                         </Col>
                                                     </Row>
                                                 </Form.Group>
-                                                <Form.Group className="mb-3 pb-1">
+                                                <Form.Group className="mb-4">
                                                     <Captcha
                                                         reCaptchaRef={reCaptchaRef}
                                                         //sitekey="YOUR_RECAPTCHA_SITE_KEY" // Replace with your reCAPTCHA site key

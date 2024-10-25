@@ -3,18 +3,16 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { BrowserRouter as Router } from "react-router-dom";
-
 import App from './App';
 import AuthenticationProvider from './contexts/authentication.context';
 import reportWebVitals from './reportWebVitals';
-import './index.scss';
 import 'sweetalert2/src/sweetalert2.scss'
+import './index.scss';
+import './assets/css/style.scss';
 
 const queryClient = new QueryClient();
-
-
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
