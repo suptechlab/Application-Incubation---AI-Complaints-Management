@@ -103,6 +103,11 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "otp_token_expiration_time")
     private Instant otpTokenExpirationTime;
 
+    @Column(name = "last_logged_in")
+    private Instant lastLoggedIn;
+
+    @Column(name = "current_logged_in")
+    private Instant currentLoggedIn;
 
     public Long getId() {
         return id;
@@ -239,6 +244,22 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setOtpTokenExpirationTime(Instant otpTokenExpirationTime) {
         this.otpTokenExpirationTime = otpTokenExpirationTime;
+    }
+
+    public Instant getLastLoggedIn() {
+        return lastLoggedIn;
+    }
+
+    public void setLastLoggedIn(Instant lastLoggedIn) {
+        this.lastLoggedIn = lastLoggedIn;
+    }
+
+    public Instant getCurrentLoggedIn() {
+        return currentLoggedIn;
+    }
+
+    public void setCurrentLoggedIn(Instant currentLoggedIn) {
+        this.currentLoggedIn = currentLoggedIn;
     }
 
     @Override

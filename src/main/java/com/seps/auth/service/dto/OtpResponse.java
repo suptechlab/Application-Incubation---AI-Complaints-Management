@@ -2,12 +2,12 @@ package com.seps.auth.service.dto;
 
 import java.time.Instant;
 
-public class OTPResponse {
+public class OtpResponse {
 
     private String otpToken;
     private Instant otpTokenExpirationTime;
 
-    public OTPResponse(String otpToken, Instant otpTokenExpirationTime) {
+    public OtpResponse(String otpToken, Instant otpTokenExpirationTime) {
         this.otpToken = otpToken;
         this.otpTokenExpirationTime = otpTokenExpirationTime;
     }

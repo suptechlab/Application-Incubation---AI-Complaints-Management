@@ -21,4 +21,14 @@
       </column>
     </addColumn>
   </changeSet>
+  <changeSet id="1729855940835" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="last_logged_in" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <column name="current_logged_in" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

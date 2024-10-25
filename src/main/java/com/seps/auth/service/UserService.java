@@ -2,13 +2,14 @@ package com.seps.auth.service;
 
 import com.seps.auth.config.Constants;
 import com.seps.auth.domain.Authority;
+import com.seps.auth.domain.LoginLog;
 import com.seps.auth.domain.User;
 import com.seps.auth.repository.AuthorityRepository;
+import com.seps.auth.repository.LoginLogRepository;
 import com.seps.auth.repository.UserRepository;
 import com.seps.auth.security.AuthoritiesConstants;
 import com.seps.auth.security.SecurityUtils;
 import com.seps.auth.service.dto.AdminUserDTO;
-import com.seps.auth.service.dto.OTPResponse;
 import com.seps.auth.service.dto.UserDTO;
 
 import java.time.Instant;
@@ -38,16 +39,25 @@ public class UserService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
+    public static final String INITIATED = "INITIATED";
+
+    public static final String SUCCESS = "SUCCESS";
+
+    public static final String FAILED = "FAILED";
+
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
+    private final LoginLogRepository loginLogRepository;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, LoginLogRepository loginLogRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.loginLogRepository = loginLogRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -317,5 +327,83 @@ public class UserService {
         user.setOtpTokenExpirationTime(otpTokenExpirationTime);
         // Save user with updated OTP information
         return userRepository.save(user);
+    }
+
+    /**
+     * Verifies if the provided OTP token is valid for the user and not expired.
+     *
+     * @param otpToken the OTP token to verify
+     * @return true if the OTP token is valid and not expired; false otherwise
+     */
+    public boolean verifyOtpToken(String otpToken) {
+        User user = userRepository.findByOtpToken(otpToken)
+            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.INVALID_OTP_TOKEN, null, null));
+        return user.getOtpTokenExpirationTime().isAfter(Instant.now());
+    }
+
+    /**
+     * Verifies if the provided OTP code matches the one associated with the OTP token for the user.
+     *
+     * @param otpCode  the OTP code provided by the user
+     * @param otpToken the OTP token to which the code should correspond
+     * @return true if the OTP code is correct for the provided token; false otherwise
+     */
+    public boolean verifyOtpCode(String otpCode, String otpToken) {
+        User user = userRepository.findByOtpToken(otpToken)
+            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.INVALID_OTP_CODE, null, null));
+        return otpCode.equals(user.getOtpCode());
+    }
+
+    public Optional<User> findUserByOtpToken(String otpToken) {
+        Optional<User> userOptional = userRepository.findByOtpToken(otpToken);
+        if (userOptional.isEmpty()) {
+            LOG.warn("No user found for OTP token: {}", otpToken);
+        }
+        return userOptional;
+    }
+
+    /**
+     * Clears the OTP token, OTP code, and their expiration times for the user and saves the updated user.
+     *
+     * @param user the user entity to update
+     * @return the updated user with cleared OTP fields
+     */
+    public User clearOtpData(User user) {
+        // Set OTP fields to null
+        user.setOtpToken(null);
+        user.setOtpCode(null);
+        user.setOtpTokenExpirationTime(null);
+        user.setOtpCodeExpirationTime(null);
+        // Save the updated user to the database
+        return userRepository.save(user);
+    }
+
+    public User updateUserOtpCode(User user) {
+        OtpService otpService = new OtpService();
+        String otpCode = otpService.generateOtpCode();
+        Instant otpExpirationTime = otpService.getOtpExpirationTime();
+        user.setOtpCode(otpCode);
+        user.setOtpCodeExpirationTime(otpExpirationTime);
+        // Save user with updated OTP information
+        return userRepository.save(user);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public void logSuccessfulLogin(User user, String clientIp) {
+        Instant instant = Instant.now();
+        // Update lastLoggedIn and currentLoggedIn timestamps
+        user.setLastLoggedIn(user.getCurrentLoggedIn()); // Set last login time to previous current login time
+        user.setCurrentLoggedIn(instant); // Update current login time to now
+        userRepository.save(user);
+        LoginLog successLoginLog = new LoginLog(user.getId(), instant, UserService.SUCCESS, clientIp);
+        loginLogRepository.save(successLoginLog);
+    }
+
+    public void saveLoginLog(User user, String status, String clientIp) {
+        LoginLog successLoginLog = new LoginLog(user.getId(), Instant.now(), status, clientIp);
+        loginLogRepository.save(successLoginLog);
     }
 }

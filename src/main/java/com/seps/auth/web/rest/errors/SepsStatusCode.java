@@ -7,7 +7,9 @@ public enum SepsStatusCode implements StatusType {
     USERNAME_PASSWORD_INVALID(10010, "username.password.failed.validation"),
     RECAPTCHA_FAILED(10011, "recaptcha.failed.validation"),
     FORM_VALIDATION_ERROR(10012, "form.validation.error"),
-    USER_NOT_FOUND(10013, "user.not.found");
+    USER_NOT_FOUND(10013, "user.not.found"),
+    INVALID_OTP_TOKEN(10014, "invalid.otp.token"),
+    INVALID_OTP_CODE(10015, "invalid.otp.code");
 
     private final int code;
 
