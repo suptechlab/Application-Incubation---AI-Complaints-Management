@@ -1,6 +1,7 @@
 package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.service.InquiryTypeService;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.InquiryTypeDTO;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,11 +20,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -95,9 +99,10 @@ public class InquiryTypeResource {
     @GetMapping
     public ResponseEntity<List<InquiryTypeDTO>> getAllInquiryTypes(
         @PageableDefault Pageable pageable,
-        @RequestParam(value = "search", required = false) String search) {
-        log.debug("REST request to get all Inquiry Types with search filter: {}", search);
-        Page<InquiryTypeDTO> page = inquiryTypeService.getAllInquiryTypes(pageable, search);
+        @RequestParam(value = "search", required = false) String search,
+        @Parameter(description = "Status filter (true for active, false for inactive)") @RequestParam(required = false) Boolean status) {
+        log.debug("REST request to get all Inquiry Types with search filter: {},{}", search, status);
+        Page<InquiryTypeDTO> page = inquiryTypeService.getAllInquiryTypes(pageable, search, status);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -111,5 +116,25 @@ public class InquiryTypeResource {
     ) {
         inquiryTypeService.changeStatus(inquiryTypeId, status);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<byte[]> listInquiryTypesDownload(@RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) throws IOException {
+        ByteArrayInputStream in = inquiryTypeService.listInquiryTypesDownload(search, status);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=Inquiry-types.xlsx");
+
+        return ResponseEntity.ok()
+            .headers(headers)
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .body(in.readAllBytes());
+    }
+
+    @Operation(summary = "List Active Inquiry Types", description = "Returns a list of active inquiry types for dropdown selection.")
+    @ApiResponse(responseCode = "200", description = "List of active inquiry types", content = @Content(schema = @Schema(implementation = InquiryTypeDTO.class)))
+    @GetMapping("/dropdown-list")
+    public ResponseEntity<List<DropdownListDTO>> listActiveInquiryTypes() {
+        List<DropdownListDTO> inquiryTypes = inquiryTypeService.listActiveInquiryTypes();
+        return ResponseEntity.ok(inquiryTypes);
     }
 }

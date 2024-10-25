@@ -1,12 +1,22 @@
 package com.seps.admin.service;
 
+import com.seps.admin.config.Constants;
+import com.seps.admin.domain.InquirySubTypeEntity;
 import com.seps.admin.domain.InquiryTypeEntity;
 import com.seps.admin.repository.InquiryTypeRepository;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.InquiryTypeDTO;
 import com.seps.admin.service.mapper.InquiryTypeMapper;
+import com.seps.admin.service.specification.InquirySubTypeSpecification;
+import com.seps.admin.service.specification.InquiryTypeSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import jakarta.validation.Valid;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.zalando.problem.Status;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -112,14 +126,11 @@ public class InquiryTypeService {
      * @return a paginated list of Inquiry Type DTOs
      */
     @Transactional(readOnly = true)
-    public Page<InquiryTypeDTO> getAllInquiryTypes(Pageable pageable, String search) {
-        if (StringUtils.hasText(search)) {
-            return inquiryTypeRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search, pageable)
+    public Page<InquiryTypeDTO> getAllInquiryTypes(Pageable pageable, String search, Boolean status) {
+
+        return inquiryTypeRepository.findAll(InquiryTypeSpecification.byFilter(search, status), pageable)
                 .map(inquiryTypeMapper::toDTO);
-        } else {
-            return inquiryTypeRepository.findAll(pageable)
-                .map(inquiryTypeMapper::toDTO);
-        }
+
     }
 
     /**
@@ -141,5 +152,53 @@ public class InquiryTypeService {
 
         inquiryType.setStatus(status);
         inquiryTypeRepository.save(inquiryType);
+    }
+
+    @Transactional(readOnly = true)
+    public ByteArrayInputStream listInquiryTypesDownload(String search, Boolean status) throws IOException {
+
+        List<InquiryTypeEntity> dataList = inquiryTypeRepository.findAll(InquiryTypeSpecification.byFilter(search, status));
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Inquiry Types");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Id", "Name", "Description", "Status"};
+
+            for (int col = 0; col < headers.length; col++) {
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(headers[col]);
+            }
+            // Data
+            int rowIdx = 1;
+            for (InquiryTypeEntity data : dataList) {
+                Row row = sheet.createRow(rowIdx++);
+
+                row.createCell(0).setCellValue(data.getId());
+                row.createCell(1).setCellValue(data.getName());
+                row.createCell(2).setCellValue(data.getDescription());
+                row.createCell(3).setCellValue(data.getStatus().equals(true) ? Constants.ACTIVE : Constants.INACTIVE);
+            }
+            // Auto-size columns
+            for (int col = 0; col < headers.length; col++) {
+                sheet.autoSizeColumn(col);
+            }
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        }
+    }
+
+    /**
+     * Retrieves a list of all active Inquiry Types for dropdown selection.
+     *
+     * @return a list of active Inquiry Type DTOs
+     */
+    @Transactional(readOnly = true)
+    public List<DropdownListDTO> listActiveInquiryTypes() {
+        return inquiryTypeRepository.findAllByStatus(true)
+            .stream()
+            .map(inquiryTypeMapper::toDropDownDTO)
+            .toList();
     }
 }

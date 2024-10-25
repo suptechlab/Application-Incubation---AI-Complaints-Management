@@ -20,6 +20,8 @@ public class InquirySubTypeDTO {
     @NotNull
     private Long inquiryTypeId;
 
+    private String inquiryTypeName;
+
     private Boolean status;
 
 }

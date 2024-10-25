@@ -1,5 +1,7 @@
 package com.seps.admin.service;
 
+import com.seps.admin.config.Constants;
+import com.seps.admin.domain.ClaimTypeEntity;
 import com.seps.admin.domain.InquirySubTypeEntity;
 import com.seps.admin.repository.InquirySubTypeRepository;
 import com.seps.admin.repository.InquiryTypeRepository;
@@ -7,16 +9,25 @@ import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.InquirySubTypeDTO;
 import com.seps.admin.service.mapper.InquirySubTypeMapper;
 import com.seps.admin.service.mapper.InquiryTypeMapper;
+import com.seps.admin.service.specification.ClaimTypeSpecification;
 import com.seps.admin.service.specification.InquirySubTypeSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import jakarta.validation.Valid;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -132,19 +143,6 @@ public class InquirySubTypeService {
     }
 
     /**
-     * Retrieves a list of all active Inquiry Types for dropdown selection.
-     *
-     * @return a list of active Inquiry Type DTOs
-     */
-    @Transactional(readOnly = true)
-    public List<DropdownListDTO> listActiveInquiryTypes() {
-        return inquiryTypeRepository.findAllByStatus(true)
-            .stream()
-            .map(inquiryTypeMapper::toDropDownDTO)
-            .toList();
-    }
-
-    /**
      * Retrieves an Inquiry Sub Type by its ID.
      *
      * @param id the ID of the inquiry sub type
@@ -157,5 +155,41 @@ public class InquirySubTypeService {
             .map(mapper::toDTO)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INQUIRY_SUB_TYPE_NOT_FOUND,
                 new String[]{id.toString()}, null));
+    }
+
+    @Transactional(readOnly = true)
+    public ByteArrayInputStream listInquirySubTypesDownload(String search, Boolean status) throws IOException {
+
+        List<InquirySubTypeEntity> dataList = inquirySubTypeRepository.findAll(InquirySubTypeSpecification.byFilter(search, status));
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Inquiry Sub Types");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Id", "Name", "Inquiry Type", "Description", "Status"};
+
+            for (int col = 0; col < headers.length; col++) {
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(headers[col]);
+            }
+            // Data
+            int rowIdx = 1;
+            for (InquirySubTypeEntity data : dataList) {
+                Row row = sheet.createRow(rowIdx++);
+
+                row.createCell(0).setCellValue(data.getId());
+                row.createCell(1).setCellValue(data.getName());
+                row.createCell(2).setCellValue(data.getInquiryType().getName());
+                row.createCell(3).setCellValue(data.getDescription());
+                row.createCell(4).setCellValue(data.getStatus().equals(true) ? Constants.ACTIVE : Constants.INACTIVE);
+            }
+            // Auto-size columns
+            for (int col = 0; col < headers.length; col++) {
+                sheet.autoSizeColumn(col);
+            }
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        }
     }
 }

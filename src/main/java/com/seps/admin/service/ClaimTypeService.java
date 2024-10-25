@@ -4,6 +4,7 @@ import com.seps.admin.config.Constants;
 import com.seps.admin.domain.ClaimTypeEntity;
 import com.seps.admin.repository.ClaimTypeRepository;
 import com.seps.admin.service.dto.ClaimTypeDTO;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.mapper.ClaimTypeMapper;
 import com.seps.admin.service.specification.ClaimTypeSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
@@ -162,5 +163,12 @@ public class ClaimTypeService {
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         }
+    }
+
+    public List<DropdownListDTO> listActiveInquiryTypes() {
+        return claimTypeRepository.findAllByStatus(true)
+            .stream()
+            .map(claimTypeMapper::toDropDownDTO)
+            .toList();
     }
 }

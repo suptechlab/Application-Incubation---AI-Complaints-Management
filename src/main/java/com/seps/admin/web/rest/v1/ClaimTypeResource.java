@@ -2,6 +2,7 @@ package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.service.ClaimTypeService;
 import com.seps.admin.service.dto.ClaimTypeDTO;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.ResponseStatus;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -84,5 +85,11 @@ public class ClaimTypeResource {
             .headers(headers)
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .body(in.readAllBytes());
+    }
+
+    @GetMapping("/dropdown-list")
+    public ResponseEntity<List<DropdownListDTO>> listActiveInquiryTypes() {
+        List<DropdownListDTO> claimTypes = claimTypeService.listActiveInquiryTypes();
+        return ResponseEntity.ok(claimTypes);
     }
 }

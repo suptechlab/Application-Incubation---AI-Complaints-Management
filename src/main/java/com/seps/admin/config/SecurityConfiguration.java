@@ -30,6 +30,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .cors(withDefaults())
             .authorizeHttpRequests(authz ->
                 // prettier-ignore
                 authz

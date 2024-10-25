@@ -69,10 +69,12 @@ jhipster:
   # CORS is disabled by default on microservices, as you should access them through a gateway.
   # If you want to enable it, please uncomment the configuration below.
   cors:
-    allowed-origins: "http://localhost:3001,https://localhost:3001,http://localhost:3001/,https://localhost:3001/"
+    allowed-origins: "http://localhost:3001,http://localhost:3001/,https://localhost:3001,https://localhost:8081,http://localhost:8081"
+    # Enable CORS when running in GitHub Codespaces
+    allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: "*"
     allowed-headers: "*"
-    exposed-headers: "Authorization,Link,X-Total-Count"
+    exposed-headers: "Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params"
     allow-credentials: true
     max-age: 1800
   security:

@@ -11,7 +11,9 @@ public enum SepsStatusCode implements StatusType {
     DUPLICATE_INQUIRY_SUB_TYPE(20012, "duplicate.inquiry.sub.type"),
     INQUIRY_SUB_TYPE_NOT_FOUND(20013, "inquiry.sub.type.not.found"),
     DUPLICATE_CLAIM_TYPE(20014, "duplicate.claim.type"),
-    CLAIM_TYPE_NOT_FOUND(20015, "claim.type.not.found"),;
+    CLAIM_TYPE_NOT_FOUND(20015, "claim.type.not.found"),
+    DUPLICATE_CLAIM_SUB_TYPE(20016, "duplicate.claim.sub.type"),
+    CLAIM_SUB_TYPE_NOT_FOUND(20017, "claim.sub.type.not.found");
 
     private final int code;
 
