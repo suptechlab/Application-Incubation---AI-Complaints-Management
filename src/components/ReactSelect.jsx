@@ -25,10 +25,6 @@ const ReactSelect = ({ options, value, onChange, className = 'mb-3 pb-1', name, 
 
     return (
         <div className={className || ''}>
-{/*           
-             <label htmlFor={name} className={selectedOption ? 'active mb-1 fs-14' : 'mb-1 fs-14'}>
-                 {label}
-             </label> */}
             {label ? <label className='mb-1 fs-14' htmlFor={name}>{label}</label> : ""}
          
             <Select
@@ -39,7 +35,7 @@ const ReactSelect = ({ options, value, onChange, className = 'mb-3 pb-1', name, 
                 options={formattedOptions}
                 placeholder={placeholder}
                 //placeholder=""
-                isClearable={selectedOption?.value != '' ? true : false}
+                isClearable={selectedOption?.value != ''}
                 classNamePrefix="react-select"
                 defaultValue={defaultValue}
                 className={`react-select-container ${selectedOption ? 'has-value' : ''}`}

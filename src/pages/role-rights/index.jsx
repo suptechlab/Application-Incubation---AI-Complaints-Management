@@ -107,7 +107,7 @@ export default function RoleRightsList() {
       },
       {
         cell: (info) => {
-          console.log("rowstatus 100->", info?.row?.original?.activated);
+          console.log("rowstatus 100->", info?.row?.original);
           return (
             <Toggle
               id={`status-${info?.row?.original?.id}`}
@@ -121,6 +121,7 @@ export default function RoleRightsList() {
                   info?.row?.original?.activated
                 )
               }
+              tooltip="Active"
             />
           );
         },
