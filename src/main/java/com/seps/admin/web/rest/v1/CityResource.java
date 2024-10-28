@@ -15,11 +15,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -96,5 +99,21 @@ public class CityResource {
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status) {
         cityService.changeStatus(id, status);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Download list of Cities", description = "Download a list of all cities as an Excel file with optional filters.")
+    @ApiResponse(responseCode = "200", description = "File downloaded successfully",
+        content = @Content(mediaType = "application/octet-stream"))
+    @GetMapping("/download")
+    public ResponseEntity<byte[]> listCitiesDownload(@RequestParam(required = false) String search,
+                                                        @RequestParam(required = false) Boolean status) throws IOException {
+        ByteArrayInputStream in = cityService.listCitiesDownload(search, status);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=cities.xlsx");
+
+        return ResponseEntity.ok()
+            .headers(headers)
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .body(in.readAllBytes());
     }
 }

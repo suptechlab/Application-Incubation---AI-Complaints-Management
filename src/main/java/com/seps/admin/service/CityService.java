@@ -1,5 +1,6 @@
 package com.seps.admin.service;
 
+import com.seps.admin.config.Constants;
 import com.seps.admin.domain.CityEntity;
 import com.seps.admin.domain.ProvinceEntity;
 import com.seps.admin.repository.CityRepository;
@@ -7,13 +8,24 @@ import com.seps.admin.repository.ProvinceRepository;
 import com.seps.admin.service.dto.CityDTO;
 import com.seps.admin.service.mapper.CityMapper;
 import com.seps.admin.service.specification.CitySpecification;
+import com.seps.admin.service.specification.ProvinceSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Service class for managing City entities.
@@ -133,5 +145,49 @@ public class CityService {
                 new String[]{id.toString()}, null));
         entity.setStatus(status);
         cityRepository.save(entity);
+    }
+
+    /**
+     * Exports the list of Cities as an Excel file.
+     *
+     * @param search the search term to filter cities (optional)
+     * @param status the status filter (true for active, false for inactive) (optional)
+     * @return a ByteArrayInputStream of the Excel file
+     * @throws IOException if an error occurs during file generation
+     */
+    @Transactional(readOnly = true)
+    public ByteArrayInputStream listCitiesDownload(String search, Boolean status) throws IOException {
+
+        List<CityEntity> dataList = cityRepository.findAll(CitySpecification.byFilter(search, status));
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Cities");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Id", "Name", "Province", "Status"};
+
+            for (int col = 0; col < headers.length; col++) {
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(headers[col]);
+            }
+
+            // Data
+            int rowIdx = 1;
+            for (CityEntity data : dataList) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(data.getId());
+                row.createCell(1).setCellValue(data.getName());
+                row.createCell(2).setCellValue(data.getProvince().getName());
+                row.createCell(3).setCellValue(data.getStatus().equals(true) ? Constants.ACTIVE : Constants.INACTIVE);
+            }
+
+            // Auto-size columns
+            for (int col = 0; col < headers.length; col++) {
+                sheet.autoSizeColumn(col);
+            }
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        }
     }
 }
