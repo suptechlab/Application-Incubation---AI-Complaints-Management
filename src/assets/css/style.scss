@@ -70,6 +70,10 @@
     .form-check-input {
         cursor: pointer;
     }
+
+    .form-check-label {
+        font-size: $theme-size-14;
+    }
 }
 
 .form-switch {
@@ -89,12 +93,6 @@
             box-shadow: 0 0 0 0.25rem rgba($success, .25);
         }
 
-    }
-}
-
-.form-check {
-    .form-check-label {
-        font-size: $theme-size-14;
     }
 }
 
