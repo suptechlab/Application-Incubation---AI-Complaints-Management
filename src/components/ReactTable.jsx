@@ -38,8 +38,6 @@ export default function ReactTable({
     // Assuming dataQuery contains headers in its response
 
 
-    console.log({"DATAQUERY DATA" : dataQuery.data})
-
     const totalRecords = dataQuery?.data?.headers?.['x-total-count'] ?? 0 ;
 
     const table = useReactTable({

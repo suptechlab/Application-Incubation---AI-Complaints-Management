@@ -13,7 +13,7 @@ import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
 import { useTranslation } from "react-i18next";
-import { changeClaimSubTypeStatus, downloadClaimSubTypes, handleGetClaimSubType } from "../../../services/claimSubType.service";
+import { changeClaimSubTypeStatus, claimTypesDropdownList, downloadClaimSubTypes, handleGetClaimSubType } from "../../../services/claimSubType.service";
 const ClaimSubType = () => {
 
   const location = useLocation();
@@ -34,6 +34,8 @@ const ClaimSubType = () => {
 
   const toggle = () => setModal(!modal);
   const editToggle = () => setEditModal({ row: '', open: !editModal?.open });
+
+  const [claimTypes , setClaimTypes] = useState([])
 
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
@@ -172,27 +174,28 @@ const ClaimSubType = () => {
         accessorFn: (row) => row?.name,
         id: "name",
         header: () => t("CLAIM SUB TYPE"),
+        enableSorting:true
       },
       {
         accessorFn: (row) => row?.claimTypeName,
         id: "claimTypeName",
         header: () => t("CLAIM TYPE"),
+        enableSorting:true
       },
       {
         accessorFn: (row) => row?.slaBreachDays,
         id: "slaBreachDays",
         header: () => t("SLA BREACH"),
+        enableSorting:true
       },
       {
         accessorFn: (row) => row.description != null ? row.description : '-',
         id: "description",
         header: () => t("DESCRIPTION"),
-        enableSorting: false,
+        enableSorting: true,
       },
       {
-        // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
-          console.log('rowstatus 100->', info?.row?.original?.status);
           return (
             <Toggle
               id={`status-${info?.row?.original?.id}`}
@@ -238,6 +241,32 @@ const ClaimSubType = () => {
     });
   }, [filter]);
 
+      // GET CLAIM TYPE DROPDOWN LIST
+      const getClaimTypeDropdownList = () => {
+        claimTypesDropdownList().then(response => {
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setClaimTypes(dropdownData)
+            }
+
+
+
+
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        })
+    }
+
+    useEffect(() => {
+        getClaimTypeDropdownList()
+    }, [])
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <PageHeader title={t("CLAIM SUB TYPE")}
@@ -259,8 +288,8 @@ const ClaimSubType = () => {
         />
       </Card>
     </div>
-    <Add modal={modal} toggle={toggle} />
-    <Edit modal={editModal?.open} toggle={editToggle} />
+    <Add modal={modal} dataQuery={dataQuery} toggle={toggle} claimTypes={claimTypes}/>
+    <Edit modal={editModal?.open} dataQuery={dataQuery} toggle={editToggle} claimTypes={claimTypes} rowData={editModal?.row} />
   </div>
 };
 

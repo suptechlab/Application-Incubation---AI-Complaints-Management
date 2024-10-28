@@ -32,3 +32,8 @@ export const changeClaimSubTypeStatus = async (id, status) => {
 export const downloadClaimSubTypes = async (params) => {
   return await instance.get('/v1/claim-sub-types/download', { params, responseType: 'arraybuffer' });
 }
+
+// CLAIM TYPE DROPDOWN LIST
+export const claimTypesDropdownList = async () => {
+  return await instance.get('/v1/claim-types/dropdown-list');
+}

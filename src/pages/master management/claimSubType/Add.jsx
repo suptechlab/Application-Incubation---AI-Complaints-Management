@@ -1,5 +1,5 @@
 import { Formik, Form } from "formik";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
 import { Button } from "react-bootstrap";
@@ -12,19 +12,21 @@ import { useTranslation } from "react-i18next";
 import { createNewClaimSubType } from "../../../services/claimSubType.service";
 
 
-const Add = ({ modal, toggle }) => {
+const Add = ({ modal, toggle, dataQuery, claimTypes }) => {
 
     const { t } = useTranslation()
+
     const handleSubmit = async (values, actions) => {
         const formData = {
-            name: "",
-            claimType: "",
-            SLABreachDay: "",
-            description: "",
+            name: values?.name ?? "",
+            claimTypeId: values?.claimType ?? "",
+            slaBreachDays: values?.SLABreachDay ?? "",
+            description: values?.description ?? "",
         }
 
         createNewClaimSubType(formData).then(response => {
             toast.success(response?.data?.message);
+            dataQuery.refetch()
             toggle()
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
@@ -45,7 +47,7 @@ const Add = ({ modal, toggle }) => {
                     initialValues={{
                         name: "",
                         claimType: "",
-                        SLABreachDay: "",
+                        slaBreachDays: "",
                         description: "",
                     }}
                     validationSchema={validationSchema}
@@ -66,28 +68,21 @@ const Add = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimSubTypeName}
-                                id="claimSubTypeName"
-                                key={"claimSubTypeName"}
+                                error={errors?.name}
+                                id="name"
+                                key={"name"}
                                 label={t("NAME OF CLAIM SUB TYPE")}
-                                name="claimSubTypeName"
+                                name="name"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.claimSubTypeName}
+                                touched={touched?.name}
                                 type="text"
-                                value={values.claimSubTypeName || ""}
+                                value={values?.name || ""}
                             />
                             <ReactSelect
                                 error={errors?.claimType}
-                                options={[{
-                                    value: 1,
-                                    label: 'Credit Portfolio'
-                                },
-                                {
-                                    value: 2,
-                                    label: 'Assets Acquired Through Payment'
-                                }]}
+                                options={claimTypes ?? []}
                                 value={values?.claimType}
                                 onChange={(option) => { setFieldValue('claimType', option?.target?.value ?? '') }}
                                 name="claimType"
@@ -97,17 +92,17 @@ const Add = ({ modal, toggle }) => {
                                 touched={touched?.claimType}
                             />
                             <FormInput
-                                error={errors.SLABreachDay}
-                                id="SLABreachDay"
-                                key={"SLABreachDay"}
+                                error={errors.slaBreachDays}
+                                id="slaBreachDays"
+                                key={"slaBreachDays"}
                                 label={t("SLA BREACH DAY")}
-                                name="SLABreachDay"
+                                name="slaBreachDays"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.SLABreachDay}
+                                touched={touched.slaBreachDays}
                                 type="number"
-                                value={values?.SLABreachDay}
+                                value={values?.slaBreachDays}
                             />
                             <FormInput
                                 error={errors?.description}

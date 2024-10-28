@@ -1,5 +1,5 @@
 import { Formik, Form } from "formik";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import FormInput from '../../../components/FormInput';
 import { Button } from "react-bootstrap";
@@ -10,18 +10,21 @@ import { useTranslation } from "react-i18next";
 import { editClaimSubType } from "../../../services/claimSubType.service";
 
 
-const Edit = ({ modal, toggle }) => {
-    const {t} = useTranslation()
+const Edit = ({ modal, dataQuery, toggle, rowData,claimTypes }) => {
+    const { t } = useTranslation()
+
+
     const handleSubmit = async (values, actions) => {
         const formData = {
-            name: "",
-            claimType: "",
-            SLABreachDay: "",
-            description: "",
+            name: values?.name ?? "",
+            claimTypeId: values?.claimType ?? null,
+            slaBreachDays: values?.slaBreachDays ?? 0,
+            description: values?.description ?? "",
         }
 
-        editClaimSubType(formData).then(response => {
+        editClaimSubType(rowData?.id , formData).then(response => {
             toast.success(response?.data?.message);
+            dataQuery.refetch()
             toggle()
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
@@ -35,16 +38,18 @@ const Edit = ({ modal, toggle }) => {
     };
 
 
+
+
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
             <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("EDIT CLAIM SUB TYPE")}</ModalHeader>
             <ModalBody >
                 <Formik
                     initialValues={{
-                        claimSubTypeName: "",
-                        claimType: "",
-                        SLABreachDay: "",
-                        description: "",
+                        name: rowData?.name,
+                        claimType: rowData?.claimTypeId,
+                        slaBreachDays: rowData?.slaBreachDays,
+                        description: rowData?.description,
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
@@ -64,28 +69,21 @@ const Edit = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors.claimSubTypeName}
-                                id="claimSubTypeName"
-                                key={"claimSubTypeName"}
+                                error={errors.name}
+                                id="name"
+                                key={"name"}
                                 label={t("NAME OF CLAIM SUB TYPE")}
-                                name="claimSubTypeName"
+                                name="name"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.claimSubTypeName}
+                                touched={touched.name}
                                 type="text"
-                                value={values.claimSubTypeName || ""}
+                                value={values.name || ""}
                             />
                             <ReactSelect
                                 error={errors?.claimType}
-                                options={[{
-                                    value: 1,
-                                    label: 'Credit Portfolio'
-                                },
-                                {
-                                    value: 2,
-                                    label: 'Assets Acquired Through Payment'
-                                }]}
+                                options={claimTypes ?? []}
                                 value={values?.claimType}
                                 onChange={(option) => { setFieldValue('claimType', option?.target?.value ?? '') }}
                                 name="claimType"
@@ -95,17 +93,17 @@ const Edit = ({ modal, toggle }) => {
                                 touched={touched?.claimType}
                             />
                             <FormInput
-                                error={errors.SLABreachDay}
-                                id="SLABreachDay"
-                                key={"SLABreachDay"}
+                                error={errors.slaBreachDays}
+                                id="slaBreachDays"
+                                key={"slaBreachDays"}
                                 label={t("SLA BREACH DAY")}
-                                name="SLABreachDay"
+                                name="slaBreachDays"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 // placeholder="Enter district name"
-                                touched={touched.SLABreachDay}
+                                touched={touched.slaBreachDays}
                                 type="number"
-                                value={values?.SLABreachDay}
+                                value={values?.slaBreachDays}
                             />
                             <FormInput
                                 error={errors?.description}
