@@ -3,14 +3,18 @@ package com.seps.auth.web.rest.errors;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
@@ -22,6 +26,7 @@ import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +35,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.web.rest.errors.ProblemDetailWithCause;
@@ -52,6 +58,10 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private String applicationName;
 
     private final Environment env;
+
+    @Autowired
+    private MessageSource messageSource;
+
 
     public ExceptionTranslator(Environment env) {
         this.env = env;
@@ -84,10 +94,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         if (
             ex instanceof com.seps.auth.service.UsernameAlreadyUsedException
         ) return (ProblemDetailWithCause) new LoginAlreadyUsedException().getBody();
-        if (ex instanceof com.seps.auth.service.EmailAlreadyUsedException) return (ProblemDetailWithCause) new EmailAlreadyUsedException()
-            .getBody();
-        if (ex instanceof com.seps.auth.service.InvalidPasswordException) return (ProblemDetailWithCause) new InvalidPasswordException()
-            .getBody();
+        if (ex instanceof com.seps.auth.service.EmailAlreadyUsedException)
+            return (ProblemDetailWithCause) new EmailAlreadyUsedException()
+                .getBody();
+        if (ex instanceof com.seps.auth.service.InvalidPasswordException)
+            return (ProblemDetailWithCause) new InvalidPasswordException()
+                .getBody();
 
         if (
             ex instanceof ErrorResponseException exp && exp.getBody() instanceof ProblemDetailWithCause problemDetailWithCause
@@ -98,7 +110,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, NativeWebRequest request) {
         if (problem.getStatus() <= 0) problem.setStatus(toStatus(err));
 
-        if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
+        if (problem.getType() == null || problem.getType().equals(URI.create("about:blank")))
+            problem.setType(getMappedType(err));
 
         // higher precedence to Custom/ResponseStatus types
         String title = extractTitle(err, problem.getStatus());
@@ -118,12 +131,18 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             getMappedMessageKey(err) != null ? getMappedMessageKey(err) : "error.http." + problem.getStatus()
         );
 
-        if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) problem.setProperty(PATH_KEY, getPathValue(request));
+        if (problemProperties == null || !problemProperties.containsKey(PATH_KEY))
+            problem.setProperty(PATH_KEY, getPathValue(request));
 
         if (
             (err instanceof MethodArgumentNotValidException fieldException) &&
-            (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
-        ) problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
+                (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
+        ) {
+            List<FieldErrorVM> fieldErrors = getFieldErrors(fieldException);
+            problem.setProperty(FIELD_ERRORS_KEY, fieldErrors);
+            problem.setProperty("errorCode", SepsStatusCode.FORM_VALIDATION_ERROR.getStatusCode());  // You can change this value as per your logic
+            problem.setProperty("errorDescription", getErrorDescription(fieldErrors));  // Custom method to get description
+        }
 
         problem.setCause(buildCause(err.getCause(), request).orElse(null));
 
@@ -222,12 +241,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private HttpHeaders buildHeaders(Throwable err) {
         return err instanceof BadRequestAlertException badRequestAlertException
             ? HeaderUtil.createFailureAlert(
-                applicationName,
-                true,
-                badRequestAlertException.getEntityName(),
-                badRequestAlertException.getErrorKey(),
-                badRequestAlertException.getMessage()
-            )
+            applicationName,
+            true,
+            badRequestAlertException.getEntityName(),
+            badRequestAlertException.getErrorKey(),
+            badRequestAlertException.getMessage()
+        )
             : null;
     }
 
@@ -246,5 +265,39 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private boolean containsPackageName(String message) {
         // This list is for sure not complete
         return StringUtils.containsAny(message, "org.", "java.", "net.", "jakarta.", "javax.", "com.", "io.", "de.", "com.seps.auth");
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Object> handleCustomException(CustomException ex, NativeWebRequest request) {
+        ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
+        pdCause.setStatus(ex.getStatus().getStatusCode());
+        // Add the custom properties
+        String errorDescription = messageSource.getMessage(ex.getsSepsStatusCode().getReasonPhrase(), ex.getMessageArgs(), request.getLocale());
+        pdCause.setProperty("message", ex.getMessage());
+        pdCause.setProperty("errorCode", ex.getsSepsStatusCode().getStatusCode());
+        pdCause.setProperty("errorDescription", errorDescription);
+        return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex), HttpStatusCode.valueOf(pdCause.getStatus()), request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthentication(AuthenticationException ex, NativeWebRequest request) {
+        // Ensure no information about existing users is revealed via failed authentication attempts
+        ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
+        SepsStatusCode sepsStatusCode = SepsStatusCode.USERNAME_PASSWORD_INVALID;
+        String errorDescription = messageSource.getMessage(sepsStatusCode.getReasonPhrase(), null, request.getLocale());
+        // Add custom properties to the error response
+        pdCause.setProperty("errorCode", sepsStatusCode.getStatusCode());
+        pdCause.setProperty("errorDescription", errorDescription);
+        return handleExceptionInternal((Exception) ex, pdCause, buildHeaders(ex), HttpStatusCode.valueOf(pdCause.getStatus()), request);
+    }
+
+    private String getErrorDescription(List<FieldErrorVM> fieldErrors) {
+        if (fieldErrors != null && !fieldErrors.isEmpty()) {
+            FieldErrorVM firstError = fieldErrors.get(0);
+            String field = firstError.getField();
+            String message = firstError.getMessage();
+            return field + " " + message;
+        }
+        return null;
     }
 }
