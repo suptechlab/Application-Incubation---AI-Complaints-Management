@@ -33,10 +33,6 @@ export default function RoleRightsList() {
 
   const toggle = () => setModal(!modal);
 
-  const editRoleRight = async (id) => {
-    navigate(`/role-rights/edit/${id}`);
-  };
-
   const deleteRoleRight = async (id) => {
     if (window.confirm("Are you sure you want to delete this role right?")) {
       try {
@@ -130,6 +126,7 @@ export default function RoleRightsList() {
         },
         id: "status",
         header: () => "Status",
+        size: '90',
       },
       {
         id: "actions",
@@ -160,7 +157,7 @@ export default function RoleRightsList() {
         header: () => (
           <div className="text-center">Actions</div>
         ),
-        enableSorting: false,
+        size: '100',
       },
     ],
     []
