@@ -1,7 +1,5 @@
 import React from 'react'
 import Input from './Input'
-
-import "./FormInput.scss"
 import TextArea from './TextArea'
 import AppTooltip from './tooltip'
 import { Button } from 'react-bootstrap'
@@ -11,7 +9,7 @@ export default function FormInput({ label, touched, error, isTextarea, wrapperCl
     const [showPassword, setShowPassword] = React.useState(false)
     
     return (
-        <div className={wrapperClassName}>
+        <div className={wrapperClassName || ''}>
             {label ? <label className='mb-1 fs-14' htmlFor={rest.id}>{label}</label> : ""}
 
             {isTextarea ? (
@@ -31,12 +29,12 @@ export default function FormInput({ label, touched, error, isTextarea, wrapperCl
                             <Button
                                 variant='link'
                                 type="button"
-                                className="position-absolute top-50 end-0 translate-middle-y h-100 link-secondary"
+                                className="position-absolute top-50 end-0 translate-middle-y h-100 link-secondary px-2"
                                 onClick={() => setShowPassword(!showPassword)}
                                 aria-label={showPassword ? "Hide Password" : "Show Password"}
 
                             >
-                                {showPassword ? <MdVisibilityOff size={20} /> : <MdVisibility size={20} />}
+                                {showPassword ? <MdVisibilityOff size={20} className='mx-1' /> : <MdVisibility size={20} className='mx-1' />}
                             </Button>
                         </AppTooltip>
                     )}

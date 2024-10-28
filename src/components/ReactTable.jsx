@@ -12,7 +12,9 @@ import SortArrow from "../assets/svg/sort-arrow.svg"
 import DataGridPagination from "./Datagridpagination"
 
 import "./ReactTable.scss"
- 
+import { Button } from "react-bootstrap"
+import { FiArrowDown, FiArrowUp } from "react-icons/fi";
+
 export default function ReactTable({
 
     columns,
@@ -96,38 +98,27 @@ export default function ReactTable({
  
     return (
 
-        <>
+        <div className="d-flex flex-column h-100 small table-cover-main">
 
-            <BTable striped bordered hover responsive size="sm">
+            <BTable striped bordered hover responsive className="mb-0">
 
-                <thead>
+                <thead className="fs-15">
 
                     {table.getHeaderGroups().map(headerGroup => (
 
                         <tr key={headerGroup.id}>
 
                             {headerGroup.headers.map(header => {
-
                                 return (
 
                                     <th key={header.id} colSpan={header.colSpan}>
 
-                                        {header.isPlaceholder ? null : (
+                                        {header.column.getCanSort() ? (
 
-                                            <div
-
-                                                className={
-
-                                                    header.column.getCanSort()
-
-                                                        ? "cursor-pointer user-select-none"
-
-                                                        : ""
-
-                                                }
-
+                                            <Button
+                                                variant="link"
+                                                className="align-items-center border-0 cursor-pointer d-flex fs-15 fw-semibold gap-2 link-dark p-0 table-sorting text-decoration-none user-select-none w-100 text-start"
                                                 onClick={header.column.getToggleSortingHandler()}
-
                                                 title={
 
                                                     header.column.getCanSort()
@@ -158,15 +149,24 @@ export default function ReactTable({
 
                                                 {{
 
-                                                    asc: <img className="sort-asc" src={SortArrow} />,
-
-                                                    desc: <img className="sort-desc" src={SortArrow} />
+                                                    asc: <span><FiArrowUp size={18} /></span>,
+                                                    desc: <span><FiArrowDown size={18} /></span>,
 
                                                 }[header.column.getIsSorted()] ?? null}
 
-                                            </div>
+                                            </Button>
 
-                                        )}
+                                        ):
+                                        flexRender(
+
+                                            header.column.columnDef.header,
+    
+                                            header.getContext()
+    
+                                            )
+                                        }
+
+                                        
 
                                     </th>
 
@@ -204,12 +204,7 @@ export default function ReactTable({
 
             </BTable>
 
-            <div className="">
-
-                <div>
- 
-                </div>
-
+            <div className="mt-auto pt-3">
                 <DataGridPagination
 
                     rowsPerPage={pagination.pageSize}
@@ -236,7 +231,7 @@ export default function ReactTable({
 
             </div>
 
-        </>
+        </div>
 
     )
 

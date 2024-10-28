@@ -1,4 +1,5 @@
 @import "../../src/assets/css/variables";
+
 .react-select {
     // Styles for the container element
 
@@ -12,7 +13,7 @@
         &--is-focused {
             border-color: #505050 !important;
             box-shadow: none;
-            
+
         }
 
         &__value-container {
@@ -80,6 +81,15 @@
 }
 
 .react-select-container {
-    position: relative;
-    z-index: inherit
+    z-index: inherit;
+
+    .react-select__single-value {
+        color: var(--bs-body-color);
+
+    }
+
+    .react-select-menu {
+        z-index: 999;
+        font-size: $theme-size-14;
+    }
 }

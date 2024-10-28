@@ -41,61 +41,24 @@
 }
 
 
-.table>thead {
-	vertical-align: middle;
-}
+// .react-select-container {
+// 	.react-select__control {
+// 		height: 44px;
+// 	}
 
-tbody tr {
-	vertical-align: middle;
-}
+// 	+label {
+// 		background: #fff;
+// 		padding: 8px 3px;
+// 		z-index: 999;
+// 		margin: 1px 5px;
+// 		height: 37px;
+// 	}
+// }
 
-.react-select-container {
-	.react-select__control {
-		height: 44px;
-	}
 
-	+label {
-		background: #fff;
-		padding: 8px 3px;
-		z-index: 999;
-		margin: 1px 5px;
-		height: 37px;
-	}
-}
-
-.table-bordered th {
-	font-size: 15px;
-}
-
-.table-bordered td {
-
-	font-size: 14px;
-}
-
-.table-bordered th:last-child,
-.table-bordered td:last-child {
-	width: 110px;
-}
-
-.pagination .page-item .page-link {
-	border-radius: 100%;
-	font-size: 14px;
-	color: #000;
-	border: none;
-	margin: 0px 3px;
-}
-
-.pagination .page-item.active .page-link {
-	background: rgba(163, 164, 177, 0.25);
-}
-
-.pagination .page-item.prev-item .page-link {
-	background: none;
-}
-
-.react-select__control:focus {
-	box-shadow: none;
-}
+// .react-select__control:focus {
+// 	box-shadow: none;
+// }
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -152,9 +115,9 @@ input:-webkit-autofill:active {
 	}
 }
 
-.react-select-menu {
-	z-index: 999;
-}
+// .react-select-menu {
+// 	z-index: 999;
+// }
 
 .w-20 {
 	width: 20%;
@@ -364,18 +327,17 @@ select {
 	}
 
 	input.form-control:-moz-placeholder {
-		/* Firefox 18- */
 		color: #000;
 		opacity: .5
 	}
 }
 
-.theme-from-footer {
-	margin-left: -20px;
-	margin-right: -20px;
-	border-color: rgba(0, 0, 0, .25) !important;
-	padding-bottom: 15px !important;
-}
+// .theme-from-footer {
+// 	margin-left: -20px;
+// 	margin-right: -20px;
+// 	border-color: rgba(0, 0, 0, .25) !important;
+// 	padding-bottom: 15px !important;
+// }
 
 input[type="radio" i] {
 	background-color: initial;
@@ -473,28 +435,9 @@ input[type='radio']:checked:after {
 	margin-bottom: 20px;
 }
 
-.role-chekbox-cover .form-check .form-check-input {
-	border-radius: 3px !important;
-	border: 3px solid #7F7F7F;
-	float: left;
-	margin-left: -1.5em;
-	width: 16px;
-	height: 16px;
-}
-
-.role-chekbox-cover .form-check {
-	min-width: 120px
-}
-
 .import-consumer-box {
 	border-radius: 4px;
 	border-color: #7F7F7F;
-}
-
-
-.form-switch .form-check-input:checked {
-	background-color: #2F7735 !important;
-	border-color: #2F7735 !important;
 }
 
 .down-color {
@@ -588,31 +531,9 @@ input[type='radio']:checked:after {
 	display: grid;
 }
 
-.react-select__indicator-separator {
-	display: none;
-}
-
-.custom-shadow {
-	box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.15);
-}
-
-.custom-table th {
-	background-color: rgba(0, 0, 0, .05);
-	font-size: 15px;
-}
-
-.custom-table tbody tr:nth-of-type(even) {
-	background-color: rgba(0, 0, 0, 0.0509803922) !important;
-}
-
-.custom-table td,
-.custom-table th {
-	padding: 1rem 1rem;
-}
-
-.min-width-200 {
-	min-width: 130px;
-}
+// .react-select__indicator-separator {
+// 	display: none;
+// }
 
 .chart-cover {
 	width: calc(100% - 130px);
@@ -986,9 +907,9 @@ input[type='radio']:checked:after {
 		padding-right: 15px;
 	}
 
-	.react-select-container {
-		margin-bottom: 25px;
-	}
+	// .react-select-container {
+	// 	margin-bottom: 25px;
+	// }
 
 	.profile-right-width {
 		width: 100%;

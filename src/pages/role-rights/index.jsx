@@ -1,23 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import Header from "./Header";
-import SearchForm from "./SearchForm";
-import RoleRightsTable from "./RoleRightsTable";
-import RoleRightsModal from "./RoleRightsModal";
-import {
-  handleGetRoleRights,
-  handleDeleteRoleRight,
-} from "../../services/rolerights.service"; // Update the import to include delete function
+import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
-import SvgIcons from "../../components/SVGIcons";
-import PageHeader from "../../components/PageHeader";
-import ListingSearchForm from "../../components/ListingSearchForm";
-import { Button, Card, Stack } from "react-bootstrap";
+import { MdDelete, MdEdit } from "react-icons/md";
+import { useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
-import { MdDelete, MdEdit } from "react-icons/md";
+import ListingSearchForm from "../../components/ListingSearchForm";
+import PageHeader from "../../components/PageHeader";
+import Toggle from "../../components/Toggle";
+import {
+  handleDeleteRoleRight,
+  handleGetRoleRights,
+} from "../../services/rolerights.service"; // Update the import to include delete function
+import { handleStatusChangeState } from "../../services/user.service";
+import RoleRightsModal from "./RoleRightsModal";
 export default function RoleRightsList() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -87,18 +85,51 @@ export default function RoleRightsList() {
     }
   }, [dataQuery.data?.data?.totalPages]);
 
+  const changeStatus = async (id, currentStatus) => {
+    try {
+      await handleStatusChangeState(id, !currentStatus);
+      toast.success("State status updated successfully");
+      dataQuery.refetch();
+    } catch (error) {
+      toast.error("Error updating state status");
+    }
+  };
+
   const columns = React.useMemo(
     () => [
       {
         accessorFn: (row) => row.name,
         id: "name",
-        header: () => "Name",
+        header: () => "Role",
+        enableSorting: true,
       },
       {
         accessorFn: (row) => row.description,
         id: "description",
         header: () => "Description",
-        enableSorting: true,
+        enableSorting: false,
+      },
+      {
+        cell: (info) => {
+          console.log("rowstatus 100->", info?.row?.original?.activated);
+          return (
+            <Toggle
+              id={`status-${info?.row?.original?.id}`}
+              key={"status"}
+              name="status"
+              value={info?.row?.original?.activated}
+              checked={info?.row?.original?.activated}
+              onChange={() =>
+                changeStatus(
+                  info?.row?.original?.id,
+                  info?.row?.original?.activated
+                )
+              }
+            />
+          );
+        },
+        id: "status",
+        header: () => "Status",
       },
       {
         id: "actions",
@@ -127,7 +158,7 @@ export default function RoleRightsList() {
           />
         ),
         header: () => (
-          <div className="d-flex justify-content-center">Actions</div>
+          <div className="text-center">Actions</div>
         ),
         enableSorting: false,
       },
@@ -152,7 +183,7 @@ export default function RoleRightsList() {
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-          <Card.Body>
+          <Card.Body className="d-flex flex-column">
             <ListingSearchForm filter={filter} setFilter={setFilter} />
             <CommonDataTable
               columns={columns}

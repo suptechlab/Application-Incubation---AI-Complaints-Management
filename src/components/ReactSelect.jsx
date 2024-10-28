@@ -2,14 +2,14 @@ import React from 'react';
 import Select from 'react-select';
 
 import "./ReactSelect.scss";
-import SvgIcons from './SVGIcons';
+import { MdArrowDropDown } from 'react-icons/md';
 
-const ReactSelect = ({ options, value, onChange, className, name, label,placeholder ,error, defaultValue=null}) => {
+const ReactSelect = ({ options, value, onChange, className = 'mb-3 pb-1', name, label,placeholder ,error, defaultValue=null}) => {
     const customStyles = {
         control: (base) => ({
             ...base,
-            height: 'calc(1.5em + .75rem + 2px)', // Adjust to match form-control height
-            minHeight: '38px', // Adjust to match form-control min-height
+            // height: 'calc(1.5em + .75rem + 2px)',
+            // minHeight: '38px', 
         }),
     };
 
@@ -24,14 +24,15 @@ const ReactSelect = ({ options, value, onChange, className, name, label,placehol
 
 
     return (
-        <div className={` ${className}`}>
-            {label ? (
-            <label htmlFor={name} className={selectedOption ? 'active mb-1 fs-14' : 'mb-1 fs-14'}>
-                {label}
-            </label>
-            ) : ""}
+        <div className={className || ''}>
+{/*           
+             <label htmlFor={name} className={selectedOption ? 'active mb-1 fs-14' : 'mb-1 fs-14'}>
+                 {label}
+             </label> */}
+            {label ? <label className='mb-1 fs-14' htmlFor={name}>{label}</label> : ""}
+         
             <Select
-                styles={customStyles}
+                // styles={customStyles}
                 name={name}
                 value={selectedOption}
                 onChange={(option) => onChange({ target: { name, value: option ? option.value : '' } })}
@@ -44,11 +45,7 @@ const ReactSelect = ({ options, value, onChange, className, name, label,placehol
                 className={`react-select-container ${selectedOption ? 'has-value' : ''}`}
                 components={{
                     // ClearIndicator: () => null,
-                    DropdownIndicator: () => (
-                        <div className="react-select__dropdown-indicator p-2">
-                            {SvgIcons.reactSelectArrow}
-                        </div>
-                    ),
+                    DropdownIndicator: () => <MdArrowDropDown size={24} className='mx-1' />,
                     IndicatorSeparator: () => null,
                 }}
             />

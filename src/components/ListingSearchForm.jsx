@@ -9,8 +9,9 @@ const ListingSearchForm = ({ filter, setFilter }) => {
   return (
     <div className="theme-card-header header-search mb-3">
       <Stack direction="horizontal" gap={2} className="flex-wrap">
-        <div className="custom-width-200 flex-grow-1 flex-md-grow-0 me-auto">
+        <div className="custom-width-200 flex-grow-1 flex-sm-grow-0 me-auto">
           <FormInput
+            wrapperClassName="mb-0"
             id="search"
             key={"search"}
             name="search"
@@ -33,9 +34,10 @@ const ListingSearchForm = ({ filter, setFilter }) => {
           />
         </div>
 
-        <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap">
+        <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
           <div className="custom-width-120 flex-grow-1 flex-md-grow-0">
             <ReactSelect
+              className="mb-0"
               class="form-select "
               placeholder={t("ALL STATUS")}
               id="floatingSelect"
