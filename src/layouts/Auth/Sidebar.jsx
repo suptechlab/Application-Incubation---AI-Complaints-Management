@@ -148,7 +148,7 @@ import "./sidebar.scss"
                                   to={subItems.path}
                                   className={`align-items-center d-flex px-0 sidebarLink rounded ${subItems.disabled ? "disabled" : ""
                                     }`}
-                                >{console.log('subItems.path', subItems.path)}
+                                >
                                   <span className="py-1 text-center min-w-44 sidebarIcon d-none ps-1">
                                     {subItems.menuIcon}
                                   </span>

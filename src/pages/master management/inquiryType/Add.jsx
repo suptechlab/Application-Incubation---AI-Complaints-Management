@@ -10,28 +10,31 @@ import { useNavigate } from "react-router-dom";
 import { validationSchema } from '../../../validations/inquiryType.validation';
 import { useTranslation } from 'react-i18next';
 import { createNewInquiryType } from '../../../services/inquiryType.service';
+import axios from 'axios';
 
 
 const Add = ({ modal, toggle }) => {
 
-    const {t} = useTranslation()
-    
-    const handleSubmit = async (values,actions) => {
+    const { t } = useTranslation()
+
+    const handleSubmit = async (values, actions) => {
         const formData = {
-            name : values?.name,
-            description : values?.description
+            name: values?.name,
+            description: values?.description
         }
+
+        // axios.post('https://relative-glider-entirely.ngrok-free.app/api/v1/inquiry-types',formData)
 
         createNewInquiryType(formData).then(response => {
             toast.success(response?.data?.message);
             toggle()
         }).catch((error) => {
-            if(error?.response?.data?.errorDescription){
+            if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);
-            }else{
+            } else {
                 toast.error(error?.message);
             }
-        }).finally(()=>{
+        }).finally(() => {
             actions.setSubmitting(false);
         });
     };
@@ -64,7 +67,7 @@ const Add = ({ modal, toggle }) => {
                     }) => (
                         <Form>
                             <FormInput
-                                error={errors?.inquiryName}
+                                error={errors?.name}
                                 id="name"
                                 key={"name"}
                                 label={t("NAME OF INQUIRY")}

@@ -9,30 +9,29 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { createNewClaimType } from '../../../services/claimType.service';
 
-const Add = ({ modal, toggle }) => {
-    const {t} = useTranslation()
+const Add = ({ modal, toggle, dataQuery }) => {
+    const { t } = useTranslation()
 
-    const handleSubmit = async (values,actions) => {
+    const handleSubmit = async (values, actions) => {
         const formData = {
-            name : values?.name,
-            description : values?.description
+            name: values?.name,
+            description: values?.description
         }
 
         createNewClaimType(formData).then(response => {
             toast.success(response?.data?.message);
+            dataQuery.refetch();
             toggle()
         }).catch((error) => {
-            if(error?.response?.data?.errorDescription){
+            if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);
-            }else{
+            } else {
                 toast.error(error?.message);
             }
-        }).finally(()=>{
+        }).finally(() => {
             actions.setSubmitting(false);
         });
     };
-
-
     return (
         <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
             <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("CREATE CLAIM TYPE")}</ModalHeader>
@@ -92,7 +91,7 @@ const Add = ({ modal, toggle }) => {
                                 <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
                                     {t("CANCEL")}
                                 </Button>
-                                <Button type="submit" isSubmitting ={false} onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
+                                <Button type="submit" isSubmitting={false} onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
                                     {t("SUBMIT")}
                                 </Button>
                             </ModalFooter>
@@ -103,5 +102,4 @@ const Add = ({ modal, toggle }) => {
         </Modal>
     );
 };
-
 export default Add;

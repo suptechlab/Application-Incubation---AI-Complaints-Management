@@ -13,18 +13,20 @@ import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
 import { useTranslation } from "react-i18next";
+import { downloadInquiryTypes, handleGetInquiryType } from "../../../services/inquiryType.service";
+import axios from "axios";
 const InquiryType = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
-  const [editModal , setEditModal] = useState({id :'' , open : false})
+  const [editModal, setEditModal] = useState({ id: '', open: false })
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
@@ -32,7 +34,7 @@ const InquiryType = () => {
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({id : '' , open : !editModal?.open});
+  const editToggle = () => setEditModal({ id: '', open: !editModal?.open });
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
@@ -63,7 +65,7 @@ const InquiryType = () => {
 
   }, []);
   const editInquiryType = async (id) => {
-    setEditModal({id : id , open : !editModal?.open })
+    setEditModal({ id: id, open: !editModal?.open })
   };
 
   const dataQuery = useQuery({
@@ -120,6 +122,42 @@ const InquiryType = () => {
       toast.error("Error updating state status");
     }
   };
+
+  // HANDLE INQUIRY TYPES CSV DOWNLOAD
+  const handleDownload = () => {
+    downloadInquiryTypes({ search: filter?.search ?? "" }).then(response => {
+      if (response?.data) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const tempLink = document.createElement('a');
+        tempLink.href = blobUrl;
+        tempLink.setAttribute('download', 'Inquiry-types.xlsx');
+
+        // Append the link to the document body before clicking it
+        document.body.appendChild(tempLink);
+
+        tempLink.click();
+
+        // Clean up by revoking the Blob URL
+        window.URL.revokeObjectURL(blobUrl);
+
+        // Remove the link from the document body after clicking
+        document.body.removeChild(tempLink);
+      } else {
+        throw new Error('Response data is empty.');
+      }
+      // toast.success(t("STATUS UPDATED"));
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    })
+  }
+
+
   useEffect(() => {
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
@@ -194,7 +232,11 @@ const InquiryType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={t("INQUIRY TYPE")} toggle={toggle} />
+    <PageHeader title={t("INQUIRY TYPE")}
+      actions={[
+        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
+        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
+      ]} />
     <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
       <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
         <ListingSearchForm filter={filter} setFilter={setFilter} />
