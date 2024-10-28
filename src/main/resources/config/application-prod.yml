@@ -33,9 +33,9 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/auth
-    username: auth
-    password: password
+    url: jdbc:postgresql://localhost:5432/SEPS
+    username: postgres
+    password: postgres
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -118,3 +118,9 @@ jhipster:
 # ===================================================================
 
 # application:
+google:
+  recaptcha:
+    secret: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    verify-url: https://www.google.com/recaptcha/api/siteverify
+    project-id: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    site-key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
