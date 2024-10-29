@@ -22,4 +22,4 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
 COPY --from=backend-compiler /app/target/auth-${VERSION}.jar /app/opt/auth.jar
-ENTRYPOINT ["/usr/bin/java", "-jar", "/app/opt/auth.jar"]
+ENTRYPOINT ["java", "-jar", "/app/opt/auth.jar"]
