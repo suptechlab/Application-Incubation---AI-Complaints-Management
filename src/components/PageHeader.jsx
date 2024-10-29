@@ -25,7 +25,7 @@ const PageHeader = ({ title, actions }) => {
                                 <Link
                                     key={`action-${index}`}
                                     to={action.to}
-                                    className={`btn btn-${action.variant || 'primary'}`}
+                                    className={`btn btn-${action.variant || 'primary'} ${action.disabled ? 'disabled' : ''}`}
                                     onClick={action.onClick}
                                 >
                                     {t(action.label)}
@@ -35,6 +35,7 @@ const PageHeader = ({ title, actions }) => {
                                     key={`action-${index}`}
                                     variant={action.variant || 'primary'}
                                     onClick={action.onClick}
+                                    disabled={action.disabled}
                                 >
                                     {t(action.label)}
                                 </Button>
@@ -54,6 +55,7 @@ PageHeader.propTypes = {
         onClick: PropTypes.func,
         to: PropTypes.string, // If present, renders a Link
         variant: PropTypes.string, // Only for Button
+        disabled: PropTypes.boolean, // Only for Button
     })),
 };
 

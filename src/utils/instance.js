@@ -12,7 +12,7 @@ instance.interceptors.request.use(
     (config) => {
         // const token = getLocalStorage('access_token');
         // AS OF NOW SET TOKEN STATICALLY BECAUSE LOGIN IS BY PASSSED
-        const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczMDE4MTcyNywiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzMwMDk1MzI3fQ.wUmg4vXq06GyWXBZFIjTJq2dQXoGAqMzY1ZA0oYoXio0NCpglXj7gBtUIl6r-iSLy0rOlrpNe-8B4pbsINiunA"
+        const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczMDI2ODIzOCwiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzMwMTgxODM4fQ.Vy4oJCi59RTlDllDpzYX8xUHUAMP9_F4ljpZ39kC6XqAJKZyxPRC25YlCym3wGRo9yxGzi6nzeHKp38CmwXkVQ"
     
         const userLanguage = 'es';
 
