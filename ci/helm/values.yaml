@@ -22,20 +22,20 @@ deployment:
     https:
       disabled: true
 
-  livenessProbe:
-    httpGet:
-      path: /ms-seps-base-service/actuator/health
-      port: 8080
-    initialDelaySeconds: 20
-    periodSeconds: 180
-    timeoutSeconds: 21
-  readinessProbe:
-    httpGet:
-      path: /ms-seps-base-service/actuator/health
-      port: 8080
-    initialDelaySeconds: 20
-    periodSeconds: 180
-    timeoutSeconds: 21
+  # livenessProbe:
+  #   httpGet:
+  #     path: /ms-seps-base-service/actuator/health
+  #     port: 8080
+  #   initialDelaySeconds: 20
+  #   periodSeconds: 180
+  #   timeoutSeconds: 21
+  # readinessProbe:
+  #   httpGet:
+  #     path: /ms-seps-base-service/actuator/health
+  #     port: 8080
+  #   initialDelaySeconds: 20
+  #   periodSeconds: 180
+  #   timeoutSeconds: 21
 
   imagePullSecrets:
     - seps-regcred
@@ -133,9 +133,9 @@ deployment:
           CURRENT_PROFILE:
             envVarName: SPRING_PROFILES_ACTIVE
           SPRING_DATASOURCE_URL:
-            envVarName: seps.jdbc.postgres.url
+            envVarName: SPRING_DATASOURCE_URL
           SPRING_DATASOURCE_USERNAME:
-            envVarName: seps.jdbc.postgres.user
+            envVarName: SPRING_DATASOURCE_USERNAME
           SPRING_LIQUIBASE_URL:
             envVarName: SPRING_LIQUIBASE_URL
             
@@ -152,10 +152,10 @@ deployment:
     seps-secrets:
       environment: # Items set like environment variable
         items:
-          JASYPT_ENCRYPTOR_PASSWORD:
-            envVarName: jasypt.encryptor.password
+          # JASYPT_ENCRYPTOR_PASSWORD:
+          #   envVarName: jasypt.encryptor.password
           SPRING_DATASOURCE_PASSWORD:
-            envVarName: seps.jdbc.postgres.password
+            envVarName: SPRING_DATASOURCE_PASSWORD
 
       # Mount a file id_rsa to connect a ftp server
   #      volume: # Items set like file in volume
