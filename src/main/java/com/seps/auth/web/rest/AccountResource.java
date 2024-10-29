@@ -11,6 +11,7 @@ import com.seps.auth.service.dto.ResponseStatus;
 import com.seps.auth.web.rest.errors.*;
 import com.seps.auth.web.rest.vm.KeyAndPasswordVM;
 import com.seps.auth.web.rest.vm.ManagedUserVM;
+import com.seps.auth.web.rest.vm.ResetPasswordVM;
 import jakarta.validation.Valid;
 
 import java.util.*;
@@ -157,10 +158,16 @@ public class AccountResource {
     /**
      * {@code POST   /account/reset-password/init} : Send an email to reset the password of the user.
      *
-     * @param mail the mail of the user.
+     * @param resetPasswordVM email and recaptcha token.
      */
     @PostMapping(path = "/account/reset-password/init")
-    public ResponseEntity<ResponseStatus> requestPasswordReset(@RequestBody String mail) {
+    public ResponseEntity<ResponseStatus> requestPasswordReset(@Valid @RequestBody ResetPasswordVM resetPasswordVM) {
+        // Verify reCAPTCHA
+        if (!userService.isRecaptchaValid(resetPasswordVM.getRecaptchaToken())) {
+            LOG.error("In request password reset Recaptcha verification failed for token: {}", resetPasswordVM.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
+        String mail = resetPasswordVM.getEmail();
         Optional<User> user = userService.requestPasswordReset(mail);
         if (user.isPresent()) {
             mailService.sendPasswordResetMail(user.orElseThrow());
@@ -185,6 +192,11 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/reset-password/finish")
     public ResponseEntity<ResponseStatus> finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+        // Verify reCAPTCHA
+        if (!userService.isRecaptchaValid(keyAndPassword.getRecaptchaToken())) {
+            LOG.error("In finish password reset Recaptcha verification failed for token: {}", keyAndPassword.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
         if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }

@@ -12,6 +12,7 @@ import com.seps.auth.security.SecurityUtils;
 import com.seps.auth.service.dto.AdminUserDTO;
 import com.seps.auth.service.dto.UserDTO;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -53,11 +54,14 @@ public class UserService {
 
     private final LoginLogRepository loginLogRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, LoginLogRepository loginLogRepository) {
+    private final RecaptchaService recaptchaService;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, LoginLogRepository loginLogRepository, RecaptchaService recaptchaService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.loginLogRepository = loginLogRepository;
+        this.recaptchaService = recaptchaService;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -414,4 +418,18 @@ public class UserService {
         LoginLog successLoginLog = new LoginLog(user.getId(), Instant.now(), status, clientIp);
         loginLogRepository.save(successLoginLog);
     }
+
+    /**
+     * Helper method to verify the Recaptcha token and handle exceptions
+     */
+    public boolean isRecaptchaValid(String recaptchaToken) {
+        try {
+            return recaptchaService.verifyRecaptcha(recaptchaToken);
+        } catch (IOException e) {
+            LOG.error("Error while verifying recaptcha token: {}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
+    }
+
+
 }
