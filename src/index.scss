@@ -1,44 +1,44 @@
 @import "../src/assets/css/variables";
 
-.form-floating {
+// .form-floating {
 
-	>.form-control,
-	>.form-control-plaintext,
-	>.form-select {
-		height: 44px;
-		min-height: 44px;
-	}
+// 	>.form-control,
+// 	>.form-control-plaintext,
+// 	>.form-select {
+// 		height: 44px;
+// 		min-height: 44px;
+// 	}
 
-	>label {
-		padding: 0.6rem 0.75rem;
-	}
+// 	>label {
+// 		padding: 0.6rem 0.75rem;
+// 	}
 
-	>.form-control,
-	>.form-control-plaintext {
-		&:focus {
-			padding-top: 0.625rem;
-		}
+// 	>.form-control,
+// 	>.form-control-plaintext {
+// 		&:focus {
+// 			padding-top: 0.625rem;
+// 		}
 
-		&:not(:placeholder-shown) {
-			padding-top: 0.625rem;
-		}
-	}
+// 		&:not(:placeholder-shown) {
+// 			padding-top: 0.625rem;
+// 		}
+// 	}
 
-	>.form-control:focus~label,
-	>.form-control:not(:placeholder-shown)~label,
-	>.form-control-plaintext~label,
-	>.form-select~label {
-		transform: scale(0.85) translateY(-1.4rem) translateX(0.15rem);
-	}
-}
+// 	>.form-control:focus~label,
+// 	>.form-control:not(:placeholder-shown)~label,
+// 	>.form-control-plaintext~label,
+// 	>.form-select~label {
+// 		transform: scale(0.85) translateY(-1.4rem) translateX(0.15rem);
+// 	}
+// }
 
-.form-floating>.form-control:focus~label,
-.form-floating>.form-control-plaintext~label,
-.form-floating>.form-select~label {
-	transform: scale(0.625) translateY(-1.4rem) translateX(0.15rem);
-	color: #000;
-	font-weight: 600;
-}
+// .form-floating>.form-control:focus~label,
+// .form-floating>.form-control-plaintext~label,
+// .form-floating>.form-select~label {
+// 	transform: scale(0.625) translateY(-1.4rem) translateX(0.15rem);
+// 	color: #000;
+// 	font-weight: 600;
+// }
 
 
 // .react-select-container {
@@ -60,12 +60,7 @@
 // 	box-shadow: none;
 // }
 
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-	-webkit-box-shadow: 0 0 0 30px white inset !important;
-}
+
 
 // .goal-modal-cover .modal-title {
 // 	font-size: 16px;
@@ -136,9 +131,9 @@ input:-webkit-autofill:active {
 
 }
 
-.multiselect-height .react-select__control {
-	min-height: 32px;
-}
+// .multiselect-height .react-select__control {
+// 	min-height: 32px;
+// }
 
 // .modal {
 // 	.modal-header {
@@ -248,13 +243,13 @@ input:-webkit-autofill:active {
 	padding-left: 42px;
 }
 
-select {
-	background: url(../src/assets/images/down.svg) no-repeat;
+// select {
+// 	background: url(../src/assets/images/down.svg) no-repeat;
 
-	background-position: calc(100% - 12px);
-	appearance: none;
-	padding-right: 30px !important;
-}
+// 	background-position: calc(100% - 12px);
+// 	appearance: none;
+// 	padding-right: 30px !important;
+// }
 
 .profile-right-width {
 	width: 70%;
@@ -339,50 +334,50 @@ select {
 // 	padding-bottom: 15px !important;
 // }
 
-input[type="radio" i] {
-	background-color: initial;
-	cursor: default;
-	appearance: auto;
-	box-sizing: border-box;
-	margin: -2px 3px 0px 5px;
-	padding: initial;
-	border: initial;
-	vertical-align: middle;
-	position: relative;
-	width: 14px;
-	height: 14px;
-}
+// input[type="radio" i] {
+// 	background-color: initial;
+// 	cursor: default;
+// 	appearance: auto;
+// 	box-sizing: border-box;
+// 	margin: -2px 3px 0px 5px;
+// 	padding: initial;
+// 	border: initial;
+// 	vertical-align: middle;
+// 	position: relative;
+// 	width: 14px;
+// 	height: 14px;
+// }
 
-input[type='radio']:after {
-	width: 14px;
-	height: 14px;
-	border-radius: 15px;
-	top: 0px;
-	left: 0px;
-	position: absolute;
-	background-color: #fff;
-	content: "";
-	display: inline-block;
-	visibility: visible;
-	border: 1.5px solid #1C1B1F;
+// input[type='radio']:after {
+// 	width: 14px;
+// 	height: 14px;
+// 	border-radius: 15px;
+// 	top: 0px;
+// 	left: 0px;
+// 	position: absolute;
+// 	background-color: #fff;
+// 	content: "";
+// 	display: inline-block;
+// 	visibility: visible;
+// 	border: 1.5px solid #1C1B1F;
 
-}
+// }
 
-input[type='radio']:checked:after {
-	width: 16px;
-	height: 16px;
-	border-radius: 15px;
-	top: 0px;
-	left: 0px;
-	position: absolute;
-	content: "";
-	display: inline-block;
-	visibility: visible;
-	border: none;
-	background-image: url(assets/images/radio_button_checked.svg);
-	background-repeat: no-repeat;
+// input[type='radio']:checked:after {
+// 	width: 16px;
+// 	height: 16px;
+// 	border-radius: 15px;
+// 	top: 0px;
+// 	left: 0px;
+// 	position: absolute;
+// 	content: "";
+// 	display: inline-block;
+// 	visibility: visible;
+// 	border: none;
+// 	background-image: url(assets/images/radio_button_checked.svg);
+// 	background-repeat: no-repeat;
 
-}
+// }
 
 
 .link-text {
