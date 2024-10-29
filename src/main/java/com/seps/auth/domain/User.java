@@ -109,6 +109,15 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "current_logged_in")
     private Instant currentLoggedIn;
 
+    @Size(max = 5)
+    @Column(name = "country_code", length = 5)
+    private String countryCode;
+
+    @Size(max = 15)
+    @Column(name = "phone_number", length = 15)
+    private String phoneNumber;
+
+
     public Long getId() {
         return id;
     }
@@ -260,6 +269,22 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setCurrentLoggedIn(Instant currentLoggedIn) {
         this.currentLoggedIn = currentLoggedIn;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override

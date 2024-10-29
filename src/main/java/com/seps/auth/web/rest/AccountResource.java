@@ -92,42 +92,45 @@ public class AccountResource {
      * {@code GET  /account} : get the current user.
      *
      * @return the current user.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
+     * @throws RuntimeException {@code 400 Bad Request} if the user couldn't be returned.
      */
     @GetMapping("/account")
     public AdminUserDTO getAccount() {
         return userService
             .getUserWithAuthorities()
             .map(AdminUserDTO::new)
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
     }
 
     /**
      * {@code POST  /account} : update the current user information.
      *
      * @param userDTO the current user information.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws RuntimeException          {@code 500 (Internal Server Error)} if the user login wasn't found.
+     * @throws CustomException {@code 400 (Bad Request)} if the user login wasn't found.
      */
     @PostMapping("/account")
-    public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
+    public ResponseEntity<ResponseStatus> saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
-            throw new EmailAlreadyUsedException();
-        }
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CURRENT_USER_NOT_FOUND, null, null));
         Optional<User> user = userRepository.findOneByLogin(userLogin);
         if (!user.isPresent()) {
-            throw new AccountResourceException("User could not be found");
+            LOG.error("User could not be found");
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null);
         }
         userService.updateUser(
             userDTO.getFirstName(),
             userDTO.getLastName(),
-            userDTO.getEmail(),
             userDTO.getLangKey(),
-            userDTO.getImageUrl()
+            userDTO.getImageUrl(),
+            userDTO.getCountryCode(),
+            userDTO.getPhoneNumber()
         );
+        return new ResponseEntity<>(new ResponseStatus(
+            messageSource.getMessage("user.profile.updated.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        ), HttpStatus.OK);
+
     }
 
     /**

@@ -229,23 +229,24 @@ public class UserService {
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
-     * @param firstName first name of user.
-     * @param lastName  last name of user.
-     * @param email     email id of user.
-     * @param langKey   language key.
-     * @param imageUrl  image URL of user.
+     * @param firstName   first name of user.
+     * @param lastName    last name of user.
+     * @param langKey     language key.
+     * @param imageUrl    image URL of user.
+     * @param countryCode countryCode  of user.
+     * @param phoneNumber phoneNumber  of user.
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void updateUser(String firstName, String lastName, String langKey, String imageUrl,
+                           String countryCode, String phoneNumber) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 user.setFirstName(firstName);
                 user.setLastName(lastName);
-                if (email != null) {
-                    user.setEmail(email.toLowerCase());
-                }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
+                user.setCountryCode(countryCode);
+                user.setPhoneNumber(phoneNumber);
                 userRepository.save(user);
                 LOG.debug("Changed Information for User: {}", user);
             });
@@ -313,7 +314,7 @@ public class UserService {
 
     public User updateUserOtpInfo(String username) {
         User user = userRepository.findOneByLogin(username)
-            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
         // Generate OTP data using OtpService
         OtpService otpService = new OtpService();
         String otpCode = otpService.generateOtpCode();
@@ -337,7 +338,7 @@ public class UserService {
      */
     public boolean verifyOtpToken(String otpToken) {
         User user = userRepository.findByOtpToken(otpToken)
-            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.INVALID_OTP_TOKEN, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_TOKEN, null, null));
         return user.getOtpTokenExpirationTime().isAfter(Instant.now());
     }
 
@@ -350,7 +351,7 @@ public class UserService {
      */
     public boolean verifyOtpCode(String otpCode, String otpToken) {
         User user = userRepository.findByOtpToken(otpToken)
-            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.INVALID_OTP_CODE, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null));
         return otpCode.equals(user.getOtpCode());
     }
 

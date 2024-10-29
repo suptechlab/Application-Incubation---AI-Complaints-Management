@@ -4,6 +4,7 @@ import com.seps.auth.config.Constants;
 import com.seps.auth.domain.Authority;
 import com.seps.auth.domain.User;
 import jakarta.validation.constraints.*;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
@@ -23,9 +24,11 @@ public class AdminUserDTO implements Serializable {
     @Size(min = 1, max = 50)
     private String login;
 
+    @NotBlank
     @Size(max = 50)
     private String firstName;
 
+    @NotBlank
     @Size(max = 50)
     private String lastName;
 
@@ -51,6 +54,13 @@ public class AdminUserDTO implements Serializable {
 
     private Set<String> authorities;
 
+    @Size(max = 5)
+    private String countryCode;
+
+    @Size(max = 15)
+    private String phoneNumber;
+
+
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -69,6 +79,8 @@ public class AdminUserDTO implements Serializable {
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
+        this.countryCode = user.getCountryCode();
+        this.phoneNumber = user.getPhoneNumber();
     }
 
     public Long getId() {
@@ -175,6 +187,22 @@ public class AdminUserDTO implements Serializable {
         this.authorities = authorities;
     }
 
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     // prettier-ignore
     @Override
     public String toString() {
@@ -191,6 +219,8 @@ public class AdminUserDTO implements Serializable {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
+            ", countryCode='" + countryCode + '\'' +
+            ", phoneNumber='" + phoneNumber + '\'' +
             "}";
     }
 }

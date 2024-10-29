@@ -10,7 +10,8 @@ public enum SepsStatusCode implements StatusType {
     USER_NOT_FOUND(10013, "user.not.found"),
     INVALID_OTP_TOKEN(10014, "invalid.otp.token"),
     INVALID_OTP_CODE(10015, "invalid.otp.code"),
-    USER_NOT_FOUND_RESET(10016, "user.not.found.reset");
+    USER_NOT_FOUND_RESET(10016, "user.not.found.reset"),
+    CURRENT_USER_NOT_FOUND(10017, "current.user.not.found");
 
     private final int code;
 
