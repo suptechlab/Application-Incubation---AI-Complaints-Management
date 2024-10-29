@@ -12,7 +12,7 @@ COPY . .
 RUN chmod +x ./mvnw
 RUN ./mvnw -Pprod clean verify -DskipTests
 
-FROM openjdk:8-alpine
+FROM openjdk:17-alpine
 
 ARG ARG_VERSION
 ENV VERSION=$ARG_VERSION
