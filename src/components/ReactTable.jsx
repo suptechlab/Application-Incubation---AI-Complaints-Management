@@ -150,7 +150,7 @@ export default function ReactTable({
         </tbody>
       </BTable>
 
-      <div className="mt-auto pt-3 pb-1">
+      <div className="mt-auto pt-3 pb-1 pagination-cover">
         <DataGridPagination
           rowsPerPage={pagination.pageSize}
           currentPage={pagination.pageIndex + 1}

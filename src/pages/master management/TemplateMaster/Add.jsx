@@ -37,7 +37,6 @@ const Add = ({ modal, toggle }) => {
       keyboard={false}
       centered={true}
       scrollable={true}
-      size="sm"
       className="theme-modal"
       enforceFocus={false}
     >
@@ -49,6 +48,7 @@ const Add = ({ modal, toggle }) => {
       <Formik
         initialValues={{
           templateName: "",
+          description: "",
         }}
         onSubmit={(values, actions) => {
           actions.setSubmitting(false);
@@ -84,6 +84,7 @@ const Add = ({ modal, toggle }) => {
               <SunEditorReact
                 id="description"
                 name="description"
+                label="Template Details *"
                 content={values.description}
                 error={errors?.description}
                 touched={touched?.description}

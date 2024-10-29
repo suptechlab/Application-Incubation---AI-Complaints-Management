@@ -105,10 +105,11 @@ const ReactSelect = ({
         components={{
           ClearIndicator: () => null,
           DropdownIndicator: () => (
-            <MdArrowDropDown size={20} className="mx-2" />
+            <MdArrowDropDown size={24} className="mx-2" />
           ),
           IndicatorSeparator: () => null,
         }}
+        menuPlacement="auto"
         // menuIsOpen={true}
       />
       {error ? <div className="form-text text-danger small">{error}</div> : null}

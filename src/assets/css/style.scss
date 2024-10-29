@@ -42,7 +42,8 @@
 
 .form-control {
     &.is-invalid {
-        background-image: none !important;
+        background-image: none;
+        padding-right: $input-padding-x;
     }
 }
 

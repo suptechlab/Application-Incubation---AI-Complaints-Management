@@ -1,4 +1,5 @@
 @import "../../src/assets/css/variables";
+
 .table-cover-main {
     .table {
 
@@ -15,6 +16,16 @@
                 padding-right: 1.5rem;
                 width: 120px;
             }
+        }
+    }
+
+    .pagination-cover {
+        .page-link {
+            min-width: 2rem;
+            min-height: 2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
     }
 }
