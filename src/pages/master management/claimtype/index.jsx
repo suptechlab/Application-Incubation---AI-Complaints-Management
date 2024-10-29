@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useQuery,useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "../../../components/PageHeader";
-import { Card } from "reactstrap";
+
 import qs from "qs";
 import ListingSearchForm from "../../../components/ListingSearchForm";
 import CommonDataTable from "../../../components/CommonDataTable";
@@ -15,6 +15,7 @@ import Add from "./Add";
 import Edit from "./Edit";
 import { useTranslation } from "react-i18next";
 import { changeClaimTypeStatus, downloadClaimTypes, handleGetClaimTypes } from "../../../services/claimType.service";
+import { Card } from "react-bootstrap";
 const ClaimType = () => {
 
   const location = useLocation();
@@ -190,6 +191,7 @@ const ClaimType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
+        size : '90'
       },
       {
         id: "actions",
@@ -210,6 +212,7 @@ const ClaimType = () => {
         },
         header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
+        size : '80'
       },
     ],
     []
@@ -242,8 +245,8 @@ const ClaimType = () => {
 
       ]}
     />
-    <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
-      <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
+    <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+      <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />
         <CommonDataTable
           columns={columns}
@@ -253,8 +256,9 @@ const ClaimType = () => {
           sorting={sorting}
           setSorting={setSorting}
         />
-      </Card>
-    </div>
+      </Card.Body>
+    </Card>
+
     <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
     <Edit modal={editModal?.open} dataQuery={dataQuery} toggle={editToggle} rowData={editModal?.row} />
   </div>

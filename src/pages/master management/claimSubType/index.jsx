@@ -1,19 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import PageHeader from "../../../components/PageHeader";
-import { Card } from "reactstrap";
 import qs from "qs";
-import ListingSearchForm from "../../../components/ListingSearchForm";
-import CommonDataTable from "../../../components/CommonDataTable";
-import { useLocation } from "react-router-dom";
-import SvgIcons from "../../../components/SVGIcons"
-import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
+import React, { useEffect, useRef, useState } from "react";
+import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
+import CommonDataTable from "../../../components/CommonDataTable";
+import ListingSearchForm from "../../../components/ListingSearchForm";
+import PageHeader from "../../../components/PageHeader";
+import SvgIcons from "../../../components/SVGIcons";
 import Toggle from "../../../components/Toggle";
+import { changeClaimSubTypeStatus, claimTypesDropdownList, downloadClaimSubTypes, handleGetClaimSubType } from "../../../services/claimSubType.service";
+import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
-import { useTranslation } from "react-i18next";
-import { changeClaimSubTypeStatus, claimTypesDropdownList, downloadClaimSubTypes, handleGetClaimSubType } from "../../../services/claimSubType.service";
 const ClaimSubType = () => {
 
   const location = useLocation();
@@ -35,7 +35,7 @@ const ClaimSubType = () => {
   const toggle = () => setModal(!modal);
   const editToggle = () => setEditModal({ row: '', open: !editModal?.open });
 
-  const [claimTypes , setClaimTypes] = useState([])
+  const [claimTypes, setClaimTypes] = useState([])
 
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
@@ -174,19 +174,19 @@ const ClaimSubType = () => {
         accessorFn: (row) => row?.name,
         id: "name",
         header: () => t("CLAIM SUB TYPE"),
-        enableSorting:true
+        enableSorting: true
       },
       {
         accessorFn: (row) => row?.claimTypeName,
         id: "claimTypeName",
         header: () => t("CLAIM TYPE"),
-        enableSorting:true
+        enableSorting: true
       },
       {
         accessorFn: (row) => row?.slaBreachDays,
         id: "slaBreachDays",
         header: () => t("SLA BREACH"),
-        enableSorting:true
+        enableSorting: true
       },
       {
         accessorFn: (row) => row.description != null ? row.description : '-',
@@ -198,6 +198,7 @@ const ClaimSubType = () => {
         cell: (info) => {
           return (
             <Toggle
+              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
               name="status"
@@ -209,6 +210,8 @@ const ClaimSubType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
+        size: '90',
+        enableSorting:true
       },
       {
         id: "actions",
@@ -229,6 +232,7 @@ const ClaimSubType = () => {
         },
         header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
         enableSorting: false,
+        size: '80'
       },
     ],
     []
@@ -241,32 +245,28 @@ const ClaimSubType = () => {
     });
   }, [filter]);
 
-      // GET CLAIM TYPE DROPDOWN LIST
-      const getClaimTypeDropdownList = () => {
-        claimTypesDropdownList().then(response => {
-            if (response?.data && response?.data?.length > 0) {
-                const dropdownData = response?.data.map(item => ({
-                    value: item.id,
-                    label: item.name
-                }));
-                setClaimTypes(dropdownData)
-            }
+  // GET CLAIM TYPE DROPDOWN LIST
+  const getClaimTypeDropdownList = () => {
+    claimTypesDropdownList().then(response => {
+      if (response?.data && response?.data?.length > 0) {
+        const dropdownData = response?.data.map(item => ({
+          value: item.id,
+          label: item.name
+        }));
+        setClaimTypes(dropdownData)
+      }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+      }
+    })
+  }
 
-
-
-
-        }).catch((error) => {
-            if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription);
-            } else {
-                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
-            }
-        })
-    }
-
-    useEffect(() => {
-        getClaimTypeDropdownList()
-    }, [])
+  useEffect(() => {
+    getClaimTypeDropdownList()
+  }, [])
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <PageHeader title={t("CLAIM SUB TYPE")}
@@ -275,8 +275,8 @@ const ClaimSubType = () => {
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
     />
-    <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
-      <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
+    <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+      <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />
         <CommonDataTable
           columns={columns}
@@ -286,9 +286,9 @@ const ClaimSubType = () => {
           sorting={sorting}
           setSorting={setSorting}
         />
-      </Card>
-    </div>
-    <Add modal={modal} dataQuery={dataQuery} toggle={toggle} claimTypes={claimTypes}/>
+      </Card.Body>
+    </Card>
+    <Add modal={modal} dataQuery={dataQuery} toggle={toggle} claimTypes={claimTypes} />
     <Edit modal={editModal?.open} dataQuery={dataQuery} toggle={editToggle} claimTypes={claimTypes} rowData={editModal?.row} />
   </div>
 };

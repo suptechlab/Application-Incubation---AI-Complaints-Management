@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "../../../components/PageHeader";
-import { Card } from "reactstrap";
 import qs from "qs";
 import ListingSearchForm from "../../../components/ListingSearchForm";
 import CommonDataTable from "../../../components/CommonDataTable";
@@ -13,8 +12,8 @@ import Toggle from "../../../components/Toggle";
 import Add from "./Add";
 import Edit from "./Edit";
 import { useTranslation } from "react-i18next";
-import { downloadInquiryTypes, handleGetInquiryType } from "../../../services/inquiryType.service";
-import axios from "axios";
+import { changeInquiryTypeStatus, downloadInquiryTypes, handleGetInquiryType } from "../../../services/inquiryType.service";
+import { Card } from "react-bootstrap";
 const InquiryType = () => {
 
   const location = useLocation();
@@ -74,20 +73,27 @@ const InquiryType = () => {
       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
       Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
-      // For now, returning default data without API request
-      return [
-        {
-          id: 1,
-          inquiryCategory: 'Corporate Governance',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-        },
-        {
-          id: 2,
-          inquiryCategory: 'Non-Profit Organizations',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-        },
-      ];
+      if (sorting.length === 0) {
+        return handleGetInquiryType({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          ...filterObj,
+        });
+      } else {
+        return handleGetInquiryType({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          sort: sorting
+            .map(
+              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+            )
+            .join(","),
+          ...filterObj,
+        });
+      }
     },
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
     // queryFn: () => {
     //   const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
     //   Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
@@ -114,13 +120,16 @@ const InquiryType = () => {
   });
 
   const changeStatus = async (id, currentStatus) => {
-    try {
-      // await handleEditDistricts(id, { status: !currentStatus });
-      toast.success("Inquiry type status updated successfully");
+    changeInquiryTypeStatus(id, !currentStatus).then(response => {
+      toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
-    } catch (error) {
-      toast.error("Error updating state status");
-    }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    })
   };
 
   // HANDLE INQUIRY TYPES CSV DOWNLOAD
@@ -157,7 +166,6 @@ const InquiryType = () => {
     })
   }
 
-
   useEffect(() => {
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
@@ -171,12 +179,12 @@ const InquiryType = () => {
   const columns = React.useMemo(
     () => [
       {
-        accessorFn: (row) => row.inquiryCategory,
-        id: "inquiryCategory",
+        accessorFn: (row) => row?.name,
+        id: "name",
         header: () => t("INQUIRY CATEGORY"),
       },
       {
-        accessorFn: (row) => row.description != null ? row.description : '-',
+        accessorFn: (row) => row?.description != null ? row?.description : '-',
         id: "description",
         header: () => t("DESCRIPTION"),
         enableSorting: false,
@@ -192,7 +200,7 @@ const InquiryType = () => {
               name="status"
               value={info?.row?.original?.status}
               checked={info?.row?.original?.status}
-            // onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
             />
           )
         },
@@ -237,8 +245,8 @@ const InquiryType = () => {
         { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]} />
-    <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
-      <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
+    <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+      <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />
         <CommonDataTable
           columns={columns}
@@ -248,8 +256,8 @@ const InquiryType = () => {
           sorting={sorting}
           setSorting={setSorting}
         />
-      </Card>
-    </div>
+      </Card.Body>
+    </Card>
     <Add modal={modal} toggle={toggle} />
     <Edit modal={editModal?.open} toggle={editToggle} />
   </div>

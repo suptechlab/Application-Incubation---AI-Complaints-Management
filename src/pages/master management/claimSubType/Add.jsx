@@ -19,8 +19,8 @@ const Add = ({ modal, toggle, dataQuery, claimTypes }) => {
     const handleSubmit = async (values, actions) => {
         const formData = {
             name: values?.name ?? "",
-            claimTypeId: values?.claimType ?? "",
-            slaBreachDays: values?.SLABreachDay ?? "",
+            claimTypeId: values?.claimType ?? null,
+            slaBreachDays: values?.slaBreachDays ?? null,
             description: values?.description ?? "",
         }
 

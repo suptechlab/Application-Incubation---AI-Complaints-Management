@@ -28,15 +28,15 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     }, []);
 
     const fetchNotifications = async () => {
-        try {
-            fetchNotificationCount();
-            const response = await handleGetNotifications();
-            if (response.status === 200) {
-                setNotifications(response.data.data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch notifications", error);
-        }
+        // try {
+        //     fetchNotificationCount();
+        //     const response = await handleGetNotifications();
+        //     if (response.status === 200) {
+        //         setNotifications(response.data.data);
+        //     }
+        // } catch (error) {
+        //     console.error("Failed to fetch notifications", error);
+        // }
     };
 
     const fetchNotificationCount = async()=>{
@@ -64,8 +64,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     const deleteNotification = async (id) => {
         try {
             console.log("Delete called...",id);
-            await handleDeleteNotification(id);
-            fetchNotifications();
+            // await handleDeleteNotification(id);
+            // fetchNotifications();
         } catch (error) {
             console.error("Failed to delete notification", error);
         }

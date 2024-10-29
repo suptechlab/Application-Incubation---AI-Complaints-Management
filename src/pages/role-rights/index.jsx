@@ -185,7 +185,7 @@ export default function RoleRightsList() {
             <ListingSearchForm filter={filter} setFilter={setFilter} />
             <CommonDataTable
               columns={columns}
-              dataQuery={dataQuery?.data?.data}
+              dataQuery={dataQuery}
               pagination={pagination}
               setPagination={setPagination}
               sorting={sorting}
