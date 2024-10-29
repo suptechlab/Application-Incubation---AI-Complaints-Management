@@ -4,7 +4,7 @@ const validationSchema = Yup.object({
     name: Yup.string()
         .max(250, "Claim subtype name cannot exceed 250 characters.")
         .required("Claim subtype name is required."),
-    claimType: Yup.string().required("Claim type is required."),
+    claimTypeId: Yup.string().required("Claim type is required."),
     slaBreachDays: Yup.number()
         .typeError("SLA Breach Day must be a number.")
         .required("SLA Breach Day is required.")

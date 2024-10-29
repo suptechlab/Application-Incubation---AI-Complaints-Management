@@ -8,32 +8,32 @@ import ReactSelect from "../../../components/ReactSelect";
 import { createNewClaimSubType } from "../../../services/claimSubType.service";
 import { validationSchema } from "../../../validations/claimSubType.validation";
 
-const Add = ({ modal, toggle }) => {
+const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
   const { t } = useTranslation();
+ 
   const handleSubmit = async (values, actions) => {
     const formData = {
-      name: "",
-      claimType: "",
-      SLABreachDay: "",
-      description: "",
-    };
+      name: values?.name ?? "",
+      claimTypeId: values?.claimType ?? null,
+      slaBreachDays: values?.slaBreachDays ?? null,
+      description: values?.description ?? "",
+    }
 
-    createNewClaimSubType(formData)
-      .then((response) => {
-        toast.success(response?.data?.message);
-        toggle();
-      })
-      .catch((error) => {
-        if (error?.response?.data?.errorDescription) {
-          toast.error(error?.response?.data?.errorDescription);
-        } else {
-          toast.error(error?.message);
-        }
-      })
-      .finally(() => {
-        actions.setSubmitting(false);
-      });
+    createNewClaimSubType(formData).then(response => {
+      toast.success(response?.data?.message);
+      dataQuery.refetch()
+      toggle()
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message);
+      }
+    }).finally(() => {
+      actions.setSubmitting(false);
+    });
   };
+
 
   return (
     <Modal
@@ -55,8 +55,8 @@ const Add = ({ modal, toggle }) => {
       <Formik
         initialValues={{
           name: "",
-          claimType: "",
-          SLABreachDay: "",
+          claimTypeId: "",
+          slaBreachDays: "",
           description: "",
         }}
         validationSchema={validationSchema}
@@ -78,54 +78,45 @@ const Add = ({ modal, toggle }) => {
           <Form>
             <Modal.Body className="text-break py-0">
               <FormInput
-                error={errors.claimSubTypeName}
-                id="claimSubTypeName"
+                error={errors?.name}
+                id="name"
                 key={"claimSubTypeName"}
                 label={t("NAME OF CLAIM SUB TYPE")}
-                name="claimSubTypeName"
+                name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 // placeholder="Enter district name"
-                touched={touched.claimSubTypeName}
+                touched={touched?.name}
                 type="text"
-                value={values.claimSubTypeName || ""}
+                value={values?.name || ""}
               />
               <ReactSelect
-                error={errors?.claimType}
-                options={[
-                  {
-                    value: 1,
-                    label: "Credit Portfolio",
-                  },
-                  {
-                    value: 2,
-                    label: "Assets Acquired Through Payment",
-                  },
-                ]}
-                value={values?.claimType}
+                error={errors?.claimTypeId}
+                options={claimTypes ?? []}
+                value={values?.claimTypeId}
                 onChange={(option) => {
-                  setFieldValue("claimType", option?.target?.value ?? "");
+                  setFieldValue("claimTypeId", option?.target?.value ?? "");
                 }}
-                name="claimType"
+                name="claimTypeId"
                 label="Claim Type"
                 className={`${
-                  touched?.claimType && errors?.claimType ? "is-invalid" : ""
+                  touched?.claimTypeId && errors?.claimTypeId ? "is-invalid" : ""
                 } mb-3`}
                 onBlur={handleBlur}
-                touched={touched?.claimType}
+                touched={touched?.claimTypeId}
               />
               <FormInput
-                error={errors.SLABreachDay}
-                id="SLABreachDay"
-                key={"SLABreachDay"}
+                error={errors?.slaBreachDays}
+                id="slaBreachDays"
+                key={"slaBreachDays"}
                 label={t("SLA BREACH DAY")}
-                name="SLABreachDay"
+                name="slaBreachDays"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 // placeholder="Enter district name"
-                touched={touched.SLABreachDay}
+                touched={touched?.slaBreachDays}
                 type="number"
-                value={values?.SLABreachDay}
+                value={values?.slaBreachDays}
               />
               <FormInput
                 error={errors?.description}
