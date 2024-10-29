@@ -1,16 +1,16 @@
 global:
-  appVersion: 1.0.0-SNAPSHOT
-  name: ms-seps-base-service
+  appVersion: 0.0.1-SNAPSHOT
+  name: ms-auth
 deployment:
   # Default values for deployment.
   # This is a YAML-formatted file.
   # Declare variables to be passed into your templates.
-  namespace: deployment-name
+  namespace: suptech
   replicaCount: 1
 
   image:
     registry: nexus.seps.gob.ec:4000
-    repository: ms-seps-base-service
+    repository: ms-auth
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
@@ -94,7 +94,7 @@ deployment:
       cpu: 1000m
       memory: 2048Mi
     requests:
-      cpu: 1m
+      cpu: 10m
       memory: 1024Mi
 
   autoscaling:
@@ -112,7 +112,7 @@ deployment:
 
   envVars:
 #    logging.level.root: INFO
-    JAVA_TOOL_OPTIONS: -Xms256m -Xmx2g -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Dvariable=value # read from System.getProperty("variable")
+    JAVA_TOOL_OPTIONS: -Xms256m -Xmx512m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Dvariable=value # read from System.getProperty("variable")
     TZ: America/Guayaquil
     # Variable to localize the id_rsa, and connect to ftp server
   # SFTP_PATH_PRIVATE_KEY: /home/.ssh/id_rsa
@@ -132,14 +132,12 @@ deployment:
         items:
           CURRENT_PROFILE:
             envVarName: SPRING_PROFILES_ACTIVE
-          SEPS_JDBC_ORACLE_URL:
-            envVarName: seps.jdbc.oracle.url
-          SEPS_JDBC_ORACLE_USER:
-            envVarName: seps.jdbc.oracle.user
-          SEPS_JDBC_POSTGRES_URL:
+          SPRING_DATASOURCE_URL:
             envVarName: seps.jdbc.postgres.url
-          SEPS_JDBC_POSTGRES_USER:
+          SPRING_DATASOURCE_USERNAME:
             envVarName: seps.jdbc.postgres.user
+          SPRING_LIQUIBASE_URL:
+            envVarName: SPRING_LIQUIBASE_URL
             
     # env:
   #   envVarName: env
@@ -154,11 +152,9 @@ deployment:
     seps-secrets:
       environment: # Items set like environment variable
         items:
-          SEPS_JDBC_ORACLE_PASSWORD:
-            envVarName: seps.jdbc.oracle.password
           JASYPT_ENCRYPTOR_PASSWORD:
             envVarName: jasypt.encryptor.password
-          SEPS_JDBC_POSTGRES_PASSWORD:
+          SPRING_DATASOURCE_PASSWORD:
             envVarName: seps.jdbc.postgres.password
 
       # Mount a file id_rsa to connect a ftp server
