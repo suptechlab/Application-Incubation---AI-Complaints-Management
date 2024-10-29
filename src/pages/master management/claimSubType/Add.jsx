@@ -148,7 +148,6 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
               >
                 {t("SUBMIT")}
               </Button>

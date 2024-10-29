@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { editInquiryType } from "../../../services/inquiryType.service";
 import { validationSchema } from "../../../validations/inquiryType.validation";
 
-const Edit = ({ modal, toggle }) => {
+const Edit = ({ modal, toggle , rowData , dataQuery }) => {
   const { t } = useTranslation();
 
   const handleSubmit = async (values, actions) => {
@@ -16,10 +16,11 @@ const Edit = ({ modal, toggle }) => {
       name: values?.name,
       description: values?.description,
     };
-    editInquiryType(formData)
+    editInquiryType(rowData?.id , formData)
       .then((response) => {
         toast.success(response?.data?.message);
         toggle();
+        dataQuery.refetch()
       })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -52,8 +53,8 @@ const Edit = ({ modal, toggle }) => {
       </Modal.Header>
       <Formik
         initialValues={{
-          name: "",
-          description: "",
+          name: rowData?.name ?? "",
+          description: rowData?.description ?? "",
         }}
         onSubmit={(values, actions) => {
           actions.setSubmitting(false);
@@ -116,7 +117,7 @@ const Edit = ({ modal, toggle }) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
+                disabled={isSubmitting ?? false}
               >
                 {t("SUBMIT")}
               </Button>

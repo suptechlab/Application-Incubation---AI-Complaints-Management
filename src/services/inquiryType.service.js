@@ -29,5 +29,5 @@ export const changeInquiryTypeStatus = async (id,status) => {
 
 // EXPORT INQUIRY TYPE LIST
 export const downloadInquiryTypes = async (params) => {
-  return await instance.get('/v1/inquiry-type', { params, responseType: 'arraybuffer' });
+  return await instance.get('/v1/inquiry-types/download', { params, responseType: 'arraybuffer' });
 }

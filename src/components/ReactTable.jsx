@@ -47,7 +47,7 @@ export default function ReactTable({
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     manualSorting: true,
-    isMultiSortEvent: (e) => true,
+    isMultiSortEvent: (e) => false,
     debugTable: true,
     enableSortingRemoval: true,
   });

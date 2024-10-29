@@ -58,7 +58,7 @@ const Add = ({ modal, toggle, dataQuery }) => {
         }}
         validationSchema={validationSchema}
         onSubmit={(values, actions) => {
-          actions.setSubmitting(false);
+          actions.setSubmitting(true);
           handleSubmit(values, actions);
         }}
       >
@@ -114,10 +114,10 @@ const Add = ({ modal, toggle, dataQuery }) => {
                 {t("CANCEL")}
               </Button>
               <Button
+                disabled={isSubmitting ?? false}
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
               >
                 {t("SUBMIT")}
               </Button>

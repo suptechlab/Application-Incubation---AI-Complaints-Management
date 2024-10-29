@@ -7,25 +7,36 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import ReactSelect from "../../../components/ReactSelect";
 import { validationSchema } from "../../../validations/inquirySubType.validation";
+import { editInquirySubType } from "../../../services/inquirySubType.service";
 
-const Edit = ({ modal, toggle }) => {
+const Edit = ({ modal, toggle, rowData, dataQuery, inquiryTypes }) => {
+
   const { t } = useTranslation();
-  const handleSubmit = async (values) => {
-    console.log("values::", values);
-    toast.success("Inquiry sub type added successfully.");
+  const handleSubmit = async (values, actions) => {
+    const formData = {
+      name: values?.name,
+      description: values?.description,
+      inquiryTypeId: values?.inquiryTypeId
+    };
 
-    // handleAddDistrict(values).then(response => {
-    //     console.log("Add District::", response);
-    //     toast.success(response.data.message);
-    //     navigate("/districts");
-    // }).catch((error) => {
-    //     if(error.response.data.fieldErrors){
-    //         toast.error(error.response.data.fieldErrors[0].message);
-    //     }else{
-    //         toast.error(error.response.data.detail);
-    //     }
-    // });
+    editInquirySubType(rowData?.id, formData)
+      .then((response) => {
+        toast.success(response?.data?.message);
+        toggle();
+        dataQuery.refetch()
+      })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+      .finally(() => {
+        actions.setSubmitting(false);
+      });
   };
+
 
   return (
     <Modal
@@ -46,12 +57,14 @@ const Edit = ({ modal, toggle }) => {
       </Modal.Header>
       <Formik
         initialValues={{
-          inquirySubCategory: "",
-          description: "",
+          name: rowData?.name ?? "",
+          description: rowData?.description ?? "",
+          inquiryTypeId: rowData?.inquiryTypeId ?? null
         }}
+        enableReinitialize={true}
         validationSchema={validationSchema}
         onSubmit={(values, actions) => {
-          actions.setSubmitting(false);
+          actions.setSubmitting(true);
           handleSubmit(values, actions);
         }}
       >
@@ -64,50 +77,42 @@ const Edit = ({ modal, toggle }) => {
           touched,
           isValid,
           errors,
+          isSubmitting
         }) => (
           <Form>
             <Modal.Body className="text-break py-0">
               <FormInput
-                error={errors.inquirySubCategory}
-                id="inquirySubCategory"
-                key={"inquirySubCategory"}
+                error={errors?.name}
+                id="name"
+                key={"name"}
                 label={t("NAME OF INQUIRY SUB TYPE")}
-                name="inquirySubCategory"
+                name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 // placeholder="Enter district name"
-                touched={touched.inquirySubCategory}
+                touched={touched?.name}
                 type="text"
-                value={values.inquirySubCategory || ""}
+                value={values?.name || ""}
               />
+
               <ReactSelect
-                error={errors?.inquiryType}
-                options={[
-                  {
-                    value: 1,
-                    label: "Corporate Governance",
-                  },
-                  {
-                    value: 2,
-                    label: "Non-Profit Organizations",
-                  },
-                ]}
-                value={values?.inquiryType}
+                error={errors?.inquiryTypeId}
+                options={inquiryTypes ?? []}
+                value={values?.inquiryTypeId}
                 onChange={(option) => {
-                  setFieldValue("inquiryType", option?.target?.value ?? "");
+                  setFieldValue("inquiryTypeId", option?.target?.value ?? "");
                 }}
-                name="inquiryType"
+                name="inquiryTypeId"
                 label={t("INQUIRY TYPE")}
-                className={`${
-                  touched?.inquiryType && errors?.inquiryType
-                    ? "is-invalid"
-                    : ""
-                } mb-3`}
+                className={`${touched?.inquiryTypeId && errors?.inquiryTypeId
+                  ? "is-invalid"
+                  : ""
+                  } mb-3`}
                 onBlur={handleBlur}
-                touched={touched?.inquiryType}
+                touched={touched?.inquiryTypeId}
               />
               <FormInput
-                error={errors.description}
+                error={errors?.description}
                 isTextarea={true}
                 id="description"
                 key={"description"}
@@ -135,7 +140,7 @@ const Edit = ({ modal, toggle }) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
+                disabled={isSubmitting ?? false}
               >
                 {t("SUBMIT")}
               </Button>

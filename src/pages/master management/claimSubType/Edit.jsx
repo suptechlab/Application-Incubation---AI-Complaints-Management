@@ -146,7 +146,7 @@ const Edit = ({ modal, dataQuery, toggle, rowData, claimTypes }) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
+                disabled={isSubmitting ?? false}
               >
                 {t("SUBMIT")}
               </Button>
