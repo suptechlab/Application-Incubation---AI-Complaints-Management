@@ -25,7 +25,7 @@ export const englishLang = {
     "EDIT CLAIM TYPE": "Edit claim type",
     "NAME OF CLAIM SUB TYPE": "Name of Claim Sub Type",
     "SLA BREACH": "SLA Breach",
-    "SLA BREACH DAY": "SLA Breach DAY",
+    "SLA BREACH DAY": "SLA Breach Days",
     "CANCEL": "Cancel",
     "SUBMIT": "Submit",
     "EDIT CLAIM SUB TYPE": "Edit Claim Sub Type",
@@ -54,6 +54,7 @@ export const englishLang = {
 
     // MESSAGES
     "STATUS UPDATED" : "Status updated successfully.",
-    "STATUS UPDATE ERROR" : "Error in  updating status"
+    "STATUS UPDATE ERROR" : "Error in  updating status",
+    "SUB-CLAIM" : "Sub-claim"
 
 }

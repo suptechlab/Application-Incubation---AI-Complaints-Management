@@ -56,7 +56,7 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
         initialValues={{
           name: "",
           claimTypeId: "",
-          slaBreachDays: "",
+          slaBreachDays: 15,
           description: "",
         }}
         validationSchema={validationSchema}
@@ -80,8 +80,8 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
               <FormInput
                 error={errors?.name}
                 id="name"
-                key={"claimSubTypeName"}
-                label={t("NAME OF CLAIM SUB TYPE")}
+                key={"name"}
+                label={t("SUB-CLAIM")}
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
