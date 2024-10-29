@@ -69,8 +69,6 @@ public class AuthenticateController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    private final RecaptchaService recaptchaService;
-
     private final UserService userService;
 
     private final MailService mailService;
@@ -78,10 +76,10 @@ public class AuthenticateController {
     private final MessageSource messageSource;
 
 
-    public AuthenticateController(JwtEncoder jwtEncoder, AuthenticationManagerBuilder authenticationManagerBuilder, RecaptchaService recaptchaService, UserService userService, MailService mailService, MessageSource messageSource) {
+    public AuthenticateController(JwtEncoder jwtEncoder, AuthenticationManagerBuilder authenticationManagerBuilder,
+                                  UserService userService, MailService mailService, MessageSource messageSource) {
         this.jwtEncoder = jwtEncoder;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.recaptchaService = recaptchaService;
         this.userService = userService;
         this.mailService = mailService;
         this.messageSource = messageSource;
@@ -169,7 +167,7 @@ public class AuthenticateController {
     public ResponseEntity<OtpResponse> login(@Valid @RequestBody LoginVM loginVM, HttpServletRequest request) {
         String clientIp = request.getRemoteAddr();
         // Verify reCAPTCHA
-        if (!isRecaptchaValid(loginVM.getRecaptchaToken())) {
+        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
             LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
         }
@@ -278,16 +276,5 @@ public class AuthenticateController {
             System.currentTimeMillis()
         );
         return new ResponseEntity<>(status,HttpStatus.OK);
-    }
-    /**
-     * Helper method to verify the Recaptcha token and handle exceptions
-     */
-    private boolean isRecaptchaValid(String recaptchaToken) {
-        try {
-            return recaptchaService.verifyRecaptcha(recaptchaToken);
-        } catch (IOException e) {
-            LOG.error("Error while verifying recaptcha token: {}", e.getMessage());
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
-        }
     }
 }
