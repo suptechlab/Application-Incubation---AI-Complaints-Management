@@ -112,7 +112,7 @@ deployment:
 
   envVars:
 #    logging.level.root: INFO
-    JAVA_TOOL_OPTIONS: -Xms256m -Xmx512m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -Dvariable=value # read from System.getProperty("variable")
+    JAVA_TOOL_OPTIONS: -Xms256m -Xmx512m 
     TZ: America/Guayaquil
     # Variable to localize the id_rsa, and connect to ftp server
   # SFTP_PATH_PRIVATE_KEY: /home/.ssh/id_rsa
