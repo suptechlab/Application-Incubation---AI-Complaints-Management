@@ -147,6 +147,10 @@
                             max-height: calc(100vh - 30.5rem);
                             margin-top: -3rem;
 
+                            @include maxheight600() {
+                                max-height: calc(100vh - 15.5rem);
+                            }
+
                             li {
 
                                 a,

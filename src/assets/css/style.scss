@@ -96,19 +96,6 @@
     }
 }
 
-.theme-modal {
-    .modal-dialog-scrollable {
-        .modal-content {
-            > form {
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-                max-height: 100%;
-            }
-        }
-    }
-}
-
 // Custom CSS
 .fs-14 {
     font-size: 14px;
@@ -150,12 +137,23 @@
     min-width: 1px;
 }
 
-.theme-loader-z-index {
-    z-index: 1002 !important;
-}
-
 .cursor-pointer {
     cursor: pointer;
+}
+
+textarea {
+    resize: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
+.theme-loader-z-index {
+    z-index: 1002 !important;
 }
 
 .bg-light-green-custom {
@@ -177,6 +175,19 @@
                     width: auto;
                     height: 100%;
                 }
+            }
+        }
+    }
+}
+
+.theme-modal {
+    .modal-dialog-scrollable {
+        .modal-content {
+            >form {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                max-height: 100%;
             }
         }
     }
