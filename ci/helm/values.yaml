@@ -136,6 +136,11 @@ deployment:
             envVarName: seps.jdbc.oracle.url
           SEPS_JDBC_ORACLE_USER:
             envVarName: seps.jdbc.oracle.user
+          SEPS_JDBC_POSTGRES_URL:
+            envVarName: seps.jdbc.postgres.url
+          SEPS_JDBC_POSTGRES_USER:
+            envVarName: seps.jdbc.postgres.user
+            
     # env:
   #   envVarName: env
   #      volume: # set items like file in volume
@@ -153,6 +158,8 @@ deployment:
             envVarName: seps.jdbc.oracle.password
           JASYPT_ENCRYPTOR_PASSWORD:
             envVarName: jasypt.encryptor.password
+          SEPS_JDBC_POSTGRES_PASSWORD:
+            envVarName: seps.jdbc.postgres.password
 
       # Mount a file id_rsa to connect a ftp server
   #      volume: # Items set like file in volume
