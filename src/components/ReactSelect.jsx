@@ -93,7 +93,7 @@ const ReactSelect = ({
           onChange({ target: { name, value: option ? option.value : "" } })
         }
         options={formattedOptions}
-        placeholder={placeholder}
+        placeholder={placeholder || 'Select'}
         //placeholder=""
         isClearable={selectedOption?.value != ""}
         classNamePrefix="react-select"

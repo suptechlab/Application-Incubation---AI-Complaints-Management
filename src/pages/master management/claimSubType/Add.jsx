@@ -9,6 +9,7 @@ import { createNewClaimSubType } from "../../../services/claimSubType.service";
 import { validationSchema } from "../../../validations/claimSubType.validation";
 
 const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
+  console.log('claimTypes',claimTypes)
   const { t } = useTranslation();
  
   const handleSubmit = async (values, actions) => {
@@ -127,7 +128,7 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 isTextarea={true}
-                rows={4}
+                rows={5}
                 // placeholder="Enter district name"
                 touched={touched.description}
                 type="text"

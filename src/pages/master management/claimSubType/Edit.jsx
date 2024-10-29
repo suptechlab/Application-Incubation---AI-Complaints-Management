@@ -126,7 +126,7 @@ const Edit = ({ modal, dataQuery, toggle, rowData, claimTypes }) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 isTextarea={true}
-                rows={4}
+                rows={5}
                 // placeholder="Enter district name"
                 touched={touched.description}
                 type="text"
