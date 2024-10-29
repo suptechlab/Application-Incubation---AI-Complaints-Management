@@ -19,7 +19,7 @@ $border-radius: .25rem;
 $input-padding-y: 0.5rem;
 $form-check-input-border-radius: .125rem;
 $form-check-input-border: 2px solid $border-color;
-$form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='10' fill='none'><path fill='#{$white}' d='M5.222 9.444.778 5 2.03 3.747l3.191 3.182L11.97.182l1.253 1.262-8 8Z'/></svg>");
+$form-check-input-checked-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='10' fill='none'><path fill='#{$white}' d='M5.222 9.444.778 5 2.03 3.747l3.191 3.182L11.97.182l1.253 1.262-8 8Z'/></svg>");
 $form-switch-color: $white;
 $form-switch-focus-color: $form-switch-color;
 $btn-font-size: 14px;
@@ -47,7 +47,14 @@ $pagination-active-bg: rgba($body-color, 0.25);
 $pagination-margin-start: .25rem;
 $pagination-disabled-color: rgba($body-color, 0.75);
 $pagination-disabled-bg: $pagination-bg;
-
+$modal-sm: 380px;
+$modal-md: 690px;
+$modal-lg: 800px;
+$modal-inner-padding: 1.5rem;
+$modal-footer-margin-between: 1rem;
+$modal-content-border-width: 0;
+$modal-content-border-radius: 1rem;
+$modal-header-padding-y: 1.313rem;
 
 // Custom Variables
 $theme-size-10: 0.625rem;

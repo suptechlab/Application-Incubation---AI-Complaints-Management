@@ -96,6 +96,19 @@
     }
 }
 
+.theme-modal {
+    .modal-dialog-scrollable {
+        .modal-content {
+            > form {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                max-height: 100%;
+            }
+        }
+    }
+}
+
 // Custom CSS
 .fs-14 {
     font-size: 14px;

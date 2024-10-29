@@ -1,107 +1,131 @@
-import { Form, Formik } from 'formik'
-import React from 'react';
-import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import FormInput from '../../../components/FormInput';
-import { Button } from "react-bootstrap";
-import Toggle from '../../../components/Toggle';
+import { Form, Formik } from "formik";
+import React from "react";
+import { Button, Modal } from "react-bootstrap";
+import FormInput from "../../../components/FormInput";
 // import { handleAddDistrict } from "../../../services/district.service";
-import toast from 'react-hot-toast';
-import { validationSchema } from '../../../validations/inquiryType.validation';
-import { useTranslation } from 'react-i18next';
-import { editInquiryType } from '../../../services/inquiryType.service';
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { editInquiryType } from "../../../services/inquiryType.service";
+import { validationSchema } from "../../../validations/inquiryType.validation";
 
 const Edit = ({ modal, toggle }) => {
+  const { t } = useTranslation();
 
-    const {t} = useTranslation()
-
-    const handleSubmit = async (values,actions) => {
-        const formData = {
-            name : values?.name,
-            description : values?.description
-        }
-        editInquiryType(formData).then(response => {
-            toast.success(response?.data?.message);
-            toggle()
-        }).catch((error) => {
-            if(error?.response?.data?.errorDescription){
-                toast.error(error?.response?.data?.errorDescription);
-            }else{
-                toast.error(error?.message);
-            }
-        }).finally(()=>{
-            actions.setSubmitting(false);
-        });
+  const handleSubmit = async (values, actions) => {
+    const formData = {
+      name: values?.name,
+      description: values?.description,
     };
+    editInquiryType(formData)
+      .then((response) => {
+        toast.success(response?.data?.message);
+        toggle();
+      })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+      .finally(() => {
+        actions.setSubmitting(false);
+      });
+  };
 
-    return (
-        <Modal className="district-modal-cover" isOpen={modal} toggle={toggle} centered >
-            <ModalHeader className='border-0 fs-16 fw-semibold' toggle={null}>{t("EDIT INQUIRY TYPE")}</ModalHeader>
-            <ModalBody >
-                <Formik
-                    initialValues={{
-                        name: "",
-                        description: ""
-                    }}
-                    onSubmit={(values, actions) => {
-                        actions.setSubmitting(false);
-                        handleSubmit(values, actions);
-                    }}
-                    validationSchema={validationSchema}
-                >
-                    {({
-                        handleChange,
-                        handleBlur,
-                        values,
-                        setFieldValue,
-                        setFieldError,
-                        touched,
-                        isValid,
-                        errors,
-                        isSubmitting
-                    }) => (
-                        <Form>
-                            <FormInput
-                                error={errors.claimTypeName}
-                                id="name"
-                                key={"name"}
-                                label={t("NAME OF INQUIRY")}
-                                name="name"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                // placeholder="Enter district name"
-                                touched={touched.name}
-                                type="text"
-                                value={values?.name || ""}
-                            />
-                            <FormInput
-                                error={errors.description}
-                                isTextarea={true}
-                                id="description"
-                                key={"description"}
-                                label={t("DESCRIPTION")}
-                                name="description"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                // placeholder="Enter district name"
-                                touched={touched?.description}
-                                rows={4}
-                                type="text"
-                                value={values?.description || ""}
-                            />
-                            <ModalFooter className='border-0'>
-                                <Button className="fs-14 fw-semibold" variant="outline-dark" onClick={toggle}>
-                                    {t("CANCEL")}
-                                </Button>
-                                <Button type="submit" disabled={isSubmitting ?? false} onSubmit={handleSubmit} className="fs-14 fw-semibold" variant="warning">
-                                    {t("SUBMIT")}
-                                </Button>
-                            </ModalFooter>
-                        </Form>
-                    )}
-                </Formik>
-            </ModalBody>
-        </Modal>
-    );
+  return (
+    <Modal
+      show={modal}
+      onHide={toggle}
+      backdrop="static"
+      keyboard={false}
+      centered={true}
+      scrollable={true}
+      size="sm"
+      className="theme-modal"
+      enforceFocus={false}
+    >
+      <Modal.Header className="pb-3">
+        <Modal.Title as="h4" className="fw-semibold">
+          {t("EDIT INQUIRY TYPE")}
+        </Modal.Title>
+      </Modal.Header>
+      <Formik
+        initialValues={{
+          name: "",
+          description: "",
+        }}
+        onSubmit={(values, actions) => {
+          actions.setSubmitting(false);
+          handleSubmit(values, actions);
+        }}
+        validationSchema={validationSchema}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          values,
+          setFieldValue,
+          setFieldError,
+          touched,
+          isValid,
+          errors,
+          isSubmitting,
+        }) => (
+          <Form>
+            <Modal.Body className="text-break py-0">
+              <FormInput
+                error={errors.claimTypeName}
+                id="name"
+                key={"name"}
+                label={t("NAME OF INQUIRY")}
+                name="name"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                // placeholder="Enter district name"
+                touched={touched.name}
+                type="text"
+                value={values?.name || ""}
+              />
+              <FormInput
+                error={errors.description}
+                isTextarea={true}
+                id="description"
+                key={"description"}
+                label={t("DESCRIPTION")}
+                name="description"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                // placeholder="Enter district name"
+                touched={touched?.description}
+                rows={4}
+                type="text"
+                value={values?.description || ""}
+              />
+            </Modal.Body>
+            <Modal.Footer className="pt-0">
+              <Button
+                type="button"
+                variant="outline-dark"
+                onClick={toggle}
+                className="custom-min-width-85"
+              >
+                {t("CANCEL")}
+              </Button>
+              <Button
+                type="submit"
+                variant="warning"
+                className="custom-min-width-85"
+                onClick={handleSubmit}
+              >
+                {t("SUBMIT")}
+              </Button>
+            </Modal.Footer>
+          </Form>
+        )}
+      </Formik>
+    </Modal>
+  );
 };
 
 export default Edit;
