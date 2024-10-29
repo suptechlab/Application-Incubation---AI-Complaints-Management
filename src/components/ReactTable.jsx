@@ -1,7 +1,7 @@
 import {
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
 import { Button } from "react-bootstrap";
@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Table as BTable } from "reactstrap";
 import DataGridPagination from "./Datagridpagination";
 import "./ReactTable.scss";
+import Loader from "./Loader";
 
 export default function ReactTable({
   columns,
@@ -24,10 +25,14 @@ export default function ReactTable({
   const defaultData = React.useMemo(() => [], []);
 
   // Assuming dataQuery contains headers in its response
-  const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 2;
+  const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 0;
+
+
+  const { isLoading, isFetching, data } = dataQuery;
+
   const table = useReactTable({
     // data: dataQuery.data?.data?.data ?? defaultData,
-    data: dataQuery?.data ?? defaultData,
+    data: data?.data ?? defaultData,
     columns,
     defaultColumn: {
       size: '200px',
@@ -47,19 +52,18 @@ export default function ReactTable({
     enableSortingRemoval: true,
   });
 
+
   React.useEffect(() => {
     let path = "";
 
     if (sorting.length === 0) {
-      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${
-        pagination.pageSize
-      }`;
+      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
+        }`;
     } else {
-      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${
-        pagination.pageSize
-      }&sortBy=${sorting
-        .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
-        .join(",")}`;
+      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
+        }&sortBy=${sorting
+          .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
+          .join(",")}`;
     }
 
     navigate(path);
@@ -67,6 +71,9 @@ export default function ReactTable({
 
   return (
     <div className="d-flex flex-column h-100 small table-cover-main">
+
+
+      <Loader isLoading={isLoading} />
       <BTable striped bordered hover responsive className="mb-0">
         <thead className="fs-15">
           {table.getHeaderGroups().map((headerGroup) => (
@@ -88,8 +95,8 @@ export default function ReactTable({
                             ? header.column.getNextSortingOrder() === "asc"
                               ? "Sort ascending"
                               : header.column.getNextSortingOrder() === "desc"
-                              ? "Sort descending"
-                              : "Clear sort"
+                                ? "Sort descending"
+                                : "Clear sort"
                             : undefined
                         }
                       >
@@ -124,6 +131,7 @@ export default function ReactTable({
             </tr>
           ))}
         </thead>
+
 
         <tbody>
           {table.getRowModel().rows.map((row) => (
