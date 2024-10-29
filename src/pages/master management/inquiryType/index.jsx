@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "../../../components/PageHeader";
 import qs from "qs";
 import ListingSearchForm from "../../../components/ListingSearchForm";
@@ -17,6 +17,9 @@ import { Card } from "react-bootstrap";
 const InquiryType = () => {
 
   const location = useLocation();
+
+  const queryClient = useQueryClient();
+
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
   const { t } = useTranslation()
 
@@ -25,7 +28,7 @@ const InquiryType = () => {
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
-  const [editModal, setEditModal] = useState({ id: '', open: false })
+  const [editModal, setEditModal] = useState({ row: {}, open: false })
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
@@ -33,7 +36,7 @@ const InquiryType = () => {
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({ id: '', open: !editModal?.open });
+  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
@@ -63,8 +66,8 @@ const InquiryType = () => {
     })
 
   }, []);
-  const editInquiryType = async (id) => {
-    setEditModal({ id: id, open: !editModal?.open })
+  const editInquiryType = async (rowData) => {
+    setEditModal({ row: rowData, open: !editModal?.open })
   };
 
   const dataQuery = useQuery({
@@ -94,29 +97,6 @@ const InquiryType = () => {
     },
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
-    // queryFn: () => {
-    //   const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-    //   Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-
-    //   if (sorting.length === 0) {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       ...filterObj,
-    //     });
-    //   } else {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       sort: sorting
-    //         .map(
-    //           (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-    //         )
-    //         .join(","),
-    //       ...filterObj,
-    //     });
-    //   }
-    // },
   });
 
   const changeStatus = async (id, currentStatus) => {
@@ -182,6 +162,7 @@ const InquiryType = () => {
         accessorFn: (row) => row?.name,
         id: "name",
         header: () => t("INQUIRY CATEGORY"),
+        enableSorting: true
       },
       {
         accessorFn: (row) => row?.description != null ? row?.description : '-',
@@ -216,7 +197,7 @@ const InquiryType = () => {
               {permission.current.editModule ?
                 <div
                   onClick={() => {
-                    editInquiryType(info?.row?.original?.id);
+                    editInquiryType(info?.row?.original);
                   }}
                 >
                   <span className=''>{SvgIcons.editIcon}</span>
@@ -230,13 +211,19 @@ const InquiryType = () => {
     ],
     []
   );
-
   useEffect(() => {
     setPagination({
       pageIndex: 0,
       pageSize: 10,
     });
   }, [filter]);
+
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
@@ -258,8 +245,8 @@ const InquiryType = () => {
         />
       </Card.Body>
     </Card>
-    <Add modal={modal} toggle={toggle} />
-    <Edit modal={editModal?.open} toggle={editToggle} />
+    <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
+    <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
   </div>
 };
 

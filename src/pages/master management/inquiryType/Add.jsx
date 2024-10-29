@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { createNewInquiryType } from "../../../services/inquiryType.service";
 import { validationSchema } from "../../../validations/inquiryType.validation";
 
-const Add = ({ modal, toggle }) => {
+const Add = ({ modal, toggle,dataQuery }) => {
   const { t } = useTranslation();
 
   const handleSubmit = async (values, actions) => {
@@ -17,12 +17,11 @@ const Add = ({ modal, toggle }) => {
       description: values?.description,
     };
 
-    // axios.post('https://relative-glider-entirely.ngrok-free.app/api/v1/inquiry-types',formData)
-
     createNewInquiryType(formData)
       .then((response) => {
         toast.success(response?.data?.message);
         toggle();
+        dataQuery.refetch()
       })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -57,6 +56,7 @@ const Add = ({ modal, toggle }) => {
         initialValues={{
           name: "",
           description: "",
+          inquiryTypeId : ""
         }}
         validationSchema={validationSchema}
         onSubmit={(values, actions) => {
@@ -119,7 +119,7 @@ const Add = ({ modal, toggle }) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
+                disabled={isSubmitting ?? false}
               >
                 {t("SUBMIT")}
               </Button>

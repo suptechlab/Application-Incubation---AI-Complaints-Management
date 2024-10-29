@@ -38,7 +38,7 @@ const ClaimType = () => {
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({ id: '', open: !editModal?.open });
+  const editToggle = () => setEditModal({ row : {}, open: !editModal?.open });
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
