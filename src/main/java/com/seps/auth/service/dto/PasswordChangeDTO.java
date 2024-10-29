@@ -1,5 +1,9 @@
 package com.seps.auth.service.dto;
 
+import com.seps.auth.web.rest.vm.ManagedUserVM;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.io.Serializable;
 
 /**
@@ -9,7 +13,11 @@ public class PasswordChangeDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @NotBlank
     private String currentPassword;
+
+    @NotBlank
+    @Size(min = ManagedUserVM.PASSWORD_MIN_LENGTH, max = ManagedUserVM.PASSWORD_MAX_LENGTH)
     private String newPassword;
 
     public PasswordChangeDTO() {

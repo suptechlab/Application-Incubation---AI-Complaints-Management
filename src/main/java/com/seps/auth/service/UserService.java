@@ -258,8 +258,15 @@ public class UserService {
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 String currentEncryptedPassword = user.getPassword();
+                // Check if the provided current password matches the stored password
                 if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
-                    throw new InvalidPasswordException();
+                    LOG.warn("User current password is invalid");
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_PASSWORD_INCORRECT, null, null);
+                }
+                // Check if the new password is the same as the current password
+                if (passwordEncoder.matches(newPassword, currentEncryptedPassword)) {
+                    LOG.warn("New password must be different from the current password");
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NEW_PASSWORD_SAME_AS_CURRENT, null, null);
                 }
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
