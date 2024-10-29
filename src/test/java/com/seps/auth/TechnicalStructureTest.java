@@ -33,6 +33,8 @@ class TechnicalStructureTest {
         .ignoreDependency(belongToAnyOf(AuthApp.class), alwaysTrue())
         .ignoreDependency(alwaysTrue(), belongToAnyOf(
             com.seps.auth.config.Constants.class,
-            com.seps.auth.config.ApplicationProperties.class
+            com.seps.auth.config.ApplicationProperties.class,
+            com.seps.auth.web.rest.errors.SepsStatusCode.class,
+            com.seps.auth.web.rest.errors.CustomException.class
         ));
 }

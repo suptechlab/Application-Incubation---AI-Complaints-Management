@@ -23,6 +23,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.zalando.problem.Status;
 
 /**
  * REST controller for managing the current user's account.
@@ -173,15 +174,20 @@ public class AccountResource {
      * @throws RuntimeException         {@code 500 (Internal Server Error)} if the password could not be reset.
      */
     @PostMapping(path = "/account/reset-password/finish")
-    public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+    public ResponseEntity<ResponseStatus> finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
         if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
         Optional<User> user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
-
         if (!user.isPresent()) {
-            throw new AccountResourceException("No user was found for this reset key");
+            LOG.error("No user was found for this reset key :{}", keyAndPassword.getKey());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND_RESET, null, null);
         }
+        return new ResponseEntity<>(new ResponseStatus(
+            messageSource.getMessage("user.password.reset.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        ), HttpStatus.OK);
     }
 
     private static boolean isPasswordLengthInvalid(String password) {

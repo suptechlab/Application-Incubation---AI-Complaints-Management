@@ -16,9 +16,11 @@ import com.seps.auth.service.dto.AdminUserDTO;
 import com.seps.auth.service.dto.PasswordChangeDTO;
 import com.seps.auth.web.rest.vm.KeyAndPasswordVM;
 import com.seps.auth.web.rest.vm.ManagedUserVM;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Stream;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -779,6 +781,6 @@ class AccountResourceIT {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(keyAndPassword))
             )
-            .andExpect(status().isInternalServerError());
+            .andExpect(status().isBadRequest());
     }
 }
