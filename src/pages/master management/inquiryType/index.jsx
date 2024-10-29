@@ -1,25 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import PageHeader from "../../../components/PageHeader";
 import qs from "qs";
-import ListingSearchForm from "../../../components/ListingSearchForm";
-import CommonDataTable from "../../../components/CommonDataTable";
-import { useLocation } from "react-router-dom";
-import SvgIcons from "../../../components/SVGIcons"
-import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
+import React, { useEffect, useRef, useState } from "react";
+import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { MdEdit } from "react-icons/md";
+import { useLocation } from "react-router-dom";
+import CommonDataTable from "../../../components/CommonDataTable";
+import DataGridActions from "../../../components/DataGridActions";
+import ListingSearchForm from "../../../components/ListingSearchForm";
+import PageHeader from "../../../components/PageHeader";
 import Toggle from "../../../components/Toggle";
+import { changeInquiryTypeStatus, downloadInquiryTypes, handleGetInquiryType } from "../../../services/inquiryType.service";
+import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
-import { useTranslation } from "react-i18next";
-import { changeInquiryTypeStatus, downloadInquiryTypes, handleGetInquiryType } from "../../../services/inquiryType.service";
-import { Card } from "react-bootstrap";
+
 const InquiryType = () => {
-
   const location = useLocation();
-
   const queryClient = useQueryClient();
-
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
   const { t } = useTranslation()
 
@@ -175,6 +174,7 @@ const InquiryType = () => {
         cell: (info) => {
           return (
             <Toggle
+              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
               // label="Status"
@@ -187,26 +187,30 @@ const InquiryType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
+        size: '80',
       },
       {
         id: "actions",
         isAction: true,
-        cell: (info) => {
-          return (
-            <div className="d-flex items-center gap-2 justify-content-center">
-              {permission.current.editModule ?
-                <div
-                  onClick={() => {
-                    editInquiryType(info?.row?.original);
-                  }}
-                >
-                  <span className=''>{SvgIcons.editIcon}</span>
-                </div> : <div></div>}
-            </div>
-          );
-        },
-        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
+        cell: (rowData) => (
+          <DataGridActions
+            controlId="province-master"
+            rowData={rowData}
+            customButtons={[
+              {
+                name: "edit",
+                enabled: permission.current.editModule,
+                type: "button",
+                title: "Edit",
+                icon: <MdEdit size={18} />,
+                handler: () => editInquiryType(rowData?.row?.original),
+              },
+            ]}
+          />
+        ),
+        header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
+        size : '80',
       },
     ],
     []

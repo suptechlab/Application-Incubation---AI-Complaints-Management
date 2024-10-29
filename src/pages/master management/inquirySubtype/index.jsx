@@ -14,6 +14,8 @@ import Edit from "./Edit";
 import { useTranslation } from "react-i18next";
 import { changeInquirySubTypeStatus, downloadInquirySubTypes, handleGetInquirySubTypes, inquiryTypesDropdownList } from "../../../services/inquirySubType.service";
 import { Card } from "react-bootstrap";
+import DataGridActions from "../../../components/DataGridActions";
+import { MdEdit } from "react-icons/md";
 
 const InquirySubType = () => {
 
@@ -180,6 +182,7 @@ const InquirySubType = () => {
         cell: (info) => {
           return (
             <Toggle
+              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
               // label="Status"
@@ -192,26 +195,30 @@ const InquirySubType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
+        size : '80',
       },
       {
         id: "actions",
-        isAction: true,
-        cell: (info) => {
-          return (
-            <div className="d-flex items-center gap-2 justify-content-center">
-              {permission.current.editModule ?
-                <div
-                  onClick={() => {
-                    editInquiryType(info?.row?.original);
-                  }}
-                >
-                  <span className=''>{SvgIcons.editIcon}</span>
-                </div> : <div></div>}
-            </div>
-          );
-        },
-        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
+        isAction: true,        
+        cell: (rowData) => (
+          <DataGridActions
+            controlId="province-master"
+            rowData={rowData}
+            customButtons={[
+              {
+                name: "edit",
+                enabled: permission.current.editModule,
+                type: "button",
+                title: "Edit",
+                icon: <MdEdit size={18} />,
+                handler: () => editInquiryType(rowData?.row?.original),
+              },
+            ]}
+          />
+        ),
+        header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
+        size : '80',
       },
     ],
     []

@@ -2,6 +2,9 @@
 
 .table-cover-main {
     .table {
+        th {
+            white-space: nowrap;
+        }
 
         th,
         td {

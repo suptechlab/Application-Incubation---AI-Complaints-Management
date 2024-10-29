@@ -99,7 +99,7 @@ const Add = ({ modal, toggle, dataQuery }) => {
                 onChange={handleChange}
                 // placeholder="Enter district name"
                 touched={touched?.description}
-                rows={4}
+                rows={5}
                 type="text"
                 value={values?.description || ""}
               />

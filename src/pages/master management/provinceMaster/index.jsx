@@ -161,20 +161,6 @@ const ProvinceMaster = () => {
       {
         id: "actions",
         isAction: true,
-        // cell: (info) => {
-        //   return (
-        //     <div className="d-flex items-center gap-2 justify-content-center">
-        //       {permission.current.editModule ?
-        //         <div
-        //           onClick={() => {
-        //             editProvinceMaster(info?.row?.original?.id);
-        //           }}
-        //         >
-        //           <span className=''>{SvgIcons.editIcon}</span>
-        //         </div> : <div></div>}
-        //     </div>
-        //   );
-        // },
         cell: (rowData) => (
           <DataGridActions
             controlId="province-master"
@@ -210,8 +196,7 @@ const ProvinceMaster = () => {
   const exportHandler = () => {
     console.log('Export to CSV')
   }
-
-
+  
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <PageHeader
           title={t("PROVINCE MASTER")}

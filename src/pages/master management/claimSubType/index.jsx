@@ -4,11 +4,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
+import DataGridActions from "../../../components/DataGridActions";
 import ListingSearchForm from "../../../components/ListingSearchForm";
 import PageHeader from "../../../components/PageHeader";
-import SvgIcons from "../../../components/SVGIcons";
 import Toggle from "../../../components/Toggle";
 import { changeClaimSubTypeStatus, claimTypesDropdownList, downloadClaimSubTypes, handleGetClaimSubType } from "../../../services/claimSubType.service";
 import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
@@ -210,29 +211,31 @@ const ClaimSubType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
-        size: '90',
+        size: '80',
         enableSorting:true
       },
       {
         id: "actions",
         isAction: true,
-        cell: (info) => {
-          return (
-            <div className="d-flex items-center gap-2 justify-content-center">
-              {permission.current.editModule ?
-                <div
-                  onClick={() => {
-                    editClaimSubType(info?.row?.original);
-                  }}
-                >
-                  <span>{SvgIcons.editIcon}</span>
-                </div> : <div></div>}
-            </div>
-          );
-        },
-        header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
+        cell: (rowData) => (
+          <DataGridActions
+            controlId="province-master"
+            rowData={rowData}
+            customButtons={[
+              {
+                name: "edit",
+                enabled: permission.current.editModule,
+                type: "button",
+                title: "Edit",
+                icon: <MdEdit size={18} />,
+                handler: () => editClaimSubType(rowData?.row?.original),
+              },
+            ]}
+          />
+        ),
+        header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
-        size: '80'
+        size: '80',
       },
     ],
     []

@@ -189,7 +189,7 @@ const TemplateMaster = () => {
           />
         ),
         header: () => (
-          <div className="d-flex justify-content-center">{t("ACTIONS")}</div>
+          <div className="text-center">{t("ACTIONS")}</div>
         ),
         enableSorting: false,
         size: "80",
