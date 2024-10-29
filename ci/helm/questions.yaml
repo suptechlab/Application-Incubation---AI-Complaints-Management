@@ -81,49 +81,49 @@ questions:
     label: JAVA_TOOL_OPTIONS
     group: "App Settings"
 
-  # - variable: deployment.livenessProbe.httpGet.path
-  #   default: "/seps-base-api-rest/actuator/health"
-  #   description: "Liveness probe path"
-  #   type: string
-  #   required: true
-  #   label: Liveness probe path
-  #   group: "Liveness Probe Settings"
-  # - variable: deployment.livenessProbe.httpGet.port
-  #   default: "8080"
-  #   description: "Liveness probe port"
-  #   type: string
-  #   required: true
-  #   label: Liveness probe port
-  #   group: "Liveness Probe Settings"
-  # - variable: deployment.livenessProbe.initialDelaySeconds
-  #   default: "90"
-  #   description: "Liveness initial delay seconds"
-  #   type: string
-  #   required: true
-  #   label: Liveness initial delay seconds
-  #   group: "Liveness Probe Settings"
+  - variable: deployment.livenessProbe.httpGet.path
+    default: "/seps-base-api-rest/actuator/health"
+    description: "Liveness probe path"
+    type: string
+    required: true
+    label: Liveness probe path
+    group: "Liveness Probe Settings"
+  - variable: deployment.livenessProbe.httpGet.port
+    default: "8080"
+    description: "Liveness probe port"
+    type: string
+    required: true
+    label: Liveness probe port
+    group: "Liveness Probe Settings"
+  - variable: deployment.livenessProbe.initialDelaySeconds
+    default: "90"
+    description: "Liveness initial delay seconds"
+    type: string
+    required: true
+    label: Liveness initial delay seconds
+    group: "Liveness Probe Settings"
 
-  # - variable: deployment.readinessProbe.httpGet.path
-  #   default: "/seps-base-api-rest/actuator/health"
-  #   description: "Readiness probe path"
-  #   type: string
-  #   required: true
-  #   label: Readiness probe path
-  #   group: "Readiness Probe Settings"
-  # - variable: deployment.readinessProbe.httpGet.port
-  #   default: "8080"
-  #   description: "Readiness probe port"
-  #   type: string
-  #   required: true
-  #   label: Readiness probe port
-  #   group: "Readiness Probe Settings"
-  # - variable: deployment.readinessProbe.initialDelaySeconds
-  #   default: "90"
-  #   description: "Readiness initial delay seconds"
-  #   type: string
-  #   required: true
-  #   label: Readiness initial delay seconds
-  #   group: "Readiness Probe Settings"
+  - variable: deployment.readinessProbe.httpGet.path
+    default: "/seps-base-api-rest/actuator/health"
+    description: "Readiness probe path"
+    type: string
+    required: true
+    label: Readiness probe path
+    group: "Readiness Probe Settings"
+  - variable: deployment.readinessProbe.httpGet.port
+    default: "8080"
+    description: "Readiness probe port"
+    type: string
+    required: true
+    label: Readiness probe port
+    group: "Readiness Probe Settings"
+  - variable: deployment.readinessProbe.initialDelaySeconds
+    default: "90"
+    description: "Readiness initial delay seconds"
+    type: string
+    required: true
+    label: Readiness initial delay seconds
+    group: "Readiness Probe Settings"
 
   ## PERSISTENCE
   - variable: deployment.persistence.enabled
