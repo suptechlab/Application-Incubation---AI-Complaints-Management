@@ -29,8 +29,8 @@ const DataGridPagination = ({
 
   const {t} = useTranslation()
   return (
-    <div className="align-items-center d-flex flex-column flex-md-row justify-content-end mb-2 mt-3">
-      <span className="fs-14  pageShowText mb-md-0 me-4">{t("ROWS PER PAGE")}: 
+    <div className="align-items-center d-flex flex-column flex-sm-row justify-content-end">
+      <span className="pageShowText mb-md-0 me-sm-4">{t("ROWS PER PAGE")}: 
         <select className="border-0 ms-2" onChange={(event) => {
           setLimit(event.target.value)
         }}>
@@ -38,7 +38,7 @@ const DataGridPagination = ({
             <option>20</option>
         </select>
         </span>
-      <div className="fs-14  pageShowText mb-md-0 me-3">
+      <div className="pageShowText mb-md-0 me-sm-4">
          {1 + (currentPage - 1) * rowsPerPage}-{""}
         {currentTotalRecord + (currentPage - 1) * rowsPerPage} of {totalRecords}{" "}
         

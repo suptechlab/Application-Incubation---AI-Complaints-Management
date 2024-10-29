@@ -1,35 +1,20 @@
-.table-bordered td,
-.table-bordered th {
-    border: none;
-    user-select: none;
-    border-bottom: none !important;
-}
+@import "../../src/assets/css/variables";
+.table-cover-main {
+    .table {
 
-thead tr {
-    background-color: #0000000D;
-    height: 50px;
+        th,
+        td {
+            height: 50px;
+            vertical-align: middle;
 
-}
+            &:first-child {
+                padding-left: 1.5rem;
+            }
 
-tbody tr {
-    height: 50px;
-}
-
-tbody tr:nth-of-type(odd) {
-    background-color: #ffffff !important;
-
-}
-
-tbody tr:nth-of-type(even) {
-    background-color: #0000000D !important;
-}
-
-.sort-desc {
-    margin: 5px;
-}
-
-.sort-asc {
-    // image rotate by 180 degree
-    transform: rotate(180deg);
-    margin: 5px;
+            &:last-child {
+                padding-right: 1.5rem;
+                width: 120px;
+            }
+        }
+    }
 }

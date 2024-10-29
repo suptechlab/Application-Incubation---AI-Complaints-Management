@@ -117,7 +117,7 @@ export default function ReactTableDashboard({
 
                                                     header.column.getCanSort()
 
-                                                        ? "cursor-pointer select-none"
+                                                        ? "cursor-pointer user-select-none"
 
                                                         : ""
 
