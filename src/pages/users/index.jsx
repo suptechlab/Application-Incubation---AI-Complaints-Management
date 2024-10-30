@@ -88,7 +88,7 @@ export default function UserList() {
         }
     };
 
-    const columns = React.useMemo(
+    const columns = React.useMemo( 
         () => [
             {
                 accessorFn: (row) => row.name,
