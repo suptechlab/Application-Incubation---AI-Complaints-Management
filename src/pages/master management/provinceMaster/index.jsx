@@ -14,6 +14,7 @@ import Toggle from "../../../components/Toggle";
 import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
+import { handleGetProvinceMaster } from "../../../services/provinceMaster.service";
 
 const ProvinceMaster = () => {
 
@@ -75,43 +76,28 @@ const ProvinceMaster = () => {
       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
       Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
-      // For now, returning default data without API request
-      return [
-        {
-          id: 1,
-          provinceMaster: 'Azuay'
-        },
-        {
-          id: 2,
-          provinceMaster: 'Bolivar'
-        },
-      ];
+      if (sorting.length === 0) {
+        return handleGetProvinceMaster({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          ...filterObj,
+        });
+      } else {
+        return handleGetProvinceMaster({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          sort: sorting
+            .map(
+              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+            )
+            .join(","),
+          ...filterObj,
+        });
+      }
     },
-    // queryFn: () => {
-    //   const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-    //   Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-
-    //   if (sorting.length === 0) {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       ...filterObj,
-    //     });
-    //   } else {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       sort: sorting
-    //         .map(
-    //           (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-    //         )
-    //         .join(","),
-    //       ...filterObj,
-    //     });
-    //   }
-    // },
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
   });
-
   const changeStatus = async (id, currentStatus) => {
     try {
       // await handleEditDistricts(id, { status: !currentStatus });
@@ -134,8 +120,8 @@ const ProvinceMaster = () => {
   const columns = React.useMemo(
     () => [
       {
-        accessorFn: (row) => row.provinceMaster,
-        id: "provinceMaster",
+        accessorFn: (row) => row?.name,
+        id: "name",
         header: () => t("Province Name"),
       },
       {
@@ -201,8 +187,8 @@ const ProvinceMaster = () => {
     <PageHeader
           title={t("PROVINCE MASTER")}
           actions={[
-            { label: "Export to CSV", to: exportHandler, variant: "outline-dark", disabled: true},
-            { label: "Add New", onClick: toggle, variant: "warning" },
+            { label: t("EXPORT TO CSV"), to: exportHandler, variant: "outline-dark", disabled: true},
+            { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
           ]}
         />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
