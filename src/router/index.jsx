@@ -1,11 +1,9 @@
-import React from "react";
-import { PublicRoutes } from "./PublicRoutes";
 import { useRoutes } from "react-router-dom";
+import { PublicRoutes } from "./PublicRoutes";
 
 const AppRoutes = () => {
-
   const element = useRoutes([...PublicRoutes])
-  return <div>{element}</div>;
+  return element;
 };
 
 export default AppRoutes;

@@ -4,6 +4,7 @@
 // Custom classes
 @include custom-class('width', 64);
 @include custom-class('height', 64);
+@include custom-class('min-height', 70);
 
 // Bootstrap Custom CSS
 .tooltip {
