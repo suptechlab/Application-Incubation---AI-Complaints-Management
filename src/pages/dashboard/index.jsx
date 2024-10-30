@@ -5,7 +5,7 @@ import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 
 export default function Dashboard() {
-  let loading = true;
+  let loading = false;
 
   const handleAdd = () => {
     alert(1);
