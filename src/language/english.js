@@ -14,6 +14,10 @@ export const englishLang = {
     "INQUIRY SUB TYPE": "Inquiry Sub Type",
     "PROVINCE MASTER":"Province Master",
     "CITY MASTER":"City Master",
-    "TEMPLATE MASTER" : "Template Master"
+    "TEMPLATE MASTER" : "Template Master",
+
+    // Portal Users Management
+    "USERS" : "Users",
+    "USERS LIST" : "Users List",
     
 }

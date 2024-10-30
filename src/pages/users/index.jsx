@@ -1,6 +1,6 @@
 import moment from "moment";
 import React, { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Card } from "reactstrap";
 import Swal from "sweetalert2";
 import { useQuery } from "@tanstack/react-query";
@@ -19,10 +19,13 @@ import SearchForm from "./SearchForm";
 import UsersTable from "./UsersTable";
 import Toggle from "../../components/Toggle";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { Stack } from "react-bootstrap";
 
 export default function UserList() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation(); // use the translation hook
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -274,13 +277,26 @@ export default function UserList() {
 
     return (
         <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-            <Header />
+            <div className="contentHeader p-1">
+                <Stack
+                    direction="horizontal"
+                    gap={2}
+                    className="flex-wrap justify-content-between custom-min-height-42"
+                >
+                    <h1 className="fw-semibold h4 mb-0 fs-22">
+                    {t('USERS LIST')}
+                    </h1>
+                    <Link to={`/users/add`} 
+                    className="fw-semibold fs-14 custom-width-85 bg-info text-white text-decoration-none rounded-2 p-2 text-center"  type="button" variant="info" size="sm">Add New</Link>
+                
+                </Stack>
+            </div>
             <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
                 <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
                     <SearchForm filter={filter} setFilter={setFilter} />
                     <UsersTable
                         columns={columns}
-                        dataQuery={dataQuery}
+                        dataQuery={dataQuery?.data?.data}
                         pagination={pagination}
                         setPagination={setPagination}
                         sorting={sorting}

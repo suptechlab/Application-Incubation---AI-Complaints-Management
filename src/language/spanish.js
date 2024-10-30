@@ -13,5 +13,9 @@ export const spanishLang = {
     "INQUIRY SUB TYPE": "Subtipo de Consulta",
     "PROVINCE MASTER": "Maestro de Provincia",
     "CITY MASTER": "Maestro de Ciudad",
-    "TEMPLATE MASTER": "Maestro de Plantillas"
+    "TEMPLATE MASTER": "Maestro de Plantillas",
+
+    // Portal Users Management
+    "USERS" : "Lista",
+    "USERS LIST" : "Lista funciones",
 }

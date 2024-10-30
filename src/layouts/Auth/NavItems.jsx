@@ -87,6 +87,16 @@ export const NavItems = () => {
       path: "/role-rights",
       disabled: false,
       roleName: "RoleRights"
+    },
+    {
+      id: 4,
+      menuName: t("USERS"),
+      title: t("USERS"),
+      menuIcon: SvgIcons.userManagementIcon,
+      path: "/users",
+      disabled: false,
+      roleName: "users"
     }
+
   ];
 }

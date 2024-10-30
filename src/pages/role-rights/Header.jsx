@@ -1,9 +1,11 @@
 import React from 'react';
 import { Button, Stack } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from "react-i18next"
 
 const Header = ({ toggle }) => {
     const navigate = useNavigate();
+    const { t } = useTranslation()
     return (
         <div className="contentHeader p-1">
             <Stack
@@ -12,7 +14,7 @@ const Header = ({ toggle }) => {
                 className="flex-wrap justify-content-between custom-min-height-42"
             >
                 <h1 className="fw-semibold h4 mb-0 fs-22">
-                    Portal Users Management
+                    {t('ROLES AND RIGHTS LIST')}
                 </h1>
                 <Link to={`/role-rights/add`} className="fw-semibold fs-14 custom-width-85 bg-info text-white text-decoration-none rounded-2 p-2 text-center" type="button" variant="info" size="sm">Add New</Link>
             </Stack>

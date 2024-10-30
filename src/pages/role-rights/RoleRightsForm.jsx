@@ -8,10 +8,13 @@ import { validationSchema } from '../../validations/rolerights.validation';
 import { handleGetRoleRightById, handleAddRoleRight, handleEditRoleRight, fetchModulesAndPermissions } from "../../services/rolerights.service";
 import toast from 'react-hot-toast';
 import SvgIcons from "../../components/SVGIcons"
+import { useTranslation } from "react-i18next"
+
 const RoleRightsForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const isEdit = !!id;
+    const { t } = useTranslation()
 
     const [initialValues, setInitialValues] = useState({
         name: "",
@@ -135,7 +138,7 @@ const RoleRightsForm = () => {
                     className="flex-wrap justify-content-between custom-min-height-42"
                 >
                     <h1 className="fw-semibold h4 mb-0 fs-22">
-                        Portal Users Management
+                        {t('ROLES AND RIGHTS LIST')}
                     </h1>
                     
                     
@@ -216,19 +219,19 @@ const RoleRightsForm = () => {
                                             {modules.map(module => (
                                                 <div key={module.id} className="mb-3">
                                                     <Row>
-                                                    <Col md={4} className="fw-bold fs-14">{module.name}</Col>
-                                                    <Col md={8} className="role-chekbox-cover">
-                                                        {module.permissions.map(permission => (
-                                                            <Form.Check
-                                                                inline
-                                                                type="checkbox"
-                                                                label={permission.description}
-                                                                checked={values.rights[module.name]?.[permission.name]?.checked || false}
-                                                                onChange={(e) => handleCheckboxChange(e,module.name, permission.name, permission.id, values, setFieldValue)}
-                                                                key={permission.id}
-                                                            />
-                                                        ))}
-                                                    </Col>
+                                                        <Col md={4} className="fw-bold fs-14">{module.name}</Col>
+                                                        <Col md={8} className="role-chekbox-cover">
+                                                            {module.permissions.map(permission => (
+                                                                <Form.Check
+                                                                    inline
+                                                                    type="checkbox"
+                                                                    label={permission.description}
+                                                                    checked={values.rights[module.name]?.[permission.name]?.checked || false}
+                                                                    onChange={(e) => handleCheckboxChange(e,module.name, permission.name, permission.id, values, setFieldValue)}
+                                                                    key={permission.id}
+                                                                />
+                                                            ))}
+                                                        </Col>
                                                     </Row>
                                                 </div>
                                             ))}

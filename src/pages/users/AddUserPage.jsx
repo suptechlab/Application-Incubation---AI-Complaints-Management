@@ -21,7 +21,8 @@ import { HiMiniUsers } from "react-icons/hi2";
 import FormSelect from "../../components/FormSelect";
 import axios from "axios";
 import { getLocalStorage } from "../../utils/storage";
-import defaultImage from "../../assets/images/broken_image.png"
+import defaultImage from "../../assets/images/broken_image.png";
+import { useTranslation } from "react-i18next"
 
 export default function AddStatePage() {
     const [pageData, setPageData] = useState(null);
@@ -41,11 +42,10 @@ export default function AddStatePage() {
     const [userData, setUserData] = useState([])
     const [isImageSet,setIsImageSet] = useState(false)
     const [emailDisabled, setEmailDisabled] = useState(false)
-
+    const { t } = useTranslation()
     const editUserValues = [];
 
- 
-    
+     
 
     useEffect(() => {
         handleGetUserCompany().then(response => {
@@ -69,7 +69,6 @@ export default function AddStatePage() {
         });
     }, []);
     
-
     const initialValue = {
             firstName: userData?.firstName ? userData?.firstName : "",
             lastName:   userData?.lastName ? userData?.lastName : "",
@@ -174,7 +173,6 @@ export default function AddStatePage() {
     }
 
     
-
     return (
         <React.Fragment>
             {loading ? 'Loading...' :
@@ -187,7 +185,7 @@ export default function AddStatePage() {
                          className="flex-wrap justify-content-between custom-min-height-42"
                      >
                          <h1 className="fw-semibold h4 mb-0 fs-22">
-                             Portal Users Management
+                                {t('ROLES AND RIGHTS LIST')}
                          </h1>
                          {isEdit ? <button onClick={ResetPassword}
                              className="fw-semibold fs-14 bg-white  text-decoration-none rounded-2 p-2 text-center" type="button" variant="info" >
@@ -235,7 +233,7 @@ export default function AddStatePage() {
                                               <Row>
                                                  <Col lg={7} sm={12} xxl={7}>
                                                      <Row>
-                                                         <Col sm={6} className="pad-right-70">
+                                                        <Col sm={6} className="pad-right-70">
                                                              <FormInput
                                                                  error={errors.firstName}
                                                                  id="firstName"
@@ -250,21 +248,7 @@ export default function AddStatePage() {
                                                                  value={values.firstName || ""}
                                                              />
                                                          </Col>
-                                                         <Col sm={6} className="pad-left-70">
-                                                             <FormInput
-                                                                 error={errors.lastName}
-                                                                 id="lastName"
-                                                                 key={"lastName"}
-                                                                 label="Last Name *"
-                                                                 name="lastName"
-                                                                 onBlur={handleBlur}
-                                                                 onChange={handleChange}
-                                                                 placeholder="Enter last name"
-                                                                 touched={touched.lastName}
-                                                                 type="text"
-                                                                 value={values.lastName || ""}
-                                                             />
-                                                         </Col>
+                                                         
                                                      </Row>
                                                      <Row>
                                                          <Col sm={6} className="pad-right-70">
@@ -354,7 +338,7 @@ export default function AddStatePage() {
                                                          </Col>
                                                      </Row>
                                                  </Col>
-                                                 <Col lg={5} sm={12} xxl={4} className="d-flex justify-content-end">
+                                                 {/* <Col lg={5} sm={12} xxl={4} className="d-flex justify-content-end">
                                                      <div className="profile-right-width">
                                                          <label>Image</label>
                                                          <div className="d-flex align-items-end">
@@ -376,7 +360,7 @@ export default function AddStatePage() {
                                                              </label>
                                                          </div>
                                                      </div>
-                                                 </Col>
+                                                 </Col> */}
                                              </Row>
                                              <Row>
                                                 <label className="">Status</label>
