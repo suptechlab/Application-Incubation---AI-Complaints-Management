@@ -22,19 +22,21 @@ deployment:
     https:
       disabled: true
 
-  livenessProbe:
-    tcpSocket:
-      port: 8080
-    initialDelaySeconds: 20
-    periodSeconds: 180
-    timeoutSeconds: 21
+  # livenessProbe:
+  #   httpGet:
+  #     path: /actuator/health
+  #     port: 8080
+  #   initialDelaySeconds: 20
+  #   periodSeconds: 20
+  #   timeoutSeconds: 180
+  # readinessProbe:
+  #   httpGet:
+  #     path: /actuator/health
+  #     port: 8080
+  #   initialDelaySeconds: 20
+  #   periodSeconds: 20
+  #   timeoutSeconds: 180 
 
-  readinessProbe:
-    tcpSocket: 
-      port: 8080
-    initialDelaySeconds: 20
-    periodSeconds: 180
-    timeoutSeconds: 21
 
   imagePullSecrets:
     - seps-regcred
