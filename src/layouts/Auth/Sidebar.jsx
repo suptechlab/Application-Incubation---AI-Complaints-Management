@@ -1,83 +1,93 @@
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Button, Nav, Navbar } from "react-bootstrap"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
-import { MdOutlineArrowDropDown, MdOutlineArrowRight } from "react-icons/md"
-import { NavLink, useNavigate } from "react-router-dom"
-import { FaChevronDown } from "react-icons/fa";
-import { FaChevronRight } from "react-icons/fa";
+import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowRight } from "react-icons/md"
+import { NavLink } from "react-router-dom"
+import { getPermissionsModuleNameList, isAdminUser } from "../../utils/authorisedmodule"
 import { NavItems } from "./NavItems"
 import "./sidebar.scss"
-import { isAdminUser, getPermissionsModuleNameList } from "../../utils/authorisedmodule"
-import { getLocalStorage } from "../../utils/storage"
 
   const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
-  const navigate = useNavigate()
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(null)
+    const sidebarRef = useRef(null);
+    const [isSubMenuOpen, setIsSubMenuOpen] = useState(null)
 
-  const handleSubmenu = idx => {
-    if (isSubMenuOpen === idx) {
-      setIsSubMenuOpen(null)
-    } else {
-      setIsSubMenuOpen(idx)
-    }
-  }
-  const companyTitle = getLocalStorage("companyTitle");
-
-  const permission = useRef({
-    list: [],
-    isAdmin: false
-  });
-
-  useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-            permission.current.isAdmin = true;
+    const handleSubmenu = idx => {
+      if (isSubMenuOpen === idx) {
+        setIsSubMenuOpen(null)
       } else {
-        getPermissionsModuleNameList().then(response => {
-            permission.current.list = response;
-        }).catch(error => {
-            console.error("Error fetching permissions:", error);
-        });
+        setIsSubMenuOpen(idx)
       }
-    }).catch(error => {
-            console.error("Error get during to fetch User Type", error);
-    })
-
-  }, []);
-
-  useEffect(() => {
-    if (isActiveSidebar) {
-      toggleSidebarButton()
     }
-  }, [navigate])
 
-  const navItemsArr = NavItems()
+    const handleToggleSidebar = () => {
+      if (isSubMenuOpen !== null && isActiveSidebar === false) {
+          setIsSubMenuOpen(null);
+      }
+      toggleSidebarButton();
+    }
+
+    const handleNavLinkClick = () => {
+      if (isActiveSidebar) {
+          setIsSubMenuOpen(null);
+      }
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isActiveSidebar && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+                setIsSubMenuOpen(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isActiveSidebar]);
+
+    const permission = useRef({
+      list: [],
+      isAdmin: false
+    });
+
+    useEffect(() => {
+      isAdminUser().then(response => {
+        if (response) {
+              permission.current.isAdmin = true;
+        } else {
+          getPermissionsModuleNameList().then(response => {
+              permission.current.list = response;
+          }).catch(error => {
+              console.error("Error fetching permissions:", error);
+          });
+        }
+      }).catch(error => {
+              console.error("Error get during to fetch User Type", error);
+      })
+
+    }, []);
+
+    const navItemsArr = NavItems()
 
   return (
-    <div className={`sidebarMenu ${isActiveSidebar ? "sidebarAction" : ""}`}>
+    <div ref={sidebarRef} className={`sidebarMenu ${isActiveSidebar ? "sidebarAction" : ""}`}>
       <Button
         variant="link"
-        onClick={toggleSidebarButton}
-        className="align-items-center bg-white border border-2 btn d-xl-flex h-20 justify-content-center mt-2 p-0 position-absolute rounded-circle start-100 top-0 translate-middle-x w-20 z-2 toogle-button d-none"
+        onClick={handleToggleSidebar}
+        className="align-items-center bg-white border border-1 btn d-xl-flex h-20 justify-content-center mt-2 p-0 position-absolute rounded-circle start-100 top-0 translate-middle-x w-20 z-2 toogle-button d-none"
         aria-label="Toggle Sidebar Menu"
       >
         {isActiveSidebar ? (
-          <IoIosArrowForward color="#ABABAB" size={12} />
+          <IoIosArrowForward size={12} />
         ) : (
-          <IoIosArrowBack color="#ABABAB" size={12} />
+          <IoIosArrowBack size={12} />
         )}
       </Button>
-      <Navbar
-        bg="dark"
-        data-bs-theme="dark"
-        variant="dark"
-        expand="xxl"
-        className="w-100 h-100 p-0"
-      >
+      <Navbar bg="primary" variant="dark" expand="xxl" className="w-100 h-100 p-0">
         <div className="d-flex flex-column w-100 h-100">
-          <div className="overflow-x-hidden bg-info overflow-y-auto sidebarList h-100">
+          <div className="overflow-x-hidden overflow-y-auto sidebarList">
             <Nav
-              defaultActiveKey="/dashboard"
+              defaultActiveKey="/admin"
               as="ul"
               className="flex-column p-2"
             >
@@ -91,14 +101,14 @@ import { getLocalStorage } from "../../utils/storage"
                         id={id}
                         as={NavLink}
                         to={path}
-                        className={`align-items-center d-flex  text-white sidebarLink text-nowrap rounded ${disabled ? "disabled opacity-25" : ""
+                        className={`align-items-center d-flex px-0 sidebarLink rounded ${disabled ? "disabled" : ""
                           }`}
-                        onClick={() => setIsSubMenuOpen(null)}
+                        onClick={handleNavLinkClick}
                       >
                         <span className="py-1 text-center min-w-44 sidebarIcon">
                           {menuIcon}
                         </span>
-                        <span className="hideInSmallSidebar text-white fs-15 fw-normal">{title}</span>
+                        <span className="hideInSmallSidebar text-wrap lh-sm">{title}</span> 
                       </Nav.Link>
                     ) : ''}
                     {permission.current.isAdmin || permission.current.list.includes(roleName) ? subMenu && (
@@ -108,24 +118,17 @@ import { getLocalStorage } from "../../utils/storage"
                           as={Button}
                           variant="link"
                           onClick={() => handleSubmenu(id)}
-                          className={`align-items-center d-flex text-white sidebarLink text-nowrap rounded w-100 ${isSubMenuOpen === id ? "active" : ""
-                            } ${disabled ? "disabled opacity-25" : ""}`}
+                          className={`align-items-center d-flex px-0 sidebarLink rounded w-100 text-white ${isSubMenuOpen === id ? "active" : ""
+                            } ${disabled ? "disabled" : ""}`}
                         >
                           <span className="py-1 text-center min-w-44 sidebarIcon">
                             {menuIcon}
                           </span>
-                          <span className="hideInSmallSidebar text-white fs-15 fw-normal">{title}</span>
-                          <span className="sub-menu-arrow text-white">
-                            {isSubMenuOpen === id ? (
-                              <FaChevronRight size={16} />
-                            ) : (
-                              <FaChevronDown size={16} />
-
-                            )}
+                          <span className="hideInSmallSidebar text-wrap text-start lh-sm">{title}</span>
+                          <span className="ms-auto sub-menu-arrow me-3">
+                            {isSubMenuOpen === id ? <MdOutlineKeyboardArrowDown size={20} /> : <MdOutlineKeyboardArrowRight size={20} />}
                           </span>
                         </Nav.Link>
-
-
                     ) : ''}
 
                     {isSubMenuOpen === id && subMenu && (
@@ -139,13 +142,13 @@ import { getLocalStorage } from "../../utils/storage"
                                   key={subItems.menuName}
                                   as={NavLink}
                                   to={subItems.path}
-                                  className={`align-items-center d-flex text-white sidebarLink text-nowrap rounded ${subItems.disabled ? "disabled opacity-25" : ""
+                                  className={`align-items-center d-flex px-0 sidebarLink rounded ${subItems.disabled ? "disabled" : ""
                                     }`}
-                                >{console.log('subItems.path', subItems.path)}
+                                >
                                   <span className="py-1 text-center min-w-44 sidebarIcon d-none ps-1">
                                     {subItems.menuIcon}
                                   </span>
-                                  <span className="hideInSmallSidebar text-white fs-15 fw-normal text-wrap">
+                                  <span className="hideInSmallSidebar text-wrap lh-sm">
                                     {subItems.menuName}
                                   </span>
                                 </Nav.Link>

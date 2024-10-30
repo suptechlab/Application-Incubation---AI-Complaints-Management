@@ -1,85 +1,94 @@
 $enable-negative-margins: true;
 $font-family-base: 'Source Sans Pro', sans-serif;
+$white: #FFF;
 $body-tertiary-bg: #F8F6F4;
 $body-secondary-bg: #F5F5F5;
 $body-color: #000000;
-// $primary: #812227;
-$primary:#1b7ace;
-$dark:#20222C;
-$secondary: #999999;
-$danger: #DC3545;
-// $info: #A12B31;
-$info :#00549e;
-$warning: #f6c300;
-$success: #2EA950;
-$light: #0088FF;
-$table-striped-order:         even;
-$table-cell-padding-y:        1rem;
-$table-cell-padding-x:        1rem;
-$table-cell-padding-y-sm:     1rem;
-$table-cell-padding-x-sm:     1rem;
-$table-border-width:          0;
-
-$border-color: #A0A0A0;
-$input-border-color: #A0A0A0;
-$input-focus-border-color:#2F61A8;
-$input-disabled-border-color:  #AEAEAE;
-$input-disabled-bg: none;
-$input-focus-width:  0;
-$input-focus-box-shadow: none;
-// $tooltip-max-width: 300px;
-// $btn-font-weight: 600;
-// $btn-padding-y: 0.688rem;
-// $btn-padding-x: 1.875rem;
- $btn-border-radius: .25rem;
-// $btn-padding-y-sm: 0.407rem;
-// $btn-padding-x-sm: 1.25rem;
-// $input-placeholder-color: #BDBDBD;
-// $input-padding-y-sm: 0.407rem;
-// $input-padding-x-sm: 1rem;
-// $input-padding-y: 0.782rem;
-// $input-padding-x: 1rem;
-// $input-font-size: 0.875rem;
-// $input-font-weight: $btn-font-weight;
-// $input-border-radius: $btn-border-radius;
-// $h3-font-size: 30px;
-// $h4-font-size: 22px;
-// $h5-font-size: 18px;
-// $border-color: #DADADA;
-// $form-check-input-border-radius: 2px;
-// $form-check-input-checked-color: #FFFFFF;
-// $form-check-input-checked-bg-image: url("data:image/svg+xml,<svg width='12' height='10' viewBox='0 0 12 9' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M4.44443 8.8889L0.555542 5.00001L1.65221 3.90334L4.44443 6.68779L10.3478 0.784454L11.4444 1.8889L4.44443 8.8889Z' fill='#{$form-check-input-checked-color}'/></svg>");
-// $primary-text-emphasis: #004C4C;
-// $modal-inner-padding: 1.25rem;
-// $modal-header-padding-y: .75rem;
-// $form-switch-checked-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3.25' fill='#{$primary}'/></svg>");
-// $accordion-button-active-color: $body-color;
-// $accordion-icon-active-color: $body-color;
-// $accordion-padding-x: 1rem;
-// $form-check-label-cursor: pointer;
-// $nav-tabs-border-radius: 0;
-// $nav-tabs-link-active-color: $primary;
-// $nav-tabs-link-active-border-color: $primary;
-// $nav-link-color: rgba($body-color, .75);
-
+$primary: #00549E;
+$secondary: #7F7F7F;
+$dark: $body-color;
+$danger: #DA220B;
+$info: #007BFF;
+$warning: #F6C300;
+$success: #146C2E;
+$link-color: #0088FF;
+$border-color: rgba(204, 204, 204, 0.7);
+$input-border-color: $secondary;
+$input-focus-border-color: $link-color;
+$border-radius: .25rem;
+$input-padding-y: 0.5rem;
+$form-check-input-border-radius: .125rem;
+$form-check-input-border: 2px solid $border-color;
+$form-check-input-checked-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='10' fill='none'><path fill='#{$white}' d='M5.222 9.444.778 5 2.03 3.747l3.191 3.182L11.97.182l1.253 1.262-8 8Z'/></svg>");
+$form-switch-color: $white;
+$form-switch-focus-color: $form-switch-color;
+$form-select-bg-size: 10px 5px;
+$form-select-indicator: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='none'><path fill='#{$body-color}' d='M5 5 0 0h10L5 5Z'/></svg>");
+$btn-font-size: 14px;
+$btn-font-weight: 600;
+$btn-padding-y: 0.469rem;
+$btn-padding-x: 1.085rem;
+$box-shadow-sm: 0px 3px 5px 0px rgba($body-color, 0.05);
+$box-shadow: 0px 2px 2px 0px rgba($body-color, 0.15);
+$navbar-dark-color: $white;
+$nav-link-font-size: 15px;
+$navbar-dark-disabled-color: rgba($white, .5);
+$card-border-radius: 0.375rem;
+$table-cell-padding-x: .75rem;
+$table-bg: rgba($body-color, 0.05);
+$table-striped-bg: $white;
+$table-striped-bg-factor: 1;
+$table-border-width: 0;
+$table-cell-vertical-align: middle;
+$table-th-font-weight: 600;
+$pagination-font-size: $btn-font-size;
+$pagination-border-radius: 5rem;
+$pagination-border-width: 0;
+$pagination-bg: $white;
+$pagination-color: $body-color;
+$pagination-active-color: $body-color;
+$pagination-active-bg: rgba($body-color, 0.25);
+$pagination-margin-start: .25rem;
+$pagination-disabled-color: rgba($body-color, 0.75);
+$pagination-disabled-bg: $pagination-bg;
+$pagination-padding-y: .25rem;
+$pagination-padding-x: .25rem;
+$modal-sm: 380px;
+$modal-md: 690px;
+$modal-lg: 800px;
+$modal-inner-padding: 1.5rem;
+$modal-footer-margin-between: 1rem;
+$modal-content-border-width: 0;
+$modal-content-border-radius: 1rem;
+$modal-header-padding-y: 1.313rem;
 
 // Custom Variables
-$font-family-secondary: 'Montserrat', sans-serif;
 $theme-size-10: 0.625rem;
 $theme-size-11: 0.6875rem;
 $theme-size-12: 0.75rem;
 $theme-size-13: 0.8125rem;
 $theme-size-14: 0.875rem;
 $theme-size-15: 0.9375rem;
-$theme-sidebar-width: 15rem;
+$theme-sidebar-width: 14.375rem;
 $theme-sidebar-brand-height: 5em;
 $theme-header-height: 4rem;
+$custom-bg-light-green: #28A745;
+$custom-bg-light-blue: #1B7ACE;
 
 // Generate custom classes for width, min-width, height, min-height
 @mixin custom-class($property, $value) {
   .custom-#{$property}-#{$value} {
     #{$property}: #{$value}+px;
   }
+}
+
+//Custom Outline Buttons hover Changes
+@mixin btn-outline-styles($color) {
+  --bs-btn-hover-color: #{$color};
+  --bs-btn-hover-bg: #{rgba($color, .10)};
+  --bs-btn-hover-border-color: #{$color};
+  --bs-btn-active-color: #{$color};
+  --bs-btn-active-bg: #{rgba($color, .20)};
 }
 
 //Responsive Mixins

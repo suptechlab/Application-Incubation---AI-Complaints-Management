@@ -296,7 +296,7 @@ export default function UserList() {
                     <SearchForm filter={filter} setFilter={setFilter} />
                     <UsersTable
                         columns={columns}
-                        dataQuery={dataQuery?.data?.data}
+                        dataQuery={dataQuery}
                         pagination={pagination}
                         setPagination={setPagination}
                         sorting={sorting}

@@ -11,12 +11,28 @@ const instance = axios.create({
 instance.interceptors.request.use(
     (config) => {
         const token = getLocalStorage('access_token');
-        const userLanguage = getLocalStorage('langKey')  ? getLocalStorage('langKey') : 'en';
-        //console.log('userLanguage',userLanguage)
+        // AS OF NOW SET TOKEN STATICALLY BECAUSE LOGIN IS BY PASSSED
+        // const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczMDI2ODIzOCwiYXV0aCI6IlJPTEVfQURNSU4gUk9MRV9VU0VSIiwiaWF0IjoxNzMwMTgxODM4fQ.Vy4oJCi59RTlDllDpzYX8xUHUAMP9_F4ljpZ39kC6XqAJKZyxPRC25YlCym3wGRo9yxGzi6nzeHKp38CmwXkVQ"
+    
+        const userLanguage = 'es';
+
+        // Set Accept-Language header
         config.headers["Accept-Language"] = userLanguage ?? "en";
+
+        // Set Authorization header if token exists
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
+        // Automatically set Content-Type based on request data
+        if (config.data && config.data instanceof FormData) {
+            // If data is FormData, set Content-Type to multipart/form-data
+            config.headers['Content-Type'] = 'multipart/form-data';
+        } else {
+            // Otherwise, set Content-Type to application/json
+            config.headers['Content-Type'] = 'application/json';
+        }
+
         return config;
     },
     (error) => {

@@ -1,45 +1,53 @@
-import React, { useEffect, useState } from "react";
-import { Card, Col, Row } from "react-bootstrap";
-import qs from "qs";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation, useNavigate } from "react-router-dom";
-import Loading from "../../components/Loading";
+import React from "react";
+import { Card, Image } from "react-bootstrap";
+import comingSoonImage from "../../assets/images/coming-soon.svg";
 import Loader from "../../components/Loader";
+import PageHeader from "../../components/PageHeader";
 
 export default function Dashboard() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  let loading = false;
 
+  const handleAdd = () => {
+    alert(1);
+  };
 
+  const handleEdit = () => {
+    alert(1);
+  };
   return (
     <>
       {loading ? (
         <Loader isLoading={loading} />
-      ) :
-        (
-          <div className="d-flex flex-column h-100 pageContainer px-sm-1 w-100 pb-sm-1">
-            <div className="pageHeader px-3 py-2 my-1 header-search">
-              <Row className="">
-                <Col md={12} lg={12}>
-                  <h1 className="fw-semibold h4 my-2">Dashboard</h1>
-                </Col>
-              </Row>
-              <center>
-                <Row>
-                  <Col md={12} lg={12}>
-                    <Row className="align-items-start g-2 justify-content-end row ">
-                      <br></br>
-                      <h1 className="fw-semibold h2 my-2">Coming Soon</h1>
-                    </Row>
-                  </Col>
-                </Row>
-              </center>
+      ) : (
+        <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+          {/* Header */}
+          <PageHeader
+            title="Dashboard"
+            // actions={[
+            //   { label: "ADD NEW", onClick: handleAdd, variant: "warning" },
+            //   { label: "Help", to: "/help", variant: "outline-dark" },
+            //   { label: "Learn More", onClick: handleAdd, variant: "primary" },
+            //   { label: "EDIT", onClick: handleEdit, variant: "outline-primary" },
+            // ]}
+          />
+          <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+            <div className="m-auto text-center">
+              <div>
+                <Image
+                  className="img-fluid"
+                  src={comingSoonImage}
+                  alt="Coming Soon Banner"
+                  width={421}
+                  height={236}
+                />
+              </div>
+              <h2 className="display-6 fw-bold mt-4 mb-0 opacity-75">
+                Coming Soon
+              </h2>
             </div>
-
-
-          </div>
-        )}
+          </Card>
+        </div>
+      )}
     </>
   );
 }

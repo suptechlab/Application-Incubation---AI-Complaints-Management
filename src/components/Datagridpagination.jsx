@@ -1,14 +1,22 @@
-import * as React from "react"
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa"
-import ReactPaginate from "react-paginate"
+import * as React from "react";
+import { useTranslation } from "react-i18next";
+import {
+  MdArrowBackIos,
+  MdArrowForwardIos
+} from "react-icons/md";
+import ReactPaginate from "react-paginate";
 
 /**
  * Data Grind Pagination Reusable Component
- * @date 4/13/2023 - 7:10:05 PM
  *
- * @param {{ rowsPerPage: any; currentPage: any; }} {
-    rowsPerPage, currentPage
-}
+ * @param {{ rowsPerPage: any; currentPage: any; totalPages: any; totalRecords: any; setCurrentPage: any; currentTotalRecord: any; setLimit: any; }} param0
+ * @param {*} param0.rowsPerPage
+ * @param {*} param0.currentPage
+ * @param {*} param0.totalPages
+ * @param {*} param0.totalRecords
+ * @param {*} param0.setCurrentPage
+ * @param {*} param0.currentTotalRecord
+ * @param {*} param0.setLimit
  * @returns {*}
  */
 
@@ -19,31 +27,35 @@ const DataGridPagination = ({
   totalRecords,
   setCurrentPage,
   currentTotalRecord,
-  setLimit
+  setLimit,
 }) => {
-  const handlePagination = page => {
-    //console.log("pagenum", page)
-    setCurrentPage(page.selected + 1)
-  }
+  const handlePagination = (page) => {
+    setCurrentPage(page.selected + 1);
+  };
+
+  const { t } = useTranslation();
   return (
-    <div className="align-items-center d-flex flex-column flex-md-row justify-content-end mb-2 mt-3">
-      <span className="fs-14  pageShowText mb-md-0 me-4">Rows per page: 
-        <select className="border-0 ms-2" onChange={(event) => {
-          setLimit(event.target.value)
-        }}>
-            <option>10</option>
-            <option>20</option>
+    <div className="align-items-center d-flex flex-column flex-sm-row justify-content-end">
+      <span className="pageShowText mb-md-0 me-sm-4">
+        {t("ROWS PER PAGE")}:
+        <select
+          className="border-0 d-inline-block form-select form-select-sm ms-2 w-auto"
+          onChange={(event) => {
+            setLimit(event.target.value);
+          }}
+        >
+          <option>10</option>
+          <option>20</option>
         </select>
-        </span>
-      <div className="fs-14  pageShowText mb-md-0 me-3">
-         {1 + (currentPage - 1) * rowsPerPage}-{""}
+      </span>
+      <div className="pageShowText mb-md-0 me-sm-4">
+        {1 + (currentPage - 1) * rowsPerPage}-{""}
         {currentTotalRecord + (currentPage - 1) * rowsPerPage} of {totalRecords}{" "}
-        
       </div>
-      
+
       <ReactPaginate
-        previousLabel={<FaAngleLeft />      }
-        nextLabel={<FaAngleRight />      }
+        previousLabel={<MdArrowBackIos />}
+        nextLabel={<MdArrowForwardIos />}
         pageClassName="page-item"
         pageLinkClassName="page-link"
         previousClassName="page-item prev-item"
@@ -56,12 +68,11 @@ const DataGridPagination = ({
         activeClassName="active"
         pageCount={totalPages}
         marginPagesDisplayed={1}
-      
         pageRangeDisplayed={4}
         forcePage={currentPage - 1}
-        onPageChange={page => handlePagination(page)}
+        onPageChange={(page) => handlePagination(page)}
       />
     </div>
-  )
-}
-export default DataGridPagination
+  );
+};
+export default DataGridPagination;

@@ -1,20 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import PageHeader from "../../../components/PageHeader";
-import { Card } from "reactstrap";
 import qs from "qs";
-import ListingSearchForm from "../../../components/ListingSearchForm";
-import CommonDataTable from "../../../components/CommonDataTable";
-import { useLocation } from "react-router-dom";
-import SvgIcons from "../../../components/SVGIcons"
-import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
+import React, { useEffect, useRef, useState } from "react";
+import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { MdEdit } from "react-icons/md";
+import { useLocation } from "react-router-dom";
+import CommonDataTable from "../../../components/CommonDataTable";
+import DataGridActions from "../../../components/DataGridActions";
+import ListingSearchForm from "../../../components/ListingSearchForm";
+import PageHeader from "../../../components/PageHeader";
 import Toggle from "../../../components/Toggle";
+import {
+  getModulePermissions,
+  isAdminUser,
+} from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
 
-
 const CityMaster = () => {
+  const { t } = useTranslation();
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -24,7 +29,7 @@ const CityMaster = () => {
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
-  const [editModal, setEditModal] = useState({ id: '', open: false })
+  const [editModal, setEditModal] = useState({ id: "", open: false });
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
@@ -32,55 +37,64 @@ const CityMaster = () => {
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({ id: '', open: !editModal?.open });
+  const editToggle = () => setEditModal({ id: "", open: !editModal?.open });
 
-  const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
+  const permission = useRef({
+    addModule: false,
+    editModule: false,
+    deleteModule: false,
+  });
 
   useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-        permission.current.addModule = true;
-        permission.current.editModule = true;
-        permission.current.deleteModule = true;
-      } else {
-        getModulePermissions("Master management").then(response => {
-          if (response.includes("CLAIM_TYPE_CREATE")) {
-            permission.current.addModule = true;
-          }
-          if (response.includes("CLAIM_TYPE_UPDATE")) {
-            permission.current.editModule = true;
-          }
-          if (response.includes("CLAIM_TYPE_DELETE")) {
-            permission.current.deleteModule = true;
-          }
-        }).catch(error => {
-          console.error("Error fetching permissions:", error);
-        });
-      }
-    }).catch(error => {
-      console.error("Error get during to fetch Province Master", error);
-    })
-
+    isAdminUser()
+      .then((response) => {
+        if (response) {
+          permission.current.addModule = true;
+          permission.current.editModule = true;
+          permission.current.deleteModule = true;
+        } else {
+          getModulePermissions("Master management")
+            .then((response) => {
+              if (response.includes("CLAIM_TYPE_CREATE")) {
+                permission.current.addModule = true;
+              }
+              if (response.includes("CLAIM_TYPE_UPDATE")) {
+                permission.current.editModule = true;
+              }
+              if (response.includes("CLAIM_TYPE_DELETE")) {
+                permission.current.deleteModule = true;
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching permissions:", error);
+            });
+        }
+      })
+      .catch((error) => {
+        console.error("Error get during to fetch Province Master", error);
+      });
   }, []);
   const editCityMaster = async (id) => {
-    setEditModal({ id: id, open: !editModal?.open })
+    setEditModal({ id: id, open: !editModal?.open });
   };
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: () => {
       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+      Object.keys(filterObj).forEach(
+        (key) => filterObj[key] === "" && delete filterObj[key]
+      );
 
       // For now, returning default data without API request
       return [
         {
           id: 1,
-          cityMaster: 'Cuenca'
+          cityMaster: "Cuenca",
         },
         {
           id: 2,
-          cityMaster: 'Guaranda'
+          cityMaster: "Guaranda",
         },
       ];
     },
@@ -133,45 +147,57 @@ const CityMaster = () => {
       {
         accessorFn: (row) => row.cityMaster,
         id: "cityMaster",
-        header: () => "City Master",
+        header: () => t("CITY MASTER"),
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
             <Toggle
+              tooltip={
+                info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
+              }
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
               // label="Status"
               name="status"
               value={info?.row?.original?.status}
               checked={info?.row?.original?.status}
-            // onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+              onChange={() =>
+                changeStatus(
+                  info?.row?.original?.id,
+                  info?.row?.original?.status
+                )
+              }
             />
-          )
+          );
         },
         id: "status",
-        header: () => "Status",
+        header: () => t("STATUS"),
+        size: "80",
       },
       {
         id: "actions",
         isAction: true,
-        cell: (info) => {
-          return (
-            <div className="d-flex items-center gap-2 justify-content-center">
-              {permission.current.editModule ?
-                <div
-                  onClick={() => {
-                    editCityMaster(info?.row?.original?.id);
-                  }}
-                >
-                  <span className=''>{SvgIcons.editIcon}</span>
-                </div> : <div></div>}
-            </div>
-          );
-        },
-        header: () => <div className="d-flex justify-content-center">Actions</div>,
+        cell: (rowData) => (
+          <DataGridActions
+            controlId="province-master"
+            rowData={rowData}
+            customButtons={[
+              {
+                name: "edit",
+                enabled: permission.current.editModule,
+                type: "button",
+                title: "Edit",
+                icon: <MdEdit size={18} />,
+                handler: () => editCityMaster(rowData?.row?.original),
+              },
+            ]}
+          />
+        ),
+        header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
+        size: "80",
       },
     ],
     []
@@ -184,25 +210,42 @@ const CityMaster = () => {
     });
   }, [filter]);
 
+  // Export to CSV Click Handler
+  const exportHandler = () => {
+    console.log('Export to CSV')
+  }
 
-  return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <PageHeader title={"City Master"} toggle={toggle} />
-    <div className="flex-grow-1 pageContent position-relative pt-4 overflow-auto">
-      <Card className="h-100 bg-white shadow-lg border-0 theme-card-cover">
-        <ListingSearchForm filter={filter} setFilter={setFilter} />
-        <CommonDataTable
-          columns={columns}
-          dataQuery={dataQuery}
-          pagination={pagination}
-          setPagination={setPagination}
-          sorting={sorting}
-          setSorting={setSorting}
-        />
+  return (
+    <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+      <PageHeader
+        title={t("CITY MASTER")}
+        actions={[
+          {
+            label: "Export to CSV",
+            to: exportHandler,
+            variant: "outline-dark",
+            disabled: true,
+          },
+          { label: "Add New", onClick: toggle, variant: "warning" },
+        ]}
+      />
+      <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+        <Card.Body className="d-flex flex-column">
+          <ListingSearchForm filter={filter} setFilter={setFilter} />
+          <CommonDataTable
+            columns={columns}
+            dataQuery={dataQuery}
+            pagination={pagination}
+            setPagination={setPagination}
+            sorting={sorting}
+            setSorting={setSorting}
+          />
+        </Card.Body>
       </Card>
+      <Add modal={modal} toggle={toggle} />
+      <Edit modal={editModal?.open} toggle={editToggle} />
     </div>
-    <Add modal={modal} toggle={toggle} />
-    <Edit modal={editModal?.open} toggle={editToggle} />
-  </div>
+  );
 };
 
 export default CityMaster;

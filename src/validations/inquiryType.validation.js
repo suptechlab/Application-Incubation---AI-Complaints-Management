@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 const validationSchema = Yup.object({
-  inquiryName: Yup.string()
+  name: Yup.string()
       .max(250, "Inquiry name cannot exceed 250 characters.")
       .required("Inquiry name is required."),
   description: Yup.string()

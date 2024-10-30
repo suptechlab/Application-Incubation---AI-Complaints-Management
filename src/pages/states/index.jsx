@@ -200,7 +200,7 @@ export default function StatesList() {
                         </div>
                     );
                 },
-                header: () => <div className="d-flex justify-content-center">Actions</div>,
+                header: () => <div className="text-center">Actions</div>,
                 enableSorting: false,
             },
         ],
