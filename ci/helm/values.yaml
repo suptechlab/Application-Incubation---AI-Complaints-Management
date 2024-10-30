@@ -3,7 +3,7 @@ global:
   name: ms-auth
 deployment:
   # Default values for deployment.
-  # This is a YAML-formatted file.
+  ## This is a YAML-formatted file.
   # Declare variables to be passed into your templates.
   namespace: suptech
   replicaCount: 1
@@ -28,7 +28,7 @@ deployment:
     initialDelaySeconds: 20
     periodSeconds: 180
     timeoutSeconds: 21
-    
+
   readinessProbe:
     tcpSocket: 
       port: 8080
