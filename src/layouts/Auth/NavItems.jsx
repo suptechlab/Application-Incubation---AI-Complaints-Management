@@ -1,8 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { MdConfirmationNumber, MdDashboard, MdFolder, MdPerson, MdSchema, MdSupervisorAccount } from "react-icons/md";
-import { getLocalStorage } from "../../utils/storage";
 
-const companyTitle = getLocalStorage("companyTitle");
 export const NavItems = () => {
   const { t } = useTranslation(); // use the translation hook
 

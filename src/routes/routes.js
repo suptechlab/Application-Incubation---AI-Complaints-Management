@@ -1,7 +1,6 @@
 import React from "react";
 import Dashboard from "../pages/dashboard";
 import DistrictdataPage from "../pages/districtdata";
-import DashboardPage from "../pages/dashboard";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import Login from "../pages/authentication/Login";
 import ForgotPassword from "../pages/authentication/ForgotPassword";
@@ -20,7 +19,6 @@ import CityMaster from "../pages/master management/cityMaster";
 import TemplateMaster from "../pages/master management/TemplateMaster";
 
 const UserForm = React.lazy(() => import("../pages/users/Edit"));
-
 const Settings = React.lazy(() => import("../pages/settings"));
 const UserTransactions = React.lazy(() => import("../pages/users/transactions"));
 
@@ -53,7 +51,7 @@ const routes = [
     },
     {
         path: "/dashboard",
-        element: <DashboardPage />,
+        element: <Dashboard />,
         isPrivate: true,
         layoutType: "Auth",
     },

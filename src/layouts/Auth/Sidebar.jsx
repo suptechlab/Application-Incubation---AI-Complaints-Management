@@ -2,15 +2,13 @@ import React, { useEffect, useRef, useState } from "react"
 import { Button, Nav, Navbar } from "react-bootstrap"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
 import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowRight } from "react-icons/md"
-import { NavLink, useNavigate } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 import { getPermissionsModuleNameList, isAdminUser } from "../../utils/authorisedmodule"
-import { getLocalStorage } from "../../utils/storage"
 import { NavItems } from "./NavItems"
 import "./sidebar.scss"
 
   const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
     const sidebarRef = useRef(null);
-    const navigate = useNavigate()
     const [isSubMenuOpen, setIsSubMenuOpen] = useState(null)
 
     const handleSubmenu = idx => {
@@ -46,8 +44,6 @@ import "./sidebar.scss"
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isActiveSidebar]);
-
-    const companyTitle = getLocalStorage("companyTitle");
 
     const permission = useRef({
       list: [],
@@ -129,7 +125,7 @@ import "./sidebar.scss"
                             {menuIcon}
                           </span>
                           <span className="hideInSmallSidebar text-wrap text-start lh-sm">{title}</span>
-                          <span className="ms-auto sub-menu-arrow">
+                          <span className="ms-auto sub-menu-arrow me-3">
                             {isSubMenuOpen === id ? <MdOutlineKeyboardArrowDown size={20} /> : <MdOutlineKeyboardArrowRight size={20} />}
                           </span>
                         </Nav.Link>
