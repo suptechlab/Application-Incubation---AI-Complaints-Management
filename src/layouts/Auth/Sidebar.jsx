@@ -125,7 +125,7 @@ import "./sidebar.scss"
                             {menuIcon}
                           </span>
                           <span className="hideInSmallSidebar text-wrap text-start lh-sm">{title}</span>
-                          <span className="ms-auto sub-menu-arrow me-3">
+                          <span className="ms-auto sub-menu-arrow">
                             {isSubMenuOpen === id ? <MdOutlineKeyboardArrowDown size={20} /> : <MdOutlineKeyboardArrowRight size={20} />}
                           </span>
                         </Nav.Link>
