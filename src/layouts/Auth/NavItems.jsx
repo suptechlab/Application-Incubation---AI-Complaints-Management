@@ -144,7 +144,6 @@ export const NavItems = () => {
       roleName: "users"
     },
     {
-
       id: 7,
       menuName: t("Tickets"),
       title: t("Tickets"),

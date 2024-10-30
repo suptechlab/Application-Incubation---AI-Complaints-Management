@@ -29,7 +29,7 @@ export default function ReactTable({
 
 
   const { isLoading, isFetching, data } = dataQuery;
-
+  // console.log('32 table',dataQuery?.data)
   const table = useReactTable({
     // data: dataQuery.data?.data?.data ?? defaultData,
     data: data?.data ?? defaultData,

@@ -91,13 +91,13 @@ export default function UserList() {
     const columns = React.useMemo(
         () => [
             {
-                accessorFn: (row) => row.firstName + ' ' + row.lastName,
-                id: "firstName",
+                accessorFn: (row) => row.name,
+                id: "name",
                 header: () => "Name",
             },
             {
-                accessorFn: (row) => row.roleName ? row.roleName : 'N/A',
-                id: "roleName",
+                accessorFn: (row) => row.claimTypeName ?? 'N/A',
+                id: "claimTypeName",
                 header: () => "Role",
                 enableSorting: false,
             },
