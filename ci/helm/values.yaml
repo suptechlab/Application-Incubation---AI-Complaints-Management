@@ -24,16 +24,13 @@ deployment:
 
   livenessProbe:
     tcpSocket:
-  #  httpGet:
-  #    path: /ms-seps-base-service/actuator/health
       port: 8080
     initialDelaySeconds: 20
     periodSeconds: 180
     timeoutSeconds: 21
+    
   readinessProbe:
-    #httpGet:
-    tcpSocket:
-    #  path: /ms-seps-base-service/actuator/health
+    tcpSocket: 
       port: 8080
     initialDelaySeconds: 20
     periodSeconds: 180
