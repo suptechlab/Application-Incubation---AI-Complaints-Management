@@ -21,11 +21,7 @@ const Header = () => {
         expand={expand}
         className="bg-body-tertiary py-0"
       >
-        <Container fluid className="custom-min-height-70 px-3">
-          <Navbar.Toggle
-            aria-controls={`headerNavbar-expand-${expand}`}
-            className="p-0 border-0 me-2"
-          />
+        <Container className="custom-min-height-70">         
 
           <Navbar.Brand as={Link} href="/" className="me-auto px-1">
             <Image fluid src={Logo} alt="Logo" width={258} height={55} />
@@ -34,28 +30,29 @@ const Header = () => {
           <Navbar.Offcanvas
             id={`headerNavbar-expand-${expand}`}
             aria-labelledby={`headerNavbarLabel-expand-${expand}`}
+            placement="end"
           >
-            <Offcanvas.Header closeButton>
-              <Offcanvas.Title id={`headerNavbarLabel-expand-${expand}`}>
+            <Offcanvas.Header closeButton className="bg-body-tertiary">
+              <Offcanvas.Title id={`headerNavbarLabel-expand-${expand}`} className="fw-semibold">
                 Menu
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
-              <Nav className="justify-content-end align-items-center flex-grow-1 pe-md-3">
-                <Nav.Link as={NavLink} to="/menu-1">
+              <Nav className="justify-content-end align-items-md-center flex-grow-1 header-menu-links">
+                <Nav.Link as={NavLink} to="/menu-1" className="mx-md-3">
                   Menu 1
                 </Nav.Link>
-                <Nav.Link as={NavLink} to="/menu-2">
+                <Nav.Link as={NavLink} to="/menu-2" className="mx-md-3">
                   Menu 2
                 </Nav.Link>
-                <Nav.Link as={NavLink} to="/menu-3">
+                <Nav.Link as={NavLink} to="/menu-3" className="mx-md-3">
                   Menu 3
                 </Nav.Link>
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
 
-          <Dropdown>
+          <Dropdown className="d-none ms-md-4">
             <Dropdown.Toggle
               variant="link"
               id="dropdown-profile"
@@ -85,6 +82,10 @@ const Header = () => {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+          <Navbar.Toggle
+            aria-controls={`headerNavbar-expand-${expand}`}
+            className="p-0 border-0 ms-3"
+          />
         </Container>
       </Navbar>
     </header>

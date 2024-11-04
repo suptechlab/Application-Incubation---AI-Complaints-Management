@@ -2,9 +2,11 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom classes
+@include custom-class('font-size', 12);
 @include custom-class('width', 64);
 @include custom-class('height', 64);
 @include custom-class('min-height', 70);
+@include custom-class('width', 400);
 
 // Bootstrap Custom CSS
 .tooltip {
@@ -139,6 +141,7 @@ input:-webkit-autofill:active {
 .spin {
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
+
     @keyframes fa-spin {
         0% {
             -webkit-transform: rotate(0deg);
@@ -160,6 +163,25 @@ input:-webkit-autofill:active {
                 flex-direction: column;
                 overflow: hidden;
                 max-height: 100%;
+            }
+        }
+    }
+}
+
+.bg-primary-90 {
+    background-color: rgba($primary, .90);
+}
+
+.carousel-cover-main {
+    .carousel-link {
+        img {
+            transition: filter 0.5s ease-in-out;
+            filter: grayscale(100%);
+        }
+
+        &:hover {
+            img {
+                filter: grayscale(0%);
             }
         }
     }
