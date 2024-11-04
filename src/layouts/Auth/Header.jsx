@@ -22,7 +22,6 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
         count: 0
     });
     const navigate = useNavigate();
-
     useEffect(() => {
         fetchNotifications();
     }, []);
