@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useRef } from "react";
 import { FormCheck } from "react-bootstrap";
 import AppTooltip from "./tooltip";
 
 const Toggle = ({ id, label, name, onChange, value, tooltip }) => {
+  const switchRef = useRef(null);
+  const handleChange = (e) => {
+    onChange(e);
+    if (switchRef.current) {
+      switchRef.current.blur();
+    }
+  };
+
+
   const toggleSwitch = (
     <FormCheck
       type="switch"
@@ -10,7 +19,8 @@ const Toggle = ({ id, label, name, onChange, value, tooltip }) => {
       name={name}
       label={label}
       checked={value}
-      onChange={onChange}
+      onChange={handleChange}
+      ref={switchRef}
     />
   );
 

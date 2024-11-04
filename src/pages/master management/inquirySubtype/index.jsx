@@ -16,11 +16,13 @@ import { changeInquirySubTypeStatus, downloadInquirySubTypes, handleGetInquirySu
 import { Card } from "react-bootstrap";
 import DataGridActions from "../../../components/DataGridActions";
 import { MdEdit } from "react-icons/md";
+import Loader from "../../../components/Loader";
 
 const InquirySubType = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+  const [isLoading, setLoading] = useState(false)
   const queryClient = useQueryClient();
   const { t } = useTranslation()
 
@@ -30,7 +32,12 @@ const InquirySubType = () => {
   });
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState({ row: {}, open: false })
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([
+    {
+      "id": "name",
+      "desc": true
+    }
+  ]);
   const [filter, setFilter] = useState({
     search: "",
   });
@@ -104,6 +111,7 @@ const InquirySubType = () => {
 
   // CHANGE STATUS
   const changeStatus = async (id, currentStatus) => {
+    setLoading(true)
     changeInquirySubTypeStatus(id, !currentStatus).then(response => {
       toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
@@ -113,6 +121,8 @@ const InquirySubType = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
+    }).finally(() => {
+      setLoading(false)
     })
   };
   useEffect(() => {
@@ -195,11 +205,11 @@ const InquirySubType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
-        size : '80',
+        size: '80',
       },
       {
         id: "actions",
-        isAction: true,        
+        isAction: true,
         cell: (rowData) => (
           <DataGridActions
             controlId="province-master"
@@ -218,7 +228,7 @@ const InquirySubType = () => {
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
-        size : '80',
+        size: '80',
       },
     ],
     []
@@ -264,6 +274,7 @@ const InquirySubType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+    <Loader isLoading={isLoading} />
     <PageHeader title={t("INQUIRY SUB TYPE")}
       actions={[
         { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
@@ -282,7 +293,6 @@ const InquirySubType = () => {
         />
       </Card.Body>
     </Card>
-
     <Add modal={modal} dataQuery={dataQuery} toggle={toggle} inquiryTypes={inquiryTypes} />
     <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} inquiryTypes={inquiryTypes} />
   </div>

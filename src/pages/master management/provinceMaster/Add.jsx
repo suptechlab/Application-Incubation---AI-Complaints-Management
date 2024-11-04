@@ -6,24 +6,31 @@ import FormInput from "../../../components/FormInput";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { validationSchema } from "../../../validations/provinceMaster.validation";
+import { createNewProvinceMaster } from "../../../services/provinceMaster.service";
 
-const Add = ({ modal, toggle }) => {
+const Add = ({ modal, toggle ,dataQuery }) => {
   const { t } = useTranslation();
-  const handleSubmit = async (values) => {
-    console.log("values::", values);
-    toast.success("Province master added successfully.");
+  const handleSubmit = async (values, actions) => {
+    const formData = {
+      name: values?.name
+    };
 
-    // handleAddDistrict(values).then(response => {
-    //     console.log("Add District::", response);
-    //     toast.success(response.data.message);
-    //     navigate("/districts");
-    // }).catch((error) => {
-    //     if(error.response.data.fieldErrors){
-    //         toast.error(error.response.data.fieldErrors[0].message);
-    //     }else{
-    //         toast.error(error.response.data.detail);
-    //     }
-    // });
+    createNewProvinceMaster(formData)
+      .then((response) => {
+        toast.success(response?.data?.message);
+        toggle();
+        dataQuery.refetch()
+      })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+      .finally(() => {
+        actions.setSubmitting(false);
+      });
   };
 
   return (
@@ -45,8 +52,7 @@ const Add = ({ modal, toggle }) => {
       </Modal.Header>
       <Formik
         initialValues={{
-          provinceName: "",
-          description: "",
+          name: ""
         }}
         onSubmit={(values, actions) => {
           actions.setSubmitting(false);
@@ -67,16 +73,16 @@ const Add = ({ modal, toggle }) => {
           <Form>
             <Modal.Body className="text-break py-0">
               <FormInput
-                error={errors?.provinceName}
-                id="provinceName"
+                error={errors?.name}
+                id="name"
                 key={"provinceName"}
                 label={t("NAME OF PROVINCE")}
-                name="provinceName"
+                name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                touched={touched?.provinceName}
+                touched={touched?.name}
                 type="text"
-                value={values?.provinceName || ""}
+                value={values?.name || ""}
               />
             </Modal.Body>
             <Modal.Footer className="pt-0">
@@ -92,7 +98,6 @@ const Add = ({ modal, toggle }) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
               >
                 {t("SUBMIT")}
               </Button>

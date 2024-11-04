@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
@@ -17,12 +17,16 @@ import {
 } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
+import { changeCityStatus, downloadCityList, handleGetCities, provinceDropdownData } from "../../../services/cityMaster.service";
+import Loader from "../../../components/Loader";
 
 const CityMaster = () => {
   const { t } = useTranslation();
 
   const location = useLocation();
+  const queryClient = useQueryClient();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+  const [isLoading , setLoading] = useState(false)
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
@@ -30,10 +34,17 @@ const CityMaster = () => {
   });
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState({ id: "", open: false });
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([
+    {
+      "id": "name",
+      "desc": true
+    }
+  ]);
   const [filter, setFilter] = useState({
     search: "",
   });
+
+  const [provinces, setProvinces] = useState([])
 
   const toggle = () => setModal(!modal);
 
@@ -74,63 +85,57 @@ const CityMaster = () => {
         console.error("Error get during to fetch Province Master", error);
       });
   }, []);
-  const editCityMaster = async (id) => {
-    setEditModal({ id: id, open: !editModal?.open });
+
+  const editCityMaster = async (rowData) => {
+    setEditModal({ row: rowData, open: !editModal?.open })
   };
 
+  // FETCH DATA
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: () => {
       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
+      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
-      // For now, returning default data without API request
-      return [
-        {
-          id: 1,
-          cityMaster: "Cuenca",
-        },
-        {
-          id: 2,
-          cityMaster: "Guaranda",
-        },
-      ];
+      if (sorting?.length === 0) {
+        return handleGetCities({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          ...filterObj,
+        });
+      } else {
+        return handleGetCities({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          sort: sorting
+            .map(
+              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+            )
+            .join(","),
+          ...filterObj,
+        });
+      }
     },
-    // queryFn: () => {
-    //   const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-    //   Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-
-    //   if (sorting.length === 0) {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       ...filterObj,
-    //     });
-    //   } else {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       sort: sorting
-    //         .map(
-    //           (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-    //         )
-    //         .join(","),
-    //       ...filterObj,
-    //     });
-    //   }
-    // },
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
   });
 
+
+  //CITY STATUS UPDATE FUNCTION
   const changeStatus = async (id, currentStatus) => {
-    try {
-      // await handleEditDistricts(id, { status: !currentStatus });
-      toast.success("Province master status updated successfully");
+    setLoading(true)
+    changeCityStatus(id, !currentStatus).then(response => {
+      toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
-    } catch (error) {
-      toast.error("Error updating state status");
-    }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    }).finally(()=>{
+      setLoading(false)
+    })
   };
   useEffect(() => {
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
@@ -145,9 +150,14 @@ const CityMaster = () => {
   const columns = React.useMemo(
     () => [
       {
-        accessorFn: (row) => row.cityMaster,
-        id: "cityMaster",
-        header: () => t("CITY MASTER"),
+        accessorFn: (row) => row?.name,
+        id: "name",
+        header: () => t("CITY NAME"),
+      },
+      {
+        accessorFn: (row) => row?.provinceName,
+        id: "provinceName",
+        header: () => t("PROVINCE"),
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -210,21 +220,81 @@ const CityMaster = () => {
     });
   }, [filter]);
 
-  // Export to CSV Click Handler
+  // EXPORT TO CSV CLICK HANDLER
   const exportHandler = () => {
-    console.log('Export to CSV')
+    downloadCityList({ search: filter?.search ?? "" }).then(response => {
+      if (response?.data) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const tempLink = document.createElement('a');
+        tempLink.href = blobUrl;
+        tempLink.setAttribute('download', 'cities.xlsx');
+
+        // Append the link to the document body before clicking it
+        document.body.appendChild(tempLink);
+
+        tempLink.click();
+
+        // Clean up by revoking the Blob URL
+        window.URL.revokeObjectURL(blobUrl);
+
+        // Remove the link from the document body after clicking
+        document.body.removeChild(tempLink);
+      } else {
+        throw new Error('Response data is empty.');
+      }
+      // toast.success(t("STATUS UPDATED"));
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    })
   }
+
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
+
+  // GET CLAIM TYPE DROPDOWN LIST
+  const getProvinceDropdownData = () => {
+    provinceDropdownData().then(response => {
+      if (response?.data && response?.data?.length > 0) {
+        const dropdownData = response?.data.map(item => ({
+          value: item?.id,
+          label: item?.name
+        }));
+        setProvinces(dropdownData)
+      }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+      }
+    })
+  }
+
+  useEffect(() => {
+    getProvinceDropdownData()
+  }, [])
+
 
   return (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+    <Loader isLoading={isLoading}/>
       <PageHeader
         title={t("CITY MASTER")}
         actions={[
           {
             label: "Export to CSV",
-            to: exportHandler,
+            onClick: exportHandler,
             variant: "outline-dark",
-            disabled: true,
           },
           { label: "Add New", onClick: toggle, variant: "warning" },
         ]}
@@ -242,8 +312,8 @@ const CityMaster = () => {
           />
         </Card.Body>
       </Card>
-      <Add modal={modal} toggle={toggle} />
-      <Edit modal={editModal?.open} toggle={editToggle} />
+      <Add modal={modal} toggle={toggle} provinces={provinces} dataQuery={dataQuery} />
+      <Edit modal={editModal?.open} toggle={editToggle} provinces={provinces} dataQuery={dataQuery} rowData={editModal?.row} />
     </div>
   );
 };

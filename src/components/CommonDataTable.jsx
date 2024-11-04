@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import ReactTable from "../components/ReactTable";
-import { useLocation } from 'react-router-dom';
 
 const CommonDataTable = ({ columns, dataQuery, pagination, setPagination, sorting, setSorting }) => {
 

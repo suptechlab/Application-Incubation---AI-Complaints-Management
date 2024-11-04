@@ -14,7 +14,7 @@ export const createNewProvinceMaster = async (data) => {
 }
 
 // EDIT EXISTING PROVINCE MASTER
-export const editInsuranceProvinceMaster = async (id, data) => {
+export const editProvinceMaster = async (id, data) => {
   return await instance.put(`/v1/provinces/${id}`, data);
 }
 
@@ -24,11 +24,11 @@ export const getProvinceMaster = async (id) => {
 }
 
 // UPDATE PROVINCE MASTER STATUS
-export const changeProvinceMaster = async (id, status) => {
+export const changeProvinceMasterStatus = async (id, status) => {
   return await instance.patch(`/v1/provinces/${id}/status?status=${status}`);
 }
 
 // EXPORT PROVINCE MASTER LIST
-export const exportProvinceMasterList = async (params) => {
+export const downloadProvinceMasterList = async (params) => {
   return await instance.get('/v1/provinces', { params, responseType: 'arraybuffer' });
 }

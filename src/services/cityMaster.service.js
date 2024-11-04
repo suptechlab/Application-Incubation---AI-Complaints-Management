@@ -1,33 +1,38 @@
 import instance from "../utils/instance";
 
 // GET ALL CITY MASTER
-export const handleGetCityMaster = async (params) => {
-  return await instance.get('/v1/city-master', {
+export const handleGetCities = async (params) => {
+  return await instance.get('/v1/cities', {
     params
   });
 }
 
 // CREATE NEW CITY MASTER
-export const createNewCityMaster = async (data) => {
-  return await instance.post('/v1/city-master', data);
+export const createNewCity = async (data) => {
+  return await instance.post('/v1/cities', data);
 }
 
 // EDIT EXISTING CITY MASTER
-export const editCityMaster = async (id, data) => {
-  return await instance.put(`/v1/city-master/${id}`, data);
+export const editCity = async (id, data) => {
+  return await instance.put(`/v1/cities/${id}`, data);
 }
 
 // GET CITY MASTER BY ID
-export const getCityMaster = async (id) => {
-  return await instance.get(`/v1/city-master/${id}`);
+export const getCitiesById = async (id) => {
+  return await instance.get(`/v1/cities/${id}`);
 }
 
 // UPDATE CITY MASTER STATUS
-export const changeCityMaster = async (id, status) => {
-  return await instance.put(`/v1/city-master/${id}?status=${status}`);
+export const changeCityStatus = async (id, status) => {
+  return await instance.patch(`/v1/cities/${id}/status?status=${status}`);
 }
 
 // EXPORT CITY MASTER LIST
-export const exportCityMasterList = async () => {
-  return await instance.get('/v1/city-master', { params, responseType: 'arraybuffer' });
+export const downloadCityList = async ({ params }) => {
+  return await instance.get('/v1/cities', { params, responseType: 'arraybuffer' });
+}
+
+// GET PROVINCE DROPDOWN DATA 
+export const provinceDropdownData = async () => {
+  return await instance.get('/v1/provinces/dropdown-list');
 }

@@ -15,11 +15,15 @@ import { changeInquiryTypeStatus, downloadInquiryTypes, handleGetInquiryType } f
 import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
+import Loader from "../../../components/Loader";
 
 const InquiryType = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+  const [isLoading , setLoading] = useState(false)
+  const [isDownloading , setDownloading] = useState(false)
+
   const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
@@ -28,7 +32,12 @@ const InquiryType = () => {
   });
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState({ row: {}, open: false })
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([
+    {
+      "id": "name",
+      "desc": true
+    }
+  ]);
   const [filter, setFilter] = useState({
     search: "",
   });
@@ -113,6 +122,8 @@ const InquiryType = () => {
 
   // HANDLE INQUIRY TYPES CSV DOWNLOAD
   const handleDownload = () => {
+    setDownloading(true)
+    toast.loading( "Export in progress... Please wait." , {id: "downloading" , isLoading : isDownloading})
     downloadInquiryTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -132,6 +143,8 @@ const InquiryType = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
+
+        toast.success("CSV file downloaded successfully.",{id: "downloading"})
       } else {
         throw new Error('Response data is empty.');
       }
@@ -142,6 +155,7 @@ const InquiryType = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
+      toast.dismiss("downloading");
     })
   }
 
@@ -153,7 +167,6 @@ const InquiryType = () => {
       });
     }
   }, [dataQuery.data?.data?.totalPages]);
-  // }, []);
 
   const columns = React.useMemo(
     () => [
@@ -210,7 +223,7 @@ const InquiryType = () => {
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
-        size : '80',
+        size: '80',
       },
     ],
     []
@@ -231,6 +244,7 @@ const InquiryType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+  <Loader isLoading={isLoading}/>
     <PageHeader title={t("INQUIRY TYPE")}
       actions={[
         { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },

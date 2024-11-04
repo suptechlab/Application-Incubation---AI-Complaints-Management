@@ -71,8 +71,6 @@ export default function ReactTable({
 
   return (
     <div className="d-flex flex-column h-100 small table-cover-main">
-
-
       <Loader isLoading={isLoading} />
       <BTable striped bordered hover responsive className="mb-0">
         <thead className="fs-15">

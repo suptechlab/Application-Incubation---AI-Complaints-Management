@@ -51,7 +51,8 @@ export const englishLang = {
     "EDIT TEMPLATE MASTER":"Edit Template Master",
     "NAME OF TEMPLATE MASTER":"Name of Template Master",
     "EXPORT TO CSV" : "Export To CSV",
-
+    "CITY NAME" : "City Name",
+    "PROVINCE":"Province",
     // MESSAGES
     "STATUS UPDATED" : "Status updated successfully.",
     "STATUS UPDATE ERROR" : "Error in  updating status",

@@ -8,26 +8,30 @@ import { useNavigate } from "react-router-dom";
 import ReactSelect from "../../../components/ReactSelect";
 import { validationSchema } from "../../../validations/cityMaster.validation";
 import { useTranslation } from "react-i18next";
+import { editCity } from "../../../services/cityMaster.service";
 
-const Edit = ({ modal, toggle }) => {
+const Edit = ({ modal, toggle, provinces, dataQuery, rowData }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const handleSubmit = async (values) => {
-    console.log("values::", values);
-    toast.success("City master added successfully.");
-
-    // handleAddDistrict(values).then(response => {
-    //     console.log("Add District::", response);
-    //     toast.success(response.data.message);
-    //     navigate("/districts");
-    // }).catch((error) => {
-    //     if(error.response.data.fieldErrors){
-    //         toast.error(error.response.data.fieldErrors[0].message);
-    //     }else{
-    //         toast.error(error.response.data.detail);
-    //     }
-    // });
-  };
+  const handleSubmit = async (values, actions) => {
+    const formData = {
+      name: values?.name ?? "",
+      provinceId: values?.provinceId ?? "",
+    }
+    editCity(rowData?.id, formData).then(response => {
+      toast.success(response?.data?.message);
+      dataQuery.refetch()
+      toggle()
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message);
+      }
+    }).finally(() => {
+      actions.setSubmitting(false);
+    });
+  }
 
   return (
     <Modal
@@ -48,11 +52,11 @@ const Edit = ({ modal, toggle }) => {
       </Modal.Header>
       <Formik
         initialValues={{
-          cityName: "",
-          province: "",
+          name: rowData?.name,
+          provinceId: rowData?.provinceId,
         }}
         onSubmit={(values, actions) => {
-          actions.setSubmitting(false);
+          actions.setSubmitting(true);
           handleSubmit(values, actions);
         }}
         validationSchema={validationSchema}
@@ -66,45 +70,36 @@ const Edit = ({ modal, toggle }) => {
           touched,
           isValid,
           errors,
+          isSubmitting
         }) => (
           <Form>
             <Modal.Body className="text-break py-0">
               <FormInput
-                error={errors.cityName}
-                id="cityName"
-                key={"cityName"}
+                error={errors?.name}
+                id="name"
+                key={"name"}
                 label={t("NAME OF THE CITY")}
-                name="cityName"
+                name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 // placeholder="Enter district name"
-                touched={touched.cityName}
+                touched={touched?.name}
                 type="text"
-                value={values.cityName || ""}
+                value={values?.name || ""}
               />
               <ReactSelect
-                error={errors?.province}
-                options={[
-                  {
-                    value: 1,
-                    label: "Azuay",
-                  },
-                  {
-                    value: 2,
-                    label: "Bolivar",
-                  },
-                ]}
-                value={values?.province}
+                error={errors?.provinceId}
+                options={provinces ?? []}
+                value={values?.provinceId}
                 onChange={(option) => {
                   setFieldValue("province", option?.target?.value ?? "");
                 }}
                 name="province"
                 label={t("PROVINCE")}
-                className={`${
-                  touched?.province && errors?.province ? "is-invalid" : ""
-                } mb-3 pb-1`}
+                className={`${touched?.provinceId && errors?.provinceId ? "is-invalid" : ""
+                  } mb-3 pb-1`}
                 onBlur={handleBlur}
-                touched={touched?.province}
+                touched={touched?.provinceId}
               />
             </Modal.Body>
             <Modal.Footer className="pt-0">
@@ -120,7 +115,7 @@ const Edit = ({ modal, toggle }) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
+                disabled={isSubmitting ?? false}
               >
                 {t("SUBMIT")}
               </Button>
