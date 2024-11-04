@@ -26,9 +26,10 @@ export const NavItems = () => {
           id: 21,
           menuName: t("SEPS Users"),
           title: t("SEPS Users"),
-          path: "/seps-users",
-          roleName: "admin",
-          disabled: true,
+          path: "/users",
+          roleName: "user",
+          disabled: false,
+
         },
         {
           id: 22,
@@ -126,6 +127,24 @@ export const NavItems = () => {
     },
     {
       id: 5,
+      menuName: t("ROLES AND RIGHTS LIST"),
+      title: t("ROLES AND RIGHTS LIST"),
+      menuIcon: <MdSupervisorAccount size={20} />,
+      path: "/role-rights",
+      disabled: false,
+      roleName: "RoleRights"
+    },
+    {
+      id: 6,
+      menuName: t("USERS"),
+      title: t("USERS"),
+      menuIcon: <MdSupervisorAccount size={20} />,
+      path: "/users",
+      disabled: false,
+      roleName: "users"
+    },
+    {
+      id: 7,
       menuName: t("Tickets"),
       title: t("Tickets"),
       menuIcon: <MdConfirmationNumber size={20} />,
@@ -134,7 +153,7 @@ export const NavItems = () => {
       disabled: true,
     },
     {
-      id: 6,
+      id: 8,
       menuName: t("Ticket Workflow"),
       title: t("Ticket Workflow"),
       menuIcon: <MdSchema size={20} />,

@@ -1,7 +1,7 @@
 import instance from "../utils/instance";
 
 export const handleGetUsers = async (params) => {
-    return await instance.get('/v1/admin/users', {
+    return await instance.get('/v1/claim-sub-types', {
         params
     });
 }

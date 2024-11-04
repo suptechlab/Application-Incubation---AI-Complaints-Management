@@ -108,7 +108,7 @@ import "./sidebar.scss"
                         <span className="py-1 text-center min-w-44 sidebarIcon">
                           {menuIcon}
                         </span>
-                        <span className="hideInSmallSidebar text-wrap lh-sm">{title}</span>
+                        <span className="hideInSmallSidebar text-wrap lh-sm">{title}</span> 
                       </Nav.Link>
                     ) : ''}
                     {permission.current.isAdmin || permission.current.list.includes(roleName) ? subMenu && (

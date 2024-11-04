@@ -34,6 +34,14 @@ export const englishLang = {
     "CREATE INQUIRY TYPE": "Create Inquiry Type",
     "EDIT INQUIRY TYPE": "Edit Inquiry Type",
     "INQUIRY SUB TYPE": "Inquiry Sub Type",
+    "PROVINCE MASTER":"Province Master",
+    "CITY MASTER":"City Master",
+    "TEMPLATE MASTER" : "Template Master",
+
+    // Portal Users Management
+    "USERS" : "Users",
+    "USERS LIST" : "Users List",
+    
     "INQUIRY SUB CATEGORY": "Inquiry Sub Category",
     "INQUIRY CATEGORY": "Inquiry Category",
     "CREATE SUB INQUIRY TYPE": "Create Sub Inquiry Type",
@@ -55,6 +63,6 @@ export const englishLang = {
     // MESSAGES
     "STATUS UPDATED" : "Status updated successfully.",
     "STATUS UPDATE ERROR" : "Error in  updating status",
-    "SUB-CLAIM" : "Sub-claim"
+    "SUB-CLAIM" : "Sub-claim",
 
 }

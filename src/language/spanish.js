@@ -11,6 +11,10 @@ export const spanishLang = {
     "PROVINCE MASTER": "Maestro de Provincia",
     "CITY MASTER": "Maestro de Ciudad",
     "TEMPLATE MASTER": "Maestro de Plantillas",
+
+    // Portal Users Management
+    "USERS" : "Lista",
+    "USERS LIST" : "Lista funciones",
     "ADD NEW": "Agregar Nuevo",
     "SEARCH": "Buscar",
     "ALL STATUS": "Todos los Estados",
@@ -50,6 +54,6 @@ export const spanishLang = {
     "EDIT TEMPLATE MASTER": "Editar maestro de plantillas",
     "NAME OF TEMPLATE MASTER": "Nombre del maestro de plantillas",
 
-    "STATUS UPDATED" : "Estado actualizado con éxito."
+    "STATUS UPDATED" : "Estado actualizado con éxito.",
 
 }
