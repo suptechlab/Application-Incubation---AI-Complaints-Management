@@ -35,7 +35,8 @@ const Home = () => {
                       <Button
                         type="button"
                         variant="warning"
-                        className="text-uppercase w-100 text-nowrap"
+                        className="text-uppercase w-100 text-nowrap fw-bold text-body"
+                        size="lg"
                       >
                         <span aria-hidden={true} className="me-1">
                           <MdEditDocument size={17} />
@@ -46,11 +47,12 @@ const Home = () => {
                     <Col>
                       <Button
                         type="button"
-                        variant="warning"
-                        className="text-uppercase w-100 text-nowrap"
+                        variant="outline-dark"
+                        className="text-uppercase w-100 text-nowrap fw-bold bg-white border-white text-body"
+                        size="lg"
                       >
                         <span aria-hidden={true} className="me-1">
-                          {SvgIcons.robotIcon}
+                          {SvgIcons.RobotIcon()}
                         </span>
                         <span className="align-middle">Inquiry</span>
                       </Button>
