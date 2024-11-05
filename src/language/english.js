@@ -38,7 +38,10 @@ export const englishLang = {
     "PROVINCE MASTER":"Province Master",
     "CITY MASTER":"City Master",
     "TEMPLATE MASTER" : "Template Master",
-
+    "TEAM MANAGEMENT": "Team Management",
+    "MASTER MANAGEMENT": "Master Management",
+    "TICKETS": "Tickets",
+    "TICKET WORKFLOW": "Ticket Workflow",
     // Portal Users Management
     "USERS" : "Users",
     "USERS LIST" : "Users List",
@@ -61,12 +64,10 @@ export const englishLang = {
     "EXPORT TO CSV" : "Export To CSV",
     "CITY NAME" : "City Name",
     "SUB-CLAIM" : "Sub-claim",
-    // NEW
     "PROVINCE NAME":"Province Name",
     // MESSAGES
     "STATUS UPDATED" : "Status updated successfully.",
     "STATUS UPDATE ERROR" : "Error in  updating status",
-    // NEW
     "EXPORT IN PROGRESS" : "Export in progress... Please wait.",
     "CSV DOWNLOADED" : "CSV file downloaded successfully.",
     "EMPTY RESPONSE":"Response data is empty."

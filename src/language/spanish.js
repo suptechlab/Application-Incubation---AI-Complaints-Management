@@ -13,8 +13,8 @@ export const spanishLang = {
     "TEMPLATE MASTER": "Maestro de Plantillas",
 
     // Portal Users Management
-    "USERS" : "Lista",
-    "USERS LIST" : "Lista funciones",
+    "USERS": "Lista",
+    "USERS LIST": "Lista funciones",
     "ADD NEW": "Agregar Nuevo",
     "SEARCH": "Buscar",
     "ALL STATUS": "Todos los Estados",
@@ -32,13 +32,17 @@ export const spanishLang = {
     "SLA BREACH DAY": "Días de Incumplimiento del SLA",
     "CANCEL": "Cancelar",
     "SUBMIT": "Enviar",
-    "EDIT":"Editar",
+    "EDIT": "Editar",
     "EDIT CLAIM SUB TYPE": "Editar Subtipo de Reclamación",
     "INQUIRY CATEGORY": "Categoría de Consulta",
     "NAME OF INQUIRY": "Nombre de la Consulta",
     "CREATE INQUIRY TYPE": "Crear Tipo de Consulta",
     "EDIT INQUIRY TYPE": "Editar Tipo de Consulta",
     "INQUIRY SUB TYPE": "Subtipo de Consulta",
+    "TEAM MANAGEMENT": "Gestión de Equipo",
+    "MASTER MANAGEMENT": "Gestión Maestra",
+    "TICKETS": "Tickets",
+    "TICKET WORKFLOW": "Flujo de Trabajo de Tickets",
     "INQUIRY SUB CATEGORY": "Subcategoría de Consulta",
     "CREATE SUB INQUIRY TYPE": "Crear Subtipo de Consulta",
     "NAME OF INQUIRY SUB TYPE": "Nombre del Subtipo de Consulta",
@@ -57,7 +61,11 @@ export const spanishLang = {
     "EXPORT TO CSV": "Exportar a CSV",
     "CITY NAME": "Nombre de la Ciudad",
     "SUB-CLAIM": "Subreclamación",
-    // MESSAGES
-    "STATUS UPDATED": "Estado actualizado correctamente.",
-    "STATUS UPDATE ERROR": "Error al actualizar el estado",
+    // MESSAGE
+    "PROVINCE NAME": "Nombre de la Provincia",
+    "STATUS UPDATED": "Estado actualizado con éxito.",
+    "STATUS UPDATE ERROR": "Error al actualizar el estado.",
+    "EXPORT IN PROGRESS": "Exportación en curso... Por favor, espere.",
+    "CSV DOWNLOADED": "Archivo CSV descargado con éxito.",
+    "EMPTY RESPONSE": "Los datos de la respuesta están vacíos."
 }
