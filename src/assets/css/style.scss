@@ -6,6 +6,7 @@
 @include custom-class('width', 64);
 @include custom-class('height', 64);
 @include custom-class('min-height', 70);
+@include custom-class('min-width', 100);
 @include custom-class('width', 400);
 
 // Bootstrap Custom CSS
@@ -187,6 +188,10 @@ input:-webkit-autofill:active {
     }
 }
 
-.help-desk-button{
+.help-desk-button {
     bottom: 4.5rem;
+}
+
+.react-select__menu-portal {
+    z-index: 1056 !important;
 }

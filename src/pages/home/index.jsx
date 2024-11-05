@@ -1,13 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Card, Col, Container, Image, Row } from "react-bootstrap";
 import { MdEditDocument } from "react-icons/md";
 import homeBg from "../../assets/images/home-bg.jpg";
+import Loader from "../../components/Loader";
 import SvgIcons from "../../components/SVGIcons";
 import BrandSection from "./brandSection";
+import PrivacyModal from "../auth/privacy";
 
 const Home = () => {
+  const [privacyModalShow, setPrivacyModalShow] = useState(false);
+
+  //Handle Privacy Modal
+  const handlePrivacyClick = () => {
+    setPrivacyModalShow(true);
+  };
+
   return (
     <React.Fragment>
+      <Loader isLoading={false} />
       <div className="d-flex flex-column flex-grow-1 position-relative w-100 z-1">
         <Image
           src={homeBg}
@@ -37,6 +47,7 @@ const Home = () => {
                         variant="warning"
                         className="text-uppercase w-100 text-nowrap fw-bold text-body"
                         size="lg"
+                        onClick={handlePrivacyClick}
                       >
                         <span aria-hidden={true} className="me-1">
                           <MdEditDocument size={17} />
@@ -65,6 +76,11 @@ const Home = () => {
         </Container>
       </div>
       <BrandSection />
+
+      <PrivacyModal
+        handleShow={privacyModalShow}
+        handleClose={() => setPrivacyModalShow(false)}
+      />
     </React.Fragment>
   );
 };

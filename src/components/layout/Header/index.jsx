@@ -14,15 +14,27 @@ import "./header.scss";
 
 const Header = () => {
   let expand = "md";
+
+  // Menu Links
+  const menuLinks = [
+    {
+      label: "Menu 1",
+      path: "/menu-1",
+    },
+    {
+      label: "Menu 2",
+      path: "/menu-2",
+    },
+    {
+      label: "Menu 3",
+      path: "/menu-3",
+    },
+  ];
+
   return (
     <header className="theme-header">
-      <Navbar
-        key={expand}
-        expand={expand}
-        className="bg-body-tertiary py-0"
-      >
-        <Container className="custom-min-height-70">         
-
+      <Navbar key={expand} expand={expand} className="bg-body-tertiary py-0">
+        <Container className="custom-min-height-70">
           <Navbar.Brand as={Link} href="/" className="me-auto px-1">
             <Image fluid src={Logo} alt="Logo" width={258} height={55} />
           </Navbar.Brand>
@@ -33,21 +45,25 @@ const Header = () => {
             placement="end"
           >
             <Offcanvas.Header closeButton className="bg-body-tertiary">
-              <Offcanvas.Title id={`headerNavbarLabel-expand-${expand}`} className="fw-semibold">
+              <Offcanvas.Title
+                id={`headerNavbarLabel-expand-${expand}`}
+                className="fw-semibold"
+              >
                 Menu
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="justify-content-end align-items-md-center flex-grow-1 header-menu-links">
-                <Nav.Link as={NavLink} to="/menu-1" className="mx-md-3">
-                  Menu 1
-                </Nav.Link>
-                <Nav.Link as={NavLink} to="/menu-2" className="mx-md-3">
-                  Menu 2
-                </Nav.Link>
-                <Nav.Link as={NavLink} to="/menu-3" className="mx-md-3">
-                  Menu 3
-                </Nav.Link>
+                {menuLinks.map((link, index) => (
+                  <Nav.Link
+                    as={NavLink}
+                    to={link.path}
+                    className="mx-md-3"
+                    key={"menu_link_" + index}
+                  >
+                    {link.label}
+                  </Nav.Link>
+                ))}
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
@@ -70,7 +86,9 @@ const Header = () => {
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="shadow border-0 mt-3">
-              <Dropdown.Header className="fw-semibold d-md-none">Alex Boston</Dropdown.Header>
+              <Dropdown.Header className="fw-semibold d-md-none">
+                Alex Boston
+              </Dropdown.Header>
               <Dropdown.Item as={Link} to="/profile" disabled>
                 Profile
               </Dropdown.Item>
