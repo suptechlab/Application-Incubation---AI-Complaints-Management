@@ -123,7 +123,7 @@ const InquiryType = () => {
   // HANDLE INQUIRY TYPES CSV DOWNLOAD
   const handleDownload = () => {
     setDownloading(true)
-    toast.loading( "Export in progress... Please wait." , {id: "downloading" , isLoading : isDownloading})
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadInquiryTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -144,9 +144,9 @@ const InquiryType = () => {
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
 
-        toast.success("CSV file downloaded successfully.",{id: "downloading"})
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
       } else {
-        throw new Error('Response data is empty.');
+        throw new Error(t("EMPTY RESPONSE"));
       }
       // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
@@ -180,7 +180,7 @@ const InquiryType = () => {
         accessorFn: (row) => row?.description != null ? row?.description : '-',
         id: "description",
         header: () => t("DESCRIPTION"),
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -214,7 +214,7 @@ const InquiryType = () => {
                 name: "edit",
                 enabled: permission.current.editModule,
                 type: "button",
-                title: "Edit",
+                title: t("EDIT"),
                 icon: <MdEdit size={18} />,
                 handler: () => editInquiryType(rowData?.row?.original),
               },
@@ -247,7 +247,7 @@ const InquiryType = () => {
   <Loader isLoading={isLoading}/>
     <PageHeader title={t("INQUIRY TYPE")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
+        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" ,disabled : isDownloading },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]} />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">

@@ -133,13 +133,13 @@ const ClaimType = () => {
   // DOWNLOAD CLAIM TYPES LIST
   const handleDownload = () => {
     setDownloading(true)
-    toast.loading( "Export in progress... Please wait." , {id: "downloading" , isLoading : isDownloading})
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadClaimTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const blobUrl = window.URL.createObjectURL(blob);
 
-        toast.success("CSV file downloaded successfully.",{id: "downloading"})
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
 
 
         const tempLink = document.createElement('a');
@@ -157,7 +157,7 @@ const ClaimType = () => {
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
       } else {
-        throw new Error('Response data is empty.');
+        throw new Error(t("EMPTY RESPONSE"));
       }
       // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
@@ -227,7 +227,7 @@ const ClaimType = () => {
                 name: "edit",
                 enabled: permission.current.editModule,
                 type: "button",
-                title: "Edit",
+                title: t("EDIT"),
                 icon: <MdEdit size={18} />,
                 handler: () => editClaimType(rowData?.row?.original),
               },

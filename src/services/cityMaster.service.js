@@ -29,7 +29,7 @@ export const changeCityStatus = async (id, status) => {
 
 // EXPORT CITY MASTER LIST
 export const downloadCityList = async ({ params }) => {
-  return await instance.get('/v1/cities', { params, responseType: 'arraybuffer' });
+  return await instance.get('/v1/cities/download', { params, responseType: 'arraybuffer' });
 }
 
 // GET PROVINCE DROPDOWN DATA 

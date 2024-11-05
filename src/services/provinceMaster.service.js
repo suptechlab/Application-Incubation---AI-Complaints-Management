@@ -1,6 +1,5 @@
 import instance from "../utils/instance";
 
-
 // GET ALL PROVINCE MASTER
 export const handleGetProvinceMaster = async (params) => {
   return await instance.get('/v1/provinces', {
@@ -30,5 +29,5 @@ export const changeProvinceMasterStatus = async (id, status) => {
 
 // EXPORT PROVINCE MASTER LIST
 export const downloadProvinceMasterList = async (params) => {
-  return await instance.get('/v1/provinces', { params, responseType: 'arraybuffer' });
+  return await instance.get('/v1/provinces/download', { params, responseType: 'arraybuffer' });
 }

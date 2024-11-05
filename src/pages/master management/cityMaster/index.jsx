@@ -26,7 +26,9 @@ const CityMaster = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const [isLoading , setLoading] = useState(false)
+  const [isDownloading, setDownloading] = useState(false)
+
+  const [isLoading, setLoading] = useState(false)
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
@@ -133,7 +135,7 @@ const CityMaster = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
-    }).finally(()=>{
+    }).finally(() => {
       setLoading(false)
     })
   };
@@ -198,7 +200,7 @@ const CityMaster = () => {
                 name: "edit",
                 enabled: permission.current.editModule,
                 type: "button",
-                title: "Edit",
+                title: t("EDIT"),
                 icon: <MdEdit size={18} />,
                 handler: () => editCityMaster(rowData?.row?.original),
               },
@@ -222,6 +224,8 @@ const CityMaster = () => {
 
   // EXPORT TO CSV CLICK HANDLER
   const exportHandler = () => {
+    setDownloading(true)
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadCityList({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -241,8 +245,9 @@ const CityMaster = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
       } else {
-        throw new Error('Response data is empty.');
+        throw new Error(t("EMPTY RESPONSE"));
       }
       // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
@@ -251,7 +256,12 @@ const CityMaster = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
-    })
+      toast.dismiss("downloading");
+    }).finally(() => {
+      // Ensure the loading toast is dismissed
+      // toast.dismiss("downloading");
+      setDownloading(false)
+    });
   }
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
@@ -287,15 +297,11 @@ const CityMaster = () => {
 
   return (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <Loader isLoading={isLoading}/>
+      <Loader isLoading={isLoading} />
       <PageHeader
         title={t("CITY MASTER")}
         actions={[
-          {
-            label: "Export to CSV",
-            onClick: exportHandler,
-            variant: "outline-dark",
-          },
+          {  label: "Export to CSV", onClick: exportHandler, variant: "outline-dark",disabled : isDownloading ?? false},
           { label: "Add New", onClick: toggle, variant: "warning" },
         ]}
       />

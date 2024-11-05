@@ -21,8 +21,9 @@ const ProvinceMaster = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  
+
   const [isLoading, setLoading] = useState(false)
+  const [isDownloading, setDownloading] = useState(false)
   const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
@@ -118,7 +119,7 @@ const ProvinceMaster = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
-    }).finally(()=>{
+    }).finally(() => {
       setLoading(false)
     })
   };
@@ -137,7 +138,7 @@ const ProvinceMaster = () => {
       {
         accessorFn: (row) => row?.name,
         id: "name",
-        header: () => t("Province Name"),
+        header: () => t("PROVINCE NAME"),
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -173,7 +174,7 @@ const ProvinceMaster = () => {
                 name: "edit",
                 enabled: permission.current.editModule,
                 type: "button",
-                title: "Edit",
+                title:t("EDIT"),
                 icon: <MdEdit size={18} />,
                 handler: () => editProvinceMaster(rowData?.row?.original),
               },
@@ -197,6 +198,8 @@ const ProvinceMaster = () => {
 
   // HANDLE PROVINCE MASTER EXPORT
   const exportHandler = () => {
+    setDownloading(true)
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadProvinceMasterList({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -216,8 +219,9 @@ const ProvinceMaster = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
       } else {
-        throw new Error('Response data is empty.');
+        throw new Error(t("EMPTY RESPONSE"));
       }
       // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
@@ -226,7 +230,12 @@ const ProvinceMaster = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
-    })
+      toast.dismiss("downloading");
+    }).finally(() => {
+      // Ensure the loading toast is dismissed
+      // toast.dismiss("downloading");
+      setDownloading(false)
+    });
   }
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
@@ -234,7 +243,7 @@ const ProvinceMaster = () => {
     <PageHeader
       title={t("PROVINCE MASTER")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark" },
+        { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
     />
