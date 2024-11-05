@@ -8,7 +8,7 @@ const PrivateRoute = ({ element }) => {
 
 
     // CHANGE CONDITION HERE TO if(isAuthenticated) FOR NOW I'VE BYPASS LOGIN
-    if (!isAuthenticated) {
+    if (isAuthenticated) {
         return element;
     } else {
         return <Navigate to='/login' replace />;

@@ -43,14 +43,16 @@ export default function AuthenticationProvider({ children }) {
     const login = async (data) => {
         const username = data.username
         return handleLogin(data).then((response) => {
-            console.log('44',response)
-            toast.success(response.data.message);
+            console.log('success',response?.data?.otpToken)
+            const otpToken = response?.data?.otpToken;
+            //toast.success(response.data.message);
             //setLocalStorage("access_token", response.data.tokens.access.token)
             //setLocalStorage("refresh_token", response.data.tokens.refresh.token)
             setIsAuthenticated(true)
-            navigate("/otp",{ state: {username}})
+            navigate("/otp",{ state: {username, otpToken}})
         }).catch((error) => {
-            toast.error(error.response.data.detail);
+            console.log('error 53->',error)
+            toast.error(error.response.data.errorDescription);
         })
     }
 
@@ -58,21 +60,22 @@ export default function AuthenticationProvider({ children }) {
         
         return handleVerifyOtp(data).then((response) => {
             console.log('otp verify 60',response)
-            toast.success(response.data.message);
-            console.log('response.data.jwt.accessToken:', response.data.data);
-            if (response.data.data.jwt) {
-                setLocalStorage("access_token", response.data.data.jwt.accessToken);
-                setLocalStorage("refresh_token", response.data.data.jwt.refreshToken);
+            //toast.success(response.data.message);
+            console.log('accessToken:', response.data);
+            if (response.data.id_token) {
+                setLocalStorage("access_token", response.data.id_token);
+                setLocalStorage("refresh_token", response.data.id_token);
                 setIsAuthenticated(true);
+                
                 handleGetAccountDetail().then((accountResponse)=>{
                     console.log("Account Detail:::", accountResponse);
-                    setLocalStorage("imageUrl", accountResponse.data.data?.imageUrl);
-                    setLocalStorage("firstName", accountResponse.data.data?.firstName);
-                    setLocalStorage("lastName", accountResponse.data.data?.lastName);
-                    setLocalStorage("companyTitle", accountResponse.data.data?.companyTitle);
+                    setLocalStorage("imageUrl", accountResponse.data?.imageUrl);
+                    setLocalStorage("firstName", accountResponse.data?.firstName);
+                    setLocalStorage("lastName", accountResponse.data?.lastName);
+                    setLocalStorage("companyTitle", '');
                     
-                    const authorities = accountResponse.data.data.authorities;
-                    const role = accountResponse.data.data.role;
+                    const authorities = accountResponse.data?.authorities;
+                    const role = 'ROLE_ADMIN' //accountResponse.data?.role;
                     setLocalStorage("user_type", authorities);
                     if(!authorities.includes("ROLE_ADMIN")){
                         const roleMap = role.modules.reduce((acc, module) => {
@@ -81,17 +84,17 @@ export default function AuthenticationProvider({ children }) {
                         }, {});
                         setLocalStorage("user_roles", roleMap);
                     }
-                    navigate("/");  
+                    navigate("/dashboard");  
                 }).catch((error) => {
                     toast.error(error);
                 });
             } else {
-                console.error('JWT tokens are missing in the response');
-                toast.error('JWT tokens are missing in the response');
+                console.error('Tokens are missing in the response');
+                toast.error('Tokens are missing in the response');
             }
             
         }).catch((error) => {
-            toast.error(error.response.data.detail);
+            toast.error(error.response.data.errorDescription);
         })
     }
 
