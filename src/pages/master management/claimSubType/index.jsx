@@ -181,13 +181,13 @@ const ClaimSubType = () => {
         accessorFn: (row) => row?.claimTypeName,
         id: "claimTypeName",
         header: () => t("CLAIM TYPE"),
-        enableSorting: true
+        enableSorting: true,
       },
       {
         accessorFn: (row) => row?.slaBreachDays,
         id: "slaBreachDays",
         header: () => t("SLA BREACH"),
-        enableSorting: true
+        enableSorting: true,
       },
       {
         accessorFn: (row) => row.description != null ? row.description : '-',

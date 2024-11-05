@@ -17,7 +17,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     const imageUrl = JSON.parse(localStorage.getItem("imageUrl"));
     const firstName = JSON.parse(localStorage.getItem("firstName"));
     const lastName = JSON.parse(localStorage.getItem("lastName"));
-    const companyTitle = JSON.parse(localStorage.getItem("companyTitle"));
+    // const companyTitle = JSON.parse(localStorage.getItem("companyTitle"));
+    const companyTitle = '';
     const [notificationsCount, setNotificationsCount] = useState({
         count: 0
     });

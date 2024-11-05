@@ -16,9 +16,12 @@ export default function Otp() {
     const { login, OtpVerify } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
     const [username, setUsername] = useState(location?.state?.username ? location?.state?.username : 'admin@yopmail.com');
+    const [otpToken, setOtpToken] = useState(location?.state?.otpToken ? location?.state?.otpToken : '');
+
 
     const onSubmit = async (values, actions) => {        
-        values.username = username;
+        //values.username = username;
+        values.otpToken = otpToken;
         console.log('param',values)
         //values.otp = otp;
         await OtpVerify({ ...values });
@@ -29,7 +32,7 @@ export default function Otp() {
     const handleResend = async () => {
         try {
             let data = {
-                'email': username
+                'otpToken': otpToken
             }
             console.log('calling handleResendOTP with data:', data);
             let res = await handleResendOTP(data);
@@ -67,7 +70,7 @@ export default function Otp() {
                                 <p className="text-body opacity-50 mb-4 pb-1 lh-sm">We’ve sent a One-Time Password (OTP) to your email&nbsp;address. Please enter it below to verify.</p>
                                 <Formik
                                     initialValues={{
-                                        otp: ''
+                                        otpCode: ''
                                     }}
                                     validationSchema={OtpValidationSchema}
                                     onSubmit={onSubmit}
@@ -85,7 +88,7 @@ export default function Otp() {
                                         <FormikForm>
                                             <Form.Group className="mb-4 pb-2">
                                                 <OtpInput
-                                                    value={values.otp}
+                                                    value={values.otpCode}
                                                     //onChange={setOtp()}
                                                     numInputs={6}
                                                     inputStyle={{
@@ -102,11 +105,11 @@ export default function Otp() {
                                                     // errorsField={errors?.otp}
                                                     // touched={touched?.otp}
                                                     // handleChange={(event) => { setFieldValue("otp", event?.target?.value) }}
-                                                    onChange={(event) => { setFieldValue("otp", event) }}
+                                                    onChange={(event) => { setFieldValue("otpCode", event) }}
                                                 />
-                                                {errors.otp && touched.otp && (
+                                                {errors.otpCode && touched.otpCode && (
                                                     <div className="invalid-feedback d-block">
-                                                        {errors.otp}
+                                                        {errors.otpCode}
                                                     </div>
                                                 )}
                                             </Form.Group>

@@ -21,6 +21,7 @@ export default function ForgotPassword() {
             toast.error("Please enter the captcha");
             return;
         }
+        values.recaptchaToken = captcha != '' ? captcha : ''
         await handleForgotPassword({ ...values }).then((response) => {
             toast.success(response.data.message)
             actions.resetForm()
@@ -28,7 +29,6 @@ export default function ForgotPassword() {
             //reCaptchaRef.current.reset()
             //setCaptcha("")
         }).catch((error) => {
-            console.log(error.response.data.message)
             toast.error(error.response.data.message);
 
         }).finally(() => {

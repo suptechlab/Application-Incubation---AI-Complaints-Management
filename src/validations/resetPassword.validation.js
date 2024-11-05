@@ -12,9 +12,9 @@ const validationSchema = Yup.object({
     confirmPassword: Yup.string()
         .required("Confirm Password is required.")
         .oneOf([Yup.ref('password'), null], 'Passwords must match'),
-    otp: Yup.string()
-        .required("OTP is required.")
-        .matches(/^\d{6}$/, "OTP max 6 digits and only numbers")
+    // otp: Yup.string()
+    //     .required("OTP is required.")
+    //     .matches(/^\d{6}$/, "OTP max 6 digits and only numbers")
 });
 
 

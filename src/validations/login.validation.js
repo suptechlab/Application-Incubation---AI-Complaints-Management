@@ -14,7 +14,7 @@ const validationSchema = Yup.object({
 // OTP validation
 const OtpValidationSchema = Yup.object().shape({
     //email_type: Yup.string().required('Pleae select email type'),
-    otp: Yup.string()
+    otpCode: Yup.string()
     .required("OTP is required.")
     .matches(/^\d{6}$/, "OTP max 6 digits and only numbers")
   });

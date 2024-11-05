@@ -15,6 +15,7 @@ export default function Login() {
     const [captcha, setCaptcha] = useState("");
     const { login } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
+    
 
     const onSubmit = async (values, actions) => {
         if (captcha === "") {
@@ -26,15 +27,17 @@ export default function Login() {
             localStorage.setItem("email", values.email);
             localStorage.setItem("password", values.password);
             localStorage.setItem("langKey", "en");
+            values.rememberMe = true;
         } else {
+            values.rememberMe = false;
             localStorage.removeItem("email");
             localStorage.removeItem("password");
             localStorage.removeItem("langKey","en");
         }
 
-        delete values.rememberMe;
         values.username = values.email
         values.recaptchaToken = captcha != '' ? captcha : '' 
+        delete values.email;
 
         await login({ ...values });
         reCaptchaRef.current.reset();

@@ -38,9 +38,9 @@ const routes = [
         layoutType: "Auth",
     },
     {
-        path: "/",
-        element: <Login />,
-        isPrivate: false,
+        path: "/dashboard",
+        element: <Dashboard />,
+        isPrivate: true,
         layoutType: "Auth",
     },
     {
@@ -102,6 +102,11 @@ const routes = [
         element: <Login />,
         isPrivate: false,
         layoutType: "Blank",
+
+        // path: "/",
+        // element: <Login />,
+        // isPrivate: false,
+        // layoutType: "Auth",
     },
     {
         path: "/otp",
