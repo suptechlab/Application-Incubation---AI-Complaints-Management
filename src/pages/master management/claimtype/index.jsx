@@ -15,12 +15,17 @@ import { changeClaimTypeStatus, downloadClaimTypes, handleGetClaimTypes } from "
 import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
+import Loader from "../../../components/Loader";
+
 const ClaimType = () => {
 
   const location = useLocation();
   const queryClient = useQueryClient();
 
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+
+  const [isLoading , setLoading] = useState(false)
+  const [isDownloading , setDownloading] = useState(false)
 
   const { t } = useTranslation()
 
@@ -30,7 +35,12 @@ const ClaimType = () => {
   });
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState({ row: {}, open: false })
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([
+    {
+        "id": "name",
+        "desc": true
+    }
+]);
   const [filter, setFilter] = useState({
     search: "",
   });
@@ -104,7 +114,7 @@ const ClaimType = () => {
 
   // STATUS UPDATE FUNCTION
   const changeStatus = async (id, currentStatus) => {
-
+    setLoading(true)
     // await handleEditDistricts(id, { status: !currentStatus });
     changeClaimTypeStatus(id, !currentStatus).then(response => {
       toast.success(t("STATUS UPDATED"));
@@ -115,15 +125,22 @@ const ClaimType = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
+    }).finally(()=>{
+      setLoading(false)
     })
   };
 
   // DOWNLOAD CLAIM TYPES LIST
   const handleDownload = () => {
+    setDownloading(true)
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadClaimTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const blobUrl = window.URL.createObjectURL(blob);
+
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+
 
         const tempLink = document.createElement('a');
         tempLink.href = blobUrl;
@@ -140,7 +157,7 @@ const ClaimType = () => {
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
       } else {
-        throw new Error('Response data is empty.');
+        throw new Error(t("EMPTY RESPONSE"));
       }
       // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
@@ -149,7 +166,12 @@ const ClaimType = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
-    })
+      toast.dismiss("downloading");
+    }).finally(() => {
+      // Ensure the loading toast is dismissed
+      // toast.dismiss("downloading");
+      setDownloading(false)
+    });
   }
 
   useEffect(() => {
@@ -173,7 +195,7 @@ const ClaimType = () => {
         accessorFn: (row) => row?.description != null ? row?.description : '-',
         id: "description",
         header: () => t("DESCRIPTION"),
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         cell: (info) => {
@@ -205,7 +227,7 @@ const ClaimType = () => {
                 name: "edit",
                 enabled: permission.current.editModule,
                 type: "button",
-                title: "Edit",
+                title: t("EDIT"),
                 icon: <MdEdit size={18} />,
                 handler: () => editClaimType(rowData?.row?.original),
               },
@@ -236,15 +258,12 @@ const ClaimType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    {/* <PageHeader title={t("CLAIM TYPE")} toggle={toggle} download={handleDownload} /> */}
+  <Loader isLoading={isLoading}/>
     <PageHeader
       title={t("CLAIM TYPE")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
+        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" , disabled : isDownloading },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
-        // { label: "Help", to: "/help", variant: "outline-dark" },
-        // { label: "Learn More", onClick: handleAdd, variant: "primary" },
-
       ]}
     />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
@@ -260,7 +279,6 @@ const ClaimType = () => {
         />
       </Card.Body>
     </Card>
-
     <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
     <Edit modal={editModal?.open} dataQuery={dataQuery} toggle={editToggle} rowData={editModal?.row} />
   </div>

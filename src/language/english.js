@@ -28,6 +28,7 @@ export const englishLang = {
     "SLA BREACH DAY": "SLA Breach Days",
     "CANCEL": "Cancel",
     "SUBMIT": "Submit",
+    "EDIT":"Edit",
     "EDIT CLAIM SUB TYPE": "Edit Claim Sub Type",
     "INQUIRY CATEGORY": "Inquiry Category",
     "NAME OF INQUIRY": "Name of Inquiry",
@@ -43,7 +44,6 @@ export const englishLang = {
     "USERS LIST" : "Users List",
     
     "INQUIRY SUB CATEGORY": "Inquiry Sub Category",
-    "INQUIRY CATEGORY": "Inquiry Category",
     "CREATE SUB INQUIRY TYPE": "Create Sub Inquiry Type",
     "NAME OF INQUIRY SUB TYPE": "Name of Inquiry Sub Type",
     "EDIT SUB INQUIRY TYPE": "Edit Sub Inquiry Type",
@@ -59,10 +59,15 @@ export const englishLang = {
     "EDIT TEMPLATE MASTER":"Edit Template Master",
     "NAME OF TEMPLATE MASTER":"Name of Template Master",
     "EXPORT TO CSV" : "Export To CSV",
-
+    "CITY NAME" : "City Name",
+    "SUB-CLAIM" : "Sub-claim",
+    // NEW
+    "PROVINCE NAME":"Province Name",
     // MESSAGES
     "STATUS UPDATED" : "Status updated successfully.",
     "STATUS UPDATE ERROR" : "Error in  updating status",
-    "SUB-CLAIM" : "Sub-claim",
-
+    // NEW
+    "EXPORT IN PROGRESS" : "Export in progress... Please wait.",
+    "CSV DOWNLOADED" : "CSV file downloaded successfully.",
+    "EMPTY RESPONSE":"Response data is empty."
 }
