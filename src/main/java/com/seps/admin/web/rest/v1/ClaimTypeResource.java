@@ -3,7 +3,9 @@ package com.seps.admin.web.rest.v1;
 import com.seps.admin.service.ClaimTypeService;
 import com.seps.admin.service.dto.ClaimTypeDTO;
 import com.seps.admin.service.dto.DropdownListDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -35,8 +37,9 @@ public class ClaimTypeResource {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseStatus> addClaimType(@RequestBody ClaimTypeDTO claimTypeDTO) throws URISyntaxException {
-        Long id = claimTypeService.addClaimType(claimTypeDTO);
+    public ResponseEntity<ResponseStatus> addClaimType(@RequestBody ClaimTypeDTO claimTypeDTO, HttpServletRequest request) throws URISyntaxException {
+        RequestInfo requestInfo = new RequestInfo(request);
+        Long id = claimTypeService.addClaimType(claimTypeDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.type.created.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.CREATED.value(),
@@ -47,8 +50,9 @@ public class ClaimTypeResource {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseStatus> updateClaimType(@PathVariable Long id, @RequestBody ClaimTypeDTO claimTypeDTO) {
-        claimTypeService.updateClaimType(id, claimTypeDTO);
+    public ResponseEntity<ResponseStatus> updateClaimType(@PathVariable Long id, @RequestBody ClaimTypeDTO claimTypeDTO, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        claimTypeService.updateClaimType(id, claimTypeDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.type.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -70,8 +74,9 @@ public class ClaimTypeResource {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status) {
-        claimTypeService.changeStatus(id, status);
+    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        claimTypeService.changeStatus(id, status, requestInfo);
         return ResponseEntity.noContent().build();
     }
 
@@ -80,11 +85,12 @@ public class ClaimTypeResource {
         ByteArrayInputStream in = claimTypeService.listClaimTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=claim-types.xlsx");
-
-        return ResponseEntity.ok()
-            .headers(headers)
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(in.readAllBytes());
+        try(in) {
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(in.readAllBytes());
+        }
     }
 
     @GetMapping("/dropdown-list")

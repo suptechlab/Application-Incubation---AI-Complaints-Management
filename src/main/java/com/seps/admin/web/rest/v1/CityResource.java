@@ -2,6 +2,7 @@ package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.service.CityService;
 import com.seps.admin.service.dto.CityDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -45,8 +47,9 @@ public class CityResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
-    public ResponseEntity<ResponseStatus> addCity(@RequestBody CityDTO cityDTO) throws URISyntaxException {
-        Long id = cityService.addCity(cityDTO);
+    public ResponseEntity<ResponseStatus> addCity(@RequestBody CityDTO cityDTO, HttpServletRequest request) throws URISyntaxException {
+        RequestInfo requestInfo = new RequestInfo(request);
+        Long id = cityService.addCity(cityDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("city.created.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.CREATED.value(),
@@ -61,8 +64,9 @@ public class CityResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseStatus> updateCity(@PathVariable Long id, @RequestBody CityDTO cityDTO) {
-        cityService.updateCity(id, cityDTO);
+    public ResponseEntity<ResponseStatus> updateCity(@PathVariable Long id, @RequestBody CityDTO cityDTO, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        cityService.updateCity(id, cityDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("city.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -96,8 +100,9 @@ public class CityResource {
     @Operation(summary = "Change the status of a City", description = "Update the status of a city to active or inactive")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status) {
-        cityService.changeStatus(id, status);
+    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        cityService.changeStatus(id, status, requestInfo);
         return ResponseEntity.noContent().build();
     }
 
@@ -110,10 +115,11 @@ public class CityResource {
         ByteArrayInputStream in = cityService.listCitiesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=cities.xlsx");
-
-        return ResponseEntity.ok()
-            .headers(headers)
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(in.readAllBytes());
+        try (in) {
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(in.readAllBytes());
+        }
     }
 }

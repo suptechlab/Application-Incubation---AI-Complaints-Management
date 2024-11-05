@@ -3,6 +3,7 @@ package com.seps.admin.web.rest.v1;
 import com.seps.admin.service.ProvinceService;
 import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.ProvinceDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -46,8 +48,9 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
-    public ResponseEntity<ResponseStatus> addProvince(@RequestBody ProvinceDTO provinceDTO) throws URISyntaxException {
-        Long id = provinceService.addProvince(provinceDTO);
+    public ResponseEntity<ResponseStatus> addProvince(@RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) throws URISyntaxException {
+        RequestInfo requestInfo = new RequestInfo(request);
+        Long id = provinceService.addProvince(provinceDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("province.created.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.CREATED.value(),
@@ -62,8 +65,9 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseStatus> updateProvince(@PathVariable Long id, @RequestBody ProvinceDTO provinceDTO) {
-        provinceService.updateProvince(id, provinceDTO);
+    public ResponseEntity<ResponseStatus> updateProvince(@PathVariable Long id, @RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        provinceService.updateProvince(id, provinceDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("province.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -97,8 +101,9 @@ public class ProvinceResource {
     @Operation(summary = "Change the status of a Province", description = "Update the status of a province (active/inactive).")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status) {
-        provinceService.changeStatus(id, status);
+    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        provinceService.changeStatus(id, status, requestInfo);
         return ResponseEntity.noContent().build();
     }
 
@@ -112,10 +117,12 @@ public class ProvinceResource {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=provinces.xlsx");
 
-        return ResponseEntity.ok()
-            .headers(headers)
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(in.readAllBytes());
+        try (in) {
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(in.readAllBytes());
+        }
     }
 
     @Operation(summary = "Get active Provinces for dropdown", description = "Retrieve a list of active provinces for dropdown selection.")

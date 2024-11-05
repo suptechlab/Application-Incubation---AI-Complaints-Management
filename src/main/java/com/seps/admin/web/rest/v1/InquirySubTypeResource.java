@@ -2,6 +2,7 @@ package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.service.InquirySubTypeService;
 import com.seps.admin.service.dto.InquirySubTypeDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -46,8 +48,9 @@ public class InquirySubTypeResource {
         @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content)
     })
     @PostMapping
-    public ResponseEntity<ResponseStatus> addInquirySubType(@Valid @RequestBody InquirySubTypeDTO dto) throws URISyntaxException {
-        Long id = service.addInquirySubType(dto);
+    public ResponseEntity<ResponseStatus> addInquirySubType(@Valid @RequestBody InquirySubTypeDTO dto, HttpServletRequest request) throws URISyntaxException {
+        RequestInfo requestInfo = new RequestInfo(request);
+        Long id = service.addInquirySubType(dto, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("inquiry.sub.type.created.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.CREATED.value(),
@@ -65,8 +68,9 @@ public class InquirySubTypeResource {
     @PutMapping("/{id}")
     public ResponseEntity<ResponseStatus> updateInquirySubType(
         @Parameter(description = "ID of the inquiry sub-type to update", required = true) @PathVariable Long id,
-        @Valid @RequestBody InquirySubTypeDTO dto) {
-        service.updateInquirySubType(id, dto);
+        @Valid @RequestBody InquirySubTypeDTO dto, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        service.updateInquirySubType(id, dto, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("inquiry.sub.type.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -110,8 +114,9 @@ public class InquirySubTypeResource {
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> changeStatus(
         @Parameter(description = "ID of the inquiry sub-type", required = true) @PathVariable Long id,
-        @Parameter(description = "New status of the inquiry sub-type", required = true) @RequestParam Boolean status) {
-        service.changeStatus(id, status);
+        @Parameter(description = "New status of the inquiry sub-type", required = true) @RequestParam Boolean status, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        service.changeStatus(id, status, requestInfo);
         return ResponseEntity.noContent().build();
     }
 
@@ -120,10 +125,11 @@ public class InquirySubTypeResource {
         ByteArrayInputStream in = service.listInquirySubTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=Inquiry-sub-types.xlsx");
-
-        return ResponseEntity.ok()
-            .headers(headers)
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(in.readAllBytes());
+        try(in) {
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(in.readAllBytes());
+        }
     }
 }

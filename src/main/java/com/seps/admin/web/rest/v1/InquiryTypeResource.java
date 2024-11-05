@@ -3,6 +3,7 @@ package com.seps.admin.web.rest.v1;
 import com.seps.admin.service.InquiryTypeService;
 import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.InquiryTypeDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +54,10 @@ public class InquiryTypeResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
-    public ResponseEntity<ResponseStatus> createInquiryType(@Valid @RequestBody InquiryTypeDTO inquiryType) throws URISyntaxException {
+    public ResponseEntity<ResponseStatus> createInquiryType(@Valid @RequestBody InquiryTypeDTO inquiryType, HttpServletRequest request) throws URISyntaxException {
         log.debug("create request with {}", inquiryType);
-        Long id = inquiryTypeService.addInquiryType(inquiryType, LocaleContextHolder.getLocale());
+        RequestInfo requestInfo = new RequestInfo(request);
+        Long id = inquiryTypeService.addInquiryType(inquiryType, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("inquiry.type.created.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.CREATED.value(),
@@ -71,8 +74,9 @@ public class InquiryTypeResource {
     @PutMapping("/{id}")
     public ResponseEntity<ResponseStatus> updateInquiryType(
         @Parameter(description = "ID of the inquiry type to update", required = true) @PathVariable Long id,
-        @RequestBody InquiryTypeDTO inquiryType) {
-        inquiryTypeService.updateInquiryType(id, inquiryType);
+        @RequestBody InquiryTypeDTO inquiryType, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        inquiryTypeService.updateInquiryType(id, inquiryType, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("inquiry.type.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -112,9 +116,11 @@ public class InquiryTypeResource {
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> changeInquiryTypeStatus(
         @Parameter(description = "ID of the inquiry type to update status", required = true) @PathVariable("id") Long inquiryTypeId,
-        @Parameter(description = "New status of the inquiry type (true for active, false for inactive)", required = true) @RequestParam("status") Boolean status
+        @Parameter(description = "New status of the inquiry type (true for active, false for inactive)", required = true) @RequestParam("status") Boolean status,
+        HttpServletRequest request
     ) {
-        inquiryTypeService.changeStatus(inquiryTypeId, status);
+        RequestInfo requestInfo = new RequestInfo(request);
+        inquiryTypeService.changeStatus(inquiryTypeId, status, requestInfo);
         return ResponseEntity.noContent().build();
     }
 
@@ -123,11 +129,12 @@ public class InquiryTypeResource {
         ByteArrayInputStream in = inquiryTypeService.listInquiryTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=Inquiry-types.xlsx");
-
-        return ResponseEntity.ok()
-            .headers(headers)
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(in.readAllBytes());
+        try(in) {
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(in.readAllBytes());
+        }
     }
 
     @Operation(summary = "List Active Inquiry Types", description = "Returns a list of active inquiry types for dropdown selection.")

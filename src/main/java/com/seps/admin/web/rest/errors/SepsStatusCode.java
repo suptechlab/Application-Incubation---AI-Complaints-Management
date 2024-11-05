@@ -17,7 +17,10 @@ public enum SepsStatusCode implements StatusType {
     DUPLICATE_PROVINCE(20018, "duplicate.province"),
     PROVINCE_NOT_FOUND(20019, "province.not.found"),
     DUPLICATE_CITY(20018, "duplicate.city"),
-    CITY_NOT_FOUND(20019, "city.not.found");
+    CITY_NOT_FOUND(20019, "city.not.found"),
+    CURRENT_USER_NOT_FOUND(20020, "current.user.not.found"),
+    AUDIT_LOG_NOT_FOUND(20021, "audit.log.not.found"),
+    INVALID_DATE_FORMAT(20022, "invalid.date.format");
 
     private final int code;
 
