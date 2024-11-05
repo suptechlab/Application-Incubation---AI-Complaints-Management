@@ -1,7 +1,7 @@
 import { Formik } from 'formik'
 import React, { useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Stack, Form, Image, Button, Col, Row, Spinner } from "react-bootstrap";
 import FormInput from '../../components/FormInput'
 import { handleResetPassword } from '../../services/authentication.service'
@@ -15,6 +15,11 @@ export default function ResetPassword() {
     const [captcha, setCaptcha] = useState('')
     const reCaptchaRef = useRef(null);
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [otpToken, setOtpToken] = useState(searchParams.get("key"));
+    
+    // console.log('otpToken=',otpToken)
+
     const onSubmit = async (values, actions) => {
         if (captcha === "") {
             toast.error("Please enter the captcha");
@@ -27,15 +32,16 @@ export default function ResetPassword() {
         // }
         console.log('values', values)
         let data = {
-            'key': values.otp,
+            'key': otpToken,
             'newPassword': values.password,
+            'recaptchaToken': captcha != '' ? captcha : '' 
         };
 
         await handleResetPassword(data).then((response) => {
             toast.success(response.data.message)
             navigate('/login', { replace: true })
         }).catch((error) => {
-            toast.error(error.response.data.message)
+            toast.error(error.response.data.errorDescription)
         })
     }
 
@@ -71,7 +77,7 @@ export default function ResetPassword() {
                                     initialValues={{
                                         password: "",
                                         confirmPassword: "",
-                                        otp: ""
+                                        //otp: ""
                                     }}
                                     validationSchema={validationSchema}
                                     onSubmit={onSubmit}
@@ -87,7 +93,7 @@ export default function ResetPassword() {
                                     }) => (
                                         <>
 
-                                            <FormInput
+                                            {/* <FormInput
                                                 error={errors.otp}
                                                 id="otp"
                                                 key={'otp'}
@@ -99,7 +105,7 @@ export default function ResetPassword() {
                                                 touched={touched.otp}
                                                 type="password"
                                                 value={values.otp}
-                                            />
+                                            /> */}
 
                                             <FormInput
                                                 error={errors.password}

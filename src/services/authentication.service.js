@@ -5,15 +5,15 @@ export const handleChangePassword = async (data) => {
 }
 
 export const handleForgotPassword = async (data) => {
-    return await instance.post('/v1/account/reset-password/init', data);
+    return await instance.post('/account/reset-password/init', data);
 }
 
 export const handleLogin = async (data) => {
-    return await instance.post('/v1/authenticate', data);
+    return await instance.post('/login', data);
 }
 
 export const handleVerifyOtp = async (data) => {
-    return await instance.post('/v1/verify-otp', data);
+    return await instance.post('/verify-login-otp', data);
 }
 
 export const handleLogout = async () => {
@@ -21,7 +21,7 @@ export const handleLogout = async () => {
 }
 
 export const handleResetPassword = async (data) => {
-    return await instance.post('/v1/account/reset-password/finish', data);
+    return await instance.post('/account/reset-password/finish', data);
     // return await instance.post('/v1/account/reset-password/finish', { data }, {
     //     params: {
     //         token
@@ -39,11 +39,11 @@ export const handleOtpVerify = async (data) => {
     return await instance.post('/v1/verify-otp', data);
 }
 
-export const handleResendOTP = async (data) => {
-    return await instance.post('/v1/account/generate-otp', data);
+export const handleResendOTP = async (params) => {
+    return await instance.get('/resend-login-otp', {params});
 }
 
 export const handleGetAccountDetail = async () => {
-    return await instance.get(`/v1/account`);
+    return await instance.get(`/account`);
 }
 
