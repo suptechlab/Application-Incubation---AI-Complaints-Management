@@ -48,7 +48,7 @@ export default function ChangePassword() {
                 className="d-flex flex-column h-100"
               >
                 <Row>
-                  <Col xl={4} xxl={3}>
+                  <Col sm={8} md={6} lg={5} xl={4} xxl={3}>
                     <FormInput
                       error={errors.oldPassword}
                       id="oldPassword"
