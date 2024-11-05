@@ -141,7 +141,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                         </Dropdown.Toggle>
                         <Dropdown.Menu align="end" className="shadow border-0 mt-3">
                             <Dropdown.Item as={Link} to="/profile" disabled>Profile</Dropdown.Item>
-                            <Dropdown.Item as={Link} to="/change-password" disabled>Change Password</Dropdown.Item>
+                            <Dropdown.Item as={Link} to="/change-password">Change Password</Dropdown.Item>
                             <Dropdown.Item as={Link} onClick={logout}>Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
