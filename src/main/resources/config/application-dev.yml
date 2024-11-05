@@ -42,10 +42,10 @@ spring:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
   mail:
-    host: ENC(${seps.smtp.mail.host})
-    port: ENC(${seps.smtp.mail.port})
-    username: ENC(${seps.smtp.mail.username})
-    password: ENC(${seps.smtp.mail.password})
+    host: ENC(${seps.mail.smtp.host})
+    port: ENC(${seps.mail.smtp.port})
+    username: ENC(${seps.mail.smtp.username})
+    password: ENC(${seps.mail.smtp.password})
     properties:
       mail:
         smtp:
@@ -88,7 +88,7 @@ jhipster:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: http://127.0.0.1:8080
+    base-url: ENC(${seps.mail.base.url})
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
