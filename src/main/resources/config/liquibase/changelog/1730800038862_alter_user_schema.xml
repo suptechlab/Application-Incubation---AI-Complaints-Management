@@ -1,0 +1,25 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1730800038862" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="status" type="int">
+        <constraints nullable="true"/>
+      </column>
+      <column name="is_password_set" type="boolean">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1730803119223" author="matellio">
+    <modifyDataType tableName="jhi_user" columnName="login" newDataType="varchar(255)"/>
+    <modifyDataType tableName="jhi_user" columnName="email" newDataType="varchar(255)"/>
+  </changeSet>
+  <changeSet id="1730815579530" author="matellio">
+    <modifyDataType tableName="jhi_user" columnName="created_by" newDataType="varchar(255)"/>
+    <modifyDataType tableName="jhi_user" columnName="last_modified_by" newDataType="varchar(255)"/>
+  </changeSet>
+</databaseChangeLog>

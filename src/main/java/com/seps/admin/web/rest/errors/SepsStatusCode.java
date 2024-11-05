@@ -17,7 +17,10 @@ public enum SepsStatusCode implements StatusType {
     DUPLICATE_PROVINCE(20018, "duplicate.province"),
     PROVINCE_NOT_FOUND(20019, "province.not.found"),
     DUPLICATE_CITY(20018, "duplicate.city"),
-    CITY_NOT_FOUND(20019, "city.not.found");
+    CITY_NOT_FOUND(20019, "city.not.found"),
+    EMAIL_ALREADY_USED(20020, "email.already.used"),
+    USER_NOT_FOUND(20021, "user.not.found"),
+    SEPS_USER_NOT_FOUND(20022, "seps.user.not.found");
 
     private final int code;
 
