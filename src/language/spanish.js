@@ -61,6 +61,8 @@ export const spanishLang = {
     "EXPORT TO CSV": "Exportar a CSV",
     "CITY NAME": "Nombre de la Ciudad",
     "SUB-CLAIM": "Subreclamación",
+    // NEW
+    "AUDIT LOGS" : "Audit Logs",
     // MESSAGE
     "PROVINCE NAME": "Nombre de la Provincia",
     "STATUS UPDATED": "Estado actualizado con éxito.",

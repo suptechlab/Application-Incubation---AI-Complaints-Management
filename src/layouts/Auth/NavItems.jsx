@@ -154,12 +154,20 @@ export const NavItems = () => {
     },
     {
       id: 8,
-      menuName: t("TICKET WORKFLOW"),
+      menuName: t("TICKET WORKFLOW fsd"),
       title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
       roleName: "admin",
       disabled: true,
+    },
+    {
+      id: 9,
+      menuName: t("AUDIT LOGS"),
+      title: t("AUDIT LOGS"),
+      menuIcon: <MdSchema size={20} />,
+      path: "/audit-logs",
+      roleName: "admin",
     },
   ];
 }

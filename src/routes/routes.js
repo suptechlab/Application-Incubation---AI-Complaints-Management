@@ -17,6 +17,8 @@ import InquirySubtype from "../pages/master management/inquirySubtype";
 import ProvinceMaster from "../pages/master management/provinceMaster";
 import CityMaster from "../pages/master management/cityMaster";
 import TemplateMaster from "../pages/master management/TemplateMaster";
+import AuditLogs from "../pages/auditLogs";
+import ViewAuditTrail from "../pages/auditLogs/ViewAuditTrail";
 
 const UserForm = React.lazy(() => import("../pages/users/Edit"));
 const Settings = React.lazy(() => import("../pages/settings"));
@@ -151,13 +153,13 @@ const routes = [
         layoutType: "Auth",
     },
     {
-        path:"/users/add",
+        path: "/users/add",
         element: <AddUserPage isEdit={false} />,
         isPrivate: true,
         layoutType: "Auth",
     },
     {
-        path:"/users/edit/:id",
+        path: "/users/edit/:id",
         element: <AddUserPage isEdit={false} />,
         isPrivate: true,
         layoutType: "Auth",
@@ -168,7 +170,7 @@ const routes = [
         isPrivate: true,
         layoutType: "Auth",
     },
-    
+
     {
         path: "/users/:id",
         element: <UserForm isEdit={true} />,
@@ -190,30 +192,41 @@ const routes = [
     },
     {
         path: "/role-rights",
-        element: <RoleRightsList/>,
+        element: <RoleRightsList />,
         isPrivate: true,
         layoutType: "Auth",
     },
     {
         path: "/role-rights/add",
-        element: <AddEditRoleRights isEdit={false}/>,
+        element: <AddEditRoleRights isEdit={false} />,
         isPrivate: true,
         layoutType: "Auth",
     },
     {
         path: "/role-rights/edit/:id",
-        element: <AddEditRoleRights isEdit={true}/>,
+        element: <AddEditRoleRights isEdit={true} />,
         isPrivate: true,
         layoutType: "Auth",
     },
-
     {
         path: "*",
         element: <NotFoundPage />,
         isPrivate: false,
         layoutType: "Blank",
     },
-    
+    {
+        path: "/audit-logs",
+        element: <AuditLogs />,
+        isPrivate: true,
+        layoutType: "Auth",
+    },
+    {
+        path: "/audit-log/:id",
+        element: <ViewAuditTrail />,
+        isPrivate: true,
+        layoutType: "Auth",
+    },
+
 ];
 
 export default routes;
