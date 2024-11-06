@@ -86,7 +86,6 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.name}
                 type="text"
                 value={values?.name || ""}
@@ -114,7 +113,6 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
                 name="slaBreachDays"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.slaBreachDays}
                 type="number"
                 value={values?.slaBreachDays}
@@ -129,7 +127,6 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
                 onChange={handleChange}
                 isTextarea={true}
                 rows={5}
-                // placeholder="Enter district name"
                 touched={touched.description}
                 type="text"
                 value={values.description || ""}

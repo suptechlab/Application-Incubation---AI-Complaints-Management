@@ -146,7 +146,6 @@ export default function UserForm({
                                             name="phoneNumber"
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            placeholder="Enter Name"
                                             touched={touched.phoneNumber}
                                             type="text"
                                             value={values.phoneNumber || ""}
@@ -162,7 +161,6 @@ export default function UserForm({
                                             name="name"
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            placeholder="Enter Name"
                                             touched={touched.name}
                                             type="text"
                                             value={values.name || ""}
@@ -178,7 +176,6 @@ export default function UserForm({
                                             options={occupations}
                                             onBlur={handleBlur}
                                             onChange={handleChange}
-                                            placeholder="Enter Name"
                                             touched={touched.occupation}
                                             type="text"
                                             value={values.occupation || ""}
@@ -198,7 +195,6 @@ export default function UserForm({
                                                     name="freeFor"
                                                     onBlur={handleBlur}
                                                     onChange={handleChange}
-                                                    placeholder="Enter Free For"
                                                     touched={touched.freeFor}
                                                     type="text"
                                                     value={values.freeFor || ""}
@@ -215,7 +211,6 @@ export default function UserForm({
                                                     name="freeTrialStartingFrom"
                                                     onBlur={handleBlur}
                                                     onChange={handleChange}
-                                                    placeholder="Enter Free Trial Starting From"
                                                     touched={touched.freeTrialStartingFrom}
                                                     type="text"
                                                     value={values.freeTrialStartingFrom || ""}
@@ -235,7 +230,6 @@ export default function UserForm({
                                             name="pouchScore"
                                             //    onBlur={handleBlur}
                                             //  onChange={handleChange}
-                                            placeholder="Enter Pouch Score"
                                             //  touched={touched.pouchScore}
                                             type="text"
                                             value={values.pouchScore}

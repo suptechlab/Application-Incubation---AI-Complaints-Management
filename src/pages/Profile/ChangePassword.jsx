@@ -57,7 +57,6 @@ export default function ChangePassword() {
                       name="oldPassword"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      placeholder="Enter old password"
                       touched={touched.oldPassword}
                       type="password"
                       value={values.oldPassword}
@@ -70,7 +69,6 @@ export default function ChangePassword() {
                       name="newPassword"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      placeholder="Enter new password"
                       touched={touched.newPassword}
                       type="password"
                       value={values.newPassword}
@@ -83,7 +81,6 @@ export default function ChangePassword() {
                       name="confirmPassword"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      placeholder="Enter confirm password"
                       touched={touched.confirmPassword}
                       type="password"
                       value={values.confirmPassword}

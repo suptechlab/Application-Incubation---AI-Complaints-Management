@@ -68,7 +68,6 @@ const RoleRightsModal = ({ modal, toggle }) => {
                 name="roleName"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                placeholder="Enter role name"
                 touched={touched.roleName}
                 type="text"
                 value={values.roleName || ""}

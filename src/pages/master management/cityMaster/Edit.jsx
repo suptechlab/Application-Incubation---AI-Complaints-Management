@@ -77,7 +77,6 @@ const Edit = ({ modal, toggle }) => {
                 name="cityName"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched.cityName}
                 type="text"
                 value={values.cityName || ""}

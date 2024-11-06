@@ -83,7 +83,6 @@ const Add = ({ modal, toggle, dataQuery }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.name}
                 type="text"
                 value={values?.name || ""}
@@ -97,7 +96,6 @@ const Add = ({ modal, toggle, dataQuery }) => {
                 name="description"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.description}
                 rows={5}
                 type="text"

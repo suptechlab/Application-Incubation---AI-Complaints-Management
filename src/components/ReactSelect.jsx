@@ -94,7 +94,6 @@ const ReactSelect = ({
         }
         options={formattedOptions}
         placeholder={placeholder || 'Select'}
-        //placeholder=""
         isClearable={selectedOption?.value != ""}
         classNamePrefix="react-select"
         defaultValue={defaultValue}

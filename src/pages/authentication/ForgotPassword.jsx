@@ -85,7 +85,6 @@ export default function ForgotPassword() {
                                             key={'email'}
                                             id="email"
                                             name="email"
-                                            placeholder="Enter email"
                                             type="text"
                                             label="Email Address *"
                                             value={values.email}

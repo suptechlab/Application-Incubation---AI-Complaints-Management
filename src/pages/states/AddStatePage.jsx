@@ -152,7 +152,6 @@ export default function AddStatePage() {
                                                                     name="stateName"
                                                                     onBlur={handleBlur}
                                                                     onChange={handleChange}
-                                                                    placeholder="Enter state name"
                                                                     touched={touched.stateName}
                                                                     type="text"
                                                                     value={values.stateName || ""}
@@ -179,7 +178,6 @@ export default function AddStatePage() {
                                                                     name="stateCode"
                                                                     onBlur={handleBlur}
                                                                     onChange={handleChange}
-                                                                    placeholder="Enter state code"
                                                                     touched={touched.stateCode}
                                                                     type="text"
                                                                     value={values.stateCode || ""}

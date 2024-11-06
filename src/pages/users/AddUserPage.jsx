@@ -209,7 +209,6 @@ export default function AddStatePage() {
                         name="email"
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        placeholder="Enter email"
                         touched={touched.email}
                         type="text"
                         value={values.email || ""}
@@ -225,7 +224,6 @@ export default function AddStatePage() {
                         name="firstName"
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        placeholder="Enter first name"
                         touched={touched.firstName}
                         type="text"
                         value={values.firstName || ""}
@@ -240,7 +238,6 @@ export default function AddStatePage() {
                         name="unidadOrganizacional"
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        placeholder="Enter unidad organizacional"
                         touched={touched.unidadOrganizacional}
                         type="text"
                         value={values.unidadOrganizacional || ""}
@@ -282,7 +279,6 @@ export default function AddStatePage() {
                             name="mobileNo"
                             onBlur={handleBlur}
                             onChange={handleChange}
-                            placeholder="Enter phone number"
                             touched={touched.mobileNo}
                             type="text"
                             value={values.mobileNo || ""}

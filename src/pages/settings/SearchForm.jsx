@@ -23,7 +23,6 @@ const SearchForm = ({ filter, setFilter }) => {
                                 <FormInput
                                     id="search"
                                     key={"search"}
-                                    //label="Search"
                                     name="search"
                                     //onBlur={handleBlur}
                                     //  onChange={handleChange}

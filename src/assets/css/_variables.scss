@@ -12,7 +12,7 @@ $info: #007BFF;
 $warning: #F6C300;
 $success: #146C2E;
 $link-color: #0088FF;
-$border-color: rgba(204, 204, 204, 0.7);
+$border-color: rgba($body-color, 0.25);
 $input-border-color: $secondary;
 $input-focus-border-color: $link-color;
 $input-padding-y: 0.5rem;
@@ -65,6 +65,7 @@ $modal-content-border-width: 0;
 $modal-content-border-radius: 1rem;
 $modal-header-padding-y: 1.313rem;
 $grid-gutter-width: 2rem;
+$dropdown-item-padding-y: 0.375rem;
 
 // Custom Variables
 $theme-size-10: 0.625rem;

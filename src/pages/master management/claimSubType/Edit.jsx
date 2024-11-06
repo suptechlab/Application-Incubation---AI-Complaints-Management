@@ -85,7 +85,6 @@ const Edit = ({ modal, dataQuery, toggle, rowData, claimTypes }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched.name}
                 type="text"
                 value={values.name || ""}
@@ -112,7 +111,6 @@ const Edit = ({ modal, dataQuery, toggle, rowData, claimTypes }) => {
                 name="slaBreachDays"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.slaBreachDays}
                 type="number"
                 value={values?.slaBreachDays}
@@ -127,7 +125,6 @@ const Edit = ({ modal, dataQuery, toggle, rowData, claimTypes }) => {
                 onChange={handleChange}
                 isTextarea={true}
                 rows={5}
-                // placeholder="Enter district name"
                 touched={touched.description}
                 type="text"
                 value={values.description || ""}
