@@ -1,37 +1,28 @@
-import { Form as FormikForm, Formik } from "formik";
+import { Formik, Form as FormikForm } from "formik";
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Form, Row, Stack } from "react-bootstrap";
+import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { validationSchema } from "../../validations/user.validation";
-import SvgIcons from "../../components/SVGIcons";
-import {
-  handleGetUserById,
-  handleAddUser,
-  handleUpdateUser,
-  handleGetCompany,
-  handleGetRole,
-  handleUserResetPassword,
-  handleGetUserCompany,
-} from "../../services/user.service";
-import Toggle from "../../components/Toggle";
-import FormInput from "../../components/FormInput";
-import { HiMiniUsers } from "react-icons/hi2";
-import FormSelect from "../../components/FormSelect";
-import axios from "axios";
-import { getLocalStorage } from "../../utils/storage";
-import defaultImage from "../../assets/images/broken_image.png";
 import { useTranslation } from "react-i18next";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import ReactSelect from "../../components/ReactSelect";
+import Toggle from "../../components/Toggle";
+import {
+  handleAddUser,
+  handleGetRole,
+  handleGetUserById,
+  handleGetUserCompany,
+  handleUpdateUser,
+} from "../../services/user.service";
+import { validationSchema } from "../../validations/user.validation";
+import UserLoader from "../../components/UserLoader";
 
 export default function AddStatePage() {
-  const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [imageUrl, setImageUrl] = useState(defaultImage);
+  const [userLoading, setUserLoading] = useState(false);
   const navigate = useNavigate();
-  const params = useParams();
   const { id } = useParams();
   const isEdit = !!id;
 
@@ -100,7 +91,6 @@ export default function AddStatePage() {
         //     profileImage: response.data.data?.imageUrl
 
         // });
-        setImageUrl(response.data.data?.imageUrl);
         setLoading(false);
       });
     } else {
@@ -109,6 +99,7 @@ export default function AddStatePage() {
   }, [id, isEdit]);
 
   const onSubmit = async (values) => {
+    setUserLoading(true);
     const formData = new FormData();
     if (!isImageSet) {
       delete values.profileImage;
@@ -141,41 +132,14 @@ export default function AddStatePage() {
     }
   };
 
-  const handleUploadImage = (event, setFieldValue) => {
-    console.log("file type", event.target.files[0].type);
-
-    const file = event.target.files[0];
-    const validTypes = ["image/png", "image/jpg", "image/jpeg"];
-
-    if (!validTypes.includes(file.type)) {
-      return toast.error("Please select only png, jpg and jpeg file.");
-    }
-    setFieldValue("profileImage", file);
-    if (event.target.files && event.target.files.length > 0) {
-      //setImageUrl(event.target.files[0]);// Image Preview
-      setImageUrl(URL.createObjectURL(event.target.files[0])); // Image Preview
-    }
-    setIsImageSet(true);
-    //setImageUrl(event.target.files[0]) // Image Preview
-  };
-
-  const ResetPassword = async () => {
-    //setLoading(true)
-    handleUserResetPassword(id)
-      .then((response) => {
-        //setLoading(false)
-        toast.success(response.data.message);
-        //navigate("/users");
-      })
-      .catch((error) => {
-        //setLoading(false)
-        toast.error(error.response.data.message);
-      });
-  };
-
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
+      <UserLoader
+        isLoading={userLoading}
+        title="Verifying User..."
+        subTitle="Using SEPS Active Directory"
+      />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader title={`${isEdit ? "Edit" : "Add"} SEPS User`} />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
@@ -243,7 +207,7 @@ export default function AddStatePage() {
                         value={values.unidadOrganizacional || ""}
                       />
                     </Col>
-                    <Col sm={6} md={6} lg={4}>
+                    {/* <Col sm={6} md={6} lg={4}>
                       <label htmlFor="mobileCode" className="mb-1 fs-14">
                         Phone
                       </label>
@@ -285,7 +249,7 @@ export default function AddStatePage() {
                           />
                         </Col>
                       </Row>
-                    </Col>
+                    </Col> */}
                     <Col sm={6} md={6} lg={4}>
                       <ReactSelect
                         label="Role"
@@ -308,7 +272,7 @@ export default function AddStatePage() {
                         touched={touched.companyId}
                       />
                     </Col>
-                    <Col xs={12}>
+                    <Col xs={12} className="mb-3 pb-1">
                       <label htmlFor="activated" className="mb-1 fs-14">
                         Status
                       </label>

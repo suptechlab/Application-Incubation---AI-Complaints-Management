@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
-    handleGetUsers,
-    handleStatusChangeState
+  handleDeleteUser,
+  handleGetUsers,
+  handleStatusChangeState,
 } from "../../services/user.service";
 
 import { Card } from "react-bootstrap";
@@ -15,7 +16,9 @@ import { useTranslation } from "react-i18next";
 import { MdDelete, MdEdit } from "react-icons/md";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
+import GenericModal from "../../components/GenericModal";
 import ListingSearchForm from "../../components/ListingSearchForm";
+import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 
@@ -36,6 +39,11 @@ export default function UserList() {
     subscription: "",
     status: "",
   });
+
+  const [loading, setLoading] = useState(false);
+  const [selectedRow, setSelectedRow] = useState();
+  const [deleteShow, setDeleteShow] = useState(false);
+  const [deleteId, setDeleteId] = useState();
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
@@ -84,8 +92,24 @@ export default function UserList() {
     }
   };
 
-  const deleteAction = (id) => {
-    console.log("deleteAction id", id);
+  //Handle Delete
+  const deleteAction = (rowData) => {
+    setSelectedRow(rowData);
+    setDeleteId(rowData.id);
+    setDeleteShow(true);
+  };
+
+  const recordDelete = async (deleteId) => {
+    setLoading(true);
+    try {
+      await handleDeleteUser(deleteId);
+      toast.success("Your data has been deleted successfully");
+      dataQuery.refetch();
+      setDeleteShow(false);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = React.useMemo(
@@ -124,11 +148,7 @@ export default function UserList() {
         id: "createdAt",
         header: () => "Creation Date",
         cell: (info) => {
-          return (
-            <span>
-              {moment(info.row.original.createdAt).format("l")}
-            </span>
-          );
+          return <span>{moment(info.row.original.createdAt).format("l")}</span>;
         },
       },
 
@@ -259,16 +279,14 @@ export default function UserList() {
                 type: "button",
                 title: "Delete",
                 icon: <MdDelete size={18} />,
-                handler: () => deleteAction(rowData.row.original.id),
+                handler: () => deleteAction(rowData.row.original),
               },
             ]}
           />
         ),
-        header: () => (
-            <div className="text-center">Actions</div>
-          ),
+        header: () => <div className="text-center">Actions</div>,
         enableSorting: false,
-        size: '80',
+        size: "80",
       },
     ],
     []
@@ -282,24 +300,38 @@ export default function UserList() {
   }, [filter]);
 
   return (
-    <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-      <PageHeader
-        title="SEPS Users"
-        actions={[{ label: "Add New", to: "/users/add", variant: "warning" }]}
+    <React.Fragment>
+      <Loader isLoading={loading} />
+      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+        <PageHeader
+          title="SEPS Users"
+          actions={[{ label: "Add New", to: "/users/add", variant: "warning" }]}
+        />
+        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+          <Card.Body className="d-flex flex-column">
+            <ListingSearchForm filter={filter} setFilter={setFilter} />
+            <CommonDataTable
+              columns={columns}
+              dataQuery={dataQuery}
+              pagination={pagination}
+              setPagination={setPagination}
+              sorting={sorting}
+              setSorting={setSorting}
+            />
+          </Card.Body>
+        </Card>
+      </div>
+
+      {/* Delete Modal */}
+      <GenericModal
+        show={deleteShow}
+        handleClose={() => setDeleteShow(false)}
+        modalHeaderTitle={`Delete SEPS User`}
+        modalBodyContent={`Are you sure, you want to delete the SEPS user - ${selectedRow?.name}?`}
+        handleAction={() => recordDelete(deleteId)}
+        buttonName="Delete"
+        ActionButtonVariant="danger"
       />
-      <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-        <Card.Body className="d-flex flex-column">
-          <ListingSearchForm filter={filter} setFilter={setFilter} />
-          <CommonDataTable
-            columns={columns}
-            dataQuery={dataQuery}
-            pagination={pagination}
-            setPagination={setPagination}
-            sorting={sorting}
-            setSorting={setSorting}
-          />
-        </Card.Body>
-      </Card>
-    </div>
+    </React.Fragment>
   );
 }

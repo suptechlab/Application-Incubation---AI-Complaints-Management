@@ -7,7 +7,7 @@ const ReactSelect = ({
   options,
   value,
   onChange,
-  className = "mb-3 pb-1",
+  wrapperClassName = "mb-3 pb-1",
   name,
   label,
   placeholder,
@@ -76,7 +76,7 @@ const ReactSelect = ({
   const selectedOption = formattedOptions.find((opt) => opt.value === value);
 
   return (
-    <div className={className || ""}>
+    <div className={wrapperClassName || ""}>
       {label ? (
         <label className="mb-1 fs-14" htmlFor={name}>
           {label}

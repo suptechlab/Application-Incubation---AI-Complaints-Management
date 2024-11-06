@@ -37,7 +37,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
           <div className="custom-width-120 flex-grow-1 flex-md-grow-0">
             <ReactSelect
-              className="mb-0"
+              wrapperClassName="mb-0"
               class="form-select "
               placeholder={t("ALL STATUS")}
               id="floatingSelect"
