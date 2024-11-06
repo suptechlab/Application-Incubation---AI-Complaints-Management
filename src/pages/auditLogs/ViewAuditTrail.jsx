@@ -6,6 +6,7 @@ import moment from "moment";
 import { getAuditLogsById } from '../../services/auditlogs.services';
 import PageHeader from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
+import AuditTable from './AuditTable';
 
 const ViewAuditTrail = () => {
 
@@ -19,64 +20,6 @@ const ViewAuditTrail = () => {
             setData(response.data);
         });
     }, [id]);
-
-
-    const toCamelCase = (str) => {
-        return str.replace(/([A-Z])/g, ' $1') // Insert a space before each uppercase letter
-            .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
-            .replace(/\w\S*/g, (txt) => {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            }).trim();
-    };
-
-    const renderAuditTable = (data) => {
-        const renderCell = (value) => {
-            if (value !== undefined && value !== "" && value !== null) {
-                if (typeof value === 'object') {
-                    return (
-                        <Table bordered>
-                            <tbody>
-                                {Object.keys(value).map(subKey => (
-                                    <tr key={subKey}>
-                                        <td>{toCamelCase(subKey)}</td>
-                                        <td>{JSON.stringify(value[subKey], undefined, 2).replace(/"/g, '')}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
-                    );
-                } else {
-                    return <pre>{JSON.stringify(value, undefined, 2).replace(/"/g, '')}</pre>;
-                }
-            }
-            return '-';
-        };
-
-        return (
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Field</th>
-                        <th>New Record</th>
-                        <th>Old Record</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data && data.auditKeySet && data.auditKeySet.map(key => (
-                        <tr key={key}>
-                            <td>{toCamelCase(key)}</td>
-                            <td>{renderCell(data.newData[key])}</td>
-                            <td>{renderCell(data.oldData[key])}</td>
-                            <td></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
-        );
-    };
-
-
 
     return (
         <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
@@ -118,7 +61,7 @@ const ViewAuditTrail = () => {
                                 <Row>
                                     <Col>
                                         <h5 className="mt-4">Audit Details</h5>
-                                        {renderAuditTable(data)}
+                                        <AuditTable newData={data?.entityData?.newData ?? {}} oldData={data?.entityData?.oldData ?? {}}/>
                                     </Col>
                                 </Row>
                                 <div className="theme-from-footer mt-auto border-top px-3 pt-3">
@@ -128,7 +71,7 @@ const ViewAuditTrail = () => {
                                         className="justify-content-end px-1"
                                     >
                                         <Link
-                                            to={"/report/audit-trail"}
+                                            to={"/audit-logs"}
                                             className="btn btn-outline-dark fs-14 width-85"
                                         >
                                             Back

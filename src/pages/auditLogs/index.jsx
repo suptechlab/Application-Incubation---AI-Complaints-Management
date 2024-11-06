@@ -230,7 +230,7 @@ const AuditLogs = () => {
         <PageHeader
             title={t("AUDIT LOGS")}
             actions={[
-                { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: true },
+                { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "warning", disabled: true },
             ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
