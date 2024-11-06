@@ -7,15 +7,25 @@ import FormInput from "../../components/FormInput";
 import PageHeader from "../../components/PageHeader";
 import { handleChangePassword } from "../../services/authentication.service";
 import { validationSchema } from "../../validations/changePassword.validation";
+import { useTranslation } from "react-i18next";
 
 export default function ChangePassword() {
+
+  const { t } = useTranslation(); // use the translation hook
+
   const onSubmit = async (values, actions) => {
+    delete values.confirmPassword;
+    values.currentPassword = values.oldPassword;
+    delete values.oldPassword;
     await handleChangePassword(values)
       .then((response) => {
+        console.log('response',response)
         toast.success(response.data.message);
         actions.resetForm();
       })
       .catch((error) => {
+        // console.log('error',error.response.data.errorDescription)
+        toast.error(error.response.data.errorDescription ?? t('SOMETHING WENT WRONG'))
         actions.resetForm();
       });
   };
@@ -53,7 +63,7 @@ export default function ChangePassword() {
                       error={errors.oldPassword}
                       id="oldPassword"
                       key={"oldPassword"}
-                      label="Old Password"
+                      label={t('OLD PASSWORD')}
                       name="oldPassword"
                       onBlur={handleBlur}
                       onChange={handleChange}
@@ -65,7 +75,7 @@ export default function ChangePassword() {
                       error={errors.newPassword}
                       id="newPassword"
                       key={"newPassword"}
-                      label="New Password"
+                      label={t('NEW PASSWORD')}
                       name="newPassword"
                       onBlur={handleBlur}
                       onChange={handleChange}
@@ -77,7 +87,7 @@ export default function ChangePassword() {
                       error={errors.confirmPassword}
                       id="confirmPassword"
                       key={"confirmPassword"}
-                      label="Confirm Password"
+                      label={t('CONFIRM PASSWORD')}
                       name="confirmPassword"
                       onBlur={handleBlur}
                       onChange={handleChange}
@@ -97,7 +107,7 @@ export default function ChangePassword() {
                       to={"/"}
                       className="btn btn-outline-dark custom-min-width-85"
                     >
-                      Cancel
+                      {t('CANCEL')}
                     </Link>
                     <Button
                       type="submit"
@@ -113,10 +123,10 @@ export default function ChangePassword() {
                           role="output"
                           className="align-middle me-1"
                         >
-                          <span className="visually-hidden">Loading...</span>
+                          <span className="visually-hidden">{t('LOADING')}...</span>
                         </Spinner>
                       ) : (
-                        "Submit"
+                        t('SUBMIT')
                       )}
                     </Button>
                   </Stack>

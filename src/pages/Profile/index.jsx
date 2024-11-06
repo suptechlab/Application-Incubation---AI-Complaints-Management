@@ -1,16 +1,32 @@
 import { Formik, Form as FormikForm } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Image, Row, Spinner, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FormInput from "../../components/FormInput";
 import PageHeader from "../../components/PageHeader";
-import { handleChangePassword } from "../../services/authentication.service";
-import { validationSchema } from "../../validations/changePassword.validation";
+import { handleAccount, handleGetAccountDetail } from "../../services/authentication.service";
+import { validationSchema } from "../../validations/profile.validation";
 import profilePlaceholderImg from "../../assets/images/default-avatar.jpg";
+import { useTranslation } from "react-i18next";
+import { getLocalStorage } from '../../utils/storage';
+import Loader from "../../components/Loader";
 
 export default function AccountProfile() {
+
+  const navigate = useNavigate()
+  const { t } = useTranslation(); // use the translation hook
+  const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState("");
+
+  const userLanguage = localStorage.getItem('langKey');
+
+  const [initialValues, setInitialValues] = useState({
+    nationalID: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+  });
 
   const ALLOWEDIMAGETYPES =
     "Allowed image file extensions are .jpg, .jpeg and .png.";
@@ -45,28 +61,48 @@ export default function AccountProfile() {
   };
 
   const onSubmit = async (values, actions) => {
-    await handleChangePassword(values)
+    delete values.nationalID
+    values.login = values.email
+    values.langKey = userLanguage ?? 'es';
+    values.countryCode = '+593'
+    values.phoneNumber = '0123456789'
+
+    await handleAccount(values)
       .then((response) => {
         toast.success(response.data.message);
         actions.resetForm();
+        navigate('/dashboard')
       })
       .catch((error) => {
         actions.resetForm();
       });
   };
 
+  useEffect(() => {
+    handleGetAccountDetail().then(response => {
+      console.log('response', response.data.firstName);
+      setInitialValues({
+        nationalID: response.data.nationalID ? response.data.nationalID : '',
+        email: response.data.email,
+        firstName: response.data.firstName,
+        lastName: response.data.lastName, // Initialize stateId if editing
+      });
+      setLoading(false);
+    });
+
+  }, []);
+
   return (
+    <>
+    {loading ? (
+      <Loader isLoading={loading} />
+    ) : (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
       <PageHeader title="Profile" />
       <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
         <Card.Body className="d-flex flex-column">
           <Formik
-            initialValues={{
-              nationalID: "ABCD12345XYZ",
-              email: "john@email.com",
-              firstName: "John",
-              lastName: "Smith",
-            }}
+            initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={onSubmit}
           >
@@ -84,8 +120,10 @@ export default function AccountProfile() {
                 className="d-flex flex-column h-100"
               >
                 <Row>
+                  {/* <pre>{JSON.stringify(errors, null, 2)}</pre>
+                  <pre>{JSON.stringify(values, null, 2)}</pre> */}
                   <Col lg={4} className="mb-3 pb-1 order-lg-last">
-                    <div className="mb-1 fs-14">Profile Image</div>
+                    <div className="mb-1 fs-14">{t('PROFILE IMAGE')}</div>
                     <Stack
                       direction="horizontal"
                       gap={2}
@@ -106,7 +144,7 @@ export default function AccountProfile() {
                             htmlFor="files"
                             className="btn btn-outline-dark custom-min-width-85"
                           >
-                            Upload
+                            {t('UPLOAD')}
                           </label>
                           <input
                             id="files"
@@ -126,14 +164,14 @@ export default function AccountProfile() {
                           error={errors.nationalID}
                           id="nationalID"
                           key={"nationalID"}
-                          label="National ID"
+                          label={t('NATIONAL ID')}
                           name="nationalID"
                           onBlur={handleBlur}
                           onChange={handleChange}
                           touched={touched.nationalID}
                           type="text"
                           value={values.nationalID}
-                          disabled={true}
+                        // disabled={true}
                         />
                       </Col>
                       <Col sm={6}>
@@ -141,7 +179,7 @@ export default function AccountProfile() {
                           error={errors.email}
                           id="email"
                           key={"email"}
-                          label="New Password"
+                          label={t('EMAIL')}
                           name="email"
                           onBlur={handleBlur}
                           onChange={handleChange}
@@ -156,14 +194,14 @@ export default function AccountProfile() {
                           error={errors.firstName}
                           id="firstName"
                           key={"firstName"}
-                          label="First Name"
+                          label={t('FIRST NAME')}
                           name="firstName"
                           onBlur={handleBlur}
                           onChange={handleChange}
                           touched={touched.firstName}
                           type="text"
                           value={values.firstName}
-                          disabled={true}
+                        // disabled={true}
                         />
                       </Col>
                       <Col sm={6}>
@@ -171,14 +209,14 @@ export default function AccountProfile() {
                           error={errors.lastName}
                           id="lastName"
                           key={"lastName"}
-                          label="Last Name"
+                          label={t('LAST NAME')}
                           name="lastName"
                           onBlur={handleBlur}
                           onChange={handleChange}
                           touched={touched.lastName}
                           type="text"
                           value={values.lastName}
-                          disabled={true}
+                        // disabled={true}
                         />
                       </Col>
                     </Row>
@@ -195,7 +233,7 @@ export default function AccountProfile() {
                       to={"/"}
                       className="btn btn-outline-dark custom-min-width-85"
                     >
-                      Cancel
+                      {t('CANCEL')}
                     </Link>
                     <Button
                       type="submit"
@@ -211,10 +249,10 @@ export default function AccountProfile() {
                           role="output"
                           className="align-middle me-1"
                         >
-                          <span className="visually-hidden">Loading...</span>
+                          <span className="visually-hidden">{t('LOADING')}...</span>
                         </Spinner>
                       ) : (
-                        "Submit"
+                        t('SUBMIT')
                       )}
                     </Button>
                   </Stack>
@@ -225,5 +263,7 @@ export default function AccountProfile() {
         </Card.Body>
       </Card>
     </div>
+  )}
+   </>
   );
 }
