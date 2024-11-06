@@ -82,7 +82,6 @@ const Edit = ({ modal, toggle, provinces, dataQuery, rowData }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.name}
                 type="text"
                 value={values?.name || ""}

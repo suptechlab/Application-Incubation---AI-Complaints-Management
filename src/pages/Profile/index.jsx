@@ -62,10 +62,10 @@ export default function AccountProfile() {
         <Card.Body className="d-flex flex-column">
           <Formik
             initialValues={{
-              nationalID: "",
-              email: "",
-              firstName: "",
-              lastName: "",
+              nationalID: "ABCD12345XYZ",
+              email: "john@email.com",
+              firstName: "John",
+              lastName: "Smith",
             }}
             validationSchema={validationSchema}
             onSubmit={onSubmit}
@@ -112,7 +112,6 @@ export default function AccountProfile() {
                             id="files"
                             accept="image/png, image/jpeg, image/jpg"
                             className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                            placeholder="Browse"
                             type="file"
                             onChange={handleFileChange}
                           />
@@ -131,7 +130,6 @@ export default function AccountProfile() {
                           name="nationalID"
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Enter national ID"
                           touched={touched.nationalID}
                           type="text"
                           value={values.nationalID}
@@ -147,7 +145,6 @@ export default function AccountProfile() {
                           name="email"
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Enter email"
                           touched={touched.email}
                           type="email"
                           value={values.email}
@@ -163,7 +160,6 @@ export default function AccountProfile() {
                           name="firstName"
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Enter first name"
                           touched={touched.firstName}
                           type="text"
                           value={values.firstName}
@@ -179,7 +175,6 @@ export default function AccountProfile() {
                           name="lastName"
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Enter last name"
                           touched={touched.lastName}
                           type="text"
                           value={values.lastName}

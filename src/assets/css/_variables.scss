@@ -12,7 +12,7 @@ $info: #007BFF;
 $warning: #F6C300;
 $success: #146C2E;
 $link-color: #0088FF;
-$border-color: rgba(204, 204, 204, 0.7);
+$border-color: rgba($body-color, 0.25);
 $input-border-color: $secondary;
 $input-focus-border-color: $link-color;
 $input-padding-y: 0.5rem;
@@ -65,6 +65,10 @@ $modal-content-border-width: 0;
 $modal-content-border-radius: 1rem;
 $modal-header-padding-y: 1.313rem;
 $grid-gutter-width: 2rem;
+$dropdown-item-padding-y: 0.375rem;
+$btn-close-color: #6C757D;
+$btn-close-opacity: 1;
+$btn-close-bg: url("data:image/svg+xml,<svg width='14' height='15' viewBox='0 0 14 15' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M13.2997 1.20973C12.9097 0.819727 12.2797 0.819727 11.8897 1.20973L6.99973 6.08973L2.10973 1.19973C1.71973 0.809727 1.08973 0.809727 0.699727 1.19973C0.309727 1.58973 0.309727 2.21973 0.699727 2.60973L5.58973 7.49973L0.699727 12.3897C0.309727 12.7797 0.309727 13.4097 0.699727 13.7997C1.08973 14.1897 1.71973 14.1897 2.10973 13.7997L6.99973 8.90973L11.8897 13.7997C12.2797 14.1897 12.9097 14.1897 13.2997 13.7997C13.6897 13.4097 13.6897 12.7797 13.2997 12.3897L8.40973 7.49973L13.2997 2.60973C13.6797 2.22973 13.6797 1.58973 13.2997 1.20973Z' fill='#6C757D'/></svg>");
 
 // Custom Variables
 $theme-size-10: 0.625rem;

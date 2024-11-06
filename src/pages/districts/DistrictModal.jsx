@@ -72,7 +72,6 @@ const DistrictModal = ({ modal, toggle }) => {
                 name="districtName"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                placeholder="Enter district name"
                 touched={touched.districtName}
                 type="text"
                 value={values.districtName || ""}
