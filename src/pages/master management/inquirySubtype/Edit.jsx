@@ -89,7 +89,6 @@ const Edit = ({ modal, toggle, rowData, dataQuery, inquiryTypes }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.name}
                 type="text"
                 value={values?.name || ""}
@@ -120,7 +119,6 @@ const Edit = ({ modal, toggle, rowData, dataQuery, inquiryTypes }) => {
                 name="description"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.description}
                 rows={5}
                 type="text"

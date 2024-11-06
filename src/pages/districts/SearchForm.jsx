@@ -23,7 +23,6 @@ const SearchForm = ({ filter, setFilter }) => {
                                 <FormInput
                                     id="search"
                                     key={"search"}
-                                    //label="Search"
                                     name="search"
                                     placeholder="Search"
                                     type="text"

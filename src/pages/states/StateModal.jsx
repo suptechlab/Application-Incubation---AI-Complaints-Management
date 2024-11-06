@@ -71,7 +71,6 @@ const StateModal = ({ modal, toggle }) => {
                 name="stateName"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                placeholder="Enter state name"
                 touched={touched.stateName}
                 type="text"
                 value={values.stateName || ""}

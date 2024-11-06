@@ -126,24 +126,6 @@ export const NavItems = () => {
       ],
     },
     {
-      id: 5,
-      menuName: t("ROLES AND RIGHTS LIST"),
-      title: t("ROLES AND RIGHTS LIST"),
-      menuIcon: <MdSupervisorAccount size={20} />,
-      path: "/role-rights",
-      disabled: false,
-      roleName: "RoleRights"
-    },
-    {
-      id: 6,
-      menuName:t("USERS"),
-      title: t("USERS"),
-      menuIcon: <MdSupervisorAccount size={20} />,
-      path: "/users",
-      disabled: false,
-      roleName: "users"
-    },
-    {
       id: 7,
       menuName: t("TICKETS"),
       title: t("TICKETS"),

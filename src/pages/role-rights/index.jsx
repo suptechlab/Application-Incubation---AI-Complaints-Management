@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { MdDelete, MdEdit } from "react-icons/md";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
+import GenericModal from "../../components/GenericModal";
 import ListingSearchForm from "../../components/ListingSearchForm";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
@@ -15,10 +16,8 @@ import {
   handleGetRoleRights,
 } from "../../services/rolerights.service"; // Update the import to include delete function
 import { handleStatusChangeState } from "../../services/user.service";
-import RoleRightsModal from "./RoleRightsModal";
 export default function RoleRightsList() {
   const location = useLocation();
-  const navigate = useNavigate();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
   const [pagination, setPagination] = useState({
@@ -31,17 +30,28 @@ export default function RoleRightsList() {
     search: "",
   });
 
-  const toggle = () => setModal(!modal);
+  const [loading, setLoading] = useState(false);
+  const [selectedRow, setSelectedRow] = useState();
+  const [deleteShow, setDeleteShow] = useState(false);
+  const [deleteId, setDeleteId] = useState();
 
-  const deleteRoleRight = async (id) => {
-    if (window.confirm("Are you sure you want to delete this role right?")) {
-      try {
-        await handleDeleteRoleRight(id);
-        toast.success("Role right deleted successfully");
-        dataQuery.refetch();
-      } catch (error) {
-        toast.error(error.response.data.detail);
-      }
+  //Handle Delete
+  const deleteAction = (rowData) => {
+    setSelectedRow(rowData);
+    setDeleteId(rowData.id);
+    setDeleteShow(true);
+  };
+
+  const recordDelete = async (deleteId) => {
+    setLoading(true);
+    try {
+      await handleDeleteRoleRight(deleteId);
+      toast.success("Role right deleted successfully");
+      dataQuery.refetch();
+      setDeleteShow(false);
+    } catch (error) {
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,7 +136,7 @@ export default function RoleRightsList() {
         },
         id: "status",
         header: () => "Status",
-        size: '90',
+        size: "90",
       },
       {
         id: "actions",
@@ -149,15 +159,13 @@ export default function RoleRightsList() {
                 type: "button",
                 title: "Delete",
                 icon: <MdDelete size={18} />,
-                handler: () => deleteRoleRight(rowData.row.original.id),
+                handler: () => deleteAction(rowData.row.original),
               },
             ]}
           />
         ),
-        header: () => (
-          <div className="text-center">Actions</div>
-        ),
-        size: '100',
+        header: () => <div className="text-center">Actions</div>,
+        size: "100",
       },
     ],
     []
@@ -193,7 +201,17 @@ export default function RoleRightsList() {
           </Card.Body>
         </Card>
       </div>
-      <RoleRightsModal modal={modal} toggle={toggle} />
+
+      {/* Delete Modal */}
+      <GenericModal
+        show={deleteShow}
+        handleClose={() => setDeleteShow(false)}
+        modalHeaderTitle={`Delete Role`}
+        modalBodyContent={`Are you sure, you want to delete the role - ${selectedRow?.name}?`}
+        handleAction={() => recordDelete(deleteId)}
+        buttonName="Delete"
+        ActionButtonVariant="danger"
+      />
     </React.Fragment>
   );
 }

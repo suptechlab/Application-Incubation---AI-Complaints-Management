@@ -82,8 +82,7 @@ const Add = ({ modal, toggle,provinces,dataQuery }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
-                touched={touched?.name}
+                touched={touched.cityName}
                 type="text"
                 value={values?.name || ""}
               />

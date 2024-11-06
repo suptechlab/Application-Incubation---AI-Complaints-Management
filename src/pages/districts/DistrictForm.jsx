@@ -134,7 +134,6 @@ const DistrictForm = () => {
                                                             name="districtName"
                                                             onBlur={handleBlur}
                                                             onChange={handleChange}
-                                                            placeholder="Enter district name"
                                                             touched={touched.districtName}
                                                             type="text"
                                                             value={values.districtName || ""}
@@ -163,7 +162,6 @@ const DistrictForm = () => {
                                                             name="districtCode"
                                                             onBlur={handleBlur}
                                                             onChange={handleChange}
-                                                            placeholder="Enter district code"
                                                             touched={touched.districtCode}
                                                             type="text"
                                                             value={values.districtCode || ""}

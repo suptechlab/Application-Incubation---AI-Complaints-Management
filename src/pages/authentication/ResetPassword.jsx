@@ -101,7 +101,6 @@ export default function ResetPassword() {
                                                 name="otp"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                placeholder="Enter OTP"
                                                 touched={touched.otp}
                                                 type="password"
                                                 value={values.otp}
@@ -115,7 +114,6 @@ export default function ResetPassword() {
                                                 name="password"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                placeholder="Enter New Password"
                                                 touched={touched.password}
                                                 type="password"
                                                 value={values.password}
@@ -129,7 +127,6 @@ export default function ResetPassword() {
                                                 name="confirmPassword"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                placeholder="Enter confirm password"
                                                 touched={touched.confirmPassword}
                                                 type="password"
                                                 value={values.confirmPassword}

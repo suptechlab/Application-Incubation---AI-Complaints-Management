@@ -171,7 +171,6 @@ const RoleRightsForm = () => {
                           name="name"
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Enter role name"
                           touched={touched.name}
                           type="text"
                           value={values.name}
@@ -186,7 +185,6 @@ const RoleRightsForm = () => {
                           name="description"
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Enter description"
                           touched={touched.description}
                           type="text"
                           value={values.description}
