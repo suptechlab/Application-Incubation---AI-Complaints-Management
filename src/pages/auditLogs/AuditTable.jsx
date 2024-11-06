@@ -1,9 +1,14 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 
 // Utility function to convert keys to camelCase
 const toCamelCase = (str) =>
   str.replace(/([-_][a-z])/gi, (match) => match.toUpperCase().replace('-', '').replace('_', ''));
+
+const toCapitalized = (str) =>
+  str.replace(/([A-Z])/g, ' $1') // Add space before each uppercase letter
+     .replace(/^./, (match) => match.toUpperCase()); // Capitalize the first letter of the resulting string
 
 // Utility function to render cell data
 const renderCell = (value) => {
@@ -29,14 +34,16 @@ const renderCell = (value) => {
 const AuditTable = ({ newData, oldData }) => {
   const auditKeys = new Set([...Object.keys(newData), ...Object.keys(oldData)]);
 
+  const {t} = useTranslation()
+
   return (
     <Table striped bordered hover>
       <thead>
         <tr>
-          <th>Field</th>
-          <th>New Record</th>
-          <th>Old Record</th>
-          <th>Status</th>
+          <th>{t("FIELD")}</th>
+          <th>{t("NEW RECORD")}</th>
+          <th>{t("OLD RECORD")}</th>
+          <th>{t("STATUS")}</th>
         </tr>
       </thead>
       <tbody>
@@ -47,11 +54,11 @@ const AuditTable = ({ newData, oldData }) => {
 
           return (
             <tr key={key}>
-              <td>{toCamelCase(key)}</td>
+              <td>{toCapitalized(key)}</td>
               <td>{renderCell(newValue)}</td>
               <td>{renderCell(oldValue)}</td>
               <td style={{ color: isChanged ? 'red' : 'green' }}>
-                {isChanged ? 'Modified' : 'Unchanged'}
+                {isChanged ? t('MODIFIED') : t('UNCHANGED')}
               </td>
             </tr>
           );

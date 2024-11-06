@@ -175,20 +175,6 @@ const routes = [
         isPrivate: true,
         layoutType: "Auth",
     },
-
-    {
-        path: "/users/:id",
-        element: <UserForm isEdit={true} />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/users/:id/transactions",
-        element: <UserTransactions />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-
     {
         path: "/settings",
         element: <Settings />,
@@ -220,18 +206,17 @@ const routes = [
         layoutType: "Blank",
     },
     {
-        path: "/audit-logs",
+        path: "/reports/audit-trail",
         element: <AuditLogs />,
         isPrivate: true,
         layoutType: "Auth",
     },
     {
-        path: "/audit-log/:id",
+        path: "/reports/audit-trail/:id",
         element: <ViewAuditTrail />,
         isPrivate: true,
         layoutType: "Auth",
     },
-
 ];
 
 export default routes;

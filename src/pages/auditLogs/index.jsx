@@ -15,6 +15,7 @@ import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule"
 import { MdVisibility } from "react-icons/md";
 import Loader from "../../components/Loader";
 import { handleGetAuditLogs } from "../../services/auditlogs.services";
+import SearchForm from "./SearchForm";
 
 const AuditLogs = () => {
 
@@ -165,9 +166,9 @@ const AuditLogs = () => {
     const columns = React.useMemo(
         () => [
             {
-                accessorFn: (row) => row.dateTime,
-                id: "dateTime",
-                header: () => "Activity Time",
+                accessorFn: (row) => row.createdAt,
+                id: "createdAt",
+                header: () => t("DATE AND TIME OF ACTIVITY"),
                 cell: (info) => {
                     return (
                         <span>
@@ -181,17 +182,17 @@ const AuditLogs = () => {
             {
                 accessorFn: (row) => row?.userName,
                 id: "userName",
-                header: () => "Username",
+                header: () => t("USERNAME/ID"),
             },
             {
                 accessorFn: (row) => row.activityType,
                 id: "activityType",
-                header: () => "Activity Type",
+                header: () => t("ACTIVITY TYPE"),
             },
             {
                 accessorFn: (row) => row.ipAddress,
                 id: "ipAddress",
-                header: () => "Ip Address",
+                header: () => t("IP ADDRESS/LOCATION"),
             },
             {
                 id: "actions",
@@ -199,11 +200,11 @@ const AuditLogs = () => {
                 cell: (info) => {
                     return (
                         <div className="d-flex items-center gap-2 justify-content-center">
-                            <Link to={`/audit-log/${info?.row?.original?.id}`} className="text-dark"><MdVisibility /> </Link>
+                            <Link to={`/reports/audit-trail/${info?.row?.original?.id}`} className="text-dark"><MdVisibility /> </Link>
                         </div>
                     );
                 },
-                header: () => <div className="d-flex justify-content-center">Actions</div>,
+                header: () => <div className="d-flex justify-content-center">{t("ACTIONS")}</div>,
                 enableSorting: false,
             },
         ],
@@ -228,14 +229,14 @@ const AuditLogs = () => {
     return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <Loader isLoading={isLoading} />
         <PageHeader
-            title={t("AUDIT LOGS")}
+            title={t("AUDIT TRAIL REPORT")}
             actions={[
                 { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "warning", disabled: true },
             ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
             <Card.Body className="d-flex flex-column">
-                <ListingSearchForm filter={filter} setFilter={setFilter} />
+                <SearchForm filter={filter} setFilter={setFilter} />
                 <CommonDataTable
                     columns={columns}
                     dataQuery={dataQuery}

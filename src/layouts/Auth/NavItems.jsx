@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { MdConfirmationNumber, MdDashboard, MdFolder, MdPerson, MdSchema, MdSupervisorAccount } from "react-icons/md";
+import { BsFillFileTextFill } from "react-icons/bs";
 
 export const NavItems = () => {
   const { t } = useTranslation(); // use the translation hook
@@ -121,7 +122,7 @@ export const NavItems = () => {
           path: "/template-master",
           moduleName: ["Master Management"],
           roleName: "admin",
-          disabled: false,
+          disabled: true,
         }
       ],
     },
@@ -145,11 +146,38 @@ export const NavItems = () => {
     },
     {
       id: 7,
-      menuName: t("AUDIT LOGS"),
-      title: t("AUDIT LOGS"),
-      menuIcon: <MdSchema size={20} />,
-      path: "/audit-logs",
+      menuName: t("REPORTS"),
+      title: t("REPORTS"),
+      menuIcon: <BsFillFileTextFill size={20} />,
+      path: '#',
+      moduleName: ["reports"],
       roleName: "admin",
-    },
+      subMenu: [
+        {
+          id: 71,
+          menuName: t("CLAIM OVERVIEW"),
+          path: "/reports/claim-overview",
+          moduleName: ["reports"],
+          roleName: "admin",
+          disabled: true,
+        },
+        {
+          id: 72,
+          menuName: t("SLA COMPLIANCE"),
+          path: "/reports/sla-compliance",
+          moduleName: ["reports"],
+          roleName: "admin",
+          disabled: true,
+        },
+        {
+          id: 73,
+          menuName: t("AUDIT TRAIL REPORT"),
+          path: "/reports/audit-trail",
+          moduleName: ["reports"],
+          roleName: "admin",
+          disabled: false,
+        },
+      ],
+    }
   ];
 }
