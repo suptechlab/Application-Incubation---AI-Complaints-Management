@@ -8,6 +8,7 @@ const ReactSelect = ({
   value,
   onChange,
   wrapperClassName = "mb-3 pb-1",
+  size,
   name,
   label,
   placeholder,
@@ -97,9 +98,7 @@ const ReactSelect = ({
         isClearable={selectedOption?.value != ""}
         classNamePrefix="react-select"
         defaultValue={defaultValue}
-        className={`react-select-container ${
-          selectedOption ? "has-value" : ""
-        }`}
+        className={`react-select-container ${selectedOption ? "has-value" : ""} ${size === 'sm' ? 'react-select-sm' : ''}`}
         menuPortalTarget={document.body}
         components={{
           ClearIndicator: () => null,

@@ -26,6 +26,7 @@ const SearchForm = ({ filter, setFilter }) => {
             name="search"
             placeholder={t("SEARCH")}
             type="text"
+            size="sm"
             onChange={(event) => {
               if (event.target.value === "") {
                 setFilter({
@@ -44,13 +45,14 @@ const SearchForm = ({ filter, setFilter }) => {
         </div>
 
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-          <div className="custom-width-120 flex-grow-1 flex-md-grow-0">
+          <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
               class="form-select "
               placeholder={t("ALL ACTIVITIES")}
               id="floatingSelect"
               options={activityTypeOptions ?? []}
+              size="sm"
               onChange={(e) => {
                 setFilter({
                   ...filter,
