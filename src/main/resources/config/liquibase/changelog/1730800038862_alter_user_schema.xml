@@ -22,4 +22,7 @@
     <modifyDataType tableName="jhi_user" columnName="created_by" newDataType="varchar(255)"/>
     <modifyDataType tableName="jhi_user" columnName="last_modified_by" newDataType="varchar(255)"/>
   </changeSet>
+  <changeSet id="1730887977377" author="matellio">
+    <modifyDataType tableName="jhi_user" columnName="first_name" newDataType="varchar(255)"/>
+  </changeSet>
 </databaseChangeLog>
