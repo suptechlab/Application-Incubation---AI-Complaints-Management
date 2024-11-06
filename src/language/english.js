@@ -35,6 +35,10 @@ export const englishLang = {
     "CREATE INQUIRY TYPE": "Create Inquiry Type",
     "EDIT INQUIRY TYPE": "Edit Inquiry Type",
     "INQUIRY SUB TYPE": "Inquiry Sub Type",
+    "PROVINCE MASTER": "Province Master",
+    "CITY MASTER": "City Master",
+    "TEMPLATE MASTER": "Template Master",
+
     "PROVINCE MASTER":"Province Master",
     "CITY MASTER":"City Master",
     "TEMPLATE MASTER" : "Template Master",
@@ -43,9 +47,9 @@ export const englishLang = {
     "TICKETS": "Tickets",
     "TICKET WORKFLOW": "Ticket Workflow",
     // Portal Users Management
-    "USERS" : "Users",
-    "USERS LIST" : "Users List",
-    
+    "USERS": "Users",
+    "USERS LIST": "Users List",
+
     "INQUIRY SUB CATEGORY": "Inquiry Sub Category",
     "CREATE SUB INQUIRY TYPE": "Create Sub Inquiry Type",
     "NAME OF INQUIRY SUB TYPE": "Name of Inquiry Sub Type",
@@ -53,6 +57,39 @@ export const englishLang = {
     "PROVINCE MASTER": "Province Master",
     "CREATE PROVINCE MASTER": "Create Province Master",
     "EDIT PROVINCE MASTER": "Edit Province Master",
+    "NAME OF PROVINCE": "Name of Province",
+    "CREATE CITY MASTER": "Create City Master",
+    "EDIT CITY MASTER": "Edit City Master",
+    "NAME OF THE CITY": "Name of the City",
+    "PROVINCE": "Province",
+    "CREATE TEMPLATE MASTER": "Create Template Master",
+    "EDIT TEMPLATE MASTER": "Edit Template Master",
+    "NAME OF TEMPLATE MASTER": "Name of Template Master",
+    "EXPORT TO CSV": "Export To CSV",
+
+    // MESSAGES
+    "STATUS UPDATED": "Status updated successfully.",
+    "STATUS UPDATE ERROR": "Error in  updating status",
+    "SUB-CLAIM": "Sub-claim",
+
+    // Authentication
+    "ONE TIME PASSWORD": "One Time Password",
+    "WE VE SENT A ONE-TIME PASSWORD (OTP)": "We’ve sent a One-Time Password (OTP) to your email&nbsp;address. Please enter it below to verify.",
+    "BACK": "Back",
+    "DIDN T RECEIVE THE CODE": "Didn’t receive the code?",
+    "RESEND CODE": "Resend Code",
+    "FORGOT PASSWORD": "Forgot Password",
+    "ENTER YOUR EMAIL ADDRESS FORGOT PASSWORD": "Enter your email address Forgot Password",
+    "EMAIL ADDRESS": "Email Address*",
+    "ENTER ADDRESS": "Enter Address",
+    "LOGIN": "Login",
+    "LOADING": "Loading",
+    "PASSWORD": "Password*",
+    "PLEASE LOGIN TO CONTINUE YOUR ACCOUNT": "Please login to continue your account",
+    "SEPS ACCOUNT LOG IN": "SEPS Account Log In",
+    "REMEMBER ME": "Remember Me",
+    "SEND": "Send",
+
     "NAME OF PROVINCE":"Name of Province",
     "CREATE CITY MASTER":"Create City Master",
     "EDIT CITY MASTER":"Edit City Master",

@@ -9,9 +9,11 @@ import Captcha from "../../components/Captcha";
 import toast from "react-hot-toast";
 import { Stack, Form, Image,Button,  Col, Row, Spinner } from "react-bootstrap";
 import Logo from "../../assets/images/logo.svg"
+import { useTranslation } from "react-i18next";
 
 
 export default function Login() {
+    const { t } = useTranslation(); // use the translation hook
     const [captcha, setCaptcha] = useState("");
     const { login } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
@@ -66,10 +68,11 @@ export default function Login() {
                                     </div>
                                     
                                     <h3 className="fw-semibold mb-1 fs-26">
-                                        SEPS Account Log In
+                                        
+                                        {t('SEPS ACCOUNT LOG IN')}
                                     </h3>
                                     <p className="text-body opacity-50 mb-4 pb-1 lh-sm">
-                                        Please login to continue your account
+                                        {t('PLEASE LOGIN TO CONTINUE YOUR ACCOUNT')}
                                     </p>
                                     <Formik
                                         initialValues={{
@@ -95,13 +98,12 @@ export default function Login() {
                                             values,
                                         }) => (
                                             <FormikForm>
-                                                
                                                 <FormInput
                                                     autoComplete="username"
                                                     error={errors.email}
                                                     id="email"
                                                     key={"email"}
-                                                    label="Email Address *"
+                                                    label={t('EMAIL ADDRESS')}
                                                     name="email"
                                                     onBlur={handleBlur}
                                                     onChange={handleChange}
@@ -116,7 +118,7 @@ export default function Login() {
                                                     error={errors.password}
                                                     id="password"
                                                     key={"password"}
-                                                    label="Password *"
+                                                    label={t('PASSWORD')}
                                                     name="password"
                                                     onBlur={handleBlur}
                                                     onChange={handleChange}
@@ -145,7 +147,8 @@ export default function Login() {
                                                                 className="small fw-semibold text-decoration-none"
                                                                 to="/forgot-password"
                                                             >
-                                                                Forgot Password?
+                                                                {t('FORGOT PASSWORD')}?
+                                                                
                                                             </Link>                                                        
                                                         </Col>
                                                     </Row>
@@ -174,10 +177,10 @@ export default function Login() {
                                                     >
                                                         {isSubmitting ? (
                                                         <Spinner size="sm" animation="border" role="output" className="align-middle me-1">
-                                                            <span className="visually-hidden">Loading...</span>
+                                                            <span className="visually-hidden">{t('LOADING')}...</span>
                                                         </Spinner>
                                                     ) : (
-                                                        "Login"
+                                                        t('LOGIN')
                                                     )}
                                                     </Button>
                                                 </Stack>

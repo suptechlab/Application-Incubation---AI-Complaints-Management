@@ -10,8 +10,10 @@ import Captcha from '../../components/Captcha';
 import Logo from "../../assets/images/logo.svg"
 import ForgotPasswordBanner from "../../assets/images/banner.png";
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { useTranslation } from "react-i18next";
 
 export default function ForgotPassword() {
+    const { t } = useTranslation(); // use the translation hook
     const [captcha, setCaptcha] = useState('')
     const reCaptchaRef = useRef(null);
     const navigate = useNavigate()
@@ -46,7 +48,7 @@ export default function ForgotPassword() {
                         <Col xs={12} className="p-4">
                             <div className="custom-max-width-320 w-100 m-auto">
                                 <Link to="/login" className='fw-semibold d-inline-block align-middle mb-5 text-decoration-none'>
-                                    <IoIosArrowRoundBack size={28} /> Back
+                                    <IoIosArrowRoundBack size={28} /> {t('BACK')}
                                 </Link>
                                 <div className="mb-4 pb-1">
                                     <Link to="/" className="d-inline-block">
@@ -60,10 +62,10 @@ export default function ForgotPassword() {
                                     </Link>                                    
                                 </div>
                                 <h3 className="fw-semibold mb-1 fs-26">
-                                    Forgot Password
+                                    {t('FORGOT PASSWORD')}
                                 </h3>
                                 <p className="text-body opacity-50 mb-4 pb-1 lh-sm">
-                                    Enter your email address
+                                    {t('ENTER YOUR EMAIL ADDRESS FORGOT PASSWORD')}
                                 </p>
                                 <Formik
                                     initialValues={{
@@ -85,9 +87,9 @@ export default function ForgotPassword() {
                                             key={'email'}
                                             id="email"
                                             name="email"
-                                            placeholder="Enter email"
+                                            placeholder= {t('ENTER ADDRESS')}
                                             type="text"
-                                            label="Email Address *"
+                                            label={t('EMAIL ADDRESS')}
                                             value={values.email}
                                             error={errors.email}
                                             touched={touched.email}
@@ -122,7 +124,7 @@ export default function ForgotPassword() {
                                                         <span className="visually-hidden">Loading...</span>
                                                     </Spinner>
                                                 ) : (
-                                                    "Send"
+                                                     t('SEND')
                                                 )}
                                             </Button>
                                         </Stack>
