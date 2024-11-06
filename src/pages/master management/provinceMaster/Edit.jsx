@@ -7,25 +7,31 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { validationSchema } from "../../../validations/provinceMaster.validation";
+import { editProvinceMaster } from "../../../services/provinceMaster.service";
 
-const Edit = ({ modal, toggle }) => {
+const Edit = ({ modal, toggle,rowData,dataQuery }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const handleSubmit = async (values) => {
-    console.log("values::", values);
-    toast.success("Province master added successfully.");
-
-    // handleAddDistrict(values).then(response => {
-    //     console.log("Add District::", response);
-    //     toast.success(response.data.message);
-    //     navigate("/districts");
-    // }).catch((error) => {
-    //     if(error.response.data.fieldErrors){
-    //         toast.error(error.response.data.fieldErrors[0].message);
-    //     }else{
-    //         toast.error(error.response.data.detail);
-    //     }
-    // });
+ 
+  const handleSubmit = async (values, actions) => {
+    const formData = {
+      name: values?.name
+    };
+    editProvinceMaster(rowData?.id , formData)
+      .then((response) => {
+        toast.success(response?.data?.message);
+        toggle();
+        dataQuery.refetch()
+      })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+      .finally(() => {
+        actions.setSubmitting(false);
+      });
   };
 
   return (
@@ -47,7 +53,7 @@ const Edit = ({ modal, toggle }) => {
       </Modal.Header>
       <Formik
         initialValues={{
-          provinceName: "",
+          name: rowData?.name,
         }}
         onSubmit={(values, actions) => {
           actions.setSubmitting(false);
@@ -68,17 +74,17 @@ const Edit = ({ modal, toggle }) => {
           <Form>
             <Modal.Body className="text-break py-0">
               <FormInput
-                error={errors.provinceName}
-                id="provinceName"
-                key={"provinceName"}
+                error={errors?.name}
+                id="name"
+                key={"name"}
                 label={t("NAME OF PROVINCE")}
-                name="provinceName"
+                name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 // placeholder="Enter district name"
-                touched={touched.provinceName}
+                touched={touched?.name}
                 type="text"
-                value={values.provinceName || ""}
+                value={values?.name || ""}
               />
             </Modal.Body>
             <Modal.Footer className="pt-0">
@@ -89,12 +95,11 @@ const Edit = ({ modal, toggle }) => {
                 className="custom-min-width-85"
               >
                 {t("CANCEL")}
-              </Button>{" "}
+              </Button>
               <Button
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
               >
                 {t("SUBMIT")}
               </Button>

@@ -16,11 +16,14 @@ import { changeInquirySubTypeStatus, downloadInquirySubTypes, handleGetInquirySu
 import { Card } from "react-bootstrap";
 import DataGridActions from "../../../components/DataGridActions";
 import { MdEdit } from "react-icons/md";
+import Loader from "../../../components/Loader";
 
 const InquirySubType = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+  const [isLoading, setLoading] = useState(false)
+  const [isDownloading , setDownloading] = useState(false)
   const queryClient = useQueryClient();
   const { t } = useTranslation()
 
@@ -30,7 +33,12 @@ const InquirySubType = () => {
   });
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState({ row: {}, open: false })
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([
+    {
+      "id": "name",
+      "desc": true
+    }
+  ]);
   const [filter, setFilter] = useState({
     search: "",
   });
@@ -104,6 +112,7 @@ const InquirySubType = () => {
 
   // CHANGE STATUS
   const changeStatus = async (id, currentStatus) => {
+    setLoading(true)
     changeInquirySubTypeStatus(id, !currentStatus).then(response => {
       toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
@@ -113,6 +122,8 @@ const InquirySubType = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
+    }).finally(() => {
+      setLoading(false)
     })
   };
   useEffect(() => {
@@ -127,6 +138,8 @@ const InquirySubType = () => {
 
   // HANDLE INQUIRY SUB TYPES CSV DOWNLOAD
   const handleDownload = () => {
+    setDownloading(true)
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadInquirySubTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -146,8 +159,9 @@ const InquirySubType = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
       } else {
-        throw new Error('Response data is empty.');
+        throw new Error(t("EMPTY RESPONSE"));
       }
       // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
@@ -156,7 +170,12 @@ const InquirySubType = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
-    })
+      toast.dismiss("downloading");
+    }).finally(() => {
+      // Ensure the loading toast is dismissed
+      // toast.dismiss("downloading");
+      setDownloading(false)
+    });
   }
 
   const columns = React.useMemo(
@@ -175,7 +194,7 @@ const InquirySubType = () => {
         accessorFn: (row) => row.description != null ? row.description : '-',
         id: "description",
         header: () => t("DESCRIPTION"),
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -195,11 +214,11 @@ const InquirySubType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
-        size : '80',
+        size: '80',
       },
       {
         id: "actions",
-        isAction: true,        
+        isAction: true,
         cell: (rowData) => (
           <DataGridActions
             controlId="province-master"
@@ -209,7 +228,7 @@ const InquirySubType = () => {
                 name: "edit",
                 enabled: permission.current.editModule,
                 type: "button",
-                title: "Edit",
+                title:t("EDIT"),
                 icon: <MdEdit size={18} />,
                 handler: () => editInquiryType(rowData?.row?.original),
               },
@@ -218,7 +237,7 @@ const InquirySubType = () => {
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
-        size : '80',
+        size: '80',
       },
     ],
     []
@@ -264,9 +283,10 @@ const InquirySubType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+    <Loader isLoading={isLoading} />
     <PageHeader title={t("INQUIRY SUB TYPE")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
+        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" ,disabled : isDownloading },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]} />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
@@ -282,7 +302,6 @@ const InquirySubType = () => {
         />
       </Card.Body>
     </Card>
-
     <Add modal={modal} dataQuery={dataQuery} toggle={toggle} inquiryTypes={inquiryTypes} />
     <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} inquiryTypes={inquiryTypes} />
   </div>

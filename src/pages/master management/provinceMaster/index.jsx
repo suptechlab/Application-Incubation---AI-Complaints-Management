@@ -14,28 +14,37 @@ import Toggle from "../../../components/Toggle";
 import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
+import { changeProvinceMasterStatus, downloadProvinceMasterList, handleGetProvinceMaster } from "../../../services/provinceMaster.service";
+import Loader from "../../../components/Loader";
 
 const ProvinceMaster = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
-  const {t} = useTranslation()
+  const [isLoading, setLoading] = useState(false)
+  const [isDownloading, setDownloading] = useState(false)
+  const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
-  const [editModal , setEditModal] = useState({id :'' , open : false})
-  const [sorting, setSorting] = useState([]);
+  const [editModal, setEditModal] = useState({ row: {}, open: false })
+  const [sorting, setSorting] = useState([
+    {
+      "id": "name",
+      "desc": true
+    }
+  ]);
   const [filter, setFilter] = useState({
     search: "",
   });
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({id : '' , open : !editModal?.open});
+  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
@@ -65,8 +74,8 @@ const ProvinceMaster = () => {
     })
 
   }, []);
-  const editProvinceMaster = async (id) => {
-    setEditModal({id : id , open : !editModal?.open })
+  const editProvinceMaster = async (rowData) => {
+    setEditModal({ row: rowData, open: !editModal?.open })
   };
 
   const dataQuery = useQuery({
@@ -75,51 +84,44 @@ const ProvinceMaster = () => {
       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
       Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
-      // For now, returning default data without API request
-      return [
-        {
-          id: 1,
-          provinceMaster: 'Azuay'
-        },
-        {
-          id: 2,
-          provinceMaster: 'Bolivar'
-        },
-      ];
+      if (sorting.length === 0) {
+        return handleGetProvinceMaster({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          ...filterObj,
+        });
+      } else {
+        return handleGetProvinceMaster({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          sort: sorting
+            .map(
+              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+            )
+            .join(","),
+          ...filterObj,
+        });
+      }
     },
-    // queryFn: () => {
-    //   const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-    //   Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-
-    //   if (sorting.length === 0) {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       ...filterObj,
-    //     });
-    //   } else {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       sort: sorting
-    //         .map(
-    //           (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-    //         )
-    //         .join(","),
-    //       ...filterObj,
-    //     });
-    //   }
-    // },
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
   });
 
+  // TOGGLE PROVINCE MASTER STATUS
   const changeStatus = async (id, currentStatus) => {
-    try {
-      // await handleEditDistricts(id, { status: !currentStatus });
-      toast.success("Province master status updated successfully");
+    setLoading(true)
+    changeProvinceMasterStatus(id, !currentStatus).then(response => {
+      toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
-    } catch (error) {
-      toast.error("Error updating state status");
-    }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    }).finally(() => {
+      setLoading(false)
+    })
   };
   useEffect(() => {
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
@@ -129,14 +131,14 @@ const ProvinceMaster = () => {
       });
     }
   }, [dataQuery.data?.data?.totalPages]);
-  // }, []);
 
+  // COLUMNS FOR PROVINCE DATA TABLE
   const columns = React.useMemo(
     () => [
       {
-        accessorFn: (row) => row.provinceMaster,
-        id: "provinceMaster",
-        header: () => t("Province Name"),
+        accessorFn: (row) => row?.name,
+        id: "name",
+        header: () => t("PROVINCE NAME"),
       },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
@@ -145,12 +147,14 @@ const ProvinceMaster = () => {
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
+              tooltip={
+                info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
+              }
               // label="Status"
               name="status"
               value={info?.row?.original?.status}
               checked={info?.row?.original?.status}
-              // onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-              tooltip="Active"
+              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
             />
           )
         },
@@ -170,9 +174,9 @@ const ProvinceMaster = () => {
                 name: "edit",
                 enabled: permission.current.editModule,
                 type: "button",
-                title: "Edit",
+                title:t("EDIT"),
                 icon: <MdEdit size={18} />,
-                handler: () => editProvinceMaster(rowData?.row?.original?.id),
+                handler: () => editProvinceMaster(rowData?.row?.original),
               },
             ]}
           />
@@ -192,19 +196,57 @@ const ProvinceMaster = () => {
     });
   }, [filter]);
 
-  // Export to CSV Click Handler
+  // HANDLE PROVINCE MASTER EXPORT
   const exportHandler = () => {
-    console.log('Export to CSV')
+    setDownloading(true)
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
+    downloadProvinceMasterList({ search: filter?.search ?? "" }).then(response => {
+      if (response?.data) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const tempLink = document.createElement('a');
+        tempLink.href = blobUrl;
+        tempLink.setAttribute('download', 'provinces.xlsx');
+
+        // Append the link to the document body before clicking it
+        document.body.appendChild(tempLink);
+
+        tempLink.click();
+
+        // Clean up by revoking the Blob URL
+        window.URL.revokeObjectURL(blobUrl);
+
+        // Remove the link from the document body after clicking
+        document.body.removeChild(tempLink);
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+      } else {
+        throw new Error(t("EMPTY RESPONSE"));
+      }
+      // toast.success(t("STATUS UPDATED"));
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+      toast.dismiss("downloading");
+    }).finally(() => {
+      // Ensure the loading toast is dismissed
+      // toast.dismiss("downloading");
+      setDownloading(false)
+    });
   }
-  
+
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+    <Loader isLoading={isLoading} />
     <PageHeader
-          title={t("PROVINCE MASTER")}
-          actions={[
-            { label: "Export to CSV", to: exportHandler, variant: "outline-dark", disabled: true},
-            { label: "Add New", onClick: toggle, variant: "warning" },
-          ]}
-        />
+      title={t("PROVINCE MASTER")}
+      actions={[
+        { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
+      ]}
+    />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />
@@ -218,8 +260,8 @@ const ProvinceMaster = () => {
         />
       </Card.Body>
     </Card>
-    <Add modal={modal} toggle={toggle} />
-    <Edit modal={editModal?.open} toggle={editToggle} />
+    <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
+    <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
   </div>
 };
 

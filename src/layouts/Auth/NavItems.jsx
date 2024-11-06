@@ -7,7 +7,7 @@ export const NavItems = () => {
   return [
     {
       id: 1,
-      menuName: t("DASHBOARD"),
+      menuName: "dashboard",
       title: t("DASHBOARD"),
       menuIcon: <MdDashboard size={20} />,
       path: "/",
@@ -16,7 +16,7 @@ export const NavItems = () => {
     },
     {
       id: 2,
-      menuName: t("USER MANAGEMENT"),
+      menuName: "user management",
       title: t("User Management"),
       menuIcon: <MdPerson size={20} />,
       path: '#',
@@ -136,7 +136,7 @@ export const NavItems = () => {
     },
     {
       id: 6,
-      menuName: t("USERS"),
+      menuName:t("USERS"),
       title: t("USERS"),
       menuIcon: <MdSupervisorAccount size={20} />,
       path: "/users",
@@ -145,8 +145,8 @@ export const NavItems = () => {
     },
     {
       id: 7,
-      menuName: t("Tickets"),
-      title: t("Tickets"),
+      menuName: t("TICKETS"),
+      title: t("TICKETS"),
       menuIcon: <MdConfirmationNumber size={20} />,
       path: "/tickets",
       roleName: "admin",
@@ -154,8 +154,8 @@ export const NavItems = () => {
     },
     {
       id: 8,
-      menuName: t("Ticket Workflow"),
-      title: t("Ticket Workflow"),
+      menuName: t("TICKET WORKFLOW"),
+      title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
       roleName: "admin",

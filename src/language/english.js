@@ -28,6 +28,7 @@ export const englishLang = {
     "SLA BREACH DAY": "SLA Breach Days",
     "CANCEL": "Cancel",
     "SUBMIT": "Submit",
+    "EDIT":"Edit",
     "EDIT CLAIM SUB TYPE": "Edit Claim Sub Type",
     "INQUIRY CATEGORY": "Inquiry Category",
     "NAME OF INQUIRY": "Name of Inquiry",
@@ -38,12 +39,18 @@ export const englishLang = {
     "CITY MASTER": "City Master",
     "TEMPLATE MASTER": "Template Master",
 
+    "PROVINCE MASTER":"Province Master",
+    "CITY MASTER":"City Master",
+    "TEMPLATE MASTER" : "Template Master",
+    "TEAM MANAGEMENT": "Team Management",
+    "MASTER MANAGEMENT": "Master Management",
+    "TICKETS": "Tickets",
+    "TICKET WORKFLOW": "Ticket Workflow",
     // Portal Users Management
     "USERS": "Users",
     "USERS LIST": "Users List",
 
     "INQUIRY SUB CATEGORY": "Inquiry Sub Category",
-    "INQUIRY CATEGORY": "Inquiry Category",
     "CREATE SUB INQUIRY TYPE": "Create Sub Inquiry Type",
     "NAME OF INQUIRY SUB TYPE": "Name of Inquiry Sub Type",
     "EDIT SUB INQUIRY TYPE": "Edit Sub Inquiry Type",
@@ -83,4 +90,22 @@ export const englishLang = {
     "REMEMBER ME": "Remember Me",
     "SEND": "Send",
 
+    "NAME OF PROVINCE":"Name of Province",
+    "CREATE CITY MASTER":"Create City Master",
+    "EDIT CITY MASTER":"Edit City Master",
+    "NAME OF THE CITY":"Name of the City",
+    "PROVINCE" : "Province",
+    "CREATE TEMPLATE MASTER":"Create Template Master",
+    "EDIT TEMPLATE MASTER":"Edit Template Master",
+    "NAME OF TEMPLATE MASTER":"Name of Template Master",
+    "EXPORT TO CSV" : "Export To CSV",
+    "CITY NAME" : "City Name",
+    "SUB-CLAIM" : "Sub-claim",
+    "PROVINCE NAME":"Province Name",
+    // MESSAGES
+    "STATUS UPDATED" : "Status updated successfully.",
+    "STATUS UPDATE ERROR" : "Error in  updating status",
+    "EXPORT IN PROGRESS" : "Export in progress... Please wait.",
+    "CSV DOWNLOADED" : "CSV file downloaded successfully.",
+    "EMPTY RESPONSE":"Response data is empty."
 }

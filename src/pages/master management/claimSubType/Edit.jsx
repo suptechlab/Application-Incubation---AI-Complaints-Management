@@ -81,7 +81,7 @@ const Edit = ({ modal, dataQuery, toggle, rowData, claimTypes }) => {
                 error={errors.name}
                 id="name"
                 key={"name"}
-                label={t("NAME OF CLAIM SUB TYPE")}
+                label={t("SUB-CLAIM")}
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
