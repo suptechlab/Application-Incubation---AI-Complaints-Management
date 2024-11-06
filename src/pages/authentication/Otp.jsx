@@ -10,8 +10,10 @@ import Logo from "../../assets/images/logo.svg"
 import {Link, useLocation } from 'react-router-dom';
 import OtpInput from 'react-otp-input';
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { useTranslation } from "react-i18next";
 
 export default function Otp() {
+    const { t } = useTranslation(); // use the translation hook
     const location = useLocation();
     const { login, OtpVerify } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
@@ -34,12 +36,10 @@ export default function Otp() {
             let data = {
                 'otpToken': otpToken
             }
-            console.log('calling handleResendOTP with data:', data);
+            
             let res = await handleResendOTP(data);
-            console.log('handleResendOTP response:', res);
             toast.success("OTP has been resent successfully.");
         } catch (error) {
-            console.error("Error in handleResend:", error);
             toast.error("Failed to resend OTP. Please try again.");
         }
     }
@@ -53,7 +53,7 @@ export default function Otp() {
                         <Col xs={12} className="p-4">
                             <div className="custom-max-width-320 w-100 m-auto">
                                 <Link to="/login" className='fw-semibold d-inline-block align-middle mb-5 text-decoration-none'>
-                                    <IoIosArrowRoundBack size={28} /> Back
+                                    <IoIosArrowRoundBack size={28} /> {t('BACK')}
                                 </Link>
                                 <div className="mb-4 pb-1">
                                     <Link to="/" className="d-inline-block">
@@ -66,8 +66,8 @@ export default function Otp() {
                                         />
                                     </Link>                                    
                                 </div>
-                                <h3 className="fw-semibold mb-1 fs-26">One Time Password</h3>
-                                <p className="text-body opacity-50 mb-4 pb-1 lh-sm">We’ve sent a One-Time Password (OTP) to your email&nbsp;address. Please enter it below to verify.</p>
+                                <h3 className="fw-semibold mb-1 fs-26">{t('ONE TIME PASSWORD')}</h3>
+                                <p className="text-body opacity-50 mb-4 pb-1 lh-sm">{t('WE VE SENT A ONE-TIME PASSWORD (OTP)')}</p>
                                 <Formik
                                     initialValues={{
                                         otpCode: ''
@@ -136,8 +136,8 @@ export default function Otp() {
                                                 </Button>
                                             </Stack>
                                             <Form.Group className="small">
-                                                Didn’t receive the code? 
-                                                <Link className="fw-semibold text-decoration-none" onClick={handleResend}> Resend Code </Link>
+                                            {t('DIDN T RECEIVE THE CODE')}
+                                                <Link className="fw-semibold text-decoration-none" onClick={handleResend}> {t('RESEND CODE')} </Link>
                                             </Form.Group>
                                         </FormikForm>
                                     )}

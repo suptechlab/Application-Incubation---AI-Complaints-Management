@@ -56,4 +56,22 @@ export const spanishLang = {
 
     "STATUS UPDATED" : "Estado actualizado con éxito.",
 
+    // Authentication
+    "ONE TIME PASSWORD" : "One Time Password",
+    "WE VE SENT A ONE-TIME PASSWORD (OTP)" : "We’ve sent a One-Time Password (OTP) to your email&nbsp;address. Please enter it below to verify.",
+    "BACK" : "Back",
+    "DIDN T RECEIVE THE CODE" : "Didn’t receive the code?",
+    "RESEND CODE" : "Resend Code",
+    "FORGOT PASSWORD" : "Forgot Password",
+    "ENTER YOUR EMAIL ADDRESS FORGOT PASSWORD" : "Enter your email address Forgot Password",
+    "EMAIL ADDRESS" : "Email Address*",
+    "ENTER ADDRESS" : "Enter Address",
+    "LOGIN" : "Login",
+    "LOADING" : "Loading",
+    "PASSWORD" : "Password*",
+    "PLEASE LOGIN TO CONTINUE YOUR ACCOUNT" : "Please login to continue your account",
+    "SEPS ACCOUNT LOG IN" : "SEPS Account Log In",
+    "REMEMBER ME" :"Remember Me",
+    "SEND" : "Send",
+
 }

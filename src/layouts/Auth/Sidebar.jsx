@@ -96,20 +96,21 @@ import "./sidebar.scss"
                 return (
                   <Nav.Item as="li" key={id}>
                     {(permission.current.isAdmin || permission.current.list.includes(roleName)) ? !subMenu && (
-                      <Nav.Link
-                        key={menuName}
-                        id={id}
-                        as={NavLink}
-                        to={path}
-                        className={`align-items-center d-flex px-0 sidebarLink rounded ${disabled ? "disabled" : ""
-                          }`}
-                        onClick={handleNavLinkClick}
-                      >
-                        <span className="py-1 text-center min-w-44 sidebarIcon">
-                          {menuIcon}
-                        </span>
-                        <span className="hideInSmallSidebar text-wrap lh-sm">{title}</span> 
-                      </Nav.Link>
+                      // <Nav.Link
+                      //   key={menuName}
+                      //   id={id}
+                      //   as={NavLink}
+                      //   to={path}
+                      //   className={`align-items-center d-flex px-0 sidebarLink rounded ${disabled ? "disabled" : ""
+                      //     }`}
+                      //   onClick={handleNavLinkClick}
+                      // >
+                      //   <span className="py-1 text-center min-w-44 sidebarIcon">
+                      //     {menuIcon}
+                      //   </span>
+                      //   <span className="hideInSmallSidebar text-wrap lh-sm">{title}</span> 
+                      // </Nav.Link>
+                      ''
                     ) : ''}
                     {permission.current.isAdmin || permission.current.list.includes(roleName) ? subMenu && (
                       
