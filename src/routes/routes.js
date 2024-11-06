@@ -27,6 +27,9 @@ const AccountProfile = React.lazy(() => import("../pages/Profile"));
 const AddEditState = React.lazy(() => import("../pages/states/StateForm"));
 const AddStatePage = React.lazy(() => import("../pages/states/AddStatePage"));
 const AddUserPage = React.lazy(() => import("../pages/users/AddUserPage"));
+const FIUserList = React.lazy(() => import("../pages/fi-users"));
+const FIUserAddEdit = React.lazy(() => import("../pages/fi-users/AddEdit"));
+const ImportFIUser = React.lazy(() => import("../pages/fi-users/importData"));
 const AddEditRoleRights = React.lazy(() =>
   import("../pages/role-rights/RoleRightsForm")
 );
@@ -104,119 +107,143 @@ const routes = [
     isPrivate: false,
     layoutType: "Blank",
 
-        // path: "/",
-        // element: <Login />,
-        // isPrivate: false,
-        // layoutType: "Auth",
-    },
-    {
-        path: "/otp",
-        element: <Otp />,
-        isPrivate: false,
-        layoutType: "Blank",
-    },
-    {
-        path: "/forgot-password",
-        element: <ForgotPassword />,
-        isPrivate: false,
-        layoutType: "Blank",
-    },
-    {
-        path: "/reset-password",
-        element: <ResetPassword />,
-        isPrivate: false,
-        layoutType: "Blank",
-    },
-    {
-        path: "/change-password",
-        element: <ChangePassword />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/profile",
-        element: <AccountProfile />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/users",
-        element: <UserList />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/states",
-        element: <StatesList />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/states/add",
-        element: <AddStatePage isEdit={false} />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/users/add",
-        element: <AddUserPage isEdit={false} />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/users/edit/:id",
-        element: <AddUserPage isEdit={false} />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/states/edit/:id",
-        element: <AddEditState isEdit={true} />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/settings",
-        element: <Settings />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/role-rights",
-        element: <RoleRightsList />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/role-rights/add",
-        element: <AddEditRoleRights isEdit={false} />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/role-rights/edit/:id",
-        element: <AddEditRoleRights isEdit={true} />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "*",
-        element: <NotFoundPage />,
-        isPrivate: false,
-        layoutType: "Blank",
-    },
-    {
-        path: "/reports/audit-trail",
-        element: <AuditLogs />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
-    {
-        path: "/reports/audit-trail/:id",
-        element: <ViewAuditTrail />,
-        isPrivate: true,
-        layoutType: "Auth",
-    },
+    // path: "/",
+    // element: <Login />,
+    // isPrivate: false,
+    // layoutType: "Auth",
+  },
+  {
+    path: "/otp",
+    element: <Otp />,
+    isPrivate: false,
+    layoutType: "Blank",
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+    isPrivate: false,
+    layoutType: "Blank",
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
+    isPrivate: false,
+    layoutType: "Blank",
+  },
+  {
+    path: "/change-password",
+    element: <ChangePassword />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/profile",
+    element: <AccountProfile />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/users",
+    element: <UserList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/states",
+    element: <StatesList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/states/add",
+    element: <AddStatePage isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/users/add",
+    element: <AddUserPage isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/users/edit/:id",
+    element: <AddUserPage isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/states/edit/:id",
+    element: <AddEditState isEdit={true} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/settings",
+    element: <Settings />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/role-rights",
+    element: <RoleRightsList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/role-rights/add",
+    element: <AddEditRoleRights isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/role-rights/edit/:id",
+    element: <AddEditRoleRights isEdit={true} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users",
+    element: <FIUserList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/add",
+    element: <FIUserAddEdit isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/edit/:id",
+    element: <FIUserAddEdit isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/import",
+    element: <ImportFIUser isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/reports/audit-trail",
+    element: <AuditLogs />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/reports/audit-trail/:id",
+    element: <ViewAuditTrail />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
+    isPrivate: false,
+    layoutType: "Blank",
+  },
 ];
 
 export default routes;

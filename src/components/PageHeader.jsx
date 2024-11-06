@@ -29,6 +29,7 @@ const PageHeader = ({ title, actions }) => {
                                     onClick={action.onClick}
                                 >
                                     {t(action.label)}
+                                    {action.icon && <span className='ms-2'>{action.icon}</span>}
                                 </Link>
                             ) : (
                                 <Button
@@ -38,6 +39,7 @@ const PageHeader = ({ title, actions }) => {
                                     disabled={action.disabled}
                                 >
                                     {t(action.label)}
+                                    {action.icon && <span className='ms-2'>{action.icon}</span>}
                                 </Button>
                             )
                         )}

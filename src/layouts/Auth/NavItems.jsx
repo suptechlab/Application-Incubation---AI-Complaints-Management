@@ -38,7 +38,7 @@ export const NavItems = () => {
           title: t("FI Users"),
           path: "/fi-users",
           roleName: "admin",
-          disabled: true,
+          disabled: false,
         },
         {
           id: 23,
