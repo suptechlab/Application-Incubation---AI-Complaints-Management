@@ -25,6 +25,9 @@ const AccountProfile = React.lazy(() => import("../pages/Profile"));
 const AddEditState = React.lazy(() => import("../pages/states/StateForm"));
 const AddStatePage = React.lazy(() => import("../pages/states/AddStatePage"));
 const AddUserPage = React.lazy(() => import("../pages/users/AddUserPage"));
+const FIUserList = React.lazy(() => import("../pages/fi-users"));
+const FIUserAddEdit = React.lazy(() => import("../pages/fi-users/AddEdit"));
+const ImportFIUser = React.lazy(() => import("../pages/fi-users/importData"));
 const AddEditRoleRights = React.lazy(() =>
   import("../pages/role-rights/RoleRightsForm")
 );
@@ -197,7 +200,30 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
   },
-
+  {
+    path: "/fi-users",
+    element: <FIUserList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/add",
+    element: <FIUserAddEdit isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/edit/:id",
+    element: <FIUserAddEdit isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/import",
+    element: <ImportFIUser isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
   {
     path: "*",
     element: <NotFoundPage />,
