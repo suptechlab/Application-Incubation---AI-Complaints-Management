@@ -20,7 +20,11 @@ public enum SepsStatusCode implements StatusType {
     CITY_NOT_FOUND(20019, "city.not.found"),
     CURRENT_USER_NOT_FOUND(20020, "current.user.not.found"),
     AUDIT_LOG_NOT_FOUND(20021, "audit.log.not.found"),
-    INVALID_DATE_FORMAT(20022, "invalid.date.format");
+    INVALID_DATE_FORMAT(20022, "invalid.date.format"),
+    EMAIL_ALREADY_USED(20023, "email.already.used"),
+    USER_NOT_FOUND(20024, "user.not.found"),
+    SEPS_USER_NOT_FOUND(20025, "seps.user.not.found"),
+    INVALID_STATUS_TRANSITION(20026, "invalid.status.transition");
 
     private final int code;
 

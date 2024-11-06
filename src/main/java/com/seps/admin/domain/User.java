@@ -2,6 +2,7 @@ package com.seps.admin.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.seps.admin.config.Constants;
+import com.seps.admin.enums.UserStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -32,8 +33,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @NotNull
     @Pattern(regexp = Constants.LOGIN_REGEX)
-    @Size(min = 1, max = 50)
-    @Column(length = 50, unique = true, nullable = false)
+    @Size(min = 1, max = 255)
+    @Column(length = 255, unique = true, nullable = false)
     private String login;
 
     @JsonIgnore
@@ -42,8 +43,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "password_hash", length = 60, nullable = false)
     private String password;
 
-    @Size(max = 50)
-    @Column(name = "first_name", length = 50)
+    @Size(max = 255)
+    @Column(name = "first_name", length = 255)
     private String firstName;
 
     @Size(max = 50)
@@ -51,8 +52,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     private String lastName;
 
     @Email
-    @Size(min = 5, max = 254)
-    @Column(length = 254, unique = true)
+    @Size(min = 5, max = 255)
+    @Column(length = 255, unique = true, nullable = false)
     private String email;
 
     @NotNull
@@ -107,6 +108,21 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Column(name = "current_logged_in")
     private Instant currentLoggedIn;
+
+    @Size(max = 5)
+    @Column(name = "country_code", length = 5)
+    private String countryCode;
+
+    @Size(max = 15)
+    @Column(name = "phone_number", length = 15)
+    private String phoneNumber;
+
+    @Enumerated
+    @Column(name = "status", columnDefinition = "smallint")
+    private UserStatusEnum status;
+
+    @Column(name = "is_password_set")
+    private boolean isPasswordSet = false;
 
     public Long getId() {
         return id;
@@ -261,6 +277,39 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.currentLoggedIn = currentLoggedIn;
     }
 
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public UserStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatusEnum status) {
+        this.status = status;
+    }
+
+    public boolean isPasswordSet() {
+        return isPasswordSet;
+    }
+
+    public void setPasswordSet(boolean passwordSet) {
+        isPasswordSet = passwordSet;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -290,6 +339,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
             ", activationKey='" + activationKey + '\'' +
+            ", status='" + status + '\'' +
+            ", isPasswordSet='" + isPasswordSet + '\'' +
             "}";
     }
 }

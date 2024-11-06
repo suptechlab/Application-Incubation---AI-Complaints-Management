@@ -16,5 +16,6 @@ public final class Constants {
     public static final String NEW_DATA = "newData";
     public static final String OLD_DATA = "oldData";
 
-    private Constants() {}
+    private Constants() {
+    }
 }
