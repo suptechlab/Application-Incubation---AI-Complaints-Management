@@ -1,0 +1,18 @@
+id,name,name_es,description,description_es,user_type
+1,Claim Type Master,Tipo de reclamo maestro,Manage Claim Type Master,Administrar el tipo de reclamo maestro,SEPS_USER
+2,Claim Sub Type Master,Subtipo de reclamo maestro,Manage Claim Sub Type Master,Administrar el subtipo de reclamo maestro,SEPS_USER
+3,Inquiry Type Master,Tipo de consulta maestro,Manage Inquiry Type Master,Administrar el tipo de consulta maestro,SEPS_USER
+4,Inquiry Sub Type Master,Subtipo de consulta maestro,Manage Inquiry Sub Type Master,Administrar el subtipo de consulta maestro,SEPS_USER
+5,Province Master,Provincia maestro,Manage Province Master,Administrar el maestro de provincia,SEPS_USER
+6,City Master,Ciudad maestro,Manage City Master,Administrar el maestro de ciudad,SEPS_USER
+7,Template Master,Plantilla maestra,Manage Template Master,Administrar el maestro de plantilla,SEPS_USER
+8,SEPS User,Usuario SEPS,Manage SEPS User by SEPS teams,Administrar usuarios de SEPS por equipos de SEPS,SEPS_USER
+9,FI User,Usuario FI,Manage FI User by SEPS teams,Administrar usuarios de FI por equipos de SEPS,SEPS_USER
+10,Ticket,Ticket,Manage Tickets by SEPS,Administrar tickets por SEPS,SEPS_USER
+11,Ticket Workflow,Flujo de trabajo de tickets,Manage Ticket Workflow by SEPS,Administrar flujo de trabajo de tickets por SEPS,SEPS_USER
+12,Teams Manage,Gestión de equipos,Manage Teams by SEPS,Administrar equipos por SEPS,SEPS_USER
+13,Audit Trails,Pistas de auditoría,Manage Audit Trails,Administrar registros de auditoría,SEPS_USER
+14,Reports,Informes,Manage Reports by SEPS,Administrar informes por SEPS,SEPS_USER
+15,FI User,Usuario FI,Manage FI User by FI teams,Administrar usuarios de FI por equipos de FI,FI_USER
+16,Ticket,Ticket,Manage Tickets by FI,Administrar tickets por FI,FI_USER
+17,Reports,Informes,Manage Reports by FI,Administrar informes por FI,FI_USER
