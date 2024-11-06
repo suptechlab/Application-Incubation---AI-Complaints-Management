@@ -1,11 +1,20 @@
 import React from "react";
 import { Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import FormInput from "../components/FormInput";
-import ReactSelect from "./ReactSelect";
+import FormInput from "../../components/FormInput";
+import ReactSelect from "../../components/ReactSelect";
+import { AUDIT_TRAIL_ACTIVITY } from "../../constants/dropdownData";
 
-const ListingSearchForm = ({ filter, setFilter }) => {
+const SearchForm = ({ filter, setFilter }) => {
   const { t } = useTranslation();
+
+  const { i18n } = useTranslation();
+
+  const activityTypeOptions = AUDIT_TRAIL_ACTIVITY.map(activity => ({
+      label: activity.label[i18n.language] || activity.label.en, // fallback to English if language not available
+      value: activity.value
+  }));
+
   return (
     <div className="theme-card-header header-search mb-3">
       <Stack direction="horizontal" gap={2} className="flex-wrap">
@@ -39,30 +48,16 @@ const ListingSearchForm = ({ filter, setFilter }) => {
             <ReactSelect
               wrapperClassName="mb-0"
               class="form-select "
-              placeholder={t("ALL STATUS")}
+              placeholder={t("ALL ACTIVITIES")}
               id="floatingSelect"
-              options={[
-                {
-                  label: t("ALL STATUS"),
-                  value: "",
-                  class: "label-class",
-                },
-                {
-                  label: t("ACTIVE"),
-                  value: true,
-                },
-                {
-                  label: t("INACTIVE"),
-                  value: false,
-                },
-              ]}
+              options={activityTypeOptions ?? []}
               onChange={(e) => {
                 setFilter({
                   ...filter,
-                  status: e.target.value,
+                  activityType: e.target.value,
                 });
               }}
-              value={filter.status}
+              value={filter.activityType}
             />
           </div>
         </Stack>
@@ -71,4 +66,4 @@ const ListingSearchForm = ({ filter, setFilter }) => {
   );
 };
 
-export default ListingSearchForm;
+export default SearchForm;

@@ -24,7 +24,7 @@ export default function FormInput({ label, touched, error, isTextarea, wrapperCl
                         {...rest}
                         type={rest.type === 'password' && showPassword ? 'text' : rest.type}
                     />
-                    {rest.type === 'password' && rest.value.length > 0 && (
+                    {rest.type === 'password' && (
                         <AppTooltip title={showPassword ? "Hide Password" : "Show Password"} placement="top">
                             <Button
                                 variant='link'

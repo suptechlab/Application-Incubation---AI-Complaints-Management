@@ -48,7 +48,7 @@ const Edit = ({ modal, toggle, rowData, dataQuery }) => {
     >
       <Modal.Header className="pb-3">
         <Modal.Title as="h4" className="fw-semibold">
-          {"EDIT CLAIM TYPE"}
+          {t("EDIT CLAIM TYPE")}
         </Modal.Title>
       </Modal.Header>
       <Formik
@@ -83,7 +83,6 @@ const Edit = ({ modal, toggle, rowData, dataQuery }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.name}
                 type="text"
                 value={values?.name || ""}
@@ -97,7 +96,6 @@ const Edit = ({ modal, toggle, rowData, dataQuery }) => {
                 name="description"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                // placeholder="Enter district name"
                 touched={touched?.description}
                 rows={5}
                 type="text"

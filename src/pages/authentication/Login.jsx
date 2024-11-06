@@ -107,7 +107,6 @@ export default function Login() {
                                                     name="email"
                                                     onBlur={handleBlur}
                                                     onChange={handleChange}
-                                                    placeholder="Enter email"
                                                     touched={touched.email}
                                                     type="text"
                                                     value={values.email || ""}
@@ -122,7 +121,6 @@ export default function Login() {
                                                     name="password"
                                                     onBlur={handleBlur}
                                                     onChange={handleChange}
-                                                    placeholder="Enter password"
                                                     touched={touched.password}
                                                     type="password"
                                                     value={values.password || ""}

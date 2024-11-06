@@ -49,6 +49,10 @@
             li {
                 margin-top: 2px;
 
+                .sub-menu-arrow {
+                    margin-right: .5rem;
+                }
+
                 &:has(.active) {
                     .btn {
                         &.sidebarLink {
@@ -131,6 +135,7 @@
                             top: 50%;
                             transform: translateY(-50%);
                             right: -0.25rem;
+                            margin-right: 0;
                         }
 
                         position: relative;
