@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 public interface UserMapper {
 
     @Mapping(source = "authorities", target = "authorities")
+    @Mapping(source = "firstName", target = "name")  // Map firstName to name
     SEPSUserDTO userToSEPSUserDTO(User user);
-
 
     default Set<String> map(Set<Authority> authorities) {
         return authorities.stream()

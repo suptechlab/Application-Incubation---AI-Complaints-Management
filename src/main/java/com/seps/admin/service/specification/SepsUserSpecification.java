@@ -1,0 +1,53 @@
+package com.seps.admin.service.specification;
+
+import com.seps.admin.domain.User;
+import com.seps.admin.enums.UserStatusEnum;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SepsUserSpecification {
+    private SepsUserSpecification() {
+
+    }
+
+    /**
+     * Creates a combined specification for filtering users by search term, status, email, and roles.
+     *
+     * @param search      the search term to filter by name
+     * @param status      the status of the user (e.g., ACTIVE, INACTIVE)
+     * @param authorities the list of authorities to filter users by
+     * @return the combined {@link Specification} with applied filters
+     */
+    public static Specification<User> byFilter(String search, UserStatusEnum status, List<String> authorities) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            // Filter by search term (e.g., name)
+            if (StringUtils.hasText(search)) {
+                predicates.add(criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%" + search.toLowerCase() + "%")
+                ));
+            }
+            // Filter by email
+            if (StringUtils.hasText(search)) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + search.toLowerCase() + "%"));
+            }
+            // Filter by status
+            if (status != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+            // Filter by roles
+            if (authorities != null && !authorities.isEmpty()) {
+                Join<Object, Object> userAuth = root.join("authorities", JoinType.INNER);
+                predicates.add(userAuth.get("name").in(authorities));
+            }
+            // Combine all predicates with 'and'
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+}

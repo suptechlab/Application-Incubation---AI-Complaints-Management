@@ -8,11 +8,15 @@ import com.seps.admin.repository.UserRepository;
 import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.service.dto.SEPSUserDTO;
 import com.seps.admin.service.mapper.UserMapper;
+import com.seps.admin.service.specification.ProvinceSpecification;
+import com.seps.admin.service.specification.SepsUserSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +24,7 @@ import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,15 +54,14 @@ public class UserService {
      * authority, and sets the user's status to active. The user's email is used as both the login and email, in lowercase.
      * </p>
      *
-     * @param userDTO the data transfer object containing user details (first name, last name, email, etc.)
+     * @param userDTO the data transfer object containing user details (name, email, etc.)
      * @return the created {@link User} entity
      */
     @Transactional
     public User addSepsUser(@Valid SEPSUserDTO userDTO) {
         User newUser = new User();
         // for a new user sets initially a random password
-        newUser.setFirstName(userDTO.getFirstName());
-        newUser.setLastName(userDTO.getLastName());
+        newUser.setFirstName(userDTO.getName());
         if (userDTO.getEmail() != null) {
             newUser.setEmail(userDTO.getEmail().toLowerCase());
             newUser.setLogin(userDTO.getEmail().toLowerCase());
@@ -100,15 +104,14 @@ public class UserService {
         User entity = userRepository.findById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
+
         List<String> authorityList = entity.getAuthorities().stream().map(authority -> authority.getName()).toList();
-        LOG.debug("authorityList:{}", authorityList);
         if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
-            LOG.info("SEPS User not found with id:{}", id);
+            LOG.warn("SEPS User not found with id:{}", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
-        entity.setFirstName(dto.getFirstName());
-        entity.setLastName(dto.getLastName());
+        entity.setFirstName(dto.getName());
         entity.setLangKey(dto.getLangKey());
         entity.setCountryCode(dto.getCountryCode());
         entity.setPhoneNumber(dto.getPhoneNumber());
@@ -129,11 +132,50 @@ public class UserService {
                 new String[]{id.toString()}, null));
         List<String> authorityList = entity.getAuthorities().stream().map(authority -> authority.getName()).toList();
         if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
-            LOG.info("SEPS User not found with id:{}", id);
+            LOG.warn("SEPS User not found with id:{}", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
         SEPSUserDTO sepsUserDTO = userMapper.userToSEPSUserDTO(entity);
         return sepsUserDTO;
+    }
+
+    /**
+     * Retrieves a paginated list of SEPS users based on search criteria and user status.
+     *
+     * @param pageable the pagination information, including page number and size
+     * @param search   the search term used to filter SEPS users, applied to relevant fields
+     * @param status   the status of the users to filter by, e.g., ACTIVE or INACTIVE
+     * @return a paginated {@link Page} of {@link SEPSUserDTO} objects that match the filter criteria
+     */
+    @Transactional(readOnly = true)
+    public Page<SEPSUserDTO> listSEPSUsers(Pageable pageable, String search, UserStatusEnum status) {
+        List<String> authorities = new ArrayList<>();
+        authorities.add(AuthoritiesConstants.SEPS);
+        return userRepository.findAll(SepsUserSpecification.byFilter(search, status, authorities), pageable)
+            .map(userMapper::userToSEPSUserDTO);
+    }
+
+    public void changeSEPSStatus(Long id, UserStatusEnum newStatus) {
+        User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
+            () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
+                new String[]{id.toString()}, null));
+        List<String> authorityList = entity.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
+            LOG.warn("SEPS User not found with id:{}", id);
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
+                new String[]{id.toString()}, null);
+        }
+        // Check if the status change is valid
+        UserStatusEnum currentStatus = entity.getStatus();
+        if ((currentStatus == UserStatusEnum.ACTIVE && newStatus != UserStatusEnum.BLOCKED) ||
+            (currentStatus == UserStatusEnum.BLOCKED && newStatus != UserStatusEnum.ACTIVE)) {
+            LOG.warn("Invalid status transition for SEPS user with id: {}. Current status: {}, New status: {}",
+                id, currentStatus, newStatus);
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_STATUS_TRANSITION,
+                new String[]{currentStatus.toString(), newStatus.toString()}, null);
+        }
+        entity.setStatus(newStatus);
+        userRepository.save(entity);
     }
 }

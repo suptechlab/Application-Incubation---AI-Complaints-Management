@@ -17,12 +17,8 @@ public class SEPSUserDTO {
     private String login;
 
     @NotBlank
-    @Size(max = 50)
-    private String firstName;
-
-    @NotBlank
-    @Size(max = 50)
-    private String lastName;
+    @Size(max = 200)
+    private String name;
 
     @NotBlank
     @Email
