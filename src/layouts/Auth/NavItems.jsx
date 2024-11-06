@@ -41,8 +41,8 @@ export const NavItems = () => {
         },
         {
           id: 23,
-          menuName: t("Roles & Rights"),
-          title: t("Roles & Rights"),
+          menuName: t("ROLES AND RIGHTS LIST"),
+          title: t("ROLES AND RIGHTS LIST"),
           path: "/role-rights",
           roleName: "admin",
           disabled: false,
@@ -127,24 +127,6 @@ export const NavItems = () => {
     },
     {
       id: 5,
-      menuName: t("ROLES AND RIGHTS LIST"),
-      title: t("ROLES AND RIGHTS LIST"),
-      menuIcon: <MdSupervisorAccount size={20} />,
-      path: "/role-rights",
-      disabled: false,
-      roleName: "RoleRights"
-    },
-    {
-      id: 6,
-      menuName:t("USERS"),
-      title: t("USERS"),
-      menuIcon: <MdSupervisorAccount size={20} />,
-      path: "/users",
-      disabled: false,
-      roleName: "users"
-    },
-    {
-      id: 7,
       menuName: t("TICKETS"),
       title: t("TICKETS"),
       menuIcon: <MdConfirmationNumber size={20} />,
@@ -153,7 +135,7 @@ export const NavItems = () => {
       disabled: true,
     },
     {
-      id: 8,
+      id: 6,
       menuName: t("TICKET WORKFLOW fsd"),
       title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
@@ -162,7 +144,7 @@ export const NavItems = () => {
       disabled: true,
     },
     {
-      id: 9,
+      id: 7,
       menuName: t("AUDIT LOGS"),
       title: t("AUDIT LOGS"),
       menuIcon: <MdSchema size={20} />,

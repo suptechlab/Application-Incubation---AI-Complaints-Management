@@ -23,6 +23,7 @@ import ViewAuditTrail from "../pages/auditLogs/ViewAuditTrail";
 const UserForm = React.lazy(() => import("../pages/users/Edit"));
 const Settings = React.lazy(() => import("../pages/settings"));
 const UserTransactions = React.lazy(() => import("../pages/users/transactions"));
+const AccountProfile = React.lazy(() => import("../pages/Profile"));
 
 
 // Saving Challenges
@@ -131,6 +132,12 @@ const routes = [
     {
         path: "/change-password",
         element: <ChangePassword />,
+        isPrivate: true,
+        layoutType: "Auth",
+    },
+    {
+        path: "/profile",
+        element: <AccountProfile />,
         isPrivate: true,
         layoutType: "Auth",
     },
