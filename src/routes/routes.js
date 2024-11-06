@@ -5,7 +5,6 @@ import Otp from "../pages/authentication/Otp";
 import ResetPassword from "../pages/authentication/ResetPassword";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import Dashboard from "../pages/dashboard";
-import DistrictdataPage from "../pages/districtdata";
 import CityMaster from "../pages/master management/cityMaster";
 import ClaimSubtype from "../pages/master management/claimSubType";
 import ClaimType from "../pages/master management/claimtype";
@@ -45,12 +44,6 @@ const routes = [
     path: "/dashboard",
     element: <Dashboard />,
     isPrivate: true,
-    layoutType: "Auth",
-  },
-  {
-    path: "/districtdata",
-    element: <DistrictdataPage />,
-    isPrivate: false,
     layoutType: "Auth",
   },
   {
