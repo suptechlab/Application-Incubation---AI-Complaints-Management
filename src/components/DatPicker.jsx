@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import SvgIcons from './SVGIcons';
 
-export default function DateRangePicker({
+export default function DatePickerCustom({
     startDate,
     endDate,
     onChange
