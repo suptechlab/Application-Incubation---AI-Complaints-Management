@@ -23,4 +23,16 @@
   <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
   <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
   <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+    <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1729606522110_inquiry_type_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1729666044042_inquiry_sub_type_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1729774226500_claim_type_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1729843071180_claim_sub_type_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1729858375990_province_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1729883010831_city_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1730182324133_activity_log_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1730826549606_roles_permissions_modules_schema.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

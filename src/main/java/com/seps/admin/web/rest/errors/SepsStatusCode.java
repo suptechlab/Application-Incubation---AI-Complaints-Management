@@ -25,6 +25,8 @@ public enum SepsStatusCode implements StatusType {
     USER_NOT_FOUND(20024, "user.not.found"),
     SEPS_USER_NOT_FOUND(20025, "seps.user.not.found"),
     INVALID_STATUS_TRANSITION(20026, "invalid.status.transition");
+    INVALID_DATE_FORMAT(20022, "invalid.date.format"),
+    ROLE_NOT_FOUND(20023, "role.not.found");
 
     private final int code;
 
