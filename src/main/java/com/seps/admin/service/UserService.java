@@ -7,9 +7,13 @@ import com.seps.admin.repository.AuthorityRepository;
 import com.seps.admin.repository.UserRepository;
 import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.security.SecurityUtils;
+import com.seps.admin.service.dto.FIUserDTO;
+import com.seps.admin.suptech.service.dto.PersonInfoDTO;
 import com.seps.admin.service.dto.SEPSUserDTO;
 import com.seps.admin.service.mapper.UserMapper;
 import com.seps.admin.service.specification.SepsUserSpecification;
+import com.seps.admin.suptech.service.ExternalAPIService;
+import com.seps.admin.suptech.service.PersonNotFoundException;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import jakarta.validation.Valid;
@@ -37,13 +41,15 @@ public class UserService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final ExternalAPIService externalAPIService;
 
     public UserService(UserRepository userRepository, AuthorityRepository authorityRepository,
-                       PasswordEncoder passwordEncoder, UserMapper userMapper) {
+                       PasswordEncoder passwordEncoder, UserMapper userMapper, ExternalAPIService externalAPIService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.externalAPIService = externalAPIService;
     }
 
     public User getCurrentUser() {
@@ -182,5 +188,63 @@ public class UserService {
         }
         entity.setStatus(newStatus);
         userRepository.save(entity);
+    }
+
+    /**
+     * Fetches the details of a person based on the provided identification.
+     * <p>
+     * This method calls an external API service to retrieve the information of a person
+     * identified by the given {@code identification}. If the person is not found, a
+     * {@code PersonNotFoundException} is caught, and a {@code CustomException} with
+     * a "NOT_FOUND" status is thrown, indicating that the person could not be located.
+     * </p>
+     *
+     * @param identificacion the unique identifier of the person whose details are to be fetched.
+     * @return a {@link PersonInfoDTO} containing the details of the person.
+     * @throws CustomException if the person is not found, with a status code of
+     *                         {@code SepsStatusCode.PERSON_NOT_FOUND}.
+     */
+    public PersonInfoDTO fetchPersonDetails(String identificacion) {
+        try {
+            return externalAPIService.getPersonInfo(identificacion);
+        } catch (PersonNotFoundException e) {
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.PERSON_NOT_FOUND,
+                new String[]{identificacion}, null);
+        }
+    }
+
+    public User addFIUser(@Valid FIUserDTO userDTO) {
+        // Lowercase the user email before comparing with database
+        if (userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).isPresent()) {
+            LOG.warn("Email {} already in use.", userDTO.getEmail());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_ALREADY_USED, null, null);
+        }
+        User newUser = new User();
+        // for a new user sets initially a random password
+        newUser.setFirstName(userDTO.getName());
+        if (userDTO.getEmail() != null) {
+            newUser.setEmail(userDTO.getEmail().toLowerCase());
+            newUser.setLogin(userDTO.getEmail().toLowerCase());
+        }
+        newUser.setLangKey(userDTO.getLangKey());
+        String randomPassword = RandomUtil.generatePassword();
+        String encryptedPassword = passwordEncoder.encode(randomPassword);
+        newUser.setPassword(encryptedPassword);
+        newUser.setActivated(true);
+        newUser.setCountryCode(userDTO.getCountryCode());
+        newUser.setPhoneNumber(userDTO.getPhoneNumber());
+        //Set Reset Password
+        newUser.setResetKey(RandomUtil.generateResetKey());
+        newUser.setResetDate(Instant.now());
+        newUser.setPasswordSet(false);
+        newUser.setStatus(UserStatusEnum.ACTIVE);
+        //Set Authority
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.FI).ifPresent(authorities::add);
+        newUser.setAuthorities(authorities);
+        userRepository.save(newUser);
+        LOG.debug("Created Information for FI User: {}", newUser);
+        return newUser;
+
     }
 }

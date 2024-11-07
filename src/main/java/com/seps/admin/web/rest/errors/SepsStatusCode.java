@@ -24,7 +24,10 @@ public enum SepsStatusCode implements StatusType {
     EMAIL_ALREADY_USED(20023, "email.already.used"),
     USER_NOT_FOUND(20024, "user.not.found"),
     SEPS_USER_NOT_FOUND(20025, "seps.user.not.found"),
-    INVALID_STATUS_TRANSITION(20026, "invalid.status.transition");
+    INVALID_STATUS_TRANSITION(20026, "invalid.status.transition"),
+    PERSON_NOT_FOUND(20027, "person.not.found"),
+    ORGANIZATION_RUC_NOT_FOUND(20028, "organization.ruc.not.found"),
+    ORGANIZATION_NOT_FOUND(20029, "organization.not.found");
 
     private final int code;
 

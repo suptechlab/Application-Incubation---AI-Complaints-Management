@@ -11,6 +11,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,6 +59,12 @@ public class CommonHelper {
                 }
 
                 Object propertyValue = readMethod.invoke(entity);
+
+                // Handle Instant formatting
+                if (propertyValue instanceof Instant) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC"));
+                    propertyValue = formatter.format((Instant) propertyValue);
+                }
 
                 // Optional: skip null values
                 if (propertyValue != null) {

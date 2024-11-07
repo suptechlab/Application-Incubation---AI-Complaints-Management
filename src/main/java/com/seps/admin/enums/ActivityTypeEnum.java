@@ -3,9 +3,7 @@ package com.seps.admin.enums;
 public enum ActivityTypeEnum {
     DATA_ENTRY("Data Entry"),
     MODIFICATION("Modification"),
-    STATUS_CHANGE("Status Change"),
-    ;
-
+    STATUS_CHANGE("Status Change");
     private final String description;
 
     ActivityTypeEnum(String description) {
