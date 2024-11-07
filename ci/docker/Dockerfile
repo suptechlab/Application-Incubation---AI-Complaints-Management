@@ -1,4 +1,4 @@
-FROM maven:3.2.5-jdk-17 AS backend-compiler
+FROM maven:3.8.5-openjdk-17 AS backend-compiler
 LABEL mantainer="usuario.seps@seps.gob.ec"
 WORKDIR /app
 COPY . .
@@ -12,7 +12,7 @@ COPY . .
 RUN chmod +x ./mvnw
 RUN ./mvnw -Pprod clean verify -DskipTests
 
-FROM openjdk:8-alpine
+FROM openjdk:17-alpine
 
 ARG ARG_VERSION
 ENV VERSION=$ARG_VERSION
