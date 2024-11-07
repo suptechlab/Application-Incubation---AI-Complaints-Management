@@ -70,21 +70,25 @@ deployment:
     port: 80
     targetPort: 8080
 
-  ingress:
-    enabled: false
-    className: "nginx"
-    annotations:
-      # kubernetes.io/tls-acme: "true"
-    hosts:
-      - host: seps.local
-        paths:
-          - path: /
-            pathType: Prefix
+  # ingress:
+  #   enabled: false
+  #   className: "nginx"
+  #   annotations:
+  #     # kubernetes.io/tls-acme: "true"
+  #   hosts:
+  #     - host: seps.local
+  #       paths:
+  #         - path: /
+  #           pathType: Prefix
              
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
+  #   tls: []
+  #   #  - secretName: chart-example-tls
+  #   #    hosts:
+  #   #      - chart-example.local
+  virtualRoute:
+    enabled: true
+    host: adminapi-suptechdev.seps.gob.ec 
+    path: /
 
   resources:
     # We usually recommend not to specify default resources and to leave this as a conscious
