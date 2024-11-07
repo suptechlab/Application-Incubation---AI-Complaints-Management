@@ -1,7 +1,7 @@
 import instance from "../utils/instance";
 
 export const handleChangePassword = async (data) => {
-    return await instance.post('/v1/auth/change-password', data);
+    return await instance.post('/account/change-password', data);
 }
 
 export const handleForgotPassword = async (data) => {
@@ -47,3 +47,6 @@ export const handleGetAccountDetail = async () => {
     return await instance.get(`/account`);
 }
 
+export const handleAccount = async (data) => {
+    return await instance.post('/account', data);
+}
