@@ -71,6 +71,7 @@
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
         <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
         <springdoc-openapi-starter-webmvc-api.version>2.6.0</springdoc-openapi-starter-webmvc-api.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <dependencyManagement>
@@ -290,6 +291,39 @@
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.zalando/problem-spring-web -->
+        <dependency>
+          <groupId>org.zalando</groupId>
+          <artifactId>problem-spring-web</artifactId>
+          <version>0.29.1</version>
+        </dependency>
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <version>${lombok.version}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.springdoc</groupId>
+          <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+          <version>2.6.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+        <dependency>
+          <groupId>org.apache.poi</groupId>
+          <artifactId>poi-ooxml</artifactId>
+          <version>5.3.0</version>
+        </dependency>
+        <dependency>
+          <groupId>io.hypersistence</groupId>
+          <artifactId>hypersistence-utils-hibernate-62</artifactId>
+          <version>3.8.1</version>
+        </dependency>
+        <dependency>
+          <groupId>com.google.code.gson</groupId>
+          <artifactId>gson</artifactId>
+          <version>2.8.9</version> <!-- Use the latest version available -->
+        </dependency>
     </dependencies>
 
     <build>
@@ -429,6 +463,17 @@
                             <path>
                                 <groupId>org.glassfish.jaxb</groupId>
                                 <artifactId>jaxb-runtime</artifactId>
+                            </path>
+                            <path>
+                              <groupId>org.projectlombok</groupId>
+                              <artifactId>lombok</artifactId>
+                              <version>${lombok.version}</version>
+                            </path>
+                            <!-- This is needed when using Lombok 1.18.16 and above -->
+                            <path>
+                              <groupId>org.projectlombok</groupId>
+                              <artifactId>lombok-mapstruct-binding</artifactId>
+                              <version>0.2.0</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
