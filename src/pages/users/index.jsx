@@ -84,11 +84,10 @@ export default function UserList() {
 
   const changeStatus = async (id, currentStatus) => {
     try {
-      await handleStatusChangeState(id, !currentStatus);
-      toast.success("State status updated successfully");
+      await handleStatusChangeState(id, currentStatus);
       dataQuery.refetch();
     } catch (error) {
-      toast.error("Error updating state status");
+      toast.error(error?.response?.data?.errorDescription);
     }
   };
 
@@ -144,29 +143,29 @@ export default function UserList() {
       },
 
       {
-        accessorFn: (row) => row.createdAt,
-        id: "createdAt",
+        accessorFn: (row) => row.createdDate,
+        id: "createdDate",
         header: () => "Creation Date",
         cell: (info) => {
-          return <span>{moment(info.row.original.createdAt).format("l")}</span>;
+          return <span>{moment(info.row.original.createdDate).format("l")}</span>;
         },
       },
 
       {
         cell: (info) => {
-          // console.log('rowstatus 100->',info?.row?.original?.activated);
+          // console.log('rowstatus 100->',info?.row?.original?.status);
           return (
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
               // label="Status"
               name="status"
-              value={info?.row?.original?.activated}
-              checked={info?.row?.original?.activated}
+              value={info?.row?.original?.status == 'ACTIVE' ? true : false }
+              checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
               onChange={() =>
                 changeStatus(
                   info?.row?.original?.id,
-                  info?.row?.original?.activated
+                  info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
                 )
               }
               tooltip="Active"
