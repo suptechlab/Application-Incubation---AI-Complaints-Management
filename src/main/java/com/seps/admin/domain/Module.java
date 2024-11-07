@@ -3,8 +3,8 @@ package com.seps.admin.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "modules")
@@ -17,10 +17,19 @@ public class Module {
     private String name;
     private String description;
 
+    @Column(name = "name_es")
+    private String nameEs;
+
+    @Column(name = "description_es")
+    private String descriptionEs;
+
     @Column(name = "user_type")
     private String userType;
 
-    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Permission> permissions = new HashSet<>();
+    @Column(name = "sort_order")
+    private Integer sortOrder;
+
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Permission> permissions = new ArrayList<>();
 
 }

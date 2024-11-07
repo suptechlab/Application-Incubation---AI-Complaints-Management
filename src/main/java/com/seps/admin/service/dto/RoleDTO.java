@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -22,10 +21,8 @@ public class RoleDTO implements Serializable {
     @NotBlank
     @Size(min = 3, max = 250)
     private String description;
-    private Long createdBy;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private Boolean deleted = false;
+    private String userType;
+    private Boolean status;
     private List<Long> permissionIds;
     private List<ModuleDTO> modules;
 

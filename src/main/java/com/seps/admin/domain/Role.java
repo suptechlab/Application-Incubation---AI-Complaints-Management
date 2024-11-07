@@ -2,14 +2,15 @@ package com.seps.admin.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -30,18 +31,17 @@ public class Role implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, length = 100, updatable = false)
-    private String createdBy;
+    @Column(name = "created_by")
+    private Long createdBy;
 
     @Column(name = "user_type", nullable = false)
     private String userType;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
@@ -57,9 +57,9 @@ public class Role implements Serializable {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<Permission> permissions = new HashSet<>();
+    private List<Permission> permissions = new ArrayList<>();
 
     @OneToMany(mappedBy = "role")
-    private Set<RolePermission> rolePermissions = new HashSet<>();
+    private List<RolePermission> rolePermissions = new ArrayList<>();
 
 }

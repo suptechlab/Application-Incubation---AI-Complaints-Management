@@ -18,12 +18,14 @@ public class Permission implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "module_id")
     private Module module;
 
     private String name;
     private String description;
 
+    @Column(name = "description_es")
+    private String descriptionEs;
 
 }
