@@ -1,12 +1,15 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Loader from "./components/Loader";
 import AppRoutes from "./router";
+import { BrowserRouter } from "react-router-dom";
 
 function App() {
   return (
-    <React.Suspense fallback={<Loader isLoading={true} />}>
-      <AppRoutes />
-    </React.Suspense>
+    <Suspense fallback={<Loader isLoading={true} />}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </Suspense>
   );
 }
 

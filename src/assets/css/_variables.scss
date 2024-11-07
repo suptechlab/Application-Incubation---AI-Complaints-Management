@@ -1,6 +1,7 @@
 $enable-negative-margins: true;
 $font-family-base: "Raleway", serif;
 $white: #FFF;
+$black: #000;
 $body-tertiary-bg: #E7E7EF;
 $body-secondary-bg: #F5F5F5;
 $body-color: #303030;
@@ -12,11 +13,14 @@ $info: #007BFF;
 $warning: #F6C300;
 $success: #146C2E;
 $link-color: #0088FF;
-$border-color: rgba(204, 204, 204, 0.7);
+$border-color: rgba($body-color, 0.25);
 $input-border-color: $secondary;
 $input-focus-border-color: $link-color;
 $border-radius: .25rem;
 $input-padding-y: 0.5rem;
+$input-disabled-color: rgba($body-color, .50);
+$input-disabled-bg: #E9E9E9;
+$border-radius: .25rem;
 $form-check-input-border-radius: .125rem;
 $form-check-input-border: 2px solid $border-color;
 $form-check-input-checked-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='10' fill='none'><path fill='#{$white}' d='M5.222 9.444.778 5 2.03 3.747l3.191 3.182L11.97.182l1.253 1.262-8 8Z'/></svg>");
@@ -33,6 +37,7 @@ $btn-padding-y-lg: 0.79rem;
 $btn-font-size-lg: $btn-font-size;
 $box-shadow-sm: 0px 3px 5px 0px rgba($body-color, 0.05);
 $box-shadow: 0px 2px 2px 0px rgba($body-color, 0.15);
+$box-shadow-lg: 0px 4px 4px 0px rgba($body-color, 0.25);
 $navbar-nav-link-padding-x: 0;
 $nav-link-font-weight: 500;
 $navbar-dark-color: $white;
@@ -66,6 +71,11 @@ $modal-footer-margin-between: 1rem;
 $modal-content-border-width: 0;
 $modal-content-border-radius: 1rem;
 $modal-header-padding-y: 1.313rem;
+$grid-gutter-width: 2rem;
+$dropdown-item-padding-y: 0.375rem;
+$btn-close-color: $black;
+$btn-close-opacity: .5;
+$btn-close-bg: url("data:image/svg+xml,<svg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M1.4 14L0 12.6L5.6 7L0 1.4L1.4 0L7 5.6L12.6 0L14 1.4L8.4 7L14 12.6L12.6 14L7 8.4L1.4 14Z' fill='#{$btn-close-color}'/></svg>");
 $offcanvas-horizontal-width: 360px;
 $offcanvas-padding-y: .938rem;
 
@@ -81,6 +91,7 @@ $theme-sidebar-brand-height: 5em;
 $theme-header-height: 4rem;
 $custom-bg-light-green: #28A745;
 $custom-bg-light-blue: #1B7ACE;
+$custom-gray: #999999;
 
 // Generate custom classes for width, min-width, height, min-height
 @mixin custom-class($property, $value) {

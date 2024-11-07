@@ -3,9 +3,15 @@
 
 // Custom classes
 @include custom-class('font-size', 12);
+@include custom-class('font-size', 18);
+@include custom-class('font-size', 26);
+@include custom-class('width', 48);
+@include custom-class('height', 48);
 @include custom-class('width', 64);
 @include custom-class('height', 64);
 @include custom-class('min-height', 70);
+@include custom-class('width', 80);
+@include custom-class('height', 80);
 @include custom-class('min-width', 100);
 @include custom-class('width', 400);
 
@@ -135,6 +141,29 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
 
+// Custom Scrollbar
+@include above-xl() {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--bs-dark);
+
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            border-radius: 20px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--bs-dark);
+            border-radius: 20px;
+
+            &:hover {
+                background-color: var(--bs-primary);
+            }
+        }
+    }
+}
+
 .theme-loader-z-index {
     z-index: 1002 !important;
 }
@@ -173,6 +202,10 @@ input:-webkit-autofill:active {
     background-color: rgba($primary, .90);
 }
 
+.text-custom-gray {
+    color: $custom-gray;
+}
+
 .carousel-cover-main {
     .carousel-link {
         img {
@@ -188,10 +221,37 @@ input:-webkit-autofill:active {
     }
 }
 
+.theme-flip-x {
+    transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    -ms-transform: rotateY(180deg);
+    -o-transform: rotateY(180deg);
+}
+
+// Help Desk
 .help-desk-button {
     bottom: 4.5rem;
 }
 
-.react-select__menu-portal {
-    z-index: 1056 !important;
+.offcanvas {
+    &.offcanvas-bottom {
+        --bs-offcanvas-height: 500px;
+        --bs-offcanvas-padding-x: 1rem;
+        --bs-offcanvas-padding-y: 1rem;
+        left: auto;
+        max-width: var(--bs-offcanvas-width);
+        border-radius: .5rem;
+        box-shadow: 0px 0 25px 0px rgba($body-color, 0.25);
+        margin: 1rem;
+        max-height: calc(100% - 2rem);
+        width: calc(100% - 2rem);
+
+        .theme-common-form {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-height: 100%;
+        }
+    }
 }

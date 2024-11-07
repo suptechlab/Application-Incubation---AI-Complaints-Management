@@ -5,7 +5,7 @@ import AppTooltip from './tooltip'
 import { Button } from 'react-bootstrap'
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
-export default function FormInput({ label, touched, error, isTextarea, wrapperClassName = 'mb-3 pb-1', ...rest }) {
+export default function FormInputBox({ label, touched, error, isTextarea, wrapperClassName = 'mb-3 pb-1', ...rest }) {
     const [showPassword, setShowPassword] = React.useState(false)
     
     return (
@@ -20,11 +20,11 @@ export default function FormInput({ label, touched, error, isTextarea, wrapperCl
             ) : (
                 <div className='position-relative'>
                     <Input
-                        className={`form-control ${touched && error ? "is-invalid" : ""}`}
+                        className={`${touched && error ? "is-invalid" : ""}`}
                         {...rest}
                         type={rest.type === 'password' && showPassword ? 'text' : rest.type}
                     />
-                    {rest.type === 'password' && rest.value.length > 0 && (
+                    {rest.type === 'password' && (
                         <AppTooltip title={showPassword ? "Hide Password" : "Show Password"} placement="top">
                             <Button
                                 variant='link'

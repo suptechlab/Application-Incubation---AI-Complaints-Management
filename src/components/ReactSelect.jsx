@@ -1,12 +1,14 @@
 import React from "react";
 import { MdArrowDropDown } from "react-icons/md";
 import Select from "react-select";
+import "./ReactSelect.scss";
 
 const ReactSelect = ({
   options,
   value,
   onChange,
-  className = "mb-3 pb-1",
+  wrapperClassName = "mb-3 pb-1",
+  size,
   name,
   label,
   placeholder,
@@ -75,7 +77,7 @@ const ReactSelect = ({
   const selectedOption = formattedOptions.find((opt) => opt.value === value);
 
   return (
-    <div className={className || ""}>
+    <div className={wrapperClassName || ""}>
       {label ? (
         <label className="mb-1 fs-14" htmlFor={name}>
           {label}
@@ -96,9 +98,7 @@ const ReactSelect = ({
         isClearable={selectedOption?.value != ""}
         classNamePrefix="react-select"
         defaultValue={defaultValue}
-        className={`react-select-container ${
-          selectedOption ? "has-value" : ""
-        }`}
+        className={`react-select-container ${selectedOption ? "has-value" : ""} ${size === 'sm' ? 'react-select-sm' : ''}`}
         menuPortalTarget={document.body}
         components={{
           ClearIndicator: () => null,

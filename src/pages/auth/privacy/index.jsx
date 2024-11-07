@@ -1,8 +1,9 @@
 import React from "react";
 import { Button, Modal, Stack } from "react-bootstrap";
-import FormInput from "../../../components/FormInput";
-import { FormSchema } from "./validations";
 import CommonFormikComponent from "../../../components/CommonFormikComponent";
+import FormInputBox from "../../../components/FormInput";
+import PrivacyData from "./privacyData";
+import { FormSchema } from "./validations";
 
 /**
  * Confirm Privacy Modal
@@ -51,7 +52,7 @@ const PrivacyModal = ({ handleShow, handleClose }) => {
         {(formikProps) => (
           <React.Fragment>
             <Modal.Body className="text-break">
-              <FormInput
+              <FormInputBox
                 error={formikProps.errors.firstName}
                 id="firstName"
                 key={"firstName"}
@@ -64,37 +65,7 @@ const PrivacyModal = ({ handleShow, handleClose }) => {
                 type="text"
                 value={formikProps.values.firstName || ""}
               />
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                bibendum nibh vel volutpat condimentum. Nullam nec libero leo.
-                Donec augue felis, varius viverra tortor non, dictum hendrerit
-                purus. Cras aliquam id orci pharetra malesuada. enim elit
-                volutpat velit, eu faucibus erat metus at diam. Integer vitae
-                nisl et le eleifend mollis.
-              </p>
-              <p>
-                Cras aliquam id orci pharetra malesuada. Aliquam nec mattis
-                augue, art aliquam quam. In eget efficitur , sem facilisis veh
-                vestibulum, enim elit volutpat velit, eu faucibus erat metus at
-                diam. Integer vitae nisl et le eleifend aliquam quam. In eget
-                efficitur , sem facilisis veh vestibulum, mollis.Lorem ipsum
-                dolor sit amet, consectetur adipiscing elit. Sed bibendum nibh
-                vel volutpat condimentum. Nullam nec libero leo. Donec augue
-                felis, varius viverra tortor non, dictum hendrerit purus. Cras
-                aliquam id orci pharetra malesuada. enim elit volutpat velit, eu
-                faucibus erat metus at diam. Integer vitae nisl et le eleifend
-                mollis.
-              </p>
-              <p>
-                Cras aliquam id orci pharetra malesuada. Aliquam nec mattis
-                augue, art aliquam quam. In eget efficitur , sem facilisis veh
-                vestibulum, enim elit volutpat velit, eu faucibus erat metus at
-                diam. Integer vitae nisl et le eleifend aliquam quam. In eget
-                efficitur , sem facilisis veh vestibulum, mollis.Nullam nec
-                libero leo. Donec augue felis, varius viverra tortor non, dictum
-                hendrerit purus. Cras aliquam id orci pharetra malesuada. enim
-                elit volutpat velit,
-              </p>
+              <PrivacyData />
             </Modal.Body>
 
             <Modal.Footer className="py-2">

@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Container, Image, Row } from "react-bootstrap";
 import { MdEditDocument } from "react-icons/md";
+import { useDispatch } from 'react-redux';
 import homeBg from "../../assets/images/home-bg.jpg";
 import Loader from "../../components/Loader";
 import SvgIcons from "../../components/SVGIcons";
-import BrandSection from "./brandSection";
+import { toggleChatbot } from "../../redux/slice/helpDeskSlice";
 import PrivacyModal from "../auth/privacy";
+import BrandSection from "./brandSection";
 
 const Home = () => {
+  const dispatch = useDispatch();
   const [privacyModalShow, setPrivacyModalShow] = useState(false);
 
   //Handle Privacy Modal
@@ -48,6 +51,7 @@ const Home = () => {
                         className="text-uppercase w-100 text-nowrap fw-bold text-body"
                         size="lg"
                         onClick={handlePrivacyClick}
+                        disabled={true}
                       >
                         <span aria-hidden={true} className="me-1">
                           <MdEditDocument size={17} />
@@ -61,6 +65,7 @@ const Home = () => {
                         variant="outline-dark"
                         className="text-uppercase w-100 text-nowrap fw-bold bg-white border-white text-body"
                         size="lg"
+                        onClick={() => dispatch(toggleChatbot())}
                       >
                         <span aria-hidden={true} className="me-1">
                           {SvgIcons.RobotIcon()}
@@ -77,6 +82,7 @@ const Home = () => {
       </div>
       <BrandSection />
 
+      {/* Privacy Modal */}
       <PrivacyModal
         handleShow={privacyModalShow}
         handleClose={() => setPrivacyModalShow(false)}
