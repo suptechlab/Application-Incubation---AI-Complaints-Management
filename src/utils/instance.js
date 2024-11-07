@@ -11,9 +11,9 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
     (config) => {
-         const token = getLocalStorage('access_token');
+        //  const token = getLocalStorage('access_token');
         // AS OF NOW SET TOKEN STATICALLY BECAUSE LOGIN IS BY PASSSED
-        //const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZXBzLmFkbWluQHlvcG1haWwuY29tIiwiZXhwIjoxNzMwODgxMTcyLCJhdXRoIjoiUk9MRV9BRE1JTiBST0xFX1VTRVIiLCJpYXQiOjE3MzA3OTQ3NzJ9.wiZwMttP6V-cOPwtu2-7ERAY7Bmg3xaCvYVmGwifm9lVJRq70bHttXBLF9Jw6-Hay8eMYFVu5rttWDbPvk1tow"
+        const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZXBzLmFkbWluQHlvcG1haWwuY29tIiwiZXhwIjoxNzMzNDYwMzM4LCJhdXRoIjoiUk9MRV9BRE1JTiBST0xFX1VTRVIiLCJpYXQiOjE3MzA4NjgzMzh9.XLjAjQZfztMmJoPTT9rhlSyM8Mye-2sUsMCYcTfjHCbzj0W_ZbpIYLb_8N8nQt7Tu-Kho4IDTYQP5t6eZZajFQ"
     
         const userLanguage = 'es';
 

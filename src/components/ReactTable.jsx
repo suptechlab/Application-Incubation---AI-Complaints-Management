@@ -28,7 +28,7 @@ export default function ReactTable({
   const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 0;
 
 
-  const { isLoading, isFetching, data } = dataQuery;
+  const { isFetching, data } = dataQuery;
   // console.log('32 table',dataQuery?.data)
   const table = useReactTable({
     // data: dataQuery.data?.data?.data ?? defaultData,
@@ -71,7 +71,7 @@ export default function ReactTable({
 
   return (
     <div className="d-flex flex-column h-100 small table-cover-main">
-      <Loader isLoading={isLoading} />
+      {/* <Loader isLoading={isLoading} /> */}
       <BTable striped bordered hover responsive className="mb-0">
         <thead className="fs-15">
           {table.getHeaderGroups().map((headerGroup) => (
