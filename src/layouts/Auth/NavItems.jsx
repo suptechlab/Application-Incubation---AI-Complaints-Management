@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { MdConfirmationNumber, MdDashboard, MdFolder, MdPerson, MdSchema, MdSupervisorAccount } from "react-icons/md";
+import { BsFillFileTextFill } from "react-icons/bs";
 
 export const NavItems = () => {
   const { t } = useTranslation(); // use the translation hook
@@ -37,12 +38,12 @@ export const NavItems = () => {
           title: t("FI Users"),
           path: "/fi-users",
           roleName: "admin",
-          disabled: true,
+          disabled: false,
         },
         {
           id: 23,
-          menuName: t("Roles & Rights"),
-          title: t("Roles & Rights"),
+          menuName: t("ROLES AND RIGHTS LIST"),
+          title: t("ROLES AND RIGHTS LIST"),
           path: "/role-rights",
           roleName: "admin",
           disabled: false,
@@ -121,12 +122,12 @@ export const NavItems = () => {
           path: "/template-master",
           moduleName: ["Master Management"],
           roleName: "admin",
-          disabled: false,
+          disabled: true,
         }
       ],
     },
     {
-      id: 7,
+      id: 5,
       menuName: t("TICKETS"),
       title: t("TICKETS"),
       menuIcon: <MdConfirmationNumber size={20} />,
@@ -135,13 +136,48 @@ export const NavItems = () => {
       disabled: true,
     },
     {
-      id: 8,
-      menuName: t("TICKET WORKFLOW"),
+      id: 6,
+      menuName: t("TICKET WORKFLOW fsd"),
       title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
       roleName: "admin",
       disabled: true,
     },
+    {
+      id: 7,
+      menuName: t("REPORTS"),
+      title: t("REPORTS"),
+      menuIcon: <BsFillFileTextFill size={20} />,
+      path: '#',
+      moduleName: ["reports"],
+      roleName: "admin",
+      subMenu: [
+        {
+          id: 71,
+          menuName: t("CLAIM OVERVIEW"),
+          path: "/reports/claim-overview",
+          moduleName: ["reports"],
+          roleName: "admin",
+          disabled: true,
+        },
+        {
+          id: 72,
+          menuName: t("SLA COMPLIANCE"),
+          path: "/reports/sla-compliance",
+          moduleName: ["reports"],
+          roleName: "admin",
+          disabled: true,
+        },
+        {
+          id: 73,
+          menuName: t("AUDIT TRAIL REPORT"),
+          path: "/reports/audit-trail",
+          moduleName: ["reports"],
+          roleName: "admin",
+          disabled: false,
+        },
+      ],
+    }
   ];
 }

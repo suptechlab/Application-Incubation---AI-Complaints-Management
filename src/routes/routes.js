@@ -5,7 +5,6 @@ import Otp from "../pages/authentication/Otp";
 import ResetPassword from "../pages/authentication/ResetPassword";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import Dashboard from "../pages/dashboard";
-import DistrictdataPage from "../pages/districtdata";
 import CityMaster from "../pages/master management/cityMaster";
 import ClaimSubtype from "../pages/master management/claimSubType";
 import ClaimType from "../pages/master management/claimtype";
@@ -13,6 +12,8 @@ import InquirySubtype from "../pages/master management/inquirySubtype";
 import InquiryType from "../pages/master management/inquiryType";
 import ProvinceMaster from "../pages/master management/provinceMaster";
 import TemplateMaster from "../pages/master management/TemplateMaster";
+import AuditLogs from "../pages/auditLogs";
+import ViewAuditTrail from "../pages/auditLogs/ViewAuditTrail";
 import ChangePassword from "../pages/Profile/ChangePassword";
 import RoleRightsList from "../pages/role-rights";
 import StatesList from "../pages/states";
@@ -25,6 +26,9 @@ const AccountProfile = React.lazy(() => import("../pages/Profile"));
 const AddEditState = React.lazy(() => import("../pages/states/StateForm"));
 const AddStatePage = React.lazy(() => import("../pages/states/AddStatePage"));
 const AddUserPage = React.lazy(() => import("../pages/users/AddUserPage"));
+const FIUserList = React.lazy(() => import("../pages/fi-users"));
+const FIUserAddEdit = React.lazy(() => import("../pages/fi-users/AddEdit"));
+const ImportFIUser = React.lazy(() => import("../pages/fi-users/importData"));
 const AddEditRoleRights = React.lazy(() =>
   import("../pages/role-rights/RoleRightsForm")
 );
@@ -40,12 +44,6 @@ const routes = [
     path: "/dashboard",
     element: <Dashboard />,
     isPrivate: true,
-    layoutType: "Auth",
-  },
-  {
-    path: "/districtdata",
-    element: <DistrictdataPage />,
-    isPrivate: false,
     layoutType: "Auth",
   },
   {
@@ -197,7 +195,42 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
   },
-
+  {
+    path: "/fi-users",
+    element: <FIUserList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/add",
+    element: <FIUserAddEdit isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/edit/:id",
+    element: <FIUserAddEdit isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/fi-users/import",
+    element: <ImportFIUser isEdit={false} />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/reports/audit-trail",
+    element: <AuditLogs />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/reports/audit-trail/:id",
+    element: <ViewAuditTrail />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
   {
     path: "*",
     element: <NotFoundPage />,

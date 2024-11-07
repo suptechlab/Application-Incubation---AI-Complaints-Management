@@ -48,7 +48,7 @@ const Edit = ({ modal, toggle, rowData, dataQuery }) => {
     >
       <Modal.Header className="pb-3">
         <Modal.Title as="h4" className="fw-semibold">
-          {"EDIT CLAIM TYPE"}
+          {t("EDIT CLAIM TYPE")}
         </Modal.Title>
       </Modal.Header>
       <Formik

@@ -48,7 +48,6 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
         setIsSubMenuOpen(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -59,7 +58,6 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
     list: [],
     isAdmin: false,
   });
-
   useEffect(() => {
     isAdminUser()
       .then((response) => {

@@ -82,7 +82,7 @@ const Add = ({ modal, toggle,provinces,dataQuery }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                touched={touched.cityName}
+                touched={touched?.name}
                 type="text"
                 value={values?.name || ""}
               />
