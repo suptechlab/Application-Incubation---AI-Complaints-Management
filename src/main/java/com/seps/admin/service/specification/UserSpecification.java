@@ -11,8 +11,8 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SepsUserSpecification {
-    private SepsUserSpecification() {
+public class UserSpecification {
+    private UserSpecification() {
 
     }
 

@@ -1,0 +1,19 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+  <changeSet id="1731052547026" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="organization_id" type="bigint" remarks="Organization(Entity) ID of the User">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+    <addForeignKeyConstraint baseTableName="jhi_user"
+                             baseColumnNames="organization_id"
+                             referencedTableName="organization"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_user_organization"/>
+  </changeSet>
+</databaseChangeLog>

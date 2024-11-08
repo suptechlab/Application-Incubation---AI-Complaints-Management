@@ -23,7 +23,10 @@ public enum ActionTypeEnum {
     PROPERTY_HIDE_EXACT_LOCATION_TOGGLE("Property Hide Exact Location"),
     PROPERTY_FLOOR_PLAN_SAVED("Property Floor Plan saved"),
     PROPERTY_FLOOR_PLAN_DELETED("Property Floor Plan deleted"),
-    ORGANIZATION_MASTER_ADD("Add Organization");
+    ORGANIZATION_MASTER_ADD("Add Organization"),
+    FI_USER_ADD("Add FI User"),
+    FI_USER_EDIT("Edit FI User"),
+    FI_USER_STATUS_CHANGE("FI User Status Change");
 
     private final String description;
 

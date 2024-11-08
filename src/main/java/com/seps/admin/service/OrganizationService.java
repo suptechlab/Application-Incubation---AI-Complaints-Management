@@ -17,6 +17,7 @@ import com.seps.admin.suptech.service.dto.OrganizationInfoDTO;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
@@ -36,7 +37,9 @@ public class OrganizationService {
     private final AuditLogService auditLogService;
     private final OrganizationMapper organizationMapper;
 
-    public OrganizationService(ExternalAPIService externalAPIService, OrganizationRepository organizationRepository, MessageSource messageSource, UserService userService, Gson gson, AuditLogService auditLogService, OrganizationMapper organizationMapper) {
+    public OrganizationService(ExternalAPIService externalAPIService, OrganizationRepository organizationRepository,
+                               MessageSource messageSource, @Lazy UserService userService, Gson gson, AuditLogService auditLogService,
+                               OrganizationMapper organizationMapper) {
         this.externalAPIService = externalAPIService;
         this.organizationRepository = organizationRepository;
         this.messageSource = messageSource;
@@ -77,18 +80,18 @@ public class OrganizationService {
                 //Audit Logs
                 Arrays.stream(LanguageEnum.values()).forEach(language -> {
                     String messageAudit = messageSource.getMessage("audit.log.organization.created",
-                            new Object[]{currenUser.getEmail(), organization.getId()}, Locale.forLanguageTag(language.getCode()));
+                        new Object[]{currenUser.getEmail(), organization.getId()}, Locale.forLanguageTag(language.getCode()));
                     auditMessageMap.put(language.getCode(), messageAudit);
                 });
                 entityData.put(Constants.NEW_DATA, convertEntityToMap(this.getOrganizationById(organization.getId())));
                 String requestBody = null;
                 auditLogService.logActivity(null, currenUser.getId(), requestInfo, "fetchOrganizationDetails", ActionTypeEnum.ORGANIZATION_MASTER_ADD.name(), organization.getId(), Organization.class.getSimpleName(),
-                        null, auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
+                    null, auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
             }
             return organizationInfoDTO;
         } catch (OrganizationNotFoundException e) {
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.ORGANIZATION_RUC_NOT_FOUND,
-                    new String[]{ruc}, null);
+                new String[]{ruc}, null);
         }
     }
 
@@ -96,8 +99,16 @@ public class OrganizationService {
     @Transactional
     public OrganizationDTO getOrganizationById(Long id) {
         return organizationRepository.findById(id)
-                .map(organizationMapper::toDTO)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_NOT_FOUND,
-                        new String[]{id.toString()}, null));
+            .map(organizationMapper::toDTO)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_NOT_FOUND,
+                new String[]{id.toString()}, null));
     }
+
+    @Transactional
+    public Organization getOrganizationByRuc(String ruc) {
+        return organizationRepository.findByRuc(ruc)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_RUC_NOT_FOUND,
+                new String[]{ruc}, null));
+    }
+
 }
