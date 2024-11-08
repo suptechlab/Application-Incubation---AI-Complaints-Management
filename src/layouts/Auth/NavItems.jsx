@@ -25,8 +25,8 @@ export const NavItems = () => {
       subMenu: [
         {
           id: 21,
-          menuName: t("SEPS Users"),
-          title: t("SEPS Users"),
+          menuName: t("SEPS USERS"),
+          title: t("SEPS USERS"),
           path: "/users",
           roleName: "user",
           disabled: false,
@@ -34,8 +34,8 @@ export const NavItems = () => {
         },
         {
           id: 22,
-          menuName: t("FI Users"),
-          title: t("FI Users"),
+          menuName: t("FI USERS"),
+          title: t("FI USERS"),
           path: "/fi-users",
           roleName: "admin",
           disabled: false,

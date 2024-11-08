@@ -22,8 +22,8 @@ const ProvinceMaster = () => {
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
-  const [isLoading, setLoading] = useState(false)
-  const [isDownloading, setDownloading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
   const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
@@ -80,36 +80,44 @@ const ProvinceMaster = () => {
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-
-      if (sorting.length === 0) {
-        return handleGetProvinceMaster({
+    queryFn: async () => {
+      setIsLoading(true); // Start loading
+  
+      try {
+        // Clean up the filter object to remove empty strings and null values
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach(key => {
+          if (filterObj[key] === "") delete filterObj[key];
+        });
+  
+        const requestOptions = {
           page: pagination.pageIndex,
           size: pagination.pageSize,
           ...filterObj,
-        });
-      } else {
-        return handleGetProvinceMaster({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map(
-              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-            )
-            .join(","),
-          ...filterObj,
-        });
+        };
+  
+        // Handle sorting if applicable
+        if (sorting.length > 0) {
+          requestOptions.sort = sorting
+            .map(sort => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+            .join(",");
+        }
+  
+        // Fetch data using handleGetProvinceMaster API call
+        const response = await handleGetProvinceMaster(requestOptions);
+        return response;
+      } finally {
+        setIsLoading(false); // Ensure loading state is reset
       }
     },
-    staleTime: 0, // Data is always stale, so it refetches
+    onError: () => setIsLoading(false), // Reset loading state on error
+    staleTime: 0, // Data is always considered stale
     cacheTime: 0, // Cache expires immediately
+    retry: 0, // Disable automatic retries to prevent multiple calls on error
   });
-
   // TOGGLE PROVINCE MASTER STATUS
   const changeStatus = async (id, currentStatus) => {
-    setLoading(true)
+    setIsLoading(true)
     changeProvinceMasterStatus(id, !currentStatus).then(response => {
       toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
@@ -120,7 +128,7 @@ const ProvinceMaster = () => {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
     }).finally(() => {
-      setLoading(false)
+      setIsLoading(false)
     })
   };
   useEffect(() => {
@@ -198,7 +206,7 @@ const ProvinceMaster = () => {
 
   // HANDLE PROVINCE MASTER EXPORT
   const exportHandler = () => {
-    setDownloading(true)
+    setIsDownloading(true)
     toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadProvinceMasterList({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
@@ -234,7 +242,7 @@ const ProvinceMaster = () => {
     }).finally(() => {
       // Ensure the loading toast is dismissed
       // toast.dismiss("downloading");
-      setDownloading(false)
+      setIsDownloading(false)
     });
   }
 

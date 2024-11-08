@@ -8,18 +8,16 @@ import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import ReactSelect from "../../components/ReactSelect";
-import Toggle from "../../components/Toggle";
 import UserLoader from "../../components/UserLoader";
+import { countryCodes } from "../../constants/CountryCodes";
+import { getOrganizationInfo, getPersonalInfo, handleAddFIUsers, handleEditFIUsers, handleGetFIuserById } from "../../services/fiusers.services";
 import {
   handleAddUser,
-  handleGetRole,
   handleGetUserById,
-  handleGetUserCompany,
-  handleUpdateUser,
+  handleUpdateUser
 } from "../../services/user.service";
-import { validationSchema } from "../../validations/user.validation";
-import { countryCodes } from "../../constants/CountryCodes";
-import { getOrganizationInfo, getPersonalInfo } from "../../services/fiusers.services";
+import { validationSchema } from "../../validations/fiUsers.validation";
+import { getRolesDropdownData } from "../../services/rolerights.service";
 
 export default function FIUserAddEdit() {
   const [loading, setLoading] = useState(true);
@@ -32,9 +30,10 @@ export default function FIUserAddEdit() {
 
   const [companyOptions, setCompanyOptions] = useState([]);
   const [rolesOptions, setRolesOptions] = useState([]);
+  const [rolesDropdownData , setRolesDropdownData] = useState([])
 
 
-  const [userData, setUserData] = useState([]);
+  const [FIuserData, setFIUserData] = useState([]);
   const [isImageSet, setIsImageSet] = useState(false);
   const [emailDisabled, setEmailDisabled] = useState(false);
   const { t } = useTranslation();
@@ -69,23 +68,22 @@ export default function FIUserAddEdit() {
   }, []);
 
   const [initialValue, setInitialValues] = useState({
-    userId: userData?.userId ? userData?.userId : "",
-    name: userData?.name ? userData?.name : "",
-    email: userData?.email ? userData?.email : "",
-    mobileCode: "+91",
-    mobileNo: userData?.mobileNo ? userData?.mobileNo : "",
-    taxId: userData?.taxId ? userData?.taxId : "",
-    entityName: userData?.entityName ? userData?.entityName : "",
-    entityType: userData?.entityType ? userData?.entityType : "",
-    companyId: userData?.companyId ? userData?.companyId : "",
-    activated: userData?.activated ? userData?.activated : false,
+    identification: FIuserData?.identification ? FIuserData?.identification : "",
+    name: FIuserData?.name ? FIuserData?.name : "",
+    email: FIuserData?.email ? FIuserData?.email : "",
+    countryCode: "+1",
+    phoneNumber: FIuserData?.mobileNo ? FIuserData?.phoneNumber : "",
+    ruc: FIuserData?.taxId ? FIuserData?.taxId : "",
+    entityName: FIuserData?.entityName ? FIuserData?.entityName : "",
+    entityType: FIuserData?.entityType ? FIuserData?.entityType : "",
+    roleId: FIuserData?.roleId ? FIuserData?.roleId : "",
   });
 
   useEffect(() => {
     if (isEdit) {
       setLoading(true);
-      handleGetUserById(id).then((response) => {
-        setUserData(response.data.data);
+      handleGetFIuserById(id).then((response) => {
+        setFIUserData(response.data.data);
         setEmailDisabled(response.data.data.email != "");
         setLoading(false);
       });
@@ -96,11 +94,11 @@ export default function FIUserAddEdit() {
 
 
   // FETCH USER PERSONAL INFO BY ID
-  const fetchUserData = async (userId) => {
+  const fetchUserData = async (identification) => {
     setLoadingInfo(true)
-    getPersonalInfo(userId).then((response) => {
+    getPersonalInfo(identification).then((response) => {
       setLoadingInfo(false)
-      setInitialValues({ ...initialValue, userId: userId, name: response?.data?.nombreCompleto })
+      setInitialValues({ ...initialValue, identification: identification, name: response?.data?.nombreCompleto })
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -118,7 +116,7 @@ export default function FIUserAddEdit() {
     setLoadingInfo(true)
     getOrganizationInfo(taxId).then((response) => {
       setLoadingInfo(false)
-      setInitialValues({ ...initialValue, taxId: taxId, entityName: response?.data?.razonSocial,entityType:response?.data?.tipoOrganizacion })
+      setInitialValues({ ...initialValue, taxId: taxId, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -132,9 +130,9 @@ export default function FIUserAddEdit() {
   }
   // HANDLE IDENTIFICATION
   const handleIdentificationBlur = (event) => {
-    const userId = event.target.value;
-    if (userId && userId !== "") {
-      fetchUserData(userId) // Call the API function
+    const identification = event.target.value;
+    if (identification && identification !== "") {
+      fetchUserData(identification) // Call the API function
     }
   };
 
@@ -146,40 +144,79 @@ export default function FIUserAddEdit() {
     }
   }
 
+  //FETCH ROLES DROPDOWN DATA
+  const fetchRolesDropdownData = ()=>{
+    getRolesDropdownData('FI_USER').then((response) => {
+      const mappedData = response?.data?.map(item => ({
+        value: item.id,
+        label: item.name
+      }));
+      setRolesDropdownData(mappedData ?? [])
+    })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+  }
+
+  useEffect(()=>{
+    fetchRolesDropdownData()
+  },[])
 
   // HANDLE SUBMIT
-  const onSubmit = async (values) => {
-
+  const handleSubmit = async (values, actions) => {
     setUserLoading(true);
-    const formData = new FormData();
-    if (!isImageSet) {
-      delete values.profileImage;
+
+    let formData = {
+      identificacion: values?.identificacion,
+      name: values?.name,
+      email: values?.email,
+      langKey: "es",
+      countryCode: values?.countryCode,
+      phoneNumber: values?.phoneNumber,
+      roleId: 1,
+      ruc: values?.ruc
     }
-    for (const key in values) {
-      formData.append(key, values[key]);
-    }
-    try {
-      if (isEdit) {
-        formData.append("id", id);
-        const response = await handleUpdateUser(id, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+
+    if (isEdit) {
+      formData.id = id
+      // CALL EDIT FI USERS API
+      handleEditFIUsers(formData).then((response) => {
+        toast.success(response?.data?.message);
+        navigate("/fi-users")
+      })
+        .catch((error) => {
+          if (error?.response?.data?.errorDescription) {
+            toast.error(error?.response?.data?.errorDescription);
+          } else {
+            toast.error(error?.message);
+          }
+        })
+        .finally(() => {
+          actions.setSubmitting(false);
         });
-        toast.success(response.data.message);
-        navigate("/fi-users");
-      } else {
-        const response = await handleAddUser(formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+
+    } else {
+      // CALL ADD FI USER API
+      handleAddFIUsers(formData).then((response) => {
+        toast.success(response?.data?.message);
+        navigate("/fi-users")
+      })
+        .catch((error) => {
+          if (error?.response?.data?.errorDescription) {
+            toast.error(error?.response?.data?.errorDescription);
+          } else {
+            toast.error(error?.message);
+          }
+        })
+        .finally(() => {
+          actions.setSubmitting(false);
         });
-        toast.success(response.data.message);
-        navigate("/fi-users");
-      }
-    } catch (error) {
-      toast.error(error.response.data.message);
     }
+
   };
 
   return (
@@ -190,13 +227,17 @@ export default function FIUserAddEdit() {
         title="Verifying User..."
       />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <PageHeader title={`${isEdit ? "Edit" : "Add"} FI User`} />
+        <PageHeader title={`${isEdit ? t("EDIT") : t("ADD")} ${t("FI USER")}`} />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
             <Formik
               initialValues={initialValue}
               validationSchema={validationSchema}
-              onSubmit={onSubmit}
+              onSubmit={(values, actions) => {
+                console.log(values)
+                actions.setSubmitting(true);
+                handleSubmit(values, actions);
+              }}
               enableReinitialize
             >
               {({
@@ -209,22 +250,21 @@ export default function FIUserAddEdit() {
                 setFieldValue,
               }) => (
                 <FormikForm
-                  onSubmit={handleSubmit}
                   className="d-flex flex-column h-100"
                 >
                   <Row>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
-                        error={errors?.userId}
-                        id="userId"
-                        key={"userId"}
-                        label="ID"
-                        name="userId"
+                        error={errors?.identification}
+                        id="identification"
+                        key={"identification"}
+                        label={t("ID")}
+                        name="identification"
                         onBlur={handleIdentificationBlur}
                         onChange={handleChange}
-                        touched={touched?.userId}
+                        touched={touched?.identification}
                         type="number"
-                        value={values?.userId || ""}
+                        value={values?.identification || ""}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
@@ -232,10 +272,10 @@ export default function FIUserAddEdit() {
                         error={errors?.name}
                         id="name"
                         key={"name"}
-                        label="Name"
+                        label={t("NAME")}
                         name="name"
                         onBlur={handleBlur}
-                        disabled={true}
+                        readOnly={true}
                         onChange={handleChange}
                         touched={touched?.name}
                         type="text"
@@ -247,7 +287,7 @@ export default function FIUserAddEdit() {
                         error={errors?.email}
                         id="email"
                         key={"email"}
-                        label="Email"
+                        label={t("EMAIL")}
                         name="email"
                         onBlur={handleBlur}
                         onChange={handleChange}
@@ -258,62 +298,62 @@ export default function FIUserAddEdit() {
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
-                      <label htmlFor="mobileCode" className="mb-1 fs-14">
-                        Phone
+                      <label htmlFor="countryCode" className="mb-1 fs-14">
+                        {t("PHONE")}
                       </label>
                       <Row className="gx-2">
                         <Col xs="auto">
                           <div className="custom-min-width-75 pe-1">
                             <ReactSelect
-                              error={errors.mobileCode}
+                              error={errors?.countryCode}
                               options={formattedCountryCodes ?? []}
-                              value={values.mobileCode}
+                              value={values?.countryCode}
                               onChange={(option) => {
                                 setFieldValue(
-                                  "mobileCode",
+                                  "countryCode",
                                   option?.target?.value ?? ""
                                 );
                               }}
-                              name="mobileCode"
+                              name="countryCode"
                               className={
-                                touched.mobileCode && errors.mobileCode
+                                touched?.countryCode && errors?.countryCode
                                   ? "is-invalid"
                                   : ""
                               }
                               onBlur={handleBlur}
-                              touched={touched.mobileCode}
+                              touched={touched?.countryCode}
                             />
                           </div>
                         </Col>
                         <Col xs>
                           <FormInput
-                            error={errors.mobileNo}
-                            id="mobileNo"
-                            key={"mobileNo"}
-                            name="mobileNo"
+                            error={errors?.phoneNumber}
+                            id="phoneNumber"
+                            key={"phoneNumber"}
+                            name="phoneNumber"
                             onBlur={handleBlur}
                             onChange={handleChange}
-                            touched={touched.mobileNo}
+                            touched={touched?.phoneNumber}
                             type="text"
-                            value={values.mobileNo || ""}
+                            value={values?.phoneNumber || ""}
                           />
                         </Col>
                       </Row>
                     </Col>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
-                        error={errors?.taxId}
-                        id="taxId"
-                        key={"taxId"}
-                        label="Entity's Tax ID (RUC)"
-                        name="taxId"
+                        error={errors?.ruc}
+                        id="ruc"
+                        key={"ruc"}
+                        label={t("ENTITY'S TAX ID (RUC)")}
+                        name="ruc"
                         onBlur={handleTaxIdBlur}
                         onChange={(option) => {
-                          setFieldValue("taxId", option?.target?.value ?? "");
+                          setFieldValue("ruc", option?.target?.value ?? "");
                         }}
-                        touched={touched?.taxId}
+                        touched={touched?.ruc}
                         type="number"
-                        value={values?.taxId || ""}
+                        value={values?.ruc || ""}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
@@ -321,14 +361,14 @@ export default function FIUserAddEdit() {
                         error={errors.entityName}
                         id="entityName"
                         key={"entityName"}
-                        label="Entity's Name"
+                        label={t("ENTITY'S NAME")}
                         name="entityName"
                         onBlur={handleBlur}
                         onChange={handleChange}
                         touched={touched.entityName}
                         type="text"
                         value={values.entityName || ""}
-                        disabled={true}
+                        readOnly={true}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
@@ -336,36 +376,36 @@ export default function FIUserAddEdit() {
                         error={errors.entityName}
                         id="entityType"
                         key={"entityType"}
-                        label="Entity type"
+                        label={t("ENTITY TYPE")}
                         name="entityType"
                         onBlur={handleBlur}
                         onChange={handleChange}
                         touched={touched.entityType}
                         type="text"
                         value={values.entityType || ""}
-                        disabled={true}
+                        readOnly={true}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
                       <ReactSelect
-                        label="Role"
-                        error={errors.companyId}
-                        options={companyOptions}
-                        value={values.companyId}
+                        label={t("ROLE")}
+                        error={errors.roleId}
+                        options={rolesDropdownData ?? []}
+                        value={values.roleId}
                         onChange={(option) => {
                           setFieldValue(
-                            "companyId",
+                            "roleId",
                             option?.target?.value ?? ""
                           );
                         }}
-                        name="companyId"
+                        name="roleId"
                         className={
-                          touched.companyId && errors.companyId
+                          touched?.roleId && errors?.roleId
                             ? "is-invalid"
                             : ""
                         }
                         onBlur={handleBlur}
-                        touched={touched.companyId}
+                        touched={touched?.roleId}
                       />
                     </Col>
                   </Row>
@@ -386,7 +426,7 @@ export default function FIUserAddEdit() {
                         variant="warning"
                         className="custom-min-width-85"
                       >
-                        {isEdit ? "Update" : "Submit"}
+                        {isEdit ? t("UPDATE") : t("SUBMIT")}
                       </Button>
                     </Stack>
                   </div>

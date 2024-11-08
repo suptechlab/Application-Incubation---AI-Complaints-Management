@@ -1,5 +1,5 @@
 import instance from "../utils/instance";
-
+const API_VERSION = process.env.REACT_APP_API_VERSION
 export const handleGetRoleRights = async (params) => {
     return await instance.get('/v1/roles', {
         params
@@ -25,4 +25,9 @@ export const handleEditRoleRight = async (id, data) => {
 
 export const fetchModulesAndPermissions = async () => {
     return await instance.get('/v1/roles/modules-permissions');
+}
+
+// GET ROLES DROPDOWN DATA WITH USER TYPE
+export const getRolesDropdownData = async (userType) =>{
+    return await instance.get(`/${API_VERSION}/roles/dropdown/${userType}`);
 }

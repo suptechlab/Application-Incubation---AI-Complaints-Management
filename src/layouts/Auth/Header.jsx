@@ -192,7 +192,9 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 alt={firstName}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-200 fs-6 lh-sm">
-                {firstName} <br />
+                {/* {firstName}  */}
+                SEPS
+                <br />
                 <Badge bg="light-green-custom" className="fs-normal">
                   FI Agent
                 </Badge>

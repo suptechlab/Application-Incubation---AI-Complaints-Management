@@ -10,7 +10,6 @@ const validationSchema = Yup.object({
      mobileNo: Yup.string().required("Mobile number is required").min(10, "Invalid phone number").max(10, "Maximum limit is 10"),
      roleId: Yup.string().required("Role is required"),
      companyId: Yup.string().required("Company is required"),
-    
      activated: Yup.boolean(),
 });
 

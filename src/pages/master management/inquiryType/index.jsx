@@ -80,31 +80,40 @@ const InquiryType = () => {
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+    queryFn: async () => {
+      setLoading(true); // Set loading to true when fetching starts
 
-      if (sorting.length === 0) {
-        return handleGetInquiryType({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetInquiryType({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map(
-              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-            )
-            .join(","),
-          ...filterObj,
-        });
+      // Parse and clean up the filter object
+      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+      Object.keys(filterObj).forEach(key => {
+        if (filterObj[key] === "") delete filterObj[key];
+      });
+
+      const requestOptions = {
+        page: pagination.pageIndex,
+        size: pagination.pageSize,
+        ...filterObj,
+      };
+
+      // Add sorting if it's specified
+      if (sorting.length > 0) {
+        requestOptions.sort = sorting
+          .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+          .join(",");
+      }
+
+      try {
+        // Make the API call
+        const response = await handleGetInquiryType(requestOptions);
+        return response;
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
       }
     },
-    staleTime: 0, // Data is always stale, so it refetches
+    onError: () => setLoading(false), // Ensure loading state is reset on error
+    staleTime: 0, // Data is always stale
     cacheTime: 0, // Cache expires immediately
+    retry: 0,
   });
 
   const changeStatus = async (id, currentStatus) => {

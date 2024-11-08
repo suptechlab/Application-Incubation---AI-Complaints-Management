@@ -28,7 +28,7 @@ export default function ReactTable({
   const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 0;
 
 
-  const { isFetching, data } = dataQuery;
+  const {data } = dataQuery;
   // console.log('32 table',dataQuery?.data)
   const table = useReactTable({
     // data: dataQuery.data?.data?.data ?? defaultData,
