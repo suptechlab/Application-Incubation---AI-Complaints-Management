@@ -39,5 +39,8 @@
       </column>
     </addColumn>
   </changeSet>
+  <changeSet id="1731048353676" author="matellio">
+    <renameColumn tableName="jhi_user" oldColumnName="identificacionData" newColumnName="identificacion_data"/>
+  </changeSet>
 
 </databaseChangeLog>
