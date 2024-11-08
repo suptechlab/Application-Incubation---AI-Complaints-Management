@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, Col, Offcanvas, Row } from 'react-bootstrap';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormCheckbox from '../../../components/formCheckbox';
-import SvgIcons from '../../../components/SVGIcons';
 import PrivacyData from '../../auth/privacy/privacyData';
+import HelpDeskHeader from '../chatHeader';
 import { PrivacyFormSchema } from '../validations';
 
 const PrivacyForm = ({ handleClose, onSubmit }) => {
@@ -19,17 +19,7 @@ const PrivacyForm = ({ handleClose, onSubmit }) => {
 
     return (
         <React.Fragment>
-            <Offcanvas.Header closeButton className='border-bottom mb-4 align-items-start'>
-                <Offcanvas.Title as="div" className="d-flex gap-2 align-items-center">
-                    <span className='align-items-center bg-warning custom-height-80 custom-width-80 d-inline-flex justify-content-center rounded-pill text-white'>
-                        {SvgIcons.RobotIcon(40, 40)}
-                    </span>
-                    <div className='text-uppercase'>
-                        <h5 className='custom-font-size-18 lh-sm mb-0 text-custom-gray'>Welcome to the </h5>
-                        <h4 className='custom-font-size-26 lh-sm mb-0'>SEPS Helpdesk</h4>
-                    </div>
-                </Offcanvas.Title>
-            </Offcanvas.Header>
+            <HelpDeskHeader />
             <CommonFormikComponent
                 validationSchema={PrivacyFormSchema}
                 initialValues={initialValues}
@@ -40,7 +30,7 @@ const PrivacyForm = ({ handleClose, onSubmit }) => {
                         {/* Chatbot Body */}
                         <div className='chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-3'>
                             <div className='chatbot-body-inner flex-grow-1 overflow-auto mx-n3 px-3'>
-                                <h5 className='custom-font-size-18 fw-semibold'>Your Privacy Matters</h5>
+                                <div className='custom-font-size-18 fw-semibold mb-2'>Your Privacy Matters</div>
                                 <PrivacyData />
                             </div>
                             <div className='pt-2'>

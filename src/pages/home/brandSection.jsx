@@ -30,7 +30,6 @@ const BrandSection = () => {
     slidesToShow: 6,
     slidesToScroll: 1,
     initialSlide: 0,
-    lazyLoad: "ondemand",
     autoplay: true,
     pauseOnHover: false,
     afterChange: (current) => {

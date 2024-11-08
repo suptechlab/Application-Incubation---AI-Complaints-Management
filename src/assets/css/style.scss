@@ -252,6 +252,10 @@ input:-webkit-autofill:active {
             flex-direction: column;
             overflow: hidden;
             max-height: 100%;
+
+            .bot-tag-btns {
+                --bs-btn-padding-x: .7rem;
+            }
         }
     }
 }

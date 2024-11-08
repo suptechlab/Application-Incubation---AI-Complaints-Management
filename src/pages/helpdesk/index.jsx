@@ -18,7 +18,7 @@ const HelpDeskBot = ({ handleShow, handleClose }) => {
             scroll={true}
             backdrop={false}
             placement="bottom"
-            aria-labelledby="SEPS Helpdesk Bot"
+            aria-label="SEPS Helpdesk Bot"
         >
             {isPrivacyFormSubmitted ? (
                 <ChatBotForm handleClose={handleClose} />

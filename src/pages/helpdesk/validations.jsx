@@ -8,3 +8,9 @@ export const PrivacyFormSchema = yup.object({
 export const ChatBotFormSchema = yup.object({
   message: yup.string().required().label('Message'),
 });
+
+export const ChatLoginFormSchema = yup.object({
+  name: yup.string().required().label('Name'),
+  nationalId: yup.string().required().label('National ID'),
+  email: yup.string().email().required().label('Email'),
+});
