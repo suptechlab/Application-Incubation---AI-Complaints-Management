@@ -1,0 +1,31 @@
+package com.seps.admin.service.dto;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RequestInfo {
+
+    private String method;
+    private String requestURI;
+    private String queryString;
+    private String remoteAddr;
+    private String remoteUser;
+    private String remoteHost;
+    private Integer remotePort;
+
+    public RequestInfo(HttpServletRequest httpServletRequest) {
+        this.method = httpServletRequest.getMethod();
+        this.requestURI = httpServletRequest.getRequestURI();
+        this.queryString = httpServletRequest.getQueryString();
+        this.remoteAddr = httpServletRequest.getRemoteAddr();
+        this.remoteUser = httpServletRequest.getRemoteUser();
+        this.remoteHost = httpServletRequest.getRemoteHost();
+        this.remotePort = httpServletRequest.getRemotePort();
+    }
+}

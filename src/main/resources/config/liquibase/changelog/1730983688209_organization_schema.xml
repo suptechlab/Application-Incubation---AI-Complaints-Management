@@ -1,0 +1,53 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+  <changeSet id="1730983688209" author="matellio">
+    <createTable tableName="organization">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ruc" type="varchar(20)" remarks="The RUC (Taxpayer Registration Number) of the organization">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="razon_social" type="varchar(255)" remarks="The legal name of the organization">
+        <constraints nullable="false"/>
+      </column>
+      <column name="nemonico_tipo_organizacion" type="varchar(255)"
+              remarks="The mnemonic code representing the type of organization">
+        <constraints nullable="false"/>
+      </column>
+      <column name="tipo_organizacion" type="varchar(255)"
+              remarks="A full description of the type of organization (e.g., cooperative, association)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_by" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_by" type="bigint">
+        <constraints nullable="true"/>
+      </column>
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseColumnNames="created_by"
+                             baseTableName="organization"
+                             constraintName="fk_organization_created_by"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+    <addForeignKeyConstraint baseColumnNames="updated_by"
+                             baseTableName="organization"
+                             constraintName="fk_organization_updated_by"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+  </changeSet>
+
+</databaseChangeLog>

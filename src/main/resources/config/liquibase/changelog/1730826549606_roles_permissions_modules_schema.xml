@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1730915222310" author="matellio">
+        <createTable tableName="roles">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="user_type" type="varchar(50)"/>
+            <column name="created_by" type="bigint"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="status" type="boolean" defaultValue="true"/>
+            <column name="deleted" type="boolean" defaultValue="false"/>
+        </createTable>
+
+        <createTable tableName="modules">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name_es" type="varchar(255)">
+              <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="description_es" type="varchar(255)"/>
+            <column name="user_type" type="varchar(50)"/>
+            <column name="sort_order" type="int"/>
+        </createTable>
+
+        <createTable tableName="permissions">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="module_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="description_es" type="varchar(255)"/>
+        </createTable>
+
+        <createTable tableName="role_permissions">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Add foreign key constraints -->
+        <addForeignKeyConstraint baseColumnNames="module_id"
+                                 baseTableName="permissions"
+                                 constraintName="fk_permissions_module"
+                                 referencedColumnNames="id"
+                                 referencedTableName="modules"/>
+
+        <addForeignKeyConstraint baseColumnNames="role_id"
+                                 baseTableName="role_permissions"
+                                 constraintName="fk_role_permissions_role"
+                                 referencedColumnNames="id"
+                                 referencedTableName="roles"/>
+
+        <addForeignKeyConstraint baseColumnNames="created_by"
+                                 baseTableName="roles"
+                                 constraintName="fk_created_by_role_jhi_user"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="permission_id"
+                                 baseTableName="role_permissions"
+                                 constraintName="fk_role_permissions_permission"
+                                 referencedColumnNames="id"
+                                 referencedTableName="permissions"/>
+
+        <loadData
+          file="config/liquibase/data/modules.csv"
+          separator=","
+          tableName="modules"/>
+
+        <loadData
+          file="config/liquibase/data/permissions.csv"
+          separator=","
+          tableName="permissions"/>
+
+    </changeSet>
+</databaseChangeLog>
