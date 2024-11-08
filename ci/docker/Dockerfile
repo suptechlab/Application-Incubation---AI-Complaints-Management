@@ -22,4 +22,4 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
 COPY --from=backend-compiler /app/target/admin-${VERSION}.jar /app/opt/admin.jar
-ENTRYPOINT ["java", "-jar", "admin.jar"]
+ENTRYPOINT ["java", "-jar", "/app/opt/admin.jar"]
