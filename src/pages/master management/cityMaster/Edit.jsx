@@ -82,7 +82,7 @@ const Edit = ({ modal, toggle, provinces, dataQuery, rowData }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                touched={touched?.name}
+                touched={touched.cityName}
                 type="text"
                 value={values?.name || ""}
               />

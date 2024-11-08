@@ -127,9 +127,10 @@ export default function AuthenticationProvider({ children }) {
                 toast.error('JWT tokens are missing in the response');
             }
         }).catch((error) => {
-            removeLocalStorage("access_token")
-            removeLocalStorage("refresh_token")
-            setIsAuthenticated(false)
+            // Temp stoping refresh token work
+            // removeLocalStorage("access_token")
+            // removeLocalStorage("refresh_token")
+            // setIsAuthenticated(false)
         })
 
     }
