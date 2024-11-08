@@ -23,7 +23,6 @@ const PrivacyModal = ({ handleShow, handleClose }) => {
   // Handle Submit Handler
   const handleSubmit = (values, actions) => {
     actions.setSubmitting(false);
-    console.log("values", values);
   };
 
   return (

@@ -7,7 +7,6 @@ const HelpDeskBot = ({ handleShow, handleClose }) => {
     const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(false);
 
     const handlePrivacyFormSubmit = (values, actions) => {
-        console.log("values", values);
         setIsPrivacyFormSubmitted(true);
         actions.setSubmitting(false);
     };

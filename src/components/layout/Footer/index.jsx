@@ -19,7 +19,6 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();  
   const dispatch = useDispatch();
   const { chatBotVisible } = useSelector((state) => state.helpDeskSlice);
-  console.log('chatBotVisible', chatBotVisible)
 
   // Nav Links
   const navLinks = [
@@ -95,7 +94,7 @@ const Footer = () => {
                       as={Link}
                       to={link.url}
                       target={link.isExternal ? "_blank" : undefined}
-                      className="p-0 custom-font-size-12 link-light text-uppercase"
+                      className="p-0 custom-font-size-12 text-white text-uppercase"
                     >
                       {link.label}
                     </Nav.Link>
@@ -116,7 +115,7 @@ const Footer = () => {
                       as={Link}
                       to={link.url}
                       target="_blank"
-                      className="p-0 fs-6 link-light"
+                      className="p-0 fs-6 text-white"
                       aria-label={link.ariaLabel}
                     >
                       {link.icon}
