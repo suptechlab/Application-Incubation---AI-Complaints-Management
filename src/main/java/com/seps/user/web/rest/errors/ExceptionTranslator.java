@@ -120,8 +120,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
 
         if (
             (err instanceof MethodArgumentNotValidException fieldException) &&
-            (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
-        ) problem.setProperty(FIELD_ERRORS_KEY, getFieldErrors(fieldException));
+                (problemProperties == null || !problemProperties.containsKey(FIELD_ERRORS_KEY))
+        ) {
+            List<FieldErrorVM> fieldErrors = getFieldErrors(fieldException);
+            problem.setProperty(FIELD_ERRORS_KEY, fieldErrors);
+            problem.setProperty("errorCode", SepsStatusCode.FORM_VALIDATION_ERROR.getStatusCode());  // You can change this value as per your logic
+            problem.setProperty("errorDescription", getErrorDescription(fieldErrors));  // Custom method to get description
+        }
 
         problem.setCause(buildCause(err.getCause(), request).orElse(null));
 
