@@ -88,7 +88,7 @@ deployment:
   virtualRoute:
     enabled: true
     host: adminapi-suptechdev.seps.gob.ec 
-    path: /
+    path: /auth
 
   resources:
     # We usually recommend not to specify default resources and to leave this as a conscious
