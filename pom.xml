@@ -7,7 +7,7 @@
     <artifactId>admin</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Admin</name>
+    <name>admin</name>
     <description>Description for Admin</description>
     <parent>
         <groupId>org.springframework.boot</groupId>
