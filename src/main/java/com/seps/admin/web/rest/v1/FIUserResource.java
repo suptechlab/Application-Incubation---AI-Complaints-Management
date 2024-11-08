@@ -125,8 +125,8 @@ public class FIUserResource {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseStatus> updateFIUser(@PathVariable Long id, @Valid @RequestBody FIUserDTO dto,
-                                                       HttpServletRequest request) {
+    public ResponseEntity<ResponseStatus> editFIUser(@PathVariable Long id, @Valid @RequestBody FIUserDTO dto,
+                                                     HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         userService.updateFIUser(id, dto, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
