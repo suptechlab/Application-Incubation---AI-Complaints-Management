@@ -71,24 +71,27 @@ deployment:
     targetPort: 8080
 
   ingress:
-    enabled: false
+    enabled: true
     className: "nginx"
     annotations:
-      # kubernetes.io/tls-acme: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     hosts:
-      - host: seps.local
+      - host: adminapi-suptechdev.seps.gob.ec
         paths:
-          - path: /
-            pathType: Prefix
-             
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
+          - path: /auth(/|$)(.*)
+            pathType: ImplementationSpecific         
+    tls:
+      - secretName: seps-cert
+        hosts:
+          - adminapi-suptechdev.seps.gob.ec
+  
+  ## Virtual Route        
   virtualRoute:
-    enabled: true
-    host: adminapi-suptechdev.seps.gob.ec 
-    path: /auth
+    enabled: false
+    host: seps.local 
+    path: /a
 
   resources:
     # We usually recommend not to specify default resources and to leave this as a conscious
