@@ -1,0 +1,122 @@
+categories:
+  - Frontend
+questions:
+  - variable: deployment.image.registry
+    default: "nexus.seps.gob.ec:4000"
+    description: "Docker registry"
+    type: string
+    required: true
+    label: Docker registry
+    group: "Docker Image Settings"
+  - variable: deployment.image.pullPolicy
+    default: "Always"
+    description: "Docker pull policy"
+    type: enum
+    options:
+      - "Always"
+      - "IfNotPresent"
+    required: true
+    label: Docker pull policy
+    group: "Docker Image Settings"
+  - variable: deployment.imagePullSecrets[0]
+    default: "cf-regcred"
+    description: "Image Pull Secret"
+    type: string #secrets type docker-registry
+    required: true
+    label: Image Pull Secret
+    group: "Docker Image Settings"
+
+  - variable: deployment.ingress.hosts[0].host
+    default: "subdomain.seps.local"
+    description: "System domain"
+    type: enum
+    options:
+      - "subdomain.seps.gob.ec"
+      - "subdomain2.seps.gob.ec"
+    required: true
+    label: System domain
+    group: "Ingress Settings"
+  - variable: deployment.ingress.hosts[0].paths[0]
+    default: "/fr-seps-base-web/"
+    description: "Context"
+    type: string
+    required: true
+    label: Context
+    group: "Ingress Settings"
+
+  - variable: deployment.resources.requests.cpu
+    default: "1m"
+    description: "CPU request"
+    type: string
+    required: true
+    label: CPU request
+    group: "Resource settings"
+  - variable: deployment.resources.limits.cpu
+    default: "200m"
+    description: "CPU limits"
+    type: string
+    required: true
+    label: CPU limits
+    group: "Resource settings"
+  - variable: deployment.resources.requests.memory
+    default: "128Mi"
+    description: "Memory request"
+    type: string
+    required: true
+    label: Memory request
+    group: "Resource settings"
+  - variable: deployment.resources.limits.memory
+    default: "256Mi"
+    description: "Memory limits"
+    type: string
+    required: true
+    label: Memory limits
+    group: "Resource settings"
+
+  - variable: deployment.livenessProbe.httpGet.path
+    default: "/fr-seps-base-web/"
+    description: "Liveness probe path"
+    type: string
+    required: true
+    label: Liveness probe path
+    group: "Liveness Probe Settings"
+  - variable: deployment.livenessProbe.httpGet.port
+    default: "80"
+    description: "Liveness probe port"
+    type: string
+    required: true
+    label: Liveness probe port
+    group: "Liveness Probe Settings"
+  - variable: deployment.livenessProbe.initialDelaySeconds
+    default: "5"
+    description: "Liveness initial delay seconds"
+    type: string
+    required: true
+    label: Liveness initial delay seconds
+    group: "Liveness Probe Settings"
+
+  - variable: deployment.readinessProbe.httpGet.path
+    default: "/fr-seps-base-web/"
+    description: "Readiness probe path"
+    type: string
+    required: true
+    label: Readiness probe path
+    group: "Readiness Probe Settings"
+  - variable: deployment.readinessProbe.httpGet.port
+    default: "80"
+    description: "Readiness probe port"
+    type: string
+    required: true
+    label: Readiness probe port
+    group: "Readiness Probe Settings"
+  - variable: deployment.readinessProbe.initialDelaySeconds
+    default: "5"
+    description: "Readiness initial delay seconds"
+    type: string
+    required: true
+    label: Readiness initial delay seconds
+    group: "Readiness Probe Settings"
+
+
+
+

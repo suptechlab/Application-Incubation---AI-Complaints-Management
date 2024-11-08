@@ -1,0 +1,6 @@
+# Pipeline to execute front construction
+
+# Maintainer = "cristian.freire@seps.gob.ec"
+
+include:
+  remote: https://gitlab.seps.gob.ec/admincicd/seps-gitlab-runner-pipeline-shared-lib/-/raw/master/react/.reactPipeline.yml
