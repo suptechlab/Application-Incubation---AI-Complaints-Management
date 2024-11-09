@@ -24,4 +24,11 @@ public class UserService {
             .flatMap(userRepository::findOneWithAuthoritiesByLogin)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CURRENT_USER_NOT_FOUND, null, null));
     }
+
+    public Long getCurrentUserId() {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneWithAuthoritiesByLogin)
+            .map(User::getId)
+            .orElse(null);
+    }
 }

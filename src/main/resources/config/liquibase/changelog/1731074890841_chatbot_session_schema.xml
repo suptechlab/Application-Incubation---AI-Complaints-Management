@@ -1,0 +1,28 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1731075114121" author="matellio">
+    <createTable tableName="chatbot_session">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="user_id" type="BIGINT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="session_id" type="VARCHAR(255)">
+        <constraints unique="true" nullable="false" uniqueConstraintName="ux_chatbot_session_id"/>
+      </column>
+      <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_accessed_date" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="chatbot_session" baseColumnNames="user_id"
+                             referencedTableName="jhi_user" referencedColumnNames="id"
+                             constraintName="fk_chatbot_session_user"/>
+  </changeSet>
+</databaseChangeLog>
