@@ -25,4 +25,19 @@
   <changeSet id="1730887977377" author="matellio">
     <modifyDataType tableName="jhi_user" columnName="first_name" newDataType="varchar(255)"/>
   </changeSet>
+
+  <changeSet id="1730991358417" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="identificacion" type="varchar(20)" remarks="identifier">
+        <constraints nullable="true"/>
+      </column>
+      <column name="identificacionData" type="jsonb" remarks="identification object">
+        <constraints nullable="true"/>
+      </column>
+      <column name="ruc" type="varchar(20)" remarks="The RUC (Taxpayer Registration Number) of the organization">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

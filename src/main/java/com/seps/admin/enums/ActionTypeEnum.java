@@ -22,7 +22,8 @@ public enum ActionTypeEnum {
 
     PROPERTY_HIDE_EXACT_LOCATION_TOGGLE("Property Hide Exact Location"),
     PROPERTY_FLOOR_PLAN_SAVED("Property Floor Plan saved"),
-    PROPERTY_FLOOR_PLAN_DELETED("Property Floor Plan deleted");
+    PROPERTY_FLOOR_PLAN_DELETED("Property Floor Plan deleted"),
+    ORGANIZATION_MASTER_ADD("Add Organization");
 
     private final String description;
 

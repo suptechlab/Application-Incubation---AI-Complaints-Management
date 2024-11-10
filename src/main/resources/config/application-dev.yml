@@ -18,7 +18,7 @@ logging:
     ROOT: DEBUG
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
-    com.seps.auth: DEBUG
+    com.seps.admin: DEBUG
 
 spring:
   devtools:
@@ -50,7 +50,7 @@ spring:
       mail:
         smtp:
           starttls:
-            enable: true  
+            enable: true
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:

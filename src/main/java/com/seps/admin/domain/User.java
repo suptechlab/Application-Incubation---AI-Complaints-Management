@@ -3,6 +3,7 @@ package com.seps.admin.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.seps.admin.config.Constants;
 import com.seps.admin.enums.UserStatusEnum;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -123,6 +125,17 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Column(name = "is_password_set")
     private boolean isPasswordSet = false;
+
+    @Column(name = "identificacion", length = 20)
+    private String identificacion;
+
+    @Type(JsonType.class)
+    @Column(name = "identificacion_data", columnDefinition = "jsonb")
+    private String identificacionData;
+
+    @Column(name = "ruc", length = 20)
+    private String ruc;
+
 
     public Long getId() {
         return id;
@@ -308,6 +321,30 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setPasswordSet(boolean passwordSet) {
         isPasswordSet = passwordSet;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
+    }
+
+    public String getIdentificacionData() {
+        return identificacionData;
+    }
+
+    public void setIdentificacionData(String identificacionData) {
+        this.identificacionData = identificacionData;
+    }
+
+    public String getRuc() {
+        return ruc;
+    }
+
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
     }
 
     @Override
