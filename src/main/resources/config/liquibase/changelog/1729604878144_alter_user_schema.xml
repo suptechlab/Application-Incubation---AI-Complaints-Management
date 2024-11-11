@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+  <changeSet id="1729604878144" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="otp_code" type="varchar(6)">
+        <constraints nullable="true" unique="true" uniqueConstraintName="ux_user_otp_code"/>
+      </column>
+      <column name="otp_code_expiration_time" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <column name="otp_token" type="varchar(36)">
+        <constraints nullable="true" unique="true" uniqueConstraintName="ux_user_otp_token"/>
+      </column>
+      <column name="otp_token_expiration_time" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1729855940835" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="last_logged_in" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <column name="current_logged_in" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1730185818662" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="country_code" type="varchar(5)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="phone_number" type="varchar(15)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

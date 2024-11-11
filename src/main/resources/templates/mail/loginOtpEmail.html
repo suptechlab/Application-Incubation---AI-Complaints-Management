@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+<head>
+  <title th:text="#{email.login.otp.title}">Your OTP Code</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
+</head>
+<body>
+<p th:text="#{email.login.otp.greeting(${user.login})}">Dear</p>
+<p th:text="#{email.login.otp.text1}"> Your One-Time Password (OTP) is:</p>
+<!-- New paragraph with centered bold OTP -->
+<p style="text-align: center;">
+  <strong th:text="${user.otpCode}"></strong>
+</p>
+<p th:text="#{email.login.otp.text2(${minutes})}">Please use this OTP within the next {0} minutes.</p>
+<p>
+  <span th:text="#{email.login.otp.text3}">Regards, </span>
+  <br/>
+  <em th:text="#{email.signature}">JHipster.</em>
+</p>
+</body>
+</html>

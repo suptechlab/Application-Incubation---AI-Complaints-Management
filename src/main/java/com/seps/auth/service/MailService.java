@@ -3,8 +3,12 @@ package com.seps.auth.service;
 import com.seps.auth.domain.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -116,5 +120,25 @@ public class MailService {
     public void sendPasswordResetMail(User user) {
         LOG.debug("Sending password reset email to '{}'", user.getEmail());
         this.sendEmailFromTemplateSync(user, "mail/passwordResetEmail", "email.reset.title");
+    }
+
+    @Async
+    public void sendLoginOtpEmail(User user) {
+        if (user.getEmail() == null) {
+            LOG.debug("Email doesn't exist for user while sending otp email to '{}'", user.getLogin());
+            return;
+        }
+        LOG.debug("Sending login otp email to '{}'", user.getEmail());
+        Instant now = Instant.now();
+        long secondsLeft = Duration.between(now, user.getOtpCodeExpirationTime()).getSeconds();
+        long minutesLeft = (long) Math.ceil(secondsLeft / 60.0); // Round up to the nearest minute
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable("minutes", minutesLeft);
+        String content = templateEngine.process("mail/loginOtpEmail", context);
+        String subject = messageSource.getMessage("email.login.otp.title", null, locale);
+        this.sendEmailSync(user.getEmail(), subject, content, false, true);
     }
 }

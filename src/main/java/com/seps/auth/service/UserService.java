@@ -2,17 +2,24 @@ package com.seps.auth.service;
 
 import com.seps.auth.config.Constants;
 import com.seps.auth.domain.Authority;
+import com.seps.auth.domain.LoginLog;
 import com.seps.auth.domain.User;
 import com.seps.auth.repository.AuthorityRepository;
+import com.seps.auth.repository.LoginLogRepository;
 import com.seps.auth.repository.UserRepository;
 import com.seps.auth.security.AuthoritiesConstants;
 import com.seps.auth.security.SecurityUtils;
 import com.seps.auth.service.dto.AdminUserDTO;
 import com.seps.auth.service.dto.UserDTO;
+
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.seps.auth.web.rest.errors.CustomException;
+import com.seps.auth.web.rest.errors.SepsStatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,6 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
 
 /**
@@ -32,16 +40,28 @@ public class UserService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
+    public static final String INITIATED = "INITIATED";
+
+    public static final String SUCCESS = "SUCCESS";
+
+    public static final String FAILED = "FAILED";
+
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
+    private final LoginLogRepository loginLogRepository;
+
+    private final RecaptchaService recaptchaService;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, LoginLogRepository loginLogRepository, RecaptchaService recaptchaService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.loginLogRepository = loginLogRepository;
+        this.recaptchaService = recaptchaService;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -213,23 +233,24 @@ public class UserService {
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
-     * @param firstName first name of user.
-     * @param lastName  last name of user.
-     * @param email     email id of user.
-     * @param langKey   language key.
-     * @param imageUrl  image URL of user.
+     * @param firstName   first name of user.
+     * @param lastName    last name of user.
+     * @param langKey     language key.
+     * @param imageUrl    image URL of user.
+     * @param countryCode countryCode  of user.
+     * @param phoneNumber phoneNumber  of user.
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void updateUser(String firstName, String lastName, String langKey, String imageUrl,
+                           String countryCode, String phoneNumber) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 user.setFirstName(firstName);
                 user.setLastName(lastName);
-                if (email != null) {
-                    user.setEmail(email.toLowerCase());
-                }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
+                user.setCountryCode(countryCode);
+                user.setPhoneNumber(phoneNumber);
                 userRepository.save(user);
                 LOG.debug("Changed Information for User: {}", user);
             });
@@ -241,8 +262,15 @@ public class UserService {
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
                 String currentEncryptedPassword = user.getPassword();
+                // Check if the provided current password matches the stored password
                 if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
-                    throw new InvalidPasswordException();
+                    LOG.warn("User current password is invalid");
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_PASSWORD_INCORRECT, null, null);
+                }
+                // Check if the new password is the same as the current password
+                if (passwordEncoder.matches(newPassword, currentEncryptedPassword)) {
+                    LOG.warn("New password must be different from the current password");
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NEW_PASSWORD_SAME_AS_CURRENT, null, null);
                 }
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
@@ -287,10 +315,121 @@ public class UserService {
 
     /**
      * Gets a list of all the authorities.
+     *
      * @return a list of all the authorities.
      */
     @Transactional(readOnly = true)
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).toList();
     }
+
+    public User updateUserOtpInfo(String username) {
+        User user = userRepository.findOneByLogin(username)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
+        // Generate OTP data using OtpService
+        OtpService otpService = new OtpService();
+        String otpCode = otpService.generateOtpCode();
+        Instant otpExpirationTime = otpService.getOtpExpirationTime();
+        String otpToken = otpService.generateOtpToken();
+        Instant otpTokenExpirationTime = otpService.getOtpTokenExpirationTime();
+        // Update user's OTP information
+        user.setOtpCode(otpCode);
+        user.setOtpCodeExpirationTime(otpExpirationTime);
+        user.setOtpToken(otpToken);
+        user.setOtpTokenExpirationTime(otpTokenExpirationTime);
+        // Save user with updated OTP information
+        return userRepository.save(user);
+    }
+
+    /**
+     * Verifies if the provided OTP token is valid for the user and not expired.
+     *
+     * @param otpToken the OTP token to verify
+     * @return true if the OTP token is valid and not expired; false otherwise
+     */
+    public boolean verifyOtpToken(String otpToken) {
+        User user = userRepository.findByOtpToken(otpToken)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_TOKEN, null, null));
+        return user.getOtpTokenExpirationTime().isAfter(Instant.now());
+    }
+
+    /**
+     * Verifies if the provided OTP code matches the one associated with the OTP token for the user.
+     *
+     * @param otpCode  the OTP code provided by the user
+     * @param otpToken the OTP token to which the code should correspond
+     * @return true if the OTP code is correct for the provided token; false otherwise
+     */
+    public boolean verifyOtpCode(String otpCode, String otpToken) {
+        User user = userRepository.findByOtpToken(otpToken)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null));
+        return otpCode.equals(user.getOtpCode());
+    }
+
+    public Optional<User> findUserByOtpToken(String otpToken) {
+        Optional<User> userOptional = userRepository.findByOtpToken(otpToken);
+        if (userOptional.isEmpty()) {
+            LOG.warn("No user found for OTP token: {}", otpToken);
+        }
+        return userOptional;
+    }
+
+    /**
+     * Clears the OTP token, OTP code, and their expiration times for the user and saves the updated user.
+     *
+     * @param user the user entity to update
+     * @return the updated user with cleared OTP fields
+     */
+    public User clearOtpData(User user) {
+        // Set OTP fields to null
+        user.setOtpToken(null);
+        user.setOtpCode(null);
+        user.setOtpTokenExpirationTime(null);
+        user.setOtpCodeExpirationTime(null);
+        // Save the updated user to the database
+        return userRepository.save(user);
+    }
+
+    public User updateUserOtpCode(User user) {
+        OtpService otpService = new OtpService();
+        String otpCode = otpService.generateOtpCode();
+        Instant otpExpirationTime = otpService.getOtpExpirationTime();
+        user.setOtpCode(otpCode);
+        user.setOtpCodeExpirationTime(otpExpirationTime);
+        // Save user with updated OTP information
+        return userRepository.save(user);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public void logSuccessfulLogin(User user, String clientIp) {
+        Instant instant = Instant.now();
+        // Update lastLoggedIn and currentLoggedIn timestamps
+        user.setLastLoggedIn(user.getCurrentLoggedIn()); // Set last login time to previous current login time
+        user.setCurrentLoggedIn(instant); // Update current login time to now
+        userRepository.save(user);
+        LoginLog successLoginLog = new LoginLog(user.getId(), instant, UserService.SUCCESS, clientIp);
+        loginLogRepository.save(successLoginLog);
+    }
+
+    public void saveLoginLog(User user, String status, String clientIp) {
+        LoginLog successLoginLog = new LoginLog(user.getId(), Instant.now(), status, clientIp);
+        loginLogRepository.save(successLoginLog);
+    }
+
+    /**
+     * Helper method to verify the Recaptcha token and handle exceptions
+     */
+    public boolean isRecaptchaValid(String recaptchaToken) {
+        try {
+            return recaptchaService.verifyRecaptcha(recaptchaToken);
+        } catch (IOException e) {
+            LOG.error("Error while verifying recaptcha token: {}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
+    }
+
+
 }

@@ -7,16 +7,24 @@ import com.seps.auth.service.MailService;
 import com.seps.auth.service.UserService;
 import com.seps.auth.service.dto.AdminUserDTO;
 import com.seps.auth.service.dto.PasswordChangeDTO;
+import com.seps.auth.service.dto.ResponseStatus;
 import com.seps.auth.web.rest.errors.*;
 import com.seps.auth.web.rest.vm.KeyAndPasswordVM;
 import com.seps.auth.web.rest.vm.ManagedUserVM;
+import com.seps.auth.web.rest.vm.ResetPasswordVM;
 import jakarta.validation.Valid;
+
 import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.zalando.problem.Status;
 
 /**
  * REST controller for managing the current user's account.
@@ -40,28 +48,31 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final MessageSource messageSource;
+
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, MessageSource messageSource) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.messageSource = messageSource;
     }
 
     /**
      * {@code POST  /register} : register the user.
      *
      * @param managedUserVM the managed user View Model.
-     * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
+     * @throws InvalidPasswordException  {@code 400 (Bad Request)} if the password is incorrect.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already used.
      */
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public ResponseEntity<Void> registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
         if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         mailService.sendActivationEmail(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -82,42 +93,45 @@ public class AccountResource {
      * {@code GET  /account} : get the current user.
      *
      * @return the current user.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
+     * @throws RuntimeException {@code 400 Bad Request} if the user couldn't be returned.
      */
     @GetMapping("/account")
     public AdminUserDTO getAccount() {
         return userService
             .getUserWithAuthorities()
             .map(AdminUserDTO::new)
-            .orElseThrow(() -> new AccountResourceException("User could not be found"));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
     }
 
     /**
      * {@code POST  /account} : update the current user information.
      *
      * @param userDTO the current user information.
-     * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
+     * @throws CustomException {@code 400 (Bad Request)} if the user login wasn't found.
      */
     @PostMapping("/account")
-    public void saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
+    public ResponseEntity<ResponseStatus> saveAccount(@Valid @RequestBody AdminUserDTO userDTO) {
         String userLogin = SecurityUtils.getCurrentUserLogin()
-            .orElseThrow(() -> new AccountResourceException("Current user login not found"));
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.orElseThrow().getLogin().equalsIgnoreCase(userLogin))) {
-            throw new EmailAlreadyUsedException();
-        }
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CURRENT_USER_NOT_FOUND, null, null));
         Optional<User> user = userRepository.findOneByLogin(userLogin);
         if (!user.isPresent()) {
-            throw new AccountResourceException("User could not be found");
+            LOG.error("User could not be found");
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null);
         }
         userService.updateUser(
             userDTO.getFirstName(),
             userDTO.getLastName(),
-            userDTO.getEmail(),
             userDTO.getLangKey(),
-            userDTO.getImageUrl()
+            userDTO.getImageUrl(),
+            userDTO.getCountryCode(),
+            userDTO.getPhoneNumber()
         );
+        return new ResponseEntity<>(new ResponseStatus(
+            messageSource.getMessage("user.profile.updated.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        ), HttpStatus.OK);
+
     }
 
     /**
@@ -127,20 +141,33 @@ public class AccountResource {
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the new password is incorrect.
      */
     @PostMapping(path = "/account/change-password")
-    public void changePassword(@RequestBody PasswordChangeDTO passwordChangeDto) {
+    public ResponseEntity<ResponseStatus> changePassword(@Valid @RequestBody PasswordChangeDTO passwordChangeDto) {
         if (isPasswordLengthInvalid(passwordChangeDto.getNewPassword())) {
             throw new InvalidPasswordException();
         }
         userService.changePassword(passwordChangeDto.getCurrentPassword(), passwordChangeDto.getNewPassword());
+        ResponseStatus status = new ResponseStatus(
+            messageSource.getMessage("user.password.changed.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(status, HttpStatus.OK);
+
     }
 
     /**
      * {@code POST   /account/reset-password/init} : Send an email to reset the password of the user.
      *
-     * @param mail the mail of the user.
+     * @param resetPasswordVM email and recaptcha token.
      */
     @PostMapping(path = "/account/reset-password/init")
-    public void requestPasswordReset(@RequestBody String mail) {
+    public ResponseEntity<ResponseStatus> requestPasswordReset(@Valid @RequestBody ResetPasswordVM resetPasswordVM) {
+        // Verify reCAPTCHA
+        if (!userService.isRecaptchaValid(resetPasswordVM.getRecaptchaToken())) {
+            LOG.error("In request password reset Recaptcha verification failed for token: {}", resetPasswordVM.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
+        String mail = resetPasswordVM.getEmail();
         Optional<User> user = userService.requestPasswordReset(mail);
         if (user.isPresent()) {
             mailService.sendPasswordResetMail(user.orElseThrow());
@@ -149,6 +176,11 @@ public class AccountResource {
             // but log that an invalid attempt has been made
             LOG.warn("Password reset requested for non existing mail");
         }
+        return new ResponseEntity<>(new ResponseStatus(
+            messageSource.getMessage("forgot.password.mail.send.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        ), HttpStatus.OK);
     }
 
     /**
@@ -156,25 +188,35 @@ public class AccountResource {
      *
      * @param keyAndPassword the generated key and the new password.
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the password could not be reset.
+     * @throws RuntimeException         {@code 500 (Internal Server Error)} if the password could not be reset.
      */
     @PostMapping(path = "/account/reset-password/finish")
-    public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+    public ResponseEntity<ResponseStatus> finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+        // Verify reCAPTCHA
+        if (!userService.isRecaptchaValid(keyAndPassword.getRecaptchaToken())) {
+            LOG.error("In finish password reset Recaptcha verification failed for token: {}", keyAndPassword.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
         if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
         Optional<User> user = userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
-
         if (!user.isPresent()) {
-            throw new AccountResourceException("No user was found for this reset key");
+            LOG.error("No user was found for this reset key :{}", keyAndPassword.getKey());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND_RESET, null, null);
         }
+        return new ResponseEntity<>(new ResponseStatus(
+            messageSource.getMessage("user.password.reset.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        ), HttpStatus.OK);
     }
 
     private static boolean isPasswordLengthInvalid(String password) {
         return (
             StringUtils.isEmpty(password) ||
-            password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
-            password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
+                password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
+                password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
     }
 }
