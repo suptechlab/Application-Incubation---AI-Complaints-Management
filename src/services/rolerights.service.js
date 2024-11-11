@@ -25,8 +25,8 @@ export const handleAddRoleRight = async (data) => {
 }
 
 export const handleEditRoleRight = async (id, data) => {
-    data.id = id;
-    return await instance.post(`/api/${API_VERSION}/roles`, data);
+    // data.id = id;
+    return await instance.put(`/api/${API_VERSION}/roles/${id}`, data);
 }
 
 export const fetchModulesAndPermissions = async (userType) => {
