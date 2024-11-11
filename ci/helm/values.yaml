@@ -146,6 +146,12 @@ deployment:
             envVarName: SPRING_DATASOURCE_USERNAME
           SPRING_LIQUIBASE_URL:
             envVarName: SPRING_LIQUIBASE_URL
+          SPRING_MAIL_HOST:
+            envVarName: SPRING_MAIL_HOST
+          SPRING_MAIL_PORT:
+            envVarName: SPRING_MAIL_PORT
+          SPRING_MAIL_USERNAME:
+            envVarName: SPRING_MAIL_USERNAME
             
     # env:
   #   envVarName: env
@@ -156,14 +162,16 @@ deployment:
   #            filePath: id_rsa_config
   #            fileMode: 644
 
-  #secrets:
-  #  seps-secrets:
-  #    environment: # Items set like environment variable
-  #      items:
+  secrets:
+    seps-secrets:
+      environment: # Items set like environment variable
+        items:
           # JASYPT_ENCRYPTOR_PASSWORD:
           #   envVarName: jasypt.encryptor.password
-  #        SPRING_DATASOURCE_PASSWORD:
-  #          envVarName: SPRING_DATASOURCE_PASSWORD
+          SPRING_DATASOURCE_PASSWORD:
+            envVarName: SPRING_DATASOURCE_PASSWORD
+          SPRING_MAIL_PASSWORD:
+            envVarName: SPRING_MAIL_PASSWORD  
 
       # Mount a file id_rsa to connect a ftp server
   #      volume: # Items set like file in volume
