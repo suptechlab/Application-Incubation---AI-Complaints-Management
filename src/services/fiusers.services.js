@@ -21,8 +21,8 @@ export const handleGetFIusersList = async (params) => {
 }
 
 // GET FI USER BY ID
-export const handleGetFIuserById = async (data,id) => {
-  return await instance.get(`/${API_VERSION}/fi-users/${id}`, data);
+export const handleGetFIuserById = async (id) => {
+  return await instance.get(`/${API_VERSION}/fi-users/${id}`);
 }
 
 
@@ -35,3 +35,8 @@ export const handleAddFIUsers = async (data) => {
 export const handleEditFIUsers = async (id, data) => {
   return await instance.put(`/${API_VERSION}/fi-users/${id}`, data);
 }
+// HANDLE FI USER STATUS CHANGE 
+export const handleFIUsersStatusChange = async (id, status) => {
+  return await instance.patch(`/${API_VERSION}/fi-users/${id}/${status}`);
+}
+

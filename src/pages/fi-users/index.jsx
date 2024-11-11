@@ -21,7 +21,7 @@ import ListingSearchForm from "../../components/ListingSearchForm";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
-import { handleGetFIusersList } from "../../services/fiusers.services";
+import { handleFIUsersStatusChange, handleGetFIusersList } from "../../services/fiusers.services";
 
 export default function FIUserList() {
   const navigate = useNavigate();
@@ -80,13 +80,23 @@ export default function FIUserList() {
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
-    try {
-      await handleStatusChangeState(id, !currentStatus);
-      toast.success("State status updated successfully");
+    setLoading(true)
+    // await handleEditDistricts(id, { status: !currentStatus });
+
+    let toggleStatus = currentStatus === "ACTIVE" ? "BLOCKED" :"ACTIVE"
+
+    handleFIUsersStatusChange(id, toggleStatus).then(response => {
+      toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
-    } catch (error) {
-      toast.error("Error updating state status");
-    }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    }).finally(()=>{
+      setLoading(false)
+    })
   };
 
 
@@ -115,10 +125,17 @@ export default function FIUserList() {
         },
       },
       {
-        accessorFn: (row) => row.entityName ?? "N/A",
+        accessorFn: (row) => row?.entityName,
         id: "entityName",
         header: () => t("ENTITY NAME"),
         enableSorting: false,
+        cell: (info) => {
+          return (
+            <span>
+              {info.row.original.organization?.razonSocial ?? "N/A"}
+            </span>
+          );
+        },
       },
       {
         accessorFn: (row) => row.createdAt,
@@ -130,22 +147,27 @@ export default function FIUserList() {
       },
       {
         cell: (info) => {
-          return (
-            <Toggle
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() =>
-                changeStatus(
-                  info?.row?.original?.id,
-                  info?.row?.original?.status
-                )
-              }
-              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
-            />
-          );
+          if(info?.row?.original?.status === "ACTIVE" || info?.row?.original?.status === "BLOCKED" ){
+            return (
+              <Toggle
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                name="status"
+                value={info?.row?.original?.status ===  "ACTIVE"}
+                checked={info?.row?.original?.status === "ACTIVE"}
+                onChange={() =>
+                  changeStatus(
+                    info?.row?.original?.id,
+                    info?.row?.original?.status
+                  )
+                }
+                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+              />
+            );
+          }else{
+            return <span>{info?.row?.original?.status} </span>
+          }
+        
         },
         id: "status",
         header: () => t("STATUS"),

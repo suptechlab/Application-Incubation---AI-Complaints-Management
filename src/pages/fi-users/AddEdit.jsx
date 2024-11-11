@@ -82,20 +82,21 @@ export default function FIUserAddEdit() {
     if (isEdit) {
       setLoading(true);
       handleGetFIuserById(id).then((response) => {
+        console.log(response)
         // setFIUserData(response.data.data);
 
         setInitialValues({
-          identification: response.data.data?.identification ? response.data.data?.identification : "",
-          name: response.data.data?.name ? response.data.data?.name : "",
-          email: response.data.data?.email ? response.data.data?.email : "",
-          countryCode: response.data.data?.countryCode ?? "+1",
-          phoneNumber: response.data.data?.mobileNo ? response.data.data?.phoneNumber : "",
-          ruc: response.data.data?.taxId ? response.data.data?.taxId : "",
-          entityName: response.data.data?.entityName ? response.data.data?.entityName : "",
-          entityType: response.data.data?.entityType ? response.data.data?.entityType : "",
-          roleId: response.data.data?.roleId ? response.data.data?.roleId : "",
+          identification: response.data?.identification ? response.data?.identification : "",
+          name: response.data?.name ? response.data?.name : "",
+          email: response.data?.email ? response.data?.email : "",
+          countryCode: response.data?.countryCode ?? "+1",
+          phoneNumber: response.data?.mobileNo ? response.data?.phoneNumber : "",
+          ruc: response.data?.taxId ? response.data?.taxId : "",
+          entityName: response.data?.entityName ? response.data?.entityName : "",
+          entityType: response.data?.entityType ? response.data?.entityType : "",
+          roleId: response.data?.roleId ? response.data?.roleId : "",
         })
-        setEmailDisabled(response.data.data.email != "");
+        // setEmailDisabled(response.data.data.email != "");
         setLoading(false);
       });
     } else {
@@ -262,9 +263,6 @@ export default function FIUserAddEdit() {
                 <FormikForm
                   className="d-flex flex-column h-100"
                 >
-                  {
-                    console.log({ errors })
-                  }
                   <Row>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
