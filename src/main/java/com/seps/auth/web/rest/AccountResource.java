@@ -163,10 +163,10 @@ public class AccountResource {
     @PostMapping(path = "/account/reset-password/init")
     public ResponseEntity<ResponseStatus> requestPasswordReset(@Valid @RequestBody ResetPasswordVM resetPasswordVM) {
         // Verify reCAPTCHA
-        if (!userService.isRecaptchaValid(resetPasswordVM.getRecaptchaToken())) {
-            LOG.error("In request password reset Recaptcha verification failed for token: {}", resetPasswordVM.getRecaptchaToken());
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
-        }
+//        if (!userService.isRecaptchaValid(resetPasswordVM.getRecaptchaToken())) {
+//            LOG.error("In request password reset Recaptcha verification failed for token: {}", resetPasswordVM.getRecaptchaToken());
+//            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+//        }
         String mail = resetPasswordVM.getEmail();
         Optional<User> user = userService.requestPasswordReset(mail);
         if (user.isPresent()) {
@@ -193,10 +193,10 @@ public class AccountResource {
     @PostMapping(path = "/account/reset-password/finish")
     public ResponseEntity<ResponseStatus> finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
         // Verify reCAPTCHA
-        if (!userService.isRecaptchaValid(keyAndPassword.getRecaptchaToken())) {
-            LOG.error("In finish password reset Recaptcha verification failed for token: {}", keyAndPassword.getRecaptchaToken());
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
-        }
+//        if (!userService.isRecaptchaValid(keyAndPassword.getRecaptchaToken())) {
+//            LOG.error("In finish password reset Recaptcha verification failed for token: {}", keyAndPassword.getRecaptchaToken());
+//            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+//        }
         if (isPasswordLengthInvalid(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }

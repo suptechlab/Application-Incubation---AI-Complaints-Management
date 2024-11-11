@@ -167,10 +167,10 @@ public class AuthenticateController {
     public ResponseEntity<OtpResponse> login(@Valid @RequestBody LoginVM loginVM, HttpServletRequest request) {
         String clientIp = request.getRemoteAddr();
         // Verify reCAPTCHA
-        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
-            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
-        }
+//        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
+//            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
+//            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+//        }
         try {
             // Authenticate user credentials
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(
