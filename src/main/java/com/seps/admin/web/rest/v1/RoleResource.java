@@ -51,23 +51,23 @@ public class RoleResource {
     public ResponseEntity<ResponseStatus> createRole(@Valid @RequestBody RoleDTO roleDTO, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to save Role : {}", roleDTO);
         RequestInfo requestInfo = new RequestInfo(request);
-        RoleDTO result = roleService.save(roleDTO, requestInfo);
+        Long id = roleService.save(roleDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("role.created.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.CREATED.value(),
             System.currentTimeMillis()
         );
-        return ResponseEntity.created(new URI("/api/v1/roles/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/v1/roles/" + id))
             .body(responseStatus);
     }
 
     @Operation(tags = {"Role Management"}, summary = "Update an existing role", description = "Update an existing role in the system")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<ResponseStatus> updateRole(@Valid @PathVariable Long id, @RequestBody RoleDTO roleDTO) {
+    public ResponseEntity<ResponseStatus> updateRole(@Valid @PathVariable Long id, @RequestBody RoleDTO roleDTO, HttpServletRequest request) {
         log.debug("REST request to update Role : {}", roleDTO);
-
-        roleService.update(id, roleDTO);
+        RequestInfo requestInfo = new RequestInfo(request);
+        roleService.update(id, roleDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("role.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -132,5 +132,13 @@ public class RoleResource {
         log.debug("REST request to get all Roles");
         List<DropdownListDTO> roles = roleService.findAll(userType);
         return ResponseEntity.ok(roles);
+    }
+    @Operation(summary = "Change the status of a Role", description = "Update the status of a role (active/inactive).")
+    @ApiResponse(responseCode = "204", description = "Status changed successfully")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> roleChangeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        roleService.changeStatus(id, status, requestInfo);
+        return ResponseEntity.noContent().build();
     }
 }

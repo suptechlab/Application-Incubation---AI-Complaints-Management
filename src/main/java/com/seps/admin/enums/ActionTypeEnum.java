@@ -19,11 +19,16 @@ public enum ActionTypeEnum {
     INQUIRY_SUB_TYPE_MASTER_ADD("Add Inquiry Sub Type Master"),
     INQUIRY_SUB_TYPE_MASTER_EDIT("Edit Inquiry Sub Type Master"),
     INQUIRY_SUB_TYPE_MASTER_STATUS_CHANGE("Inquiry Sub Type Status Change"),
-
-    PROPERTY_HIDE_EXACT_LOCATION_TOGGLE("Property Hide Exact Location"),
-    PROPERTY_FLOOR_PLAN_SAVED("Property Floor Plan saved"),
-    PROPERTY_FLOOR_PLAN_DELETED("Property Floor Plan deleted"),
-    ORGANIZATION_MASTER_ADD("Add Organization");
+    ROLE_ADD("Add New Role"),
+    ROLE_EDIT("Edit Existing Role"),
+    ROLE_STATUS_CHANGE("Role Status Change"),
+    ORGANIZATION_MASTER_ADD("Add Organization"),
+    FI_USER_ADD("Add FI User"),
+    FI_USER_EDIT("Edit FI User"),
+    FI_USER_STATUS_CHANGE("FI User Status Change"),
+    SEPS_USER_ADD("Add SEPS User"),
+    SEPS_USER_EDIT("Edit SEPS User"),
+    SEPS_USER_STATUS_CHANGE("SEPS User Status Change");
 
     private final String description;
 

@@ -108,4 +108,10 @@ public class MailService {
         this.sendEmailFromTemplateSync(user, "mail/sepsUserCreationEmail", "email.seps.user.creation.title");
     }
 
+    @Async
+    public void sendFIUserCreationEmail(User user) {
+        LOG.debug("Sending creation email to FI User '{}'", user.getEmail());
+        this.sendEmailFromTemplateSync(user, "mail/fiUserCreationEmail", "email.fi.user.creation.title");
+    }
+
 }

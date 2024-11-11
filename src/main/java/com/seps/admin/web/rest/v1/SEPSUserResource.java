@@ -5,7 +5,7 @@ import com.seps.admin.enums.UserStatusEnum;
 import com.seps.admin.repository.UserRepository;
 import com.seps.admin.service.MailService;
 import com.seps.admin.service.UserService;
-import com.seps.admin.service.dto.ProvinceDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import com.seps.admin.service.dto.SEPSUserDTO;
 import com.seps.admin.web.rest.errors.CustomException;
@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +40,15 @@ import java.util.List;
 @Tag(name = "SEPS User Management", description = "APIs for managing SEPS users")
 @RestController
 @RequestMapping("/api/v1/seps-users")
-public class SepsUserResource {
+public class SEPSUserResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SepsUserResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SEPSUserResource.class);
     private final UserService userService;
     private final MessageSource messageSource;
     private final UserRepository userRepository;
     private final MailService mailService;
 
-    public SepsUserResource(UserService userService, MessageSource messageSource, UserRepository userRepository,
+    public SEPSUserResource(UserService userService, MessageSource messageSource, UserRepository userRepository,
                             MailService mailService) {
         this.userService = userService;
         this.messageSource = messageSource;
@@ -72,14 +73,16 @@ public class SepsUserResource {
         )
     })
     @PostMapping
-    public ResponseEntity<ResponseStatus> addSepsUser(@Valid @RequestBody SEPSUserDTO dto) throws URISyntaxException {
+    public ResponseEntity<ResponseStatus> addSEPSUser(@Valid @RequestBody SEPSUserDTO dto, HttpServletRequest request)
+        throws URISyntaxException {
         LOG.info("Attempting to create a new SEPS user with email: {}", dto.getEmail());
         // Lowercase the user email before comparing with database
         if (userRepository.findOneByEmailIgnoreCase(dto.getEmail()).isPresent()) {
             LOG.warn("Email {} already in use.", dto.getEmail());
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_ALREADY_USED, null, null);
         } else {
-            User newUser = userService.addSepsUser(dto);
+            RequestInfo requestInfo = new RequestInfo(request);
+            User newUser = userService.addSEPSUser(dto, requestInfo);
             mailService.sendSepsUserCreationEmail(newUser);
             ResponseStatus responseStatus = new ResponseStatus(
                 messageSource.getMessage("seps.user.created.successfully", null, LocaleContextHolder.getLocale()),
@@ -97,18 +100,19 @@ public class SepsUserResource {
             schema = @Schema(implementation = SEPSUserDTO.class)))
     @GetMapping("/{id}")
     public ResponseEntity<SEPSUserDTO> getSepsUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getSepsUserById(id));
+        return ResponseEntity.ok(userService.getSEPSUserById(id));
     }
 
     @Operation(summary = "List all SEPS User", description = "Retrieve a list of all SEPS user with optional search and status filters.")
     @ApiResponse(responseCode = "200", description = "SEPS User retrieved successfully",
         content = @Content(mediaType = "application/json",
-            schema = @Schema(implementation = ProvinceDTO.class)))
+            schema = @Schema(implementation = SEPSUserDTO.class)))
     @GetMapping
     public ResponseEntity<List<SEPSUserDTO>> listSEPSUsers(Pageable pageable,
                                                            @RequestParam(value = "search", required = false) String search,
-                                                           @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status) {
-        Page<SEPSUserDTO> page = userService.listSEPSUsers(pageable, search, status);
+                                                           @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
+                                                           @Parameter(description = "Filter by role") @RequestParam(required = false) Long roleId) {
+        Page<SEPSUserDTO> page = userService.listSEPSUsers(pageable, search, status, roleId);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -123,8 +127,10 @@ public class SepsUserResource {
         )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseStatus> updateSepsUser(@PathVariable Long id, @Valid @RequestBody SEPSUserDTO dto) {
-        userService.updateSepsUser(id, dto);
+    public ResponseEntity<ResponseStatus> editSEPSUser(@PathVariable Long id, @Valid @RequestBody SEPSUserDTO dto,
+                                                       HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        userService.editSEPSUser(id, dto, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("seps.user.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -136,9 +142,11 @@ public class SepsUserResource {
     @Operation(summary = "Change the status of a SEPS User", description = "Update the status of a SEPS User (ACTIVE/BLOCKED).")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/{status}")
-    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @PathVariable(name = "status") UserStatusEnum status) {
+    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @PathVariable(name = "status") UserStatusEnum status,
+                                             HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
         // Perform the status update
-        userService.changeSEPSStatus(id, status);
+        userService.changeSEPSStatus(id, status, requestInfo);
         return ResponseEntity.noContent().build();
     }
 }

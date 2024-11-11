@@ -133,8 +133,22 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "identificacion_data", columnDefinition = "jsonb")
     private String identificacionData;
 
-    @Column(name = "ruc", length = 20)
-    private String ruc;
+    @Column(name = "organization_id", insertable = false, updatable = false)
+    private Long organizationId;
+
+    @ManyToOne
+    @JoinColumn(name = "organization_id", updatable = false)
+    private Organization organization;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "user_role",
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
+    )
+    @BatchSize(size = 20)
+    private Set<Role> roles = new HashSet<>();
 
 
     public Long getId() {
@@ -339,12 +353,28 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.identificacionData = identificacionData;
     }
 
-    public String getRuc() {
-        return ruc;
+    public Long getOrganizationId() {
+        return organizationId;
     }
 
-    public void setRuc(String ruc) {
-        this.ruc = ruc;
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override
