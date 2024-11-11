@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,7 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
-    public ResponseEntity<ResponseStatus> addProvince(@RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) throws URISyntaxException {
+    public ResponseEntity<ResponseStatus> addProvince(@Valid @RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) throws URISyntaxException {
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = provinceService.addProvince(provinceDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
@@ -65,7 +66,7 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseStatus> updateProvince(@PathVariable Long id, @RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) {
+    public ResponseEntity<ResponseStatus> updateProvince(@PathVariable Long id, @Valid @RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         provinceService.updateProvince(id, provinceDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(

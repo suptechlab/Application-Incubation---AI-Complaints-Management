@@ -132,7 +132,6 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             problem.setProperty("errorDescription", getErrorDescription(fieldErrors));  // Custom method to get description
         }
 
-
         problem.setCause(buildCause(err.getCause(), request).orElse(null));
 
         return problem;
