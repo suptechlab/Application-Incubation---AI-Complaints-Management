@@ -36,9 +36,8 @@ export default function FIUserAddEdit() {
   const [FIuserData, setFIUserData] = useState([]);
   const [isImageSet, setIsImageSet] = useState(false);
   const [emailDisabled, setEmailDisabled] = useState(false);
-  const { t } = useTranslation();
-  const editUserValues = [];
 
+  const { t } = useTranslation();
 
   const formattedCountryCodes = countryCodes.map(country => ({
     value: country?.value,
@@ -177,7 +176,7 @@ export default function FIUserAddEdit() {
       langKey: "es",
       countryCode: values?.countryCode,
       phoneNumber: values?.phoneNumber,
-      roleId: 1,
+      roleId: values?.roleId,
       ruc: values?.ruc
     }
 
@@ -234,7 +233,6 @@ export default function FIUserAddEdit() {
               initialValues={initialValue}
               validationSchema={validationSchema}
               onSubmit={(values, actions) => {
-                console.log(values)
                 actions.setSubmitting(true);
                 handleSubmit(values, actions);
               }}
@@ -252,6 +250,9 @@ export default function FIUserAddEdit() {
                 <FormikForm
                   className="d-flex flex-column h-100"
                 >
+                {
+                  console.log({errors})
+                }
                   <Row>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
@@ -358,40 +359,40 @@ export default function FIUserAddEdit() {
                     </Col>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
-                        error={errors.entityName}
+                        error={errors?.entityName}
                         id="entityName"
                         key={"entityName"}
                         label={t("ENTITY'S NAME")}
                         name="entityName"
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        touched={touched.entityName}
+                        touched={touched?.entityName}
                         type="text"
-                        value={values.entityName || ""}
+                        value={values?.entityName || ""}
                         readOnly={true}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
-                        error={errors.entityName}
+                        error={errors?.entityName}
                         id="entityType"
                         key={"entityType"}
                         label={t("ENTITY TYPE")}
                         name="entityType"
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        touched={touched.entityType}
+                        touched={touched?.entityType}
                         type="text"
-                        value={values.entityType || ""}
+                        value={values?.entityType || ""}
                         readOnly={true}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
                       <ReactSelect
                         label={t("ROLE")}
-                        error={errors.roleId}
+                        error={errors?.roleId}
                         options={rolesDropdownData ?? []}
-                        value={values.roleId}
+                        value={values?.roleId}
                         onChange={(option) => {
                           setFieldValue(
                             "roleId",

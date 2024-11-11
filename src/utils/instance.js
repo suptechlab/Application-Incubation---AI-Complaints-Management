@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getLocalStorage } from './storage';
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+const BASE_URL = process.env.REACT_APP_ADMIN_API_URL;
 
 const instance = axios.create({
      baseURL: `${BASE_URL}/`,

@@ -4,7 +4,7 @@ const API_VERSION = process.env.REACT_APP_API_VERSION
 
 // GET PERSONAL INFO BY IDENTIFICATION
 export const getPersonalInfo = async (identification) => {
-  return await instance.get(`/${API_VERSION}/fi-users/person-info?identification=${identification}`);
+  return await instance.get(`/${API_VERSION}/fi-users/person-info?identificacion=${identification}`);
 }
 
 // GET ORGANIZATION INFO BY TAX ID

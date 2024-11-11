@@ -1,7 +1,7 @@
 // getValidationMessages.js
 import { messages } from '../language/validationLocalization';
 
-export const getValidationMessages = (lang = 'es') => {
+export const getValidationMessages = (lang = 'en') => {
   return messages[lang] || messages.es; // Fallback to English if the language is not found
 };
 

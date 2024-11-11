@@ -12,12 +12,13 @@ const ReactSelect = ({
   label,
   placeholder,
   error,
+  touched,
   defaultValue = null,
 }) => {
   const customStyles = {
     control: (base, state) => ({
       ...base,
-      borderColor: state.isFocused ? "#00549E" : error ? "#FF1418" : "#7F7F7F",
+      borderColor: state.isFocused ? "#00549E" : error && touched ? "#FF1418" : "#7F7F7F",
       boxShadow: state.isFocused ? "0 0 0 .2rem rgba(0,123,255,.25)" : null,
       "&:hover": {
         borderColor: state.isFocused
@@ -77,7 +78,7 @@ const ReactSelect = ({
 
   return (
     <div className={wrapperClassName || ""}>
-      {label ? (
+      {label ? ( 
         <label className="mb-1 fs-14" htmlFor={name}>
           {label}
         </label>
@@ -111,7 +112,7 @@ const ReactSelect = ({
         menuPlacement="auto"
         // menuIsOpen={true}
       />
-      {error ? <div className="form-text text-danger small">{error}</div> : null}
+           {touched && error && <small className="form-text text-danger">{error}</small>}
     </div>
   );
 };
