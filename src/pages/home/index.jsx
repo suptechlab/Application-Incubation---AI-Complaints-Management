@@ -48,7 +48,7 @@ const Home = () => {
                       <Button
                         type="button"
                         variant="warning"
-                        className="text-uppercase w-100 text-nowrap fw-bold text-body"
+                        className="text-uppercase w-100 text-nowrap fw-bold"
                         size="lg"
                         onClick={handlePrivacyClick}
                         disabled={true}

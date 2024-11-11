@@ -55,6 +55,11 @@
     @include btn-outline-styles($danger);
 }
 
+.btn-warning,
+.btn-secondary {
+    --bs-btn-color: #{$body-color};
+}
+
 .form-check {
     .form-check-input {
         cursor: pointer;
@@ -258,4 +263,8 @@ input:-webkit-autofill:active {
             }
         }
     }
+}
+
+.border-dashed {
+    --bs-border-style: dashed;
 }

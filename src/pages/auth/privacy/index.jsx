@@ -1,64 +1,68 @@
 import React from "react";
 import { Button, Modal, Stack } from "react-bootstrap";
 import CommonFormikComponent from "../../../components/CommonFormikComponent";
-import FormInputBox from "../../../components/FormInput";
+import FormCheckbox from "../../../components/formCheckbox";
+import { PrivacyFormSchema } from "../../helpdesk/validations";
 import PrivacyData from "./privacyData";
-import { FormSchema } from "./validations";
 
 /**
  * Confirm Privacy Modal
  *
- * @param {{ handleClose: any; onSubmit: any; }} param0
+ * @param {{ handleClose: any; }} param0
  * @param {*} param0.handleClose
- * @param {*} param0.onSubmit
  * @returns {*}
  */
 
-const PrivacyModal = ({ handleClose, onSubmit }) => {
+const PrivacyModal = ({ handleClose, handleFormSubmit }) => {
   // Initial Values
   const initialValues = {
-    firstName: "",
+    agreePrivacy: false,
   };
 
   // Handle Submit Handler
   const handleSubmit = (values, actions) => {
-    onSubmit(values, actions);
+    handleFormSubmit(values, actions);
   };
 
   return (
     <React.Fragment>
-      <Modal.Header closeButton>
-        <Modal.Title as="h4" className="fw-bold">
+      <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
+        <Modal.Title as="h4" className="fw-bold pt-1">
           Your Privacy Matters
         </Modal.Title>
       </Modal.Header>
 
       <CommonFormikComponent
-        validationSchema={FormSchema}
+        validationSchema={PrivacyFormSchema}
         initialValues={initialValues}
         onSubmit={handleSubmit}
       >
         {(formikProps) => (
           <React.Fragment>
-            <Modal.Body className="text-break">
-              <FormInputBox
-                error={formikProps.errors.firstName}
-                id="firstName"
-                key={"firstName"}
-                label="First Name *"
-                name="firstName"
-                onBlur={formikProps.handleBlur}
-                onChange={formikProps.handleChange}
-                placeholder="Enter first name"
-                touched={formikProps.touched.firstName}
-                type="text"
-                value={formikProps.values.firstName || ""}
-              />
-              <PrivacyData />
+            <Modal.Body className="text-break d-flex flex-column small p-0">
+              <div className='chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-4'>
+                <div className='chatbot-body-inner flex-grow-1 overflow-auto mx-n4 px-4'>
+                  <PrivacyData />
+                </div>
+                <div className='pt-2'>
+                  <FormCheckbox
+                    wrapperClassName="mb-0"
+                    className='fs-6 fw-semibold'
+                    id="agreePrivacy"
+                    checked={formikProps.values.agreePrivacy}
+                    onBlur={formikProps.handleBlur}
+                    onChange={formikProps.handleChange}
+                    touched={formikProps.touched.agreePrivacy}
+                    error={formikProps.errors.agreePrivacy}
+                    type="checkbox"
+                    label="I agreed to the data protection and privacy terms"
+                  />
+                </div>
+              </div>
             </Modal.Body>
 
-            <Modal.Footer className="py-2">
-              <Stack direction="horizontal" gap={3} className="flex-wrap py-1">
+            <Modal.Footer className="pt-0">
+              <Stack direction="horizontal" gap={3} className="flex-wrap pt-0">
                 <Button
                   type="button"
                   variant="secondary"
