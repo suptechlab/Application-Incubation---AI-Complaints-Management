@@ -6,16 +6,16 @@ import homeBg from "../../assets/images/home-bg.jpg";
 import Loader from "../../components/Loader";
 import SvgIcons from "../../components/SVGIcons";
 import { toggleChatbot } from "../../redux/slice/helpDeskSlice";
-import PrivacyModal from "../auth/privacy";
+import FileClaimMainModal from "../auth";
 import BrandSection from "./brandSection";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const [privacyModalShow, setPrivacyModalShow] = useState(false);
+  const [fileClaimMainModalShow, setFileClaimMainModalShow] = useState(false);
 
   //Handle Privacy Modal
   const handlePrivacyClick = () => {
-    setPrivacyModalShow(true);
+    setFileClaimMainModalShow(true);
   };
 
   return (
@@ -82,10 +82,10 @@ const Home = () => {
       </div>
       <BrandSection />
 
-      {/* Privacy Modal */}
-      <PrivacyModal
-        handleShow={privacyModalShow}
-        handleClose={() => setPrivacyModalShow(false)}
+      {/* File a Claim Main Modal */}
+      <FileClaimMainModal
+        handleShow={fileClaimMainModalShow}
+        handleClose={() => setFileClaimMainModalShow(false)}
       />
     </React.Fragment>
   );

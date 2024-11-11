@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Offcanvas } from 'react-bootstrap';
-import ChatBotForm from './chatForm.jsx/index.jsx';
-import PrivacyForm from './privacyForm.jsx/index.jsx';
+import ChatBotForm from './chatForm';
+import PrivacyForm from './privacyForm';
 
 const HelpDeskBot = ({ handleShow, handleClose }) => {
     const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(false);

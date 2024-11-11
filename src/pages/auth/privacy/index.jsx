@@ -8,13 +8,13 @@ import { FormSchema } from "./validations";
 /**
  * Confirm Privacy Modal
  *
- * @param {{ handleShow: any; handleClose: any; }} param0
- * @param {*} param0.handleShow
+ * @param {{ handleClose: any; onSubmit: any; }} param0
  * @param {*} param0.handleClose
+ * @param {*} param0.onSubmit
  * @returns {*}
  */
 
-const PrivacyModal = ({ handleShow, handleClose }) => {
+const PrivacyModal = ({ handleClose, onSubmit }) => {
   // Initial Values
   const initialValues = {
     firstName: "",
@@ -22,21 +22,11 @@ const PrivacyModal = ({ handleShow, handleClose }) => {
 
   // Handle Submit Handler
   const handleSubmit = (values, actions) => {
-    actions.setSubmitting(false);
+    onSubmit(values, actions);
   };
 
   return (
-    <Modal
-      show={handleShow}
-      onHide={handleClose}
-      backdrop="static"
-      keyboard={false}
-      centered={true}
-      scrollable={true}
-      size="lg"
-      className="theme-modal"
-      enforceFocus={false}
-    >
+    <React.Fragment>
       <Modal.Header closeButton>
         <Modal.Title as="h4" className="fw-bold">
           Your Privacy Matters
@@ -89,7 +79,7 @@ const PrivacyModal = ({ handleShow, handleClose }) => {
           </React.Fragment>
         )}
       </CommonFormikComponent>
-    </Modal>
+    </React.Fragment>
   );
 };
 
