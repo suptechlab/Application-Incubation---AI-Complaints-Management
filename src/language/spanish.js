@@ -125,4 +125,6 @@ export const spanishLang = {
     "ROLE": "Rol",
     "UPDATE": "Actualizar",
     "ROLE & RIGHTS": "Roles y Derechos",
+    "SEPS Users" : "Usuarios de SEPS",
+    "User Management" : "Gestión de usuarios",
 };

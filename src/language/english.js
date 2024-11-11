@@ -144,4 +144,6 @@ export const englishLang = {
     "ROLE": "Role",
     "UPDATE": "Update",
     "ROLE & RIGHTS": "Roles & Rights",
+    "SEPS Users" : "SEPS Users",
+    "User Management": "User Management",
 }

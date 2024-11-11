@@ -25,16 +25,16 @@ export default function Login() {
             return;
         }
 
+        localStorage.setItem("langKey", "es");
         if (values.rememberMe) {
+            values.rememberMe = true;
             localStorage.setItem("email", values.email);
             localStorage.setItem("password", values.password);
-            localStorage.setItem("langKey", "es");
-            values.rememberMe = true;
         } else {
             values.rememberMe = false;
             localStorage.removeItem("email");
             localStorage.removeItem("password");
-            localStorage.removeItem("langKey","es");
+            // localStorage.removeItem("langKey","es");
         }
 
         values.username = values.email
