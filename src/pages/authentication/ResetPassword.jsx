@@ -10,8 +10,11 @@ import Logo from "../../assets/images/logo.svg"
 import AuthBanner from "../../assets/images/banner.png";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import Captcha from '../../components/Captcha';
+import { useTranslation } from "react-i18next";
 
 export default function ResetPassword() {
+
+    const { t } = useTranslation(); // use the translation hook
     const [captcha, setCaptcha] = useState('')
     const reCaptchaRef = useRef(null);
     const navigate = useNavigate()
@@ -54,7 +57,7 @@ export default function ResetPassword() {
                         <Col xs={12} className="p-4">
                             <div className="custom-max-width-320 w-100 m-auto">
                                 <Link to="/forgot-password" className='fw-semibold d-inline-block align-middle mb-5 text-decoration-none'>
-                                    <IoIosArrowRoundBack size={28} /> Back
+                                    <IoIosArrowRoundBack size={28} /> {t('BACK')}
                                 </Link>
                                 <div className="mb-4 pb-1">
                                     <Link to="/" className="d-inline-block">
@@ -68,10 +71,10 @@ export default function ResetPassword() {
                                     </Link>                                    
                                 </div>
                                 <h3 className="fw-semibold mb-1 fs-26">
-                                    Reset Password
+                                Restablecer contraseña
                                 </h3>
                                 <p className="text-body opacity-50 mb-4 pb-1 lh-sm">
-                                    Enter new password
+                                Introducir nueva contraseña
                                 </p>
                                 <Formik
                                     initialValues={{
@@ -93,24 +96,11 @@ export default function ResetPassword() {
                                     }) => (
                                         <>
 
-                                            {/* <FormInput
-                                                error={errors.otp}
-                                                id="otp"
-                                                key={'otp'}
-                                                label="OTP *"
-                                                name="otp"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                                touched={touched.otp}
-                                                type="password"
-                                                value={values.otp}
-                                            /> */}
-
                                             <FormInput
                                                 error={errors.password}
                                                 id="password"
                                                 key={'password'}
-                                                label="New Password *"
+                                                label="Nueva contraseña *"
                                                 name="password"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
@@ -123,7 +113,7 @@ export default function ResetPassword() {
                                                 error={errors.confirmPassword}
                                                 id="confirmPassword"
                                                 key={'confirmPassword'}
-                                                label="Confirm New Password *"
+                                                label="Confirmar nueva contraseña *"
                                                 name="confirmPassword"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
@@ -157,10 +147,10 @@ export default function ResetPassword() {
                                                 >
                                                     {isSubmitting ? (
                                                         <Spinner size="sm" animation="border" role="output" className="align-middle me-1">
-                                                            <span className="visually-hidden">Loading...</span>
+                                                            <span className="visually-hidden">{t('LOADING')}...</span>
                                                         </Spinner>
                                                     ) : (
-                                                        "Submit"
+                                                        t('SUBMIT')
                                                     )}
                                                 </Button>
                                             </Stack>

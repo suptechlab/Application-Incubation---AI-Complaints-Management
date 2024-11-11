@@ -8,7 +8,7 @@ import { getLocalStorage } from '../utils/storage';
 
 
 // const userLanguage = getLocalStorage('langKey')  ? getLocalStorage('langKey') : 'en';
-const userLanguage = "en";
+const userLanguage = "es"; // es/en
 
 // console.log(userLanguage)
 
@@ -16,7 +16,7 @@ const userLanguage = "en";
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
-    lng: userLanguage ?? 'en', // set the default language
+    lng: userLanguage ?? 'es', // set the default language
     resources: {
       // TRANSLATIONS
       en: {

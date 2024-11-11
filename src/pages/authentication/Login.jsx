@@ -28,13 +28,13 @@ export default function Login() {
         if (values.rememberMe) {
             localStorage.setItem("email", values.email);
             localStorage.setItem("password", values.password);
-            localStorage.setItem("langKey", "en");
+            localStorage.setItem("langKey", "es");
             values.rememberMe = true;
         } else {
             values.rememberMe = false;
             localStorage.removeItem("email");
             localStorage.removeItem("password");
-            localStorage.removeItem("langKey","en");
+            localStorage.removeItem("langKey","es");
         }
 
         values.username = values.email
@@ -137,7 +137,7 @@ export default function Login() {
                                                                 onBlur={handleBlur}
                                                                 onChange={handleChange}
                                                                 type="checkbox"
-                                                                label="Remember Me"
+                                                                label="Acuérdate de mí"
                                                             />                                                    
                                                         </Col>
                                                         <Col xs="auto">
