@@ -12,7 +12,11 @@ import {
   handleGetRoleRightById,
 } from "../../services/rolerights.service";
 import Loader from "../../components/Loader";
+import { useTranslation } from "react-i18next";
+
 const RoleRightsForm = () => {
+
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
@@ -122,7 +126,7 @@ const RoleRightsForm = () => {
           navigate("/role-rights");
         })
         .catch((error) => {
-            toast.error(error.response.data.detail);
+            toast.error(error.response.data.errorDescription);
       });
     } else {
       handleAddRoleRight(payload)
@@ -134,7 +138,7 @@ const RoleRightsForm = () => {
           if (error.response.data.fieldErrors) {
             toast.error(error.response.data.fieldErrors[0].message);
           } else {
-            toast.error(error.response.data.detail);
+            toast.error(error.response.data.errorDescription);
           }
         });
     }
@@ -175,7 +179,7 @@ const RoleRightsForm = () => {
                                 error={errors.name}
                                 id="name"
                                 key={"name"}
-                                label="Role Name *"
+                                label="Nombre del rol *"
                                 name="name"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -189,7 +193,7 @@ const RoleRightsForm = () => {
                                 error={errors.description}
                                 id="description"
                                 key={"description"}
-                                label="Description"
+                                label="Descripción"
                                 name="description"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
@@ -202,7 +206,7 @@ const RoleRightsForm = () => {
 
                           <div className="mt-2">
                             <h5 className="fw-semibold border-bottom pb-1 mb-3">
-                              Assign Rights
+                              Ceder derechos  
                             </h5>
                             {modules.map((module) => (
                               <div key={module.id} className="mb-2 pb-1">
@@ -255,14 +259,14 @@ const RoleRightsForm = () => {
                             to={"/role-rights"}
                             className="btn btn-outline-dark custom-min-width-85"
                           >
-                            Cancel
+                             {t('CANCEL')}
                           </Link>
                           <Button
                             type="submit"
                             variant="warning"
                             className="custom-min-width-85"
                           >
-                            {isEdit ? "Update" : "Submit"}
+                              {isEdit ? t('UPDATE') : t('SUBMIT')}
                           </Button>
                         </Stack>
                       </div>

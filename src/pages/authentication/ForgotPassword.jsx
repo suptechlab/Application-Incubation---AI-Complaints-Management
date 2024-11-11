@@ -31,7 +31,7 @@ export default function ForgotPassword() {
             //reCaptchaRef.current.reset()
             //setCaptcha("")
         }).catch((error) => {
-            toast.error(error.response.data.message);
+            toast.error(error.response.data.errorDescription);
 
         }).finally(() => {
             actions.setSubmitting(false)
