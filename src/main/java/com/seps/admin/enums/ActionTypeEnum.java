@@ -22,7 +22,10 @@ public enum ActionTypeEnum {
     ROLE_ADD("Add New Role"),
     ROLE_EDIT("Edit Existing Role"),
     ROLE_STATUS_CHANGE("Role Status Change"),
-    ORGANIZATION_MASTER_ADD("Add Organization");
+    ORGANIZATION_MASTER_ADD("Add Organization"),
+    FI_USER_ADD("Add FI User"),
+    FI_USER_EDIT("Edit FI User"),
+    FI_USER_STATUS_CHANGE("FI User Status Change");
 
     private final String description;
 

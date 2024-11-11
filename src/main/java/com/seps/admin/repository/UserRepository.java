@@ -1,12 +1,15 @@
 package com.seps.admin.repository;
 
+import com.seps.admin.domain.Authority;
 import com.seps.admin.domain.User;
+import com.seps.admin.enums.UserStatusEnum;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Spring Data JPA repository for the {@link User} entity.
@@ -26,5 +29,11 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @EntityGraph(attributePaths = "authorities")
     Optional<User> findOneWithAuthoritiesById(Long id);
+
+    // Check if a user exists with the given identificacion, authorities, and status
+    Optional<User> findOneByIdentificacionAndAuthoritiesInAndStatusIn(
+        String identificacion, Set<Authority> authorities, Set<UserStatusEnum> statuses
+    );
+
 
 }

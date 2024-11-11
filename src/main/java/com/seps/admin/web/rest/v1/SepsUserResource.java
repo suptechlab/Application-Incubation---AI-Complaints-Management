@@ -103,7 +103,7 @@ public class SepsUserResource {
     @Operation(summary = "List all SEPS User", description = "Retrieve a list of all SEPS user with optional search and status filters.")
     @ApiResponse(responseCode = "200", description = "SEPS User retrieved successfully",
         content = @Content(mediaType = "application/json",
-            schema = @Schema(implementation = ProvinceDTO.class)))
+            schema = @Schema(implementation = SEPSUserDTO.class)))
     @GetMapping
     public ResponseEntity<List<SEPSUserDTO>> listSEPSUsers(Pageable pageable,
                                                            @RequestParam(value = "search", required = false) String search,
