@@ -22,6 +22,7 @@
 @include custom-class('width', 150);
 @include custom-class('max-width', 150);
 @include custom-class('width', 160);
+@include custom-class('min-width', 160);
 @include custom-class('width', 190);
 @include custom-class('width', 200);
 @include custom-class('max-width', 200);
@@ -168,6 +169,7 @@ input:-webkit-autofill:active {
 .spin {
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
+
     @keyframes fa-spin {
         0% {
             -webkit-transform: rotate(0deg);

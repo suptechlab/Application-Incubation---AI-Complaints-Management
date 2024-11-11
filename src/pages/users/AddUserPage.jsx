@@ -20,6 +20,7 @@ import { validationSchema } from "../../validations/user.validation";
 import UserLoader from "../../components/UserLoader";
 
 export default function AddStatePage() {
+
   const [loading, setLoading] = useState(true);
   const [userLoading, setUserLoading] = useState(false);
   const navigate = useNavigate();
@@ -31,66 +32,52 @@ export default function AddStatePage() {
 
   const [countryCodeData, setCountryCodeData] = useState([
     { label: "+91", value: "+91" },
+    { label: "+593", value: "+593" },
   ]);
   const [userData, setUserData] = useState([]);
   const [isImageSet, setIsImageSet] = useState(false);
   const [emailDisabled, setEmailDisabled] = useState(false);
   const { t } = useTranslation();
-  const editUserValues = [];
+  const [initialValues, setInitialValues] = useState({
+    name: "",
+    email: "",
+    roleId: "",
+    mobileCode: "+91",
+    mobileNo: "",
+    activated: true,
+    profileImage: "",
+  });
 
   useEffect(() => {
-    handleGetUserCompany().then((response) => {
-      let companiesList = [{ value: "", label: "Select company" }];
-      if (response.data?.data?.length > 0) {
-        response.data?.data?.forEach((category) => {
-          companiesList.push({ value: category?.id, label: category?.title });
-        });
-      }
-      setCompanyOptions(companiesList);
-    });
-
-    handleGetRole().then((response) => {
+    const userType = 'SEPS_USER';
+    handleGetRole(userType).then((response) => {
       let roleList = [{ value: "", label: "Select role" }];
-      if (response.data?.data?.length > 0) {
-        response.data?.data?.forEach((category) => {
-          roleList.push({ value: category?.id, label: category?.name });
+      if (response.data?.length > 0) {
+        response.data?.forEach((roles) => {
+          roleList.push({ value: roles?.id, label: roles?.name });
         });
       }
       setRolesOptions(roleList);
     });
   }, []);
 
-  const initialValue = {
-    firstName: userData?.firstName ? userData?.firstName : "",
-    lastName: userData?.lastName ? userData?.lastName : "",
-    email: userData?.email ? userData?.email : "",
-    mobileCode: "+91",
-    mobileNo: userData?.mobileNo ? userData?.mobileNo : "",
-    roleId: userData?.roleId ? userData?.roleId : "",
-    companyId: userData?.companyId ? userData?.companyId : companyOptions[0],
-    activated: userData?.activated ? userData?.activated : false,
-    profileImage: userData?.imageUrl ? userData?.imageUrl : "",
-  };
-
   useEffect(() => {
     if (isEdit) {
       setLoading(true);
       handleGetUserById(id).then((response) => {
-        setUserData(response.data.data);
-        setEmailDisabled(response.data.data.email == "" ? false : true);
+        setUserData(response.data);
+        setEmailDisabled(response.data?.email == "" ? false : true);
 
-        // setInitialValues({
-        //     firstName: 'hello',
-        //     lastName: response.data.data?.lastName,
-        //     email: response.data.data?.email,
-        //     mobileCode: response.data.data?.mobileCode ? response.data.data?.mobileCode : '+91',
-        //     mobileNo: response.data.data?.mobileNo,
-        //     activated: response.data.data?.activated,
-        //     roleId: response.data.data?.roleId,
-        //     companyId: response.data.data?.companyId,
-        //     profileImage: response.data.data?.imageUrl
-
-        // });
+        setInitialValues({
+          name: response.data?.name ? response.data?.name : "",
+          email: response.data?.email ? response.data?.email : "",
+          roleId: response.data?.roleId ??  "",
+          // activated: response.data?.status == 'ACTIVE' ? true : false,
+          //mobileCode: "+91",
+          // mobileNo: userData?.mobileNo ? userData?.mobileNo : "",
+          // activated: userData?.activated ? userData?.activated : false,
+          // profileImage: userData?.imageUrl ? userData?.imageUrl : "",
+        });
         setLoading(false);
       });
     } else {
@@ -98,37 +85,65 @@ export default function AddStatePage() {
     }
   }, [id, isEdit]);
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values, actions) => {
     setUserLoading(true);
-    const formData = new FormData();
-    if (!isImageSet) {
-      delete values.profileImage;
-    }
-    for (const key in values) {
-      formData.append(key, values[key]);
-    }
+    // const formData = new FormData();
+    // if (!isImageSet) {
+    //   delete values.profileImage;
+    // }
+    // for (const key in values) {
+    //   formData.append(key, values[key]);
+    // }
 
     try {
       if (isEdit) {
-        formData.append("id", id);
-        const response = await handleUpdateUser(id, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        toast.success(response.data.message);
-        navigate("/users");
-      } else {
-        const response = await handleAddUser(formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        toast.success(response.data.message);
-        navigate("/users");
+        // formData.append("id", id);
+        // const response = await handleUpdateUser(id, formData, {
+        //   headers: {
+        //     "Content-Type": "multipart/form-data",
+        //   },
+        // });
+        
+       
+        delete values.profileImage;
+        delete values.profileImage;
+        delete values.activated;
+        delete values.mobileCode;
+        delete values.mobileNo;
+        await handleUpdateUser( id, { ...values }).then((response) => {
+          toast.success(response.data.message)
+          actions.resetForm()
+          navigate('/users')
+        }).catch((error) => {
+          setUserLoading(false);
+          toast.error(error.response.data.detail);
+
+        }).finally(() => {
+          actions.setSubmitting(false)
+        })
+      }
+      else {
+        
+        delete values.profileImage;
+        delete values.profileImage;
+        delete values.activated;
+        delete values.mobileCode;
+        delete values.mobileNo;
+        await handleAddUser({ ...values }).then((response) => {
+          toast.success(response.data.message)
+          actions.resetForm()
+          navigate('/users')
+        }).catch((error) => {
+          setUserLoading(false);
+          toast.error(error.response.data.detail);
+
+        }).finally(() => {
+          actions.setSubmitting(false)
+        })
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      setUserLoading(false);
+      toast.error(t('SOMETHING WENT WRONG'));
     }
   };
 
@@ -141,14 +156,17 @@ export default function AddStatePage() {
         subTitle="Using SEPS Active Directory"
       />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <PageHeader title={`${isEdit ? "Edit" : "Add"} SEPS User`} />
+        <PageHeader title={`${isEdit ? t('EDIT SEPS') : t('ADD SEPS')}  `} />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
+            {
+              loading ? "" : 
+            
             <Formik
-              initialValues={initialValue}
+              initialValues={initialValues}
               validationSchema={validationSchema}
               onSubmit={onSubmit}
-              // enableReinitialize
+            // enableReinitialize
             >
               {({
                 errors,
@@ -164,12 +182,15 @@ export default function AddStatePage() {
                   className="d-flex flex-column h-100"
                 >
                   <Row>
+                    {/* <pre>{JSON.stringify(initialValues,null,2)}</pre> */}
+                    {/* <pre>{JSON.stringify(values,null,2)}</pre> */}
+                    {/* <pre>{JSON.stringify(errors,null,2)}</pre> */}
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
                         error={errors.email}
                         id="email"
                         key={"email"}
-                        label="Email"
+                        label={t('EMAIL')}
                         name="email"
                         onBlur={handleBlur}
                         onChange={handleChange}
@@ -181,16 +202,16 @@ export default function AddStatePage() {
                     </Col>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
-                        error={errors.firstName}
-                        id="firstName"
-                        key={"firstName"}
-                        label="Name"
-                        name="firstName"
+                        error={errors.name}
+                        id="name"
+                        key={"name"}
+                        label={t('NAME')}
+                        name="name"
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        touched={touched.firstName}
+                        touched={touched.name}
                         type="text"
-                        value={values.firstName || ""}
+                        value={values.name || ""}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
@@ -198,7 +219,7 @@ export default function AddStatePage() {
                         error={errors.unidadOrganizacional}
                         id="unidadOrganizacional"
                         key={"unidadOrganizacional"}
-                        label="Unidad Organizacional"
+                        label={t('UNIDAD ORGANIZACIONAL')}
                         name="unidadOrganizacional"
                         onBlur={handleBlur}
                         onChange={handleChange}
@@ -252,29 +273,29 @@ export default function AddStatePage() {
                     </Col> */}
                     <Col sm={6} md={6} lg={4}>
                       <ReactSelect
-                        label="Role"
-                        error={errors.companyId}
-                        options={companyOptions}
-                        value={values.companyId}
+                        label={t('ROLE')}
+                        error={errors.roleId}
+                        options={rolesOptions}
+                        value={values.roleId}
                         onChange={(option) => {
                           setFieldValue(
-                            "companyId",
+                            "roleId",
                             option?.target?.value ?? ""
                           );
                         }}
-                        name="companyId"
+                        name="roleId"
                         className={
-                          touched.companyId && errors.companyId
+                          touched.roleId && errors.roleId
                             ? "is-invalid"
                             : ""
                         }
                         onBlur={handleBlur}
-                        touched={touched.companyId}
+                        touched={touched.roleId}
                       />
                     </Col>
-                    <Col xs={12} className="mb-3 pb-1">
+                    {/* <Col xs={12} className="mb-3 pb-1">
                       <label htmlFor="activated" className="mb-1 fs-14">
-                        Status
+                        {t('STATUS')}
                       </label>
                       <Toggle
                         id="activated"
@@ -283,7 +304,7 @@ export default function AddStatePage() {
                         onChange={handleChange}
                         value={values.activated}
                       />
-                    </Col>
+                    </Col> */}
                   </Row>
 
                   <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
@@ -296,20 +317,21 @@ export default function AddStatePage() {
                         to={"/users"}
                         className="btn btn-outline-dark custom-min-width-85"
                       >
-                        Cancel
+                        {t('CANCEL')}
                       </Link>
                       <Button
                         type="submit"
                         variant="warning"
                         className="custom-min-width-85"
                       >
-                        {isEdit ? "Update" : "Submit"}
+                        {isEdit ? t('UPDATE') : t('SUBMIT')}
                       </Button>
                     </Stack>
                   </div>
                 </FormikForm>
               )}
             </Formik>
+            }
           </Card.Body>
         </Card>
       </div>

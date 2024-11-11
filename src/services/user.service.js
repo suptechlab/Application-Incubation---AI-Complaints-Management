@@ -1,50 +1,54 @@
 import {adminApi} from "../utils/instance";
 
+const API_VERSION = process.env.REACT_APP_API_VERSION
+// const port = process.env.REACT_APP_SEPS_USER_PORT
+
+// instance.defaults.baseURL = `${process.env.REACT_APP_API_URL}:${port}`;
+
+export const handleAddUser = async (data) => {
+    return await adminApi.post(`/api/${API_VERSION}/seps-users`, data);
+}
+
 export const handleGetUsers = async (params) => {
-    return await adminApi.get('/v1/claim-sub-types', {
+    return await adminApi.get(`/api/${API_VERSION}/seps-users`, {
         params
     });
 }
 
-export const handleGetUser = async (id) => {
-    return await adminApi.get(`/v1/users/${id}`);
+export const handleGetUserById = async (id) => {
+    return await adminApi.get(`/api/${API_VERSION}/seps-users/${id}`);
 }
 
+
+
 export const handleUpdateUser = async (id, data) => {
-    // return await adminApi.put(`/v1/admin/users/${id}`, data);
-    return await adminApi.put(`/v1/admin/users`, data);
+    return await adminApi.put(`/api/${API_VERSION}/seps-users/${id}`, data);
 }
 
 export const handleDeleteUser = async (id) => {
-    return await adminApi.delete(`/v1/admin/users/${id}`);
+    return await adminApi.delete(`/api/${API_VERSION}/admin/users/${id}`);
 }
 
 export const handleStatusChangeState = async (id, status) => {
-    return await adminApi.put(`/v1/admin/users/${id}/status?active=${status}`, {});
+    // return await instance.put(`/api/${API_VERSION}/seps-users/${id}/status?active=${status}`, {});
+    return await adminApi.patch(`/api/${API_VERSION}/seps-users/${id}/${status}`, {});
 }
 
-export const handleGetUserById = async (id) => {
-    return await adminApi.get(`/v1/admin/users/${id}`);
-}
 
-export const handleAddUser = async (data) => {
-    return await adminApi.post('/v1/admin/users', data);
-}
 
 export const handleGetCompany = async (id) => {
-    return await adminApi.get(`/v1/companies`);
+    return await adminApi.get(`/api/${API_VERSION}/companies`);
 }
 
 export const handleGetUserCompany = async (id) => {
-    return await adminApi.get(`/v1/user-companies`);
+    return await adminApi.get(`/api/${API_VERSION}/user-companies`);
 }
 
-export const handleGetRole = async (id) => {
-    return await adminApi.get(`/v1/roles/dropdown`);
+export const handleGetRole = async (userType) => {
+    return await adminApi.get(`/api/${API_VERSION}/roles/dropdown/${userType}`);
 }
-
 
 export const handleUserResetPassword = async (id)=>{
-    return await adminApi.get(`/v1/admin/users/reset-password/${id}`)
+    return await adminApi.get(`/api/${API_VERSION}/admin/users/reset-password/${id}`)
 }
 

@@ -1,28 +1,34 @@
 import {adminApi} from "../utils/instance";
 
+
+const API_VERSION = process.env.REACT_APP_API_VERSION
+// const port = process.env.REACT_APP_SEPS_USER_PORT
+
+// instance.defaults.baseURL = `${process.env.REACT_APP_API_URL}:${port}`;
+
 export const handleGetRoleRights = async (params) => {
-    return await adminApi.get('/v1/roles', {
+    return await adminApi.get(`/api/${API_VERSION}/roles`, {
         params
     });
 }
 
 export const handleDeleteRoleRight = async (id) => {
-    return await adminApi.delete(`/v1/roles/${id}`);
+    return await adminApi.delete(`/api/${API_VERSION}/${id}`);
 }
 
 export const handleGetRoleRightById = async (id) => {
-    return await adminApi.get(`/v1/roles/${id}`);
+    return await adminApi.get(`/api/${API_VERSION}/roles/${id}`);
 }
 
 export const handleAddRoleRight = async (data) => {
-    return await adminApi.post('/v1/roles', data);
+    return await adminApi.post(`/api/${API_VERSION}/roles`, data);
 }
 
 export const handleEditRoleRight = async (id, data) => {
-    data.id = id;
-    return await adminApi.put(`/v1/roles`, data);
+    // data.id = id;
+    return await adminApi.put(`/api/${API_VERSION}/roles/${id}`, data);
 }
 
-export const fetchModulesAndPermissions = async () => {
-    return await adminApi.get('/v1/roles/modules-permissions');
+export const fetchModulesAndPermissions = async (userType) => {
+    return await adminApi.get(`/api/${API_VERSION}/roles/modules-permissions/${userType}`);
 }

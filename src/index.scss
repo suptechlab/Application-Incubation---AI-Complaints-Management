@@ -270,62 +270,62 @@
 }
 
 
-.header-search {
-	input.form-control {
-		height: 32px !important;
-		font-size: 14px !important;
-	}
+// .header-search {
+// 	input.form-control {
+// 		height: 32px !important;
+// 		font-size: 14px !important;
+// 	}
 
-	.react-select-container .react-select__control {
-		height: inherit;
-		min-height: 32px;
-		border-radius: 4px !important;
-	}
+// 	.react-select-container .react-select__control {
+// 		height: inherit;
+// 		min-height: 32px;
+// 		border-radius: 4px !important;
+// 	}
 
-	.react-select-container .react-select__menu {
-		min-width: 120px;
-	}
+// 	.react-select-container .react-select__menu {
+// 		min-width: 120px;
+// 	}
 
-	.react-select__dropdown-indicator {
-		padding: 0px 5px !important;
-	}
+// 	.react-select__dropdown-indicator {
+// 		padding: 0px 5px !important;
+// 	}
 
-	.react-select__value-container {
-		padding-top: 0px;
-		padding-bottom: 0px;
-		border-color: #7F7F7F !important;
-		font-size: 14px;
-		color: #000 !important;
-	}
+// 	.react-select__value-container {
+// 		padding-top: 0px;
+// 		padding-bottom: 0px;
+// 		border-color: #7F7F7F !important;
+// 		font-size: 14px;
+// 		color: #000 !important;
+// 	}
 
-	.react-select__indicator {
-		padding: 3px !important;
-	}
+// 	.react-select__indicator {
+// 		padding: 3px !important;
+// 	}
 
-	.react-select__placeholder {
-		color: #000 !important;
-	}
+// 	.react-select__placeholder {
+// 		color: #000 !important;
+// 	}
 
-	input.form-control::-webkit-input-placeholder {
-		color: #000;
-		opacity: .5
-	}
+// 	input.form-control::-webkit-input-placeholder {
+// 		color: #000;
+// 		opacity: .5
+// 	}
 
-	input.form-control::-moz-placeholder {
-		color: #000;
-		opacity: .5
-	}
+// 	input.form-control::-moz-placeholder {
+// 		color: #000;
+// 		opacity: .5
+// 	}
 
-	input.form-control:-ms-input-placeholder {
-		color: #000;
-		opacity: .5
-	}
+// 	input.form-control:-ms-input-placeholder {
+// 		color: #000;
+// 		opacity: .5
+// 	}
 
-	input.form-control:-moz-placeholder {
-		color: #000;
-		opacity: .5
-	}
-}
+// 	input.form-control:-moz-placeholder {
+// 		color: #000;
+// 		opacity: .5
+// 	}
+// }
 
 // .theme-from-footer {
 // 	margin-left: -20px;
@@ -887,9 +887,9 @@
 		margin-bottom: 25px;
 	}
 
-	.header-search .react-select__value-container {
-		font-size: 12px;
-	}
+	// .header-search .react-select__value-container {
+	// 	font-size: 12px;
+	// }
 }
 
 

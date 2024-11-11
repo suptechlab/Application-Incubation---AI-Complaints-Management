@@ -16,7 +16,11 @@ import {
   handleGetRoleRights,
 } from "../../services/rolerights.service"; // Update the import to include delete function
 import { handleStatusChangeState } from "../../services/user.service";
+import { useTranslation } from "react-i18next";
+
 export default function RoleRightsList() {
+
+  const { t } = useTranslation();
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
@@ -106,13 +110,13 @@ export default function RoleRightsList() {
       {
         accessorFn: (row) => row.name,
         id: "name",
-        header: () => "Role",
+        header: () => t('ROLE'),
         enableSorting: true,
       },
       {
         accessorFn: (row) => row.description,
         id: "description",
-        header: () => "Description",
+        header: () => t('DESCRIPTION'),
         enableSorting: false,
       },
       {
@@ -122,12 +126,12 @@ export default function RoleRightsList() {
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
               name="status"
-              value={info?.row?.original?.activated}
-              checked={info?.row?.original?.activated}
+              value={info?.row?.original?.status == 'ACTIVE' ? true : false }
+              checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
               onChange={() =>
                 changeStatus(
                   info?.row?.original?.id,
-                  info?.row?.original?.activated
+                  info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
                 )
               }
               tooltip="Active"
@@ -135,7 +139,7 @@ export default function RoleRightsList() {
           );
         },
         id: "status",
-        header: () => "Status",
+        header: () => t('STATUS'),
         size: "90",
       },
       {
@@ -164,7 +168,7 @@ export default function RoleRightsList() {
             ]}
           />
         ),
-        header: () => <div className="text-center">Actions</div>,
+        header: () => <div className="text-center">{t('ACTIONS')}</div>,
         size: "100",
       },
     ],

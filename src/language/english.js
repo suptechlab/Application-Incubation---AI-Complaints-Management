@@ -137,4 +137,11 @@ export const englishLang = {
     "EXPORT IN PROGRESS": "Export in progress... Please wait.",
     "CSV DOWNLOADED": "CSV file downloaded successfully.",
     "EMPTY RESPONSE": "Response data is empty.",
+    "ADD SEPS": "Add SEPS User",
+    "EDIT SEPS": "Edit SEPS User",
+    "SEPS USER": "SEPS User",
+    "UNIDAD ORGANIZACIONAL": "Unidad Organizacional",
+    "ROLE": "Role",
+    "UPDATE": "Update",
+    "ROLE & RIGHTS": "Roles & Rights",
 }

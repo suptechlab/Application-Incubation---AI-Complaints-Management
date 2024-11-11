@@ -1,4 +1,26 @@
 @import "../../src/assets/css/variables";
-.react-select__menu-portal{
+
+.react-select__menu-portal {
     z-index: 1056 !important;
+}
+
+.react-select-container {
+    &.react-select-sm {
+        .react-select__control {
+            min-height: 32px;
+            font-size: .875rem;
+
+            .react-select__value-container {
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+
+            .react-select__indicators {
+                >svg {
+                    margin-left: .25rem !important;
+                    margin-right: .25rem !important;
+                }
+            }
+        }
+    }
 }

@@ -20,7 +20,7 @@ export default function FormInput({ label, touched, error, isTextarea, wrapperCl
             ) : (
                 <div className='position-relative'>
                     <Input
-                        className={`form-control ${touched && error ? "is-invalid" : ""}`}
+                        className={`${touched && error ? "is-invalid" : ""}`}
                         {...rest}
                         type={rest.type === 'password' && showPassword ? 'text' : rest.type}
                     />
