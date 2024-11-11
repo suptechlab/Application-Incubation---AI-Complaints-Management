@@ -156,14 +156,14 @@ deployment:
   #            filePath: id_rsa_config
   #            fileMode: 644
 
-  secrets:
-    seps-secrets:
-      environment: # Items set like environment variable
-        items:
+  #secrets:
+  #  seps-secrets:
+  #    environment: # Items set like environment variable
+  #      items:
           # JASYPT_ENCRYPTOR_PASSWORD:
           #   envVarName: jasypt.encryptor.password
-          SPRING_DATASOURCE_PASSWORD:
-            envVarName: SPRING_DATASOURCE_PASSWORD
+  #        SPRING_DATASOURCE_PASSWORD:
+  #          envVarName: SPRING_DATASOURCE_PASSWORD
 
       # Mount a file id_rsa to connect a ftp server
   #      volume: # Items set like file in volume
