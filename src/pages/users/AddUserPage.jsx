@@ -72,6 +72,7 @@ export default function AddStatePage() {
           name: response.data?.name ? response.data?.name : "",
           email: response.data?.email ? response.data?.email : "",
           roleId: response.data?.roleId ??  "",
+          // activated: response.data?.status == 'ACTIVE' ? true : false,
           //mobileCode: "+91",
           // mobileNo: userData?.mobileNo ? userData?.mobileNo : "",
           // activated: userData?.activated ? userData?.activated : false,
@@ -103,7 +104,7 @@ export default function AddStatePage() {
         //   },
         // });
         
-        //values.roleId = 1;
+       
         delete values.profileImage;
         delete values.profileImage;
         delete values.activated;
@@ -122,7 +123,7 @@ export default function AddStatePage() {
         })
       }
       else {
-        //values.roleId = 1;
+        
         delete values.profileImage;
         delete values.profileImage;
         delete values.activated;
@@ -181,9 +182,9 @@ export default function AddStatePage() {
                   className="d-flex flex-column h-100"
                 >
                   <Row>
-                    {/* <pre>{JSON.stringify(initialValues,null,2)}</pre>
-                    <pre>{JSON.stringify(values,null,2)}</pre>
-                    <pre>{JSON.stringify(errors,null,2)}</pre> */}
+                    {/* <pre>{JSON.stringify(initialValues,null,2)}</pre> */}
+                    {/* <pre>{JSON.stringify(values,null,2)}</pre> */}
+                    {/* <pre>{JSON.stringify(errors,null,2)}</pre> */}
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
                         error={errors.email}
@@ -292,7 +293,7 @@ export default function AddStatePage() {
                         touched={touched.roleId}
                       />
                     </Col>
-                    <Col xs={12} className="mb-3 pb-1">
+                    {/* <Col xs={12} className="mb-3 pb-1">
                       <label htmlFor="activated" className="mb-1 fs-14">
                         {t('STATUS')}
                       </label>
@@ -303,7 +304,7 @@ export default function AddStatePage() {
                         onChange={handleChange}
                         value={values.activated}
                       />
-                    </Col>
+                    </Col> */}
                   </Row>
 
                   <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
