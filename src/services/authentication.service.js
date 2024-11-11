@@ -42,18 +42,16 @@ export const handleRefreshToken = async () => {
     });
 }
 
-export const handleOtpVerify = async (data) => {
-    return await authApi.post(`/api/verify-otp`, data);
-}
+
 
 export const handleResendOTP = async (params) => {
-    return await authApi.get(`/api/resend-login-otp`, {params});
+    return await authApi.get(`/resend-login-otp`, {params});
 }
 
 export const handleGetAccountDetail = async () => {
-    return await authApi.get(`/api/account`);
+    return await authApi.get(`/account`);
 }
 
 export const handleAccount = async (data) => {
-    return await authApi.post(`/api/account`, data);
+    return await authApi.post(`/account`, data);
 }
