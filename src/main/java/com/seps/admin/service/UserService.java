@@ -82,11 +82,18 @@ public class UserService {
      * authority, and sets the user's status to active. The user's email is used as both the login and email, in lowercase.
      * </p>
      *
-     * @param userDTO the data transfer object containing user details (name, email, etc.)
+     * @param userDTO     the data transfer object containing user details (name, email, etc.)
+     * @param requestInfo
      * @return the created {@link User} entity
      */
     @Transactional
-    public User addSepsUser(@Valid SEPSUserDTO userDTO) {
+    public User addSEPSUser(@Valid SEPSUserDTO userDTO, RequestInfo requestInfo) {
+        User currenUser = getCurrentUser();
+        // Fetch role or throw exception if not found
+        Long roleId = userDTO.getRoleId();
+        Role role = roleRepository.findByIdAndUserType(roleId, UserTypeEnum.SEPS_USER.toString())
+            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.ROLE_NOT_FOUND, null, null));
+        // Initialize new User and set its properties
         User newUser = new User();
         // for a new user sets initially a random password
         newUser.setFirstName(userDTO.getName());
@@ -112,8 +119,21 @@ public class UserService {
         newUser.setAuthorities(authorities);
         //Set Role
         Set<Role> roles = new HashSet<>();
-
+        roles.add(role);
+        newUser.setRoles(roles);
         userRepository.save(newUser);
+        //Audit Logs
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Map<String, Object> entityData = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.seps.user.created",
+                new Object[]{currenUser.getEmail(), newUser.getId()}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+        entityData.put(Constants.NEW_DATA, convertEntityToMap(this.getSEPSUserById(newUser.getId())));
+        String requestBody = gson.toJson(userDTO);
+        auditLogService.logActivity(null, currenUser.getId(), requestInfo, "addSEPSUser", ActionTypeEnum.SEPS_USER_ADD.name(), newUser.getId(), User.class.getSimpleName(),
+            null, auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
         LOG.debug("Created Information for SEPS User: {}", newUser);
         return newUser;
     }
@@ -126,27 +146,50 @@ public class UserService {
      * If the user is not found or does not have SEPS authority, a {@code CustomException} is thrown.
      * </p>
      *
-     * @param id  the ID of the user to be updated
-     * @param dto the data transfer object containing updated user details
+     * @param id          the ID of the user to be updated
+     * @param userDTO     the data transfer object containing updated user details
+     * @param requestInfo
      * @throws CustomException if the user is not found or lacks SEPS authority
      */
     @Transactional
-    public void updateSepsUser(Long id, @Valid SEPSUserDTO dto) {
-        User entity = userRepository.findById(id).orElseThrow(
+    public void editSEPSUser(Long id, @Valid SEPSUserDTO userDTO, RequestInfo requestInfo) {
+        User currenUser = getCurrentUser();
+        User user = userRepository.findById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
 
-        List<String> authorityList = entity.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = user.getAuthorities().stream().map(authority -> authority.getName()).toList();
         if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
             LOG.warn("SEPS User not found with id:{}", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
-        entity.setFirstName(dto.getName());
-        entity.setLangKey(dto.getLangKey());
-        entity.setCountryCode(dto.getCountryCode());
-        entity.setPhoneNumber(dto.getPhoneNumber());
-        userRepository.save(entity);
+        // Fetch role or throw exception if not found
+        Long roleId = userDTO.getRoleId();
+        Role role = roleRepository.findByIdAndUserType(roleId, UserTypeEnum.SEPS_USER.toString())
+            .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.ROLE_NOT_FOUND, null, null));
+        //Old Data
+        Map<String, Object> oldData = convertEntityToMap(this.getSEPSUserById(id));
+
+        user.setFirstName(userDTO.getName());
+        user.setLangKey(userDTO.getLangKey());
+        user.setCountryCode(userDTO.getCountryCode());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        userRepository.save(user);
+        //Audit Logs
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.seps.user.updated",
+                new Object[]{currenUser.getEmail(), user.getId()}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(this.getSEPSUserById(user.getId()));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        String requestBody = gson.toJson(userDTO);
+        auditLogService.logActivity(null, currenUser.getId(), requestInfo, "editSEPSUser", ActionTypeEnum.SEPS_USER_EDIT.name(), user.getId(), User.class.getSimpleName(),
+            null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
     }
 
     /**
@@ -157,7 +200,7 @@ public class UserService {
      * @throws CustomException if the user is not found or not a SEPS user
      */
     @Transactional(readOnly = true)
-    public SEPSUserDTO getSepsUserById(Long id) {
+    public SEPSUserDTO getSEPSUserById(Long id) {
         User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
@@ -180,25 +223,27 @@ public class UserService {
      * @return a paginated {@link Page} of {@link SEPSUserDTO} objects that match the filter criteria
      */
     @Transactional(readOnly = true)
-    public Page<SEPSUserDTO> listSEPSUsers(Pageable pageable, String search, UserStatusEnum status) {
+    public Page<SEPSUserDTO> listSEPSUsers(Pageable pageable, String search, UserStatusEnum status,Long roleId) {
         List<String> authorities = new ArrayList<>();
         authorities.add(AuthoritiesConstants.SEPS);
-        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities), pageable)
+        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities, roleId), pageable)
             .map(userMapper::userToSEPSUserDTO);
     }
 
-    public void changeSEPSStatus(Long id, UserStatusEnum newStatus) {
-        User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
+    @Transactional
+    public void changeSEPSStatus(Long id, UserStatusEnum newStatus, RequestInfo requestInfo) {
+        User currenUser = getCurrentUser();
+        User user = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
-        List<String> authorityList = entity.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = user.getAuthorities().stream().map(authority -> authority.getName()).toList();
         if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
             LOG.warn("SEPS User not found with id:{}", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
         // Check if the status change is valid
-        UserStatusEnum currentStatus = entity.getStatus();
+        UserStatusEnum currentStatus = user.getStatus();
         if ((currentStatus == UserStatusEnum.ACTIVE && newStatus != UserStatusEnum.BLOCKED) ||
             (currentStatus == UserStatusEnum.BLOCKED && newStatus != UserStatusEnum.ACTIVE)) {
             LOG.warn("Invalid status transition for SEPS user with id: {}. Current status: {}, New status: {}",
@@ -206,8 +251,25 @@ public class UserService {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_STATUS_TRANSITION,
                 new String[]{currentStatus.toString(), newStatus.toString()}, null);
         }
-        entity.setStatus(newStatus);
-        userRepository.save(entity);
+        //Old Data
+        Map<String, Object> oldData = convertEntityToMap(this.getSEPSUserById(user.getId()));
+        user.setStatus(newStatus);
+        userRepository.save(user);
+        //Audit Log
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.seps.user.status.change",
+                new Object[]{currenUser.getEmail(), user.getId()}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(this.getSEPSUserById(user.getId()));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        Map<String, Object> req = new HashMap<>();
+        String requestBody = null;
+        auditLogService.logActivity(null, currenUser.getId(), requestInfo, "changeSEPSStatus", ActionTypeEnum.SEPS_USER_STATUS_CHANGE.name(), user.getId(), User.class.getSimpleName(),
+            null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), requestBody);
     }
 
     /**
@@ -355,10 +417,10 @@ public class UserService {
      * @return a paginated list of FI users matching the search and status criteria
      */
     @Transactional(readOnly = true)
-    public Page<FIUserDTO> listFIUsers(Pageable pageable, String search, UserStatusEnum status) {
+    public Page<FIUserDTO> listFIUsers(Pageable pageable, String search, UserStatusEnum status, Long roleId) {
         List<String> authorities = new ArrayList<>();
         authorities.add(AuthoritiesConstants.FI);
-        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities), pageable)
+        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities,roleId), pageable)
             .map(userMapper::userToFIUserDTO);
     }
 
@@ -376,7 +438,7 @@ public class UserService {
      * @throws CustomException if the user, FI authority, or role is not found
      */
     @Transactional
-    public void updateFIUser(Long id, @Valid FIUserDTO userDTO, RequestInfo requestInfo) {
+    public void editFIUser(Long id, @Valid FIUserDTO userDTO, RequestInfo requestInfo) {
         User currenUser = getCurrentUser();
         User user = userRepository.findOneWithAuthoritiesById(id).orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
             new String[]{id.toString()}, null));
@@ -412,7 +474,7 @@ public class UserService {
         entityData.put(Constants.OLD_DATA, oldData);
         entityData.put(Constants.NEW_DATA, newData);
         String requestBody = gson.toJson(userDTO);
-        auditLogService.logActivity(null, currenUser.getId(), requestInfo, "updateFIUser", ActionTypeEnum.FI_USER_EDIT.name(), user.getId(), User.class.getSimpleName(),
+        auditLogService.logActivity(null, currenUser.getId(), requestInfo, "editFIUser", ActionTypeEnum.FI_USER_EDIT.name(), user.getId(), User.class.getSimpleName(),
             null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
     }

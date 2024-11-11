@@ -17,6 +17,7 @@ public interface UserMapper {
     @Mapping(source = "authorities", target = "authorities")
     // Map firstName to name
     @Mapping(source = "firstName", target = "name")
+    @Mapping(target = "roleId", expression = "java(getFirstRoleId(user))")
     SEPSUserDTO userToSEPSUserDTO(User user);
 
     @Mapping(source = "authorities", target = "authorities")

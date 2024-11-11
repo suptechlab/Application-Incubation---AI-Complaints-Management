@@ -26,7 +26,10 @@ public enum ActionTypeEnum {
     ORGANIZATION_MASTER_ADD("Add Organization"),
     FI_USER_ADD("Add FI User"),
     FI_USER_EDIT("Edit FI User"),
-    FI_USER_STATUS_CHANGE("FI User Status Change");
+    FI_USER_STATUS_CHANGE("FI User Status Change"),
+    SEPS_USER_ADD("Add SEPS User"),
+    SEPS_USER_EDIT("Edit SEPS User"),
+    SEPS_USER_STATUS_CHANGE("SEPS User Status Change");
 
     private final String description;
 

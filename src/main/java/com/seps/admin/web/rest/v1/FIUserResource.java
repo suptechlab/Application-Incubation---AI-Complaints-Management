@@ -64,40 +64,40 @@ public class FIUserResource {
     }
 
     @Operation(
-            summary = "Create a new FI User",
-            description = """
-                        Creates a new FI user in the system. The email address is validated to ensure
-                        uniqueness before creating the user. If the email already exists, a 400 error is returned.
-                        Upon successful creation, an account creation email is sent to the new user.
-                    """
+        summary = "Create a new FI User",
+        description = """
+                Creates a new FI user in the system. The email address is validated to ensure
+                uniqueness before creating the user. If the email already exists, a 400 error is returned.
+                Upon successful creation, an account creation email is sent to the new user.
+            """
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "FI User created successfully",
-                    content = @Content(schema = @Schema(implementation = ResponseStatus.class))
-            )
+        @ApiResponse(
+            responseCode = "201",
+            description = "FI User created successfully",
+            content = @Content(schema = @Schema(implementation = ResponseStatus.class))
+        )
     })
     @PostMapping
     public ResponseEntity<ResponseStatus> addFIUser(@Valid @RequestBody FIUserDTO dto, HttpServletRequest request)
-            throws URISyntaxException {
+        throws URISyntaxException {
         LOG.info("Attempting to create a new FI user with email: {}", dto.getEmail());
         RequestInfo requestInfo = new RequestInfo(request);
         User newUser = userService.addFIUser(dto, requestInfo);
         mailService.sendFIUserCreationEmail(newUser);
         ResponseStatus responseStatus = new ResponseStatus(
-                messageSource.getMessage("fi.user.created.successfully", null, LocaleContextHolder.getLocale()),
-                HttpStatus.CREATED.value(),
-                System.currentTimeMillis()
+            messageSource.getMessage("fi.user.created.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.CREATED.value(),
+            System.currentTimeMillis()
         );
         return ResponseEntity.created(new URI("/api/v1/fi-users/" + newUser.getId()))
-                .body(responseStatus);
+            .body(responseStatus);
     }
 
     @Operation(summary = "Get a FI User by ID", description = "Retrieve a specific FI user by its ID.")
     @ApiResponse(responseCode = "200", description = "FI user details retrieved successfully",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = FIUserDTO.class)))
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = FIUserDTO.class)))
     @GetMapping("/{id}")
     public ResponseEntity<FIUserDTO> getFIUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getFIUserById(id));
@@ -105,34 +105,35 @@ public class FIUserResource {
 
     @Operation(summary = "List all FI User", description = "Retrieve a list of all FI user with optional search and status filters.")
     @ApiResponse(responseCode = "200", description = "FI Users retrieved successfully",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = FIUserDTO.class)))
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = FIUserDTO.class)))
     @GetMapping
     public ResponseEntity<List<FIUserDTO>> listFIUsers(Pageable pageable,
                                                        @RequestParam(value = "search", required = false) String search,
-                                                       @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status) {
-        Page<FIUserDTO> page = userService.listFIUsers(pageable, search, status);
+                                                       @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
+                                                       @Parameter(description = "Filter by role") @RequestParam(required = false) Long roleId) {
+        Page<FIUserDTO> page = userService.listFIUsers(pageable, search, status, roleId);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     @Operation(summary = "Update an existing SEPS User", description = "Update the details of an existing SEPS user.")
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "SEPS User updated successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseStatus.class))
-            )
+        @ApiResponse(
+            responseCode = "200",
+            description = "SEPS User updated successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseStatus.class))
+        )
     })
     @PutMapping("/{id}")
     public ResponseEntity<ResponseStatus> editFIUser(@PathVariable Long id, @Valid @RequestBody FIUserDTO dto,
                                                      HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
-        userService.updateFIUser(id, dto, requestInfo);
+        userService.editFIUser(id, dto, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
-                messageSource.getMessage("fi.user.updated.successfully", null, LocaleContextHolder.getLocale()),
-                HttpStatus.OK.value(),
-                System.currentTimeMillis()
+            messageSource.getMessage("fi.user.updated.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
     }

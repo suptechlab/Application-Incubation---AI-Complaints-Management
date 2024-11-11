@@ -22,9 +22,10 @@ public class UserSpecification {
      * @param search      the search term to filter by name
      * @param status      the status of the user (e.g., ACTIVE, INACTIVE)
      * @param authorities the list of authorities to filter users by
+     * @param roleId
      * @return the combined {@link Specification} with applied filters
      */
-    public static Specification<User> byFilter(String search, UserStatusEnum status, List<String> authorities) {
+    public static Specification<User> byFilter(String search, UserStatusEnum status, List<String> authorities, Long roleId) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // Filter by search term (e.g., name)
@@ -45,6 +46,10 @@ public class UserSpecification {
             if (authorities != null && !authorities.isEmpty()) {
                 Join<Object, Object> userAuth = root.join("authorities", JoinType.INNER);
                 predicates.add(userAuth.get("name").in(authorities));
+            }
+            if (roleId != null) {
+                Join<Object, Object> userRoles = root.join("roles", JoinType.INNER);
+                predicates.add(criteriaBuilder.equal(userRoles.get("id"), roleId));
             }
             // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
