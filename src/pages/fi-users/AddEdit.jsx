@@ -30,7 +30,7 @@ export default function FIUserAddEdit() {
 
   const [companyOptions, setCompanyOptions] = useState([]);
   const [rolesOptions, setRolesOptions] = useState([]);
-  const [rolesDropdownData , setRolesDropdownData] = useState([])
+  const [rolesDropdownData, setRolesDropdownData] = useState([])
 
 
   const [FIuserData, setFIUserData] = useState([]);
@@ -67,22 +67,34 @@ export default function FIUserAddEdit() {
   }, []);
 
   const [initialValue, setInitialValues] = useState({
-    identification: FIuserData?.identification ? FIuserData?.identification : "",
-    name: FIuserData?.name ? FIuserData?.name : "",
-    email: FIuserData?.email ? FIuserData?.email : "",
+    identification: "",
+    name: "",
+    email: "",
     countryCode: "+1",
-    phoneNumber: FIuserData?.mobileNo ? FIuserData?.phoneNumber : "",
-    ruc: FIuserData?.taxId ? FIuserData?.taxId : "",
-    entityName: FIuserData?.entityName ? FIuserData?.entityName : "",
-    entityType: FIuserData?.entityType ? FIuserData?.entityType : "",
-    roleId: FIuserData?.roleId ? FIuserData?.roleId : "",
+    phoneNumber: "",
+    ruc: "",
+    entityName: "",
+    entityType: "",
+    roleId: "",
   });
 
   useEffect(() => {
     if (isEdit) {
       setLoading(true);
       handleGetFIuserById(id).then((response) => {
-        setFIUserData(response.data.data);
+        // setFIUserData(response.data.data);
+
+        setInitialValues({
+          identification: response.data.data?.identification ? response.data.data?.identification : "",
+          name: response.data.data?.name ? response.data.data?.name : "",
+          email: response.data.data?.email ? response.data.data?.email : "",
+          countryCode: response.data.data?.countryCode ?? "+1",
+          phoneNumber: response.data.data?.mobileNo ? response.data.data?.phoneNumber : "",
+          ruc: response.data.data?.taxId ? response.data.data?.taxId : "",
+          entityName: response.data.data?.entityName ? response.data.data?.entityName : "",
+          entityType: response.data.data?.entityType ? response.data.data?.entityType : "",
+          roleId: response.data.data?.roleId ? response.data.data?.roleId : "",
+        })
         setEmailDisabled(response.data.data.email != "");
         setLoading(false);
       });
@@ -144,7 +156,7 @@ export default function FIUserAddEdit() {
   }
 
   //FETCH ROLES DROPDOWN DATA
-  const fetchRolesDropdownData = ()=>{
+  const fetchRolesDropdownData = () => {
     getRolesDropdownData('FI_USER').then((response) => {
       const mappedData = response?.data?.map(item => ({
         value: item.id,
@@ -161,9 +173,9 @@ export default function FIUserAddEdit() {
       })
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchRolesDropdownData()
-  },[])
+  }, [])
 
   // HANDLE SUBMIT
   const handleSubmit = async (values, actions) => {
@@ -250,9 +262,9 @@ export default function FIUserAddEdit() {
                 <FormikForm
                   className="d-flex flex-column h-100"
                 >
-                {
-                  console.log({errors})
-                }
+                  {
+                    console.log({ errors })
+                  }
                   <Row>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput

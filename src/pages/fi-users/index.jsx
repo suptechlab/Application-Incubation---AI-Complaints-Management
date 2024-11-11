@@ -103,13 +103,13 @@ export default function FIUserList() {
         header: () => t("EMAIL"),
       },
       {
-        accessorFn: (row) => row.mobileNo,
-        id: "mobileNo",
-        header: () =>t("ORGANIZATIONAL UNIT") ,
+        accessorFn: (row) => row.phoneNumber,
+        id: "phoneNumber",
+        header: () =>t("PHONE") ,
         cell: (info) => {
           return (
             <span>
-              {info.row.original.mobileCode} {info.row.original.mobileNo}
+              {info.row.original.countryCode} {info.row.original.phoneNumber}
             </span>
           );
         },
@@ -195,6 +195,7 @@ export default function FIUserList() {
               label: t("IMPORT FI USERS"),
               to: "/fi-users/import",
               variant: "outline-dark",
+              disabled : true
             },
             { label: t("ADD NEW"), to: "/fi-users/add", variant: "warning" },
           ]}
