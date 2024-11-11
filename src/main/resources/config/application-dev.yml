@@ -32,9 +32,9 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/SEPS
-    username: postgres
-    password: postgres
+    url: ENC(${seps.jdbc.postgres.url})
+    username: ENC(${seps.jdbc.postgres.user})
+    password: ENC(${seps.jdbc.postgres.password})
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -42,10 +42,10 @@ spring:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: xxxxxxxxxxxxxxxx
-    password: xxxxxxxxxxxxxxxx
+    host: ENC(${seps.mail.smtp.host})
+    port: ENC(${seps.mail.smtp.port})
+    username: ENC(${seps.mail.smtp.username})
+    password: ENC(${seps.mail.smtp.password})
     properties:
       mail:
         smtp:
@@ -71,7 +71,7 @@ jhipster:
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000'
+    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,https://user-suptechdev.seps.gob.ec,https://webportal-suptechdev.seps.gob.ec'
     # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
@@ -88,7 +88,7 @@ jhipster:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: http://127.0.0.1:8080
+    base-url: ENC(${seps.mail.base.url})
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
@@ -108,7 +108,6 @@ jhipster:
 # application:
 google:
   recaptcha:
-    secret: xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    verify-url: https://www.google.com/recaptcha/api/siteverify
-    project-id: xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    site-key: xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    secret: ENC(${seps.google.recaptcha.secret})
+    verify-url: ENC(${seps.google.recaptcha.verify.url})
+
