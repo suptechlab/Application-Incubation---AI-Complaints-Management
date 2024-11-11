@@ -1,6 +1,11 @@
 @import "../../src/assets/css/variables";
 
 .table-cover-main {
+    pre {
+        font-family: var(--bs-body-font-family);
+        font-size: $theme-size-14 ;
+    }
+
     .table {
         th {
             white-space: nowrap;

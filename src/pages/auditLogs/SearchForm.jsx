@@ -19,7 +19,7 @@ const SearchForm = ({ filter, setFilter }) => {
   }));
 
 
-  const [dateFilter , setDateFilter] = useState({startDate : '' , endDate : ''})
+  const [dateFilter, setDateFilter] = useState({ startDate: '', endDate: '' })
 
   // Temporary state to hold the selected dates
   const [tempDateRange, setTempDateRange] = useState([null, null]);
@@ -86,9 +86,18 @@ const SearchForm = ({ filter, setFilter }) => {
           </div>
           {/* DATE RANGE FILTER */}
 
-          <CustomDateRangePicker tempDateRange ={tempDateRange} handleChange={handleDateFilterChange} startDate={filter?.startDate ?? null} endDate={filter?.endDate}/>
-        
-        
+          <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+            <CustomDateRangePicker
+              wrapperClassName="mb-0"
+              tempDateRange={tempDateRange}
+              handleChange={handleDateFilterChange}
+              startDate={filter?.startDate ?? null}
+              endDate={filter?.endDate}
+              selectsRange={true}
+              placeholder="Select Date Range"
+              size="sm"
+            />
+          </div>
         </Stack>
       </Stack>
     </div>
