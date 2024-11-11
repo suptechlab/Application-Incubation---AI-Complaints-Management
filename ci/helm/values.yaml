@@ -143,7 +143,9 @@ deployment:
           SPRING_MAIL_PORT:
             envVarName: SPRING_MAIL_PORT
           SPRING_MAIL_USERNAME:
-            envVarName: SPRING_MAIL_USERNAME            
+            envVarName: SPRING_MAIL_USERNAME
+          GOOGLE_RECAPTCHA_VERIFY-URL:
+            envVarName: GOOGLE_RECAPTCHA_VERIFY-URL 
 
     # env:
   #   envVarName: env
@@ -163,7 +165,9 @@ deployment:
           SPRING_DATASOURCE_PASSWORD:
             envVarName: SPRING_DATASOURCE_PASSWORD
           SPRING_MAIL_PASSWORD:
-            envVarName: SPRING_MAIL_PASSWORD            
+            envVarName: SPRING_MAIL_PASSWORD
+          GOOGLE_RECAPTCHA_SECRET:
+            envVarName: GOOGLE_RECAPTCHA_SECRET            
 
       # Mount a file id_rsa to connect a ftp server
   #      volume: # Items set like file in volume
