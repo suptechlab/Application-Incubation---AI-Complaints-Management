@@ -19,10 +19,9 @@ public enum ActionTypeEnum {
     INQUIRY_SUB_TYPE_MASTER_ADD("Add Inquiry Sub Type Master"),
     INQUIRY_SUB_TYPE_MASTER_EDIT("Edit Inquiry Sub Type Master"),
     INQUIRY_SUB_TYPE_MASTER_STATUS_CHANGE("Inquiry Sub Type Status Change"),
-
-    PROPERTY_HIDE_EXACT_LOCATION_TOGGLE("Property Hide Exact Location"),
-    PROPERTY_FLOOR_PLAN_SAVED("Property Floor Plan saved"),
-    PROPERTY_FLOOR_PLAN_DELETED("Property Floor Plan deleted");
+    ROLE_ADD("Add New Role"),
+    ROLE_EDIT("Edit Existing Role"),
+    ROLE_STATUS_CHANGE("Role Status Change");
 
     private final String description;
 
