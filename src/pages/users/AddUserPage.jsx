@@ -49,16 +49,16 @@ export default function AddStatePage() {
   });
 
   useEffect(() => {
-
-    // handleGetRole().then((response) => {
-    //   let roleList = [{ value: "", label: "Select role" }];
-    //   if (response.data?.data?.length > 0) {
-    //     response.data?.data?.forEach((category) => {
-    //       roleList.push({ value: category?.id, label: category?.name });
-    //     });
-    //   }
-    //   setRolesOptions(roleList);
-    // });
+    const userType = 'SEPS_USER';
+    handleGetRole(userType).then((response) => {
+      let roleList = [{ value: "", label: "Select role" }];
+      if (response.data?.length > 0) {
+        response.data?.forEach((roles) => {
+          roleList.push({ value: roles?.id, label: roles?.name });
+        });
+      }
+      setRolesOptions(roleList);
+    });
   }, []);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function AddStatePage() {
         //   },
         // });
         
-        values.roleId = 1;
+        //values.roleId = 1;
         delete values.profileImage;
         delete values.profileImage;
         delete values.activated;
@@ -122,7 +122,7 @@ export default function AddStatePage() {
         })
       }
       else {
-        values.roleId = 1;
+        //values.roleId = 1;
         delete values.profileImage;
         delete values.profileImage;
         delete values.activated;
@@ -274,7 +274,7 @@ export default function AddStatePage() {
                       <ReactSelect
                         label={t('ROLE')}
                         error={errors.roleId}
-                        options={companyOptions}
+                        options={rolesOptions}
                         value={values.roleId}
                         onChange={(option) => {
                           setFieldValue(

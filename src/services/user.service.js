@@ -44,8 +44,8 @@ export const handleGetUserCompany = async (id) => {
     return await instance.get(`/api/${API_VERSION}/user-companies`);
 }
 
-export const handleGetRole = async (id) => {
-    return await instance.get(`/api/${API_VERSION}/roles/dropdown`);
+export const handleGetRole = async (userType) => {
+    return await instance.get(`/api/${API_VERSION}/roles/dropdown/${userType}`);
 }
 
 export const handleUserResetPassword = async (id)=>{

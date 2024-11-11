@@ -133,4 +133,5 @@ export const spanishLang = {
     "UNIDAD ORGANIZACIONAL": "Unidad Organizacional",
     "ROLE": "Role",
     "UPDATE": "Update",
+    "ROLE & RIGHTS": "Roles & Rights",
 }

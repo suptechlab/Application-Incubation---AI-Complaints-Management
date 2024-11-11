@@ -158,7 +158,6 @@ export default function UserList() {
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
-              // label="Status"
               name="status"
               value={info?.row?.original?.status == 'ACTIVE' ? true : false }
               checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
