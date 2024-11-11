@@ -1,6 +1,6 @@
 function translateText(spanishText, englishText) {
 
-  // const userLanguage = cookies.get('langKey') ?? 'en';
+  // const userLanguage = cookies.get('langKey') ?? 'es';
   // return userLanguage === 'ar' ? arabicText : englishText;
 
   return spanishText

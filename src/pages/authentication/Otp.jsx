@@ -128,10 +128,10 @@ export default function Otp() {
                                                 >
                                                     {isSubmitting ? (
                                                         <Spinner size="sm" animation="border" role="output" className="align-middle me-1">
-                                                            <span className="visually-hidden">Loading...</span>
+                                                            <span className="visually-hidden">{t('LOADING')}...</span>
                                                         </Spinner>
                                                     ) : (
-                                                        "Verify OTP"
+                                                        "Verificar OTP"
                                                     )}
                                                 </Button>
                                             </Stack>
