@@ -29,6 +29,9 @@ public enum SepsStatusCode implements StatusType {
     PERSON_NOT_FOUND(20028, "person.not.found"),
     ORGANIZATION_RUC_NOT_FOUND(20029, "organization.ruc.not.found"),
     ORGANIZATION_NOT_FOUND(20030, "organization.not.found");
+    ROLE_NOT_FOUND(20023, "role.not.found"),
+    ROLE_NAME_ALREADY_EXIST(20024, "role.name.already.exist"),
+    INVALID_PERMISSION_FOR_USER_TYPE(20025, "invalid.permission.for.user.type");
 
     private final int code;
 
