@@ -22,8 +22,8 @@ const InquirySubType = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const [isLoading, setLoading] = useState(false)
-  const [isDownloading , setDownloading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isDownloading , setIsDownloading] = useState(false)
   const queryClient = useQueryClient();
   const { t } = useTranslation()
 
@@ -84,35 +84,45 @@ const InquirySubType = () => {
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-      if (sorting.length === 0) {
-        return handleGetInquirySubTypes({
+    queryFn: async () => {
+      setIsLoading(true); // Start loading
+
+      try {
+        // Clean up the filter object to remove empty strings and null values
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach((key) => {
+          if (filterObj[key] === "") delete filterObj[key];
+        });
+
+        const requestOptions = {
           page: pagination.pageIndex,
           size: pagination.pageSize,
           ...filterObj,
-        });
-      } else {
-        return handleGetInquirySubTypes({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map(
-              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-            )
-            .join(","),
-          ...filterObj,
-        });
+        };
+
+        // Handle sorting if applicable
+        if (sorting.length > 0) {
+          requestOptions.sort = sorting
+            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+            .join(",");
+        }
+
+        // Fetch data using handleGetInquirySubTypes API call
+        const response = await handleGetInquirySubTypes(requestOptions);
+        return response;
+      } finally {
+        setIsLoading(false); // Ensure loading state is reset
       }
     },
-    staleTime: 0, // Data is always stale, so it refetches
+    onError: () => setIsLoading(false), // Reset loading state on error
+    staleTime: 0, // Data is always considered stale
     cacheTime: 0, // Cache expires immediately
+    retry: 0,
   });
 
   // CHANGE STATUS
   const changeStatus = async (id, currentStatus) => {
-    setLoading(true)
+    setIsLoading(true)
     changeInquirySubTypeStatus(id, !currentStatus).then(response => {
       toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
@@ -123,7 +133,7 @@ const InquirySubType = () => {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
     }).finally(() => {
-      setLoading(false)
+      setIsLoading(false)
     })
   };
   useEffect(() => {
@@ -138,7 +148,7 @@ const InquirySubType = () => {
 
   // HANDLE INQUIRY SUB TYPES CSV DOWNLOAD
   const handleDownload = () => {
-    setDownloading(true)
+    setIsDownloading(true)
     toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadInquirySubTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
@@ -174,7 +184,7 @@ const InquirySubType = () => {
     }).finally(() => {
       // Ensure the loading toast is dismissed
       // toast.dismiss("downloading");
-      setDownloading(false)
+      setIsDownloading(false)
     });
   }
 

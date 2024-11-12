@@ -24,8 +24,8 @@ const ClaimType = () => {
 
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
-  const [isLoading , setLoading] = useState(false)
-  const [isDownloading , setDownloading] = useState(false)
+  const [isLoading, setLoading] = useState(false)
+  const [isDownloading, setDownloading] = useState(false)
 
   const { t } = useTranslation()
 
@@ -37,17 +37,17 @@ const ClaimType = () => {
   const [editModal, setEditModal] = useState({ row: {}, open: false })
   const [sorting, setSorting] = useState([
     {
-        "id": "name",
-        "desc": true
+      "id": "name",
+      "desc": true
     }
-]);
+  ]);
   const [filter, setFilter] = useState({
     search: "",
   });
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({ row : {}, open: !editModal?.open });
+  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
@@ -85,31 +85,48 @@ const ClaimType = () => {
   // DATA QUERY
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+    queryFn: async () => {
+      // Set loading state to true before the request starts
+      setLoading(true);
 
-      if (sorting.length === 0) {
-        return handleGetClaimTypes({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetClaimTypes({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map(
-              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-            )
-            .join(","),
-          ...filterObj,
-        });
+      try {
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+        // Make the API request based on sorting
+        let response;
+        if (sorting.length === 0) {
+          response = await handleGetClaimTypes({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            ...filterObj,
+          });
+        } else {
+          response = await handleGetClaimTypes({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            sort: sorting
+              .map(
+                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+              )
+              .join(","),
+            ...filterObj,
+          });
+        }
+
+        // Return the API response data
+        return response;
+      } catch (error) {
+        console.error("Error fetching data", error);
+        // Optionally, handle errors here
+      } finally {
+        // Set loading state to false when the request finishes (whether successful or not)
+        setLoading(false);
       }
     },
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
+    retry: 0,
   });
 
   // STATUS UPDATE FUNCTION
@@ -125,7 +142,7 @@ const ClaimType = () => {
       } else {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
-    }).finally(()=>{
+    }).finally(() => {
       setLoading(false)
     })
   };
@@ -133,13 +150,13 @@ const ClaimType = () => {
   // DOWNLOAD CLAIM TYPES LIST
   const handleDownload = () => {
     setDownloading(true)
-    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
+    toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading })
     downloadClaimTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const blobUrl = window.URL.createObjectURL(blob);
 
-        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
 
 
         const tempLink = document.createElement('a');
@@ -213,7 +230,7 @@ const ClaimType = () => {
         },
         id: "status",
         header: () => t("STATUS"),
-        size : '80'
+        size: '80'
       },
       {
         id: "actions",
@@ -236,7 +253,7 @@ const ClaimType = () => {
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
-        size : '80',
+        size: '80',
       },
     ],
     []
@@ -258,11 +275,11 @@ const ClaimType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-  <Loader isLoading={isLoading}/>
+    <Loader isLoading={isLoading} />
     <PageHeader
       title={t("CLAIM TYPE")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" , disabled : isDownloading },
+        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
     />

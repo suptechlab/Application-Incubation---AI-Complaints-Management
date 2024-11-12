@@ -1,19 +1,27 @@
 import * as Yup from "yup";
+import { getValidationMessages } from "../services/Validation.service";
+
+const msg = getValidationMessages();
+
+// Define the regex pattern for Spanish characters
+const SPANISH_CHARACTERS_REGEX = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]*$/;
 
 const validationSchema = Yup.object({
-    name: Yup.string()
-        .max(250, "Claim subtype name cannot exceed 250 characters.")
-        .required("Claim subtype name is required."),
-    claimTypeId: Yup.string().required("Claim type is required."),
-    slaBreachDays: Yup.number()
-        .typeError("SLA Breach Day must be a number.")
-        .required("SLA Breach Day is required.")
-        .min(0, "SLA Breach Day cannot be a negative number."),
-    description: Yup.string()
-        .max(512, "Description cannot exceed 512 characters.")
-        .required("Description is required.")
+  name: Yup.string().trim()
+    .matches(SPANISH_CHARACTERS_REGEX, msg.nameInvalid)  // Apply regex for valid Spanish characters
+    .max(250, msg.nameMax)  // Max length validation
+    .required(msg.nameRequired),  // Required field validation
+
+  claimTypeId: Yup.string().required(msg.claimTypeIdRequired),
+
+  slaBreachDays: Yup.number()
+    .typeError(msg.slaBreachDaysInvalid)
+    .required(msg.slaBreachDaysRequired)
+    .min(0, msg.slaBreachDaysNegative),
+
+  description: Yup.string()
+    .nullable()
+    .max(512, msg.descriptionMax),  // Max length validation for description
 });
-
-
 
 export { validationSchema };

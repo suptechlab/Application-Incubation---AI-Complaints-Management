@@ -4,23 +4,19 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import {
-  handleDeleteUser,
-  handleGetUsers,
-  handleStatusChangeState,
-} from "../../services/user.service";
 
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
-import GenericModal from "../../components/GenericModal";
 import ListingSearchForm from "../../components/ListingSearchForm";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
+import { handleFIUsersStatusChange, handleGetFIusersList } from "../../services/fiusers.services";
+import SearchForm from "./SearchForm";
 
 export default function FIUserList() {
   const navigate = useNavigate();
@@ -36,41 +32,58 @@ export default function FIUserList() {
 
   const [filter, setFilter] = React.useState({
     search: "",
-    subscription: "",
-    status: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [selectedRow, setSelectedRow] = useState();
-  const [deleteShow, setDeleteShow] = useState(false);
-  const [deleteId, setDeleteId] = useState();
 
-  const dataQuery = useQuery({
-    queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
+    // DATA QUERY
+    const dataQuery = useQuery({
+      queryKey: ["data", pagination, sorting, filter],
+      queryFn: async () => {
+        // Set loading state to true before the request starts
+        setLoading(true);
+  
+        try {
+          const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+          Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+  
+          // Make the API request based on sorting
+          let response;
+          if (sorting.length === 0) {
+            response = await handleGetFIusersList({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              ...filterObj,
+            });
+          } else {
+            response = await handleGetFIusersList({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              sort: sorting
+                .map(
+                  (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                )
+                .join(","),
+              ...filterObj,
+            });
+          }
+  
+          // Return the API response data
+          return response;
+        } catch (error) {
+          console.error("Error fetching data", error);
+          // Optionally, handle errors here
+        } finally {
+          // Set loading state to false when the request finishes (whether successful or not)
+          setLoading(false);
+        }
+      },
+      staleTime: 0, // Data is always stale, so it refetches
+      cacheTime: 0, // Cache expires immediately
+      retry: 0,
+    });
 
-      if (sorting.length === 0) {
-        return handleGetUsers({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetUsers({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
-      }
-    },
-  });
+
 
   //handle last page deletion item
   useEffect(() => {
@@ -83,94 +96,97 @@ export default function FIUserList() {
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
-    try {
-      await handleStatusChangeState(id, !currentStatus);
-      toast.success("State status updated successfully");
+    setLoading(true)
+    // await handleEditDistricts(id, { status: !currentStatus });
+
+    let toggleStatus = currentStatus === "ACTIVE" ? "BLOCKED" :"ACTIVE"
+
+    handleFIUsersStatusChange(id, toggleStatus).then(response => {
+      toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
-    } catch (error) {
-      toast.error("Error updating state status");
-    }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    }).finally(()=>{
+      setLoading(false)
+    })
   };
 
-  //Handle Delete
-  const deleteAction = (rowData) => {
-    setSelectedRow(rowData);
-    setDeleteId(rowData.id);
-    setDeleteShow(true);
-  };
-
-  const recordDelete = async (deleteId) => {
-    setLoading(true);
-    try {
-      await handleDeleteUser(deleteId);
-      toast.success("Your data has been deleted successfully");
-      dataQuery.refetch();
-      setDeleteShow(false);
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const columns = React.useMemo(
     () => [
       {
         accessorFn: (row) => row.name,
         id: "name",
-        header: () => "Name",
+        header: () => t("NAME"),
       },
       {
         accessorFn: (row) => row.email,
         id: "email",
-        header: () => "Email",
+        header: () => t("EMAIL"),
       },
       {
-        accessorFn: (row) => row.mobileNo,
-        id: "mobileNo",
-        header: () => "Unidad Organizacional",
+        accessorFn: (row) => row.phoneNumber,
+        id: "phoneNumber",
+        header: () =>t("PHONE") ,
         cell: (info) => {
           return (
             <span>
-              {info.row.original.mobileCode} {info.row.original.mobileNo}
+              {info.row.original.countryCode} {info.row.original.phoneNumber}
             </span>
           );
         },
       },
       {
-        accessorFn: (row) => row.entityName ?? "N/A",
+        accessorFn: (row) => row?.entityName,
         id: "entityName",
-        header: () => "Entity Name",
+        header: () => t("ENTITY NAME"),
         enableSorting: false,
+        cell: (info) => {
+          return (
+            <span>
+              {info.row.original.organization?.razonSocial ?? "N/A"}
+            </span>
+          );
+        },
       },
       {
         accessorFn: (row) => row.createdAt,
         id: "createdAt",
-        header: () => "Creation Date",
+        header: () => t("CREATION DATE"),
         cell: (info) => {
           return <span>{moment(info.row.original.createdAt).format("l")}</span>;
         },
       },
       {
         cell: (info) => {
-          return (
-            <Toggle
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.activated}
-              checked={info?.row?.original?.activated}
-              onChange={() =>
-                changeStatus(
-                  info?.row?.original?.id,
-                  info?.row?.original?.activated
-                )
-              }
-              tooltip="Active"
-            />
-          );
+          if(info?.row?.original?.status === "ACTIVE" || info?.row?.original?.status === "BLOCKED" ){
+            return (
+              <Toggle
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                name="status"
+                value={info?.row?.original?.status ===  "ACTIVE"}
+                checked={info?.row?.original?.status === "ACTIVE"}
+                onChange={() =>
+                  changeStatus(
+                    info?.row?.original?.id,
+                    info?.row?.original?.status
+                  )
+                }
+                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+              />
+            );
+          }else{
+            return <span>{info?.row?.original?.status} </span>
+          }
+        
         },
         id: "status",
-        header: () => "Status",
+        header: () => t("STATUS"),
         size: "80",
       },
       {
@@ -185,21 +201,13 @@ export default function FIUserList() {
                 name: "edit",
                 enabled: true,
                 type: "link",
-                title: "Edit",
+                title: t("EDIT"),
                 icon: <MdEdit size={18} />,
-              },
-              {
-                name: "delete",
-                enabled: true,
-                type: "button",
-                title: "Delete",
-                icon: <MdDelete size={18} />,
-                handler: () => deleteAction(rowData.row.original),
               },
             ]}
           />
         ),
-        header: () => <div className="text-center">Actions</div>,
+        header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
         size: "80",
       },
@@ -219,19 +227,20 @@ export default function FIUserList() {
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
-          title="FI Users"
+          title={t("FI USERS")}
           actions={[
             {
-              label: "Import FI Users",
+              label: t("IMPORT FI USERS"),
               to: "/fi-users/import",
               variant: "outline-dark",
+              disabled : true
             },
-            { label: "Add New", to: "/fi-users/add", variant: "warning" },
+            { label: t("ADD NEW"), to: "/fi-users/add", variant: "warning" },
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
-            <ListingSearchForm filter={filter} setFilter={setFilter} />
+            <SearchForm filter={filter} setFilter={setFilter} />
             <CommonDataTable
               columns={columns}
               dataQuery={dataQuery}
@@ -245,15 +254,7 @@ export default function FIUserList() {
       </div>
 
       {/* Delete Modal */}
-      <GenericModal
-        show={deleteShow}
-        handleClose={() => setDeleteShow(false)}
-        modalHeaderTitle={`Delete SEPS User`}
-        modalBodyContent={`Are you sure, you want to delete the SEPS user - ${selectedRow?.name}?`}
-        handleAction={() => recordDelete(deleteId)}
-        buttonName="Delete"
-        ActionButtonVariant="danger"
-      />
+    
     </React.Fragment>
   );
 }

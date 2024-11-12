@@ -1,9 +1,24 @@
 import * as Yup from "yup";
+import { getValidationMessages } from "../services/Validation.service";
+
+
+const msg = getValidationMessages();
+
+// Define the regex pattern for Spanish characters
+const SPANISH_CHARACTERS_REGEX = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]*$/;
 
 const validationSchema = Yup.object({
-    name: Yup.string().max(250, "Claim type name cannot exceed 250 characters").required("Name of claim type is required."),
-    description: Yup.string().max(512, "Description cannot exceed 512 characters").required("Description is required.")
+  name: Yup.string()
+  .trim() // Remove leading and trailing spaces
+    .matches(
+      SPANISH_CHARACTERS_REGEX,
+     msg.nameInvalid
+    )
+    .max(250, msg.nameMax)
+    .required(msg.nameRequired),
+  description: Yup.string()
+    .nullable()
+    .max(512, msg.descriptionMax),
 });
-
 
 export { validationSchema };

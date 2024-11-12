@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 
-const PageHeader = ({ title, actions }) => {
+const PageHeader = ({ title = "", actions=[] }) => {
     const { t } = useTranslation();
 
     return (
