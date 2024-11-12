@@ -119,29 +119,29 @@ export default function RoleRightsList() {
         header: () => t('DESCRIPTION'),
         enableSorting: false,
       },
-      {
-        cell: (info) => {
-          return (
-            <Toggle
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.status == 'ACTIVE' ? true : false }
-              checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
-              onChange={() =>
-                changeStatus(
-                  info?.row?.original?.id,
-                  info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
-                )
-              }
-              tooltip="Active"
-            />
-          );
-        },
-        id: "status",
-        header: () => t('STATUS'),
-        size: "90",
-      },
+      // {
+      //   cell: (info) => {
+      //     return (
+      //       <Toggle
+      //         id={`status-${info?.row?.original?.id}`}
+      //         key={"status"}
+      //         name="status"
+      //         value={info?.row?.original?.status == 'ACTIVE' ? true : false }
+      //         checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
+      //         onChange={() =>
+      //           changeStatus(
+      //             info?.row?.original?.id,
+      //             info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
+      //           )
+      //         }
+      //         tooltip="Active"
+      //       />
+      //     );
+      //   },
+      //   id: "status",
+      //   header: () => t('STATUS'),
+      //   size: "90",
+      // },
       {
         id: "actions",
         isAction: true,

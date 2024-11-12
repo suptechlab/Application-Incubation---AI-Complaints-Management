@@ -227,6 +227,7 @@ export default function AddStatePage() {
                         touched={touched.unidadOrganizacional}
                         type="text"
                         value={values.unidadOrganizacional || ""}
+                        disabled={true}
                       />
                     </Col>
                     {/* <Col sm={6} md={6} lg={4}>
