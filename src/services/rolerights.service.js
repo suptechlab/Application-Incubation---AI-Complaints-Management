@@ -32,3 +32,8 @@ export const handleEditRoleRight = async (id, data) => {
 export const fetchModulesAndPermissions = async (userType) => {
     return await adminApi.get(`/${API_VERSION}/roles/modules-permissions/${userType}`);
 }
+
+// GET ROLES DROPDOWN DATA WITH USER TYPE
+export const getRolesDropdownData = async (userType) =>{
+    return await instance.get(`/${API_VERSION}/roles/dropdown/${userType}`);
+}

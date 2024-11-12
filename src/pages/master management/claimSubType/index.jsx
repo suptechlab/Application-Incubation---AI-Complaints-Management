@@ -23,8 +23,8 @@ const ClaimSubType = () => {
   const { t } = useTranslation()
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
-  const [isLoading, setLoading] = useState(false)
-  const [isDownloading , setDownloading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
@@ -85,33 +85,38 @@ const ClaimSubType = () => {
   // FETCH DATA
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
+    queryFn: async () => {
+      setIsLoading(true); // Start loading
+
+      // Clean up the filter object to remove empty strings and null values
       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+      Object.keys(filterObj).forEach((key) => {
+        if (filterObj[key] === "") delete filterObj[key];
+      });
 
-      if (sorting.length === 0) {
-        return handleGetClaimSubType({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetClaimSubType({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map(
-              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-            )
-            .join(","),
-          ...filterObj,
-        });
+      const requestOptions = {
+        page: pagination.pageIndex,
+        size: pagination.pageSize,
+        ...filterObj,
+      };
+
+      // Handle sorting if applicable
+      if (sorting.length > 0) {
+        requestOptions.sort = sorting
+          .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+          .join(",");
       }
-    },
-    staleTime: 0, // Data is always stale, so it refetches
-    cacheTime: 0, // Cache expires immediately
-  });
 
+      // Fetch data using handleGetClaimSubType API call
+      const response = await handleGetClaimSubType(requestOptions);
+      setIsLoading(false); // End loading
+      return response;
+    },
+    onError: () => setIsLoading(false), // Ensure loading state is reset on error
+    staleTime: 0, // Data is always considered stale
+    cacheTime: 0, // Cache expires immediately
+    retry: 0,
+  });
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
   useEffect(() => {
@@ -121,7 +126,7 @@ const ClaimSubType = () => {
   }, [queryClient]);
   // STATUS UPDATE FUNCTION
   const changeStatus = async (id, currentStatus) => {
-    setLoading(true)
+    setIsLoading(true)
     // await handleEditDistricts(id, { status: !currentStatus });
     changeClaimSubTypeStatus(id, !currentStatus).then(response => {
       toast.success(t("STATUS UPDATED"));
@@ -133,13 +138,13 @@ const ClaimSubType = () => {
         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
       }
     }).finally(()=>{
-      setLoading(false)
+      setIsLoading(false)
     })
   };
 
   // DOWNLOAD CLAIM TYPES LIST
   const handleDownload = () => {
-    setDownloading(true)
+    setIsDownloading(true)
     toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
     downloadClaimSubTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
@@ -176,7 +181,7 @@ const ClaimSubType = () => {
     }).finally(() => {
       // Ensure the loading toast is dismissed
       // toast.dismiss("downloading");
-      setDownloading(false)
+      setIsDownloading(false)
     });
   }
 
