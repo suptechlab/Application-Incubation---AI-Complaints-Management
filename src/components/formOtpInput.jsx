@@ -7,7 +7,7 @@ export default function FormOtpInputBox({ label, touched, error, wrapperClassNam
             {label ? <label className='mb-1 fs-14' htmlFor={rest.id}>{label}</label> : ""}
             <OTPInput
                 renderInput={(props) => (
-                    <input {...props} className={`form-control ${touched && error ? "is-invalid" : ""}`} />
+                    <input {...props} className={`form-otp-mobile-width form-control p-1 ${touched && error ? "is-invalid" : ""}`} />
                 )}
                 containerStyle={{
                     justifyContent: "space-between"

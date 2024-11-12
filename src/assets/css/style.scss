@@ -2,16 +2,25 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom classes
+@include custom-class('margin-top', 1);
+@include custom-class('padding-right', 42);
+@include custom-class('font-size', 10);
 @include custom-class('font-size', 12);
 @include custom-class('font-size', 18);
 @include custom-class('font-size', 26);
+@include custom-class('width', 32);
+@include custom-class('height', 32);
+@include custom-class('width', 42);
+@include custom-class('height', 42);
 @include custom-class('width', 48);
 @include custom-class('height', 48);
+@include custom-class('min-width', 60);
 @include custom-class('width', 64);
 @include custom-class('height', 64);
 @include custom-class('min-height', 70);
 @include custom-class('width', 80);
 @include custom-class('height', 80);
+@include custom-class('min-width', 90);
 @include custom-class('min-width', 100);
 @include custom-class('width', 400);
 
@@ -55,9 +64,20 @@
     @include btn-outline-styles($danger);
 }
 
+
+//Custom Button Colors Changes
 .btn-warning,
 .btn-secondary {
     --bs-btn-color: #{$body-color};
+}
+
+.btn-warning {
+    &:disabled {
+        --bs-btn-disabled-color: #{$body-color};
+        --bs-btn-disabled-opacity: 1;
+        border-color: transparent;
+        background-color: rgba($warning, .50);
+    }
 }
 
 .form-check {
@@ -267,4 +287,10 @@ input:-webkit-autofill:active {
 
 .border-dashed {
     --bs-border-style: dashed;
+}
+
+.form-otp-mobile-width {
+    @include below-sm() {
+        width: 40px !important;
+    }
 }

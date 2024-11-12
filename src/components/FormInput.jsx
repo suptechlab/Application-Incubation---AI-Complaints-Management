@@ -5,9 +5,9 @@ import AppTooltip from './tooltip'
 import { Button } from 'react-bootstrap'
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
-export default function FormInputBox({ label, touched, error, isTextarea, wrapperClassName = 'mb-3 pb-1', ...rest }) {
+export default function FormInputBox({ label, touched, error, isTextarea, wrapperClassName = 'mb-3 pb-1', inputClassName, inputIcon, ...rest }) {
     const [showPassword, setShowPassword] = React.useState(false)
-    
+
     return (
         <div className={wrapperClassName || ''}>
             {label ? <label className='mb-1 fs-14' htmlFor={rest.id}>{label}</label> : ""}
@@ -20,7 +20,7 @@ export default function FormInputBox({ label, touched, error, isTextarea, wrappe
             ) : (
                 <div className='position-relative'>
                     <Input
-                        className={`${touched && error ? "is-invalid" : ""}`}
+                        className={`${touched && error ? "is-invalid" : ""} ${inputClassName || ''}`}
                         {...rest}
                         type={rest.type === 'password' && showPassword ? 'text' : rest.type}
                     />
@@ -38,6 +38,7 @@ export default function FormInputBox({ label, touched, error, isTextarea, wrappe
                             </Button>
                         </AppTooltip>
                     )}
+                    {inputIcon}
                 </div>
             )}
 

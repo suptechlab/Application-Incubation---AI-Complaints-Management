@@ -46,9 +46,9 @@ const OtpFormSection = ({ handleFormSubmit }) => {
                     <FormOtpInputBox
                         wrapperClassName="mb-3"
                         value={formikProps.values.otpCode}
-                        numInputs={4}
+                        numInputs={6}
                         inputStyle={{
-                            width: "74px",
+                            width: "50px",
                             height: "42px",
                         }}
                         onChange={(event) => { formikProps.setFieldValue("otpCode", event) }}

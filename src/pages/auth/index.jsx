@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import LoginModal from "./login";
 import PrivacyModal from './privacy';
+import AccountSetupModal from "./account-setup";
 
 /**
  * File a Claim Main Modal
@@ -41,11 +42,16 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
     }, 500);
   }
 
+  // Handle Finish Buton
+  const handleFinishButonClick = () => {
+    // Close the modal
+    handleCloseReset();
+  }
 
   // Show Component
   let modalChildren;
   if (isSignupClicked) {
-    modalChildren = 'Soon';
+    modalChildren = <AccountSetupModal handleClose={handleClose} handleFormSubmit={handleFinishButonClick} />;
   } else if (isPrivacyFormSubmitted) {
     modalChildren = <LoginModal handleSignUpClick={handleSignupButtonClick} />;
   } else {
@@ -61,7 +67,7 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
       centered={true}
       scrollable={true}
       size="lg"
-      className="theme-modal"
+      className="theme-modal scrollable-disabled-below-600"
       enforceFocus={false}
     >
       {modalChildren}

@@ -13,5 +13,28 @@ export const OtpFormSchema = yup.object({
     .string()
     .required()
     .label("OTP")
-    .matches(/^\d{4}$/, "OTP max 4 digits and only numbers"),
+    .matches(/^\d{6}$/, "OTP max 6 digits and only numbers"),
+});
+
+export const IdVerificationFormSchema = yup.object({
+  nationalID: yup
+    .string()
+    .required()
+    .label("National ID number"),
+  fingerprintCode: yup
+    .string()
+    .required()
+    .label("Fingerprint code"),
+});
+
+export const PersonalInfoTabSchema = yup.object({
+  phoneNumber: yup
+    .string()
+    .required()
+    .label("Phone number"),
+  email: yup
+    .string()
+    .email()
+    .required()
+    .label("Email address"),
 });
