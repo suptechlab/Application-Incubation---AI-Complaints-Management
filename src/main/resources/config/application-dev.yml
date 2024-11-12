@@ -40,22 +40,32 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/seps
-    username: postgres
-    password: postgres
+    url: ENC(${seps.jdbc.postgres.url})
+    username: ENC(${seps.jdbc.postgres.user})
+    password: ENC(${seps.jdbc.postgres.password})
     hikari:
       poolName: Hikari
       auto-commit: false
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
+  mail:
+    host: ENC(${seps.mail.smtp.host})
+    port: ENC(${seps.mail.smtp.port})
+    username: ENC(${seps.mail.smtp.username})
+    password: ENC(${seps.mail.smtp.password})
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
 
 server:
-  port: 8082
+  port: 8080
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
 
@@ -69,7 +79,7 @@ jhipster:
   # CORS is disabled by default on microservices, as you should access them through a gateway.
   # If you want to enable it, please uncomment the configuration below.
   cors:
-    allowed-origins: "http://localhost:3001,http://localhost:3001/,https://localhost:3001"
+    allowed-origins: "http://localhost:3001,http://localhost:3001/,https://localhost:3001,https://user-suptechdev.seps.gob.ec,https://webportal-suptechdev.seps.gob.ec"
     # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: "*"
@@ -85,6 +95,8 @@ jhipster:
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
+  mail: # specific JHipster mail property, for standard properties see MailProperties
+    base-url: https://user-suptechdev.seps.gob.ec
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
@@ -102,3 +114,7 @@ jhipster:
 # ===================================================================
 
 # application:
+google:
+  recaptcha:
+    secret: ENC(${seps.google.recaptcha.secret})
+    verify-url: ENC(${seps.google.recaptcha.verify.url})

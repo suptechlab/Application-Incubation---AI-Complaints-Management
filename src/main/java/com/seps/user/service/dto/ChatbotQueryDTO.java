@@ -5,9 +5,8 @@ import lombok.Data;
 @Data
 public class ChatbotQueryDTO {
 
-    private String query;
-    private Long userId;
-    private String sessionId;
+    private String message;
+    private String sender;
 
     // Getters and Setters
 }

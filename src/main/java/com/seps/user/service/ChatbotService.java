@@ -4,6 +4,8 @@ import com.seps.user.domain.ChatbotSession;
 import com.seps.user.repository.ChatbotSessionRepository;
 import com.seps.user.service.dto.ChatbotQueryDTO;
 import com.seps.user.service.dto.RasaResponseDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,18 +22,21 @@ import java.util.UUID;
 @Transactional
 public class ChatbotService {
 
+    private final Logger log = LoggerFactory.getLogger(ChatbotService.class);
+
     private final ChatbotSessionRepository chatbotSessionRepository;
     private final WebClient webClient;
-
+    private final UserService userService;
     /**
      * Constructor for ChatbotService.
      *
      * @param chatbotSessionRepository the repository for managing chatbot sessions.
      */
-    public ChatbotService(ChatbotSessionRepository chatbotSessionRepository) {
+    public ChatbotService(ChatbotSessionRepository chatbotSessionRepository, UserService userService) {
         this.chatbotSessionRepository = chatbotSessionRepository;
+        this.userService = userService;
         this.webClient = WebClient.builder()
-            .baseUrl("http://localhost:5005")
+            .baseUrl("https://select-caiman-intimate.ngrok-free.app")
             .build();
     }
 
@@ -43,14 +48,16 @@ public class ChatbotService {
      * @return a Flux of RasaResponseDTO containing the responses from the Rasa server.
      */
     public Flux<RasaResponseDTO> handleQuery(ChatbotQueryDTO queryDTO) {
-        String sessionId = queryDTO.getSessionId();
+        String sessionId = queryDTO.getSender();
         if (sessionId == null || sessionId.isBlank()) {
-            sessionId = createNewSession(queryDTO.getUserId());
+            Long userId = userService.getCurrentUserId();
+            sessionId = createNewSession(userId);
+            queryDTO.setSender(sessionId);
         } else {
             updateLastAccessedDate(sessionId);
         }
 
-        return sendQueryToRasa(queryDTO.getQuery(), sessionId);
+        return sendQueryToRasa(queryDTO);
     }
 
     /**
@@ -83,19 +90,23 @@ public class ChatbotService {
 
     /**
      * Sends the user's query to the Rasa server and retrieves the response.
-     *
-     * @param query     the query message from the user.
-     * @param sessionId the session ID used to maintain the context of the conversation.
+     * queryDTO
      * @return a Flux of RasaResponseDTO containing the responses from the Rasa server.
      */
-    private Flux<RasaResponseDTO> sendQueryToRasa(String query, String sessionId) {
-        String payload = String.format("{\"sender\": \"%s\", \"message\": \"%s\"}", sessionId, query);
-
+    private Flux<RasaResponseDTO> sendQueryToRasa(ChatbotQueryDTO queryDTO) {
         return webClient.post()
             .uri("/webhooks/rest/webhook")
-            .header("Content-Type", "application/json")
-            .bodyValue(payload)
+            .bodyValue(queryDTO)
             .retrieve()
-            .bodyToFlux(RasaResponseDTO.class);
+            .bodyToFlux(RasaResponseDTO.class)
+            .map(response -> {
+                log.debug("Rasa response: {}", response);
+                // Check if recipientId is null and set it to queryDTO's sender
+                if (response.getRecipientId() == null || response.getRecipientId().isBlank()) {
+                    response.setRecipientId(queryDTO.getSender());
+                }
+                return response;
+            });
     }
+
 }
