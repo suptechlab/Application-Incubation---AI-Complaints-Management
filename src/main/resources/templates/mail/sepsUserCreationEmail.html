@@ -9,7 +9,7 @@
     <p th:text="#{email.seps.user.creation.greeting(${user.firstName})}">Dear</p>
     <p th:text="#{email.seps.user.creation.text1}">Your SEPS User account has been created, please click on the URL below to access it:</p>
     <p>
-      <a th:with="url=(@{|${baseUrl}/account/reset/finish?key=${user.resetKey}|})" th:href="${url}" th:text="${url}">Login Link</a>
+      <a th:with="url=(@{|${baseUrl}/reset-password?key=${user.resetKey}|})" th:href="${url}" th:text="${url}">Login Link</a>
     </p>
     <p>
       <span th:text="#{email.seps.user.creation.text2}">Regards, </span>

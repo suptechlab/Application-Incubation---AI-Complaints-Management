@@ -57,7 +57,7 @@ spring:
     cache: false
 
 server:
-  port: 8081
+  port: 8080
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
 
@@ -71,7 +71,7 @@ jhipster:
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:3001,http://localhost:3001/'
+    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:3001,http://localhost:3001/,https://webportal-suptechdev.seps.gob.ec,https://webportal-suptechdev.seps.gob.ec/'
     # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
@@ -88,7 +88,7 @@ jhipster:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    base-url: ENC(${seps.mail.base.url})
+    base-url: https://webportal-suptechdev.seps.gob.ec
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
