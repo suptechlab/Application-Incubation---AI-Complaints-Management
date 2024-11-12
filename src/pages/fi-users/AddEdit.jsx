@@ -11,13 +11,8 @@ import ReactSelect from "../../components/ReactSelect";
 import UserLoader from "../../components/UserLoader";
 import { countryCodes } from "../../constants/CountryCodes";
 import { getOrganizationInfo, getPersonalInfo, handleAddFIUsers, handleEditFIUsers, handleGetFIuserById } from "../../services/fiusers.services";
-import {
-  handleAddUser,
-  handleGetUserById,
-  handleUpdateUser
-} from "../../services/user.service";
-import { validationSchema } from "../../validations/fiUsers.validation";
 import { getRolesDropdownData } from "../../services/rolerights.service";
+import { validationSchema } from "../../validations/fiUsers.validation";
 
 export default function FIUserAddEdit() {
   const [loading, setLoading] = useState(true);

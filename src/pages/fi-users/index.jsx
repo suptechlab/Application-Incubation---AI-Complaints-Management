@@ -4,24 +4,19 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import {
-  handleDeleteUser,
-  handleGetUsers,
-  handleStatusChangeState,
-} from "../../services/user.service";
 
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
-import GenericModal from "../../components/GenericModal";
 import ListingSearchForm from "../../components/ListingSearchForm";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 import { handleFIUsersStatusChange, handleGetFIusersList } from "../../services/fiusers.services";
+import SearchForm from "./SearchForm";
 
 export default function FIUserList() {
   const navigate = useNavigate();
@@ -224,7 +219,7 @@ export default function FIUserList() {
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
-            <ListingSearchForm filter={filter} setFilter={setFilter} />
+            <SearchForm filter={filter} setFilter={setFilter} />
             <CommonDataTable
               columns={columns}
               dataQuery={dataQuery}
