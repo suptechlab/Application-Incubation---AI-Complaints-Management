@@ -120,22 +120,20 @@ export const englishLang = {
     "NAME": "Name",
     "PROFILE IMAGE": "Profile Image",
     "UPLOAD": "Upload",
-    "STATUS UPDATED": "Status updated successfully.",
-    "STATUS UPDATE ERROR": "Error in  updating status",
-    "EXPORT IN PROGRESS": "Export in progress... Please wait.",
-    "CSV DOWNLOADED": "CSV file downloaded successfully.",
-    "EMPTY RESPONSE": "Response data is empty.",
+ 
     "ADD SEPS": "Add SEPS User",
     "EDIT SEPS": "Edit SEPS User",
     "SEPS USER": "SEPS User",
     "UNIDAD ORGANIZACIONAL": "Unidad Organizacional",
-    "ROLE": "Role",
-    "UPDATE": "Update",
+  
     "ROLE & RIGHTS": "Roles & Rights",
     "SEPS Users" : "SEPS Users",
     "User Management": "User Management",
     "ENTITY NAME": "Entity Name",
     "FI USERS": "FI Users",
     "SEPS USERS":"SEPS Users",
-    "SELECT ROLE" : "Select Role"
+    "SELECT ROLE" : "Select Role",
+    "PENDING":"Pending",
+    "BLOCKED" : "Blocked",
+    "DELETED":"Deleted"
 }

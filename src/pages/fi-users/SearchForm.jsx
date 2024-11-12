@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const SearchForm = ({ filter, setFilter }) => {
   const { t } = useTranslation();
 
-  const [rolesDropdownData , setRolesDropdownData] = useState([])
+  const [rolesDropdownData, setRolesDropdownData] = useState([])
 
   //FETCH ROLES DROPDOWN DATA
   const fetchRolesDropdownData = () => {
@@ -33,7 +33,7 @@ const SearchForm = ({ filter, setFilter }) => {
   }
 
   useEffect(() => {
-    fetchRolesDropdownData ()
+    fetchRolesDropdownData()
   }, [])
 
 
@@ -48,6 +48,7 @@ const SearchForm = ({ filter, setFilter }) => {
             name="search"
             placeholder={t("SEARCH")}
             type="text"
+            size="sm"
             onChange={(event) => {
               if (event.target.value === "") {
                 setFilter({
@@ -65,29 +66,31 @@ const SearchForm = ({ filter, setFilter }) => {
           />
         </div>
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-          <div className="custom-width-160 flex-grow-1 flex-md-grow-0">
+          <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
               class="form-select "
               placeholder={t("SELECT ROLE")}
               id="floatingSelect"
               options={rolesDropdownData ?? []}
+              size="sm"
               onChange={(e) => {
                 setFilter({
                   ...filter,
                   roleId: e.target.value,
                 });
               }}
-              value={filter.roleId}
+              value={filter?.roleId}
             />
           </div>
         </Stack>
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-          <div className="custom-width-160 flex-grow-1 flex-md-grow-0">
+          <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
               class="form-select "
               placeholder={t("ALL STATUS")}
+              size="sm"
               id="floatingSelect"
               options={[
                 {
