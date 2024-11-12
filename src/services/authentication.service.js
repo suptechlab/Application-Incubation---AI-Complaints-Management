@@ -42,9 +42,6 @@ export const handleRefreshToken = async () => {
     });
 }
 
-export const handleOtpVerify = async (data) => {
-    return await authApi.post(`/verify-otp`, data);
-}
 
 export const handleResendOTP = async (params) => {
     return await authApi.get(`/resend-login-otp`, {params});
