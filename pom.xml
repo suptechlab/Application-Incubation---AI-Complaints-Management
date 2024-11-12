@@ -7,7 +7,7 @@
     <artifactId>user</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>ms-user</name>
+    <name>ms-user-service</name>
     <description>Description for User</description>
     <parent>
         <groupId>org.springframework.boot</groupId>
