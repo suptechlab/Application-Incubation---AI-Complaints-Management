@@ -9,24 +9,22 @@ import {
   Navbar,
 } from "react-bootstrap";
 import { FaCaretDown, FaTrash } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import Logo from "../../assets/images/logo.svg";
-import { AuthenticationContext } from "../../contexts/authentication.context";
-import "./header.scss";
-import {
-  handleGetNotifications,
-  handleMarkAllNotifications,
-  handleDeleteNotification,
-  handleCountNotifications,
-} from "../../services/notification.service";
 import {
   MdAccountBox,
   MdKey,
   MdLogout,
   MdOutlineNotifications,
 } from "react-icons/md";
+import { Link, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/images/default-avatar.jpg";
+import Logo from "../../assets/images/logo.svg";
 import AppTooltip from "../../components/tooltip";
+import { AuthenticationContext } from "../../contexts/authentication.context";
+import {
+  handleCountNotifications,
+  handleMarkAllNotifications
+} from "../../services/notification.service";
+import "./header.scss";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
   const { logout } = useContext(AuthenticationContext);
@@ -178,6 +176,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
               </ul>
             </Dropdown.Menu>
           </Dropdown>
+
+        
           <Dropdown className="profileDropdown ms-3 ms-sm-4">
             <Dropdown.Toggle
               variant="link"
@@ -186,14 +186,13 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
             >
               <Image
                 className="object-fit-cover rounded-circle"
-                src={imageUrl != null ? imageUrl : defaultAvatar}
+                src={imageUrl && imageUrl != null ? imageUrl : defaultAvatar}
                 width={40}
                 height={40}
                 alt={firstName}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-200 fs-6 lh-sm">
-                {/* {firstName}  */}
-                SEPS
+                {firstName} 
                 <br />
                 <Badge bg="light-green-custom" className="fs-normal">
                   FI Agent
