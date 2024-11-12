@@ -23,14 +23,7 @@ export default function FIUserAddEdit() {
 
   const [loadingInfo, setLoadingInfo] = useState(false)
 
-  const [companyOptions, setCompanyOptions] = useState([]);
-  const [rolesOptions, setRolesOptions] = useState([]);
   const [rolesDropdownData, setRolesDropdownData] = useState([])
-
-
-  const [FIuserData, setFIUserData] = useState([]);
-  const [isImageSet, setIsImageSet] = useState(false);
-  const [emailDisabled, setEmailDisabled] = useState(false);
 
   const { t } = useTranslation();
 
@@ -38,28 +31,6 @@ export default function FIUserAddEdit() {
     value: country?.value,
     label: country?.value
   }));
-
-  useEffect(() => {
-    // handleGetUserCompany().then((response) => {
-    //   let companiesList = [{ value: "", label: "Select company" }];
-    //   if (response.data?.data?.length > 0) {
-    //     response.data?.data?.forEach((category) => {
-    //       companiesList.push({ value: category?.id, label: category?.title });
-    //     });
-    //   }
-    //   setCompanyOptions(companiesList);
-    // });
-
-    // handleGetRole().then((response) => {
-    //   let roleList = [{ value: "", label: "Select role" }];
-    //   if (response.data?.data?.length > 0) {
-    //     response.data?.data?.forEach((category) => {
-    //       roleList.push({ value: category?.id, label: category?.name });
-    //     });
-    //   }
-    //   setRolesOptions(roleList);
-    // });
-  }, []);
 
   const [initialValue, setInitialValues] = useState({
     identification: "",
@@ -77,21 +48,17 @@ export default function FIUserAddEdit() {
     if (isEdit) {
       setLoading(true);
       handleGetFIuserById(id).then((response) => {
-        console.log(response)
-        // setFIUserData(response.data.data);
-
         setInitialValues({
-          identification: response.data?.identification ? response.data?.identification : "",
+          identification: response.data?.identificacion ? response.data?.identificacion : "",
           name: response.data?.name ? response.data?.name : "",
           email: response.data?.email ? response.data?.email : "",
-          countryCode: response.data?.countryCode ?? "+1",
-          phoneNumber: response.data?.mobileNo ? response.data?.phoneNumber : "",
-          ruc: response.data?.taxId ? response.data?.taxId : "",
-          entityName: response.data?.entityName ? response.data?.entityName : "",
-          entityType: response.data?.entityType ? response.data?.entityType : "",
+          countryCode: response?.data?.countryCode ?? "+1",
+          phoneNumber: response?.data?.phoneNumber ? response?.data?.phoneNumber : "",
+          ruc: response?.data?.organization?.ruc ? response?.data?.organization?.ruc : "",
+          entityName: response?.data?.organization?.razonSocial ? response?.data?.organization?.razonSocial : "",
+          entityType: response.data?.organization?.tipoOrganizacion ? response.data?.organization?.tipoOrganizacion : "",
           roleId: response.data?.roleId ? response.data?.roleId : "",
         })
-        // setEmailDisabled(response.data.data.email != "");
         setLoading(false);
       });
     } else {
@@ -99,6 +66,27 @@ export default function FIUserAddEdit() {
     }
   }, [id, isEdit]);
 
+  //FETCH ROLES DROPDOWN DATA
+  const fetchRolesDropdownData = () => {
+    getRolesDropdownData('FI_USER').then((response) => {
+      const mappedData = response?.data?.map(item => ({
+        value: item.id,
+        label: item.name
+      }));
+      setRolesDropdownData(mappedData ?? [])
+    })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+  }
+
+  useEffect(() => {
+    fetchRolesDropdownData()
+  }, [])
 
   // FETCH USER PERSONAL INFO BY ID
   const fetchUserData = async (identification) => {
@@ -151,34 +139,13 @@ export default function FIUserAddEdit() {
     }
   }
 
-  //FETCH ROLES DROPDOWN DATA
-  const fetchRolesDropdownData = () => {
-    getRolesDropdownData('FI_USER').then((response) => {
-      const mappedData = response?.data?.map(item => ({
-        value: item.id,
-        label: item.name
-      }));
-      setRolesDropdownData(mappedData ?? [])
-    })
-      .catch((error) => {
-        if (error?.response?.data?.errorDescription) {
-          toast.error(error?.response?.data?.errorDescription);
-        } else {
-          toast.error(error?.message);
-        }
-      })
-  }
-
-  useEffect(() => {
-    fetchRolesDropdownData()
-  }, [])
 
   // HANDLE SUBMIT
   const handleSubmit = async (values, actions) => {
     setUserLoading(true);
 
     let formData = {
-      identificacion: values?.identificacion,
+      identificacion: values?.identification,
       name: values?.name,
       email: values?.email,
       langKey: "es",
@@ -189,9 +156,9 @@ export default function FIUserAddEdit() {
     }
 
     if (isEdit) {
-      formData.id = id
+      // formData.id = id
       // CALL EDIT FI USERS API
-      handleEditFIUsers(formData).then((response) => {
+      handleEditFIUsers(id , formData).then((response) => {
         toast.success(response?.data?.message);
         navigate("/fi-users")
       })
@@ -204,6 +171,7 @@ export default function FIUserAddEdit() {
         })
         .finally(() => {
           actions.setSubmitting(false);
+          setUserLoading(false);
         });
 
     } else {
@@ -221,6 +189,7 @@ export default function FIUserAddEdit() {
         })
         .finally(() => {
           actions.setSubmitting(false);
+          setUserLoading(false);
         });
     }
 
@@ -244,7 +213,7 @@ export default function FIUserAddEdit() {
                 actions.setSubmitting(true);
                 handleSubmit(values, actions);
               }}
-              enableReinitialize
+              enableReinitialize = {true}
             >
               {({
                 errors,
@@ -254,6 +223,7 @@ export default function FIUserAddEdit() {
                 touched,
                 values,
                 setFieldValue,
+                isSubmitting
               }) => (
                 <FormikForm
                   className="d-flex flex-column h-100"
@@ -300,7 +270,6 @@ export default function FIUserAddEdit() {
                         touched={touched.email}
                         type="text"
                         value={values.email || ""}
-                        disabled={emailDisabled}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
@@ -431,6 +400,7 @@ export default function FIUserAddEdit() {
                         type="submit"
                         variant="warning"
                         className="custom-min-width-85"
+                        disabled={isSubmitting ?? false}
                       >
                         {isEdit ? t("UPDATE") : t("SUBMIT")}
                       </Button>

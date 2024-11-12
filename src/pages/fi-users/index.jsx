@@ -36,33 +36,54 @@ export default function FIUserList() {
 
   const [loading, setLoading] = useState(false);
 
+    // DATA QUERY
+    const dataQuery = useQuery({
+      queryKey: ["data", pagination, sorting, filter],
+      queryFn: async () => {
+        // Set loading state to true before the request starts
+        setLoading(true);
+  
+        try {
+          const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+          Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+  
+          // Make the API request based on sorting
+          let response;
+          if (sorting.length === 0) {
+            response = await handleGetFIusersList({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              ...filterObj,
+            });
+          } else {
+            response = await handleGetFIusersList({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              sort: sorting
+                .map(
+                  (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                )
+                .join(","),
+              ...filterObj,
+            });
+          }
+  
+          // Return the API response data
+          return response;
+        } catch (error) {
+          console.error("Error fetching data", error);
+          // Optionally, handle errors here
+        } finally {
+          // Set loading state to false when the request finishes (whether successful or not)
+          setLoading(false);
+        }
+      },
+      staleTime: 0, // Data is always stale, so it refetches
+      cacheTime: 0, // Cache expires immediately
+      retry: 0,
+    });
 
-  const dataQuery = useQuery({
-    queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
 
-      if (sorting.length === 0) {
-        return handleGetFIusersList({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetFIusersList({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
-      }
-    },
-  });
 
   //handle last page deletion item
   useEffect(() => {

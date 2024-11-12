@@ -14,10 +14,13 @@ const SearchForm = ({ filter, setFilter }) => {
   //FETCH ROLES DROPDOWN DATA
   const fetchRolesDropdownData = () => {
     getRolesDropdownData('FI_USER').then((response) => {
-      const mappedData = response?.data?.map(item => ({
-        value: item.id,
-        label: item.name
-      }));
+      const mappedData = [
+        { label: "All Roles", value: "" },
+        ...(response?.data?.map(item => ({
+          value: item.id,
+          label: item.name
+        })) || [])
+      ];
       setRolesDropdownData(mappedData ?? [])
     })
       .catch((error) => {
