@@ -65,7 +65,7 @@ const SearchForm = ({ filter, setFilter }) => {
           />
         </div>
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-          <div className="custom-width-120 flex-grow-1 flex-md-grow-0">
+          <div className="custom-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
               class="form-select "
@@ -83,7 +83,7 @@ const SearchForm = ({ filter, setFilter }) => {
           </div>
         </Stack>
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-          <div className="custom-width-120 flex-grow-1 flex-md-grow-0">
+          <div className="custom-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
               class="form-select "

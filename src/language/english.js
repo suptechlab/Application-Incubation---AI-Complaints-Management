@@ -137,6 +137,5 @@ export const englishLang = {
     "ENTITY NAME": "Entity Name",
     "FI USERS": "FI Users",
     "SEPS USERS":"SEPS Users",
-    // NEW
     "SELECT ROLE" : "Select Role"
 }

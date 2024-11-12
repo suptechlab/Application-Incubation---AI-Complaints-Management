@@ -166,5 +166,6 @@ export const spanishLang = {
     "User Management" : "Gestión de usuarios",
     "ENTITY NAME": "Nombre de la Entidad",
     "FI USERS":"Usuarios FI",
-    "SEPS USERS" : "Usuarios de SEPS"
+    "SEPS USERS" : "Usuarios de SEPS",
+    "SELECT ROLE" : "Seleccionar rol"
 }

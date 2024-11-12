@@ -35,5 +35,5 @@ export const fetchModulesAndPermissions = async (userType) => {
 
 // GET ROLES DROPDOWN DATA WITH USER TYPE
 export const getRolesDropdownData = async (userType) =>{
-    return await instance.get(`/${API_VERSION}/roles/dropdown/${userType}`);
+    return await adminApi.get(`/${API_VERSION}/roles/dropdown/${userType}`);
 }
