@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <Router>
+      <Router basename={process.env.REACT_APP_BASE_NAME}>
         <AuthenticationProvider>
           <App />
           <Toaster position='top-right' />
