@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.11.xsd">
+
+  <changeSet id="1731476673420" author="matellio">
+    <createTable tableName="template_master">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="template_key" type="VARCHAR(100)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="template_name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="template_type" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="subject" type="VARCHAR(255)"/>
+      <column name="content" type="TEXT"/>
+      <column name="supported_variables" type="TEXT"/>
+      <column name="status" type="BOOLEAN" defaultValueBoolean="true"/>
+      <column name="created_by" type="BIGINT"/>
+      <column name="created_date" type="TIMESTAMP" defaultValueDate="CURRENT_TIMESTAMP"/>
+      <column name="updated_by" type="BIGINT"/>
+      <column name="updated_date" type="TIMESTAMP"/>
+    </createTable>
+    <addForeignKeyConstraint
+      baseTableName="template_master" baseColumnNames="created_by"
+      referencedTableName="jhi_user" referencedColumnNames="id"
+      constraintName="fk_template_master_created_by_jhi_user"/>
+    <addForeignKeyConstraint
+      baseTableName="template_master" baseColumnNames="updated_by"
+      referencedTableName="jhi_user" referencedColumnNames="id"
+      constraintName="fk_template_master_updated_by_jhi_user"/>
+  </changeSet>
+
+</databaseChangeLog>
