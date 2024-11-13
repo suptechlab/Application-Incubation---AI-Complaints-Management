@@ -12,7 +12,7 @@
 # Full reference is available at:
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
-
+#testing deployment again
 logging:
   level:
     ROOT: DEBUG
@@ -71,7 +71,7 @@ jhipster:
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:3001,http://localhost:3001/,https://user-suptechdev.seps.gob.ec,https://webportal-suptechdev.seps.gob.ec'
+    allowed-origins: 'http://localhost:3001,https://localhost:3001,http://localhost:9000,https://localhost:9000,https://user-suptechdev.seps.gob.ec,https://webportal-suptechdev.seps.gob.ec,http://localhost:3001/,https://localhost:3001/'
     # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
