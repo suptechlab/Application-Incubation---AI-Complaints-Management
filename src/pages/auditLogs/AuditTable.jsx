@@ -8,7 +8,7 @@ const toCamelCase = (str) =>
 
 const toCapitalized = (str) =>
   str.replace(/([A-Z])/g, ' $1') // Add space before each uppercase letter
-     .replace(/^./, (match) => match.toUpperCase()); // Capitalize the first letter of the resulting string
+    .replace(/^./, (match) => match.toUpperCase()); // Capitalize the first letter of the resulting string
 
 // Utility function to render cell data
 const renderCell = (value) => {
@@ -31,10 +31,10 @@ const renderCell = (value) => {
 };
 
 // Render audit table
-const AuditTable = ({ newData, oldData }) => {
+const AuditTable = ({ newData, oldData, activityType }) => {
   const auditKeys = new Set([...Object.keys(newData), ...Object.keys(oldData)]);
 
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <Table striped bordered hover>
@@ -42,8 +42,10 @@ const AuditTable = ({ newData, oldData }) => {
         <tr>
           <th>{t("FIELD")}</th>
           <th>{t("NEW RECORD")}</th>
-          <th>{t("OLD RECORD")}</th>
-          <th>{t("STATUS")}</th>
+          {
+            activityType !== "DATA_ENTRY" ? <th>{t("OLD RECORD")}</th> : ""
+          }
+          {activityType !== "DATA_ENTRY" ? <th>{t("STATUS")}</th> : ""}
         </tr>
       </thead>
       <tbody>
@@ -56,10 +58,14 @@ const AuditTable = ({ newData, oldData }) => {
             <tr key={key}>
               <td>{toCapitalized(key)}</td>
               <td>{renderCell(newValue)}</td>
-              <td>{renderCell(oldValue)}</td>
-              <td style={{ color: isChanged ? 'red' : 'green' }}>
-                {isChanged ? t('MODIFIED') : t('UNCHANGED')}
-              </td>
+              {
+                activityType !== "DATA_ENTRY" ? <td>{renderCell(oldValue)}</td> : ""
+              }
+              {
+                activityType !== "DATA_ENTRY" ? <td style={{ color: isChanged ? 'red' : 'green' }}>
+                  {isChanged ? t('MODIFIED') : t('UNCHANGED')}
+                </td> : ""
+              }
             </tr>
           );
         })}

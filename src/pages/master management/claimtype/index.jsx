@@ -126,7 +126,9 @@ const ClaimType = () => {
     },
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
-    retry: 0,
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
 
   // STATUS UPDATE FUNCTION

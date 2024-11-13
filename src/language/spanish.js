@@ -22,6 +22,8 @@ export const spanishLang = {
     "ROWS PER PAGE": "Filas por página",
     "NAME OF CLAIM TYPE": "Nombre del Tipo de Reclamación",
     "CREATE CLAIM TYPE": "Crear Tipo de Reclamación",
+    "CREATE CLAIM SUB TYPE": "CREAR SUBTIPO DE RECLAMO",
+    "EDIT CLAIM SUB TYPE": "EDITAR SUBTIPO DE RECLAMO",
     "EDIT CLAIM TYPE": "Editar Tipo de Reclamación",
     "NAME OF CLAIM SUB TYPE": "Nombre del Subtipo de Reclamación",
     "SLA BREACH": "Incumplimiento del SLA",

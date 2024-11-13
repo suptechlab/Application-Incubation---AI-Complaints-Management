@@ -22,6 +22,8 @@ export const englishLang = {
     "ROWS PER PAGE": "Rows per page",
     "NAME OF CLAIM TYPE": "Name of Claim Type",
     "CREATE CLAIM TYPE": "Create Claim Type",
+    "CREATE CLAIM SUB TYPE":"Create Claim Sub Type",
+    "EDIT CLAIM SUB TYPE" : "Edit Claim Sub Type",
     "EDIT CLAIM TYPE": "Edit claim type",
     "NAME OF CLAIM SUB TYPE": "Name of Claim Sub Type",
     "SLA BREACH": "SLA Breach",

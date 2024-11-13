@@ -113,6 +113,8 @@ const ProvinceMaster = () => {
     onError: () => setIsLoading(false), // Reset loading state on error
     staleTime: 0, // Data is always considered stale
     cacheTime: 0, // Cache expires immediately
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
     retry: 0, // Disable automatic retries to prevent multiple calls on error
   });
   // TOGGLE PROVINCE MASTER STATUS

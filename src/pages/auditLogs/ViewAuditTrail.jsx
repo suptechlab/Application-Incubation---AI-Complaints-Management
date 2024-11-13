@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useParams } from "react-router-dom";
-import { Card, Col, Row, Stack, Table } from 'react-bootstrap';
 import moment from "moment";
-import { getAuditLogsById } from '../../services/auditlogs.services';
-import PageHeader from '../../components/PageHeader';
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import AuditTable from './AuditTable';
+import { Link, useParams } from "react-router-dom";
 import Loader from '../../components/Loader';
+import PageHeader from '../../components/PageHeader';
+import { getAuditLogsById } from '../../services/auditlogs.services';
+import AuditTable from './AuditTable';
 
 const ViewAuditTrail = () => {
 
@@ -61,7 +61,7 @@ const ViewAuditTrail = () => {
                         <Row>
                             <Col>
                                 <h5 className="mt-4">{t("AUDIT DETAILS")}</h5>
-                                <AuditTable newData={data?.entityData?.newData ?? {}} oldData={data?.entityData?.oldData ?? {}} />
+                                <AuditTable newData={data?.entityData?.newData ?? {}} oldData={data?.entityData?.oldData ?? {}} activityType={data?.activityType ?? ""} />
                             </Col>
                         </Row>
                         <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">

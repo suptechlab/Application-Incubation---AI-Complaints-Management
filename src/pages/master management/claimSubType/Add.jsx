@@ -15,7 +15,7 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
   const handleSubmit = async (values, actions) => {
     const formData = {
       name: values?.name ?? "",
-      claimTypeId: values?.claimType ?? null,
+      claimTypeId: values?.claimTypeId ?? null,
       slaBreachDays: values?.slaBreachDays ?? null,
       description: values?.description ?? "",
     }
@@ -50,7 +50,7 @@ const Add = ({ modal, toggle ,dataQuery , claimTypes}) => {
     >
       <Modal.Header className="pb-3">
         <Modal.Title as="h4" className="fw-semibold">
-          Create Claim Sub Type
+         {t("CREATE CLAIM SUB TYPE")}
         </Modal.Title>
       </Modal.Header>
       <Formik

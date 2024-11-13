@@ -117,7 +117,9 @@ const InquirySubType = () => {
     onError: () => setIsLoading(false), // Reset loading state on error
     staleTime: 0, // Data is always considered stale
     cacheTime: 0, // Cache expires immediately
-    retry: 0,
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
 
   // CHANGE STATUS

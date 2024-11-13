@@ -115,7 +115,9 @@ const ClaimSubType = () => {
     onError: () => setIsLoading(false), // Ensure loading state is reset on error
     staleTime: 0, // Data is always considered stale
     cacheTime: 0, // Cache expires immediately
-    retry: 0,
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
