@@ -1,12 +1,13 @@
 package com.seps.auth.web.rest;
 
+import com.seps.auth.domain.Otp;
 import com.seps.auth.domain.User;
 import com.seps.auth.repository.UserRepository;
 import com.seps.auth.security.SecurityUtils;
 import com.seps.auth.service.MailService;
+import com.seps.auth.service.OtpService;
 import com.seps.auth.service.UserService;
-import com.seps.auth.service.dto.AdminUserDTO;
-import com.seps.auth.service.dto.PasswordChangeDTO;
+import com.seps.auth.service.dto.*;
 import com.seps.auth.service.dto.ResponseStatus;
 import com.seps.auth.web.rest.errors.*;
 import com.seps.auth.web.rest.vm.KeyAndPasswordVM;
@@ -50,11 +51,14 @@ public class AccountResource {
 
     private final MessageSource messageSource;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, MessageSource messageSource) {
+    private final OtpService otpService;
+
+    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService, MessageSource messageSource, OtpService otpService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
         this.messageSource = messageSource;
+        this.otpService = otpService;
     }
 
     /**
@@ -218,5 +222,54 @@ public class AccountResource {
                 password.length() < ManagedUserVM.PASSWORD_MIN_LENGTH ||
                 password.length() > ManagedUserVM.PASSWORD_MAX_LENGTH
         );
+    }
+
+    /**
+     * Generates and sends a One-Time Password (OTP) to the specified email for user registration.
+     * <p>
+     * This endpoint creates an OTP for the provided email address to be used during the registration process.
+     * The OTP is sent to the user’s email in the appropriate locale, and a response is returned with a success message,
+     * HTTP status, and timestamp.
+     *
+     * @param requestOtpDTO contains The email address to which the registration OTP will be sent.
+     * @return {@link ResponseEntity} containing a {@link ResponseStatus} with a success
+     * message, HTTP status code, and the current timestamp.
+     */
+    @PostMapping("/register/request-otp")
+    public ResponseEntity<ResponseStatus> requestRegisterOtp(@RequestBody @Valid RequestOtpDTO requestOtpDTO) {
+        String email = requestOtpDTO.getEmail();
+        Otp otp = otpService.generateOtp(email);
+        mailService.sendRegisterOtpEmail(otp, LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new ResponseStatus(
+            messageSource.getMessage("otp.sent.to.email", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        ), HttpStatus.OK);
+    }
+
+
+    /**
+     * Verifies the One-Time Password (OTP) for user registration.
+     * <p>
+     * This endpoint checks if the provided OTP is valid for the specified email address.
+     * If the OTP is invalid or expired, an error is logged, and a {@link CustomException}
+     * is thrown with a relevant error status and message. If the OTP is valid, a
+     * {@code NO_CONTENT} status is returned, indicating successful verification.
+     *
+     * @param verifyOtpDTO The email address associated with the OTP to be verified.
+     * @return {@link ResponseEntity} with {@code HttpStatus.NO_CONTENT} if the OTP is valid;
+     * otherwise, a {@link CustomException} is thrown with an error status and message.
+     * @throws CustomException if the OTP is invalid or expired.
+     */
+    @PostMapping("/register/verify-otp")
+    public ResponseEntity<Void> verifyRegisterOtp(@Valid @RequestBody VerifyOtpDTO verifyOtpDTO) {
+        String email = verifyOtpDTO.getEmail();
+        String otpCode = verifyOtpDTO.getOtpCode();
+        boolean isVerified = otpService.verifyOtp(email, otpCode);
+        if (!isVerified) {
+            LOG.error("Invalid OTP code for token: {}", otpCode);
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

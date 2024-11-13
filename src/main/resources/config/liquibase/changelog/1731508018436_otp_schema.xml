@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+  <changeSet id="1731508018436" author="matellio">
+    <createTable tableName="otp">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="email" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="otp_code" type="varchar(6)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="used" type="boolean" defaultValue="false">
+        <constraints nullable="false"/>
+      </column>
+      <column name="expiry_time" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+    <!-- Add Unique Constraint for Email if Needed -->
+    <addUniqueConstraint columnNames="email, otp_code" tableName="otp" constraintName="unique_email_otp"/>
+    <!-- Index for faster queries by email -->
+    <createIndex indexName="idx_email" tableName="otp">
+      <column name="email"/>
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>

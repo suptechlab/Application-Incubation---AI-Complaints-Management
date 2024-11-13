@@ -12,8 +12,11 @@ public enum SepsStatusCode implements StatusType {
     INVALID_OTP_CODE(10015, "invalid.otp.code"),
     USER_NOT_FOUND_RESET(10016, "user.not.found.reset"),
     CURRENT_USER_NOT_FOUND(10017, "current.user.not.found"),
-    USER_PASSWORD_INCORRECT(10018,"user.password.incorrect"),
-    NEW_PASSWORD_SAME_AS_CURRENT(10019,"new.password.same.as.current");
+    USER_PASSWORD_INCORRECT(10018, "user.password.incorrect"),
+    NEW_PASSWORD_SAME_AS_CURRENT(10019, "new.password.same.as.current"),
+    OTP_COD_ALREADY_USED(10020, "otp.already.used"),
+    PERSON_NOT_FOUND(20028, "person.not.found"),
+    ORGANIZATION_RUC_NOT_FOUND(20029, "organization.ruc.not.found");
 
     private final int code;
 

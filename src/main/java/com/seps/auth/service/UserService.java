@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.seps.auth.suptech.service.PersonNotFoundException;
 import com.seps.auth.web.rest.errors.CustomException;
 import com.seps.auth.web.rest.errors.SepsStatusCode;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
+import com.seps.auth.suptech.service.dto.PersonInfoDTO;
+import com.seps.auth.suptech.service.ExternalAPIService;
 
 /**
  * Service class for managing users.
@@ -56,12 +59,19 @@ public class UserService {
 
     private final RecaptchaService recaptchaService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, LoginLogRepository loginLogRepository, RecaptchaService recaptchaService) {
+    private final ExternalAPIService externalAPIService;
+
+    private final OtpService otpService;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository,
+                       LoginLogRepository loginLogRepository, RecaptchaService recaptchaService, ExternalAPIService externalAPIService, OtpService otpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.loginLogRepository = loginLogRepository;
         this.recaptchaService = recaptchaService;
+        this.externalAPIService = externalAPIService;
+        this.otpService = otpService;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -327,7 +337,6 @@ public class UserService {
         User user = userRepository.findOneByLogin(username)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
         // Generate OTP data using OtpService
-        OtpService otpService = new OtpService();
         String otpCode = otpService.generateOtpCode();
         Instant otpExpirationTime = otpService.getOtpExpirationTime();
         String otpToken = otpService.generateOtpToken();
@@ -391,7 +400,6 @@ public class UserService {
     }
 
     public User updateUserOtpCode(User user) {
-        OtpService otpService = new OtpService();
         String otpCode = otpService.generateOtpCode();
         Instant otpExpirationTime = otpService.getOtpExpirationTime();
         user.setOtpCode(otpCode);
@@ -431,5 +439,26 @@ public class UserService {
         }
     }
 
-
+    /**
+     * Fetches the details of a person based on the provided identification.
+     * <p>
+     * This method calls an external API service to retrieve the information of a person
+     * identified by the given {@code identification}. If the person is not found, a
+     * {@code PersonNotFoundException} is caught, and a {@code CustomException} with
+     * a "NOT_FOUND" status is thrown, indicating that the person could not be located.
+     * </p>
+     *
+     * @param identificacion the unique identifier of the person whose details are to be fetched.
+     * @return a {@link PersonInfoDTO} containing the details of the person.
+     * @throws CustomException if the person is not found, with a status code of
+     *                         {@code SepsStatusCode.PERSON_NOT_FOUND}.
+     */
+    public PersonInfoDTO fetchPersonDetails(String identificacion) {
+        try {
+            return externalAPIService.getPersonInfo(identificacion);
+        } catch (PersonNotFoundException e) {
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.PERSON_NOT_FOUND,
+                new String[]{identificacion}, null);
+        }
+    }
 }
