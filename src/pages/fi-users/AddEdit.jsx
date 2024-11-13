@@ -107,11 +107,11 @@ export default function FIUserAddEdit() {
   };
 
   // TAX ID 
-  const fetchOrganizationData = async (taxId) => {
+  const fetchOrganizationData = async (ruc) => {
     setLoadingInfo(true)
-    getOrganizationInfo(taxId).then((response) => {
+    getOrganizationInfo(ruc).then((response) => {
       setLoadingInfo(false)
-      setInitialValues({ ...initialValue, taxId: taxId, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
+      setInitialValues({ ...initialValue, ruc: ruc, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -133,9 +133,9 @@ export default function FIUserAddEdit() {
 
   // HANDLE TAX ID BLUR
   const handleTaxIdBlur = (event) => {
-    const taxID = event.target.value;
-    if (taxID && taxID !== "") {
-      fetchOrganizationData(taxID) // Call the API function
+    const ruc = event.target.value;
+    if (ruc && ruc !== "") {
+      fetchOrganizationData(ruc) // Call the API function
     }
   }
 
