@@ -50,10 +50,10 @@ public class DpaAcceptanceResource {
         @ApiResponse(responseCode = "500", description = "Internal server error.",
             content = @Content(mediaType = "application/json"))
     })
-    @PostMapping("/accept/{status}")
+    @PostMapping("/accept")
     public ResponseEntity<ResponseStatus> acceptDpa(
         @Parameter(description = "Acceptance status of the DPA. 'true' for accepted, 'false' for declined.", example = "true")
-        @PathVariable(required = false) Boolean status,
+        @RequestParam Boolean status,
         HttpServletRequest request) {
 
         // Save the acceptance data
