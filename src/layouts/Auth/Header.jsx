@@ -195,7 +195,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 {firstName} 
                 <br />
                 <Badge bg="light-green-custom" className="fs-normal">
-                  FI Agent
+                  Admin
                 </Badge>
               </span>
               <FaCaretDown size={16} className="ms-1" />
