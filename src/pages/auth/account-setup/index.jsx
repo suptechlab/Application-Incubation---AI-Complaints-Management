@@ -80,7 +80,7 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
                     </Row>
                 </div>
             </Modal.Header>
-            <Modal.Body className="text-break d-flex flex-column small pt-0">
+            <Modal.Body className="text-break d-flex flex-column small pt-0 px-0">
                 <Tab.Container
                     id="theme-steps-tabs"
                     activeKey={activeTab}
@@ -88,7 +88,7 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
                     <Tab.Content>
                         {tabData.map((tab) => (
                             <Tab.Pane key={tab.eventKey} eventKey={tab.eventKey}>
-                                {tab.content}
+                                <div className="px-4">{tab.content}</div>
                             </Tab.Pane>
                         ))}
                     </Tab.Content>

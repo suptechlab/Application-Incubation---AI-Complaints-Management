@@ -8,14 +8,14 @@ const getStepClasses = (stepCurrent, stepCompleted) =>
     `${stepCurrent ? 'step-current' : ''} ${stepCompleted ? 'step-completed' : ''}`;
 
 // Component to display step circle and title
-const StepItem = ({ stepCompleted, stepCurrent, id, stepTitle }) => (
+const StepItem = ({ stepCompleted, stepCurrent, id, stepTitle, disabled }) => (
     <>
         <span 
             className={`theme-steps-progress-circle rounded-circle d-inline-flex align-items-center justify-content-center position-relative custom-width-32 custom-height-32 fs-5 text-white lh-sm ${getStepClasses(stepCurrent, stepCompleted)}`}>
             {stepCompleted ? <MdCheck size={22} /> : id}
         </span>
         <span 
-            className={`theme-steps-progress-title custom-min-width-60 custom-font-size-10 fw-semibold lh-sm d-block mt-1 ${stepCurrent ? 'opacity-100' : 'opacity-50'} ${stepCompleted ? 'text-primary opacity-100' : ''}`}>
+            className={`theme-steps-progress-title custom-min-width-65 custom-font-size-10 fw-semibold lh-sm d-block mt-1 ${stepCurrent ? 'opacity-100' : 'opacity-50'} ${stepCompleted ? 'text-primary opacity-100' : ''} ${disabled ? '': 'opacity-100'}`}>
             {stepTitle}
         </span>
     </>
@@ -29,14 +29,14 @@ const StepsProgress = ({ stepData = [] }) => (
                 className={`col text-center position-relative z-0 ${getStepClasses(stepCurrent, stepCompleted)}`}>
                 
                 {disabled ? (
-                    <StepItem stepCompleted={stepCompleted} stepCurrent={stepCurrent} id={id} stepTitle={stepTitle} />
+                    <StepItem stepCompleted={stepCompleted} stepCurrent={stepCurrent} id={id} stepTitle={stepTitle} disabled={disabled} />
                 ) : (
                     <Button 
                         className="p-0 border-0 text-body text-decoration-none" 
                         variant="link" 
                         onClick={stepClickHandler}
                     >
-                        <StepItem stepCompleted={stepCompleted} stepCurrent={stepCurrent} id={id} stepTitle={stepTitle} />
+                        <StepItem stepCompleted={stepCompleted} stepCurrent={stepCurrent} id={id} stepTitle={stepTitle} disabled={disabled} />
                     </Button>
                 )}
             </li>

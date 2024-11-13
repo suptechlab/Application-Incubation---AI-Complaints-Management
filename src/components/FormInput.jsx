@@ -5,7 +5,7 @@ import AppTooltip from './tooltip'
 import { Button } from 'react-bootstrap'
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
-export default function FormInputBox({ label, touched, error, isTextarea, wrapperClassName = 'mb-3 pb-1', inputClassName, inputIcon, ...rest }) {
+export default function FormInputBox({ label, touched, error, isTextarea, wrapperClassName = 'mb-3', inputClassName, inputIcon, ...rest }) {
     const [showPassword, setShowPassword] = React.useState(false)
 
     return (

@@ -4,7 +4,7 @@ import LoginFormSection from "./loginFormSection";
 import OtpFormSection from "./otpFormSection";
 import SetupAccountSection from "./setupAccountSection";
 
-const LoginModal = ({handleSignUpClick}) => {
+const LoginModal = ({handleSignUpClick, handleLoginSucccesSubmit}) => {
     const [isloginFormSubmitted, setIsloginFormSubmitted] = useState(false);
 
     // Handle Login Form Submit
@@ -31,7 +31,7 @@ const LoginModal = ({handleSignUpClick}) => {
                         <div className="border-black border-dashed border-top d-lg-none opacity-100 w-100" />
                     </Col>
                     <Col lg>
-                        {isloginFormSubmitted ? <OtpFormSection handleFormSubmit={handleLoginFormSubmit} /> : <LoginFormSection handleFormSubmit={handleLoginFormSubmit} />}
+                        {isloginFormSubmitted ? <OtpFormSection handleFormSubmit={handleLoginSucccesSubmit} /> : <LoginFormSection handleFormSubmit={handleLoginFormSubmit} />}
                     </Col>
                 </Row>
 

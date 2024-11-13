@@ -7,7 +7,7 @@ const ReactSelect = ({
   options,
   value,
   onChange,
-  wrapperClassName = "mb-3 pb-1",
+  wrapperClassName = "mb-3",
   size,
   name,
   label,
