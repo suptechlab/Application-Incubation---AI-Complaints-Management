@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { axiosRequest } from '../api/axios';
+import { userApi } from '../api/axios';
 import EndPoint from '../api/endpoint';
 
 const initialState = {
@@ -12,7 +12,7 @@ export const login = createAsyncThunk(
     'auth/login',
     async (values) => {
         try {
-            const response = await axiosRequest.post(EndPoint.LOGIN_API, values);
+            const response = await userApi.post(EndPoint.LOGIN_API, values);
             return response.data;
         } catch (error) {
             return error;

@@ -7,15 +7,21 @@ import HelpDeskHeader from '../chatHeader';
 import { PrivacyFormSchema } from '../validations';
 
 const PrivacyForm = ({ handleClose, onSubmit }) => {
+
+
+
     // Initial Values
     const initialValues = {
-        agreePrivacy: false,
+        agreePrivacy: false ,
     };
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
-        onSubmit(values, actions);        
+        onSubmit(values, actions);  
     };
+
+ 
+ 
 
     return (
         <React.Fragment>

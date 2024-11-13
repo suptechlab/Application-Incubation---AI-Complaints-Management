@@ -1,32 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Offcanvas, Stack } from 'react-bootstrap';
 import { MdKeyboardBackspace, MdPerson } from 'react-icons/md';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormInputBox from '../../../components/FormInput';
 import SvgIcons from '../../../components/SVGIcons';
 import { ChatBotFormSchema } from '../validations';
+import { useDispatch, useSelector } from 'react-redux';
+import {  sendQuery } from '../../../redux/slice/helpDeskSlice';
 
 const ChatBotForm = () => {
+
+    const dispatch = useDispatch()
     // Initial Values
     const initialValues = {
         message: '',
     };
 
+    const { apiResponse } = useSelector((state) => state.helpDeskSlice);
+
+    const [chatData, setChatData] = useState([{
+        id: 1,
+        message: <>How may i help you ?</>,
+        userMode: false,
+        botViewMode: true,
+        botReview: [],
+        botSuggestion: []
+    },])
+
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
-        const upateUserData = {
+        // Send the message to the API
+        dispatch(sendQuery({ message: values.message }));
+
+        // Add user message to the chat state
+        const userMessage = {
             id: chatData.length + 1,
             message: values.message,
             userMode: true,
-        }
-        setChatData([...chatData, upateUserData])
+            botViewMode: false,
+            botReview: [],
+            botSuggestion: [],
+        };
+
+        setChatData([...chatData , userMessage])
 
         actions.setSubmitting(false);
         actions.resetForm();
     };
 
+
     //Dummy Chat 
-    const [chatData, setChatData] = useState([
+    const dummy_chat = [
         {
             id: 8,
             message: <>How may i help you ? Please choose from an option below.</>,
@@ -225,12 +249,19 @@ const ChatBotForm = () => {
             botViewMode: true,
             botReview: [],
         },
-    ])
+    ]
+
 
     // Action Button Handler
     const actionButtonHandler = (id) => {
         console.log(`Button with suggestion ${id} clicked!`);
     };
+
+
+    useEffect(()=>{
+        // MANAGE API RESPONSE HERE WITH CHAT DATA
+    },[apiResponse])
+
 
     return (
         <React.Fragment>
@@ -317,9 +348,10 @@ const ChatBotForm = () => {
                                 )
 
                             })}
-                            <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
+                            {/* WHEN CHAT ENDS USE THIS */}
+                            {/* <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
                                 <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
-                            </Stack>
+                            </Stack> */}
                         </div>
 
                         {/* Chatbot Body Footer */}
