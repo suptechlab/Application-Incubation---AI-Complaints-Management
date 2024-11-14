@@ -119,7 +119,7 @@ export default function UserList() {
         header: () => t('NAME'),
       },
       {
-        accessorFn: (row) => row.claimTypeName ?? "N/A",
+        accessorFn: (row) => row.roles[0].name ?? "N/A",
         id: "claimTypeName",
         header: () =>  t('ROLE'),
         enableSorting: false,

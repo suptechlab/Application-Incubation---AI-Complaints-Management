@@ -3,8 +3,10 @@ import { Card, Image } from "react-bootstrap";
 import comingSoonImage from "../../assets/images/coming-soon.svg";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   let loading = false;
 
   const handleAdd = () => {
@@ -22,7 +24,7 @@ export default function Dashboard() {
         <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
           {/* Header */}
           <PageHeader
-            title="Dashboard"
+            title="Panel"
             // actions={[
             //   { label: "ADD NEW", onClick: handleAdd, variant: "warning" },
             //   { label: "Help", to: "/help", variant: "outline-dark" },
@@ -42,7 +44,7 @@ export default function Dashboard() {
                 />
               </div>
               <h2 className="display-6 fw-bold mt-4 mb-0 opacity-75">
-                Coming Soon
+                  Muy pronto
               </h2>
             </div>
           </Card>

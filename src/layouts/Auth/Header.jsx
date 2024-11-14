@@ -149,7 +149,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                       Mark As Read
                     </Link>
                   ) : (
-                    "No notification found"
+                    "No se encontró ninguna notificación"
                   )}
                 </li>
                 {notifications.map((notification) => (
