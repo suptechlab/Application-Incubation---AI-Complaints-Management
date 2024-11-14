@@ -168,6 +168,29 @@ input:-webkit-autofill:active {
     z-index: 1060 !important;
 }
 
+// Custom Scrollbar
+@include above-xl() {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--bs-dark);
+
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            border-radius: 20px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--bs-dark);
+            border-radius: 20px;
+
+            &:hover {
+                background-color: var(--bs-primary);
+            }
+        }
+    }
+}
+
 .bg-light-green-custom {
     background-color: $custom-bg-light-green;
 }
@@ -235,5 +258,11 @@ input:-webkit-autofill:active {
         &::after {
             display: none;
         }
+    }
+}
+
+.visible-in-small-devices{
+    @include below-lg(){
+        overflow: visible !important;
     }
 }

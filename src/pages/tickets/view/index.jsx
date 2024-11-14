@@ -1,16 +1,28 @@
 import React, { useState } from 'react';
-import { Card, Col, Dropdown, Row, Stack } from 'react-bootstrap';
+import { Button, Card, Col, Dropdown, Image, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { MdArrowDropDown, MdAttachFile } from 'react-icons/md';
+import { MdArrowDropDown, MdAttachFile, MdCalendarToday } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import CommonViewData from '../../../components/CommonViewData';
 import Loader from '../../../components/Loader';
 import AppTooltip from '../../../components/tooltip';
 import TicketViewHeader from './header';
+import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 
 const TicketsView = () => {
   const { t } = useTranslation();
   const [selectedPriority, setSelectedPriority] = useState('Low');
+  const [fileName, setFileName] = useState("");
+
+  //Handle File Change
+  const handleFileChange = (event) => {
+    const file = event.currentTarget.files[0];
+    if (file) {
+      setFileName(file.name);
+    } else {
+      setFileName("Fi_Users_data.xlsx");
+    }
+  };
 
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
@@ -126,44 +138,110 @@ const TicketsView = () => {
       <TicketViewHeader
         title="#52541"
       />
-      <div className='d-flex flex-column h-100'>
-        <div className='pb-4 flex-grow-1'>
-          <Row className='h-100'>
-            <Col lg={6} className='h-100'>
-              <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
-                <Card.Body className="d-flex flex-column h-100">
-                  <Row>
-                    {viewTopData?.map((item, index) => (
-                      <Col key={"data_view_" + index} {...item.colProps}>
-                        <CommonViewData label={item.label} value={item.value} />
-                      </Col>
-                    ))}
-                  </Row>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col lg={6}>
-
-            </Col>
-          </Row>
-        </div>
-        <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3 bg-body">
-          <Stack
-            direction="horizontal"
-            gap={3}
-            className="justify-content-end flex-wrap"
-          >
-            <Link
-              to={"/tickets"}
-              className="btn btn-outline-dark custom-min-width-85"
-            >
-              {t("BACK")}
-            </Link>
-
-          </Stack>
-        </div>
+      <div className='d-flex flex-column flex-grow-1 overflow-y-auto overflow-x-hidden visible-in-small-devices pb-4'>
+        <Row className='h-100 g-3'>
+          <Col lg={6} className='h-100'>
+            <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
+              <Card.Body className="d-flex flex-column h-100 overflow-auto">
+                <Row>
+                  {viewTopData?.map((item, index) => (
+                    <Col key={"data_view_" + index} {...item.colProps}>
+                      <CommonViewData label={item.label} value={item.value} />
+                    </Col>
+                  ))}
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col lg={6} className='h-100'>
+            <Card className="border-0 shadow">
+              <Card.Header className='bg-body border-0 py-3'>
+                <Row className='g-2 align-items-center'>
+                  <Col xs="auto">
+                    <Image
+                      className="object-fit-cover rounded-circle"
+                      src={defaultAvatar}
+                      width={36}
+                      height={36}
+                      alt="John Smith"
+                    />
+                  </Col>
+                  <Col xs className='small lh-sm'>
+                    <div className='fw-bold'>John Smith</div>
+                    <Stack direction='horizontal' gap={2} className='text-secondary'>
+                      <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                      <span>07-14-24 | 10:00 am </span>
+                    </Stack>
+                  </Col>
+                </Row>
+              </Card.Header>
+              <Card.Body>
+                Body
+                {fileName && (
+                  <div className='mx-n3 px-3 mt-3 mb-n2'>
+                    <Link
+                      target="_blank"
+                      to="/fi-users/import"
+                      className="text-decoration-none small mw-100 text-break"
+                    >
+                      {fileName}
+                    </Link>
+                  </div>
+                )}
+              </Card.Body>
+              <Card.Footer className='bg-body py-3'>
+                <Stack direction='horizontal' gap={2} className='flex-wrap'>
+                  <div className="overflow-hidden position-relative z-1 flex-shrink-0 me-auto">
+                    <label
+                      htmlFor="files"
+                      className="small link-info align-middle cursor-pointer"
+                    >
+                      <span className='align-text-bottom'><MdAttachFile size={16} /></span> Add attachment
+                    </label>
+                    <input
+                      id="files"
+                      accept="image/png, image/jpeg, image/jpg"
+                      className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                      type="file"
+                      onChange={handleFileChange}
+                    />
+                  </div>
+                  <Button
+                    type='button'
+                    size="sm"
+                    variant='outline-dark'
+                  >
+                    Reply to Customer
+                  </Button>
+                  <Button
+                    type='button'
+                    size="sm"
+                    variant='warning'
+                  >
+                    Reply Internally
+                  </Button>
+                </Stack>
+              </Card.Footer>
+            </Card>
+          </Col>
+        </Row>
       </div>
 
+      <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3 bg-body">
+        <Stack
+          direction="horizontal"
+          gap={3}
+          className="justify-content-end flex-wrap"
+        >
+          <Link
+            to={"/tickets"}
+            className="btn btn-outline-dark custom-min-width-85"
+          >
+            {t("BACK")}
+          </Link>
+
+        </Stack>
+      </div>
     </div>
   )
 }

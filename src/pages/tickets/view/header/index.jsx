@@ -31,7 +31,7 @@ const TicketViewHeader = ({ title = "" }) => {
     };
 
     return (
-        <div className="contentHeader">
+        <div className="pb-3">
             <Stack
                 direction="horizontal"
                 gap={2}
