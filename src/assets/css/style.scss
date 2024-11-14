@@ -2,6 +2,7 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom height and width classes
+@include custom-class('font-size', 30);
 @include custom-class('height', 26);
 @include custom-class('width', 26);
 @include custom-class('min-height', 38);
@@ -9,6 +10,8 @@
 @include custom-class('width', 38);
 @include custom-class('height', 42);
 @include custom-class('width', 42);
+@include custom-class('width', 48);
+@include custom-class('height', 48);
 @include custom-class('height', 60);
 @include custom-class('width', 60);
 @include custom-class('min-width', 75);
@@ -166,6 +169,10 @@ input:-webkit-autofill:active {
     background-color: $custom-bg-light-green;
 }
 
+.bg-yellow {
+    background-color: $custom-bg-yellow;
+}
+
 .spin {
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
@@ -212,6 +219,14 @@ input:-webkit-autofill:active {
                 overflow: hidden;
                 max-height: 100%;
             }
+        }
+    }
+}
+
+.hide-dropdown-arrow {
+    &.dropdown-toggle {
+        &::after {
+            display: none;
         }
     }
 }

@@ -4,14 +4,14 @@ $white: #FFF;
 $body-tertiary-bg: #F8F6F4;
 $body-secondary-bg: #F5F5F5;
 $body-color: #000000;
-$primary: #00549E;
+$primary: #005DA5;
 $secondary: #7F7F7F;
 $dark: $body-color;
-$danger: #DA220B;
-$info: #007BFF;
-$warning: #F6C300;
-$success: #146C2E;
-$link-color: #0088FF;
+$danger: #E12726;
+$info: #0088FF;
+$warning: #F6BD16;
+$success: #28A745;
+$link-color: $info;
 $border-color: rgba($body-color, 0.25);
 $input-border-color: $secondary;
 $input-focus-border-color: $link-color;
@@ -84,11 +84,12 @@ $theme-sidebar-brand-height: 5em;
 $theme-header-height: 4rem;
 $custom-bg-light-green: #28A745;
 $custom-bg-light-blue: #1B7ACE;
+$custom-bg-yellow: #DE9800;
 
 // Generate custom classes for width, min-width, height, min-height
 @mixin custom-class($property, $value) {
   .custom-#{$property}-#{$value} {
-    #{$property}: #{$value}+px;
+    #{$property}: #{$value}+px !important;
   }
 }
 
