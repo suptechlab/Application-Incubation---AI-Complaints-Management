@@ -79,7 +79,7 @@ jhipster:
   # CORS is disabled by default on microservices, as you should access them through a gateway.
   # If you want to enable it, please uncomment the configuration below.
   cors:
-    allowed-origins: "http://localhost:3001,http://localhost:3001/,https://localhost:3001,https://user-suptechdev.seps.gob.ec,https://webportal-suptechdev.seps.gob.ec"
+    allowed-origins: "http://localhost:3001,http://localhost:3001/,https://localhost:3001,https://user-suptechdev.seps.gob.ec,https://webportal-suptechdev.seps.gob.ec,http://localhost:3000,http://localhost:3000/"
     # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: "*"
