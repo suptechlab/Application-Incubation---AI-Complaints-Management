@@ -32,7 +32,9 @@ public enum SepsStatusCode implements StatusType {
     ROLE_NAME_ALREADY_EXIST(20031, "role.name.already.exist"),
     INVALID_PERMISSION_FOR_USER_TYPE(20032, "invalid.permission.for.user.type"),
     FI_USER_NOT_FOUND(20033, "fi.user.not.found"),
-    FI_USER_ALREADY_EXIST(20034, "fi.user.already.exist");
+    FI_USER_ALREADY_EXIST(20034, "fi.user.already.exist"),
+    DUPLICATE_TEMPLATE(20035,"duplicate.template"),
+    TEMPLATE_NOT_FOUND(20036,"template.not.found");
 
     private final int code;
 

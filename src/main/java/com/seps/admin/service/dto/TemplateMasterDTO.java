@@ -1,5 +1,7 @@
 package com.seps.admin.service.dto;
 
+import com.seps.admin.enums.TemplateTypeEnum;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 @NoArgsConstructor
@@ -10,9 +12,12 @@ public class TemplateMasterDTO {
 
     private Long id;
     private String templateKey;
+    @NotEmpty
     private String templateName;
-    private String templateType;
+    private TemplateTypeEnum templateType;
+    @NotEmpty
     private String subject;
+    @NotEmpty
     private String content;
     private String supportedVariables;
     private Boolean status;

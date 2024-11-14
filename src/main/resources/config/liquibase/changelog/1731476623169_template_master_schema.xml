@@ -9,7 +9,7 @@
       <column name="id" type="BIGINT" autoIncrement="true">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="template_key" type="VARCHAR(100)">
+      <column name="template_key" type="VARCHAR(255)">
         <constraints nullable="false" unique="true"/>
       </column>
       <column name="template_name" type="VARCHAR(255)">
@@ -23,9 +23,9 @@
       <column name="supported_variables" type="TEXT"/>
       <column name="status" type="BOOLEAN" defaultValueBoolean="true"/>
       <column name="created_by" type="BIGINT"/>
-      <column name="created_date" type="TIMESTAMP" defaultValueDate="CURRENT_TIMESTAMP"/>
+      <column name="created_at" type="TIMESTAMP" defaultValueDate="CURRENT_TIMESTAMP"/>
       <column name="updated_by" type="BIGINT"/>
-      <column name="updated_date" type="TIMESTAMP"/>
+      <column name="updated_at" type="TIMESTAMP"/>
     </createTable>
     <addForeignKeyConstraint
       baseTableName="template_master" baseColumnNames="created_by"
