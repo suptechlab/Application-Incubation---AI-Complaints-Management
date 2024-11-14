@@ -137,5 +137,6 @@ export const englishLang = {
     "SELECT ROLE" : "Select Role",
     "PENDING":"Pending",
     "BLOCKED" : "Blocked",
-    "DELETED":"Deleted"
+    "DELETED":"Deleted",
+    "USER TYPE":"User Type",
 }

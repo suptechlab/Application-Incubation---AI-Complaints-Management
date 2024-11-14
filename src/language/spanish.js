@@ -138,5 +138,6 @@ export const spanishLang = {
     "SELECT ROLE": "Seleccionar rol",
     "PENDING": "Pendiente",
     "BLOCKED": "Bloqueado",
-    "DELETED": "Eliminado"
+    "DELETED": "Eliminado",
+    "USER TYPE":"Tipo de usuario",
 }

@@ -55,18 +55,21 @@ const RoleRightsForm = () => {
           name: roleData.name,
           description: roleData.description,
           rights: rights,
+          userType: roleData.userType,
         });
+        
+        setUserType(roleData.userType); // SEPS_USER/FI_USER
         setModules(response.data.modules);
       });
       setLoading(false);
     } else {
-      setUserType('SEPS_USER'); // SEPS_USER/FI_USER
+      //setUserType('SEPS_USER'); // SEPS_USER/FI_USER
       fetchModulesAndPermissions(userType).then((response) => {
         setModules(response.data);
       });
       setLoading(false);
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, userType]);
 
   // const handleCheckboxChange = (e, module, permission, permissionId) => {
   //     setInitialValues(prevValues => ({
@@ -83,7 +86,7 @@ const RoleRightsForm = () => {
   //         },
   //     }));
   // };
-  
+
   const handleCheckboxChange = (
     e,
     module,
@@ -127,8 +130,8 @@ const RoleRightsForm = () => {
           navigate("/role-rights");
         })
         .catch((error) => {
-            toast.error(error.response.data.errorDescription);
-      });
+          toast.error(error.response.data.errorDescription);
+        });
     } else {
       handleAddRoleRight(payload)
         .then((response) => {
@@ -150,7 +153,7 @@ const RoleRightsForm = () => {
       {
         loading ? <Loader isLoading={loading} /> :
           <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-            <PageHeader title={`${isEdit ? t('EDIT') : t('ADD')} `} /> {t('ROLE & RIGHTS')}
+            <PageHeader title={`${isEdit ? t('EDIT') : t('ADD')} ${t('ROLE & RIGHTS')}`} />
             <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
               <Card.Body className="d-flex flex-column">
                 <Formik
@@ -173,7 +176,42 @@ const RoleRightsForm = () => {
                       className="d-flex flex-column h-100"
                     >
                       <Row>
+                        {/* <pre>{JSON.stringify(values,null,2)}</pre> */}
                         <Col xs={12}>
+                          <Row>
+                            <Col md={4}>
+                              <div className='d-flex justify-content-between status-radio'>
+                                <div>
+                                  <label className='fs-13 fw-bolder'>{t('USER TYPE')}</label>
+                                </div>
+                                <div className='d-flex'>
+                                    <label className="form-check-label">
+                                      <input
+                                        className="form-check-input radio-inline"
+                                        type="radio"
+                                        name="userType"
+                                        value="SEPS_USER"
+                                        checked={values.userType === 'SEPS_USER'}
+                                        onChange={() => setFieldValue("userType", "SEPS_USER")}
+                                      />
+                                      {t('SEPS USER')}
+                                    </label>
+                                    <label className="form-check-label ms-3">
+                                      <input
+                                        className="form-check-input radio-inline"
+                                        type="radio"
+                                        name="userType"
+                                        value="FI_USER"
+                                        checked={values.userType === 'FI_USER'}
+                                        onChange={() => setFieldValue("userType", "FI_USER")}
+                                      />
+                                      {t('FI USER')}
+                                    </label>
+                                  </div>
+                              </div>
+
+                            </Col>
+                          </Row>
                           <Row>
                             <Col md={4}>
                               <FormInput
@@ -207,7 +245,7 @@ const RoleRightsForm = () => {
 
                           <div className="mt-2">
                             <h5 className="fw-semibold border-bottom pb-1 mb-3">
-                              Ceder derechos  
+                              Ceder derechos
                             </h5>
                             {modules.map((module) => (
                               <div key={module.id} className="mb-2 pb-1">
@@ -260,14 +298,14 @@ const RoleRightsForm = () => {
                             to={"/role-rights"}
                             className="btn btn-outline-dark custom-min-width-85"
                           >
-                             {t('CANCEL')}
+                            {t('CANCEL')}
                           </Link>
                           <Button
                             type="submit"
                             variant="warning"
                             className="custom-min-width-85"
                           >
-                              {isEdit ? t('UPDATE') : t('SUBMIT')}
+                            {isEdit ? t('UPDATE') : t('SUBMIT')}
                           </Button>
                         </Stack>
                       </div>

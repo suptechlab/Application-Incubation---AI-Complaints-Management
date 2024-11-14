@@ -122,7 +122,7 @@ export const NavItems = () => {
           path: "/template-master",
           moduleName: ["Master Management"],
           roleName: "admin",
-          disabled: true,
+          disabled: false,
         }
       ],
     },
