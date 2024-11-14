@@ -6,7 +6,7 @@ import FormInputBox from '../../../components/FormInput';
 import SvgIcons from '../../../components/SVGIcons';
 import { ChatBotFormSchema } from '../validations';
 import { useDispatch, useSelector } from 'react-redux';
-import {  sendQuery } from '../../../redux/slice/helpDeskSlice';
+import { addChatData, sendQuery } from '../../../redux/slice/helpDeskSlice';
 
 const ChatBotForm = () => {
 
@@ -16,7 +16,8 @@ const ChatBotForm = () => {
         message: '',
     };
 
-    const { apiResponse } = useSelector((state) => state.helpDeskSlice);
+    const { apiResponse, queryError } = useSelector((state) => state.helpDeskSlice);
+    const [chatEnded , setChatEnded] = useState(false)
 
     const [chatData, setChatData] = useState([{
         id: 1,
@@ -24,13 +25,24 @@ const ChatBotForm = () => {
         userMode: false,
         botViewMode: true,
         botReview: [],
-        botSuggestion: []
+        botSuggestion: [],
+        error: null
     },])
+
+    const [senderId, setSenderId] = useState("")
+
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
         // Send the message to the API
-        dispatch(sendQuery({ message: values.message }));
+
+        const msgData = {
+            message: values?.message
+        }
+        if (senderId) {
+            msgData.sender = senderId
+        }
+        dispatch(sendQuery(msgData));
 
         // Add user message to the chat state
         const userMessage = {
@@ -38,17 +50,15 @@ const ChatBotForm = () => {
             message: values.message,
             userMode: true,
             botViewMode: false,
-            botReview: [],
+            botReview: [], //buttons
             botSuggestion: [],
         };
 
-        setChatData([...chatData , userMessage])
+        setChatData([...chatData, userMessage])
 
         actions.setSubmitting(false);
         actions.resetForm();
     };
-
-
     //Dummy Chat 
     const dummy_chat = [
         {
@@ -250,18 +260,95 @@ const ChatBotForm = () => {
             botReview: [],
         },
     ]
-
-
     // Action Button Handler
-    const actionButtonHandler = (id) => {
-        console.log(`Button with suggestion ${id} clicked!`);
+    const actionButtonHandler = (msgData) => {
+        // Send the message to the API
+        dispatch(sendQuery(msgData));
     };
 
+    const [prevApiResponse, setPrevApiResponse] = useState(null);
 
-    useEffect(()=>{
-        // MANAGE API RESPONSE HERE WITH CHAT DATA
-    },[apiResponse])
+    useEffect(() => {
+        if (Array.isArray(apiResponse) && apiResponse.length > 0) {
+            // Compare current apiResponse with the previous one to avoid duplicates
+            const isDuplicateResponse = JSON.stringify(apiResponse) === JSON.stringify(prevApiResponse);
 
+            if (!isDuplicateResponse) {
+                setChatData((prevChatData) => {
+                    // Map through the apiResponse to create new chat data
+                    const newChatData = apiResponse?.map((item, index) => {
+                        const hasButtons = item.buttons && item.buttons.length > 0;
+                        return {
+                            id: prevChatData.length + index + 1,
+                            message: <>{item.text}</>,
+                            userMode: false,
+                            botViewMode: true,
+                            recipientId: item.recipientId,
+                            botReview: hasButtons
+                                ? item.buttons.map((btn, idx) => ({
+                                    id: idx + 1,
+                                    suggestion: btn.title,
+                                    positive: idx === 0, // Assuming the first button is positive
+                                    payload: btn.payload,
+                                }))
+                                : [],
+                            botSuggestion: [],
+                        };
+                    });
+
+                    // Return the new chat data
+                    return [...prevChatData, ...newChatData];
+                });
+
+                // Update senderId if the last recipientId exists
+                const lastRecipientId = apiResponse.at(-1)?.recipientId;
+                if (lastRecipientId) setSenderId(lastRecipientId);
+                // Set the new apiResponse as prevApiResponse
+                setPrevApiResponse(apiResponse);
+            }
+        }else if(prevApiResponse !== null){
+            // setChatEnded(true)
+        }
+       
+    
+            
+
+        if (queryError) {
+
+            // Add queryError as a new message if not already added
+            setChatData((prevChatData) => {
+                const lastError = prevChatData.at(-1)?.error;
+
+                // Avoid adding duplicate error messages
+                if (lastError === queryError) return prevChatData;
+
+                const userMessage = {
+                    id: prevChatData.length + 1, // Use prevChatData length for unique ID
+                    message: '',
+                    userMode: false,
+                    botViewMode: false,
+                    botReview: [],
+                    botSuggestion: [],
+                    error: queryError,
+                };
+
+                return [...prevChatData, userMessage];
+            });
+        }
+
+    }, [apiResponse, queryError]);
+
+
+    // useEffect(()=>{
+    //     if(chatHistory===undefined){
+    //         addChatData(chatData)
+    //     }else{
+    //         setChatData(chatHistory)
+    //     }
+    // },[])
+
+
+    // console.log(chatData)
 
     return (
         <React.Fragment>
@@ -277,7 +364,7 @@ const ChatBotForm = () => {
                         <div className='chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-3'>
                             {/* Message Repeater Section */}
                             {chatData?.map((messageItem) => {
-                                const { id, message, userMode, botViewMode, botSuggestion, botReview } = messageItem;
+                                const { id, message, userMode, botViewMode, botSuggestion, botReview, recipientId, error } = messageItem;
                                 return (
                                     <div
                                         key={id}
@@ -294,6 +381,7 @@ const ChatBotForm = () => {
                                             >
                                                 {userMode ? <MdPerson size={32} /> : SvgIcons.RobotIcon(24, 24)}
                                             </span>
+                                            <div> <p className='text-danger'>{error}</p></div>
                                             <div
                                                 className={`fw-medium my-auto rounded ${userMode ? 'bg-body-tertiary text-start' : 'bg-warning bg-opacity-10'} ${botViewMode ? 'bg-white' : 'p-2'}`}
                                             >
@@ -305,14 +393,14 @@ const ChatBotForm = () => {
                                                         className="flex-wrap mt-3"
                                                     >
                                                         {botReview.map((actionItem) => {
-                                                            const { id, suggestion, positive } = actionItem;
+                                                            const { id, suggestion, positive, payload } = actionItem;
                                                             return (
                                                                 <Button
                                                                     key={id}
                                                                     type="button"
                                                                     variant={positive ? "success" : "light"}
                                                                     className={`bot-tag-btns text-start border-opacity-50 border-primary fs-6 lh-sm py-2 ${positive ? "text-white" : "text-body"}`}
-                                                                    onClick={() => actionButtonHandler(suggestion)}
+                                                                    onClick={() => actionButtonHandler({ message: payload, sender: recipientId })}
                                                                 >
                                                                     {suggestion}
                                                                 </Button>
@@ -349,9 +437,12 @@ const ChatBotForm = () => {
 
                             })}
                             {/* WHEN CHAT ENDS USE THIS */}
-                            {/* <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
+                            {
+                                chatEnded ?   <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
                                 <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
-                            </Stack> */}
+                            </Stack> : ''
+                            }
+                          
                         </div>
 
                         {/* Chatbot Body Footer */}
