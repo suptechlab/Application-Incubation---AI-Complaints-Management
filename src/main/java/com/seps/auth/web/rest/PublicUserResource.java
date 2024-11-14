@@ -59,6 +59,13 @@ public class PublicUserResource {
         return pageable.getSort().stream().map(Sort.Order::getProperty).allMatch(ALLOWED_ORDERED_PROPERTIES::contains);
     }
 
+    /**
+     * Retrieves detailed information of a person based on their identification number.
+     *
+     * @param identificacion The national identification number of the person to retrieve.
+     * @return ResponseEntity containing the {@code PersonInfoDTO} with person details.
+     */
+    @GetMapping("/person-info")
     public ResponseEntity<PersonInfoDTO> getPersonInformationByIdentification(@RequestParam(name = "identificacion") String identificacion) {
         // Perform the status update
         PersonInfoDTO personInfo = userService.fetchPersonDetails(identificacion);

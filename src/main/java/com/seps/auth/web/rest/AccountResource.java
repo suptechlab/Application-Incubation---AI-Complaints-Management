@@ -16,14 +16,20 @@ import com.seps.auth.web.rest.vm.ResetPasswordVM;
 import jakarta.validation.Valid;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.zalando.problem.Status;
 
@@ -69,15 +75,15 @@ public class AccountResource {
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already used.
      */
-    @PostMapping("/register")
-    public ResponseEntity<Void> registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
-            throw new InvalidPasswordException();
-        }
-        User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<Void> registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+//        if (isPasswordLengthInvalid(managedUserVM.getPassword())) {
+//            throw new InvalidPasswordException();
+//        }
+//        User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
+//        mailService.sendActivationEmail(user);
+//        return ResponseEntity.status(HttpStatus.CREATED).build();
+//    }
 
     /**
      * {@code GET  /activate} : activate the registered user.
@@ -237,7 +243,7 @@ public class AccountResource {
      */
     @PostMapping("/register/request-otp")
     public ResponseEntity<ResponseStatus> requestRegisterOtp(@RequestBody @Valid RequestOtpDTO requestOtpDTO) {
-        String email = requestOtpDTO.getEmail();
+        String email = requestOtpDTO.getEmail().toLowerCase();
         Otp otp = otpService.generateOtp(email);
         mailService.sendRegisterOtpEmail(otp, LocaleContextHolder.getLocale());
         return new ResponseEntity<>(new ResponseStatus(
@@ -263,7 +269,7 @@ public class AccountResource {
      */
     @PostMapping("/register/verify-otp")
     public ResponseEntity<Void> verifyRegisterOtp(@Valid @RequestBody VerifyOtpDTO verifyOtpDTO) {
-        String email = verifyOtpDTO.getEmail();
+        String email = verifyOtpDTO.getEmail().toLowerCase();
         String otpCode = verifyOtpDTO.getOtpCode();
         boolean isVerified = otpService.verifyOtp(email, otpCode);
         if (!isVerified) {

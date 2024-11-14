@@ -1,15 +1,13 @@
 package com.seps.auth.service;
 
 import com.seps.auth.config.Constants;
-import com.seps.auth.domain.Authority;
-import com.seps.auth.domain.LoginLog;
-import com.seps.auth.domain.User;
-import com.seps.auth.repository.AuthorityRepository;
-import com.seps.auth.repository.LoginLogRepository;
-import com.seps.auth.repository.UserRepository;
+import com.seps.auth.domain.*;
+import com.seps.auth.enums.UserStatusEnum;
+import com.seps.auth.repository.*;
 import com.seps.auth.security.AuthoritiesConstants;
 import com.seps.auth.security.SecurityUtils;
 import com.seps.auth.service.dto.AdminUserDTO;
+import com.seps.auth.service.dto.RegisterUserDTO;
 import com.seps.auth.service.dto.UserDTO;
 
 import java.io.IOException;
@@ -63,8 +61,12 @@ public class UserService {
 
     private final OtpService otpService;
 
+    private final PersonaRepository personaRepository;
+
+    private final OtpRepository otpRepository;
+
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository,
-                       LoginLogRepository loginLogRepository, RecaptchaService recaptchaService, ExternalAPIService externalAPIService, OtpService otpService) {
+                       LoginLogRepository loginLogRepository, RecaptchaService recaptchaService, ExternalAPIService externalAPIService, OtpService otpService, PersonaRepository personaRepository, OtpRepository otpRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
@@ -72,6 +74,8 @@ public class UserService {
         this.recaptchaService = recaptchaService;
         this.externalAPIService = externalAPIService;
         this.otpService = otpService;
+        this.personaRepository = personaRepository;
+        this.otpRepository = otpRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -111,46 +115,46 @@ public class UserService {
             });
     }
 
-    public User registerUser(AdminUserDTO userDTO, String password) {
-        userRepository
-            .findOneByLogin(userDTO.getLogin().toLowerCase())
-            .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
-                if (!removed) {
-                    throw new UsernameAlreadyUsedException();
-                }
-            });
-        userRepository
-            .findOneByEmailIgnoreCase(userDTO.getEmail())
-            .ifPresent(existingUser -> {
-                boolean removed = removeNonActivatedUser(existingUser);
-                if (!removed) {
-                    throw new EmailAlreadyUsedException();
-                }
-            });
-        User newUser = new User();
-        String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setLogin(userDTO.getLogin().toLowerCase());
-        // new user gets initially a generated password
-        newUser.setPassword(encryptedPassword);
-        newUser.setFirstName(userDTO.getFirstName());
-        newUser.setLastName(userDTO.getLastName());
-        if (userDTO.getEmail() != null) {
-            newUser.setEmail(userDTO.getEmail().toLowerCase());
-        }
-        newUser.setImageUrl(userDTO.getImageUrl());
-        newUser.setLangKey(userDTO.getLangKey());
-        // new user is not active
-        newUser.setActivated(false);
-        // new user gets registration key
-        newUser.setActivationKey(RandomUtil.generateActivationKey());
-        Set<Authority> authorities = new HashSet<>();
-        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
-        newUser.setAuthorities(authorities);
-        userRepository.save(newUser);
-        LOG.debug("Created Information for User: {}", newUser);
-        return newUser;
-    }
+//    public User registerUser(AdminUserDTO userDTO, String password) {
+//        userRepository
+//            .findOneByLogin(userDTO.getLogin().toLowerCase())
+//            .ifPresent(existingUser -> {
+//                boolean removed = removeNonActivatedUser(existingUser);
+//                if (!removed) {
+//                    throw new UsernameAlreadyUsedException();
+//                }
+//            });
+//        userRepository
+//            .findOneByEmailIgnoreCase(userDTO.getEmail())
+//            .ifPresent(existingUser -> {
+//                boolean removed = removeNonActivatedUser(existingUser);
+//                if (!removed) {
+//                    throw new EmailAlreadyUsedException();
+//                }
+//            });
+//        User newUser = new User();
+//        String encryptedPassword = passwordEncoder.encode(password);
+//        newUser.setLogin(userDTO.getLogin().toLowerCase());
+//        // new user gets initially a generated password
+//        newUser.setPassword(encryptedPassword);
+//        newUser.setFirstName(userDTO.getFirstName());
+//        newUser.setLastName(userDTO.getLastName());
+//        if (userDTO.getEmail() != null) {
+//            newUser.setEmail(userDTO.getEmail().toLowerCase());
+//        }
+//        newUser.setImageUrl(userDTO.getImageUrl());
+//        newUser.setLangKey(userDTO.getLangKey());
+//        // new user is not active
+//        newUser.setActivated(false);
+//        // new user gets registration key
+//        newUser.setActivationKey(RandomUtil.generateActivationKey());
+//        Set<Authority> authorities = new HashSet<>();
+//        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+//        newUser.setAuthorities(authorities);
+//        userRepository.save(newUser);
+//        LOG.debug("Created Information for User: {}", newUser);
+//        return newUser;
+//    }
 
     private boolean removeNonActivatedUser(User existingUser) {
         if (existingUser.isActivated()) {
@@ -440,25 +444,94 @@ public class UserService {
     }
 
     /**
-     * Fetches the details of a person based on the provided identification.
+     * Fetches detailed information of a person based on their identification.
      * <p>
-     * This method calls an external API service to retrieve the information of a person
-     * identified by the given {@code identification}. If the person is not found, a
-     * {@code PersonNotFoundException} is caught, and a {@code CustomException} with
-     * a "NOT_FOUND" status is thrown, indicating that the person could not be located.
+     * This method first tries to retrieve person details from an external API.
+     * If the person record is not found in the database, it saves the new details to the database.
      * </p>
      *
-     * @param identificacion the unique identifier of the person whose details are to be fetched.
-     * @return a {@link PersonInfoDTO} containing the details of the person.
-     * @throws CustomException if the person is not found, with a status code of
-     *                         {@code SepsStatusCode.PERSON_NOT_FOUND}.
+     * @param identificacion The national identification number of the person.
+     * @return PersonInfoDTO containing the person's details.
+     * @throws CustomException if the person is not found in the external API.
      */
     public PersonInfoDTO fetchPersonDetails(String identificacion) {
         try {
-            return externalAPIService.getPersonInfo(identificacion);
+            PersonInfoDTO personInfoDTO = externalAPIService.getPersonInfo(identificacion);
+            Optional<Persona> optionalPersona = personaRepository.findByIdentificacion(identificacion);
+            if (!optionalPersona.isPresent()) {
+                Persona persona = new Persona();
+                persona.setIdentificacion(identificacion);
+                persona.setNombreCompleto(personInfoDTO.getNombreCompleto());
+                persona.setGenero(personInfoDTO.getGenero());
+                persona.setLugarNacimiento(personInfoDTO.getLugarNacimiento());
+                persona.setNacionalidad(personInfoDTO.getNacionalidad());
+                personaRepository.save(persona);
+            }
+            return personInfoDTO;
         } catch (PersonNotFoundException e) {
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.PERSON_NOT_FOUND,
                 new String[]{identificacion}, null);
         }
     }
+
+    @Transactional
+    public User registerUser(RegisterUserDTO userDTO) {
+        userRepository
+            .findOneByEmailIgnoreCase(userDTO.getEmail())
+            .ifPresent(existingUser -> {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_ALREADY_USED, null, null);
+            });
+        String email = userDTO.getEmail();
+        Otp otpEntity = otpRepository.findOneByEmailIgnoreCase(email)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null));
+        if (otpEntity.getExpiryTime().isBefore(Instant.now())) {
+            LOG.error("OTP code is expired");
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
+        }
+        if (!otpEntity.isUsed()) {
+            LOG.error("Email not verified :{}", email);
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_NOT_VERIFIED, null, null);
+        }
+        String identificacion = userDTO.getIdentificacion();
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        userRepository
+            .findOneByIdentificacionAndAuthoritiesIn(identificacion, authorities)
+            .ifPresent(existingUser -> {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_IDENTIFICATION_ALREADY_EXIST, new String[]{identificacion}, null);
+            });
+
+        Persona persona = getPersonaByIdentificacion(identificacion);
+        String normalizeEmail = userDTO.getEmail().toLowerCase();
+        User newUser = new User();
+        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
+        newUser.setLogin(normalizeEmail);
+        // new user gets initially a generated password
+        newUser.setPassword(encryptedPassword);
+        newUser.setFirstName(persona.getNombreCompleto());
+        newUser.setEmail(normalizeEmail);
+        newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
+        newUser.setActivated(true);
+        newUser.setCountryCode(userDTO.getCountryCode());
+        newUser.setPhoneNumber(userDTO.getPhoneNumber());
+        newUser.setStatus(UserStatusEnum.ACTIVE);
+        newUser.setPasswordSet(false);
+        newUser.setIdentificacion(identificacion);
+        newUser.setGender(persona.getGenero());
+        newUser.setFingerprintVerified(false);
+        //Set Authorities
+        newUser.setAuthorities(authorities);
+        userRepository.save(newUser);
+        LOG.debug("Created Information for Registered User: {}", newUser);
+        otpRepository.deleteByEmail(email);
+        return newUser;
+    }
+
+    @Transactional
+    public Persona getPersonaByIdentificacion(String identificacion) {
+        return personaRepository.findByIdentificacion(identificacion)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PERSON_NOT_FOUND,
+                new String[]{identificacion}, null));
+    }
+
 }

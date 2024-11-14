@@ -1,11 +1,14 @@
 package com.seps.auth.repository;
 
+import com.seps.auth.domain.Authority;
 import com.seps.auth.domain.User;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import com.seps.auth.enums.UserStatusEnum;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -50,5 +53,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return an Optional containing the user if found, or empty if no user has the given OTP code
      */
     Optional<User> findByOtpCode(String otpCode);
+
+    // Check if a user exists with the given identificacion, authorities
+    Optional<User> findOneByIdentificacionAndAuthoritiesIn(String identificacion, Set<Authority> authorities );
 
 }

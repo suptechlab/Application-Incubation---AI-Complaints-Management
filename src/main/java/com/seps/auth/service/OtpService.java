@@ -73,64 +73,33 @@ public class OtpService {
     }
 
     public Otp generateOtp(String email) {
-        // Generate new OTP code
         String otpCode = generateOtpCode();
-        // Set expiry time for the OTP (e.g., 5 minutes from now)
         Instant expiryTime = Instant.now().plusSeconds(OTP_EXPIRATION_DURATION * 60);
-        // Check if OTP for the email already exists
-        Optional<Otp> existingOtp = otpRepository.findByEmail(email);
-        Otp otp;
-        if (existingOtp.isPresent()) {
-            // If OTP exists for the email, update the entity with the new OTP
-            otp = existingOtp.get();
-        } else {
-            // If no OTP exists for the email, create a new one
-            otp = new Otp();
-            otp.setEmail(email);
-        }
+        Otp otp = otpRepository.findOneByEmailIgnoreCase(email)
+            .orElseGet(() -> {
+                Otp newOtp = new Otp();
+                newOtp.setEmail(email);
+                return newOtp;
+            });
         otp.setOtpCode(otpCode);
-        otp.setUsed(false);  // Reset OTP as unused
+        otp.setUsed(false);
         otp.setExpiryTime(expiryTime);
         otpRepository.save(otp);
-        // Simulate sending OTP (Here you would use email service)
         LOG.debug("Sent OTP: {} to email:{}", otpCode, email);
         return otp;
     }
 
-    /**
-     * Verifies the provided OTP code for the given email.
-     * <p>
-     * This method retrieves the OTP entity associated with the specified email.
-     * It validates whether the OTP code matches and is not expired. If the OTP
-     * is valid and unused, it marks the OTP as used and returns {@code true}.
-     * If the OTP is expired, does not match, or has already been used, it
-     * returns {@code false}.
-     * </p>
-     *
-     * @param email   The email address associated with the OTP to verify.
-     * @param otpCode The OTP code to be verified.
-     * @return {@code true} if the OTP is valid, matches, and is unused; {@code false} otherwise.
-     * @throws CustomException if the OTP has already been used, with status {@code BAD_REQUEST}
-     *                         and error code {@code SepsStatusCode.OTP_COD_ALREADY_USED}.
-     */
     public boolean verifyOtp(String email, String otpCode) {
-        // Retrieve OTP entity using Optional to handle the absence of the entity
-        Optional<Otp> otpEntityOpt = otpRepository.findByEmail(email);
-        if (otpEntityOpt.isPresent()) {
-            Otp otp = otpEntityOpt.get();
-            // Check if OTP is valid
-            if (otp.isUsed()) {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.OTP_COD_ALREADY_USED, null, null);
-            }
-            // Check if the OTP matches and is still valid (not expired)
-            if (otp.getOtpCode().equals(otpCode) && otp.getExpiryTime().isAfter(Instant.now())) {
-                // OTP is valid, delete it (optional)
-                // Mark OTP as used
-                otp.setUsed(true);
-                otpRepository.save(otp);
-                return true;
-            }
+        Otp otp = otpRepository.findOneByEmailIgnoreCase(email)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null));
+        if (otp.isUsed()) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.OTP_COD_ALREADY_USED, null, null);
         }
-        return false;  // Either OTP doesn't match or it's expired
+        if (otp.getOtpCode().equals(otpCode) && otp.getExpiryTime().isAfter(Instant.now())) {
+            otp.setUsed(true);
+            otpRepository.save(otp);
+            return true;
+        }
+        return false;
     }
 }

@@ -11,6 +11,7 @@ import com.seps.auth.service.MailService;
 import com.seps.auth.service.RecaptchaService;
 import com.seps.auth.service.UserService;
 import com.seps.auth.service.dto.OtpResponse;
+import com.seps.auth.service.dto.RegisterUserDTO;
 import com.seps.auth.service.dto.ResponseStatus;
 import com.seps.auth.web.rest.errors.CustomException;
 import com.seps.auth.web.rest.errors.SepsStatusCode;
@@ -277,4 +278,29 @@ public class AuthenticateController {
         );
         return new ResponseEntity<>(status,HttpStatus.OK);
     }
+
+    /**
+     * Registers a new user in the system.
+     *
+     * <p>This endpoint accepts a {@link RegisterUserDTO} object containing the user's registration details.
+     * After successful registration, the user is authenticated and a JWT token is generated and returned.
+     *
+     * @param dto the {@link RegisterUserDTO} containing the user's registration information, validated upon receipt.
+     * @return a {@link ResponseEntity} containing the generated {@link JWTToken} and an HTTP header with the Bearer token.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<JWTToken> register(@Valid @RequestBody RegisterUserDTO dto) {
+        User user = userService.registerUser(dto);
+        List<GrantedAuthority> authorities = user.getAuthorities().stream()
+            .map(role -> new SimpleGrantedAuthority(role.getName()))
+            .collect(Collectors.toList());
+        UsernamePasswordAuthenticationToken authentication =
+            new UsernamePasswordAuthenticationToken(user.getLogin(), null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = this.createToken(authentication, true);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setBearerAuth(jwt);
+        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+    }
+
 }
