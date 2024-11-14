@@ -195,7 +195,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 {firstName} 
                 <br />
                 <Badge bg="light-green-custom" className="fs-normal">
-                  Admin
+                     Administrador
                 </Badge>
               </span>
               <FaCaretDown size={16} className="ms-1" />
@@ -205,19 +205,19 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 <span className="me-2">
                   <MdAccountBox size={18} />
                 </span>
-                <span className="align-middle">Profile</span>
+                <span className="align-middle">Perfil</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password">
                 <span className="me-2">
                   <MdKey size={18} />
                 </span>
-                <span className="align-middle">Change Password</span>
+                <span className="align-middle">Cambiar la contraseña</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} onClick={logout}>
                 <span className="me-2">
                   <MdLogout size={18} />
                 </span>
-                <span className="align-middle">Logout</span>
+                <span className="align-middle">Cerrar sesión</span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
