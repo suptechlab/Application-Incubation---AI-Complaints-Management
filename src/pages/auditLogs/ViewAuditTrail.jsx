@@ -9,20 +9,44 @@ import { getAuditLogsById } from '../../services/auditlogs.services';
 import AuditTable from './AuditTable';
 
 const ViewAuditTrail = () => {
+  const { id } = useParams();
+  const { t } = useTranslation();
+  const [data, setData] = useState({});
+  const [isLoading, setLoading] = useState(true);
 
-    const { id } = useParams();
+  useEffect(() => {
+    getAuditLogsById(id)
+      .then((response) => {
+        setData(response.data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [id]);
 
-    const { t } = useTranslation()
-    const [data, setData] = useState({});
-    const [isLoading , setLoading] = useState(true)
+  // View Top Data
+  const viewTopData = [
+    {
+      label: t("DATE AND TIME OF ACTIVITY"),
+      value: data?.createdAt
+        ? moment(data?.createdAt).format("D/M/YYYY hh:mm A")
+        : "-",
+    },
+    {
+      label: t("USERNAME/ID"),
+      value: data?.loggedUser?.firstName,
+    },
+    {
+      label: t("ACTIVITY TYPE"),
+      value: data?.activityType,
+    },
+    {
+      label: t("IP ADDRESS/LOCATION"),
+      value: data?.ipAddress,
+    },
+  ];
 
-    useEffect(() => {
-        getAuditLogsById(id).then(response => {
-            setData(response.data);
-        }).finally(()=>{
-            setLoading(false)
-        });
-    }, [id]);
+  
 
     return (
         <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">

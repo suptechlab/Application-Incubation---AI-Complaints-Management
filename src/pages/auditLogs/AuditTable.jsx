@@ -1,33 +1,36 @@
-import React from 'react';
-import { Table } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { Table } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 // Utility function to convert keys to camelCase
 const toCamelCase = (str) =>
-  str.replace(/([-_][a-z])/gi, (match) => match.toUpperCase().replace('-', '').replace('_', ''));
+  str.replace(/([-_][a-z])/gi, (match) =>
+    match.toUpperCase().replace("-", "").replace("_", "")
+  );
 
 const toCapitalized = (str) =>
-  str.replace(/([A-Z])/g, ' $1') // Add space before each uppercase letter
+  str
+    .replace(/([A-Z])/g, " $1") // Add space before each uppercase letter
     .replace(/^./, (match) => match.toUpperCase()); // Capitalize the first letter of the resulting string
 
 // Utility function to render cell data
 const renderCell = (value) => {
-  if (value === undefined || value === null || value === "") return '-';
-  if (typeof value === 'object') {
+  if (value === undefined || value === null || value === "") return "-";
+  if (typeof value === "object") {
     return (
       <Table bordered size="sm">
         <tbody>
           {Object.entries(value).map(([subKey, subValue]) => (
             <tr key={subKey}>
               <td>{toCamelCase(subKey)}</td>
-              <td>{JSON.stringify(subValue, null, 2).replace(/"/g, '')}</td>
+              <td>{JSON.stringify(subValue, null, 2).replace(/"/g, "")}</td>
             </tr>
           ))}
         </tbody>
       </Table>
     );
   }
-  return <pre>{JSON.stringify(value, null, 2).replace(/"/g, '')}</pre>;
+  return <pre className="mb-0">{JSON.stringify(value, null, 2).replace(/"/g, "")}</pre>;
 };
 
 // Render audit table

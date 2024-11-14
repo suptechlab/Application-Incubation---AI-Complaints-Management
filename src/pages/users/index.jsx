@@ -303,7 +303,7 @@ export default function UserList() {
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
           title="Usuarios de SEPS"
-          actions={[{ label: "Add New", to: "/users/add", variant: "warning" }]}
+          actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
