@@ -1,19 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import moment from "moment";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { Card, Col, Row, Stack } from "react-bootstrap";
-import toast from "react-hot-toast";
-import { MdConfirmationNumber, MdEdit, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
+import { Card } from "react-bootstrap";
+import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
-import DataGridActions from "../../../components/DataGridActions";
+import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import Toggle from "../../../components/Toggle";
-import { handleGetUsers, handleStatusChangeState } from "../../../services/user.service";
+import { handleGetUsers } from "../../../services/user.service";
 import TicketsListFilters from "./filters";
-import InfoCards from "../../../components/infoCards";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -133,7 +129,7 @@ export default function TicketsList() {
             colProps: { sm: 6, lg: 3 }
         },
         {
-            bgColor: 'bg-yellow',
+            bgColor: 'bg-orange',
             Icon: <MdHourglassEmpty size={24} />,
             title: 'Tickets in Progress',
             value: 2,
