@@ -271,14 +271,14 @@ export default function UserList() {
                 title: "Edit",
                 icon: <MdEdit size={18} />,
               },
-              {
-                name: "delete",
-                enabled: true,
-                type: "button",
-                title: "Delete",
-                icon: <MdDelete size={18} />,
-                handler: () => deleteAction(rowData.row.original),
-              },
+              // {
+              //   name: "delete",
+              //   enabled: true,
+              //   type: "button",
+              //   title: "Delete",
+              //   icon: <MdDelete size={18} />,
+              //   handler: () => deleteAction(rowData.row.original),
+              // },
             ]}
           />
         ),
