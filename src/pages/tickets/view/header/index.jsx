@@ -8,17 +8,18 @@ import AppTooltip from '../../../../components/tooltip';
 const TicketViewHeader = ({ title = "" }) => {
     const [selectedStatus, setSelectedStatus] = useState('In Progress');
 
-  // Function to handle dropdown item selection
-  const handleSelect = (priority) => {
-    setSelectedStatus(priority);
-  };
+    // Function to handle dropdown item selection
+    const handleSelect = (priority) => {
+        setSelectedStatus(priority);
+    };
 
     // The color class based on the status
+    const statusOptions = ['Closed', 'In Progress', 'New', 'Rejected'];
     const getStatusClass = (status) => {
         switch (status) {
             case 'Closed':
                 return 'bg-success';
-            case 'In progress':
+            case 'In Progress':
                 return 'bg-info';
             case 'New':
                 return 'bg-primary';
@@ -55,10 +56,15 @@ const TicketViewHeader = ({ title = "" }) => {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item className="small" onClick={() => handleSelect('Closed')}>Closed</Dropdown.Item>
-                            <Dropdown.Item className="small" onClick={() => handleSelect('In progress')}>In progress</Dropdown.Item>
-                            <Dropdown.Item className="small" onClick={() => handleSelect('New')}>New</Dropdown.Item>
-                            <Dropdown.Item className="small" onClick={() => handleSelect('Rejected')}>Rejected</Dropdown.Item>
+                            {statusOptions?.map((status) => (
+                                <Dropdown.Item
+                                    key={status}
+                                    className={`small ${selectedStatus === status ? 'active' : ''}`}
+                                    onClick={() => handleSelect(status)}
+                                >
+                                    {status}
+                                </Dropdown.Item>
+                            ))}
                         </Dropdown.Menu>
                     </Dropdown>
                     <Dropdown>

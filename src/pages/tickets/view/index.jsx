@@ -18,6 +18,7 @@ const TicketsView = () => {
   };
 
   // The color class based on the priority level
+  const priorityOptions = ['Low', 'Medium', 'High', 'NIL'];
   const getPriorityClass = (priority) => {
     switch (priority) {
       case 'Low':
@@ -66,18 +67,15 @@ const TicketsView = () => {
             </AppTooltip>
           </Dropdown.Toggle>
           <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
-            <Dropdown.Item className="small" onClick={() => handleSelect('Low')}>
-              Low
-            </Dropdown.Item>
-            <Dropdown.Item className="small" onClick={() => handleSelect('Medium')}>
-              Medium
-            </Dropdown.Item>
-            <Dropdown.Item className="small" onClick={() => handleSelect('High')}>
-              High
-            </Dropdown.Item>
-            <Dropdown.Item className="small" onClick={() => handleSelect('NIL')}>
-              NIL
-            </Dropdown.Item>
+            {priorityOptions?.map((priority) => (
+              <Dropdown.Item
+                key={priority}
+                className={`small ${selectedPriority === priority ? 'active' : ''}`}
+                onClick={() => handleSelect(priority)}
+              >
+                {priority}
+              </Dropdown.Item>
+            ))}
           </Dropdown.Menu>
         </Dropdown>
       </Stack>),
