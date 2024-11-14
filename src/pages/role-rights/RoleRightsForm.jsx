@@ -13,6 +13,7 @@ import {
 } from "../../services/rolerights.service";
 import Loader from "../../components/Loader";
 import { useTranslation } from "react-i18next";
+import { validationSchema } from "../../validations/rolerights.validation";
 
 const RoleRightsForm = () => {
 
@@ -149,12 +150,12 @@ const RoleRightsForm = () => {
       {
         loading ? <Loader isLoading={loading} /> :
           <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-            <PageHeader title={`${isEdit ? 'Edit' : 'Add'} Role`} />
+            <PageHeader title={`${isEdit ? t('EDIT') : t('ADD')} `} /> {t('ROLE & RIGHTS')}
             <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
               <Card.Body className="d-flex flex-column">
                 <Formik
                   initialValues={initialValues}
-                  //validationSchema={validationSchema}
+                  validationSchema={validationSchema}
                   onSubmit={onSubmit}
                   enableReinitialize
                 >

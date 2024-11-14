@@ -1,22 +1,23 @@
 import * as Yup from "yup";
+import { getValidationMessages } from "../services/Validation.service";
+const msg = getValidationMessages();
 
 const emailRegExp = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
 
 const validationSchema = Yup.object({
     email: Yup.string()
-        .matches(emailRegExp, "Email must be a valid email")
-        .required("Email is required.").max(100, "Maximum limit is 100"),
-    password: Yup.string().required("Password is required.").max(100, "Maximum limit is 100")
+        .matches(emailRegExp, msg.emailMustValid)
+        .required(msg.emailRequired).max(100, msg.maximumLimit100),
+        password: Yup.string().required(msg.passwordRequired).max(100, msg.maximumLimit100)
 
 });
 
 // OTP validation
 const OtpValidationSchema = Yup.object().shape({
-    //email_type: Yup.string().required('Pleae select email type'),
     otpCode: Yup.string()
-    .required("OTP is required.")
-    .matches(/^\d{6}$/, "OTP max 6 digits and only numbers")
+    .required(msg.otpRequired)
+    .matches(/^\d{6}$/, msg.otpMax6Digit)
   });
 
 export { validationSchema, OtpValidationSchema };

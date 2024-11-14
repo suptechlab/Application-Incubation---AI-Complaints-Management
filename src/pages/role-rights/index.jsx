@@ -186,9 +186,9 @@ export default function RoleRightsList() {
     <React.Fragment>
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
-          title="Roles & Rights"
+          title={t('ROLE & RIGHTS')}
           actions={[
-            { label: "Add New", to: "/role-rights/add", variant: "warning" },
+            { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">

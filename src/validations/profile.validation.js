@@ -1,20 +1,20 @@
-import * as Yup from "yup"
+import * as Yup from "yup";
+import { getValidationMessages } from "../services/Validation.service";
+const msg = getValidationMessages();
 
 const validationSchema = Yup.object({
     nationalID: Yup.string()
-        .max(250, "National ID cannot exceed 250 characters.")
-        .required("National ID is required."),
+        .max(250, msg.nationalIDMax) // Use dynamic message for National ID max length
+        .required(msg.nationalIDRequired), // Use dynamic message for National ID required
     email: Yup.string()
-        .max(250, "Email cannot exceed 250 characters.")
-        .required("Email is required."),
+        .max(250, msg.emailMax) // Use dynamic message for email max length
+        .required(msg.emailRequired), // Use dynamic message for email required
     firstName: Yup.string()
-        .max(250, "First name cannot exceed 250 characters.")
-        .required("First name is required."),
+        .max(250, msg.firstNameMax) // Use dynamic message for first name max length
+        .required(msg.firstNameRequired), // Use dynamic message for first name required
     lastName: Yup.string()
-        .max(250, "Last name cannot exceed 250 characters.")
-        .required("Last name is required."),
+        .max(250, msg.lastNameMax) // Use dynamic message for last name max length
+        .required(msg.lastNameRequired), // Use dynamic message for last name required
 });
-
-
 
 export { validationSchema };
