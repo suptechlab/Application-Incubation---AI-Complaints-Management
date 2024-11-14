@@ -1,17 +1,36 @@
-import React from "react";
+import moment from "moment";
+import React, { useState } from "react";
 import { Button, Dropdown, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { MdOutlineFilterAlt } from "react-icons/md";
 import { Link } from "react-router-dom";
+import CustomDateRangePicker from "../../../../components/CustomDateRangePicker";
 import FormInput from "../../../../components/FormInput";
 import ReactSelect from "../../../../components/ReactSelect";
 import AppTooltip from "../../../../components/tooltip";
 
 const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla }) => {
     const { t } = useTranslation();
+    const [dateFilter, setDateFilter] = useState({ startDate: '', endDate: '' })
+
+    // Temporary state to hold the selected dates
+    const [tempDateRange, setTempDateRange] = useState([null, null]);
+
+    const handleDateFilterChange = ([newStartDate, newEndDate]) => {
+        setTempDateRange([newStartDate, newEndDate]);
+
+        // Update filter state only if both dates are selected
+        if (newStartDate && newEndDate) {
+            setFilter({
+                startDate: moment(newStartDate).format("YYYY-MM-DD"),
+                endDate: moment(newEndDate).format("YYYY-MM-DD")
+            });
+        }
+    };
+
     return (
         <div className="theme-card-header header-search mb-3">
-            <Stack direction="horizontal" gap={2} className="flex-wrap">
+            <Stack direction="horizontal" gap={2} className="flex-wrap gap-md-3">
                 <div className="custom-width-200 flex-grow-1 flex-sm-grow-0 me-auto">
                     <FormInput
                         wrapperClassName="mb-0"
@@ -37,73 +56,87 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         value={filter.search}
                     />
                 </div>
-
-                <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-                    <Button
-                        type="button"
-                        variant="warning"
-                        onClick={returnToAdminClick}
-                    >
-                        Return to Admin
-                    </Button>
-                    <div className="custom-min-width-100 flex-grow-1 flex-md-grow-0">
-                        <ReactSelect
-                            wrapperClassName="mb-0"
-                            class="form-select "
-                            placeholder="Claim Type"
-                            id="floatingSelect"
-                            size="sm"
-                            options={[
-                                {
-                                    label: "Claim Type",
-                                    value: "",
-                                },
-                                {
-                                    label: "Option 1",
-                                    value: 'option-1',
-                                },
-                            ]}
-                            onChange={(e) => {
-                                setFilter({
-                                    ...filter,
-                                    status: e.target.value,
-                                });
-                            }}
-                            value={filter.status}
-                        />
-                    </div>
+                <Button
+                    type="button"
+                    variant="warning"
+                    onClick={returnToAdminClick}
+                    className="flex-grow-1 flex-sm-grow-0"
+                >
+                    Return to Admin
+                </Button>
+                <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                    <ReactSelect
+                        wrapperClassName="mb-0"
+                        class="form-select "
+                        placeholder="Claim Type"
+                        id="floatingSelect"
+                        size="sm"
+                        options={[
+                            {
+                                label: "Claim Type",
+                                value: "",
+                            },
+                            {
+                                label: "Option 1",
+                                value: 'option-1',
+                            },
+                        ]}
+                        onChange={(e) => {
+                            setFilter({
+                                ...filter,
+                                status: e.target.value,
+                            });
+                        }}
+                        value={filter.status}
+                    />
+                </div>
+                <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                    <ReactSelect
+                        wrapperClassName="mb-0"
+                        class="form-select "
+                        placeholder={t("ALL STATUS")}
+                        id="floatingSelect"
+                        size="sm"
+                        options={[
+                            {
+                                label: t("ALL STATUS"),
+                                value: "",
+                                class: "label-class",
+                            },
+                            {
+                                label: t("ACTIVE"),
+                                value: true,
+                            },
+                            {
+                                label: t("INACTIVE"),
+                                value: false,
+                            },
+                        ]}
+                        onChange={(e) => {
+                            setFilter({
+                                ...filter,
+                                status: e.target.value,
+                            });
+                        }}
+                        value={filter.status}
+                    />
+                </div>
+                <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap">
+                    {/* DATE RANGE FILTER */}
                     <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                        <ReactSelect
+                        <CustomDateRangePicker
                             wrapperClassName="mb-0"
-                            class="form-select "
-                            placeholder={t("ALL STATUS")}
-                            id="floatingSelect"
+                            tempDateRange={tempDateRange}
+                            handleChange={handleDateFilterChange}
+                            startDate={filter?.startDate ?? null}
+                            endDate={filter?.endDate}
+                            selectsRange={true}
+                            placeholder="Select Date Range"
                             size="sm"
-                            options={[
-                                {
-                                    label: t("ALL STATUS"),
-                                    value: "",
-                                    class: "label-class",
-                                },
-                                {
-                                    label: t("ACTIVE"),
-                                    value: true,
-                                },
-                                {
-                                    label: t("INACTIVE"),
-                                    value: false,
-                                },
-                            ]}
-                            onChange={(e) => {
-                                setFilter({
-                                    ...filter,
-                                    status: e.target.value,
-                                });
-                            }}
-                            value={filter.status}
                         />
                     </div>
 
+                    {/* Dropdown FILTER */}
                     <Dropdown>
                         <Dropdown.Toggle
                             variant="link"
