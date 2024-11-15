@@ -19,6 +19,7 @@ export default function ReactTable({
   setSorting,
   pagination,
   sorting,
+  showPagination=true,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,7 +29,7 @@ export default function ReactTable({
   const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 0;
 
 
-  const {data } = dataQuery;
+  const { data } = dataQuery;
   // console.log('32 table',dataQuery?.data)
   const table = useReactTable({
     // data: dataQuery.data?.data?.data ?? defaultData,
@@ -148,21 +149,24 @@ export default function ReactTable({
         </tbody>
       </BTable>
 
-      <div className="mt-auto pt-3 pb-1 pagination-cover">
-        <DataGridPagination
-          rowsPerPage={pagination.pageSize}
-          currentPage={pagination.pageIndex + 1}
-          totalPages={Math.ceil(totalRecords / pagination.pageSize)}
-          totalRecords={totalRecords}
-          setCurrentPage={(selected) => {
-            table.setPagination({ ...pagination, pageIndex: selected - 1 });
-          }}
-          currentTotalRecord={table.getRowModel().rows.length}
-          setLimit={(limit) => {
-            table.setPagination({ pageIndex: 0, pageSize: limit });
-          }}
-        />
-      </div>
+      {/* Conditionally render pagination based on showPagination prop */}
+      {showPagination && (
+        <div className="mt-auto pt-3 pb-1 pagination-cover">
+          <DataGridPagination
+            rowsPerPage={pagination.pageSize}
+            currentPage={pagination.pageIndex + 1}
+            totalPages={Math.ceil(totalRecords / pagination.pageSize)}
+            totalRecords={totalRecords}
+            setCurrentPage={(selected) => {
+              table.setPagination({ ...pagination, pageIndex: selected - 1 });
+            }}
+            currentTotalRecord={table.getRowModel().rows.length}
+            setLimit={(limit) => {
+              table.setPagination({ pageIndex: 0, pageSize: limit });
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
