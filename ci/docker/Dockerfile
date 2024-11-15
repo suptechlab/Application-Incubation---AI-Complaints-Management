@@ -12,24 +12,22 @@ COPY . .
 RUN chmod +x ./mvnw
 RUN ./mvnw -Pprod clean verify -DskipTests
 
-FROM openjdk:17-alpine
+FROM openjdk:17-slim
 
 ARG ARG_VERSION
 ENV VERSION=$ARG_VERSION
 
-# Install required libraries for font rendering
-RUN apk add --no-cache fontconfig ttf-dejavu libx11 curl
+# Install necessary libraries and fonts
+RUN apt-get update && apt-get install -y \
+    ttf-mscorefonts-installer \
+    fontconfig \
+    ttf-dejavu \
+    libx11-6 \
+    curl && \
+    fc-cache -f -v && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* 
 
-# Download and install Microsoft Core Fonts, including Calibri
-RUN curl -LO http://ftp.us.debian.org/debian/pool/contrib/m/msttcorefonts-installer/msttcorefonts-installer_3.8.1_all.deb && \
-    apk add --no-cache --virtual .msttcorefonts-installer-deps --allow-untrusted msttcorefonts-installer_3.8.1_all.deb && \
-    rm msttcorefonts-installer_3.8.1_all.deb && \
-    apk del .msttcorefonts-installer-deps
-
-# Rebuild font cache
-RUN fc-cache -f -v    
-
-RUN apk add --no-cache tzdata
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
