@@ -272,7 +272,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
         pdCause.setStatus(ex.getStatus().getStatusCode());
         // Add the custom properties
-        String errorDescription = messageSource.getMessage(ex.getsSepsStatusCode().getReasonPhrase(), ex.getMessageArgs(), request.getLocale());
+        String errorDescription;
+        if (ex.isUseMessageDirectly()) {
+            errorDescription = ex.getMessage(); // Use the direct message
+        } else {
+            // Fetch from language file
+            errorDescription = messageSource.getMessage(ex.getsSepsStatusCode().getReasonPhrase(), ex.getMessageArgs(), request.getLocale());
+        }
         pdCause.setProperty("message", ex.getMessage());
         pdCause.setProperty("errorCode", ex.getsSepsStatusCode().getStatusCode());
         pdCause.setProperty("errorDescription", errorDescription);

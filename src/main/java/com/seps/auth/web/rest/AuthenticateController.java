@@ -6,10 +6,12 @@ import static com.seps.auth.security.SecurityUtils.JWT_ALGORITHM;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seps.auth.domain.LoginLog;
 import com.seps.auth.domain.User;
+import com.seps.auth.enums.UserStatusEnum;
 import com.seps.auth.repository.LoginLogRepository;
 import com.seps.auth.service.MailService;
 import com.seps.auth.service.RecaptchaService;
 import com.seps.auth.service.UserService;
+import com.seps.auth.service.dto.LoginOtpDTO;
 import com.seps.auth.service.dto.OtpResponse;
 import com.seps.auth.service.dto.RegisterUserDTO;
 import com.seps.auth.service.dto.ResponseStatus;
@@ -303,4 +305,24 @@ public class AuthenticateController {
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
+    @PostMapping("/send-login-otp")
+    public ResponseEntity<OtpResponse> sendLoginOtp(@Valid @RequestBody LoginOtpDTO dto,HttpServletRequest request){
+        String clientIp = request.getRemoteAddr();
+        // Verify reCAPTCHA
+//        if (!userService.isRecaptchaValid(dto.getRecaptchaToken())) {
+//            LOG.error("Recaptcha verification failed for send login otp token: {}", dto.getRecaptchaToken());
+//            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+//        }
+        User account = userService.getEndUserWithAuthoritiesByEmail(dto.getEmail())
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_ACCOUNT_NOT_EXIST, null, null));
+        userService.validateAccount(account);
+        String login=account.getLogin();
+        // Retrieve user, update OTP, and send via email
+        User user=userService.updateUserOtpInfo(login);
+        mailService.sendLoginOtpEmail(user);
+        // Log the successful login attempt
+        userService.saveLoginLog(user,UserService.INITIATED, clientIp);
+        // Return OTP response
+        return new ResponseEntity<>(new OtpResponse(user.getOtpToken(), user.getOtpTokenExpirationTime()), HttpStatus.OK);
+    }
 }

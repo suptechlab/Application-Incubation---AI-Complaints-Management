@@ -3,14 +3,16 @@ package com.seps.auth.suptech.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seps.auth.service.UserService;
+import com.seps.auth.service.dto.ConsultationRequest;
 import com.seps.auth.suptech.service.ExternalAPIService;
-import com.seps.auth.suptech.service.OrganizationNotFoundException;
 import com.seps.auth.suptech.service.PersonNotFoundException;
-import com.seps.auth.suptech.service.dto.OrganizationInfoDTO;
+import com.seps.auth.suptech.service.PersonValidationException;
 import com.seps.auth.suptech.service.dto.PersonInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -33,7 +35,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
             // Check if Content-Type is JSON
             if (!response.getHeaders().getContentType().toString().contains("application/json")) {
                 LOG.error("Unexpected response format: {}", response.getBody());
-                throw new RuntimeException("Expected JSON response but received HTML or other format.");
+                throw new RuntimeException("Se esperaba una respuesta JSON pero se recibió un formato no compatible.");
             }
             // Parse JSON response
             JsonNode jsonResponse;
@@ -41,7 +43,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
                 jsonResponse = objectMapper.readTree(response.getBody());
             } catch (JsonProcessingException e) {
                 LOG.error("Error parsing JSON response: {}", response.getBody(), e);
-                throw new RuntimeException("Invalid JSON response from external API", e);
+                throw new RuntimeException("Expected JSON response but received unsupported formatInvalid JSON response from external API", e);
             }
             // Check response status
             if (jsonResponse.has("status") && "Succefull".equals(jsonResponse.get("status").asText())) {
@@ -67,21 +69,48 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
             }
         } catch (Exception e) {
             LOG.error("Unexpected error while calling external API", e);
-            throw new RuntimeException("An error occurred while calling the external API", e);
+            throw new RuntimeException("Se produjo un error al llamar a la API de información personal", e);
         }
     }
 
 
     @Override
-    public OrganizationInfoDTO getOrganizationInfo(String ruc) {
-        String url = "https://srvrestpre-app.seps.gob.ec/organizaciones-sf/obtener-organizacion/publico/obtener-informacion-organizacion-ruc/" + ruc;
+    public Boolean validateIndividualPerson(ConsultationRequest request) {
+        String identificacion = request.getIdentificacion();
+        String individualDactilar = request.getIndividualDactilar();
+        String url = "http://sca.seps.local/seps-consulta/consultaDinardap/validarPersonaIndividual";
+        String requestBody = String.format(
+            "{\"identificacion\":\"%s\",\"individualDactilar\":\"%s\"}",
+            identificacion, individualDactilar);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         try {
-            ResponseEntity<OrganizationInfoDTO> response = restTemplate.getForEntity(url, OrganizationInfoDTO.class);
-            return response.getBody();
-        } catch (HttpClientErrorException.BadRequest e) {
-            throw new OrganizationNotFoundException("No se encontró la entidad para el RUC " + ruc);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            if (!response.getHeaders().getContentType().toString().contains("application/json")) {
+                LOG.error("Unexpected response format: {}", response.getBody());
+                throw new RuntimeException("Se esperaba una respuesta JSON pero se recibió un formato no compatible.");
+            }
+            JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+            if (jsonResponse.has("status") && "Succefull".equals(jsonResponse.get("status").asText())) {
+                return true; // Successful validation
+            } else {
+                String errorMessage = jsonResponse.has("message") ? jsonResponse.get("message").asText() : "Validación fallida.";
+                throw new PersonValidationException(errorMessage);
+            }
+        } catch (HttpClientErrorException e) {
+            LOG.error("HTTP client error: {}", e.getMessage());
+            String responseBody = e.getResponseBodyAsString();
+            try {
+                JsonNode errorResponse = objectMapper.readTree(responseBody);
+                String errorMessage = errorResponse.has("message") ? errorResponse.get("message").asText() : "Validación fallida";
+                throw new PersonValidationException(errorMessage);
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException("Error al analizar la respuesta de error: " + responseBody, ex);
+            }
         } catch (Exception e) {
-            throw new RuntimeException("An error occurred while calling the external API", e);
+            LOG.error("Unexpected error during validation", e);
+            throw new RuntimeException("Se produjo un error al validar la persona individual", e);
         }
     }
 }

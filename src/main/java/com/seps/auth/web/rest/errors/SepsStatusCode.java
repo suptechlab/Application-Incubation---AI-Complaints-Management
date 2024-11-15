@@ -19,7 +19,13 @@ public enum SepsStatusCode implements StatusType {
     ORGANIZATION_RUC_NOT_FOUND(10022, "organization.ruc.not.found"),
     EMAIL_ALREADY_USED(10023, "email.already.used"),
     USER_IDENTIFICATION_ALREADY_EXIST(10024, "user.identification.already.exist"),
-    EMAIL_NOT_VERIFIED(10025, "email.not.verified");
+    EMAIL_NOT_VERIFIED(10025, "email.not.verified"),
+    INVALID_INDIVIDUAL_PERSON(10026, "invalid.individual.person"),
+    USER_ACCOUNT_NOT_EXIST(10027, "user.account.not.exist"),
+    USER_ACCOUNT_NOT_ACTIVE(10028, "user.account.not.active"),
+    USER_ACCOUNT_STATUS_PENDING(10029, "user.account.status.pending"),
+    USER_ACCOUNT_STATUS_BLOCKED(10030, "user.account.status.blocked"),
+    USER_ACCOUNT_STATUS_DELETED(10031, "user.account.status.deleted");
 
     private final int code;
 
