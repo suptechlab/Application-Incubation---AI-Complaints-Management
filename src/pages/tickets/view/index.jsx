@@ -1,28 +1,18 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, Dropdown, Image, Row, Stack } from 'react-bootstrap';
+import { Card, Col, Dropdown, Image, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown, MdAttachFile, MdCalendarToday } from 'react-icons/md';
 import { Link } from 'react-router-dom';
+import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from '../../../components/CommonViewData';
 import Loader from '../../../components/Loader';
 import AppTooltip from '../../../components/tooltip';
 import TicketViewHeader from './header';
-import defaultAvatar from "../../../assets/images/default-avatar.jpg";
+import TicketTabsSection from './tabs';
 
 const TicketsView = () => {
   const { t } = useTranslation();
   const [selectedPriority, setSelectedPriority] = useState('Low');
-  const [fileName, setFileName] = useState("");
-
-  //Handle File Change
-  const handleFileChange = (event) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      setFileName(file.name);
-    } else {
-      setFileName("Fi_Users_data.xlsx");
-    }
-  };
 
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
@@ -156,7 +146,7 @@ const TicketsView = () => {
           <Col lg={6}>
             <Card className="border-0 shadow">
               <Card.Header className='bg-body border-0 py-3'>
-                <Row className='g-2 align-items-center'>
+                <Row className='g-2'>
                   <Col xs="auto">
                     <Image
                       className="object-fit-cover rounded-circle"
@@ -175,55 +165,7 @@ const TicketsView = () => {
                   </Col>
                 </Row>
               </Card.Header>
-              <Card.Body>
-                Body
-                {fileName && (
-                  <div className='mx-n3 px-3 mt-3 mb-n2'>
-                    <Link
-                      target="_blank"
-                      to="/fi-users/import"
-                      className="text-decoration-none small mw-100 text-break"
-                    >
-                      {fileName}
-                    </Link>
-                  </div>
-                )}
-              </Card.Body>
-              <Card.Footer className='bg-body py-3'>
-                <Stack direction='horizontal' gap={2} className='flex-wrap'>
-                  <div className="overflow-hidden position-relative z-1 flex-shrink-0 me-auto">
-                    <label
-                      htmlFor="files"
-                      className="small link-info align-middle cursor-pointer"
-                    >
-                      <span className='align-text-bottom'><MdAttachFile size={16} /></span> Add attachment
-                    </label>
-                    <input
-                      id="files"
-                      accept="image/png, image/jpeg, image/jpg"
-                      className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                      type="file"
-                      onChange={handleFileChange}
-                    />
-                  </div>
-                  <Stack direction='horizontal' gap={2} className='flex-wrap justify-content-between justify-content-sm-end flex-fill'>
-                    <Button
-                      type='button'
-                      size="sm"
-                      variant='outline-dark'
-                    >
-                      Reply to Customer
-                    </Button>
-                    <Button
-                      type='button'
-                      size="sm"
-                      variant='warning'
-                    >
-                      Reply Internally
-                    </Button>
-                  </Stack>
-                </Stack>
-              </Card.Footer>
+              <TicketTabsSection />
             </Card>
           </Col>
         </Row>

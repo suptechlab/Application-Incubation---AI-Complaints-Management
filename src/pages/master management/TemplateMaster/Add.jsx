@@ -84,6 +84,7 @@ const Add = ({ modal, toggle }) => {
                 id="description"
                 name="description"
                 label="Template Details *"
+                height="215"
                 content={values.description}
                 error={errors?.description}
                 touched={touched?.description}
