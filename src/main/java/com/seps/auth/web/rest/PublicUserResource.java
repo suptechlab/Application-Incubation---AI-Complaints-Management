@@ -71,6 +71,4 @@ public class PublicUserResource {
         PersonInfoDTO personInfo = userService.fetchPersonDetails(identificacion);
         return ResponseEntity.ok(personInfo);
     }
-
-
 }

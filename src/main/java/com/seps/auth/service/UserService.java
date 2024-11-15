@@ -455,6 +455,14 @@ public class UserService {
      * @throws CustomException if the person is not found in the external API.
      */
     public PersonInfoDTO fetchPersonDetails(String identificacion) {
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        userRepository
+            .findOneByIdentificacionAndAuthoritiesIn(identificacion, authorities)
+            .ifPresent(existingUser -> {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_IDENTIFICATION_ALREADY_EXIST, new String[]{identificacion}, null);
+            });
+
         try {
             PersonInfoDTO personInfoDTO = externalAPIService.getPersonInfo(identificacion);
             Optional<Persona> optionalPersona = personaRepository.findByIdentificacion(identificacion);

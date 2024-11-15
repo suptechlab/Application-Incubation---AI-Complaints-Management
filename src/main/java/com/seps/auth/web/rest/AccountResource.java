@@ -243,6 +243,13 @@ public class AccountResource {
      */
     @PostMapping("/register/request-otp")
     public ResponseEntity<ResponseStatus> requestRegisterOtp(@RequestBody @Valid RequestOtpDTO requestOtpDTO) {
+
+        userRepository
+            .findOneByEmailIgnoreCase(requestOtpDTO.getEmail())
+            .ifPresent(existingUser -> {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_ALREADY_USED, null, null);
+            });
+
         String email = requestOtpDTO.getEmail().toLowerCase();
         Otp otp = otpService.generateOtp(email);
         mailService.sendRegisterOtpEmail(otp, LocaleContextHolder.getLocale());
