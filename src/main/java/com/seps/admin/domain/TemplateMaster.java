@@ -2,6 +2,8 @@ package com.seps.admin.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
@@ -41,12 +43,18 @@ public class TemplateMaster {
     @Column(name = "created_by")
     private Long createdBy;
 
-    @Column(name = "created_date", updatable = false)
-    private Instant createdDate;
+    @ManyToOne
+    @JoinColumn(name = "created_by", referencedColumnName = "id", insertable = false, updatable = false)
+    private User userCreatedBy;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    @Column(name = "updated_date")
-    private Instant updatedDate;
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 }
