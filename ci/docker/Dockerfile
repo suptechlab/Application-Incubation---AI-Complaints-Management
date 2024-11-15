@@ -17,6 +17,9 @@ FROM openjdk:17-alpine
 ARG ARG_VERSION
 ENV VERSION=$ARG_VERSION
 
+# Install required libraries for font rendering
+RUN apk add --no-cache fontconfig ttf-dejavu libx11
+
 RUN apk add --no-cache tzdata
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
