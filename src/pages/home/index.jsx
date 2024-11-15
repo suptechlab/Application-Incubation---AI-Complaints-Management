@@ -51,7 +51,7 @@ const Home = () => {
                         className="text-uppercase w-100 text-nowrap fw-bold"
                         size="lg"
                         onClick={handlePrivacyClick}
-                        disabled={true}
+                        // disabled={true}
                       >
                         <span aria-hidden={true} className="me-1">
                           <MdEditDocument size={17} />

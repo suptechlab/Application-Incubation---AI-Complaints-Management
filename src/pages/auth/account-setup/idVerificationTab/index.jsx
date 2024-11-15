@@ -6,20 +6,49 @@ import FormInputBox from "../../../../components/FormInput";
 import SvgIcons from "../../../../components/SVGIcons";
 import AppTooltip from "../../../../components/tooltip";
 import { IdVerificationFormSchema } from "../../validations";
+import { useDispatch } from "react-redux";
+import { fingerPrintValidate, nationalIdVerify } from "../../../../redux/slice/authSlice";
 
-const IdVerificationTab = ({ handleFormSubmit }) => {
+const IdVerificationTab = ({ isSubmitted }) => {
     const [isFormSubmitted, setIsFormSubmitted] = useState(false)
+    const dispatch = useDispatch()
     // Initial Values
-    const initialValues = {
-        nationalID: '',
+    const [initialValues] = useState({
+        nationalID: '1716194319', // REMOVE THIS VALUE AFTER DEVELOPMENT
         fingerprintCode: '',
-        otpCode: '',
+    });
+
+    const [isIdVerified, setIsVerified] = useState(false)
+    // Handle Submit Handler
+    const handleSubmit = async (values, actions) => {
+
+        isSubmitted(true);
+        setIsFormSubmitted(true)
+
+        // handleFormSubmit(values, actions);
+
+        // UNCOMMENT THIS CODE ONCE FINGERPRINT API STARTS
+        // const result = await dispatch(fingerPrintValidate({ identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }));
+        // if (fingerPrintValidate.fulfilled.match(result)) {
+        //     isSubmitted(true);
+        //     setIsFormSubmitted(true)
+        // } else {
+        //     console.log("ARE YOU IN ELSE PART NA")
+        //     setIsFormSubmitted(false)
+        // }
+        actions.setSubmitting(false);
     };
 
-    // Handle Submit Handler
-    const handleSubmit = (values, actions) => {
-        setIsFormSubmitted(true)
-        handleFormSubmit(values, actions);
+    // Handle National ID Verification
+    const handleNationalIdVerify = async (value) => {
+        if (value && value !== '') {
+            const result = await dispatch(nationalIdVerify(value));
+            if (nationalIdVerify.fulfilled.match(result)) {
+                setIsVerified(true)
+            } else {
+                console.error('Verification error:', result.error.message);
+            }
+        }
     };
 
     return (
@@ -57,7 +86,7 @@ const IdVerificationTab = ({ handleFormSubmit }) => {
                                 name="nationalID"
                                 type="text"
                                 error={formikProps.errors.nationalID}
-                                onBlur={formikProps.handleBlur}
+                                onBlur={(event) => handleNationalIdVerify(event?.target?.value)}
                                 onChange={formikProps.handleChange}
                                 touched={formikProps.touched.nationalID}
                                 value={formikProps.values.nationalID || ""}
@@ -73,12 +102,13 @@ const IdVerificationTab = ({ handleFormSubmit }) => {
                                 name="fingerprintCode"
                                 type="text"
                                 error={formikProps.errors.fingerprintCode}
-                                onBlur={formikProps.handleBlur}
+                                onBlur={formikProps?.handleBlur}
                                 onChange={formikProps.handleChange}
                                 touched={formikProps.touched.fingerprintCode}
                                 value={formikProps.values.fingerprintCode || ""}
                                 inputIcon={isFormSubmitted && <span className="text-success position-absolute top-0 end-0 p-1 custom-width-42 h-100 d-inline-flex align-items-center justify-content-center pe-none user-select-none">{SvgIcons.checkBadgeIcon}</span>}
                                 inputClassName={isFormSubmitted && "custom-padding-right-42"}
+                                disabled={!isIdVerified}
                             />
                         </Col>
                         <Col xs="auto" className="pt-lg-4">
@@ -86,9 +116,9 @@ const IdVerificationTab = ({ handleFormSubmit }) => {
                                 type="submit"
                                 variant="warning"
                                 className="custom-min-width-90 custom-margin-top-1"
-                                disabled={isFormSubmitted}
+                                disabled={isFormSubmitted || !isIdVerified}
                             >
-                                Verify
+                                {isFormSubmitted ? 'Verified' : 'Verify'}
                             </Button>
                         </Col>
                     </Row>

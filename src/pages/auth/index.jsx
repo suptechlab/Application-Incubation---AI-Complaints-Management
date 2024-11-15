@@ -5,6 +5,9 @@ import SetupSuccesModal from "./account-setup/setup-success";
 import FileClaimModal from "./file-a-claim";
 import LoginModal from "./login";
 import PrivacyModal from './privacy';
+import { dpaAcceptance } from "../../redux/slice/helpDeskSlice";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 /**
  * File a Claim Main Modal
@@ -16,16 +19,26 @@ import PrivacyModal from './privacy';
  */
 
 const FileClaimMainModal = ({ handleShow, handleClose }) => {
-  const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(false);
+
+  const { isAgree } = useSelector((state) => state?.helpDeskSlice);
+  const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(isAgree);
   const [isSignupClicked, setIsSignupClicked] = useState(false);
   const [setupSuccesModalShow, setSetupSuccesModalShow] = useState(false);
   const [isFileClaimModalShow, setIsFileClaimModalShow] = useState(false);
 
+  const dispatch = useDispatch()
+
   // Handle Privacy Form Submit
-  const handlePrivacyFormSubmit = (values, actions) => {
-    console.log('handlePrivacyFormSubmit', values)
+  const handlePrivacyFormSubmit = (values, actions) => { 
     setIsPrivacyFormSubmitted(true);
     actions.setSubmitting(false);
+    dispatch(dpaAcceptance(values?.agreePrivacy)).then((data) => {
+      if (data.payload.status == 200) {
+        toast.success(data?.payload?.message ?? "")
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
   };
 
   // Handle Signup Button Click
@@ -96,7 +109,7 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
       <FileClaimModal
         handleShow={isFileClaimModalShow}
         handleClose={() => setIsFileClaimModalShow(false)}
-        // handleFormSubmit={handleFileClaimButtonClick}
+      // handleFormSubmit={handleFileClaimButtonClick}
       />
     </React.Fragment>
   );

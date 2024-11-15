@@ -31,6 +31,7 @@ const PersonalInfoTab = ({ handleFormSubmit }) => {
 
   // Handle OTP Submit Handler
   const handleOtpSubmit = (values, actions) => {
+    console.log("CALLING OTP SUBMIT HERE")
     setIsFormSubmitted(false);
     setIsFormEmailValidate(true);
     handleFormSubmit(values, actions);

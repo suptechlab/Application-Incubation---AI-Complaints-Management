@@ -50,7 +50,7 @@ export const createAxiosInstance = (baseURL) => {
         const statusCode = error.response.status;
         switch (Math.floor(statusCode / 100)) {
           case 4:
-            toast.error(`Client error ${statusCode}: ${error.response.statusText}, ${error.response.data.message}`);
+            toast.error(`${error?.response?.data?.errorDescription ?? error?.response?.data?.message}`);
             break;
           case 5:
             toast.error(`Server error ${statusCode}: ${error.response.statusText}`);
@@ -72,3 +72,4 @@ export const createAxiosInstance = (baseURL) => {
 
 // Usage example: creating an Axios instance for user API
 export const userApi = createAxiosInstance(`${process.env.REACT_APP_USER_API_URL}`);
+export const authApi = createAxiosInstance(`${process.env.REACT_APP_AUTH_API_URL}`);

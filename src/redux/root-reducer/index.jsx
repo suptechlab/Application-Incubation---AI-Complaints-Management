@@ -1,9 +1,11 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import helpDeskSlice from '../slice/helpDeskSlice';
+import authSlice from '../slice/authSlice'
 
 const MainReducer = combineReducers(
   {
     helpDeskSlice:  helpDeskSlice,
+    authSlice : authSlice
   }
 );
 

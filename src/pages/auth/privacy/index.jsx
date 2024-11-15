@@ -13,7 +13,7 @@ import PrivacyData from "./privacyData";
  * @returns {*}
  */
 
-const PrivacyModal = ({ handleClose, handleFormSubmit }) => {
+const PrivacyModal = ({ handleClose, handleFormSubmit }) => { 
   // Initial Values
   const initialValues = {
     agreePrivacy: false,

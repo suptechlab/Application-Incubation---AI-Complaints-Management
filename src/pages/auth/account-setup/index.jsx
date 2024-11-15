@@ -3,16 +3,23 @@ import { Button, Col, Modal, Row, Stack, Tab } from "react-bootstrap";
 import StepsProgress from "../../../components/stepProgress/stepProgress";
 import IdVerificationTab from "./idVerificationTab";
 import PersonalInfoTab from "./personalInfoTab";
+import { fingerPrintValidate } from "../../../redux/slice/authSlice";
+import { useDispatch } from "react-redux";
 
 const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
+
+    const dispatch = useDispatch()
+
     const [activeTab, setActiveTab] = useState(0);
     const [isIdVerificationSubmitted, setIsIdVerificationSubmitted] = useState(false);
     const [isPersonalInfoSubmitted, setIsPersonalInfoSubmitted] = useState(false);
 
     // Handle ID Verification Submit
-    const handleIdVerificationSubmit = (values, actions) => {
-        console.log('ID Verification values', values)
-        setIsIdVerificationSubmitted(true);
+    const handleIdVerificationSubmit = async (values, actions) => {
+        const result = await dispatch(fingerPrintValidate({identificacion : values?.nationalID , individualDactilar : values?.fingerprintCode}));
+        if (fingerPrintValidate.fulfilled.match(result)) {
+            setIsIdVerificationSubmitted(true);
+        }
         actions.setSubmitting(false);
     };
 
@@ -53,7 +60,7 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
     const tabData = [
         {
             eventKey: 0,
-            content: <IdVerificationTab handleFormSubmit={handleIdVerificationSubmit} />,
+            content: <IdVerificationTab isSubmitted={setIsIdVerificationSubmitted} />,
         },
         {
             eventKey: 1,
