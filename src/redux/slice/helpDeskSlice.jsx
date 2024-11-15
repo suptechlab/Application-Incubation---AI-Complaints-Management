@@ -11,7 +11,7 @@ const initialState = {
     queryError: null,
     querySuccess: false,
     apiResponse: {},
-    chatHistory: [], // Adding a chatHistory array to hold chat messages
+  
 };
 
 // DPA ACCEPTANCE 
@@ -73,14 +73,10 @@ const helpDeskSlice = createSlice({
             state.querySuccess = false;
             state.queryError = null;
         },
-        addChatData: (state, action) => {
-            // action.payload should contain the new chat message
-            if (Array.isArray(state.chatHistory)) {
-                state.chatHistory.push(action.payload);
-            } else {
-                console.error('chatHistory is not an array:', state.chatHistory);
-            }
-        },
+       
+        clearApiResponse(state) {
+            state.apiResponse = null;
+          },
     
     },
     extraReducers: (builder) => {
@@ -118,6 +114,6 @@ const helpDeskSlice = createSlice({
     },
 });
 
-export const { toggleChatbot ,addChatData} = helpDeskSlice.actions;
+export const { toggleChatbot ,clearApiResponse} = helpDeskSlice.actions;
 
 export default helpDeskSlice.reducer;

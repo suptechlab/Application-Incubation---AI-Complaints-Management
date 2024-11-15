@@ -6,7 +6,7 @@ import FormInputBox from '../../../components/FormInput';
 import SvgIcons from '../../../components/SVGIcons';
 import { ChatBotFormSchema } from '../validations';
 import { useDispatch, useSelector } from 'react-redux';
-import { addChatData, sendQuery } from '../../../redux/slice/helpDeskSlice';
+import { clearApiResponse, sendQuery } from '../../../redux/slice/helpDeskSlice';
 
 const ChatBotForm = () => {
 
@@ -17,7 +17,8 @@ const ChatBotForm = () => {
     };
 
     const { apiResponse, queryError } = useSelector((state) => state.helpDeskSlice);
-    const [chatEnded , setChatEnded] = useState(false)
+    const [chatEnded, setChatEnded] = useState(false)
+ 
 
     const [chatData, setChatData] = useState([{
         id: 1,
@@ -36,28 +37,33 @@ const ChatBotForm = () => {
     const handleSubmit = (values, actions) => {
         // Send the message to the API
 
-        const msgData = {
-            message: values?.message
+
+        if(values?.message && values?.message!== null){
+            const msgData = {
+                message: values?.message
+            }
+            if (senderId) {
+                msgData.sender = senderId
+            }
+            dispatch(sendQuery(msgData));
+    
+            // Add user message to the chat state
+            const userMessage = {
+                id: chatData.length + 1,
+                message: values.message,
+                userMode: true,
+                botViewMode: false,
+                botReview: [], //buttons
+                botSuggestion: [],
+            };
+    
+            setChatData([...chatData, userMessage])
+    
+            actions.setSubmitting(false);
+            actions.resetForm();
         }
-        if (senderId) {
-            msgData.sender = senderId
-        }
-        dispatch(sendQuery(msgData));
 
-        // Add user message to the chat state
-        const userMessage = {
-            id: chatData.length + 1,
-            message: values.message,
-            userMode: true,
-            botViewMode: false,
-            botReview: [], //buttons
-            botSuggestion: [],
-        };
-
-        setChatData([...chatData, userMessage])
-
-        actions.setSubmitting(false);
-        actions.resetForm();
+      
     };
     //Dummy Chat 
     const dummy_chat = [
@@ -261,69 +267,126 @@ const ChatBotForm = () => {
         },
     ]
     // Action Button Handler
-    const actionButtonHandler = (msgData) => {
+    const actionButtonHandler = (event ,msgData) => {
+        event.preventDefault();
         // Send the message to the API
         dispatch(sendQuery(msgData));
     };
 
     const [prevApiResponse, setPrevApiResponse] = useState(null);
 
+    // useEffect(() => {
+    //     if (Array.isArray(apiResponse) && apiResponse.length > 0) {
+    //         // Compare current apiResponse with the previous one to avoid duplicates
+    //         const isDuplicateResponse = JSON.stringify(apiResponse) === JSON.stringify(prevApiResponse);
+
+    //         if (!isDuplicateResponse) {
+    //             setChatData((prevChatData) => {
+    //                 // Map through the apiResponse to create new chat data
+    //                 const newChatData = apiResponse?.map((item, index) => {
+    //                     const hasButtons = item.buttons && item.buttons.length > 0;
+    //                     return {
+    //                         id: prevChatData.length + index + 1,
+    //                         message: <>{item.text}</>,
+    //                         userMode: false,
+    //                         botViewMode: true,
+    //                         recipientId: item.recipientId,
+    //                         botReview: hasButtons
+    //                             ? item.buttons.map((btn, idx) => ({
+    //                                 id: idx + 1,
+    //                                 suggestion: btn.title,
+    //                                 positive: idx === 0, // Assuming the first button is positive
+    //                                 payload: btn.payload,
+    //                             }))
+    //                             : [],
+    //                         botSuggestion: [],
+    //                     };
+    //                 });
+
+    //                 // Return the new chat data
+    //                 return [...prevChatData, ...newChatData];
+    //             });
+
+    //             // Update senderId if the last recipientId exists
+    //             const lastRecipientId = apiResponse.at(-1)?.recipientId;
+    //             if (lastRecipientId) setSenderId(lastRecipientId);
+    //             // Set the new apiResponse as prevApiResponse
+    //             setPrevApiResponse(apiResponse);
+    //         }
+    //     }else if(prevApiResponse !== null){
+    //         // setChatEnded(true)
+    //     }
+
+    //     if (queryError) {
+    //         // Add queryError as a new message if not already added
+    //         setChatData((prevChatData) => {
+    //             const lastError = prevChatData.at(-1)?.error;
+
+    //             // Avoid adding duplicate error messages
+    //             if (lastError === queryError) return prevChatData;
+
+    //             const userMessage = {
+    //                 id: prevChatData.length + 1, // Use prevChatData length for unique ID
+    //                 message: '',
+    //                 userMode: false,
+    //                 botViewMode: false,
+    //                 botReview: [],
+    //                 botSuggestion: [],
+    //                 error: queryError,
+    //             };
+
+    //             return [...prevChatData, userMessage];
+    //         });
+    //     }
+
+    // }, [apiResponse, queryError]);
+
+
+
+
     useEffect(() => {
+        let updatedChatData = [...chatData]; // Start with existing chat data
+
+        // Step 2: Handle new API responses
         if (Array.isArray(apiResponse) && apiResponse.length > 0) {
-            // Compare current apiResponse with the previous one to avoid duplicates
             const isDuplicateResponse = JSON.stringify(apiResponse) === JSON.stringify(prevApiResponse);
 
             if (!isDuplicateResponse) {
-                setChatData((prevChatData) => {
-                    // Map through the apiResponse to create new chat data
-                    const newChatData = apiResponse?.map((item, index) => {
-                        const hasButtons = item.buttons && item.buttons.length > 0;
-                        return {
-                            id: prevChatData.length + index + 1,
-                            message: <>{item.text}</>,
-                            userMode: false,
-                            botViewMode: true,
-                            recipientId: item.recipientId,
-                            botReview: hasButtons
-                                ? item.buttons.map((btn, idx) => ({
-                                    id: idx + 1,
-                                    suggestion: btn.title,
-                                    positive: idx === 0, // Assuming the first button is positive
-                                    payload: btn.payload,
-                                }))
-                                : [],
-                            botSuggestion: [],
-                        };
-                    });
-
-                    // Return the new chat data
-                    return [...prevChatData, ...newChatData];
+                // Map through the apiResponse to create new chat entries
+                const newChatData = apiResponse.map((item, index) => {
+                    const hasButtons = item.buttons && item.buttons.length > 0;
+                    return {
+                        id: chatData.length + index + 1,
+                        message: <>{item.text}</>,
+                        userMode: false,
+                        botViewMode: true,
+                        recipientId: item.recipientId,
+                        botReview: hasButtons
+                            ? item.buttons.map((btn, idx) => ({
+                                id: idx + 1,
+                                suggestion: btn.title,
+                                positive: idx === 0, // Assuming the first button is positive
+                                payload: btn.payload,
+                            }))
+                            : [],
+                        botSuggestion: [],
+                    };
                 });
 
-                // Update senderId if the last recipientId exists
-                const lastRecipientId = apiResponse.at(-1)?.recipientId;
-                if (lastRecipientId) setSenderId(lastRecipientId);
-                // Set the new apiResponse as prevApiResponse
-                setPrevApiResponse(apiResponse);
+                updatedChatData = [...chatData, ...newChatData];
+                setPrevApiResponse(apiResponse); 
+              
+               // Update the previous response to avoid duplicates
             }
-        }else if(prevApiResponse !== null){
-            // setChatEnded(true)
         }
-       
-    
-            
 
+        // Step 3: Handle query errors
         if (queryError) {
+            const lastError = chatData.at(-1)?.error;
 
-            // Add queryError as a new message if not already added
-            setChatData((prevChatData) => {
-                const lastError = prevChatData.at(-1)?.error;
-
-                // Avoid adding duplicate error messages
-                if (lastError === queryError) return prevChatData;
-
-                const userMessage = {
-                    id: prevChatData.length + 1, // Use prevChatData length for unique ID
+            if (lastError !== queryError) {
+                const errorMessage = {
+                    id: updatedChatData.length + 1,
                     message: '',
                     userMode: false,
                     botViewMode: false,
@@ -331,30 +394,29 @@ const ChatBotForm = () => {
                     botSuggestion: [],
                     error: queryError,
                 };
+                updatedChatData.push(errorMessage);
+            }
+        }
 
-                return [...prevChatData, userMessage];
-            });
+        // Step 4: Update chat data state and persist it
+        if (updatedChatData.length !== chatData.length) {
+            setChatData(updatedChatData);
+            dispatch(clearApiResponse())
+        }
+
+        // Step 5: Update senderId if there's a new recipientId
+        if (Array.isArray(apiResponse) && apiResponse.length > 0) {
+            const lastRecipientId = apiResponse.at(-1)?.recipientId;
+            if (lastRecipientId) setSenderId(lastRecipientId);
         }
 
     }, [apiResponse, queryError]);
-
-
-    // useEffect(()=>{
-    //     if(chatHistory===undefined){
-    //         addChatData(chatData)
-    //     }else{
-    //         setChatData(chatHistory)
-    //     }
-    // },[])
-
-
-    // console.log(chatData)
 
     return (
         <React.Fragment>
             <Offcanvas.Header closeButton className='align-items-start pb-1'></Offcanvas.Header>
             <CommonFormikComponent
-                validationSchema={ChatBotFormSchema}
+                // validationSchema={ChatBotFormSchema}
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
             >
@@ -400,7 +462,7 @@ const ChatBotForm = () => {
                                                                     type="button"
                                                                     variant={positive ? "success" : "light"}
                                                                     className={`bot-tag-btns text-start border-opacity-50 border-primary fs-6 lh-sm py-2 ${positive ? "text-white" : "text-body"}`}
-                                                                    onClick={() => actionButtonHandler({ message: payload, sender: recipientId })}
+                                                                    onClick={(event) => actionButtonHandler(event , { message: payload, sender: recipientId })}
                                                                 >
                                                                     {suggestion}
                                                                 </Button>
@@ -438,11 +500,11 @@ const ChatBotForm = () => {
                             })}
                             {/* WHEN CHAT ENDS USE THIS */}
                             {
-                                chatEnded ?   <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
-                                <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
-                            </Stack> : ''
+                                chatEnded ? <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
+                                    <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
+                                </Stack> : ''
                             }
-                          
+
                         </div>
 
                         {/* Chatbot Body Footer */}
