@@ -12,21 +12,15 @@ COPY . .
 RUN chmod +x ./mvnw
 RUN ./mvnw -Pprod clean verify -DskipTests
 
-FROM openjdk:17-slim
+FROM openjdk:17-alpine
 
 ARG ARG_VERSION
 ENV VERSION=$ARG_VERSION
 
 # Install necessary libraries and fonts
-RUN apt-get update && apt-get install -y \
-    ttf-mscorefonts-installer \
-    fontconfig \
-    ttf-dejavu \
-    libx11-6 \
-    curl && \
-    fc-cache -f -v && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* 
+RUN apk add --no-cache fontconfig ttf-dejavu libx11
+RUN fc-cache -f -v    
+RUN apk add --no-cache tzdata
 
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
