@@ -69,36 +69,36 @@ export default function TicketsList() {
     const columns = React.useMemo(
         () => [
             {
-                accessorFn: (row) => row.ticketId,
+                // accessorFn: (row) => row.ticketId,
                 id: "ticketId",
                 header: () => "Ticket ID",
             },
             {
-                accessorFn: (row) => row.creationDate,
+                // accessorFn: (row) => row.creationDate,
                 id: "creationDate",
                 header: () => "Creation Date",
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row.claimType,
+                // accessorFn: (row) => row.claimType,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row.claimFilledBy,
+                // accessorFn: (row) => row.claimFilledBy,
                 id: "claimFilledBy",
                 header: () => "Claim filled by",
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row.sla,
+                // accessorFn: (row) => row.sla,
                 id: "sla",
                 header: () => "SLA",
                 enableSorting: true,
             },
             {
-                accessorFn: "Closed",
+                // accessorFn: "Closed",
                 id: "status",
                 header: () => "Status",
                 size: "90",

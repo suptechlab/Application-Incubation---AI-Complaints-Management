@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactTable from "../components/ReactTable";
 
-const CommonDataTable = ({ columns, dataQuery, pagination, setPagination, sorting, setSorting }) => {
+const CommonDataTable = ({ columns, dataQuery, pagination, setPagination, sorting, setSorting, showPagination }) => {
 
     return (
         <div className="flex-grow-1 d-flex flex-column">
@@ -12,6 +12,7 @@ const CommonDataTable = ({ columns, dataQuery, pagination, setPagination, sortin
                 pagination={pagination}
                 setSorting={setSorting}
                 sorting={sorting}
+                showPagination={showPagination}
             />
         </div>
     );
