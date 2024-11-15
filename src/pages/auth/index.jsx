@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
+import AccountSetupModal from "./account-setup";
+import SetupSuccesModal from "./account-setup/setup-success";
+import FileClaimModal from "./file-a-claim";
 import LoginModal from "./login";
 import PrivacyModal from './privacy';
 
@@ -15,6 +18,8 @@ import PrivacyModal from './privacy';
 const FileClaimMainModal = ({ handleShow, handleClose }) => {
   const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(false);
   const [isSignupClicked, setIsSignupClicked] = useState(false);
+  const [setupSuccesModalShow, setSetupSuccesModalShow] = useState(false);
+  const [isFileClaimModalShow, setIsFileClaimModalShow] = useState(false);
 
   // Handle Privacy Form Submit
   const handlePrivacyFormSubmit = (values, actions) => {
@@ -41,31 +46,59 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
     }, 500);
   }
 
+  // Handle Finish Button
+  const handleFinishButtonClick = () => {
+    handleCloseReset();
+    setSetupSuccesModalShow(true)
+  }
+
+  // Handle File a Claim Button
+  const handleSuccessButtonClick = () => {
+    setSetupSuccesModalShow(false)
+    handleCloseReset()
+    setIsFileClaimModalShow(true)
+  }
 
   // Show Component
   let modalChildren;
   if (isSignupClicked) {
-    modalChildren = 'Soon';
+    modalChildren = <AccountSetupModal handleClose={handleClose} handleFormSubmit={handleFinishButtonClick} />;
   } else if (isPrivacyFormSubmitted) {
-    modalChildren = <LoginModal handleSignUpClick={handleSignupButtonClick} />;
+    modalChildren = <LoginModal handleSignUpClick={handleSignupButtonClick} handleLoginSucccesSubmit={handleSuccessButtonClick} />;
   } else {
     modalChildren = <PrivacyModal handleClose={handleClose} handleFormSubmit={handlePrivacyFormSubmit} />;
   }
 
   return (
-    <Modal
-      show={handleShow}
-      onHide={handleCloseReset}
-      backdrop="static"
-      keyboard={false}
-      centered={true}
-      scrollable={true}
-      size="lg"
-      className="theme-modal"
-      enforceFocus={false}
-    >
-      {modalChildren}
-    </Modal>
+    <React.Fragment>
+      <Modal
+        show={handleShow}
+        onHide={handleCloseReset}
+        backdrop="static"
+        keyboard={false}
+        centered={true}
+        scrollable={true}
+        size="lg"
+        className="theme-modal scrollable-disabled-below-600"
+        enforceFocus={false}
+      >
+        {modalChildren}
+      </Modal>
+
+      {/* File a Claim Setup Success Modal */}
+      <SetupSuccesModal
+        handleShow={setupSuccesModalShow}
+        handleClose={() => setSetupSuccesModalShow(false)}
+        handleFormSubmit={handleSuccessButtonClick}
+      />
+
+      {/* File a Claim Modals */}
+      <FileClaimModal
+        handleShow={isFileClaimModalShow}
+        handleClose={() => setIsFileClaimModalShow(false)}
+        // handleFormSubmit={handleFileClaimButtonClick}
+      />
+    </React.Fragment>
   );
 };
 

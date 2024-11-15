@@ -2,16 +2,25 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom classes
+@include custom-class('margin-top', 1);
+@include custom-class('padding-right', 42);
+@include custom-class('font-size', 10);
 @include custom-class('font-size', 12);
 @include custom-class('font-size', 18);
 @include custom-class('font-size', 26);
+@include custom-class('width', 32);
+@include custom-class('height', 32);
+@include custom-class('width', 42);
+@include custom-class('height', 42);
 @include custom-class('width', 48);
 @include custom-class('height', 48);
 @include custom-class('width', 64);
 @include custom-class('height', 64);
+@include custom-class('min-width', 65);
 @include custom-class('min-height', 70);
 @include custom-class('width', 80);
 @include custom-class('height', 80);
+@include custom-class('min-width', 90);
 @include custom-class('min-width', 100);
 @include custom-class('width', 400);
 
@@ -55,6 +64,8 @@
     @include btn-outline-styles($danger);
 }
 
+
+//Custom Button Colors Changes
 .btn-warning,
 .btn-secondary {
     --bs-btn-color: #{$body-color};
@@ -146,6 +157,15 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
 
+body {
+    // Show numeric values in aligned
+    font-feature-settings: "lnum" 1;
+    font-variant-numeric: lining-nums;
+    -webkit-font-feature-settings: "lnum" 1;
+    -moz-font-feature-settings: "lnum" 1;
+    -ms-font-feature-settings: "lnum" 1;
+}
+
 // Custom Scrollbar
 @include above-xl() {
     * {
@@ -198,6 +218,25 @@ input:-webkit-autofill:active {
                 flex-direction: column;
                 overflow: hidden;
                 max-height: 100%;
+            }
+
+            .tab-content {
+                display: flex;
+                overflow: hidden;
+                max-height: 100%;
+
+                .tab-pane {
+                    overflow: auto;
+                    max-height: 100%;
+                    width: 100%;
+
+                    >form {
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                        max-height: 100%;
+                    }
+                }
             }
         }
     }
@@ -267,4 +306,10 @@ input:-webkit-autofill:active {
 
 .border-dashed {
     --bs-border-style: dashed;
+}
+
+.form-otp-mobile-width {
+    @include below-sm() {
+        width: 40px !important;
+    }
 }
