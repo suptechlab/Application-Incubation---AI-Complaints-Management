@@ -260,9 +260,3 @@ input:-webkit-autofill:active {
         }
     }
 }
-
-.visible-in-small-devices{
-    @include below-lg(){
-        overflow: visible !important;
-    }
-}

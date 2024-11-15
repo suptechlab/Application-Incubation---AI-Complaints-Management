@@ -138,11 +138,11 @@ const TicketsView = () => {
       <TicketViewHeader
         title="#52541"
       />
-      <div className='d-flex flex-column flex-grow-1 overflow-y-auto overflow-x-hidden visible-in-small-devices pb-4'>
-        <Row className='h-100 g-3'>
-          <Col lg={6} className='h-100'>
-            <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
-              <Card.Body className="d-flex flex-column h-100 overflow-auto">
+      <div className='d-flex flex-column flex-grow-1'>
+        <Row className='h-100 gy-3 gy-lg-0 gx-3 pb-3'>
+          <Col lg={6}>
+            <Card className="border-0 shadow h-100">
+              <Card.Body>
                 <Row>
                   {viewTopData?.map((item, index) => (
                     <Col key={"data_view_" + index} {...item.colProps}>
@@ -153,7 +153,7 @@ const TicketsView = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col lg={6} className='h-100'>
+          <Col lg={6}>
             <Card className="border-0 shadow">
               <Card.Header className='bg-body border-0 py-3'>
                 <Row className='g-2 align-items-center'>
@@ -206,20 +206,22 @@ const TicketsView = () => {
                       onChange={handleFileChange}
                     />
                   </div>
-                  <Button
-                    type='button'
-                    size="sm"
-                    variant='outline-dark'
-                  >
-                    Reply to Customer
-                  </Button>
-                  <Button
-                    type='button'
-                    size="sm"
-                    variant='warning'
-                  >
-                    Reply Internally
-                  </Button>
+                  <Stack direction='horizontal' gap={2} className='flex-wrap justify-content-between justify-content-sm-end flex-fill'>
+                    <Button
+                      type='button'
+                      size="sm"
+                      variant='outline-dark'
+                    >
+                      Reply to Customer
+                    </Button>
+                    <Button
+                      type='button'
+                      size="sm"
+                      variant='warning'
+                    >
+                      Reply Internally
+                    </Button>
+                  </Stack>
                 </Stack>
               </Card.Footer>
             </Card>
