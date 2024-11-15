@@ -1,5 +1,6 @@
 package com.seps.auth.service;
 
+import com.seps.auth.domain.Otp;
 import com.seps.auth.domain.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -12,6 +13,7 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -140,5 +142,24 @@ public class MailService {
         String content = templateEngine.process("mail/loginOtpEmail", context);
         String subject = messageSource.getMessage("email.login.otp.title", null, locale);
         this.sendEmailSync(user.getEmail(), subject, content, false, true);
+    }
+
+    @Async
+    public void sendRegisterOtpEmail(Otp otp, Locale locale) {
+        if (otp.getEmail() == null) {
+            LOG.debug("Email doesn't exist for user while sending register otp email to '{}'", otp.getEmail());
+            return;
+        }
+        LOG.debug("Sending register otp email to '{}'", otp.getEmail());
+        Instant now = Instant.now();
+        long secondsLeft = Duration.between(now, otp.getExpiryTime()).getSeconds();
+        long minutesLeft = (long) Math.ceil(secondsLeft / 60.0); // Round up to the nearest minute
+        Context context = new Context(locale);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable("otpCode", otp.getOtpCode());
+        context.setVariable("minutes", minutesLeft);
+        String content = templateEngine.process("mail/registerOtpEmail", context);
+        String subject = messageSource.getMessage("email.register.otp.title", null, locale);
+        this.sendEmailSync(otp.getEmail(), subject, content, false, true);
     }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+  <changeSet id="1731568550084" author="matellio">
+    <createTable tableName="persona">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="identificacion" type="varchar(20)" remarks="The national identification number">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="nombre_completo" type="varchar(255)" remarks="The full name of the person">
+        <constraints nullable="true"/>
+      </column>
+      <column name="genero" type="varchar(10)" remarks="The gender of the person (e.g., MUJER for female)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="lugar_nacimiento" type="varchar(255)" remarks="The birthplace including province, city, and district">
+        <constraints nullable="true"/>
+      </column>
+      <column name="nacionalidad" type="varchar(255)" remarks="The nationality of the person">
+        <constraints nullable="true"/>
+      </column>
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>

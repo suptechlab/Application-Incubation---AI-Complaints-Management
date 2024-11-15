@@ -41,4 +41,19 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet id="1731585418897" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="gender" type="varchar(10)" remarks="The gender of the person (e.g., MUJER for female)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="fingerprint_verified" type="boolean" defaultValue="false">
+        <constraints nullable="true"/>
+      </column>
+      <column name="fingerprint_verified_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>
