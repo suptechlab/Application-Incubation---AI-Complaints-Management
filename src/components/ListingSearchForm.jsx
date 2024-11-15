@@ -51,11 +51,11 @@ const ListingSearchForm = ({ filter, setFilter }) => {
                 },
                 {
                   label: t("ACTIVE"),
-                  value: true,
+                  value: 'ACTIVE',
                 },
                 {
                   label: t("INACTIVE"),
-                  value: false,
+                  value: 'BLOCKED',
                 },
               ]}
               onChange={(e) => {

@@ -116,18 +116,18 @@ export default function UserList() {
       {
         accessorFn: (row) => row.name,
         id: "name",
-        header: () => "Name",
+        header: () => t('NAME'),
       },
       {
-        accessorFn: (row) => row.claimTypeName ?? "N/A",
+        accessorFn: (row) => row.roles[0].name ?? "N/A",
         id: "claimTypeName",
-        header: () => "Role",
+        header: () =>  t('ROLE'),
         enableSorting: false,
       },
       {
         accessorFn: (row) => row.email,
         id: "email",
-        header: () => "Email",
+        header: () => t('EMAIL'),
       },
       {
         accessorFn: (row) => row.mobileNo,
@@ -145,7 +145,7 @@ export default function UserList() {
       {
         accessorFn: (row) => row.createdDate,
         id: "createdDate",
-        header: () => "Creation Date",
+        header: () => "Fecha de creación",
         cell: (info) => {
           return <span>{moment(info.row.original.createdDate).format("l")}</span>;
         },
@@ -167,12 +167,12 @@ export default function UserList() {
                   info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
                 )
               }
-              tooltip="Active"
+              tooltip="Activo / Bloquear"
             />
           );
         },
         id: "status",
-        header: () => "Status",
+        header: () => t('STATUS'),
         size: "80",
       },
 
@@ -271,18 +271,18 @@ export default function UserList() {
                 title: "Edit",
                 icon: <MdEdit size={18} />,
               },
-              {
-                name: "delete",
-                enabled: true,
-                type: "button",
-                title: "Delete",
-                icon: <MdDelete size={18} />,
-                handler: () => deleteAction(rowData.row.original),
-              },
+              // {
+              //   name: "delete",
+              //   enabled: true,
+              //   type: "button",
+              //   title: "Delete",
+              //   icon: <MdDelete size={18} />,
+              //   handler: () => deleteAction(rowData.row.original),
+              // },
             ]}
           />
         ),
-        header: () => <div className="text-center">Actions</div>,
+        header: () => <div className="text-center">{t('ACTIONS')}</div>,
         enableSorting: false,
         size: "80",
       },
