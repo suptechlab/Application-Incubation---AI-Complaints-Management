@@ -32,6 +32,10 @@ const ImportFIUser = React.lazy(() => import("../pages/fi-users/importData"));
 const AddEditRoleRights = React.lazy(() =>
   import("../pages/role-rights/RoleRightsForm")
 );
+const TicketsList = React.lazy(() => import("../pages/tickets/list"));
+const TicketsView = React.lazy(() => import("../pages/tickets/view"));
+const TeamManagementAddEdit = React.lazy(() => import("../pages/team-management/add-edit"));
+const TeamManagementList = React.lazy(() => import("../pages/team-management/list"));
 
 const routes = [
   {
@@ -236,6 +240,36 @@ const routes = [
     element: <NotFoundPage />,
     isPrivate: false,
     layoutType: "Blank",
+  },
+  {
+    path: "/tickets",
+    element: <TicketsList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/tickets/view/:id",
+    element: <TicketsView />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/team-management",
+    element: <TeamManagementList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/team-management/add",
+    element: <TeamManagementAddEdit />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/team-management/edit/:id",
+    element: <TeamManagementAddEdit />,
+    isPrivate: true,
+    layoutType: "Auth",
   },
 ];
 

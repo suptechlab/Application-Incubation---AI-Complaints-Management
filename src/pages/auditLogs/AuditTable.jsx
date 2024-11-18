@@ -37,43 +37,55 @@ const renderCell = (value) => {
 const AuditTable = ({ newData, oldData, activityType }) => {
   const auditKeys = new Set([...Object.keys(newData), ...Object.keys(oldData)]);
 
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>{t("FIELD")}</th>
-          <th>{t("NEW RECORD")}</th>
-          {
-            activityType !== "DATA_ENTRY" ? <th>{t("OLD RECORD")}</th> : ""
-          }
-          {activityType !== "DATA_ENTRY" ? <th>{t("STATUS")}</th> : ""}
-        </tr>
-      </thead>
-      <tbody>
-        {[...auditKeys].map((key) => {
-          const newValue = newData[key];
-          const oldValue = oldData[key];
-          const isChanged = JSON.stringify(newValue) !== JSON.stringify(oldValue);
+    <div className="d-flex flex-column h-100 small table-cover-main">
+      <Table striped bordered hover responsive className="mb-0">
+        <thead className="fs-15">
+          <tr>
+            <th scope="col" className="custom-width-130 text-nowrap">
+              {t("FIELD")}
+            </th>
+            <th scope="col">{t("NEW RECORD")}</th>
+            {
+              activityType !== "DATA_ENTRY" &&
+              <>
+                <th scope="col">{t("OLD RECORD")}</th>
 
-          return (
-            <tr key={key}>
-              <td>{toCapitalized(key)}</td>
-              <td>{renderCell(newValue)}</td>
-              {
-                activityType !== "DATA_ENTRY" ? <td>{renderCell(oldValue)}</td> : ""
-              }
-              {
-                activityType !== "DATA_ENTRY" ? <td style={{ color: isChanged ? 'red' : 'green' }}>
-                  {isChanged ? t('MODIFIED') : t('UNCHANGED')}
-                </td> : ""
-              }
-            </tr>
-          );
-        })}
-      </tbody>
-    </Table>
+                <th scope="col" className="custom-width-110 text-nowrap">
+                  {t("STATUS")}
+                </th>
+              </>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {[...auditKeys].map((key) => {
+            const newValue = newData[key];
+            const oldValue = oldData[key];
+            const isChanged =
+              JSON.stringify(newValue) !== JSON.stringify(oldValue);
+            return (
+              <tr key={key}>
+                <td className="custom-width-130 text-nowrap">{toCapitalized(key)}</td>
+                <td>{renderCell(newValue)}</td>
+                {activityType !== "DATA_ENTRY" &&
+                  <>
+                    <td>{renderCell(oldValue)}</td>
+                    <td
+                      className={`custom-width-110 text-nowrap ${isChanged ? "text-danger" : "text-success"
+                        }`}
+                    >
+                      {isChanged ? t("MODIFIED") : t("UNCHANGED")}
+                    </td> </>
+                }
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 

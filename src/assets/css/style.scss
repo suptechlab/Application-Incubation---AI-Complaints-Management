@@ -2,6 +2,8 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom height and width classes
+@include custom-class('font-size', 13);
+@include custom-class('font-size', 30);
 @include custom-class('height', 26);
 @include custom-class('width', 26);
 @include custom-class('min-height', 38);
@@ -9,6 +11,9 @@
 @include custom-class('width', 38);
 @include custom-class('height', 42);
 @include custom-class('width', 42);
+@include custom-class('width', 48);
+@include custom-class('height', 48);
+@include custom-class('min-width', 50);
 @include custom-class('height', 60);
 @include custom-class('width', 60);
 @include custom-class('min-width', 75);
@@ -19,6 +24,7 @@
 @include custom-class('width', 130);
 @include custom-class('width', 120);
 @include custom-class('min-width', 120);
+@include custom-class('min-width', 130);
 @include custom-class('width', 150);
 @include custom-class('max-width', 150);
 @include custom-class('width', 160);
@@ -162,8 +168,39 @@ input:-webkit-autofill:active {
     z-index: 1060 !important;
 }
 
+// Custom Scrollbar
+@include above-xl() {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--bs-dark);
+
+        &::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            border-radius: 20px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--bs-dark);
+            border-radius: 20px;
+
+            &:hover {
+                background-color: var(--bs-primary);
+            }
+        }
+    }
+}
+
 .bg-light-green-custom {
     background-color: $custom-bg-light-green;
+}
+
+.bg-orange {
+    background-color: $custom-bg-orange;
+}
+
+.text-orange {
+    color: $custom-bg-orange;
 }
 
 .spin {
@@ -212,6 +249,14 @@ input:-webkit-autofill:active {
                 overflow: hidden;
                 max-height: 100%;
             }
+        }
+    }
+}
+
+.hide-dropdown-arrow {
+    &.dropdown-toggle {
+        &::after {
+            display: none;
         }
     }
 }
