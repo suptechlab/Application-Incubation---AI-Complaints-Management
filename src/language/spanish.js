@@ -139,5 +139,6 @@ export const spanishLang = {
     "PENDING": "Pendiente",
     "BLOCKED": "Bloqueado",
     "DELETED": "Eliminado",
-    "USER TYPE":"Tipo de usuario",
+    "USER TYPE": "Tipo de usuario",
+    "NOTIFICATION": "Eliminado",
 }

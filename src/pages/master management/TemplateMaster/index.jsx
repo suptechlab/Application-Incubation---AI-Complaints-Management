@@ -18,6 +18,12 @@ import {
 import Add from "./Add";
 import Edit from "./Edit";
 
+
+import {
+  handleGetTemplateMaster,
+  changeTemplateMaster,
+} from "../../../services/templateMaster.service";
+
 const TemplateMaster = () => {
   const { t } = useTranslation();
 
@@ -74,53 +80,54 @@ const TemplateMaster = () => {
         console.error("Error get during to fetch Province Master", error);
       });
   }, []);
+
   const editCityMaster = async (id) => {
     setEditModal({ id: id, open: !editModal?.open });
   };
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
-
-      // For now, returning default data without API request
-      return [
-        {
-          id: 1,
-          templateMaster: "Cuenca",
-        },
-        {
-          id: 2,
-          templateMaster: "Guaranda",
-        },
-      ];
-    },
     // queryFn: () => {
     //   const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-    //   Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+    //   Object.keys(filterObj).forEach(
+    //     (key) => filterObj[key] === "" && delete filterObj[key]
+    //   );
 
-    //   if (sorting.length === 0) {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       ...filterObj,
-    //     });
-    //   } else {
-    //     return handleGetDistricts({
-    //       page: pagination.pageIndex,
-    //       size: pagination.pageSize,
-    //       sort: sorting
-    //         .map(
-    //           (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-    //         )
-    //         .join(","),
-    //       ...filterObj,
-    //     });
-    //   }
+    //   // For now, returning default data without API request
+    //   return [
+    //     {
+    //       id: 1,
+    //       templateMaster: "Cuenca",
+    //     },
+    //     {
+    //       id: 2,
+    //       templateMaster: "Guaranda",
+    //     },
+    //   ];
     // },
+    queryFn: () => {
+      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+      if (sorting.length === 0) {
+        return handleGetTemplateMaster({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          ...filterObj,
+        });
+      } else {
+        return handleGetTemplateMaster({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          sort: sorting
+            .map(
+              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+            )
+            .join(","),
+          ...filterObj,
+        });
+      }
+    },
   });
 
   const changeStatus = async (id, currentStatus) => {
@@ -145,8 +152,8 @@ const TemplateMaster = () => {
   const columns = React.useMemo(
     () => [
       {
-        accessorFn: (row) => row.templateMaster,
-        id: "templateMaster",
+        accessorFn: (row) => row.templateName,
+        id: "templateName",
         header: () => t("TEMPLATE MASTER"),
       },
       {
@@ -160,7 +167,7 @@ const TemplateMaster = () => {
               name="status"
               value={info?.row?.original?.status}
               checked={info?.row?.original?.status}
-              // onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
               tooltip="Active"
             />
           )

@@ -139,4 +139,5 @@ export const englishLang = {
     "BLOCKED" : "Blocked",
     "DELETED":"Deleted",
     "USER TYPE":"User Type",
+    "NOTIFICATION": "Notification",
 }
