@@ -129,18 +129,18 @@ export default function UserList() {
         id: "email",
         header: () => t('EMAIL'),
       },
-      {
-        accessorFn: (row) => row.mobileNo,
-        id: "mobileNo",
-        header: () => "Unidad Organizacional",
-        cell: (info) => {
-          return (
-            <span>
-              {info.row.original.mobileCode} {info.row.original.mobileNo}
-            </span>
-          );
-        },
-      },
+      // {
+      //   accessorFn: (row) => row.mobileNo,
+      //   id: "mobileNo",
+      //   header: () => "Unidad Organizacional",
+      //   cell: (info) => {
+      //     return (
+      //       <span>
+      //         {info.row.original.mobileCode} {info.row.original.mobileNo}
+      //       </span>
+      //     );
+      //   },
+      // },
 
       {
         accessorFn: (row) => row.createdDate,

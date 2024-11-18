@@ -46,6 +46,8 @@ const DataGridPagination = ({
         >
           <option>10</option>
           <option>20</option>
+          <option>50</option>
+          <option>100</option>
         </select>
       </span>
       <div className="pageShowText mb-md-0 me-sm-4">
