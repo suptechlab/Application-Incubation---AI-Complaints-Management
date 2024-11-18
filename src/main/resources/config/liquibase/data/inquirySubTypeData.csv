@@ -1,0 +1,87 @@
+id;name;description;inquiry_type_id;status;created_at;updated_at
+1;Executive Authorities;Executive Authorities;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+2;Management of Executives and Administrators;Management of Executives and Administrators;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+3;Extensions of Executives;Extensions of Executives;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+4;Internal Conflicts;Internal Conflicts;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+5;Application of Article 28 of Transport Cooperatives;Application of Article 28 of Transport Cooperatives;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+6;Internal Regulations / Allowances;Internal Regulations / Allowances;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+7;Destruction of Files;Destruction of Files;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+8;Process for Challenging Minutes;Process for Challenging Minutes;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+9;File Transfer;File Transfer;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+10;Profits and Surpluses;Profits and Surpluses;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+11;Process for Challenging Records;Process for Challenging Records;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+12;Delegation / Proxy;Delegation / Proxy;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+13;Special Commissions / Committees;Special Commissions / Committees;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+14;Registration of Assembly Members, Boards, and Legal Representatives of SFPS and OEPS;Registration of Assembly Members, Boards, and Legal Representatives of SFPS and OEPS;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+15;Electoral Processes SFPS-OEPS;Electoral Processes SFPS-OEPS;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+16;General Assemblies of Partners or Representatives (Including Call Notices);General Assemblies of Partners or Representatives (Including Call Notices);1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+17;Prohibitions and Restrictions for Executives;Prohibitions and Restrictions for Executives;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+18;Settlement of Benefits;Settlement of Benefits;1;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+19;Inquiries from Non-Profit Organizations;Inquiries from Non-Profit Organizations;2;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+20;Unauthorized Charges;Unauthorized Charges;3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+21;Policies;Policies;3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+22;Debt Reduction Insurance;Debt Reduction Insurance;3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+23;Transparency and Disclosure;Transparency and Disclosure;3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+24;Information Citing the LOTAIP (Transparency and Access to Public Information Law);Information Citing the LOTAIP (Transparency and Access to Public Information Law);3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+25;Fair and Responsible Treatment;Fair and Responsible Treatment;3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+26;Data Security and Protection Risk;Data Security and Protection Risk;3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+27;Credit Data Registry;Credit Data Registry;3;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+28;ormative, Accounting, and Reporting Provisions in the Technical Supervision of Controlled Organizations;ormative, Accounting, and Reporting Provisions in the Technical Supervision of Controlled Organizations;4;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+29;Personnel Management with Entities/Organizations;Personnel Management with Entities/Organizations;5;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+30;No SEPS Competence;No SEPS Competence;6;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+31;No Power of Attorney / Legal Representation / Effective Possession;No Power of Attorney / Legal Representation / Effective Possession;7;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+32;Requirements, Processes, and Conditions;Requirements, Processes, and Conditions;8;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+33;Requirements,Processes, and Conditions;Requirements, Processes, and Conditions;9;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+34;Requirements, Processes,and Conditions;Requirements, Processes, and Conditions;10;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+35;Requirements,Processes,and Conditions;Requirements, Processes, and Conditions;11;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+36;Requirements,Processes , and Conditions;Requirements, Processes, and Conditions;12;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+37;Credit Rating Agencies' Ratings;Credit Rating Agencies' Ratings;13;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+38;Registration of Support Entities - Foundations and Corporations;Registration of Support Entities - Foundations and Corporations;14;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+39;Operationality and Use of Electronic Channels;Operationality and Use of Electronic Channels;15;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+40;Steps to Generate the Access Form;Steps to Generate the Access Form;16;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+41;Types of Roles That Can Be Requested;Types of Roles That Can Be Requested;16;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+42;Number of Users per Entity per Role;Number of Users per Entity per Role;16;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+43;Steps to Obtain a Rating;Steps to Obtain a Rating;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+44;Rating Requirements;Rating Requirements;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+45;Procedure in the Strategic Personnel Registration System (REPE);Procedure in the Strategic Personnel Registration System (REPE);17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+46;Normative Issues of Rating, Registration, Obligations, and De-qualification of Strategic Personnel: Auditors, Compliance Officers, and Evaluators;Normative Issues of Rating, Registration, Obligations, and De-qualification of Strategic Personnel: Auditors, Compliance Officers, and Evaluators;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+47;Steps to Register and Update Compliance Officers' Data;Steps to Register and Update Compliance Officers' Data;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+48;Formats and Documents Required from Compliance Officers;Formats and Documents Required from Compliance Officers;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+49;Normative Exceptions and Restrictions for Registering Compliance Officers;Normative Exceptions and Restrictions for Registering Compliance Officers;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+50;Steps to Register an Auditor;Steps to Register an Auditor;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+51;Format to Request Auditor Data Update;Format to Request Auditor Data Update;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+52;Normative Exceptions and Restrictions for Registering an Auditor;Normative Exceptions and Restrictions for Registering an Auditor;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+53;Steps for Liquidator Rating;Steps for Liquidator Rating;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+54;Requirements for Liquidator Rating;Requirements for Liquidator Rating;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+55;Pre-Rating Steps for OEPS Liquidators;Pre-Rating Steps for OEPS Liquidators;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+56;Courses Required for OEPS Liquidators to Qualify;Courses Required for OEPS Liquidators to Qualify;17;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+57;Information Requirements NOT CERTIFIED from Data and Records Available in SEPS Institutional Systems: Partners, Executives, Strategic Personnel, and Registry of EPS Entities and Organizations (Legal Existence);Information Requirements NOT CERTIFIED from Data and Records Available in SEPS Institutional Systems: Partners, Executives, Strategic Personnel, and Registry of EPS Entities and Organizations (Legal Existence);18;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+58;Response to Information Requests Subject to Banking Secrecy and Personal Data Protection;Response to Information Requests Subject to Banking Secrecy and Personal Data Protection;18;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+59;Updating Data and Records Available in SEPS Institutional Systems: Partners, Executives, Strategic Personnel, and Registry of EPS Entities and Organizations;Updating Data and Records Available in SEPS Institutional Systems: Partners, Executives, Strategic Personnel, and Registry of EPS Entities and Organizations;18;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+60;Inquiries if an Organization is Under Our Control – Registry;Inquiries if an Organization is Under Our Control – Registry;19;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+61;Inquiries if the Associates of an Organization Must Be Affiliated with IESS;Inquiries if the Associates of an Organization Must Be Affiliated with IESS;20;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+62;Compliance and Statutory Obligations of Partners and Associates;Compliance and Statutory Obligations of Partners and Associates;20;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+63;Registration of OEPS Partners/Associates: Voluntary, Deceased, Exclusion;Registration of OEPS Partners/Associates: Voluntary, Deceased, Exclusion;20;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+64;Unfair Competition;Unfair Competition;20;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+65;Entry and Exit of Partners;Entry and Exit of Partners;20;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+66;Steps to Generate the Name Reservation Request;Steps to Generate the Name Reservation Request;21;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+67;Name Composition (Type, Group, Class, Specific Name, and Acronym);Name Composition (Type, Group, Class, Specific Name, and Acronym);21;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+68;Duration of Name Reservations;Duration of Name Reservations;21;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+69;Service Channel for Name Reservations;Service Channel for Name Reservations;21;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+70;Minimum Number of Partners and Initial Capital;Minimum Number of Partners and Initial Capital;22;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+71;Determination of Social Purpose and Common Link;Determination of Social Purpose and Common Link;22;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+72;Formation of Transport and Housing Cooperatives;Formation of Transport and Housing Cooperatives;22;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+73;Service Channel for Formation of Popular and Solidarity Economy Organizations;Service Channel for Formation of Popular and Solidarity Economy Organizations;22;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+74;Opening of Capital Integration Account;Opening of Capital Integration Account;22;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+75;Registry;Registry;22;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+76;Steps to Generate the Unique Form for Organization Formation;Steps to Generate the Unique Form for Organization Formation;22;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+77;Definition of Self-Control, Internal Structure, Registration, and Common Link;Definition of Self-Control, Internal Structure, Registration, and Common Link;23;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+78;The Legal Representative of Savings Banks Cannot Be a Legal Representative in Another Entity While in Office;The Legal Representative of Savings Banks Cannot Be a Legal Representative in Another Entity While in Office;23;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+79;Operations That Savings Banks Can Perform;Operations That Savings Banks Can Perform;23;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+80;Prohibitions for Savings Banks;Prohibitions for Savings Banks;23;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+81;Mechanism for Savings Bank Registration;Mechanism for Savings Bank Registration;23;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+82;Annual Update of Savings Banks;Annual Update of Savings Banks;23;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+83;Removal of Savings Banks from the Registry;Removal of Savings Banks from the Registry;23;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+84;Modification of Public Service Hours;Modification of Public Service Hours;24;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+85;Authorization for Temporary Suspension of Public Service Due to Holidays;Authorization for Temporary Suspension of Public Service Due to Holidays;24;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
+86;Suspension of Public Service Due to Unforeseen Circumstances or Force Majeure;Suspension of Public Service Due to Unforeseen Circumstances or Force Majeure;24;true;2024-11-18 13:39:10.358361;2024-11-18 13:39:10.358361
