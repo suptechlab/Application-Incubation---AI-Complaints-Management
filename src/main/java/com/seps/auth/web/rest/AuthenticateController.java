@@ -305,14 +305,28 @@ public class AuthenticateController {
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
+    /**
+     * Endpoint to send a login OTP to the user's registered email address.
+     *
+     * @param dto the {@link LoginOtpDTO} containing the email, reCAPTCHA token, and rememberMe flag.
+     * @param request the {@link HttpServletRequest} to retrieve the client's IP address.
+     * @return a {@link ResponseEntity} containing an {@link OtpResponse} with the OTP token and expiration time.
+     *
+     * @throws CustomException if:
+     *         <ul>
+     *             <li>reCAPTCHA validation fails (error code: RECAPTCHA_FAILED).</li>
+     *             <li>The user account does not exist (error code: USER_ACCOUNT_NOT_EXIST).</li>
+     *             <li>The user account fails validation (e.g., BLOCKED, DELETED).</li>
+     *         </ul>
+     */
     @PostMapping("/send-login-otp")
     public ResponseEntity<OtpResponse> sendLoginOtp(@Valid @RequestBody LoginOtpDTO dto,HttpServletRequest request){
         String clientIp = request.getRemoteAddr();
         // Verify reCAPTCHA
-//        if (!userService.isRecaptchaValid(dto.getRecaptchaToken())) {
-//            LOG.error("Recaptcha verification failed for send login otp token: {}", dto.getRecaptchaToken());
-//            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
-//        }
+        if (!userService.isRecaptchaValid(dto.getRecaptchaToken())) {
+            LOG.error("Recaptcha verification failed for send login otp token: {}", dto.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
         User account = userService.getEndUserWithAuthoritiesByEmail(dto.getEmail())
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_ACCOUNT_NOT_EXIST, null, null));
         userService.validateAccount(account);
