@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class RegisterUserDTO implements Serializable {
 
     @NotBlank
+    @Size(max = 254)
     private String identificacion;
 
     @NotBlank

@@ -7,6 +7,7 @@ import com.seps.auth.repository.*;
 import com.seps.auth.security.AuthoritiesConstants;
 import com.seps.auth.security.SecurityUtils;
 import com.seps.auth.service.dto.AdminUserDTO;
+import com.seps.auth.service.dto.ConsultationRequest;
 import com.seps.auth.service.dto.RegisterUserDTO;
 import com.seps.auth.service.dto.UserDTO;
 
@@ -17,8 +18,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.seps.auth.suptech.service.PersonNotFoundException;
+import com.seps.auth.suptech.service.PersonValidationException;
 import com.seps.auth.web.rest.errors.CustomException;
 import com.seps.auth.web.rest.errors.SepsStatusCode;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -541,5 +544,40 @@ public class UserService {
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PERSON_NOT_FOUND,
                 new String[]{identificacion}, null));
     }
+
+    public Boolean validatePersonIndividual(@Valid ConsultationRequest request) {
+        try {
+            return externalAPIService.validateIndividualPerson(request);
+        } catch (PersonValidationException e) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_ACCOUNT_NOT_EXIST, e.getMessage());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> getEndUserWithAuthoritiesByEmail(String email) {
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        return userRepository.findOneWithAuthoritiesByEmailIgnoreCaseAndAuthoritiesIn(email, authorities);
+    }
+
+    public void validateAccount(User user) {
+        String username = user.getLogin();
+        if (!user.isActivated()) {
+            LOG.warn("User {} account is not activated", username);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_NOT_ACTIVE, null);
+        }
+        UserStatusEnum userStatus = user.getStatus();
+        if (userStatus.equals(UserStatusEnum.PENDING)) {
+            LOG.error("User {} account is pending", username);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_PENDING, null);
+        } else if (userStatus.equals(UserStatusEnum.BLOCKED)) {
+            LOG.error("User {} account is disabled", username);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_BLOCKED, null);
+        } else if (userStatus.equals(UserStatusEnum.DELETED)) {
+            LOG.error("User {} account is disabled", username);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_DELETED, null);
+        }
+    }
+
 
 }

@@ -55,6 +55,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByOtpCode(String otpCode);
 
     // Check if a user exists with the given identificacion, authorities
-    Optional<User> findOneByIdentificacionAndAuthoritiesIn(String identificacion, Set<Authority> authorities );
+    Optional<User> findOneByIdentificacionAndAuthoritiesIn(String identificacion, Set<Authority> authorities);
+
+    @EntityGraph(attributePaths = "authorities")
+    Optional<User> findOneWithAuthoritiesByEmailIgnoreCaseAndAuthoritiesIn(String email, Set<Authority> authorities);
+
 
 }
