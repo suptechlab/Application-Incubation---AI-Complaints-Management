@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+  <changeSet id="1731668868692" author="matellio">
+    <!-- Create teams table -->
+    <createTable tableName="teams">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="team_name" type="VARCHAR(200)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="TEXT"/>
+      <column name="entity_id" type="BIGINT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="entity_type" type="VARCHAR(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="status" type="BOOLEAN" defaultValueBoolean="true"/>
+      <column name="created_by" type="BIGINT"/>
+      <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="updated_by" type="BIGINT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <!-- Add unique constraint on team_name, entity_id, and entity_type -->
+    <addUniqueConstraint tableName="teams" columnNames="team_name, entity_id, entity_type" constraintName="uq_team_name_entity"/>
+
+    <!-- Create team_members table -->
+    <createTable tableName="team_members">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="team_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="user_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="assigned_by" type="BIGINT"/>
+      <column name="assigned_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseTableName="teams" baseColumnNames="created_by"
+      referencedTableName="jhi_user" referencedColumnNames="id"
+      constraintName="fk_teams_created_by_jhi_user"/>
+
+    <addForeignKeyConstraint
+      baseTableName="teams" baseColumnNames="updated_by"
+      referencedTableName="jhi_user" referencedColumnNames="id"
+      constraintName="fk_teams_updated_by_jhi_user"/>
+
+    <!-- Add foreign key constraint for team_id -->
+    <addForeignKeyConstraint
+      baseTableName="team_members" baseColumnNames="team_id"
+      referencedTableName="teams" referencedColumnNames="id"
+      onDelete="CASCADE"
+      constraintName="fk_team_members_team_id_teams"/>
+  </changeSet>
+</databaseChangeLog>

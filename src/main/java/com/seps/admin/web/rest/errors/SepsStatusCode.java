@@ -34,7 +34,10 @@ public enum SepsStatusCode implements StatusType {
     FI_USER_NOT_FOUND(20033, "fi.user.not.found"),
     FI_USER_ALREADY_EXIST(20034, "fi.user.already.exist"),
     DUPLICATE_TEMPLATE(20035,"duplicate.template"),
-    TEMPLATE_NOT_FOUND(20036,"template.not.found");
+    TEMPLATE_NOT_FOUND(20036,"template.not.found"),
+    INVALID_MEMBER_LIST(20037,"invalid.member.list"),
+    DUPLICATE_TEAM(20038,"duplicate.team"),
+    MEMBER_ALREADY_ASSIGNED(20039,"member.already.assigned");
 
     private final int code;
 
