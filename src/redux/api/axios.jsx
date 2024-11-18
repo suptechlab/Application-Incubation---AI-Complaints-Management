@@ -1,5 +1,6 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { getLocalStorage } from '../../utils/storage';
 
 // Function to create Axios instance
 export const createAxiosInstance = (baseURL) => {
@@ -11,7 +12,11 @@ export const createAxiosInstance = (baseURL) => {
   axiosInstance.interceptors.request.use(
     (config) => {
       // Static or dynamically get your token as needed
-      const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZXBzLXVzZXJAeW9wbWFpbC5jb20iLCJleHAiOjE3MzQwOTA3MzksImF1dGgiOiJST0xFX1VTRVIiLCJpYXQiOjE3MzE0OTg3Mzl9.EEIaYdyKI3lKwLDnpgBp4yK_d1NifU4vJUp0xbMYQMf-rTXAEuaiH8IGlKoAc1GI_YFfgDoVyjpvaYzHdzPMXg"; // Replace this with your token logic
+      // const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZXBzLXVzZXJAeW9wbWFpbC5jb20iLCJleHAiOjE3MzQwOTA3MzksImF1dGgiOiJST0xFX1VTRVIiLCJpYXQiOjE3MzE0OTg3Mzl9.EEIaYdyKI3lKwLDnpgBp4yK_d1NifU4vJUp0xbMYQMf-rTXAEuaiH8IGlKoAc1GI_YFfgDoVyjpvaYzHdzPMXg"; // Replace this with your token logic
+
+
+      const token = getLocalStorage("id_token")
+      
       const userLanguage = 'en'; // Or dynamically determine language preference
 
       // Add Accept-Language header

@@ -8,8 +8,9 @@ import AppTooltip from "../../../../components/tooltip";
 import { IdVerificationFormSchema } from "../../validations";
 import { useDispatch } from "react-redux";
 import { fingerPrintValidate, nationalIdVerify } from "../../../../redux/slice/authSlice";
+import toast from "react-hot-toast";
 
-const IdVerificationTab = ({ isSubmitted }) => {
+const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
     const [isFormSubmitted, setIsFormSubmitted] = useState(false)
     const dispatch = useDispatch()
     // Initial Values
@@ -25,9 +26,12 @@ const IdVerificationTab = ({ isSubmitted }) => {
         isSubmitted(true);
         setIsFormSubmitted(true)
 
+        setNewAccountData((prev)=> ({...prev , identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
+
         // handleFormSubmit(values, actions);
 
         // UNCOMMENT THIS CODE ONCE FINGERPRINT API STARTS
+
         // const result = await dispatch(fingerPrintValidate({ identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }));
         // if (fingerPrintValidate.fulfilled.match(result)) {
         //     isSubmitted(true);
@@ -42,12 +46,20 @@ const IdVerificationTab = ({ isSubmitted }) => {
     // Handle National ID Verification
     const handleNationalIdVerify = async (value) => {
         if (value && value !== '') {
-            const result = await dispatch(nationalIdVerify(value));
-            if (nationalIdVerify.fulfilled.match(result)) {
-                setIsVerified(true)
-            } else {
-                console.error('Verification error:', result.error.message);
-            }
+
+            setIsVerified(true)
+            setNewAccountData((prev)=> ({...prev , identificacion: value}))
+
+            //  COMMENTED THIS BECAUSE AS OF NOW I DON'T HAVE BHUT SARI NATIONAL ID'S FOR VERIFY
+            
+
+            // const result = await dispatch(nationalIdVerify(value));
+            // if (nationalIdVerify.fulfilled.match(result)) {
+            //     setIsVerified(true)
+            //     setNewAccountData((prev)=> ({...prev , identificacion: value}))
+            // } else {
+            //     console.error('Verification error:', result.error.message);
+            // }
         }
     };
 

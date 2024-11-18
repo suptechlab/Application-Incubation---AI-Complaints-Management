@@ -2,8 +2,10 @@ import React from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import SvgIcons from '../../../../components/SVGIcons'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const SetupSuccesModal = ({ handleShow, handleClose, handleFormSubmit }) => {
+    const {user} = useSelector(state => state?.authSlice)
     return (
         <Modal
             show={handleShow}
@@ -20,7 +22,7 @@ const SetupSuccesModal = ({ handleShow, handleClose, handleFormSubmit }) => {
                     <div className='mb-2' aria-label='Success Launch Icon'>{SvgIcons.successIcon}</div>
                     <h2 className='fw-bold'>Success! </h2>
                     <h5 className='custom-font-size-18 fw-semibold'>Your Account is Set Up</h5>
-                    <p className='lh-sm small mb-4 pt-1'>Your account has been successfully created. Details have been sent to your email <Link to="mainto:email alex@xyz.com" className='text-decoration-none'>alex@xyz.com</Link>.</p>
+                    <p className='lh-sm small mb-4 pt-1'>Your account has been successfully created. Details have been sent to your email <Link to={`mainto:email ${user?.email}`} className='text-decoration-none'>{user?.email}</Link>.</p>
                     <Button
                         type="button"
                         variant="warning"

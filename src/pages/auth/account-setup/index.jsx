@@ -14,9 +14,11 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
     const [isIdVerificationSubmitted, setIsIdVerificationSubmitted] = useState(false);
     const [isPersonalInfoSubmitted, setIsPersonalInfoSubmitted] = useState(false);
 
+    const [newAccountData, setNewAccountData] = useState({})
+
     // Handle ID Verification Submit
     const handleIdVerificationSubmit = async (values, actions) => {
-        const result = await dispatch(fingerPrintValidate({identificacion : values?.nationalID , individualDactilar : values?.fingerprintCode}));
+        const result = await dispatch(fingerPrintValidate({ identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }));
         if (fingerPrintValidate.fulfilled.match(result)) {
             setIsIdVerificationSubmitted(true);
         }
@@ -26,15 +28,15 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
     // Handle Personal Info Submit
     const handlePersonalInfoSubmit = (values, actions) => {
         console.log('Personal Info values', values)
-        setIsPersonalInfoSubmitted(true);
-        actions.setSubmitting(false);
+        // setIsPersonalInfoSubmitted(true);
+        // actions.setSubmitting(false);
     };
 
     // Handle Finish Button Click
     const handleFinishClick = () => {
         setIsIdVerificationSubmitted(false);
         setIsPersonalInfoSubmitted(false);
-        handleFormSubmit()
+        handleFormSubmit(newAccountData)
     };
 
     //Steps Data
@@ -60,11 +62,11 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
     const tabData = [
         {
             eventKey: 0,
-            content: <IdVerificationTab isSubmitted={setIsIdVerificationSubmitted} />,
+            content: <IdVerificationTab setNewAccountData={setNewAccountData} isSubmitted={setIsIdVerificationSubmitted} />,
         },
         {
             eventKey: 1,
-            content: <PersonalInfoTab handleFormSubmit={handlePersonalInfoSubmit} />,
+            content: <PersonalInfoTab setNewAccountData={setNewAccountData} isSubmitted={setIsPersonalInfoSubmitted} />,
         },
     ];
 

@@ -9,8 +9,22 @@ import FormOtpInputBox from "../../../../components/formOtpInput";
 import SvgIcons from "../../../../components/SVGIcons";
 import AppTooltip from "../../../../components/tooltip";
 import { OtpFormSchema, PersonalInfoTabSchema } from "../../validations";
+import { countryCodes } from "../../../../constants/CountryCodes";
+import ReactSelect from "../../../../components/ReactSelect";
+import { sendOTPonEmail, verifyRegisterOTP } from "../../../../redux/slice/authSlice";
+import { useDispatch } from "react-redux";
 
-const PersonalInfoTab = ({ handleFormSubmit }) => {
+const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
+
+
+  const dispatch = useDispatch()
+
+  const formattedCountryCodes = countryCodes.map(country => ({
+    value: country?.value,
+    label: country?.value
+  }));
+
+
   const [isFormEmailValidate, setIsFormEmailValidate] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [optSendStatus, setOptSendStatus] = useState(false);
@@ -20,34 +34,80 @@ const PersonalInfoTab = ({ handleFormSubmit }) => {
   // Initial Values
   const initialValues = {
     email: formikRef?.current?.values?.email || "",
+    countryCode: formikRef?.current?.values?.countryCode || "",
     phoneNumber: formikRef?.current?.values?.phoneNumber || "",
     otpCode: "",
   };
 
-  // Handle Submit Handler
-  const handleSubmit = (values, actions) => {
-    setIsFormSubmitted(true);
+  // Reusable function to send OTP
+  const sendOTP = async (email) => {
+    try {
+      const result = await dispatch(sendOTPonEmail({ email }));
+      if (sendOTPonEmail.fulfilled.match(result)) {
+        toast.success(result?.message ?? "OTP Sent successfully.");
+        return true;
+      } else {
+        console.error(result?.error?.message ?? "Failed to send OTP.");
+        return false;
+      }
+    } catch (error) {
+      console.error("SEND OTP ERROR:", error?.message);
+      return false;
+    }
   };
 
-  // Handle OTP Submit Handler
-  const handleOtpSubmit = (values, actions) => {
-    console.log("CALLING OTP SUBMIT HERE")
-    setIsFormSubmitted(false);
-    setIsFormEmailValidate(true);
-    handleFormSubmit(values, actions);
+  // HANDLE SEND OTP ON REGISTER
+  const handleSubmit = async (values, actions) => {
+    const isOtpSent = await sendOTP(values?.email);
+    if (isOtpSent) {
+      setIsFormSubmitted(true);
+    }
+    actions.setSubmitting(false);
   };
 
   // Handle Resend OTP
-  const handleResend = () => {
+  const handleResend = async (email) => {
+    // THIS STATE IS FOR SPINNING RESNED OTP BUTTON
     setOptSendStatus(true);
-    try {
+    const isOtpSent = await sendOTP(email);
+    if (isOtpSent) {
       setOptSendStatus(false);
-      toast.success("OTP has been resent successfully.");
-    } catch (error) {
-      toast.error("Failed to resend OTP. Please try again.");
+      // toast.success("OTP has been resent successfully.");
+    } else {
       setOptSendStatus(false);
     }
   };
+
+  // HANDLE REGISTER OTP VERIFICATION
+  const handleOtpSubmit = async (values, actions) => {
+    try {
+      const result = await dispatch(verifyRegisterOTP({ email: values?.email, otpCode: values?.otpCode }));
+      if (verifyRegisterOTP?.fulfilled?.match(result)) {
+        setNewAccountData((prev) => (
+          {
+            ...prev,
+            email: values?.email,
+            countryCode: values?.countryCode,
+            phoneNumber: values?.phoneNumber,
+            otpCode: values?.otpCode
+          }))
+        setIsFormSubmitted(false);
+        setIsFormEmailValidate(true);
+        isSubmitted(true)
+        toast.success(result?.message ?? "OTP Verified.")
+      } else {
+        console.error(result?.error?.message);
+      }
+    } catch (error) {
+      console.error("VERIFY OTP ERROR : ", error?.message)
+    } finally {
+      actions.setSubmitting(false)
+    }
+
+
+    // handleFormSubmit(values, actions);
+  };
+
 
   return (
     <CommonFormikComponent
@@ -73,6 +133,24 @@ const PersonalInfoTab = ({ handleFormSubmit }) => {
             </AppTooltip>
           </Stack>
           <Row>
+            <Col lg={2}>
+              <ReactSelect
+                label="Country Code"
+                error={formikProps.errors.countryCode}
+                options={formattedCountryCodes ?? []}
+                value={formikProps.values.countryCode}
+                onChange={(option) => {
+                  formikProps.setFieldValue(
+                    "countryCode",
+                    option?.target?.value ?? ""
+                  );
+                }}
+                name="countryCode"
+                className={formikProps.touched.countryCode && formikProps.errors.countryCode ? "is-invalid" : ""}
+                onBlur={formikProps.handleBlur}
+                touched={formikProps.touched.countryCode}
+              />
+            </Col>
             <Col lg={6}>
               <FormInputBox
                 wrapperClassName="mb-4"
@@ -80,7 +158,7 @@ const PersonalInfoTab = ({ handleFormSubmit }) => {
                 id="phoneNumber"
                 label="Phone Number"
                 name="phoneNumber"
-                type="text"
+                type="number"
                 error={formikProps.errors.phoneNumber}
                 onBlur={formikProps.handleBlur}
                 onChange={formikProps.handleChange}
@@ -119,6 +197,7 @@ const PersonalInfoTab = ({ handleFormSubmit }) => {
                       onChange={formikProps.handleChange}
                       touched={formikProps.touched.email}
                       value={formikProps.values.email || ""}
+                      readOnly={isFormEmailValidate ?? false}
                       inputIcon={
                         isFormEmailValidate && (
                           <span className="text-success position-absolute top-0 end-0 p-1 custom-width-42 h-100 d-inline-flex align-items-center justify-content-center pe-none user-select-none">
@@ -181,7 +260,7 @@ const PersonalInfoTab = ({ handleFormSubmit }) => {
                       type="button"
                       variant="link"
                       className="fw-semibold text-decoration-none p-0 border-0"
-                      onClick={handleResend}
+                      onClick={() => handleResend(formikProps?.values?.email)}
                     >
                       <span className="me-1">
                         <MdRefresh

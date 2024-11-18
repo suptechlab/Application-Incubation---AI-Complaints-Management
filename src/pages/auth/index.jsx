@@ -8,6 +8,7 @@ import PrivacyModal from './privacy';
 import { dpaAcceptance } from "../../redux/slice/helpDeskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { registerUser, verifyLoginOTP } from "../../redux/slice/authSlice";
 
 /**
  * File a Claim Main Modal
@@ -21,7 +22,7 @@ import toast from "react-hot-toast";
 const FileClaimMainModal = ({ handleShow, handleClose }) => {
 
   const { isAgree } = useSelector((state) => state?.helpDeskSlice);
-  const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(isAgree);
+  // const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(isAgree);
   const [isSignupClicked, setIsSignupClicked] = useState(false);
   const [setupSuccesModalShow, setSetupSuccesModalShow] = useState(false);
   const [isFileClaimModalShow, setIsFileClaimModalShow] = useState(false);
@@ -29,8 +30,8 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
   const dispatch = useDispatch()
 
   // Handle Privacy Form Submit
-  const handlePrivacyFormSubmit = (values, actions) => { 
-    setIsPrivacyFormSubmitted(true);
+  const handlePrivacyFormSubmit = (values, actions) => {
+    // setIsPrivacyFormSubmitted(true);
     actions.setSubmitting(false);
     dispatch(dpaAcceptance(values?.agreePrivacy)).then((data) => {
       if (data.payload.status == 200) {
@@ -54,29 +55,44 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
 
     // A timeout to reset the state after a brief delay
     setTimeout(() => {
-      setIsPrivacyFormSubmitted(false);
+      // setIsPrivacyFormSubmitted(false);
       setIsSignupClicked(false);
     }, 500);
   }
 
+
   // Handle Finish Button
-  const handleFinishButtonClick = () => {
-    handleCloseReset();
-    setSetupSuccesModalShow(true)
+  const handleFinishButtonClick = async (values) => {
+    // handleCloseReset();
+    const result = await dispatch(registerUser(values));
+    if (registerUser.fulfilled.match(result)) {
+      handleCloseReset()
+      setSetupSuccesModalShow(true)
+      // toast.success(result?.message ?? "Account setup success.")
+    } else {
+      console.error('Registration error:', result.error.message);
+    }
   }
 
   // Handle File a Claim Button
-  const handleSuccessButtonClick = () => {
-    setSetupSuccesModalShow(false)
-    handleCloseReset()
-    setIsFileClaimModalShow(true)
+  const handleSuccessButtonClick =async (values) => {
+
+    // verifyLoginOTP
+    const result = await dispatch(verifyLoginOTP(values));
+    if (verifyLoginOTP.fulfilled.match(result)) {
+      setSetupSuccesModalShow(false)
+      handleCloseReset()
+      setIsFileClaimModalShow(true)
+    } else {
+      console.error('VERIFY OTP ERROR:', result.error.message);
+    }
   }
 
   // Show Component
   let modalChildren;
   if (isSignupClicked) {
     modalChildren = <AccountSetupModal handleClose={handleClose} handleFormSubmit={handleFinishButtonClick} />;
-  } else if (isPrivacyFormSubmitted) {
+  } else if (isAgree) {
     modalChildren = <LoginModal handleSignUpClick={handleSignupButtonClick} handleLoginSucccesSubmit={handleSuccessButtonClick} />;
   } else {
     modalChildren = <PrivacyModal handleClose={handleClose} handleFormSubmit={handlePrivacyFormSubmit} />;

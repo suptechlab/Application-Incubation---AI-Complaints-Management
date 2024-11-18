@@ -6,7 +6,7 @@ import CommonFormikComponent from "../../../components/CommonFormikComponent";
 import FormOtpInputBox from "../../../components/formOtpInput";
 import { OtpFormSchema } from "../validations";
 
-const OtpFormSection = ({ handleFormSubmit }) => {
+const OtpFormSection = ({otpToken, handleFormSubmit }) => {
     const [optSendStatus, setOptSendStatus] = useState(false);
 
     // Initial Values
@@ -16,6 +16,8 @@ const OtpFormSection = ({ handleFormSubmit }) => {
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
+        values.otpToken = otpToken
+        // VERIFY OTP HERE
         handleFormSubmit(values, actions);
     };
 

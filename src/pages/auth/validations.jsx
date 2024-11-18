@@ -28,8 +28,13 @@ export const IdVerificationFormSchema = yup.object({
 });
 
 export const PersonalInfoTabSchema = yup.object({
+  countryCode: yup
+    .string()
+    .required()
+    .label("Country Code"),
   phoneNumber: yup
     .string()
+    .matches(/^[1-9][\s-]?\d{9,14}$/, 'Phone number must be valid')
     .required()
     .label("Phone number"),
   email: yup
