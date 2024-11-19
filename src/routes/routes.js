@@ -102,7 +102,7 @@ const routes = [
     path: "/login",
     element: <Login />,
     isPrivate: false,
-    layoutType: "Blank",
+    // layoutType: "Blank",
 
     // path: "/",
     // element: <Login />,
