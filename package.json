@@ -2,7 +2,7 @@
   "name": "Cambridge",
   "version": "0.1.0",
   "private": true,
-  // "homepage": "http://localhost:3001",
+  
   "homepage": "https://webportal-suptechdev.seps.gob.ec",
   "dependencies": {
     "@emotion/react": "^11.11.4",
