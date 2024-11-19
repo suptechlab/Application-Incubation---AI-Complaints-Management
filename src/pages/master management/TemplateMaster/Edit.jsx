@@ -15,45 +15,45 @@ import {
 } from "../../../services/templateMaster.service";
 import Loader from "../../../components/Loader";
 
-const Edit = ({ provinces, modal, toggle }) => {
+const Edit = ({ provinces, modal, toggle,rowData,dataQuery }) => {
 
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [templateTypeOption, setTemplateTypeOption] = useState([
-    { value: "EMAIL ", label: t('EMAIL') },
-    { value: "EMAIL ", label: t('NOTIFICATION') }
+    { value: "EMAIL", label: t('EMAIL') },
+    { value: "NOTIFICATION", label: t('NOTIFICATION') }
   ])
-  const [initialValues, setInitialValues] = useState({
-          templateName: "",
-          subject: "",
-          content: "",
-          templateType: "",
-  });
+  const [initialValues, setInitialValues] = useState();
 
   useEffect(() => {
-    getTemplateMaster()
-    .then((response) => {
-      setInitialValues({
-          templateName: response.data?.templateName ?? "",
-          subject: response.data?.subject ?? "",
-          content: response.data?.content ?? "",
-          templateType: response.data?.templateType ?? "", 
-      });
-      setLoading(false);
-    })
-    .catch((error) => {
-        console.error("Error get during to fetch", error);
-    }); 
-  });
+    if(rowData){
+      setLoading(true);
+      //actions.ressetForm()
+      getTemplateMaster(rowData?.id)
+      .then((response) => {
+        console.log('response.data?.templateType',response.data?.templateType)
+        setInitialValues({
+            templateName: response.data?.templateName ?? "",
+            subject: response.data?.subject ?? "",
+            content: response.data?.content ?? "",
+            templateType: response.data?.templateType ?? "", 
+        });
+        setLoading(false);
+      })
+      .catch((error) => {
+          console.error("Error get during to fetch", error);
+      }); 
+    }
+  },[modal]);
 
   const onSubmit = async (values, actions) => {
-    console.log("values::", values);
-    //toast.success("Template master added successfully.");
-
-    editTemplateMaster(values).then(response => {
+    setLoading(true);
+    editTemplateMaster(rowData?.id,values).then(response => {
+      toggle();
+      setLoading(false);
       toast.success(response.data.message);
-      navigate("/template-master");
+      dataQuery.refetch()
     }).catch((error) => {
       console.log('error', error)
       toast.error(error);
@@ -62,7 +62,9 @@ const Edit = ({ provinces, modal, toggle }) => {
 
   return (
     <Fragment>
+    { loading ?  
     <Loader isLoading={loading} />
+    :
     <Modal
       show={modal}
       onHide={toggle}
@@ -78,6 +80,7 @@ const Edit = ({ provinces, modal, toggle }) => {
           {t("CREATE TEMPLATE MASTER")}
         </Modal.Title>
       </Modal.Header>
+      
       <Formik
         initialValues={initialValues}
         // onSubmit={(values, actions) => {
@@ -100,13 +103,14 @@ const Edit = ({ provinces, modal, toggle }) => {
                   onSubmit={handleSubmit}
                   className="d-flex flex-column h-100"
                 >
+                  
             <Modal.Body className="text-break py-0">
               <ReactSelect
                 error={errors?.templateType}
                 options={templateTypeOption ?? []}
-                value={values.templateType}
+                value={values?.templateType}
                 onChange={(option) => {
-                    setFieldValue('templateType', option.target.value);
+                    setFieldValue('templateType', option?.target?.value ?? "");
                 }}
                 name="templateType"
                 label={t("PROVINCE")}
@@ -116,34 +120,34 @@ const Edit = ({ provinces, modal, toggle }) => {
                 touched={touched?.templateType}
               />
               <FormInput
-                error={errors.templateName}
+                error={errors?.templateName}
                 id="templateName"
                 key={"templateName"}
                 label={t("NAME OF TEMPLATE MASTER")}
                 name="templateName"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                touched={touched.templateName}
+                touched={touched?.templateName}
                 type="text"
-                value={values.templateName || ""}
+                value={values?.templateName || ""}
               />
               <FormInput
-                error={errors.subject}
+                error={errors?.subject}
                 id="subject"
                 key={"subject"}
                 label={t("NAME OF TEMPLATE MASTER")}
                 name="subject"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                touched={touched.subject}
+                touched={touched?.subject}
                 type="text"
-                value={values.subject || ""}
+                value={values?.subject || ""}
               />
               <SunEditorReact
                 id="content"
                 name="content"
                 label="Template Details *"
-                content={values.content}
+                content={values?.content}
                 error={errors?.content}
                 touched={touched?.content}
                 handleBlur={handleBlur}
@@ -174,6 +178,7 @@ const Edit = ({ provinces, modal, toggle }) => {
       </Formik>
 
     </Modal>
+    }
     </Fragment>
   );
 };

@@ -13,9 +13,11 @@ const Edit = ({ modal, toggle,rowData,dataQuery }) => {
   const { t } = useTranslation();
  
   const handleSubmit = async (values, actions) => {
+    
     const formData = {
       name: values?.name
     };
+
     editProvinceMaster(rowData?.id , formData)
       .then((response) => {
         toast.success(response?.data?.message);

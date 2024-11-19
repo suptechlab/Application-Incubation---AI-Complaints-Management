@@ -17,7 +17,7 @@ const validationSchema = Yup.object({
     .required(msg.subjectRequired), // Dynamic message for required field
 
   content: Yup.string()
-    .max(1500, msg.templateContentMax1500) // Dynamic message for max 1500 characters
+    .max(8500, msg.templateContentMax1500) // Dynamic message for max 1500 characters
     .required(msg.templateContentRequired), // Dynamic message for required field
 });
 

@@ -140,4 +140,5 @@ export const englishLang = {
     "DELETED":"Deleted",
     "USER TYPE":"User Type",
     "NOTIFICATION": "Notification",
+    "TEMPLATE TYPE" : "Template Type",
 }

@@ -141,4 +141,5 @@ export const spanishLang = {
     "DELETED": "Eliminado",
     "USER TYPE": "Tipo de usuario",
     "NOTIFICATION": "Eliminado",
+    "TEMPLATE TYPE" : "Tipo de usuario",
 }

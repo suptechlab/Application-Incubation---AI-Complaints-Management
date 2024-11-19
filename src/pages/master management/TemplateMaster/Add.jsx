@@ -15,23 +15,22 @@ import {
   getTemplateMaster,
 } from "../../../services/templateMaster.service";
 
-const Add = ({ provinces, modal, toggle }) => {
+const Add = ({ provinces, modal, toggle, dataQuery }) => {
 
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [templateTypeOption, setTemplateTypeOption] = useState([
-    { value: "EMAIL ", label: t('EMAIL') },
-    { value: "EMAIL ", label: t('NOTIFICATION') }
+    { value: "EMAIL", label: t('EMAIL') },
+    { value: "NOTIFICATION", label: t('NOTIFICATION') }
   ])
 
   const onSubmit = async (values, actions) => {
-    console.log("values::", values);
-    //toast.success("Template master added successfully.");
 
     createNewTemplateMaster(values).then(response => {
       toast.success(response.data.message);
-      navigate("/template-master");
+      toggle();
+      dataQuery.refetch()
     }).catch((error) => {
       console.log('error', error)
       toast.error(error);

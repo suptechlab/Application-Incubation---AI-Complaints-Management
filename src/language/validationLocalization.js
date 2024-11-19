@@ -50,7 +50,7 @@ export const messages = {
     templateNameRequired: "Template name is required.",
     templateTypeRequired: "Template type is required.",
     subjectRequired: "Subject name is required",
-    templateContentMax1500: "Template details cannot exceed 1500 characters.",
+    templateContentMax1500: "Template details cannot exceed 8500 characters.",
     templateContentRequired: "Template details is required.",
   },
   es: {
@@ -104,7 +104,7 @@ export const messages = {
     templateNameRequired: "Se requiere el nombre de la plantilla.",
     templateTypeRequired: "Se requiere el tipo de plantilla.",
     subjectRequired: "Se requiere el nombre del asunto.",
-    templateContentMax1500: "Los detalles de la plantilla no pueden exceder los 1500 caracteres.",
+    templateContentMax1500: "Los detalles de la plantilla no pueden exceder los 8500 caracteres.",
     templateContentRequired: "Se requieren los detalles de la plantilla.",
   }
 };

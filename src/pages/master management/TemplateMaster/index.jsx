@@ -22,6 +22,7 @@ import Edit from "./Edit";
 import {
   handleGetTemplateMaster,
   changeTemplateMaster,
+  downloadTemplateList,
 } from "../../../services/templateMaster.service";
 
 const TemplateMaster = () => {
@@ -29,7 +30,7 @@ const TemplateMaster = () => {
 
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-
+  const [isDownloading, setDownloading] = useState(false)
   const [pagination, setPagination] = useState({
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
     pageSize: params.limit ? parseInt(params.limit) : 10,
@@ -81,8 +82,8 @@ const TemplateMaster = () => {
       });
   }, []);
 
-  const editCityMaster = async (id) => {
-    setEditModal({ id: id, open: !editModal?.open });
+  const editCityMaster = async (rowData) => {
+    setEditModal({ row: rowData, open: !editModal?.open });
   };
 
   const dataQuery = useQuery({
@@ -131,12 +132,13 @@ const TemplateMaster = () => {
   });
 
   const changeStatus = async (id, currentStatus) => {
+    
     try {
-      // await handleEditDistricts(id, { status: !currentStatus });
-      toast.success("Province master status updated successfully");
+      await changeTemplateMaster(id, { status: !currentStatus });
+      
       dataQuery.refetch();
     } catch (error) {
-      toast.error("Error updating state status");
+      toast.error();
     }
   };
   useEffect(() => {
@@ -156,6 +158,12 @@ const TemplateMaster = () => {
         id: "templateName",
         header: () => t("TEMPLATE MASTER"),
       },
+      {
+        accessorFn: (row) => row.templateType,
+        id: "templateType",
+        header: () => t("TEMPLATE TYPE"),
+      },
+      
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
@@ -189,8 +197,8 @@ const TemplateMaster = () => {
                 enabled: permission.current.editModule,
                 type: "button",
                 title: "Edit",
-                icon: <MdEdit size={18} />,
-                handler: () => editCityMaster(rowData?.row?.original?.id),
+                icon: <MdEdit size={18} />, 
+                handler: () => editCityMaster(rowData?.row?.original),
               },
             ]}
           />
@@ -212,17 +220,54 @@ const TemplateMaster = () => {
     });
   }, [filter]);
 
-  // Export to CSV Click Handler
+  // EXPORT TO CSV CLICK HANDLER
   const exportHandler = () => {
-    console.log("Export to CSV");
-  };
+    setDownloading(true)
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
+    downloadTemplateList({ search: filter?.search ?? "" }).then(response => {
+      if (response?.data) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const tempLink = document.createElement('a');
+        tempLink.href = blobUrl;
+        tempLink.setAttribute('download', 'cities.xlsx');
+
+        // Append the link to the document body before clicking it
+        document.body.appendChild(tempLink);
+
+        tempLink.click();
+
+        // Clean up by revoking the Blob URL
+        window.URL.revokeObjectURL(blobUrl);
+
+        // Remove the link from the document body after clicking
+        document.body.removeChild(tempLink);
+        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+      } else {
+        throw new Error(t("EMPTY RESPONSE"));
+      }
+      // toast.success(t("STATUS UPDATED"));
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+      toast.dismiss("downloading");
+    }).finally(() => {
+      // Ensure the loading toast is dismissed
+      // toast.dismiss("downloading");
+      setDownloading(false)
+    });
+  }
 
   return (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
       <PageHeader
         title={t("TEMPLATE MASTER")}
         actions={[
-          { label: "Export to CSV", to: exportHandler, variant: "outline-dark", disabled: true},
+          {  label: "Export to CSV", onClick: exportHandler, variant: "outline-dark",disabled : isDownloading ?? false},
           { label: "Add New", onClick: toggle, variant: "warning" },
         ]}
       />
@@ -239,8 +284,8 @@ const TemplateMaster = () => {
           />
         </Card.Body>
       </Card>
-      <Add modal={modal} toggle={toggle} />
-      <Edit modal={editModal?.open} toggle={editToggle} />
+      <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
+      <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
     </div>
   );
 };
