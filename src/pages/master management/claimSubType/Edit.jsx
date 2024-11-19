@@ -87,7 +87,7 @@ const Edit = ({ modal, dataQuery, toggle, rowData, claimTypes }) => {
                 onChange={handleChange}
                 touched={touched.name}
                 type="text"
-                value={values.name || ""}
+                value={values.name || ""} 
               />
               <ReactSelect
                 error={errors?.claimTypeId}
