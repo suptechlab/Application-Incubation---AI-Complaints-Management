@@ -15,6 +15,7 @@ import PageHeader from "../../../components/PageHeader";
 import { handleDeleteUser, handleGetUsers } from "../../../services/user.service";
 
 export default function TeamManagementList() {
+
     const location = useLocation();
     const { t } = useTranslation(); // use the translation hook
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -104,13 +105,13 @@ export default function TeamManagementList() {
             {
                 accessorFn: (row) => row.roles[0].name ?? "N/A",
                 id: "claimTypeName",
-                header: () => t('Description'),
+                header: () => t('DESCRIPTION'),
                 enableSorting: false,
             },
             {
                 accessorFn: (row) => row.email,
                 id: "email",
-                header: () => t('Association'),
+                header: () => t('ASSOCIATION'),
                 enableSorting: false,
             },
             {
@@ -159,7 +160,7 @@ export default function TeamManagementList() {
             <Loader isLoading={loading} />
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
                 <PageHeader
-                    title="Team Management"
+                    title={t('TEAM MANAGEMENT')}
                     actions={[{ label: t('ADD NEW'), to: "/team-management/add", variant: "warning" }]}
                 />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">

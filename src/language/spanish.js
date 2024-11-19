@@ -142,4 +142,5 @@ export const spanishLang = {
     "USER TYPE": "Tipo de usuario",
     "NOTIFICATION": "Eliminado",
     "TEMPLATE TYPE" : "Tipo de usuario",
+    "ASSOCIATION" : "Bloqueado",
 }

@@ -141,4 +141,5 @@ export const englishLang = {
     "USER TYPE":"User Type",
     "NOTIFICATION": "Notification",
     "TEMPLATE TYPE" : "Template Type",
+    "ASSOCIATION" : "Association",
 }
