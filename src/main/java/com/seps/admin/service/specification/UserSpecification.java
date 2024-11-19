@@ -28,15 +28,13 @@ public class UserSpecification {
     public static Specification<User> byFilter(String search, UserStatusEnum status, List<String> authorities, Long roleId) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // Filter by search term (e.g., name)
+            // Filter by search term (e.g., name, email, department) with OR condition
             if (StringUtils.hasText(search)) {
-                predicates.add(criteriaBuilder.or(
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%" + search.toLowerCase() + "%")
-                ));
-            }
-            // Filter by email
-            if (StringUtils.hasText(search)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + search.toLowerCase() + "%"));
+                Predicate namePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%" + search.toLowerCase() + "%");
+                Predicate emailPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + search.toLowerCase() + "%");
+                Predicate departmentPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("department")), "%" + search.toLowerCase() + "%");
+                // Combine name, email, and department with OR
+                predicates.add(criteriaBuilder.or(namePredicate, emailPredicate, departmentPredicate));
             }
             // Filter by status
             if (status != null) {

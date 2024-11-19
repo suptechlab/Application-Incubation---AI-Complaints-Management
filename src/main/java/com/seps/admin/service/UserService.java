@@ -11,6 +11,8 @@ import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.security.SecurityUtils;
 import com.seps.admin.service.dto.FIUserDTO;
 import com.seps.admin.service.dto.RequestInfo;
+import com.seps.admin.suptech.service.LdapSearchService;
+import com.seps.admin.suptech.service.UserNotFoundException;
 import com.seps.admin.suptech.service.dto.PersonInfoDTO;
 import com.seps.admin.service.dto.SEPSUserDTO;
 import com.seps.admin.service.mapper.UserMapper;
@@ -50,12 +52,12 @@ public class UserService {
     private final AuditLogService auditLogService;
     private final MessageSource messageSource;
     private final Gson gson;
-
+    private final LdapSearchService ldapSearchService;
 
     public UserService(UserRepository userRepository, AuthorityRepository authorityRepository,
                        PasswordEncoder passwordEncoder, UserMapper userMapper, ExternalAPIService externalAPIService,
                        RoleRepository roleRepository, OrganizationService organizationService, AuditLogService auditLogService,
-                       MessageSource messageSource, Gson gson) {
+                       MessageSource messageSource, Gson gson, LdapSearchService ldapSearchService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
@@ -66,6 +68,7 @@ public class UserService {
         this.auditLogService = auditLogService;
         this.messageSource = messageSource;
         this.gson = gson;
+        this.ldapSearchService = ldapSearchService;
     }
 
     @Transactional
@@ -89,6 +92,10 @@ public class UserService {
     @Transactional
     public User addSEPSUser(@Valid SEPSUserDTO userDTO, RequestInfo requestInfo) {
         User currenUser = getCurrentUser();
+        String normalizedEmail = userDTO.getEmail().toLowerCase();
+        Map<String, String> data = verifySEPSUser(normalizedEmail);
+        String name = data.get("displayName");
+        String department = data.get("department");
         // Fetch role or throw exception if not found
         Long roleId = userDTO.getRoleId();
         Role role = roleRepository.findByIdAndUserType(roleId, UserTypeEnum.SEPS_USER.toString())
@@ -96,10 +103,10 @@ public class UserService {
         // Initialize new User and set its properties
         User newUser = new User();
         // for a new user sets initially a random password
-        newUser.setFirstName(userDTO.getName());
+        newUser.setFirstName(name);
         if (userDTO.getEmail() != null) {
-            newUser.setEmail(userDTO.getEmail().toLowerCase());
-            newUser.setLogin(userDTO.getEmail().toLowerCase());
+            newUser.setEmail(normalizedEmail);
+            newUser.setLogin(normalizedEmail);
         }
         newUser.setLangKey(userDTO.getLangKey());
         String randomPassword = RandomUtil.generatePassword();
@@ -113,6 +120,7 @@ public class UserService {
         newUser.setResetDate(Instant.now());
         newUser.setPasswordSet(false);
         newUser.setStatus(UserStatusEnum.ACTIVE);
+        newUser.setDepartment(department);
         //Set Authority
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.SEPS).ifPresent(authorities::add);
@@ -170,8 +178,6 @@ public class UserService {
             .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.ROLE_NOT_FOUND, null, null));
         //Old Data
         Map<String, Object> oldData = convertEntityToMap(this.getSEPSUserById(id));
-
-        user.setFirstName(userDTO.getName());
         user.setLangKey(userDTO.getLangKey());
         user.setCountryCode(userDTO.getCountryCode());
         user.setPhoneNumber(userDTO.getPhoneNumber());
@@ -223,7 +229,7 @@ public class UserService {
      * @return a paginated {@link Page} of {@link SEPSUserDTO} objects that match the filter criteria
      */
     @Transactional(readOnly = true)
-    public Page<SEPSUserDTO> listSEPSUsers(Pageable pageable, String search, UserStatusEnum status,Long roleId) {
+    public Page<SEPSUserDTO> listSEPSUsers(Pageable pageable, String search, UserStatusEnum status, Long roleId) {
         List<String> authorities = new ArrayList<>();
         authorities.add(AuthoritiesConstants.SEPS);
         return userRepository.findAll(UserSpecification.byFilter(search, status, authorities, roleId), pageable)
@@ -420,7 +426,7 @@ public class UserService {
     public Page<FIUserDTO> listFIUsers(Pageable pageable, String search, UserStatusEnum status, Long roleId) {
         List<String> authorities = new ArrayList<>();
         authorities.add(AuthoritiesConstants.FI);
-        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities,roleId), pageable)
+        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities, roleId), pageable)
             .map(userMapper::userToFIUserDTO);
     }
 
@@ -530,5 +536,44 @@ public class UserService {
         String requestBody = null;
         auditLogService.logActivity(null, currenUser.getId(), requestInfo, "changeFIStatus", ActionTypeEnum.FI_USER_STATUS_CHANGE.name(), user.getId(), User.class.getSimpleName(),
             null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), requestBody);
+    }
+
+    /**
+     * Verifies if a SEPS user exists by searching for their email in the LDAP directory and fetching relevant details.
+     * <p>
+     * This method performs an LDAP search based on the provided email and attempts to retrieve the user's
+     * details such as their display name, department, and title. If the user is not found or an error occurs,
+     * it throws a `CustomException` with appropriate status and error codes.
+     *
+     * @param email The email address of the SEPS user to be verified.
+     * @return A map containing the user's details, including:
+     * - "displayName": the user's display name (if available),
+     * - "department": the user's department (if available),
+     * - "title": the user's title (if available).
+     * @throws CustomException If the user is not found in the LDAP directory or if any error occurs during the process.
+     *                         The exception is thrown with the `Status.NOT_FOUND` or `Status.BAD_REQUEST` status depending on the situation.
+     *                         The `SepsStatusCode.SEPS_USER_VERIFICATION_FAILED` error code is used in case of failure.
+     */
+    public Map<String, String> verifySEPSUser(String email) {
+        Map<String, String> userDetails = new HashMap<>();
+        try {
+            // Call the LDAP search service to fetch user details
+            Map<String, String> ldapDetails = ldapSearchService.searchByEmail(email);
+            // Filter only the required attributes (displayName, department, and title)
+            if (ldapDetails.containsKey("displayName")) {
+                userDetails.put("displayName", ldapDetails.get("displayName"));
+            }
+            if (ldapDetails.containsKey("department")) {
+                userDetails.put("department", ldapDetails.get("department"));
+            }
+            if (ldapDetails.containsKey("title")) {
+                userDetails.put("title", ldapDetails.get("title"));
+            }
+        } catch (UserNotFoundException e) {
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_VERIFICATION_FAILED, e.getMessage());
+        } catch (Exception e) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.SEPS_USER_VERIFICATION_FAILED, e.getMessage());
+        }
+        return userDetails;
     }
 }
