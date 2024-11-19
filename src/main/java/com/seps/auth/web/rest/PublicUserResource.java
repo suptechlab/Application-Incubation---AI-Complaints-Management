@@ -75,9 +75,27 @@ public class PublicUserResource {
     }
 
 
+    /**
+     * Validates an individual person by their identification number and biometric data.
+     *
+     * @param request The {@code ConsultationRequest} containing the national ID and biometric data to validate.
+     * @return ResponseEntity containing a boolean indicating if the person is valid.
+     */
     @PostMapping("/validate-individual-person")
     public ResponseEntity<Boolean> validateIndividualPerson(@Valid @RequestBody ConsultationRequest request) {
         return ResponseEntity.ok(userService.validatePersonIndividual(request));
+    }
+
+
+    /**
+     * Validates if a user exists based on their national identification number.
+     *
+     * @param identificacion The national identification number of the user to validate.
+     * @return ResponseEntity containing a boolean indicating if the user exists.
+     */
+    @GetMapping("/validate-identificacion")
+    public ResponseEntity<Boolean> validateUserIdentificacion(@RequestParam(name = "identificacion") String identificacion) {
+        return ResponseEntity.ok(userService.validateUserIdentificacion(identificacion));
     }
 
 }

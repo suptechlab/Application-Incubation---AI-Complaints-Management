@@ -54,6 +54,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/verify-login-otp")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/resend-login-otp")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/person-info")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/validate-identificacion")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/validate-individual-person")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/send-login-otp")).permitAll()
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()

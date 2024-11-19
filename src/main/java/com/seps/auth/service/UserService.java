@@ -458,14 +458,6 @@ public class UserService {
      * @throws CustomException if the person is not found in the external API.
      */
     public PersonInfoDTO fetchPersonDetails(String identificacion) {
-        Set<Authority> authorities = new HashSet<>();
-        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
-        userRepository
-            .findOneByIdentificacionAndAuthoritiesIn(identificacion, authorities)
-            .ifPresent(existingUser -> {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_IDENTIFICATION_ALREADY_EXIST, new String[]{identificacion}, null);
-            });
-
         try {
             PersonInfoDTO personInfoDTO = externalAPIService.getPersonInfo(identificacion);
             Optional<Persona> optionalPersona = personaRepository.findByIdentificacion(identificacion);
@@ -571,13 +563,28 @@ public class UserService {
             LOG.error("User {} account is pending", username);
             throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_PENDING, null);
         } else if (userStatus.equals(UserStatusEnum.BLOCKED)) {
-            LOG.error("User {} account is disabled", username);
+            LOG.error("User {} account is blocked", username);
             throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_BLOCKED, null);
         } else if (userStatus.equals(UserStatusEnum.DELETED)) {
-            LOG.error("User {} account is disabled", username);
+            LOG.error("User {} account is deleted", username);
             throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_DELETED, null);
         }
     }
 
-
+    public Boolean validateUserIdentificacion(String identificacion) {
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        userRepository
+            .findOneByIdentificacionAndAuthoritiesIn(identificacion, authorities)
+            .ifPresent(existingUser -> {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_IDENTIFICATION_ALREADY_EXIST, new String[]{identificacion}, null);
+            });
+        try {
+            externalAPIService.getPersonInfo(identificacion);
+            return true;
+        } catch (PersonNotFoundException e) {
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.PERSON_NOT_FOUND,
+                new String[]{identificacion}, null);
+        }
+    }
 }
