@@ -30,6 +30,7 @@ const RoleRightsForm = () => {
     rights: {},
   });
 
+
   const [modules, setModules] = useState([]);
   const [userType, setUserType] = useState('SEPS_USER');
 
@@ -83,7 +84,7 @@ const RoleRightsForm = () => {
   //         },
   //     }));
   // };
-  
+
   const handleCheckboxChange = (
     e,
     module,
@@ -120,6 +121,8 @@ const RoleRightsForm = () => {
       permissionIds: permissionIds,
     };
 
+
+
     if (isEdit) {
       await handleEditRoleRight(id, payload)
         .then((response) => {
@@ -127,8 +130,8 @@ const RoleRightsForm = () => {
           navigate("/role-rights");
         })
         .catch((error) => {
-            toast.error(error.response.data.errorDescription);
-      });
+          toast.error(error.response.data.errorDescription);
+        });
     } else {
       handleAddRoleRight(payload)
         .then((response) => {
@@ -149,6 +152,7 @@ const RoleRightsForm = () => {
     <>
       {
         loading ? <Loader isLoading={loading} /> :
+
           <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
             <PageHeader title={`${isEdit ? t('EDIT') : t('ADD')} `} /> {t('ROLE & RIGHTS')}
             <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
@@ -172,6 +176,8 @@ const RoleRightsForm = () => {
                       onSubmit={handleSubmit}
                       className="d-flex flex-column h-100"
                     >
+                      {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
+                      {/* <pre>{JSON.stringify(values,null,2)}</pre> */}
                       <Row>
                         <Col xs={12}>
                           <Row>
@@ -207,7 +213,7 @@ const RoleRightsForm = () => {
 
                           <div className="mt-2">
                             <h5 className="fw-semibold border-bottom pb-1 mb-3">
-                              Ceder derechos  
+                              Ceder derechos
                             </h5>
                             {modules.map((module) => (
                               <div key={module.id} className="mb-2 pb-1">
@@ -260,14 +266,14 @@ const RoleRightsForm = () => {
                             to={"/role-rights"}
                             className="btn btn-outline-dark custom-min-width-85"
                           >
-                             {t('CANCEL')}
+                            {t('CANCEL')}
                           </Link>
                           <Button
                             type="submit"
                             variant="warning"
                             className="custom-min-width-85"
                           >
-                              {isEdit ? t('UPDATE') : t('SUBMIT')}
+                            {isEdit ? t('UPDATE') : t('SUBMIT')}
                           </Button>
                         </Stack>
                       </div>

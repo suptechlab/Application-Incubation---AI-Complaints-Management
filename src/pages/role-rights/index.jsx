@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
@@ -17,9 +17,11 @@ import {
 } from "../../services/rolerights.service"; // Update the import to include delete function
 import { handleStatusChangeState } from "../../services/user.service";
 import { useTranslation } from "react-i18next";
+import Loader from "../../components/Loader";
 
 export default function RoleRightsList() {
 
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -84,15 +86,23 @@ export default function RoleRightsList() {
         });
       }
     },
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
+  
 
   useEffect(() => {
+    setLoading(true);
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
+    setLoading(false);
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
@@ -157,14 +167,14 @@ export default function RoleRightsList() {
                 title: "Edit",
                 icon: <MdEdit size={18} />,
               },
-              {
-                name: "delete",
-                enabled: true,
-                type: "button",
-                title: "Delete",
-                icon: <MdDelete size={18} />,
-                handler: () => deleteAction(rowData.row.original),
-              },
+              // {
+              //   name: "delete",
+              //   enabled: true,
+              //   type: "button",
+              //   title: "Delete",
+              //   icon: <MdDelete size={18} />,
+              //   handler: () => deleteAction(rowData.row.original),
+              // },
             ]}
           />
         ),
@@ -182,8 +192,16 @@ export default function RoleRightsList() {
     });
   }, [filter]);
 
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
+
   return (
     <React.Fragment>
+         <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
           title={t('ROLE & RIGHTS')}
