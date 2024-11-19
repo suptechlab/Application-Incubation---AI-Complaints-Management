@@ -93,7 +93,12 @@ export default function FIUserAddEdit() {
     setLoadingInfo(true)
     getPersonalInfo(identification).then((response) => {
       setLoadingInfo(false)
-      setInitialValues({ ...initialValue, identification: identification, name: response?.data?.nombreCompleto })
+      if(response?.data?.nombreCompleto){
+        setInitialValues({ ...initialValue, identification: identification, name: response?.data?.nombreCompleto })
+      }else{
+        setInitialValues({ ...initialValue, identification: identification, name: '' })
+      }
+     
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -101,6 +106,7 @@ export default function FIUserAddEdit() {
         } else {
           toast.error(error?.message);
         }
+        setInitialValues({ ...initialValue, identification: identification, name: '' })
       }).finally(() => {
         setLoadingInfo(false)
       })
@@ -111,7 +117,12 @@ export default function FIUserAddEdit() {
     setLoadingInfo(true)
     getOrganizationInfo(ruc).then((response) => {
       setLoadingInfo(false)
-      setInitialValues({ ...initialValue, ruc: ruc, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
+      if(response?.data?.razonSocial){
+        setInitialValues({ ...initialValue, ruc: ruc, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
+      }else{
+        setInitialValues({ ...initialValue, ruc: ruc, entityName: '', entityType: '' })
+      }
+     
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -119,6 +130,7 @@ export default function FIUserAddEdit() {
         } else {
           toast.error(error?.message);
         }
+        setInitialValues({ ...initialValue, ruc: ruc, entityName: '', entityType: '' })
       }).finally(() => {
         setLoadingInfo(false)
       })
@@ -158,7 +170,7 @@ export default function FIUserAddEdit() {
     if (isEdit) {
       // formData.id = id
       // CALL EDIT FI USERS API
-      handleEditFIUsers(id , formData).then((response) => {
+      handleEditFIUsers(id, formData).then((response) => {
         toast.success(response?.data?.message);
         navigate("/fi-users")
       })
@@ -192,7 +204,6 @@ export default function FIUserAddEdit() {
           setUserLoading(false);
         });
     }
-
   };
 
   return (
@@ -213,7 +224,7 @@ export default function FIUserAddEdit() {
                 actions.setSubmitting(true);
                 handleSubmit(values, actions);
               }}
-              enableReinitialize = {true}
+              enableReinitialize={true}
             >
               {({
                 errors,
