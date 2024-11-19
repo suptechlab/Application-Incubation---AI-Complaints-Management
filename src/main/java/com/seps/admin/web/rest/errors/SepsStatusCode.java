@@ -34,7 +34,8 @@ public enum SepsStatusCode implements StatusType {
     FI_USER_NOT_FOUND(20033, "fi.user.not.found"),
     FI_USER_ALREADY_EXIST(20034, "fi.user.already.exist"),
     DUPLICATE_TEMPLATE(20035,"duplicate.template"),
-    TEMPLATE_NOT_FOUND(20036,"template.not.found");
+    TEMPLATE_NOT_FOUND(20036,"template.not.found"),
+    SEPS_USER_VERIFICATION_FAILED(20037,"seps.user.verification.failed");
 
     private final int code;
 

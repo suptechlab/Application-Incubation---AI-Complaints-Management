@@ -8,6 +8,7 @@ import com.seps.admin.service.UserService;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import com.seps.admin.service.dto.SEPSUserDTO;
+import com.seps.admin.service.dto.VerifySEPSUserDTO;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -36,6 +38,8 @@ import tech.jhipster.web.util.PaginationUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 @Tag(name = "SEPS User Management", description = "APIs for managing SEPS users")
 @RestController
@@ -55,7 +59,6 @@ public class SEPSUserResource {
         this.userRepository = userRepository;
         this.mailService = mailService;
     }
-
 
     @Operation(
         summary = "Create a new SEPS User",
@@ -83,7 +86,7 @@ public class SEPSUserResource {
         } else {
             RequestInfo requestInfo = new RequestInfo(request);
             User newUser = userService.addSEPSUser(dto, requestInfo);
-            mailService.sendSepsUserCreationEmail(newUser);
+            //mailService.sendSepsUserCreationEmail(newUser);
             ResponseStatus responseStatus = new ResponseStatus(
                 messageSource.getMessage("seps.user.created.successfully", null, LocaleContextHolder.getLocale()),
                 HttpStatus.CREATED.value(),
@@ -149,4 +152,21 @@ public class SEPSUserResource {
         userService.changeSEPSStatus(id, status, requestInfo);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(
+        summary = "Verify a SEPS User by email",
+        description = "Checks whether a SEPS user exists in the SEPS active directory based on the provided email address."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User verification successful, returns user information."),
+        @ApiResponse(responseCode = "400", description = "Invalid email format provided."),
+        @ApiResponse(responseCode = "400", description = "User not found in the SEPS active directory."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
+    @PostMapping("/verify")
+    public ResponseEntity<Map<String, String>> verifySEPSUser(@Valid @RequestBody VerifySEPSUserDTO dto) {
+        String email = dto.getEmail();
+        return ResponseEntity.ok().body(userService.verifySEPSUser(email));
+    }
+
 }
