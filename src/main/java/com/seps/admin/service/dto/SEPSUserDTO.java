@@ -40,5 +40,6 @@ public class SEPSUserDTO {
     private Set<RoleDTO> roles;
     private UserStatusEnum status;
     private boolean isPasswordSet;
-
+    @NotBlank
+    private String department;
 }

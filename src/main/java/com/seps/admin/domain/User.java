@@ -150,6 +150,9 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @BatchSize(size = 20)
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "department", length = 255)
+    private String department;
+
 
     public Long getId() {
         return id;
@@ -375,6 +378,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     @Override
