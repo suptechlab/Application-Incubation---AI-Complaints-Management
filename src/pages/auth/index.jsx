@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import AccountSetupModal from "./account-setup";
 import SetupSuccesModal from "./account-setup/setup-success";
@@ -19,13 +19,15 @@ import { registerUser, verifyLoginOTP } from "../../redux/slice/authSlice";
  * @returns {*}
  */
 
-const FileClaimMainModal = ({ handleShow, handleClose }) => {
+const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, setIsFileClaimModalShow}) => {
 
+
+  // CHECK IF USER HAS ACCEPTED DPA OR NOT FROM REDUX STATE
   const { isAgree } = useSelector((state) => state?.helpDeskSlice);
   // const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(isAgree);
   const [isSignupClicked, setIsSignupClicked] = useState(false);
   const [setupSuccesModalShow, setSetupSuccesModalShow] = useState(false);
-  const [isFileClaimModalShow, setIsFileClaimModalShow] = useState(false);
+ 
 
   const dispatch = useDispatch()
 
@@ -61,7 +63,7 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
   }
 
 
-  // Handle Finish Button
+  // HANDLE FINISH BUTTON
   const handleFinishButtonClick = async (values) => {
     // handleCloseReset();
     const result = await dispatch(registerUser(values));
@@ -74,13 +76,13 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
     }
   }
 
-  // Handle File a Claim Button
-  const handleSuccessButtonClick =async (values) => {
-
+  // HANDLE FILE A CLAIM BUTTON
+  const handleSuccessButtonClick = async (values, actions) => {
     // verifyLoginOTP
     const result = await dispatch(verifyLoginOTP(values));
     if (verifyLoginOTP.fulfilled.match(result)) {
       setSetupSuccesModalShow(false)
+      actions.setSubmitting(false)
       handleCloseReset()
       setIsFileClaimModalShow(true)
     } else {
@@ -100,7 +102,7 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
 
   return (
     <React.Fragment>
-      <Modal
+     <Modal
         show={handleShow}
         onHide={handleCloseReset}
         backdrop="static"
@@ -112,8 +114,7 @@ const FileClaimMainModal = ({ handleShow, handleClose }) => {
         enforceFocus={false}
       >
         {modalChildren}
-      </Modal>
-
+      </Modal> 
       {/* File a Claim Setup Success Modal */}
       <SetupSuccesModal
         handleShow={setupSuccesModalShow}

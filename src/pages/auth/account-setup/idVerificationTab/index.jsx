@@ -9,13 +9,15 @@ import { IdVerificationFormSchema } from "../../validations";
 import { useDispatch } from "react-redux";
 import { fingerPrintValidate, nationalIdVerify } from "../../../../redux/slice/authSlice";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
+    const {t} = useTranslation()
     const [isFormSubmitted, setIsFormSubmitted] = useState(false)
     const dispatch = useDispatch()
     // Initial Values
     const [initialValues] = useState({
-        nationalID: '1716194319', // REMOVE THIS VALUE AFTER DEVELOPMENT
+        nationalID: '', // REMOVE THIS VALUE AFTER DEVELOPMENT
         fingerprintCode: '',
     });
 
@@ -28,7 +30,6 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
 
         setNewAccountData((prev)=> ({...prev , identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
 
-        // handleFormSubmit(values, actions);
 
         // UNCOMMENT THIS CODE ONCE FINGERPRINT API STARTS
 
@@ -50,16 +51,13 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
             setIsVerified(true)
             setNewAccountData((prev)=> ({...prev , identificacion: value}))
 
-            //  COMMENTED THIS BECAUSE AS OF NOW I DON'T HAVE BHUT SARI NATIONAL ID'S FOR VERIFY
-            
-
-            // const result = await dispatch(nationalIdVerify(value));
-            // if (nationalIdVerify.fulfilled.match(result)) {
-            //     setIsVerified(true)
-            //     setNewAccountData((prev)=> ({...prev , identificacion: value}))
-            // } else {
-            //     console.error('Verification error:', result.error.message);
-            // }
+            const result = await dispatch(nationalIdVerify(value));
+            if (nationalIdVerify.fulfilled.match(result)) {
+                setIsVerified(true)
+                setNewAccountData((prev)=> ({...prev , identificacion: value}))
+            } else {
+                console.error('Verification error:', result.error.message);
+            }
         }
     };
 
@@ -76,9 +74,9 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
                         gap={2}
                         className="mb-3 flex-wrap"
                     >
-                        <h5 className="custom-font-size-18 mb-0 fw-bold">National ID Verification</h5>
+                        <h5 className="custom-font-size-18 mb-0 fw-bold">{t("NATIONAL_ID_VERIFICATION")}</h5>
                         <AppTooltip
-                            title="National ID Verification Tooltip Data"
+                            title={t("NATIONAL_ID_VERIFICATION")}
                         >
                             <Button
                                 type="button"
@@ -94,7 +92,7 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
                             <FormInputBox
                                 autoComplete="off"
                                 id="nationalID"
-                                label="National ID Number"
+                                label={t("NATIONAL_ID_NUMBER")}
                                 name="nationalID"
                                 type="text"
                                 error={formikProps.errors.nationalID}
@@ -110,7 +108,7 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
                             <FormInputBox
                                 autoComplete="off"
                                 id="fingerprintCode"
-                                label="Fingerprint code"
+                                label={t("FINGERPRINT_CODE")}
                                 name="fingerprintCode"
                                 type="text"
                                 error={formikProps.errors.fingerprintCode}
@@ -130,7 +128,7 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
                                 className="custom-min-width-90 custom-margin-top-1"
                                 disabled={isFormSubmitted || !isIdVerified}
                             >
-                                {isFormSubmitted ? 'Verified' : 'Verify'}
+                                {isFormSubmitted ? t('VERIFIED_BUTTON') : t('VERIFY_BUTTON')}
                             </Button>
                         </Col>
                     </Row>

@@ -13,11 +13,14 @@ import { countryCodes } from "../../../../constants/CountryCodes";
 import ReactSelect from "../../../../components/ReactSelect";
 import { sendOTPonEmail, verifyRegisterOTP } from "../../../../redux/slice/authSlice";
 import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
 
 
   const dispatch = useDispatch()
+
+  const {t} = useTranslation()
 
   const formattedCountryCodes = countryCodes.map(country => ({
     value: country?.value,
@@ -120,9 +123,9 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
         <React.Fragment>
           <Stack direction="horizontal" gap={2} className="mb-3 flex-wrap">
             <h5 className="custom-font-size-18 mb-0 fw-bold">
-              Personal Information
+              {t("PERSONAL_INFORMATION")}
             </h5>
-            <AppTooltip title="Personal Information Tooltip Data">
+            <AppTooltip title={t("PERSONAL_INFORMATION")}>
               <Button
                 type="button"
                 variant="link"
@@ -135,7 +138,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
           <Row>
             <Col lg={2}>
               <ReactSelect
-                label="Country Code"
+                label={t("COUNTRY_CODE")}
                 error={formikProps.errors.countryCode}
                 options={formattedCountryCodes ?? []}
                 value={formikProps.values.countryCode}
@@ -156,7 +159,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                 wrapperClassName="mb-4"
                 autoComplete="off"
                 id="phoneNumber"
-                label="Phone Number"
+                label={t("PHONE_NUMBER")}
                 name="phoneNumber"
                 type="number"
                 error={formikProps.errors.phoneNumber}
@@ -169,9 +172,9 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
             <Col xs={12}>
               <Stack direction="horizontal" gap={2} className="mb-3 flex-wrap">
                 <h5 className="custom-font-size-18 mb-0 fw-bold">
-                  Email Verification
+                  {t("EMAIL_VERIFICATION")}
                 </h5>
-                <AppTooltip title="Email Verification Tooltip Data">
+                <AppTooltip title={t("EMAIL_VERIFICATION")}>
                   <Button
                     type="button"
                     variant="link"
@@ -189,7 +192,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                     <FormInputBox
                       autoComplete="off"
                       id="email"
-                      label="Email Address"
+                      label={("EMAIL_ADDRESS")}
                       name="email"
                       type="email"
                       error={formikProps.errors.email}
@@ -217,7 +220,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                         variant="warning"
                         className="custom-min-width-100 custom-margin-top-1"
                       >
-                        Send OTP
+                        {t("SEND_OTP_BUTTON")}
                       </Button>
                     </Col>
                   )}
@@ -226,8 +229,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
             ) : (
               <Col xs={12}>
                 <p className="mb-4 mt-n2">
-                  Fill the below form to create your account then you will be
-                  redirected to file a claim.
+                  {t("FORM_INSTRUCTION")}
                 </p>
                 <Row>
                   <Col sm lg={6}>
@@ -252,7 +254,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                       variant="warning"
                       className="custom-min-width-100 custom-margin-top-1"
                     >
-                      Verify OTP
+                      {t("OTP_VERIFICATION")}
                     </Button>
                   </Col>
                   <Col xs={12}>
@@ -268,11 +270,10 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                           className={optSendStatus ? "spin" : ""}
                         />
                       </span>{" "}
-                      Resend OTP
+                      {t("RESEND_OTP")}
                     </Button>
                     <p className="pt-3 mb-0 fst-italic custom-font-size-12">
-                      Didn't receive the OTP? Check your spam folder or click
-                      "Resend OTP" to get a new code.
+                      {t("OTP_INSTRUCTION")}
                     </p>
                   </Col>
                 </Row>

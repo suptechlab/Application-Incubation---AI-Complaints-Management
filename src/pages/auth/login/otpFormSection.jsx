@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { MdRefresh } from "react-icons/md";
 import CommonFormikComponent from "../../../components/CommonFormikComponent";
 import FormOtpInputBox from "../../../components/formOtpInput";
 import { OtpFormSchema } from "../validations";
+import { resendLoginOTPonEmail } from "../../../redux/slice/authSlice";
+import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 
-const OtpFormSection = ({otpToken, handleFormSubmit }) => {
+const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
     const [optSendStatus, setOptSendStatus] = useState(false);
+    const [isResendDisabled, setIsResendDisabled] = useState(false);
+    const [timer, setTimer] = useState(0);
+
+    const {t} = useTranslation()
+
+    const dispatch = useDispatch()
 
     // Initial Values
     const initialValues = {
@@ -16,23 +25,47 @@ const OtpFormSection = ({otpToken, handleFormSubmit }) => {
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
+        actions.setSubmitting(true)
         values.otpToken = otpToken
         // VERIFY OTP HERE
         handleFormSubmit(values, actions);
     };
 
-
     // Handle Resend OTP 
-    const handleResend = () => {
-        setOptSendStatus(true)
+    const handleResend = async () => {
+        setOptSendStatus(true);
+        setIsResendDisabled(true);
+        setTimer(60); // Start 60-second timer
         try {
-            setOptSendStatus(false)
-            toast.success("OTP has been resent successfully.");
+            const result = await dispatch(resendLoginOTPonEmail(otpToken));
+
+            if (resendLoginOTPonEmail.fulfilled.match(result)) {
+                toast.success(result?.message || "OTP has been resent successfully.");
+            } else {
+                console.error('OTP Send error:', result.error.message);
+                // toast.error("Failed to resend OTP. Please try again.");
+            }
         } catch (error) {
-            toast.error("Failed to resend OTP. Please try again.");
-            setOptSendStatus(false)
+            console.error("Error during OTP resend:", error);
+            toast.error("An unexpected error occurred. Please try again.");
+        } finally {
+            setOptSendStatus(false);
         }
-    }
+    };
+
+    useEffect(() => {
+        let countdown;
+        if (timer > 0) {
+            countdown = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        } else {
+            setIsResendDisabled(false)
+            clearInterval(countdown);
+        }
+
+        return () => clearInterval(countdown); // Cleanup on unmount
+    }, [timer]);
 
     return (
         <CommonFormikComponent
@@ -42,9 +75,9 @@ const OtpFormSection = ({otpToken, handleFormSubmit }) => {
         >
             {(formikProps) => (
                 <React.Fragment>
-                    <h6 className="fw-bold">For Existing User ?</h6>
-                    <div className="fw-semibold mb-2">Verify your Email</div>
-                    <p>We've sent a One-Time Password (OTP) to your email address. Please enter it below to verify.</p>
+                    <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
+                    <div className="fw-semibold mb-2">{t('VERIFY_EMAIL_LABEL')}</div>
+                    <p>{t('OTP_SENT_INSTRUCTION')}</p>
                     <FormOtpInputBox
                         wrapperClassName="mb-3"
                         value={formikProps.values.otpCode}
@@ -64,19 +97,23 @@ const OtpFormSection = ({otpToken, handleFormSubmit }) => {
                             variant="link"
                             className="fw-semibold text-decoration-none p-0 border-0"
                             onClick={handleResend}
+                            disabled={isResendDisabled || timer > 0}
                         >
-                            <span className="me-1"><MdRefresh size={21} className={optSendStatus ? 'spin' : ''} /></span>Resend OTP
+                            {timer > 0 ? `${t('RESEND_OTP_TIMER')} ${timer}s` : <>
+                                <span className="me-1"><MdRefresh size={21} className={optSendStatus ? 'spin' : ''} /></span> {t('RESEND_OTP')}
+                            </>}
                         </Button>
                         <Button
                             type="submit"
                             variant="warning"
                             className="custom-min-width-100 ms-auto"
                         >
-                            Verify OTP
+                            {t('VERIFY_OTP')}
                         </Button>
                     </Stack>
-                    <p className="mb-0 pt-3 fst-italic">Didn't receive the OTP? Check your spam folder or click "Resend OTP" to get a new code.</p>
+                    <p className="mb-0 pt-3 fst-italic">{t('OTP_NOT_RECEIVED_INSTRUCTION')}</p>
                 </React.Fragment>
+
             )}
         </CommonFormikComponent>
     );

@@ -5,18 +5,21 @@ import FormInputBox from "../../../components/FormInput";
 import { LoginFormSchema } from "../validations";
 import Captcha from "../../../components/Captcha";
 import FormCheckbox from "../../../components/formCheckbox";
+import { useTranslation } from "react-i18next";
 
 const LoginFormSection = ({ handleFormSubmit }) => {
+    const {t} = useTranslation()
     // Initial Values
     const initialValues = {
         email: '',
-        rememberMe : false
+        rememberMe: false
     };
 
 
     const [captcha, setCaptcha] = useState('')
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
+        actions.setSubmitting(true)
         values.recaptchaToken = captcha
         handleFormSubmit(values, actions);
     };
@@ -30,13 +33,13 @@ const LoginFormSection = ({ handleFormSubmit }) => {
         >
             {(formikProps) => (
                 <React.Fragment>
-                    <h6 className="fw-bold">For Existing User ?</h6>
-                    <p>To file a claim, please login to your account.</p>
+                    <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
+                    <p>{t('LOGIN_INSTRUCTION')}</p>
                     <FormInputBox
                         wrapperClassName="mb-3"
                         autoComplete="off"
                         id="email"
-                        label="Email Address"
+                        label={t('EMAIL_ADDRESS_LABEL')}
                         name="email"
                         type="email"
                         error={formikProps.errors.email}
@@ -45,19 +48,17 @@ const LoginFormSection = ({ handleFormSubmit }) => {
                         touched={formikProps.touched.email}
                         value={formikProps.values.email || ""}
                     />
-                     <FormCheckbox
+                    <FormCheckbox
                         id="rememberMe"
                         checked={formikProps.values.rememberMe}
                         onBlur={formikProps.handleBlur}
                         onChange={formikProps.handleChange}
                         type="checkbox"
-                        label="Remember Me"
+                        label={t('REMEMBER_ME_LABEL')}
                     />
                     <Captcha
                         reCaptchaRef={reCaptchaRef}
-                        onChangeCaptchaCode={(
-                            value
-                        ) => {
+                        onChangeCaptchaCode={(value) => {
                             setCaptcha(value);
                         }}
                     />
@@ -66,11 +67,13 @@ const LoginFormSection = ({ handleFormSubmit }) => {
                             type="submit"
                             variant="warning"
                             className="custom-min-width-100 ms-auto"
+                            disabled={formikProps?.isSubmitting}
                         >
-                            Send OTP
+                            {t('SEND_OTP_BUTTON')}
                         </Button>
                     </Stack>
                 </React.Fragment>
+
             )}
         </CommonFormikComponent>
     );

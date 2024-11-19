@@ -5,10 +5,13 @@ import IdVerificationTab from "./idVerificationTab";
 import PersonalInfoTab from "./personalInfoTab";
 import { fingerPrintValidate } from "../../../redux/slice/authSlice";
 import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
 
     const dispatch = useDispatch()
+
+    const {t} = useTranslation()
 
     const [activeTab, setActiveTab] = useState(0);
     const [isIdVerificationSubmitted, setIsIdVerificationSubmitted] = useState(false);
@@ -43,14 +46,14 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
     const stepData = [
         {
             id: 1,
-            stepTitle: <>ID<br />Verification</>,
+            stepTitle: <>{t("ID")}<br />{t("VERIFICATION")}</>,
             stepCurrent: activeTab === 0,
             stepCompleted: activeTab === 1,
             stepClickHandler: () => setActiveTab(0),
         },
         {
             id: 2,
-            stepTitle: <>Personal &amp;<br />Login Info</>,
+            stepTitle: <>{t("PERSONAL")} &amp;<br />{t("LOGIN_INFO")}</>,
             stepCurrent: activeTab === 1,
             stepCompleted: isPersonalInfoSubmitted,
             stepClickHandler: () => setActiveTab(1),
@@ -77,9 +80,9 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
                     <Row className="g-0">
                         <Col sm lg={7}>
                             <Modal.Title as="h4" className="fw-bold">
-                                Account Setup
+                                {t("ACCOUNT_SETUP")}
                             </Modal.Title>
-                            <p className="small">Fill the below form to create your account then you will be redirected to file a claim.</p>
+                            <p className="small">{t("FILL_FORM")}</p>
                         </Col>
                         <Col sm="auto" className="ms-auto mb-2 mb-sm-0">
                             <div className="text-end">
@@ -116,7 +119,7 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
                         }}
                         className="custom-min-width-100 me-auto"
                     >
-                        <span className="me-1">&lt;</span>Back
+                        <span className="me-1">&lt;</span>{t("BACK")}
                     </Button>
                     <Button
                         type="button"
@@ -130,7 +133,7 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
                         }}
                         disabled={activeTab === 1 && !isPersonalInfoSubmitted || !isIdVerificationSubmitted}
                     >
-                        {activeTab === 1 ? 'Finish' : <>Next<span className="ms-1">&gt;</span></>}
+                        {activeTab === 1 ? t("FINISH") : <>{t("NEXT")}<span className="ms-1">&gt;</span></>}
                     </Button>
                 </Stack>
             </Modal.Footer>

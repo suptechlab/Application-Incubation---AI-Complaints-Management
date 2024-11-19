@@ -8,20 +8,9 @@ const initialState = {
     loading: false,
     error: null,
     user: {},
+    isLoggedIn : false
 };
 
-// LOGIN API
-export const login = createAsyncThunk(
-    'auth/login',
-    async (values, { rejectWithValue }) => {
-        try {
-            const response = await authApi.post(EndPoint.LOGIN_API, values);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
-    }
-);
 // NATIONAL ID VERIFY
 export const nationalIdVerify = createAsyncThunk(
     'nationalIdVerify',
@@ -62,9 +51,35 @@ export const sendLoginOTPonEmail = createAsyncThunk(
 // VERIFY LOGIN OTP 
 export const verifyLoginOTP = createAsyncThunk(
     'verifyLoginOTP',
-    async (values, { rejectWithValue }) => {
+    async (values, { rejectWithValue,dispatch }) => {
         try {
             const response = await authApi.post(`${EndPoint.VERIFY_LOGIN_OTP}`, values);
+
+            const { id_token } = response.data;
+
+            // Step 2: Save the id_token to localStorage
+            setLocalStorage('id_token', id_token);
+
+            // Step 3: Fetch account info using the stored token
+            const accountResponse = await dispatch(getAccountInfo());
+
+            return {
+                id_token: id_token,
+                accountData: accountResponse.payload
+            };
+
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+//RESEND LOGIN OTP ON EMAIL
+export const resendLoginOTPonEmail = createAsyncThunk(
+    'resendLoginOTPonEmail',
+    async (token, { rejectWithValue }) => {
+        try {
+            const response = await authApi.get(`${EndPoint.RESEND_LOGIN_OTP}?otpToken=${token}`);
             return response?.data;
         } catch (error) {
             return rejectWithValue(error)
@@ -147,25 +162,13 @@ const authSlice = createSlice({
         setLogout: (state) => {
             state.token = '';
             state.user = {};
+            state.isLoggedIn = false
             removeLocalStorage('id_token');
         }
     },
 
     extraReducers: (builder) => {
         builder
-            // LOGIN
-            .addCase(login.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(login.fulfilled, (state, action) => {
-                state.loading = false;
-                state.token = action.payload.accessToken;
-            })
-            .addCase(login.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
             // ACCOUNT INFO
             .addCase(getAccountInfo.pending, (state) => {
                 state.loading = true;
@@ -234,13 +237,13 @@ const authSlice = createSlice({
             })
             .addCase(registerUser.fulfilled, (state, action) => {
                 state.loading = false;
+                state.isLoggedIn = true
                 state.token = action.payload.id_token
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action?.error?.errorDescription ?? action?.error?.message;
             })
-
             // SEND LOGIN OTP ON EMAIL
             .addCase(sendLoginOTPonEmail.pending, (state) => {
                 state.loading = true;
@@ -248,7 +251,6 @@ const authSlice = createSlice({
             })
             .addCase(sendLoginOTPonEmail.fulfilled, (state, action) => {
                 state.loading = false;
-                // state.token = action.payload.id_token
             })
             .addCase(sendLoginOTPonEmail.rejected, (state, action) => {
                 state.loading = false;
@@ -262,9 +264,23 @@ const authSlice = createSlice({
             })
             .addCase(verifyLoginOTP.fulfilled, (state, action) => {
                 state.loading = false;
-                state.token = action.id_token
+                state.isLoggedIn = true
+                state.token = action.payload.id_token
             })
             .addCase(verifyLoginOTP.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action?.error?.errorDescription ?? action?.error?.message;
+            })
+
+            // RESEND LOGIN OTP 
+            .addCase(resendLoginOTPonEmail.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(resendLoginOTPonEmail.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(resendLoginOTPonEmail.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action?.error?.errorDescription ?? action?.error?.message;
             })

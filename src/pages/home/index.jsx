@@ -1,21 +1,34 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Container, Image, Row } from "react-bootstrap";
 import { MdEditDocument } from "react-icons/md";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import homeBg from "../../assets/images/home-bg.jpg";
 import Loader from "../../components/Loader";
 import SvgIcons from "../../components/SVGIcons";
 import { toggleChatbot } from "../../redux/slice/helpDeskSlice";
 import FileClaimMainModal from "../auth";
 import BrandSection from "./brandSection";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const dispatch = useDispatch();
+
+  const {t} = useTranslation()
+  // GET IS LOGGED IN STATUS OF USER FROM REDUX
+  const { isLoggedIn } = useSelector((state) => state?.authSlice)
+
+  // THIS STATE IS FOR OPEN MAIN MODAL IF USER NOT LOGGED IN
   const [fileClaimMainModalShow, setFileClaimMainModalShow] = useState(false);
+  // THIS STATE IS FOR OPEN FILE CLAIM MODAL DIRECTLY IF USER IS LOGGED IN
+  const [isFileClaimModalShow, setIsFileClaimModalShow] = useState(false);
 
   //Handle Privacy Modal
-  const handlePrivacyClick = () => {
-    setFileClaimMainModalShow(true);
+  const handleFileClaimBtn = () => {
+    if (isLoggedIn) {
+      setIsFileClaimModalShow(true)
+    } else {
+      setFileClaimMainModalShow(true);
+    }
   };
 
   return (
@@ -24,7 +37,7 @@ const Home = () => {
       <div className="d-flex flex-column flex-grow-1 position-relative w-100 z-1">
         <Image
           src={homeBg}
-          alt="Homepage Background Cover"
+          alt={t("HOMEPAGE_BACKGROUND_ALT")}
           className="h-100 object-fit-cover pe-none position-absolute start-0 top-0 user-select-none w-100 z-n1"
         />
         <Container className="my-auto">
@@ -33,15 +46,13 @@ const Home = () => {
               <Card className="bg-primary-90 rounded-4 border-0 text-white mw-100 custom-width-400 my-5">
                 <Card.Body className="p-4">
                   <div className="fw-bold text-uppercase pt-1">
-                    Any Doubts ?
+                    {t("ANY_DOUBTS")} 
                   </div>
                   <h1 className="fs-4 fw-bold text-uppercase">
-                    File a Claim or Inquire us
+                    {t("FILE_CLAIM_OR_INQUIRE")}
                   </h1>
                   <p className="small fw-medium pb-1">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    bibendum nibh vel volutpat condimentum. Nullam nec libero
-                    leo.
+                   {t("FILE_CLAIM_DESCRIPTION")}
                   </p>
                   <Row className="flex-wrap g-3 pb-2">
                     <Col>
@@ -50,13 +61,13 @@ const Home = () => {
                         variant="warning"
                         className="text-uppercase w-100 text-nowrap fw-bold"
                         size="lg"
-                        onClick={handlePrivacyClick}
-                        // disabled={true}
+                        onClick={handleFileClaimBtn}
+                      // disabled={true}
                       >
                         <span aria-hidden={true} className="me-1">
                           <MdEditDocument size={17} />
                         </span>
-                        <span className="align-middle">FILE A CLAIM</span>
+                        <span className="align-middle">{t("FILE_A_CLAIM")}</span>
                       </Button>
                     </Col>
                     <Col>
@@ -70,7 +81,7 @@ const Home = () => {
                         <span aria-hidden={true} className="me-1">
                           {SvgIcons.RobotIcon()}
                         </span>
-                        <span className="align-middle">Inquiry</span>
+                        <span className="align-middle">{t("INQUIRY")}</span>
                       </Button>
                     </Col>
                   </Row>
@@ -86,6 +97,8 @@ const Home = () => {
       <FileClaimMainModal
         handleShow={fileClaimMainModalShow}
         handleClose={() => setFileClaimMainModalShow(false)}
+        isFileClaimModalShow={isFileClaimModalShow}
+        setIsFileClaimModalShow={setIsFileClaimModalShow}
       />
     </React.Fragment>
   );

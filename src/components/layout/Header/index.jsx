@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Button,
   Container,
   Dropdown,
   Image,
@@ -11,25 +12,39 @@ import { Link, NavLink } from "react-router-dom";
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import Logo from "../../../assets/images/logo.svg";
 import "./header.scss";
+import { useDispatch, useSelector } from "react-redux";
+import { setLogout } from "../../../redux/slice/authSlice";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
+
+  const { isLoggedIn , user } = useSelector((state) => state?.authSlice)
+
+  const {t} = useTranslation()
+
+  const dispatch = useDispatch()
+
   let expand = "md";
 
   // Menu Links
   const menuLinks = [
     {
-      label: "Menu 1",
+      label: t("MENU_1"),
       path: "/menu-1",
     },
     {
-      label: "Menu 2",
+      label: t("MENU_2"),
       path: "/menu-2",
     },
     {
-      label: "Menu 3",
+      label: t("MENU_3"),
       path: "/menu-3",
     },
   ];
+
+  const handleLogout = ()=>{
+    dispatch(setLogout())
+  }
 
   return (
     <header className="theme-header">
@@ -49,7 +64,7 @@ const Header = () => {
                 id={`headerNavbarLabel-expand-${expand}`}
                 className="fw-semibold"
               >
-                Menu
+                t{t("MENU")}
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
@@ -60,6 +75,7 @@ const Header = () => {
                     to={link.path}
                     className="mx-md-3"
                     key={"menu_link_" + index}
+                    disabled = {true}
                   >
                     {link.label}
                   </Nav.Link>
@@ -68,7 +84,7 @@ const Header = () => {
             </Offcanvas.Body>
           </Navbar.Offcanvas>
 
-          <Dropdown className="d-none ms-md-4">
+          <Dropdown className={`${!isLoggedIn ? 'd-none' :'' } ms-md-4`}>
             <Dropdown.Toggle
               variant="link"
               id="dropdown-profile"
@@ -82,21 +98,21 @@ const Header = () => {
                 alt={"Alex Boston"}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-150 fs-6 lh-sm fw-semibold">
-                {"Alex Boston"}
+              {user?.firstName}
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="shadow border-0 mt-3">
               <Dropdown.Header className="fw-semibold d-md-none">
-                Alex Boston
+              {user?.firstName ?? ''} 
               </Dropdown.Header>
               <Dropdown.Item as={Link} to="/profile" disabled>
-                Profile
+                {t("PROFILE")}
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password" disabled>
-                Change Password
+                {t("CHANGE_PASSWORD")}
               </Dropdown.Item>
-              <Dropdown.Item as={Link} disabled>
-                Logout
+              <Dropdown.Item as={Button} onClick={handleLogout}>
+                {t("LOGOUT")}
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
