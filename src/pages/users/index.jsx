@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
@@ -23,6 +23,8 @@ import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 
 export default function UserList() {
+
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation(); // use the translation hook
@@ -70,16 +72,23 @@ export default function UserList() {
         });
       }
     },
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
 
   //handle last page deletion item
   useEffect(() => {
+    setLoading(true);
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
+    setLoading(false);
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
@@ -297,6 +306,13 @@ export default function UserList() {
     });
   }, [filter]);
 
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
+  
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
