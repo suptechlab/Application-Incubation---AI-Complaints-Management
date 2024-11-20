@@ -27,7 +27,7 @@ export default function ForgotPassword() {
         await handleForgotPassword({ ...values }).then((response) => {
             toast.success(response.data.message)
             actions.resetForm()
-            //navigate('/reset-password')
+            navigate('/login')
             //reCaptchaRef.current.reset()
             //setCaptcha("")
         }).catch((error) => {

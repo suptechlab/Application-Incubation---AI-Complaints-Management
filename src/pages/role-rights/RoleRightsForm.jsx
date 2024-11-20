@@ -35,6 +35,7 @@ const RoleRightsForm = () => {
 
   useEffect(() => {
     if (isEdit) {
+      setLoading(true);
       handleGetRoleRightById(id).then((response) => {
         const roleData = response.data;
         const rights = roleData.modules.reduce((acc, module) => {
@@ -63,6 +64,7 @@ const RoleRightsForm = () => {
       });
       setLoading(false);
     } else {
+      setLoading(true);
       //setUserType('SEPS_USER'); // SEPS_USER/FI_USER
       fetchModulesAndPermissions(userType).then((response) => {
         setModules(response.data);
