@@ -13,9 +13,9 @@ const PublicRoute = ({ element }) => {
         if (element && element.type && allowedPages.includes(element.type.name)) {
             return <Navigate to='/' replace />;
         }
-        else{
-            return <Navigate to='/login' replace />;
-        }
+        // else{
+        //     return <Navigate to='/login' replace />;
+        // }
     }
 
     return element;
