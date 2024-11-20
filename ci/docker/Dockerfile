@@ -10,7 +10,7 @@ COPY . .
 #ENV SEPS_MAVEN_PASSWORD=$SEPS_MAVEN_PASSWORD_ARG
 
 RUN chmod +x ./mvnw
-RUN ./mvnw -Pprod clean verify -DskipTests -Dmodernizer.skip=true
+RUN ./mvnw -Pdev clean verify -DskipTests -Dmodernizer.skip=true
 
 FROM openjdk:17-alpine
 
@@ -18,7 +18,7 @@ ARG ARG_VERSION
 ENV VERSION=$ARG_VERSION
 
 # Install necessary libraries and fonts
-RUN apk add --no-cache fontconfig ttf-dejavu libx11
+RUN apk add --no-cache fontconfig ttf-dejavu libx11 curl
 RUN fc-cache -f -v
 RUN apk add --no-cache tzdata
 
