@@ -21,24 +21,27 @@ import java.util.Map;
 public class LdapSearchService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LdapSearchService.class);
-    private static final String LDAP_URL = "ldap://abnoba.seps.local:389";
-    private static final String BASE_DN = "DC=SEPS,DC=local";
-    private static final String LDAP_USERNAME = "CN=suptech,OU=Cambrigde,DC=SEPS,DC=local";
-    private static final String LDAP_PASSWORD = "Must4n8_2k2G";
+    @Autowired
+    private LdapConfig ldapConfig;
 
     @Autowired
     private MessageSource messageSource;
 
     public Map<String, String> searchByEmail(String email) throws UserNotFoundException {
+        LOG.debug("LdapSearchService url:{}", ldapConfig.getUrl());
+        LOG.debug("LdapSearchService username:{}", ldapConfig.getUsername());
+        LOG.debug("LdapSearchService password:{}", ldapConfig.getPassword());
+        LOG.debug("LdapSearchService basedn:{}", ldapConfig.getBasedn());
+
         Map<String, String> userDetails = new HashMap<>();
         DirContext ctx = null;
         try {
             // Set up the environment for LDAP connection
             Hashtable<String, String> env = new Hashtable<>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-            env.put(Context.PROVIDER_URL, LDAP_URL);
-            env.put(Context.SECURITY_PRINCIPAL, LDAP_USERNAME);
-            env.put(Context.SECURITY_CREDENTIALS, LDAP_PASSWORD);
+            env.put(Context.PROVIDER_URL, ldapConfig.getUrl());
+            env.put(Context.SECURITY_PRINCIPAL, ldapConfig.getUsername());
+            env.put(Context.SECURITY_CREDENTIALS, ldapConfig.getPassword());
             env.put(Context.SECURITY_AUTHENTICATION, "simple");
             // Create the DirContext
             ctx = new InitialDirContext(env);
@@ -47,7 +50,7 @@ public class LdapSearchService {
             SearchControls searchControls = new SearchControls();
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             // Perform the search
-            NamingEnumeration<SearchResult> results = ctx.search(BASE_DN, searchFilter, searchControls);
+            NamingEnumeration<SearchResult> results = ctx.search(ldapConfig.getBasedn(), searchFilter, searchControls);
             if (results.hasMore()) {
                 SearchResult result = results.next();
                 NamingEnumeration<? extends Attribute> attributes = result.getAttributes().getAll();
