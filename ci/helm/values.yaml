@@ -147,12 +147,12 @@ deployment:
             envVarName: SPRING_MAIL_USERNAME
           GOOGLE_RECAPTCHA_VERIFY-URL:
             envVarName: GOOGLE_RECAPTCHA_VERIFY-URL
-          LDAP_URL:
-            envVarName: LDAP_URL
-          LDAP_BASEDN:
-            envVarName: LDAP_BASEDN
-          LDAP_USERNAME:
-            envVarName: LDAP_USERNAME
+#          LDAP_URL:
+#            envVarName: LDAP_URL
+#          LDAP_BASEDN:
+#            envVarName: LDAP_BASEDN
+#          LDAP_USERNAME:
+#            envVarName: LDAP_USERNAME
 
     # env:
   #   envVarName: env
@@ -175,8 +175,8 @@ deployment:
             envVarName: SPRING_MAIL_PASSWORD
           GOOGLE_RECAPTCHA_SECRET:
             envVarName: GOOGLE_RECAPTCHA_SECRET            
-          LDAP_PASSWORD:
-            envVarName: LDAP_PASSWORD
+#          LDAP_PASSWORD:
+#            envVarName: LDAP_PASSWORD
             
       # Mount a file id_rsa to connect a ftp server
   #      volume: # Items set like file in volume
