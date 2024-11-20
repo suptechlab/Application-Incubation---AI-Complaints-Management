@@ -5,6 +5,10 @@ import { BrowserRouter } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getLocalStorage } from "./utils/storage";
 import { getAccountInfo, setLogout } from "./redux/slice/authSlice";
+import { fetchMasterData } from "./redux/slice/masterSlice";
+import 'primereact/resources/themes/lara-light-indigo/theme.css'; 
+import 'primereact/resources/primereact.min.css'; 
+import 'primeicons/primeicons.css'; 
 
 function App() {
 
@@ -20,9 +24,11 @@ function App() {
         try {
           // Dispatch getAccountInfo to validate the token
           const response = await dispatch(getAccountInfo()).unwrap();
-
           if (!response) {
             throw new Error('Invalid token');
+          } else {
+            // CALL COMMON DROPDOWN API'S HERE AND STORE IN REDUX
+            dispatch(fetchMasterData());
           }
         } catch (error) {
           console.error('Token validation failed:', error);

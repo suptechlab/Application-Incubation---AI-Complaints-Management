@@ -105,8 +105,8 @@ const Header = () => {
               <Dropdown.Header className="fw-semibold d-md-none">
               {user?.firstName ?? ''} 
               </Dropdown.Header>
-              <Dropdown.Item as={Link} to="/profile" disabled>
-                {t("PROFILE")}
+              <Dropdown.Item as={Link} to="/my-account">
+                {t("MY ACCOUNT")}
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password" disabled>
                 {t("CHANGE_PASSWORD")}

@@ -7,8 +7,8 @@ import AppTooltip from '../../../../components/tooltip';
 import { BasicInfoFormSchema } from '../../validations';
 import ReactSelect from '../../../../components/ReactSelect';
 
-
 const BasicInfoTab = ({ handleFormSubmit }) => {
+
     // Initial Values
     const initialValues = {
         nationalID: '',
@@ -26,7 +26,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
     };
     return (
         <CommonFormikComponent
-            validationSchema={BasicInfoFormSchema}
+            // validationSchema={BasicInfoFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
         >
@@ -97,7 +97,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                 <ReactSelect
                                     label="Gender"
                                     error={formikProps.errors.gender}
-                                    options={[{ label: "Select", value: "" }, { label: "Male", value: "male" }]}
+                                    options={[{ label: "Select", value: "" }, { label: "Male", value: "MALE" } , {label :"Female",label:"FEMALE"}]}
                                     value={formikProps.values.gender}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(

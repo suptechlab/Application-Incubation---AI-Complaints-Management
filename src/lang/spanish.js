@@ -56,5 +56,6 @@ export const spanishLang = {
   "SUCCESS_TITLE": "¡Éxito!",
   "ACCOUNT_SETUP_SUCCESS": "Tu cuenta está configurada",
   "ACCOUNT_CREATION_MESSAGE": "Tu cuenta se ha creado correctamente. Los detalles han sido enviados a tu correo electrónico",
-  "FILE_CLAIM_NOW": "Presentar una reclamación ahora"
+  "FILE_CLAIM_NOW": "Presentar una reclamación ahora",
+  "MY_ACCOUNT":"Mi cuenta"
 }

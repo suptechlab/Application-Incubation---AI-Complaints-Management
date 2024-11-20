@@ -4,8 +4,12 @@ import CommonFormikComponent from '../../../../components/CommonFormikComponent'
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { OtherInfoFormSchema } from '../../validations';
+import { useSelector } from 'react-redux';
 
 const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
+
+    const { customer_types, priority_care_group } = useSelector((state) => state?.masterSlice)
+
     // Initial Values
     const initialValues = {
         priorityCareGroup: '',
@@ -20,7 +24,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
     };
     return (
         <CommonFormikComponent
-            validationSchema={OtherInfoFormSchema}
+            // validationSchema={OtherInfoFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
         >
@@ -39,7 +43,13 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                 <ReactSelect
                                     label="Priority care group*"
                                     error={formikProps.errors.priorityCareGroup}
-                                    options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
+                                    options={[
+                                        { label: "Select", value: "" },
+                                        ...priority_care_group.map((group) => ({
+                                            label: group.label, // Ensure group has a `label` property
+                                            value: group.value, // Ensure group has a `value` property
+                                        }))
+                                    ]}
                                     value={formikProps.values.priorityCareGroup}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(
@@ -57,7 +67,13 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                 <ReactSelect
                                     label="Customer Type*"
                                     error={formikProps.errors.customerType}
-                                    options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
+                                    options={[
+                                        { label: "Select", value: "" },
+                                        ...customer_types.map((group) => ({
+                                            label: group.label, // Ensure group has a `label` property
+                                            value: group.value, // Ensure group has a `value` property
+                                        }))
+                                    ]}
                                     value={formikProps.values.customerType}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(

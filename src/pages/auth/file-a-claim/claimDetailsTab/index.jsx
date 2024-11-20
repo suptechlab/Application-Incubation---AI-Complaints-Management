@@ -38,10 +38,10 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
     
     return (
         <CommonFormikComponent
-            validationSchema={ClaimDetailsFormSchema}
+            // validationSchema={ClaimDetailsFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
-        >
+        >   
             {(formikProps) => (
                 <React.Fragment>
                     <Modal.Body className="text-break d-flex flex-column small pt-0">

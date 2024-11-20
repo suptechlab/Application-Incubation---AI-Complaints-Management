@@ -107,6 +107,7 @@ const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
                             type="submit"
                             variant="warning"
                             className="custom-min-width-100 ms-auto"
+                            disabled={formikProps?.isSubmitting ?? false}
                         >
                             {t('VERIFY_OTP')}
                         </Button>

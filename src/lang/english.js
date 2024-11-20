@@ -56,5 +56,6 @@ export const englishLang = {
   "SUCCESS_TITLE": "Success!",
   "ACCOUNT_SETUP_SUCCESS": "Your Account is Set Up",
   "ACCOUNT_CREATION_MESSAGE": "Your account has been successfully created. Details have been sent to your email",
-  "FILE_CLAIM_NOW": "File a Claim Now"
+  "FILE_CLAIM_NOW": "File a Claim Now",
+  "MY_ACCOUNT":"My Account"
 }
