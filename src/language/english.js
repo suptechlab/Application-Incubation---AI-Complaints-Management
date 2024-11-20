@@ -142,4 +142,12 @@ export const englishLang = {
     "NOTIFICATION": "Notification",
     "TEMPLATE TYPE" : "Template Type",
     "ASSOCIATION" : "Association",
+    // Team managment
+    "ENTITY NAME": "Entity Name",
+    "TEAM NAME": "Team Name",
+    "ASSIGN TEAM MEMBERS": "Assign Team Members",
+    "MEMBER NAME": "Member Name",
+    "ASSIGN": "Assign",
+
+
 }

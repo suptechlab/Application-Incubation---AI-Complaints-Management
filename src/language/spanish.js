@@ -140,7 +140,13 @@ export const spanishLang = {
     "BLOCKED": "Bloqueado",
     "DELETED": "Eliminado",
     "USER TYPE": "Tipo de usuario",
-    "NOTIFICATION": "Eliminado",
-    "TEMPLATE TYPE" : "Tipo de usuario",
-    "ASSOCIATION" : "Bloqueado",
+    "NOTIFICATION": "Notificación",
+    "TEMPLATE TYPE": "Tipo de plantilla",
+    "ASSOCIATION": "Asociación",
+     // Team managment
+     "ENTITY NAME": "Nombre de la entidad",
+     "TEAM NAME": "Nombre del equipo",
+     "ASSIGN TEAM MEMBERS": "Asignar miembros del equipo",
+     "MEMBER NAME": "Nombre del miembro",
+     "ASSIGN": "Asignar"
 }

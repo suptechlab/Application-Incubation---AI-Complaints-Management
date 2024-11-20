@@ -224,11 +224,46 @@ export default function TeamManagementAddEdit() {
                                 <FormikForm
                                     onSubmit={handleSubmit}
                                     className="d-flex flex-column h-100"
-                                >
+                                >   
+                                    <Row>
+                                        <Col md={4}>
+                                        <div className='d-flex justify-content-between status-radio'>
+                                            <div>
+                                            <label className='fs-13 fw-bolder'>{t('USER TYPE')}</label>
+                                            </div>
+                                            <div className='d-flex'>
+                                                <label className="form-check-label">
+                                                <input
+                                                    className="form-check-input radio-inline"
+                                                    type="radio"
+                                                    name="userType"
+                                                    value="SEPS_USER"
+                                                    checked={values.userType === 'SEPS_USER'}
+                                                    onChange={() => setFieldValue("userType", "SEPS_USER")}
+                                                />
+                                                {t('SEPS USER')}
+                                                </label>
+                                                <label className="form-check-label ms-3">
+                                                <input
+                                                    className="form-check-input radio-inline"
+                                                    type="radio"
+                                                    name="userType"
+                                                    value="FI_USER"
+                                                    checked={values.userType === 'FI_USER'}
+                                                    onChange={() => setFieldValue("userType", "FI_USER")}
+                                                />
+                                                {t('FI USER')}
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        </Col>
+                                        <br></br>
+                                    </Row>
                                     <Row>
                                         <Col sm={6} lg={4}>
                                             <ReactSelect
-                                                label="Entity Name"
+                                                label={t('ENTITY NAME')}
                                                 error={errors.entityName}
                                                 options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
                                                 value={values.entityName}
@@ -251,7 +286,7 @@ export default function TeamManagementAddEdit() {
                                         <Col sm={6} lg={4}>
                                             <FormInput
                                                 id="teamName"
-                                                label="Team Name"
+                                                label={t('TEAM NAME')}
                                                 name="teamName"
                                                 type="text"
                                                 onBlur={handleBlur}
@@ -264,7 +299,7 @@ export default function TeamManagementAddEdit() {
                                         <Col lg={8}>
                                             <FormInput
                                                 id="description"
-                                                label="Team Description"
+                                                label={t('DESCRIPTION')}
                                                 name="description"
                                                 type="text"
                                                 as="textarea"
@@ -277,7 +312,7 @@ export default function TeamManagementAddEdit() {
                                             />
                                         </Col>
                                         <Col xs={12}>
-                                            <h5 className="fw-semibold mb-1 border-bottom mb-3 py-2">Assign Team Members</h5>
+                                            <h5 className="fw-semibold mb-1 border-bottom mb-3 py-2">{t('ASSIGN TEAM MEMBERS')}</h5>
                                             <Row>
                                                 <Col lg={8}>
                                                     <Row className="gx-3">
@@ -309,7 +344,7 @@ export default function TeamManagementAddEdit() {
                                                                 variant="outline-dark"
                                                                 className="custom-min-width-85 mt-1 custom-height-42"
                                                             >
-                                                                Assign
+                                                                {t('ASSIGN')}
                                                             </Button>
                                                         </Col>
 
