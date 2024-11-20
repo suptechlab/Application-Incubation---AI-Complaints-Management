@@ -92,7 +92,6 @@ export default function RoleRightsList() {
     refetchOnMount: false, // Prevent refetching on component remount
     retry: 0, //Disable retry on failure
   });
-  
 
   useEffect(() => {
     setLoading(true);
@@ -127,6 +126,12 @@ export default function RoleRightsList() {
         accessorFn: (row) => row.description,
         id: "description",
         header: () => t('DESCRIPTION'),
+        enableSorting: false,
+      },
+      {
+        accessorFn: (row) => row.userType == 'SEPS_USER' ? 'SEPS-USER' : 'FI-User',
+        id: "userType",
+        header: () => t('ROLE & RIGHTS'),
         enableSorting: false,
       },
       // {
@@ -201,7 +206,7 @@ export default function RoleRightsList() {
 
   return (
     <React.Fragment>
-         <Loader isLoading={loading} />
+       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
           title={t('ROLE & RIGHTS')}
