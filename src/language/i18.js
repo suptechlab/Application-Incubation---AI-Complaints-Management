@@ -3,12 +3,12 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { spanishLang } from './spanish';
 import { englishLang } from './english';
-// import { getLocalStorage } from '../utils/storage';
+import { getLocalStorage } from '../utils/storage';
 
 
 
-// const userLanguage = getLocalStorage('langKey')  ? getLocalStorage('langKey') : 'en';
-const userLanguage = "es";
+const userLanguage = getLocalStorage('lang')  ? getLocalStorage('lang') : 'es';
+// const userLanguage = "es";
 
 // console.log(userLanguage)
 
