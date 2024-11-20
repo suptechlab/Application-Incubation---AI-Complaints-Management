@@ -124,7 +124,7 @@ export default function UserList() {
     () => [
       {
         accessorFn: (row) => row.name,
-        id: "name",
+        id: "firstName",
         header: () => t('NAME'),
       },
       {

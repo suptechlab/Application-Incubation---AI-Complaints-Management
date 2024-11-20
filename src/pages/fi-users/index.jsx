@@ -122,7 +122,7 @@ export default function FIUserList() {
     () => [
       {
         accessorFn: (row) => row.name,
-        id: "name",
+        id: "firstName",
         header: () => t("NAME"),
       },
       {
