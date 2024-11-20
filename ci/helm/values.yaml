@@ -152,7 +152,7 @@ deployment:
           LDAP_BASEDN:
             envVarName: LDAP_BASEDN
           LDAP_USERNAME:
-            envVarName: LDAP_USERNAME             
+            envVarName: LDAP_USERNAME
 
     # env:
   #   envVarName: env
