@@ -33,5 +33,13 @@ public class TeamMember implements Serializable {
     @CreationTimestamp
     @Column(name = "assigned_at")
     private Instant assignedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_by", referencedColumnName = "id", insertable = false, updatable = false)
+    private User assigned;
 }
 

@@ -1,6 +1,7 @@
 package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.service.OrganizationService;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.suptech.service.dto.OrganizationInfoDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Tag(name = "Organization Management", description = "APIs for managing Organizations")
 @RestController
@@ -38,5 +41,13 @@ public class OrganizationResource {
         // Perform the status update
         OrganizationInfoDTO organizationInfoDTO = organizationService.fetchOrganizationDetails(ruc, requestInfo);
         return ResponseEntity.ok(organizationInfoDTO);
+    }
+
+    @Operation(summary = "GET the organization list", description = "GET the organization list.")
+    @ApiResponse(responseCode = "200", description = "Organization list fetched successfully")
+    @GetMapping("/list")
+    public ResponseEntity<List<DropdownListDTO>> getOrganizationInfoInfoList() {
+        List<DropdownListDTO> orgList = organizationService.fetchOrganizationList();
+        return ResponseEntity.ok(orgList);
     }
 }

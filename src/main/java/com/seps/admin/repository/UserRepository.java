@@ -41,5 +41,16 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("SELECT u.id FROM User u JOIN u.authorities a WHERE a.name = :role")
     List<Long> findValidPersonIdsByUserRole(@Param("role") String role);
 
-
+    @Query("""
+        SELECT u
+        FROM User u
+        JOIN u.authorities a
+        WHERE u.id NOT IN (
+            SELECT tm.user.id
+            FROM TeamMember tm
+        )
+        AND a.name = :role
+        AND u.activated = true
+    """)
+    List<User> findUsersNotAssignedToTeamByRole(@Param("role") String role);
 }
