@@ -94,6 +94,7 @@ export default function RoleRightsList() {
         setLoading(false); // Start loading
       }
     },
+    onError: () => setLoading(false), // Ensure loading state is reset on error
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
     refetchOnWindowFocus: false, // Disable refetching on window focus
