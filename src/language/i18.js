@@ -7,8 +7,8 @@ import { englishLang } from './english';
 
 
 
-// const userLanguage = getLocalStorage('langKey')  ? getLocalStorage('langKey') : 'en';
-const userLanguage = "es";
+const userLanguage = getLocalStorage('lang')  ? getLocalStorage('lang') : 'es';
+// const userLanguage = "es";
 
 // console.log(userLanguage)
 
