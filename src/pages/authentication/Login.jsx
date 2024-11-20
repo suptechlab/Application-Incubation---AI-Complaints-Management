@@ -147,7 +147,7 @@ export default function Login() {
                                                                 className="small fw-semibold text-decoration-none"
                                                                 to="/forgot-password"
                                                             >
-                                                                {t('FORGOT PASSWORD')}?
+                                                                {t('FORGOT PASSWORD')}
                                                                 
                                                             </Link>                                                        
                                                         </Col>

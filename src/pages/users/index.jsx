@@ -17,7 +17,7 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import GenericModal from "../../components/GenericModal";
-import ListingSearchForm from "../../components/ListingSearchForm";
+import ListingSearchFormUsers from "../../components/ListingSearchFormUsers";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
@@ -50,28 +50,36 @@ export default function UserList() {
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
-
-      if (sorting.length === 0) {
-        return handleGetUsers({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetUsers({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
-      }
+      setLoading(true); // Start loading
+      try {
+          const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+          Object.keys(filterObj).forEach(
+            (key) => filterObj[key] === "" && delete filterObj[key]
+          );
+    
+          if (sorting.length === 0) {
+            return handleGetUsers({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              ...filterObj,
+            });
+          } else {
+            return handleGetUsers({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              sort: sorting
+                .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+                .join(","),
+              ...filterObj,
+            });
+          } 
+      } catch (error) {
+        setLoading(false); // Start loading
+      } finally {
+        setLoading(false); // Start loading
+      }  
     },
+    onError: () => setLoading(false), // Ensure loading state is reset on error
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
     refetchOnWindowFocus: false, // Disable refetching on window focus
@@ -93,9 +101,12 @@ export default function UserList() {
 
   const changeStatus = async (id, currentStatus) => {
     try {
+      setLoading(true)
       await handleStatusChangeState(id, currentStatus);
       dataQuery.refetch();
+      setLoading(false)
     } catch (error) {
+      setLoading(false)
       toast.error(error?.response?.data?.errorDescription);
     }
   };
@@ -126,10 +137,11 @@ export default function UserList() {
         accessorFn: (row) => row.name,
         id: "firstName",
         header: () => t('NAME'),
+        enableSorting: false,
       },
       {
         accessorFn: (row) => row.roles[0].name ?? "N/A",
-        id: "claimTypeName",
+        id: "role",
         header: () =>  t('ROLE'),
         enableSorting: false,
       },
@@ -315,27 +327,29 @@ export default function UserList() {
   
   return (
     <React.Fragment>
-      <Loader isLoading={loading} />
-      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <PageHeader
-          title="Usuarios de SEPS"
-          actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
-        />
-        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-          <Card.Body className="d-flex flex-column">
-            <ListingSearchForm filter={filter} setFilter={setFilter} />
-            <CommonDataTable
-              columns={columns}
-              dataQuery={dataQuery}
-              pagination={pagination}
-              setPagination={setPagination}
-              sorting={sorting}
-              setSorting={setSorting}
-            />
-          </Card.Body>
-        </Card>
-      </div>
 
+      { loading ? <Loader isLoading={loading} />
+      :
+        <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+          <PageHeader
+            title="Usuarios de SEPS"
+            actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
+          />
+          <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+            <Card.Body className="d-flex flex-column">
+              <ListingSearchFormUsers filter={filter} setFilter={setFilter} />
+              <CommonDataTable
+                columns={columns}
+                dataQuery={dataQuery}
+                pagination={pagination}
+                setPagination={setPagination}
+                sorting={sorting}
+                setSorting={setSorting}
+              />
+            </Card.Body>
+          </Card>
+        </div>
+      }
       {/* Delete Modal */}
       <GenericModal
         show={deleteShow}

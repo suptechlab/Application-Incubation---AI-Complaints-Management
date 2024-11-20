@@ -63,7 +63,7 @@ export const englishLang = {
     "BACK": "Back",
     "DIDN T RECEIVE THE CODE": "Didn’t receive the code?",
     "RESEND CODE": "Resend Code",
-    "FORGOT PASSWORD": "Forgot Password",
+    "FORGOT PASSWORD": "Forgot Password?",
     "ENTER YOUR EMAIL ADDRESS FORGOT PASSWORD": "Enter your email address Forgot Password",
     "EMAIL ADDRESS": "Email Address*",
     "ENTER ADDRESS": "Enter Address",

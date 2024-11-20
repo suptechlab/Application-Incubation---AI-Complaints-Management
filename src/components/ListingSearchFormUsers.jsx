@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import FormInput from "../components/FormInput";
 import ReactSelect from "./ReactSelect";
 
-const ListingSearchForm = ({ filter, setFilter }) => {
+const ListingSearchFormUsers = ({ filter, setFilter }) => {
   const { t } = useTranslation();
   return (
     <div className="theme-card-header header-search mb-3">
@@ -51,11 +51,11 @@ const ListingSearchForm = ({ filter, setFilter }) => {
                 },
                 {
                   label: t("ACTIVE"),
-                  value: true,
+                  value: 'ACTIVE',
                 },
                 {
                   label: t("INACTIVE"),
-                  value: false,
+                  value: 'BLOCKED',
                 },
               ]}
               onChange={(e) => {
@@ -73,4 +73,4 @@ const ListingSearchForm = ({ filter, setFilter }) => {
   );
 };
 
-export default ListingSearchForm;
+export default ListingSearchFormUsers;

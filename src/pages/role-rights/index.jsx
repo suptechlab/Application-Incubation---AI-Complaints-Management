@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import GenericModal from "../../components/GenericModal";
-import ListingSearchForm from "../../components/ListingSearchForm";
+import ListingSearchFormUsers from "../../components/ListingSearchFormUsers";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 import {
@@ -56,6 +56,7 @@ export default function RoleRightsList() {
       dataQuery.refetch();
       setDeleteShow(false);
     } catch (error) {
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -64,26 +65,33 @@ export default function RoleRightsList() {
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
+      setLoading(true); // Start loading
+      try {
+            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+            Object.keys(filterObj).forEach(
+              (key) => filterObj[key] === "" && delete filterObj[key]
+            );
 
-      if (sorting.length === 0) {
-        return handleGetRoleRights({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetRoleRights({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
+            if (sorting.length === 0) {
+              return handleGetRoleRights({
+                page: pagination.pageIndex,
+                size: pagination.pageSize,
+                ...filterObj,
+              });
+            } else {
+              return handleGetRoleRights({
+                page: pagination.pageIndex,
+                size: pagination.pageSize,
+                sort: sorting
+                  .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+                  .join(","),
+                ...filterObj,
+              });
+            }
+      } catch (error) {
+        setLoading(false); // Start loading
+      } finally {
+        setLoading(false); // Start loading
       }
     },
     staleTime: 0, // Data is always stale, so it refetches
@@ -206,28 +214,31 @@ export default function RoleRightsList() {
 
   return (
     <React.Fragment>
-       <Loader isLoading={loading} />
-      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <PageHeader
-          title={t('ROLE & RIGHTS')}
-          actions={[
-            { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
-          ]}
-        />
-        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-          <Card.Body className="d-flex flex-column">
-            <ListingSearchForm filter={filter} setFilter={setFilter} />
-            <CommonDataTable
-              columns={columns}
-              dataQuery={dataQuery}
-              pagination={pagination}
-              setPagination={setPagination}
-              sorting={sorting}
-              setSorting={setSorting}
+      {
+          loading ? <Loader isLoading={loading} />
+          :
+          <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+            <PageHeader
+              title={t('ROLE & RIGHTS')}
+              actions={[
+                { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
+              ]}
             />
-          </Card.Body>
-        </Card>
-      </div>
+            <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+              <Card.Body className="d-flex flex-column">
+                {/* <ListingSearchFormUsers filter={filter} setFilter={setFilter} /> */}
+                <CommonDataTable
+                  columns={columns}
+                  dataQuery={dataQuery}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                  sorting={sorting}
+                  setSorting={setSorting}
+                />
+              </Card.Body>
+            </Card>
+          </div>
+      }
 
       {/* Delete Modal */}
       <GenericModal
