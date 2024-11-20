@@ -42,7 +42,7 @@ export default function UserList() {
     status: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedRow, setSelectedRow] = useState();
   const [deleteShow, setDeleteShow] = useState(false);
   const [deleteId, setDeleteId] = useState();
@@ -89,14 +89,14 @@ export default function UserList() {
 
   //handle last page deletion item
   useEffect(() => {
-    setLoading(true);
+    
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
-    setLoading(false);
+    
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
