@@ -110,5 +110,8 @@ google:
   recaptcha:
     secret: ENC(${seps.google.recaptcha.secret})
     verify-url: ENC(${seps.google.recaptcha.verify.url})
-
-
+ldap:
+  url: ldap://abnoba.seps.local:389
+  basedn: DC=SEPS,DC=local
+  username: CN=suptech,OU=Cambrigde,DC=SEPS,DC=local
+  password: Must4n8_2k2G
