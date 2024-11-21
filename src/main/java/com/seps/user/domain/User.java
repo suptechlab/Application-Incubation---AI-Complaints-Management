@@ -2,6 +2,7 @@ package com.seps.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.seps.user.config.Constants;
+import com.seps.user.enums.UserStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -107,6 +108,35 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Column(name = "current_logged_in")
     private Instant currentLoggedIn;
+
+
+    @Size(max = 5)
+    @Column(name = "country_code", length = 5)
+    private String countryCode;
+
+    @Size(max = 15)
+    @Column(name = "phone_number", length = 15)
+    private String phoneNumber;
+
+    @Enumerated
+    @Column(name = "status", columnDefinition = "smallint")
+    private UserStatusEnum status;
+
+    @Column(name = "is_password_set")
+    private boolean isPasswordSet = false;
+
+    @Column(name = "identificacion", length = 20)
+    private String identificacion;
+
+    @Column(name = "gender", length = 10)
+    private String gender;
+
+    @Column(name = "fingerprint_verified")
+    private boolean fingerprintVerified;
+
+    @Column(name = "fingerprint_verified_at")
+    private Instant fingerprintVerifiedAt;
+
 
     public Long getId() {
         return id;
@@ -259,6 +289,70 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setCurrentLoggedIn(Instant currentLoggedIn) {
         this.currentLoggedIn = currentLoggedIn;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public UserStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatusEnum status) {
+        this.status = status;
+    }
+
+    public boolean isPasswordSet() {
+        return isPasswordSet;
+    }
+
+    public void setPasswordSet(boolean passwordSet) {
+        isPasswordSet = passwordSet;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public boolean isFingerprintVerified() {
+        return fingerprintVerified;
+    }
+
+    public void setFingerprintVerified(boolean fingerprintVerified) {
+        this.fingerprintVerified = fingerprintVerified;
+    }
+
+    public Instant getFingerprintVerifiedAt() {
+        return fingerprintVerifiedAt;
+    }
+
+    public void setFingerprintVerifiedAt(Instant fingerprintVerifiedAt) {
+        this.fingerprintVerifiedAt = fingerprintVerifiedAt;
     }
 
     @Override

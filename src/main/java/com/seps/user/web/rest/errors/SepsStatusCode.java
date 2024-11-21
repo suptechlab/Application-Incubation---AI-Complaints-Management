@@ -6,8 +6,8 @@ public enum SepsStatusCode implements StatusType {
 
     USERNAME_PASSWORD_INVALID(10010, "username.password.failed.validation"),
     FORM_VALIDATION_ERROR(10012, "form.validation.error"),
-    CURRENT_USER_NOT_FOUND(20020, "current.user.not.found"),
-    ;
+    USER_NOT_FOUND(10013, "user.not.found"),
+    CURRENT_USER_NOT_FOUND(20020, "current.user.not.found");
 
     private final int code;
 
