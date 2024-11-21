@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1732177298941" author="matellio" labels="data">
+
+    <!-- Truncate tables before loading data -->
+    <sql>
+      TRUNCATE TABLE city CASCADE;
+      TRUNCATE TABLE province CASCADE;
+    </sql>
+
+    <!-- Load data into tables -->
+    <loadData
+      file="config/liquibase/data/province_data.csv"
+      separator=";"
+      tableName="province">
+      <column name="id" type="numeric"/>
+      <column name="name" type="string"/>
+      <column name="status" type="boolean"/>
+      <column name="created_at" type="timestamp"/>
+      <column name="updated_at" type="timestamp"/>
+    </loadData>
+
+    <loadData
+      file="config/liquibase/data/city_data.csv"
+      separator=";"
+      tableName="city">
+      <column name="id" type="numeric"/>
+      <column name="name" type="string"/>
+      <column name="province_id" type="numeric"/>
+      <column name="status" type="boolean"/>
+      <column name="created_at" type="timestamp"/>
+      <column name="updated_at" type="timestamp"/>
+    </loadData>
+
+  </changeSet>
+</databaseChangeLog>
