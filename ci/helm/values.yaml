@@ -1,6 +1,6 @@
 global:
   appVersion: 0.0.1-SNAPSHOT
-  name: ms-auth
+  name: ms-ticket-service
 deployment:
   # Default values for deployment.
   ## This is a YAML-formatted file.
@@ -10,7 +10,7 @@ deployment:
 
   image:
     registry: nexus.seps.gob.ec:4000
-    repository: ms-auth
+    repository: ms-ticket-service
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion..
     tag: ""
@@ -80,7 +80,7 @@ deployment:
     hosts:
       - host: adminapi-suptechdev.seps.gob.ec
         paths:
-          - path: /auth(/|$)(.*)
+          - path: /ticket(/|$)(.*)
             pathType: ImplementationSpecific         
     tls:
       - secretName: seps-cert
