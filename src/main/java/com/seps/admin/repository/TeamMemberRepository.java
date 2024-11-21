@@ -1,0 +1,19 @@
+package com.seps.admin.repository;
+
+import com.seps.admin.domain.TeamMember;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
+
+    @Query("SELECT tm.userId FROM TeamMember tm WHERE tm.team.id = :teamId")
+    List<Long> findUserIdsByTeamId(@Param("teamId") Long teamId);
+
+    Optional<TeamMember> findByTeamIdAndUserId(Long teamId, Long userId);
+}

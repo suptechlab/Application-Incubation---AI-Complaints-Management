@@ -36,6 +36,13 @@ public enum SepsStatusCode implements StatusType {
     DUPLICATE_TEMPLATE(20035,"duplicate.template"),
     TEMPLATE_NOT_FOUND(20036,"template.not.found"),
     SEPS_USER_VERIFICATION_FAILED(20037,"seps.user.verification.failed");
+    TEMPLATE_NOT_FOUND(20036,"template.not.found"),
+    INVALID_MEMBER_LIST(20037,"invalid.member.list"),
+    DUPLICATE_TEAM(20038,"duplicate.team"),
+    MEMBER_ALREADY_ASSIGNED(20039,"member.already.assigned"),
+    TEAM_NOT_FOUND(20040,"team.not.found"),
+    NO_MEMBERS_TO_ASSIGN(20041,"no.member.to.assign"),
+    MEMBER_NOT_FOUND_IN_TEAM(20042,"member.not.found.in.team");
 
     private final int code;
 

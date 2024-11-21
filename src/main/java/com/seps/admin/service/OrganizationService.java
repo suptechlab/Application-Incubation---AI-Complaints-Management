@@ -8,6 +8,7 @@ import com.seps.admin.enums.ActionTypeEnum;
 import com.seps.admin.enums.ActivityTypeEnum;
 import com.seps.admin.enums.LanguageEnum;
 import com.seps.admin.repository.OrganizationRepository;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.OrganizationDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.mapper.OrganizationMapper;
@@ -111,4 +112,25 @@ public class OrganizationService {
                 new String[]{ruc}, null));
     }
 
+    /**
+     * Fetches a list of organizations and maps them to a list of {@link DropdownListDTO}.
+     *
+     * <p>This method retrieves all organizations from the database, formats their details
+     * (combining the organization's nemonico type and RUC in a specific format), and
+     * converts them into {@link DropdownListDTO} objects to be used in dropdown menus or
+     * similar UI components.</p>
+     *
+     * @return a list of {@link DropdownListDTO} containing the organization's ID and
+     *         formatted name in the format: "nemonicoTipoOrganizacion (RUC)".
+     */
+    public List<DropdownListDTO> fetchOrganizationList() {
+        return organizationRepository.findAll().stream()
+            .map(org->{
+                DropdownListDTO orgDto = new DropdownListDTO();
+                orgDto.setId(org.getId());
+                orgDto.setName(org.getNemonicoTipoOrganizacion() + " (" + org.getRuc() + ")" );
+                return orgDto;
+            })
+            .toList();
+    }
 }

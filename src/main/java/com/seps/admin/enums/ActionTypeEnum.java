@@ -31,7 +31,12 @@ public enum ActionTypeEnum {
     SEPS_USER_STATUS_CHANGE("SEPS User Status Change"),
     TEMPLATE_MASTER_ADD("Add Template Master"),
     TEMPLATE_MASTER_EDIT("Edit Template Master"),
-    TEMPLATE_MASTER_STATUS_CHANGE("Template Status Change");
+    TEMPLATE_MASTER_STATUS_CHANGE("Template Status Change"),
+    TEAM_ADD("Add Team"),
+    TEAM_EDIT("Edit Team"),
+    TEAM_STATUS_CHANGE("Team Status Change"),
+    TEAM_ASSIGNED_MEMBER("Team assigned member"),
+    TEAM_UNASSIGNED_MEMBER("Team unassigned member");
 
     private final String description;
 
