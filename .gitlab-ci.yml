@@ -1,0 +1,12 @@
+## Execute gitlab construction to sprin boot project..
+
+# Author = author name
+
+# Maintainer = user seps manteiner
+variables:
+  environment: develop
+
+include:
+  - project: 'admincicd/seps-gitlab-runner-pipeline-shared-lib'
+    file: 'maven/.mavenServicePipeline.yml'
+    ref: develop
