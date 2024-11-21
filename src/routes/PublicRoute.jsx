@@ -11,7 +11,7 @@ const PublicRoute = ({ element }) => {
         const allowedPages = ["Login", "ForgotPassword", "ResetPassword" ];
 
         if (element && element.type && allowedPages.includes(element.type.name)) {
-            return <Navigate to='/' replace />;
+            return <Navigate to='/dashboard' replace />;
         }
         // else{
         //     return <Navigate to='/login' replace />;

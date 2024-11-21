@@ -103,14 +103,14 @@ export default function RoleRightsList() {
   });
 
   useEffect(() => {
-    //setLoading(true);
+    setLoading(true);
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
-    //setLoading(false);
+    setLoading(false);
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
