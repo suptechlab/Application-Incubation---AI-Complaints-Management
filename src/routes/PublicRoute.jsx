@@ -8,11 +8,19 @@ const PublicRoute = ({ element }) => {
 
     if (isAuthenticated) {
         // Check if the user is trying to access the login, forgot password, or reset password page
-        const allowedPages = ["Login", "ForgotPassword", "ResetPassword", ];
+        const allowedPages = ["Login", "ForgotPassword", "ResetPassword", "Otp" ];
 
-        if (element && element.type && allowedPages.includes(element.type.name)) {
-            return <Navigate to='/login' replace />;
-        }
+        //if (element && element.type && allowedPages.includes(element.type.name)) {
+            // return <Navigate to='/login' replace />;
+        // }
+        //console.log('element.type.',element.type.name)
+        if (
+            element &&
+            element.type.name &&
+            allowedPages.includes(element.type.name)
+          ) {
+            return <Navigate to="/" replace />;
+          }
     }
 
     return element;

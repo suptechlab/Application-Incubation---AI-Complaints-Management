@@ -14,7 +14,7 @@ import GenericModal from "../../../components/GenericModal";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import ReactSelect from "../../../components/ReactSelect";
-import { handleAddUser, handleDeleteUser, handleGetUserById, handleGetUsers, handleUpdateUser } from "../../../services/user.service";
+import { getTeamMemberList ,handleAddUser, handleDeleteUser, handleGetUserById, handleGetUsers, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
 export default function TeamManagementAddEdit() {
@@ -28,7 +28,7 @@ export default function TeamManagementAddEdit() {
         entityName: "",
         teamName: "",
         description: "",
-        memberName: "",
+        entityId: "",
     });
 
     const location = useLocation();
@@ -48,6 +48,8 @@ export default function TeamManagementAddEdit() {
     const [selectedRow, setSelectedRow] = useState();
     const [deleteShow, setDeleteShow] = useState(false);
     const [deleteId, setDeleteId] = useState();
+    const [userType, setUserType] = useState('FI'); // SEPS or FI
+    const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show 
 
     useEffect(() => {
         if (isEdit) {
@@ -62,8 +64,14 @@ export default function TeamManagementAddEdit() {
                 setLoading(false);
             });
         } else {
-            setLoading(false);
         }
+
+        getTeamMemberList(userType).then((response) => {
+            //setUserData(response.data);
+        });
+        setLoading(false);
+
+
     }, [id, isEdit]);
 
     const onSubmit = async (values, actions) => {
@@ -236,10 +244,14 @@ export default function TeamManagementAddEdit() {
                                                 <input
                                                     className="form-check-input radio-inline"
                                                     type="radio"
-                                                    name="userType"
-                                                    value="SEPS_USER"
-                                                    checked={values.userType === 'SEPS_USER'}
-                                                    onChange={() => setFieldValue("userType", "SEPS_USER")}
+                                                    name="entityType"
+                                                    value="SEPS"
+                                                    checked={values.entityType === 'SEPS'}
+                                                    // onChange={() => setFieldValue("entityType", "SEPS")}
+                                                    onChange={() => {
+                                                        setFieldValue("entityType", "SEPS");
+                                                        setShowEntityOrgId(false);
+                                                    }}
                                                 />
                                                 {t('SEPS USER')}
                                                 </label>
@@ -247,10 +259,14 @@ export default function TeamManagementAddEdit() {
                                                 <input
                                                     className="form-check-input radio-inline"
                                                     type="radio"
-                                                    name="userType"
-                                                    value="FI_USER"
-                                                    checked={values.userType === 'FI_USER'}
-                                                    onChange={() => setFieldValue("userType", "FI_USER")}
+                                                    name="entityType"
+                                                    value="FI"
+                                                    checked={values.entityType === 'FI'}
+                                                    // onChange={() => setFieldValue("entityType", "FI")}
+                                                    onChange={() => {
+                                                        setFieldValue("entityType", "FI");
+                                                        setShowEntityOrgId(true);
+                                                    }}
                                                 />
                                                 {t('FI USER')}
                                                 </label>
@@ -260,29 +276,36 @@ export default function TeamManagementAddEdit() {
                                         </Col>
                                         <br></br>
                                     </Row>
+                                    <pre>{JSON.stringify(values,null,2)}</pre>
+                                    <pre>{JSON.stringify(errors,null,2)}</pre>
                                     <Row>
-                                        <Col sm={6} lg={4}>
-                                            <ReactSelect
-                                                label={t('ENTITY NAME')}
-                                                error={errors.entityName}
-                                                options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
-                                                value={values.entityName}
-                                                onChange={(option) => {
-                                                    setFieldValue(
-                                                        "entityName",
-                                                        option?.target?.value ?? ""
-                                                    );
-                                                }}
-                                                name="entityName"
-                                                className={
-                                                    touched.entityName && errors.entityName
-                                                        ? "is-invalid"
-                                                        : ""
-                                                }
-                                                onBlur={handleBlur}
-                                                touched={touched.entityName}
-                                            />
-                                        </Col>
+                                        {
+                                            showEntityOrgId ? 
+                                            <Col sm={6} lg={4}>
+                                                <ReactSelect
+                                                    label={t('ENTITY NAME')}
+                                                    error={errors.entityId}
+                                                    options={[{ label: "Select", value: "" }, { label: "entityId 1 - org", value: "1" }, { label: "entityId 1 - org", value: "2" }]}
+                                                    value={values.entityId}
+                                                    onChange={(option) => {
+                                                        setFieldValue(
+                                                            "entityId",
+                                                            option?.target?.value ?? ""
+                                                        );
+                                                    }}
+                                                    name="entityId"
+                                                    className={
+                                                        touched.entityId && errors.entityId
+                                                            ? "is-invalid"
+                                                            : ""
+                                                    }
+                                                    onBlur={handleBlur}
+                                                    touched={touched.entityName}
+                                                    
+                                                />
+                                            </Col>
+                                            : ''
+                                        }    
                                         <Col sm={6} lg={4}>
                                             <FormInput
                                                 id="teamName"
@@ -295,7 +318,11 @@ export default function TeamManagementAddEdit() {
                                                 touched={touched.teamName}
                                                 value={values.teamName || ""}
                                             />
-                                        </Col>
+                                        </Col>  
+                                    </Row>
+                                    <Row>
+                                        
+                                        
                                         <Col lg={8}>
                                             <FormInput
                                                 id="description"
@@ -319,23 +346,23 @@ export default function TeamManagementAddEdit() {
                                                         <Col xs>
                                                             <ReactSelect
                                                                 label="Member Name"
-                                                                error={errors.memberName}
+                                                                error={errors.entityId}
                                                                 options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
-                                                                value={values.memberName}
+                                                                value={values.entityId}
                                                                 onChange={(option) => {
                                                                     setFieldValue(
-                                                                        "memberName",
+                                                                        "entityId",
                                                                         option?.target?.value ?? ""
                                                                     );
                                                                 }}
-                                                                name="memberName"
+                                                                name="entityId"
                                                                 className={
-                                                                    touched.memberName && errors.memberName
+                                                                    touched.entityId && errors.entityId
                                                                         ? "is-invalid"
                                                                         : ""
                                                                 }
                                                                 onBlur={handleBlur}
-                                                                touched={touched.memberName}
+                                                                touched={touched.entityId}
                                                             />
                                                         </Col>
                                                         <Col xs="auto" className="mb-3 pb-1 pt-4">
