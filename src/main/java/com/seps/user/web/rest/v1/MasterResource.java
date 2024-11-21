@@ -30,10 +30,11 @@ public class MasterResource {
     private final MasterDataService masterDataService;
     private final ProvinceService provinceService;
     private final CityService cityService;
+    private final OrganizationService organizationService;
 
     public MasterResource(InquiryTypeService inquiryTypeService, ClaimTypeService claimTypeService,
                           InquirySubTypeService inquirySubTypeService, ClaimSubTypeService claimSubTypeService, MasterDataService masterDataService,
-                          ProvinceService provinceService, CityService cityService) {
+                          ProvinceService provinceService, CityService cityService, OrganizationService organizationService) {
         this.inquiryTypeService = inquiryTypeService;
         this.claimTypeService = claimTypeService;
         this.inquirySubTypeService = inquirySubTypeService;
@@ -41,6 +42,7 @@ public class MasterResource {
         this.masterDataService = masterDataService;
         this.provinceService = provinceService;
         this.cityService =  cityService;
+        this.organizationService = organizationService;
     }
 
     /**
@@ -190,5 +192,13 @@ public class MasterResource {
     public ResponseEntity<List<DropdownListDTO>> listActiveCityByProvince(@PathVariable Long provinceId) {
         List<DropdownListDTO> cities = cityService.listActiveCityByProvinceId(provinceId);
         return ResponseEntity.ok(cities);
+    }
+
+    @Operation(summary = "GET the organization list", description = "GET the organization list.")
+    @ApiResponse(responseCode = "200", description = "Organization list fetched successfully")
+    @GetMapping("/organization-list")
+    public ResponseEntity<List<DropdownListDTO>> getOrganizationInfoInfoList() {
+        List<DropdownListDTO> orgList = organizationService.fetchOrganizationList();
+        return ResponseEntity.ok(orgList);
     }
 }
