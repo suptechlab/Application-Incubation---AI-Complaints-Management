@@ -49,7 +49,7 @@ export const fetchClaimSubTypes = createAsyncThunk(
   'masterDropdownData/fetchClaimSubTypes',
   async (claimTypeId, { rejectWithValue }) => {
     try {
-      const response = await userApi.get(EndPoint.MASTER_CLAIM_SUB_TYPE_LIST, { claimTypeId });
+      const response = await userApi.get(`${EndPoint.MASTER_CLAIM_SUB_TYPE_LIST}/${claimTypeId}`,);
 
       if (response.status !== 200) {
         return rejectWithValue('Failed to fetch claim sub-types');

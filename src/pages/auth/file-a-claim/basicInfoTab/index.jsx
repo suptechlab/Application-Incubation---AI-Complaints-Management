@@ -6,8 +6,12 @@ import FormInputBox from '../../../../components/FormInput';
 import AppTooltip from '../../../../components/tooltip';
 import { BasicInfoFormSchema } from '../../validations';
 import ReactSelect from '../../../../components/ReactSelect';
+import { useTranslation } from 'react-i18next';
 
 const BasicInfoTab = ({ handleFormSubmit }) => {
+
+
+    const {t} = useTranslation()
 
     // Initial Values
     const initialValues = {
@@ -38,9 +42,9 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             gap={2}
                             className="mb-3 flex-wrap"
                         >
-                            <h5 className="custom-font-size-18 mb-0 fw-bold">Basic Information</h5>
+                            <h5 className="custom-font-size-18 mb-0 fw-bold">{t("BASIC_INFORMATION")}</h5>
                             <AppTooltip
-                                title="Basic Information Tooltip Data"
+                                title={t("BASIC_INFORMATION")}
                             >
                                 <Button
                                     type="button"
@@ -56,7 +60,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                 <FormInputBox
                                     autoComplete="off"
                                     id="nationalID"
-                                    label="National ID Number"
+                                    label={t("NATIONAL_ID_NUMBER")}
                                     name="nationalID"
                                     type="text"
                                     error={formikProps.errors.nationalID}
@@ -70,7 +74,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                 <FormInputBox
                                     autoComplete="off"
                                     id="email"
-                                    label="Email"
+                                    label={t("EMAIL")}
                                     name="email"
                                     type="email"
                                     error={formikProps.errors.email}
@@ -83,7 +87,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             <Col lg={6}>
                                 <FormInputBox
                                     id="name"
-                                    label="Name"
+                                    label={t("NAME")}
                                     name="name"
                                     type="text"
                                     error={formikProps.errors.name}
@@ -95,9 +99,13 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Gender"
+                                    label={t("GENDER")}
                                     error={formikProps.errors.gender}
-                                    options={[{ label: "Select", value: "" }, { label: "Male", value: "MALE" } , {label :"Female",label:"FEMALE"}]}
+                                    options={[
+                                        { label: t("SELECT"), value: "" },
+                                        { label: t("MALE"), value: "MALE" },
+                                        { label: t("FEMALE"), value: "FEMALE" }
+                                    ]}
                                     value={formikProps.values.gender}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(
@@ -114,7 +122,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             <Col lg={6}>
                                 <FormInputBox
                                     id="cellphone"
-                                    label="Cellphone"
+                                    label={t("CELLPHONE")}
                                     name="cellphone"
                                     type="text"
                                     error={formikProps.errors.cellphone}
@@ -126,9 +134,12 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Province of Residence*"
+                                    label={t("PROVINCE_OF_RESIDENCE")}
                                     error={formikProps.errors.provinceOfResidence}
-                                    options={[{ label: "Select", value: "" }, { label: "Residence 1", value: "residence1" }]}
+                                    options={[
+                                        { label: t("SELECT"), value: "" },
+                                        { label: t("RESIDENCE_1"), value: "residence1" }
+                                    ]}
                                     value={formikProps.values.provinceOfResidence}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(
@@ -144,9 +155,12 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Canton of Residence*"
+                                    label={t("CANTON_OF_RESIDENCE")}
                                     error={formikProps.errors.cantonOfResidence}
-                                    options={[{ label: "Select", value: "" }, { label: "Residence 2", value: "residence2" }]}
+                                    options={[
+                                        { label: t("SELECT"), value: "" },
+                                        { label: t("RESIDENCE_2"), value: "residence2" }
+                                    ]}
                                     value={formikProps.values.cantonOfResidence}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(
@@ -168,10 +182,11 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             variant="warning"
                             className="custom-min-width-100"
                         >
-                            Next<span className="ms-1">&gt;</span>
+                            {t("NEXT")}<span className="ms-1">&gt;</span>
                         </Button>
                     </Modal.Footer>
                 </React.Fragment>
+
             )}
         </CommonFormikComponent>
     )

@@ -5,10 +5,13 @@ import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { OtherInfoFormSchema } from '../../validations';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
     const { customer_types, priority_care_group } = useSelector((state) => state?.masterSlice)
+
+    const {t} = useTranslation()
 
     // Initial Values
     const initialValues = {
@@ -31,24 +34,22 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
             {(formikProps) => (
                 <React.Fragment>
                     <Modal.Body className="text-break d-flex flex-column small pt-0">
-                        <Stack
-                            direction="horizontal"
-                            gap={2}
-                            className="mb-2 pb-1 flex-wrap"
-                        >
-                            <h5 className="custom-font-size-18 mb-0 fw-bold">Other Information</h5>
+                        <Stack direction="horizontal" gap={2} className="mb-2 pb-1 flex-wrap">
+                            <h5 className="custom-font-size-18 mb-0 fw-bold">
+                                {t("OTHER_INFORMATION")}
+                            </h5>
                         </Stack>
                         <Row className="gx-4">
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Priority care group*"
+                                    label={t("PRIORITY_CARE_GROUP")}
                                     error={formikProps.errors.priorityCareGroup}
                                     options={[
-                                        { label: "Select", value: "" },
+                                        { label: t("SELECT"), value: "" },
                                         ...priority_care_group.map((group) => ({
                                             label: group.label, // Ensure group has a `label` property
                                             value: group.value, // Ensure group has a `value` property
-                                        }))
+                                        })),
                                     ]}
                                     value={formikProps.values.priorityCareGroup}
                                     onChange={(option) => {
@@ -58,21 +59,26 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         );
                                     }}
                                     name="priorityCareGroup"
-                                    className={formikProps.touched.priorityCareGroup && formikProps.errors.priorityCareGroup ? "is-invalid" : ""}
+                                    className={
+                                        formikProps.touched.priorityCareGroup &&
+                                            formikProps.errors.priorityCareGroup
+                                            ? "is-invalid"
+                                            : ""
+                                    }
                                     onBlur={formikProps.handleBlur}
                                     touched={formikProps.touched.priorityCareGroup}
                                 />
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Customer Type*"
+                                    label={t("CUSTOMER_TYPE")}
                                     error={formikProps.errors.customerType}
                                     options={[
-                                        { label: "Select", value: "" },
+                                        { label: t("SELECT"), value: "" },
                                         ...customer_types.map((group) => ({
                                             label: group.label, // Ensure group has a `label` property
                                             value: group.value, // Ensure group has a `value` property
-                                        }))
+                                        })),
                                     ]}
                                     value={formikProps.values.customerType}
                                     onChange={(option) => {
@@ -82,16 +88,24 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         );
                                     }}
                                     name="customerType"
-                                    className={formikProps.touched.customerType && formikProps.errors.customerType ? "is-invalid" : ""}
+                                    className={
+                                        formikProps.touched.customerType &&
+                                            formikProps.errors.customerType
+                                            ? "is-invalid"
+                                            : ""
+                                    }
                                     onBlur={formikProps.handleBlur}
                                     touched={formikProps.touched.customerType}
                                 />
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Entity Name*"
+                                    label={t("ENTITY_NAME")}
                                     error={formikProps.errors.entityName}
-                                    options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
+                                    options={[
+                                        { label: t("SELECT"), value: "" },
+                                        { label: t("OPTION_1"), value: "option-1" },
+                                    ]}
                                     value={formikProps.values.entityName}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(
@@ -100,7 +114,12 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         );
                                     }}
                                     name="entityName"
-                                    className={formikProps.touched.entityName && formikProps.errors.entityName ? "is-invalid" : ""}
+                                    className={
+                                        formikProps.touched.entityName &&
+                                            formikProps.errors.entityName
+                                            ? "is-invalid"
+                                            : ""
+                                    }
                                     onBlur={formikProps.handleBlur}
                                     touched={formikProps.touched.entityName}
                                 />
@@ -108,7 +127,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col lg={6}>
                                 <FormInputBox
                                     id="entitysTaxID"
-                                    label="Entity's Tax ID (RUC)"
+                                    label={t("ENTITYS_TAX_ID")}
                                     name="entitysTaxID"
                                     type="text"
                                     error={formikProps.errors.entitysTaxID}
@@ -127,17 +146,18 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             onClick={backButtonClickHandler}
                             className="custom-min-width-100 me-auto"
                         >
-                            <span className="me-1">&lt;</span>Back
+                            <span className="me-1">&lt;</span>{t("BACK")}
                         </Button>
                         <Button
                             type="submit"
                             variant="warning"
                             className="custom-min-width-100"
                         >
-                            Next<span className="ms-1">&gt;</span>
+                            {t("NEXT")}<span className="ms-1">&gt;</span>
                         </Button>
                     </Modal.Footer>
                 </React.Fragment>
+
             )}
         </CommonFormikComponent>
     )

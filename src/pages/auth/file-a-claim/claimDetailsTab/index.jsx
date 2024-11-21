@@ -7,9 +7,19 @@ import { ClaimDetailsFormSchema } from '../../validations';
 import FormCheckbox from '../../../../components/formCheckbox';
 import { MdBackup } from 'react-icons/md';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchClaimSubTypes } from '../../../../redux/slice/masterSlice';
+import { useTranslation } from 'react-i18next';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
+
+    const { t } = useTranslation()
+
+
+    const { claim_types } = useSelector((state) => state?.masterSlice)
+
+    const dispatch = useDispatch()
 
     // Initial Values
     const initialValues = {
@@ -21,27 +31,41 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
         agreeDeclarations: false,
     };
 
-      //Handle File Change
-  const handleFileChange = (event) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      setFileName(file.name);
-    } else {
-      setFileName("Fi_Users_data.xlsx");
-    }
-  };
+    const [claimSubTypes, setClaimSubTypes] = useState([])
+    //Handle File Change
+    const handleFileChange = (event) => {
+        const file = event.currentTarget.files[0];
+        if (file) {
+            setFileName(file.name);
+        } else {
+            setFileName("Fi_Users_data.xlsx");
+        }
+    };
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
         handleFormSubmit(values, actions);
     };
-    
+
+
+    const getClaimSubTypes = async (claimTypeId) => {
+        const response = await dispatch(fetchClaimSubTypes(claimTypeId))
+
+        if (fetchClaimSubTypes.fulfilled.match(response)) {
+
+            setClaimSubTypes(response?.payload)
+
+        } else {
+            console.error('Sub types error:', response.error.message);
+        }
+    }
+
     return (
         <CommonFormikComponent
             // validationSchema={ClaimDetailsFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
-        >   
+        >
             {(formikProps) => (
                 <React.Fragment>
                     <Modal.Body className="text-break d-flex flex-column small pt-0">
@@ -50,20 +74,25 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             gap={2}
                             className="mb-2 pb-1 flex-wrap"
                         >
-                            <h5 className="custom-font-size-18 mb-0 fw-bold">Claim Details</h5>
+                            <h5 className="custom-font-size-18 mb-0 fw-bold">{t("CLAIM_DETAILS")}</h5>
                         </Stack>
                         <Row className="gx-4">
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Claim Type*"
+                                    label={t("CLAIM_TYPE")}
                                     error={formikProps.errors.claimType}
-                                    options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
+                                    options={[
+                                        { label: t("SELECT"), value: "" },
+                                        ...claim_types.map((group) => ({
+                                            label: group.label,
+                                            value: group.value,
+                                        })),
+                                    ]}
                                     value={formikProps.values.claimType}
                                     onChange={(option) => {
-                                        formikProps.setFieldValue(
-                                            "claimType",
-                                            option?.target?.value ?? ""
-                                        );
+                                        formikProps.setFieldValue("claimType", option?.target?.value ?? "");
+                                        formikProps.setFieldValue("claimSubtype", "");
+                                        getClaimSubTypes(option?.target?.value);
                                     }}
                                     name="claimType"
                                     className={formikProps.touched.claimType && formikProps.errors.claimType ? "is-invalid" : ""}
@@ -73,15 +102,18 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label="Claim Subtype"
+                                    label={t("CLAIM_SUBTYPE")}
                                     error={formikProps.errors.claimSubtype}
-                                    options={[{ label: "Select", value: "" }, { label: "Option 1", value: "option-1" }]}
+                                    options={[
+                                        { label: t("SELECT"), value: "" },
+                                        ...claimSubTypes.map((group) => ({
+                                            label: group.label,
+                                            value: group.value,
+                                        })),
+                                    ]}
                                     value={formikProps.values.claimSubtype}
                                     onChange={(option) => {
-                                        formikProps.setFieldValue(
-                                            "claimSubtype",
-                                            option?.target?.value ?? ""
-                                        );
+                                        formikProps.setFieldValue("claimSubtype", option?.target?.value ?? "");
                                     }}
                                     name="claimSubtype"
                                     className={formikProps.touched.claimSubtype && formikProps.errors.claimSubtype ? "is-invalid" : ""}
@@ -92,7 +124,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col xs={12}>
                                 <FormInputBox
                                     id="precedents"
-                                    label="Precedents*"
+                                    label={t("PRECEDENTS")}
                                     name="precedents"
                                     type="text"
                                     as="textarea"
@@ -107,7 +139,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col xs={12}>
                                 <FormInputBox
                                     id="specificPetition"
-                                    label="Specific Petition*"
+                                    label={t("SPECIFIC_PETITION")}
                                     name="specificPetition"
                                     type="text"
                                     as="textarea"
@@ -126,7 +158,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             htmlFor="files"
                                             className="btn btn-secondary"
                                         >
-                                            <span className='me-2'><MdBackup size={20}/></span>Upload Optional Attachments
+                                            <span className='me-2'><MdBackup size={20} /></span>{t("UPLOAD_OPTIONAL_ATTACHMENTS")}
                                         </label>
                                         <input
                                             id="files"
@@ -158,7 +190,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                     touched={formikProps.touched.agreeDeclarations}
                                     error={formikProps.errors.agreeDeclarations}
                                     type="checkbox"
-                                    label="I agreed on all the Declarations, and conditions"
+                                    label={t("AGREE_DECLARATIONS")}
                                 />
                             </Col>
                         </Row>
@@ -170,17 +202,18 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             onClick={backButtonClickHandler}
                             className="custom-min-width-100 me-auto"
                         >
-                            <span className="me-1">&lt;</span>Back
+                            <span className="me-1">&lt;</span>{t("BACK")}
                         </Button>
                         <Button
                             type="submit"
                             variant="warning"
                             className="custom-min-width-100"
                         >
-                            Next<span className="ms-1">&gt;</span>
+                            {t("NEXT")}<span className="ms-1">&gt;</span>
                         </Button>
                     </Modal.Footer>
                 </React.Fragment>
+
             )}
         </CommonFormikComponent>
     )

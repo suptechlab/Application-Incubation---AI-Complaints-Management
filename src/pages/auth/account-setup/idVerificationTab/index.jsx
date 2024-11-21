@@ -48,9 +48,6 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
     const handleNationalIdVerify = async (value) => {
         if (value && value !== '') {
 
-            setIsVerified(true)
-            setNewAccountData((prev)=> ({...prev , identificacion: value}))
-
             const result = await dispatch(nationalIdVerify(value));
             if (nationalIdVerify.fulfilled.match(result)) {
                 setIsVerified(true)

@@ -6,8 +6,12 @@ import ClaimDetailsTab from "./claimDetailsTab";
 import FileAlertModal from "./file-alert";
 import FileSuccesModal from "./file-success";
 import OtherInfoTab from "./otherInfoTab";
+import { useTranslation } from "react-i18next";
 
 const FileClaimModal = ({ handleShow, handleClose }) => {
+
+    const { t } = useTranslation()
+
     const [activeTab, setActiveTab] = useState(0);
     const [isBasicInfoSubmitted, setIsBasicInfoSubmitted] = useState(false);
     const [isOtherInfoSubmitted, setIsOtherInfoSubmitted] = useState(false);
@@ -78,14 +82,14 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     const stepData = [
         {
             id: 1,
-            stepTitle: "Basic Info",
+            stepTitle: t("BASIC_INFO"),
             stepCurrent: activeTab === 0,
             stepCompleted: isBasicInfoSubmitted,
             stepClickHandler: () => setActiveTab(0),
         },
         {
             id: 2,
-            stepTitle: "Other Info",
+            stepTitle: t("OTHER_INFO"),
             stepCurrent: activeTab === 1,
             stepCompleted: isOtherInfoSubmitted,
             stepClickHandler: () => setActiveTab(1),
@@ -93,13 +97,14 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
         },
         {
             id: 3,
-            stepTitle: "Claim Details",
+            stepTitle: t("CLAIM_DETAILS"),
             stepCurrent: activeTab === 2,
             stepCompleted: activeTab === 3,
             stepClickHandler: () => setActiveTab(2),
             disabled: !isOtherInfoSubmitted,
         }
     ]
+
 
     //Tabs Data
     const tabData = [
@@ -135,9 +140,9 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
                         <Row className="g-0">
                             <Col lg={6}>
                                 <Modal.Title as="h4" className="fw-bold">
-                                    File a Claim
+                                    {t("FILE_A_CLAIM")}
                                 </Modal.Title>
-                                <p className="small">Fill the claim form below and save the claim reference number for future discussions.</p>
+                                <p className="small">{t("CLAIM_FORM_DESCRIPTION")}</p>
                             </Col>
                             <Col lg="auto" className="ms-auto mb-2 mb-sm-0">
                                 <div className="text-end">
@@ -147,6 +152,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
                         </Row>
                     </div>
                 </Modal.Header>
+
                 <Tab.Container
                     id="file-clainm-steps-tabs"
                     activeKey={activeTab}
