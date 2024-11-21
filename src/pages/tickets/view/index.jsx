@@ -7,12 +7,16 @@ import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from '../../../components/CommonViewData';
 import Loader from '../../../components/Loader';
 import AppTooltip from '../../../components/tooltip';
+import AttachmentsModal from '../modals/attachmentsModal';
+import UserInfoModal from '../modals/userInfoModal';
 import TicketViewHeader from './header';
 import TicketTabsSection from './tabs';
 
 const TicketsView = () => {
   const { t } = useTranslation();
   const [selectedPriority, setSelectedPriority] = useState('Low');
+  const [userInfoModalShow, setUserInfoModalShow] = useState(false);
+  const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
 
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
@@ -36,6 +40,16 @@ const TicketsView = () => {
     }
   };
 
+  // Handle File a Claim Button
+  const handleUserInfoClick = () => {
+    setUserInfoModalShow(true)
+  }
+
+  // Handle Attachments Button
+  const handleAttachmentsClick = () => {
+    setAttachmentsModalShow(true)
+  }
+
   // View Top Data
   const viewTopData = [
     {
@@ -50,7 +64,7 @@ const TicketsView = () => {
     },
     {
       label: "Claim filed by",
-      value: <Link to="/" className='text-decoration-none'>Veronica Andres</Link>,
+      value: <Link onClick={handleUserInfoClick} className='text-decoration-none'>Veronica Andres</Link>,
       colProps: { sm: 6 }
     },
     {
@@ -106,7 +120,7 @@ const TicketsView = () => {
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <Link className='fw-semibold text-decoration-none'>Attachments</Link>
+        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
       </Stack>),
       colProps: { xs: 12, className: "pb-4" }
     },
@@ -123,70 +137,108 @@ const TicketsView = () => {
   ];
 
   return (
-    <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+    <React.Fragment>
       <Loader isLoading={false} />
-      <TicketViewHeader
-        title="#52541"
-      />
-      <div className='d-flex flex-column flex-grow-1'>
-        <Row className='h-100 gy-3 gy-lg-0 gx-3 pb-3'>
-          <Col lg={6}>
-            <Card className="border-0 shadow h-100">
-              <Card.Body>
-                <Row>
-                  {viewTopData?.map((item, index) => (
-                    <Col key={"data_view_" + index} {...item.colProps}>
-                      <CommonViewData label={item.label} value={item.value} />
+      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+        <TicketViewHeader
+          title="#52541"
+        />
+        <div className='d-flex flex-column flex-grow-1'>
+          <Row className='h-100 gy-3 gy-lg-0 gx-3 pb-3'>
+            <Col lg={6}>
+              <Card className="border-0 shadow h-100">
+                <Card.Body>
+                  <Row>
+                    {viewTopData?.map((item, index) => (
+                      <Col key={"data_view_" + index} {...item.colProps}>
+                        <CommonViewData label={item.label} value={item.value} />
+                      </Col>
+                    ))}
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col lg={6}>
+              <Card className="border-0 shadow">
+                <Card.Header className='bg-body border-0 py-3'>
+                  <Row className='g-2'>
+                    <Col xs="auto">
+                      <Image
+                        className="object-fit-cover rounded-circle"
+                        src={defaultAvatar}
+                        width={36}
+                        height={36}
+                        alt="John Smith"
+                      />
                     </Col>
-                  ))}
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col lg={6}>
-            <Card className="border-0 shadow">
-              <Card.Header className='bg-body border-0 py-3'>
-                <Row className='g-2'>
-                  <Col xs="auto">
-                    <Image
-                      className="object-fit-cover rounded-circle"
-                      src={defaultAvatar}
-                      width={36}
-                      height={36}
-                      alt="John Smith"
-                    />
-                  </Col>
-                  <Col xs className='small lh-sm'>
-                    <div className='fw-bold'>John Smith</div>
-                    <Stack direction='horizontal' gap={2} className='text-secondary'>
-                      <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                      <span>07-14-24 | 10:00 am </span>
-                    </Stack>
-                  </Col>
-                </Row>
-              </Card.Header>
-              <TicketTabsSection />
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                    <Col xs className='small lh-sm'>
+                      <div className='fw-bold'>John Smith</div>
+                      <Stack direction='horizontal' gap={2} className='text-secondary'>
+                        <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                        <span>07-14-24 | 10:00 am </span>
+                      </Stack>
+                    </Col>
+                  </Row>
+                </Card.Header>
+                <TicketTabsSection />
+              </Card>
+              <Card className="border-0 shadow mt-3">
+                <Card.Body>
+                  <Row className='g-2'>
+                    <Col xs="auto">
+                      <Image
+                        className="object-fit-cover rounded-circle"
+                        src={defaultAvatar}
+                        width={36}
+                        height={36}
+                        alt="John Smith"
+                      />
+                    </Col>
+                    <Col xs className='small lh-sm'>
+                      <div className='fw-bold'>John Smith <span className='fw-normal'>added Internal Note</span></div>
+                      <Stack direction='horizontal' gap={2} className='text-secondary'>
+                        <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                        <span>07-14-24 | 10:00 am </span>
+                      </Stack>
+                      <p className='mt-2 mb-0'>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </div>
 
-      <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3 bg-body">
-        <Stack
-          direction="horizontal"
-          gap={3}
-          className="justify-content-end flex-wrap"
-        >
-          <Link
-            to={"/tickets"}
-            className="btn btn-outline-dark custom-min-width-85"
+        <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3 bg-body">
+          <Stack
+            direction="horizontal"
+            gap={3}
+            className="justify-content-end flex-wrap"
           >
-            {t("BACK")}
-          </Link>
+            <Link
+              to={"/tickets"}
+              className="btn btn-outline-dark custom-min-width-85"
+            >
+              {t("BACK")}
+            </Link>
 
-        </Stack>
+          </Stack>
+        </div>
       </div>
-    </div>
+
+      {/* User Info Modals */}
+      <UserInfoModal
+        modal={userInfoModalShow}
+        toggle={() => setUserInfoModalShow(false)}
+      />
+
+      {/* Attachments Modals */}
+      <AttachmentsModal
+        modal={attachmentsModalShow}
+        toggle={() => setAttachmentsModalShow(false)}
+      />
+
+    </React.Fragment>
   )
 }
 
