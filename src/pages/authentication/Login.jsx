@@ -58,7 +58,7 @@ export default function Login() {
                             <Col xs={12} className="p-4">
                                 <div className="custom-max-width-320 w-100 m-auto">
                                     <div className="mb-4 pb-1">
-                                        <Link to="/" className="d-inline-block">
+                                        <Link to="/login" className="d-inline-block">
                                             <Image
                                                 className="img-fluid"
                                                 src={Logo}

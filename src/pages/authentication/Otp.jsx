@@ -56,7 +56,7 @@ export default function Otp() {
                                     <IoIosArrowRoundBack size={28} /> {t('BACK')}
                                 </Link>
                                 <div className="mb-4 pb-1">
-                                    <Link to="/" className="d-inline-block">
+                                    <Link to="/login" className="d-inline-block">
                                         <Image
                                             className="img-fluid"
                                             src={Logo}
