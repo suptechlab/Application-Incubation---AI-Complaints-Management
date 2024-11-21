@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
@@ -19,6 +19,8 @@ import { handleFIUsersStatusChange, handleGetFIusersList } from "../../services/
 import SearchForm from "./SearchForm";
 
 export default function FIUserList() {
+
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation(); // use the translation hook
@@ -223,6 +225,13 @@ export default function FIUserList() {
       pageSize: 10,
     });
   }, [filter]);
+
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
 
   return (
     <React.Fragment>

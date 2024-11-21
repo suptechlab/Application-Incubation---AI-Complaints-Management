@@ -56,7 +56,7 @@ const Edit = ({ modal, toggle,rowData,dataQuery }) => {
           name: rowData?.name,
         }}
         onSubmit={(values, actions) => {
-          actions.setSubmitting(false);
+          actions.setSubmitting(true);
           handleSubmit(values, actions);
         }}
         validationSchema={validationSchema}
@@ -70,6 +70,7 @@ const Edit = ({ modal, toggle,rowData,dataQuery }) => {
           touched,
           isValid,
           errors,
+          isSubmitting
         }) => (
           <Form>
             <Modal.Body className="text-break py-0">
@@ -99,6 +100,7 @@ const Edit = ({ modal, toggle,rowData,dataQuery }) => {
                 type="submit"
                 variant="warning"
                 className="custom-min-width-85"
+                disabled={isSubmitting ?? false}
               >
                 {t("SUBMIT")}
               </Button>

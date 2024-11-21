@@ -111,6 +111,7 @@ export default function RoleRightsList() {
       });
     }
     setLoading(false);
+    console.log('114: set page ')
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
@@ -200,6 +201,7 @@ export default function RoleRightsList() {
   );
 
   useEffect(() => {
+    console.log('203: set pagnination called')
     setPagination({
       pageIndex: 0,
       pageSize: 10,
@@ -211,6 +213,7 @@ export default function RoleRightsList() {
     return () => {
       queryClient.removeQueries("data");
     };
+    console.log('215: removeQueries called')
   }, [queryClient]);
 
   return (
