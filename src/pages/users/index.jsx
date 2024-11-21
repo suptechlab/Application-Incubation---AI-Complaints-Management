@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
@@ -17,12 +17,14 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import GenericModal from "../../components/GenericModal";
-import ListingSearchForm from "../../components/ListingSearchForm";
+import ListingSearchFormUsers from "../../components/ListingSearchFormUsers";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 
 export default function UserList() {
+
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation(); // use the translation hook
@@ -40,7 +42,7 @@ export default function UserList() {
     status: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedRow, setSelectedRow] = useState();
   const [deleteShow, setDeleteShow] = useState(false);
   const [deleteId, setDeleteId] = useState();
@@ -48,45 +50,63 @@ export default function UserList() {
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
-
-      if (sorting.length === 0) {
-        return handleGetUsers({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetUsers({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
-      }
+      setLoading(true); // Start loading
+      try {
+          const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+          Object.keys(filterObj).forEach(
+            (key) => filterObj[key] === "" && delete filterObj[key]
+          );
+    
+          if (sorting.length === 0) {
+            return handleGetUsers({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              ...filterObj,
+            });
+          } else {
+            return handleGetUsers({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              sort: sorting
+                .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+                .join(","),
+              ...filterObj,
+            });
+          } 
+      } catch (error) {
+        setLoading(false); // Start loading
+      } finally {
+        setLoading(false); // Start loading
+      }  
     },
+    onError: () => setLoading(false), // Ensure loading state is reset on error
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
 
   //handle last page deletion item
   useEffect(() => {
+    
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
+    
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
     try {
+      setLoading(true)
       await handleStatusChangeState(id, currentStatus);
       dataQuery.refetch();
+      setLoading(false)
     } catch (error) {
+      setLoading(false)
       toast.error(error?.response?.data?.errorDescription);
     }
   };
@@ -115,12 +135,13 @@ export default function UserList() {
     () => [
       {
         accessorFn: (row) => row.name,
-        id: "name",
+        id: "firstName",
         header: () => t('NAME'),
+        enableSorting: false,
       },
       {
         accessorFn: (row) => row.roles[0].name ?? "N/A",
-        id: "claimTypeName",
+        id: "role",
         header: () =>  t('ROLE'),
         enableSorting: false,
       },
@@ -129,18 +150,18 @@ export default function UserList() {
         id: "email",
         header: () => t('EMAIL'),
       },
-      {
-        accessorFn: (row) => row.mobileNo,
-        id: "mobileNo",
-        header: () => "Unidad Organizacional",
-        cell: (info) => {
-          return (
-            <span>
-              {info.row.original.mobileCode} {info.row.original.mobileNo}
-            </span>
-          );
-        },
-      },
+      // {
+      //   accessorFn: (row) => row.mobileNo,
+      //   id: "mobileNo",
+      //   header: () => "Unidad Organizacional",
+      //   cell: (info) => {
+      //     return (
+      //       <span>
+      //         {info.row.original.mobileCode} {info.row.original.mobileNo}
+      //       </span>
+      //     );
+      //   },
+      // },
 
       {
         accessorFn: (row) => row.createdDate,
@@ -297,29 +318,38 @@ export default function UserList() {
     });
   }, [filter]);
 
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
+  
   return (
     <React.Fragment>
-      <Loader isLoading={loading} />
-      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <PageHeader
-          title="Usuarios de SEPS"
-          actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
-        />
-        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-          <Card.Body className="d-flex flex-column">
-            <ListingSearchForm filter={filter} setFilter={setFilter} />
-            <CommonDataTable
-              columns={columns}
-              dataQuery={dataQuery}
-              pagination={pagination}
-              setPagination={setPagination}
-              sorting={sorting}
-              setSorting={setSorting}
-            />
-          </Card.Body>
-        </Card>
-      </div>
 
+      { loading ? <Loader isLoading={loading} />
+      :
+        <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+          <PageHeader
+            title="Usuarios de SEPS"
+            actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
+          />
+          <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+            <Card.Body className="d-flex flex-column">
+              <ListingSearchFormUsers filter={filter} setFilter={setFilter} />
+              <CommonDataTable
+                columns={columns}
+                dataQuery={dataQuery}
+                pagination={pagination}
+                setPagination={setPagination}
+                sorting={sorting}
+                setSorting={setSorting}
+              />
+            </Card.Body>
+          </Card>
+        </div>
+      }
       {/* Delete Modal */}
       <GenericModal
         show={deleteShow}

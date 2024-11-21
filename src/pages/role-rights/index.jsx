@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import GenericModal from "../../components/GenericModal";
-import ListingSearchForm from "../../components/ListingSearchForm";
+import ListingSearchFormUsers from "../../components/ListingSearchFormUsers";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 import {
@@ -17,9 +17,11 @@ import {
 } from "../../services/rolerights.service"; // Update the import to include delete function
 import { handleStatusChangeState } from "../../services/user.service";
 import { useTranslation } from "react-i18next";
+import Loader from "../../components/Loader";
 
 export default function RoleRightsList() {
 
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -34,7 +36,7 @@ export default function RoleRightsList() {
     search: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedRow, setSelectedRow] = useState();
   const [deleteShow, setDeleteShow] = useState(false);
   const [deleteId, setDeleteId] = useState();
@@ -54,6 +56,7 @@ export default function RoleRightsList() {
       dataQuery.refetch();
       setDeleteShow(false);
     } catch (error) {
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -62,37 +65,52 @@ export default function RoleRightsList() {
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
+      setLoading(true); // Start loading
+      try {
+            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+            Object.keys(filterObj).forEach(
+              (key) => filterObj[key] === "" && delete filterObj[key]
+            );
 
-      if (sorting.length === 0) {
-        return handleGetRoleRights({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetRoleRights({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
+            if (sorting.length === 0) {
+              return handleGetRoleRights({
+                page: pagination.pageIndex,
+                size: pagination.pageSize,
+                ...filterObj,
+              });
+            } else {
+              return handleGetRoleRights({
+                page: pagination.pageIndex,
+                size: pagination.pageSize,
+                sort: sorting
+                  .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+                  .join(","),
+                ...filterObj,
+              });
+            }
+      } catch (error) {
+        setLoading(false); // Start loading
+      } finally {
+        setLoading(false); // Start loading
       }
     },
+    onError: () => setLoading(false), // Ensure loading state is reset on error
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
 
   useEffect(() => {
+    //setLoading(true);
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
+    //setLoading(false);
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
@@ -117,6 +135,12 @@ export default function RoleRightsList() {
         accessorFn: (row) => row.description,
         id: "description",
         header: () => t('DESCRIPTION'),
+        enableSorting: false,
+      },
+      {
+        accessorFn: (row) => row.userType == 'SEPS_USER' ? 'SEPS-USER' : 'FI-User',
+        id: "userType",
+        header: () => t('ROLE & RIGHTS'),
         enableSorting: false,
       },
       // {
@@ -157,14 +181,14 @@ export default function RoleRightsList() {
                 title: "Edit",
                 icon: <MdEdit size={18} />,
               },
-              {
-                name: "delete",
-                enabled: true,
-                type: "button",
-                title: "Delete",
-                icon: <MdDelete size={18} />,
-                handler: () => deleteAction(rowData.row.original),
-              },
+              // {
+              //   name: "delete",
+              //   enabled: true,
+              //   type: "button",
+              //   title: "Delete",
+              //   icon: <MdDelete size={18} />,
+              //   handler: () => deleteAction(rowData.row.original),
+              // },
             ]}
           />
         ),
@@ -182,29 +206,40 @@ export default function RoleRightsList() {
     });
   }, [filter]);
 
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
+
   return (
     <React.Fragment>
-      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <PageHeader
-          title={t('ROLE & RIGHTS')}
-          actions={[
-            { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
-          ]}
-        />
-        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-          <Card.Body className="d-flex flex-column">
-            {/* <ListingSearchForm filter={filter} setFilter={setFilter} /> */}
-            <CommonDataTable
-              columns={columns}
-              dataQuery={dataQuery}
-              pagination={pagination}
-              setPagination={setPagination}
-              sorting={sorting}
-              setSorting={setSorting}
+      {
+          loading ? <Loader isLoading={loading} />
+          :
+          <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+            <PageHeader
+              title={t('ROLE & RIGHTS')}
+              actions={[
+                { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
+              ]}
             />
-          </Card.Body>
-        </Card>
-      </div>
+            <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+              <Card.Body className="d-flex flex-column">
+                {/* <ListingSearchFormUsers filter={filter} setFilter={setFilter} /> */}
+                <CommonDataTable
+                  columns={columns}
+                  dataQuery={dataQuery}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                  sorting={sorting}
+                  setSorting={setSorting}
+                />
+              </Card.Body>
+            </Card>
+          </div>
+      }
 
       {/* Delete Modal */}
       <GenericModal

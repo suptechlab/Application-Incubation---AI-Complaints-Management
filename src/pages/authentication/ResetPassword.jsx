@@ -44,7 +44,7 @@ export default function ResetPassword() {
             toast.success(response.data.message)
             navigate('/login', { replace: true })
         }).catch((error) => {
-            toast.error(error.response.data.errorDescription)
+            toast.error(error.response.data.errorDescription ? error.response.data.errorDescription : t('SOMETHING WENT WRONG'))
         })
     }
 
