@@ -5,6 +5,7 @@ import com.seps.admin.service.TeamService;
 import com.seps.admin.service.dto.*;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,9 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.web.util.PaginationUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -151,5 +157,18 @@ public class TeamResource {
         RequestInfo requestInfo = new RequestInfo(request);
         teamService.changeStatus(id, status, requestInfo);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "List all Teams", description = "Retrieve a list of all teams with optional search and status filters.")
+    @ApiResponse(responseCode = "200", description = "Teams retrieved successfully",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = ProvinceDTO.class)))
+    @GetMapping
+    public ResponseEntity<List<TeamListDTO>> listTeams(Pageable pageable,
+                                                           @RequestParam(value = "search", required = false) String search,
+                                                           @Parameter(description = "Filter by status (true for active, false for inactive)") @RequestParam(required = false) Boolean status) {
+        Page<TeamListDTO> page = teamService.listTeams(pageable, search, status);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 }

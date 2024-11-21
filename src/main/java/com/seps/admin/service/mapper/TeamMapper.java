@@ -3,6 +3,7 @@ package com.seps.admin.service.mapper;
 import com.seps.admin.domain.Team;
 import com.seps.admin.domain.TeamMember;
 import com.seps.admin.service.dto.TeamDTO;
+import com.seps.admin.service.dto.TeamListDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -47,4 +48,7 @@ public interface TeamMapper {
             return memberDTO;
         }).toList();
     }
+
+    @Mapping(source = "createdByUser.email", target = "createdByEmail")
+    TeamListDTO toTeamListDTO(Team team);
 }

@@ -11,11 +11,15 @@ import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.service.dto.*;
 import com.seps.admin.service.mapper.TeamMapper;
 import com.seps.admin.service.mapper.UserMapper;
+import com.seps.admin.service.specification.ProvinceSpecification;
+import com.seps.admin.service.specification.TeamSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
@@ -518,5 +522,10 @@ public class TeamService {
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "changeStatus", ActionTypeEnum.TEAM_STATUS_CHANGE.name(), savedTeam.getId(), Team.class.getSimpleName(),
             null, auditMessageMap,entityData, ActivityTypeEnum.STATUS_CHANGE.name(), requestBody);
+    }
+
+    public Page<TeamListDTO> listTeams(Pageable pageable, String search, Boolean status) {
+        return teamRepository.findAll(TeamSpecification.byFilter(search, status), pageable)
+            .map(teamMapper::toTeamListDTO);
     }
 }
