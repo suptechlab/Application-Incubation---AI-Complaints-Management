@@ -21,5 +21,5 @@ RUN apk add --no-cache tzdata
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-COPY --from=backend-compiler /app/target/auth-${VERSION}.jar /app/opt/auth.jar
-ENTRYPOINT ["java", "-jar", "/app/opt/auth.jar"]
+COPY --from=backend-compiler /app/target/ticket-${VERSION}.jar /app/opt/ticket.jar
+ENTRYPOINT ["java", "-jar", "/app/opt/ticket.jar"]
