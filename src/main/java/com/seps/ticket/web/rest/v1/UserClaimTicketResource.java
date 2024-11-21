@@ -1,6 +1,7 @@
 package com.seps.ticket.web.rest.v1;
 
-import com.seps.ticket.service.ClaimTicketService;
+import com.seps.ticket.service.UserClaimTicketService;
+import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.service.dto.TicketDTO;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,18 +16,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/user/claim-tickets")
 public class UserClaimTicketResource {
 
-    private final ClaimTicketService claimTicketService;
+    private final UserClaimTicketService userClaimTicketService;
 
-    public UserClaimTicketResource(ClaimTicketService claimTicketService) {
-        this.claimTicketService = claimTicketService;
+    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService) {
+        this.userClaimTicketService = userClaimTicketService;
     }
 
     // Endpoint for Users to create a claim ticket
     @PostMapping("/file-claim")
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<TicketDTO> fileClaim(@RequestBody @Valid ClaimTicketRequest claimTicketRequest) {
-        TicketDTO createdTicket = claimTicketService.createTicket(claimTicketRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTicket);
+    public ResponseEntity<ClaimTicketResponseDTO> fileClaim(@RequestBody @Valid ClaimTicketRequest claimTicketRequest) {
+        ClaimTicketResponseDTO claimTicketResponseDTO = userClaimTicketService.fileClaim(claimTicketRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
     }
 
 }

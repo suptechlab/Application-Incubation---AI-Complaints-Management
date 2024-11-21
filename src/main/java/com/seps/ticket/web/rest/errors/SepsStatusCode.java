@@ -8,13 +8,17 @@ public enum SepsStatusCode implements StatusType {
     RECAPTCHA_FAILED(10011, "recaptcha.failed.validation"),
     FORM_VALIDATION_ERROR(10012, "form.validation.error"),
     USER_NOT_FOUND(10013, "user.not.found"),
-    PERSON_NOT_FOUND(10021, "person.not.found"),
-    ORGANIZATION_RUC_NOT_FOUND(10022, "organization.ruc.not.found"),
+    CURRENT_USER_NOT_FOUND(10017, "current.user.not.found"),
     USER_ACCOUNT_NOT_EXIST(10027, "user.account.not.exist"),
     USER_ACCOUNT_NOT_ACTIVE(10028, "user.account.not.active"),
     USER_ACCOUNT_STATUS_PENDING(10029, "user.account.status.pending"),
     USER_ACCOUNT_STATUS_BLOCKED(10030, "user.account.status.blocked"),
-    USER_ACCOUNT_STATUS_DELETED(10031, "user.account.status.deleted");
+    USER_ACCOUNT_STATUS_DELETED(10031, "user.account.status.deleted"),
+    CLAIM_TYPE_NOT_FOUND(20015, "claim.type.not.found"),
+    CLAIM_SUB_TYPE_NOT_FOUND(20017, "claim.sub.type.not.found"),
+    PROVINCE_NOT_FOUND(20019, "province.not.found"),
+    CITY_NOT_FOUND(20019, "city.not.found"),
+    ORGANIZATION_NOT_FOUND(20030, "organization.not.found");
 
     private final int code;
 
