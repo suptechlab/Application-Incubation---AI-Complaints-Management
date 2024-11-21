@@ -38,11 +38,17 @@ const TeamManagementAddEdit = React.lazy(() => import("../pages/team-management/
 const TeamManagementList = React.lazy(() => import("../pages/team-management/list"));
 
 const routes = [
+  // {
+  //   path: "/",
+  //   element: <Dashboard />,
+  //   isPrivate: true,
+  //   layoutType: "Auth",
+  // },
   {
     path: "/",
-    element: <Dashboard />,
-    isPrivate: true,
-    layoutType: "Auth",
+    element: <Login />,
+    isPrivate: false,
+    // layoutType: "Auth",
   },
   {
     path: "/dashboard",

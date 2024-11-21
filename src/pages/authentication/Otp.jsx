@@ -38,9 +38,9 @@ export default function Otp() {
             }
             
             let res = await handleResendOTP(data);
-            toast.success("OTP has been resent successfully.");
+            toast.success("OTP enviado con éxito.");
         } catch (error) {
-            toast.error("Failed to resend OTP. Please try again.");
+            toast.error("No se pudo reenviar el OTP. Inténtalo nuevamente.");
         }
     }
 
