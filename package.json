@@ -2,7 +2,6 @@
   "name": "Cambridge",
   "version": "0.1.0",
   "private": true,
-  
   "homepage": "https://webportal-suptechdev.seps.gob.ec",
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -37,7 +36,7 @@
     "react-router-dom": "^6.23.0",
     "react-scripts": "5.0.1",
     "react-select": "^5.8.0",
-    "reactstrap": "^9.2.2",
+    "reactstrap": "^9.2.3",
     "sass": "^1.77.0",
     "suneditor": "^2.47.0",
     "suneditor-react": "^3.6.1",
