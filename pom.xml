@@ -8,7 +8,7 @@
   <artifactId>ticket</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>Ticket</name>
+  <name>ms-ticket-service</name>
   <description>Description for Ticket</description>
   <parent>
     <groupId>org.springframework.boot</groupId>
