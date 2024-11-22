@@ -260,3 +260,10 @@ input:-webkit-autofill:active {
         }
     }
 }
+
+.form-control {&:read-only {
+    color: $input-disabled-color;
+    background-color: $input-disabled-bg;
+    border-color: $input-disabled-border-color;
+}
+}
