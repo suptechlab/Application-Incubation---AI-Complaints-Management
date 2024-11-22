@@ -64,14 +64,19 @@ const RoleRightsForm = () => {
       });
       setLoading(false);
     } else {
-      setLoading(true);
-      //setUserType('SEPS_USER'); // SEPS_USER/FI_USER
-      fetchModulesAndPermissions(userType).then((response) => {
-        setModules(response.data);
-      });
-      setLoading(false);
+      
     }
-  }, [id, isEdit, userType]);
+  }, [id, isEdit]);
+
+
+  useEffect(() => {
+    setLoading(true);
+    //setUserType('SEPS_USER'); // SEPS_USER/FI_USER
+    fetchModulesAndPermissions(userType).then((response) => {
+      setModules(response.data);
+    });
+    setLoading(false);
+  }, [userType])
 
   // const handleCheckboxChange = (e, module, permission, permissionId) => {
   //     setInitialValues(prevValues => ({
@@ -193,8 +198,12 @@ const RoleRightsForm = () => {
                                         type="radio"
                                         name="userType"
                                         value="SEPS_USER"
-                                        checked={values.userType === 'SEPS_USER'}
-                                        onChange={() => setFieldValue("userType", "SEPS_USER")}
+                                        checked={userType == 'SEPS_USER'}
+                                        onChange={() => {
+                                          setFieldValue("rights", {}); 
+                                          setFieldValue("userType", "SEPS_USER");
+                                          setUserType('SEPS_USER');
+                                        }}
                                       />
                                       {t('SEPS USER')}
                                     </label>
@@ -204,8 +213,13 @@ const RoleRightsForm = () => {
                                         type="radio"
                                         name="userType"
                                         value="FI_USER"
-                                        checked={values.userType === 'FI_USER'}
-                                        onChange={() => setFieldValue("userType", "FI_USER")}
+                                        checked={values.userType == 'FI_USER'}
+                                        onChange={() => {
+                                          
+                                          setFieldValue("rights", {}); 
+                                          setFieldValue("userType", "FI_USER");
+                                          setUserType('FI_USER');
+                                        }}
                                       />
                                       {t('FI USER')}
                                     </label>
@@ -244,7 +258,7 @@ const RoleRightsForm = () => {
                               />
                             </Col>
                           </Row>
-
+                                            {/* <pre>{JSON.stringify(values.rights,null,2)}</pre> */}
                           <div className="mt-2">
                             <h5 className="fw-semibold border-bottom pb-1 mb-3">
                               Ceder derechos
@@ -270,7 +284,8 @@ const RoleRightsForm = () => {
                                             permission.name
                                           ]?.checked || false
                                         }
-                                        onChange={(e) =>
+                                        onChange={(e) => {
+                                          
                                           handleCheckboxChange(
                                             e,
                                             module.name,
@@ -279,7 +294,7 @@ const RoleRightsForm = () => {
                                             values,
                                             setFieldValue
                                           )
-                                        }
+                                        }}
                                         key={permission.id}
                                       />
                                     ))}
