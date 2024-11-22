@@ -19,8 +19,8 @@ export const handleUpdateUser = async (id, data) => {
     return await adminApi.put(`/${API_VERSION}/teams/${id}`, data);
 }
 
-export const handleGetUsers = async (params) => {
-    return await adminApi.get(`/${API_VERSION}/seps-users`, {
+export const handleGetTableData = async (params) => {
+    return await adminApi.get(`/${API_VERSION}/teams`, {
         params
     });
 }

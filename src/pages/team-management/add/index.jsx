@@ -15,7 +15,7 @@ import AppTooltip from "../../../components/tooltip";
 import { getOrganizationList, getTeamMemberList, handleAddUser, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
-export default function TeamManagementEdit() {
+export default function TeamManagementAddEdit() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const { id } = useParams();

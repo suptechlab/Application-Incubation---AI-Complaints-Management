@@ -12,7 +12,7 @@ import GenericModal from "../../../components/GenericModal";
 import ListingSearchForm from "../../../components/ListingSearchForm";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import { handleDeleteUser, handleGetUsers } from "../../../services/user.service";
+import { handleDeleteUser, handleGetTableData } from "../../../services/teamManagment.service";
 
 export default function TeamManagementList() {
 
@@ -46,13 +46,13 @@ export default function TeamManagementList() {
             );
 
             if (sorting.length === 0) {
-                return handleGetUsers({
+                return handleGetTableData({
                     page: pagination.pageIndex,
                     size: pagination.pageSize,
                     ...filterObj,
                 });
             } else {
-                return handleGetUsers({
+                return handleGetTableData({
                     page: pagination.pageIndex,
                     size: pagination.pageSize,
                     sort: sorting
@@ -97,20 +97,20 @@ export default function TeamManagementList() {
     const columns = React.useMemo(
         () => [
             {
-                accessorFn: (row) => row.name,
-                id: "name",
+                accessorFn: (row) => row.teamName,
+                id: "teamName",
                 header: () => t('Team Name'),
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row.roles[0].name ?? "N/A",
-                id: "claimTypeName",
-                header: () => t('DESCRIPTION'),
+                accessorFn: (row) => row.entityType ?? "N/A",
+                id: "entityType",
+                header: () => t('ENTITY NAME'),
                 enableSorting: false,
             },
             {
-                accessorFn: (row) => row.email,
-                id: "email",
+                accessorFn: (row) => row.createdByEmail,
+                id: "createdByEmail",
                 header: () => t('ASSOCIATION'),
                 enableSorting: false,
             },
