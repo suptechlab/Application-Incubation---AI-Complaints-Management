@@ -3,21 +3,20 @@ package com.seps.ticket.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.enums.UserStatusEnum;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.BatchSize;
 
 /**
  * A user.
@@ -35,8 +34,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @NotNull
     @Pattern(regexp = Constants.LOGIN_REGEX)
-    @Size(min = 1, max = 255)
-    @Column(length = 255, unique = true, nullable = false)
+    @Size(min = 1, max = 50)
+    @Column(length = 50, unique = true, nullable = false)
     private String login;
 
     @JsonIgnore
@@ -45,8 +44,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "password_hash", length = 60, nullable = false)
     private String password;
 
-    @Size(max = 255)
-    @Column(name = "first_name", length = 255)
+    @Size(max = 50)
+    @Column(name = "first_name", length = 50)
     private String firstName;
 
     @Size(max = 50)
@@ -54,8 +53,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     private String lastName;
 
     @Email
-    @Size(min = 5, max = 255)
-    @Column(length = 255, unique = true, nullable = false)
+    @Size(min = 5, max = 254)
+    @Column(length = 254, unique = true)
     private String email;
 
     @NotNull
@@ -86,9 +85,9 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-        name = "jhi_user_authority",
-        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")}
+            name = "jhi_user_authority",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")}
     )
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
@@ -129,10 +128,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "identificacion", length = 20)
     private String identificacion;
 
-    @Type(JsonType.class)
-    @Column(name = "identificacion_data", columnDefinition = "jsonb")
-    private String identificacionData;
-
     @Column(name = "organization_id", insertable = false, updatable = false)
     private Long organizationId;
 
@@ -140,18 +135,27 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @JoinColumn(name = "organization_id", updatable = false)
     private Organization organization;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-        name = "user_role",
-        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
-    )
-    @BatchSize(size = 20)
-    private Set<Role> roles = new HashSet<>();
+    @Column(name = "gender", length = 10)
+    private String gender;
+
+    @Column(name = "fingerprint_verified")
+    private boolean fingerprintVerified;
+
+    @Column(name = "fingerprint_verified_at")
+    private Instant fingerprintVerifiedAt;
 
     @Column(name = "department", length = 255)
     private String department;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "user_role",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
+    )
+    @BatchSize(size = 20)
+    private Set<Role> roles = new HashSet<>();
 
 
     public Long getId() {
@@ -307,7 +311,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.currentLoggedIn = currentLoggedIn;
     }
 
-
     public String getCountryCode() {
         return countryCode;
     }
@@ -348,14 +351,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.identificacion = identificacion;
     }
 
-    public String getIdentificacionData() {
-        return identificacionData;
-    }
-
-    public void setIdentificacionData(String identificacionData) {
-        this.identificacionData = identificacionData;
-    }
-
     public Long getOrganizationId() {
         return organizationId;
     }
@@ -372,12 +367,28 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         this.organization = organization;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public String getGender() {
+        return gender;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public boolean isFingerprintVerified() {
+        return fingerprintVerified;
+    }
+
+    public void setFingerprintVerified(boolean fingerprintVerified) {
+        this.fingerprintVerified = fingerprintVerified;
+    }
+
+    public Instant getFingerprintVerifiedAt() {
+        return fingerprintVerifiedAt;
+    }
+
+    public void setFingerprintVerifiedAt(Instant fingerprintVerifiedAt) {
+        this.fingerprintVerifiedAt = fingerprintVerifiedAt;
     }
 
     public String getDepartment() {
@@ -386,6 +397,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override
@@ -409,16 +428,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", activated='" + activated + '\'' +
-            ", langKey='" + langKey + '\'' +
-            ", activationKey='" + activationKey + '\'' +
-            ", status='" + status + '\'' +
-            ", isPasswordSet='" + isPasswordSet + '\'' +
-            "}";
+                "login='" + login + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", activated='" + activated + '\'' +
+                ", langKey='" + langKey + '\'' +
+                ", activationKey='" + activationKey + '\'' +
+                "}";
     }
 }

@@ -8,5 +8,6 @@ public class ClaimTicketResponseDTO {
     private Boolean foundDuplicate;
     private Long duplicateTicketId;
     private Long newTicketId;
+    private Long newId;
     private String email;
 }

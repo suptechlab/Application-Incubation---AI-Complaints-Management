@@ -18,7 +18,8 @@ public enum SepsStatusCode implements StatusType {
     CLAIM_SUB_TYPE_NOT_FOUND(20017, "claim.sub.type.not.found"),
     PROVINCE_NOT_FOUND(20019, "province.not.found"),
     CITY_NOT_FOUND(20019, "city.not.found"),
-    ORGANIZATION_NOT_FOUND(20030, "organization.not.found");
+    ORGANIZATION_NOT_FOUND(20030, "organization.not.found"),
+    CLAIM_TICKET_NOT_FOUND(40010, "claim.ticket.not.found");
 
     private final int code;
 

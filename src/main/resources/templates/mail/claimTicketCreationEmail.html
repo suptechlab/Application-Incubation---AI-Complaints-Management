@@ -1,0 +1,47 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+<head>
+  <title th:text="#{email.claim.creation.title}">Claim Ticket Created</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
+</head>
+<body>
+<p th:text="#{email.claim.creation.greeting(${userName})}">Dear User,</p>
+
+<p th:text="#{email.claim.creation.text1(${ticketId})}">
+  Your claim ticket with ID #1732268731 has been successfully created. Below are the claim details:
+</p>
+
+<p>
+  <strong th:text="#{email.claim.creation.details}">Claim Details:</strong>
+</p>
+<ul>
+  <li>
+    <strong th:text="#{email.claim.creation.type}">Claim Type:</strong>
+    <span th:text="${claimType}">Credit Portfolio</span>
+  </li>
+  <li>
+    <strong th:text="#{email.claim.creation.subtype}">Claim Subtype:</strong>
+    <span th:text="${claimSubType}">Refinancing Request</span>
+  </li>
+  <li>
+    <strong th:text="#{email.claim.creation.priority}">Priority:</strong>
+    <span th:text="${priority}">Medium</span>
+  </li>
+  <li>
+    <strong th:text="#{email.claim.creation.status}">Status:</strong>
+    <span th:text="${status}">New</span>
+  </li>
+</ul>
+<p>
+  <a th:with="url=(@{|${baseUrlUser}/my-account/${ticketId}|})"
+     th:href="${url}"
+     th:text="#{email.claim.creation.link.text}">View Claim Details</a>
+</p>
+<p>
+  <span th:text="#{email.claim.creation.regards}">Regards,</span>
+  <br/>
+  <em th:text="#{email.signature}">Support Team</em>
+</p>
+</body>
+</html>
