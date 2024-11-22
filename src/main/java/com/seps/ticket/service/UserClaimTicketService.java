@@ -64,14 +64,16 @@ public class UserClaimTicketService {
         // Check for duplicate tickets
         if (Boolean.TRUE.equals(claimTicketRequest.getCheckDuplicate())) {
             List<ClaimTicket> duplicateTickets = claimTicketRepository.findByUserIdAndClaimTypeIdAndClaimSubTypeIdAndOrganizationId(
-                currentUserId,
-                claimTicketRequest.getClaimTypeId(),
-                claimTicketRequest.getClaimSubTypeId(),
-                claimTicketRequest.getOrganizationId()
+                    currentUserId,
+                    claimTicketRequest.getClaimTypeId(),
+                    claimTicketRequest.getClaimSubTypeId(),
+                    claimTicketRequest.getOrganizationId()
             );
 
             if (!duplicateTickets.isEmpty()) {
-                ClaimTicket duplicateTicket = duplicateTickets.stream().findAny().get();
+                ClaimTicket duplicateTicket = duplicateTickets.stream()
+                        .findAny()
+                        .orElseThrow(() -> new IllegalStateException("Duplicate ticket expected but not found."));
                 responseDTO.setFoundDuplicate(true);
                 responseDTO.setDuplicateTicketId(duplicateTicket.getTicketId());
                 return responseDTO;
@@ -80,19 +82,19 @@ public class UserClaimTicketService {
         responseDTO.setFoundDuplicate(false);
         // Fetch and validate associated entities
         Province province = provinceRepository.findById(claimTicketRequest.getProvinceId())
-            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PROVINCE_NOT_FOUND, null, null));
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PROVINCE_NOT_FOUND, null, null));
 
         City city = cityRepository.findByIdAndProvinceId(claimTicketRequest.getCityId(), claimTicketRequest.getProvinceId())
-            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CITY_NOT_FOUND, null, null));
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CITY_NOT_FOUND, null, null));
 
         Organization organization = organizationRepository.findById(claimTicketRequest.getOrganizationId())
-            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_NOT_FOUND, null, null));
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_NOT_FOUND, null, null));
 
         ClaimType claimType = claimTypeRepository.findById(claimTicketRequest.getClaimTypeId())
-            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TYPE_NOT_FOUND, null, null));
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TYPE_NOT_FOUND, null, null));
 
         ClaimSubType claimSubType = claimSubTypeRepository.findByIdAndClaimTypeId(claimTicketRequest.getClaimSubTypeId(), claimTicketRequest.getClaimTypeId())
-            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_SUB_TYPE_NOT_FOUND, null, null));
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_SUB_TYPE_NOT_FOUND, null, null));
 
         // Create and save the new claim ticket
         ClaimTicket newClaimTicket = new ClaimTicket();
