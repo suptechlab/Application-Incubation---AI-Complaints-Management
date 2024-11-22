@@ -1,8 +1,13 @@
 package com.seps.ticket.web.rest.v1;
 
-import com.seps.ticket.service.ClaimTicketService;
-import com.seps.ticket.service.dto.TicketDTO;
+import com.seps.ticket.service.UserClaimTicketService;
+import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,18 +20,29 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/user/claim-tickets")
 public class UserClaimTicketResource {
 
-    private final ClaimTicketService claimTicketService;
+    private final UserClaimTicketService userClaimTicketService;
 
-    public UserClaimTicketResource(ClaimTicketService claimTicketService) {
-        this.claimTicketService = claimTicketService;
+    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService) {
+        this.userClaimTicketService = userClaimTicketService;
     }
 
+
+    @Operation(
+        summary = "File a claim API",
+        description = "Allows a user to file a claim.",
+        tags = {"File Claim"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Claimed file successfully.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ClaimTicketResponseDTO.class))),
+    })
     // Endpoint for Users to create a claim ticket
     @PostMapping("/file-claim")
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<TicketDTO> fileClaim(@RequestBody @Valid ClaimTicketRequest claimTicketRequest) {
-        TicketDTO createdTicket = claimTicketService.createTicket(claimTicketRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTicket);
+    public ResponseEntity<ClaimTicketResponseDTO> fileClaim(@RequestBody @Valid ClaimTicketRequest claimTicketRequest) {
+        ClaimTicketResponseDTO claimTicketResponseDTO = userClaimTicketService.fileClaim(claimTicketRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(claimTicketResponseDTO);
     }
 
 }

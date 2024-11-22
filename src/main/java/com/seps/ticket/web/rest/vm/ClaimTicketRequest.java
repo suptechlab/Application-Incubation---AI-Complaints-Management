@@ -1,5 +1,7 @@
 package com.seps.ticket.web.rest.vm;
 
+import com.seps.ticket.enums.CustomerTypeEnum;
+import com.seps.ticket.enums.PriorityCareGroupEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +30,22 @@ public class ClaimTicketRequest {
     private Long provinceId;
     @NotNull
     private Long cityId;
-
+    @NotNull
+    private PriorityCareGroupEnum priorityCareGroup;
+    @NotNull
+    private CustomerTypeEnum customerType;
+    @NotNull
+    private Long organizationId;
+    @NotNull
+    private Long claimTypeId;
+    @NotNull
+    private Long claimSubTypeId;
+    @NotBlank
+    @Size(max = 1024)
+    private String precedents;
+    @NotBlank
+    @Size(max = 1024)
+    private String specificPetition;
     // Getters and Setters
+    private Boolean checkDuplicate = true;
 }

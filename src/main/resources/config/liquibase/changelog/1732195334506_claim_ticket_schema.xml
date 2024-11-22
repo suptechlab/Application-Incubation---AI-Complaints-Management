@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1732195334506" author="matellio">
+    <createTable tableName="claim_ticket">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <!-- Unique ticket identifier -->
+      <column name="ticket_id" type="int" remarks="Unique ticket identifier for referencing the claim ticket">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <!-- User ID -->
+      <column name="user_id" type="bigint" remarks="User ID of the claimant">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Province of residence for the claimant -->
+      <column name="province_id" type="bigint" remarks="Province of residence of the claimant">
+        <constraints nullable="false"/>
+      </column>
+      <!-- City (Canton) of residence for the claimant -->
+      <column name="city_id" type="bigint" remarks="City (Canton) of residence for the claimant">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Entity or financial institution associated with the claim -->
+      <column name="organization_id" type="bigint" remarks="Entity or financial institution linked to the claim">
+        <constraints nullable="false"/>
+      </column>
+      <!-- ID of the claim type -->
+      <column name="claim_type_id" type="bigint" remarks="Identifies the type of the claim">
+        <constraints nullable="false"/>
+      </column>
+      <!-- ID of the claim subtype -->
+      <column name="claim_sub_type_id" type="bigint" remarks="Identifies the subtype of the claim">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Priority care group (Enum stored as INT) -->
+      <column name="priority_care_group" type="int"
+              remarks="Priority care group assigned to the claimant (e.g., pregnant women, children, etc.)">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Customer type (Enum stored as INT) -->
+      <column name="customer_type" type="int"
+              remarks="Type of customer (e.g., Partner Associate, Legal Representative, etc.)">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Precedents of the claimant -->
+      <column name="precedents" type="text" remarks="Historical precedents related to the claimant">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Specific petition made by the claimant -->
+      <column name="specific_petition" type="text"
+              remarks="Details of the specific petition or request made by the claimant">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Priority level of the ticket (Enum stored as INT) -->
+      <column name="priority" type="int" remarks="Priority level of the ticket (e.g., high, medium, low)">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Date when the SLA breach occurs -->
+      <column name="sla_breach_date" type="date" remarks="Date on which SLA breach occurs for the claim">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Number of days after SLA breach -->
+      <column name="sla_breach_days" type="int" remarks="Number of days elapsed after the SLA breach">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Financial Institute (FI) agent handling the ticket -->
+      <column name="fi_agent_id" type="bigint"
+              remarks="Financial Institute (FI) agent responsible for handling the ticket">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the ticket was assigned -->
+      <column name="assigned_at" type="timestamp" remarks="Timestamp when the claim ticket was assigned to an agent">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Status of the claim (Enum stored as INT) -->
+      <column name="status" type="int"
+              remarks="Current status of the claim ticket (e.g., NEW, ASSIGNED, IN_PROGRESS, etc.)">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Sub-status of the claim, based on REJECTED and CLOSED statuses (Enum stored as INT) -->
+      <column name="sub_status" type="int" remarks="Sub-status of the claim ticket (e.g., REJECTED, CLOSED, etc.)">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Status comment or notes while closing or rejecting the ticket -->
+      <column name="status_comment" type="text"
+              remarks="Comment or note added while closing or rejecting the claim ticket">
+        <constraints nullable="true"/>
+      </column>
+      <!-- User who created the ticket -->
+      <column name="created_by" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Timestamp when the ticket was created -->
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <!-- User who last updated the ticket -->
+      <column name="updated_by" type="bigint">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the ticket was last updated -->
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+    <!-- Foreign Key constraint for user_id linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="user_id"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_user_id"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+    <!-- Foreign Key constraint for province_id linking to the province table -->
+    <addForeignKeyConstraint baseColumnNames="province_id"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_province_id"
+                             referencedColumnNames="id"
+                             referencedTableName="province"/>
+
+    <!-- Foreign Key constraint for city_id linking to the city table -->
+    <addForeignKeyConstraint baseColumnNames="city_id"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_city_id"
+                             referencedColumnNames="id"
+                             referencedTableName="city"/>
+
+    <!-- Foreign Key constraint for organization_id linking to the organization table -->
+    <addForeignKeyConstraint baseColumnNames="organization_id"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_organization_id"
+                             referencedColumnNames="id"
+                             referencedTableName="organization"/>
+
+    <!-- Foreign Key constraint for claim_type_id linking to the claim_type table -->
+    <addForeignKeyConstraint baseColumnNames="claim_type_id"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_claim_type_id"
+                             referencedColumnNames="id"
+                             referencedTableName="claim_type"/>
+
+    <!-- Foreign Key constraint for claim_sub_type_id linking to the claim_sub_type table -->
+    <addForeignKeyConstraint baseColumnNames="claim_sub_type_id"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_claim_sub_type_id"
+                             referencedColumnNames="id"
+                             referencedTableName="claim_sub_type"/>
+
+    <!-- Foreign Key constraint for fi_agent_id linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="fi_agent_id"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_fi_agent_id"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+    <!-- Foreign Key constraint for created_by linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="created_by"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_created_by"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+    <!-- Foreign Key constraint for updated_by linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="updated_by"
+                             baseTableName="claim_ticket"
+                             constraintName="fk_claim_ticket_updated_by"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+  </changeSet>
+  <changeSet id="1732199533801" author="matellio">
+    <renameColumn tableName="claim_ticket" oldColumnName="sub_status" newColumnName="closed_status"
+                  remarks="Closed status"/>
+    <addColumn tableName="claim_ticket">
+      <column name="rejected_status" type="int" remarks="rejected status">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+  <changeSet id="1732201075289" author="matellio">
+    <modifyDataType tableName="claim_ticket" columnName="ticket_id" newDataType="bigint"/>
+  </changeSet>
+</databaseChangeLog>
