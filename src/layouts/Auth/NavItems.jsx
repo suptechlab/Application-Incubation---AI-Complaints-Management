@@ -133,7 +133,7 @@ export const NavItems = () => {
       menuIcon: <MdConfirmationNumber size={20} />,
       path: "/tickets",
       roleName: "admin",
-      disabled: true,
+      disabled: false,
     },
     {
       id: 6,

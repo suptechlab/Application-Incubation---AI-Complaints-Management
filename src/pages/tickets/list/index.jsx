@@ -3,7 +3,7 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
@@ -13,6 +13,7 @@ import TicketsListFilters from "./filters";
 
 export default function TicketsList() {
     const location = useLocation();
+    const navigate = useNavigate();
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -116,7 +117,8 @@ export default function TicketsList() {
 
     //Add New Click Hanlder
     const addNewClickHanlder = () => {
-        console.log('Soon...')
+        // navigate tickets/view/1
+        navigate('/tickets/view/1')
     }
 
     // Info Cards Data
