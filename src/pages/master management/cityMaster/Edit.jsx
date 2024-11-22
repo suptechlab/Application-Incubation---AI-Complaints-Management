@@ -1,18 +1,16 @@
 import { Form, Formik } from "formik";
 import React from "react";
-import FormInput from "../../../components/FormInput";
 import { Button, Modal } from "react-bootstrap";
+import FormInput from "../../../components/FormInput";
 // import { handleAddDistrict } from "../../../services/district.service";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import ReactSelect from "../../../components/ReactSelect";
-import { validationSchema } from "../../../validations/cityMaster.validation";
 import { useTranslation } from "react-i18next";
+import ReactSelect from "../../../components/ReactSelect";
 import { editCity } from "../../../services/cityMaster.service";
+import { validationSchema } from "../../../validations/cityMaster.validation";
 
 const Edit = ({ modal, toggle, provinces, dataQuery, rowData }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const handleSubmit = async (values, actions) => {
     const formData = {
       name: values?.name ?? "",
@@ -82,7 +80,7 @@ const Edit = ({ modal, toggle, provinces, dataQuery, rowData }) => {
                 name="name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                touched={touched.cityName}
+                touched={touched.name}
                 type="text"
                 value={values?.name || ""}
               />
@@ -91,9 +89,9 @@ const Edit = ({ modal, toggle, provinces, dataQuery, rowData }) => {
                 options={provinces ?? []}
                 value={values?.provinceId}
                 onChange={(option) => {
-                  setFieldValue("province", option?.target?.value ?? "");
+                  setFieldValue("provinceId", option?.target?.value ?? "");
                 }}
-                name="province"
+                name="provinceId"
                 label={t("PROVINCE")}
                 className={`${touched?.provinceId && errors?.provinceId ? "is-invalid" : ""
                   } mb-3 pb-1`}

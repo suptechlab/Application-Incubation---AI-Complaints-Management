@@ -93,38 +93,47 @@ const CityMaster = () => {
   };
 
   // FETCH DATA
+
+
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-
-      if (sorting?.length === 0) {
-        return handleGetCities({
+    queryFn: async () => {
+      setLoading(true); // Start loading
+  
+      try {
+        // Clean up the filter object to remove empty strings and null values
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach(key => {
+          if (filterObj[key] === "") delete filterObj[key];
+        });
+  
+        const requestOptions = {
           page: pagination.pageIndex,
           size: pagination.pageSize,
           ...filterObj,
-        });
-      } else {
-        return handleGetCities({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map(
-              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-            )
-            .join(","),
-          ...filterObj,
-        });
+        };
+  
+        // Handle sorting if applicable
+        if (sorting.length > 0) {
+          requestOptions.sort = sorting
+            .map(sort => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+            .join(",");
+        }
+  
+        // Fetch data using handleGetProvinceMaster API call
+        const response = await handleGetCities(requestOptions);
+        return response;
+      } finally {
+        setLoading(false); // Ensure loading state is reset
       }
     },
-    staleTime: 0, // Data is always stale, so it refetches
+    onError: () => setLoading(false), // Reset loading state on error
+    staleTime: 0, // Data is always considered stale
     cacheTime: 0, // Cache expires immediately
     refetchOnWindowFocus: false, // Disable refetching on window focus
     refetchOnMount: false, // Prevent refetching on component remount
-    retry: 0, //Disable retry on failure
+    retry: 0, // Disable automatic retries to prevent multiple calls on error
   });
-
 
   //CITY STATUS UPDATE FUNCTION
   const changeStatus = async (id, currentStatus) => {
@@ -228,7 +237,7 @@ const CityMaster = () => {
   // EXPORT TO CSV CLICK HANDLER
   const exportHandler = () => {
     setDownloading(true)
-    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
+    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading ?? false})
     downloadCityList({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -297,14 +306,13 @@ const CityMaster = () => {
     getProvinceDropdownData()
   }, [])
 
-
   return (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
       <Loader isLoading={isLoading} />
       <PageHeader
         title={t("CITY MASTER")}
         actions={[
-          {  label: "Export to CSV", onClick: exportHandler, variant: "outline-dark",disabled : isDownloading ?? false},
+          {  label: "Export to CSV", onClick: exportHandler, variant: "outline-dark",disabled : isDownloading ? true : false},
           { label: "Add New", onClick: toggle, variant: "warning" },
         ]}
       />

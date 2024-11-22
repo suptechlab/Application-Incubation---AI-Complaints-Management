@@ -4,7 +4,7 @@ import { getValidationMessages } from "../services/Validation.service";
 const msg = getValidationMessages();
 
 // Define the regex pattern for Spanish characters
-const SPANISH_CHARACTERS_REGEX = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]*$/;
+const SPANISH_CHARACTERS_REGEX =  /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s,]*$/;
 
 const validationSchema = Yup.object({
   name: Yup.string()
