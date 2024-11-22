@@ -5,8 +5,10 @@ import { MdMoreVert, MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import AppTooltip from '../../../../components/tooltip';
 import AddAttachmentsModal from '../../modals/addAttachmentsModal';
+import { useTranslation } from 'react-i18next';
 
 const TicketViewHeader = ({ title = "" }) => {
+    const { t } = useTranslation();
     const [selectedStatus, setSelectedStatus] = useState('In Progress');
     const [addAttachmentsModalShow, setAddAttachmentsModalShow] = useState(false);
 
@@ -54,6 +56,12 @@ const TicketViewHeader = ({ title = "" }) => {
                     </h1>
 
                     <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
+                        <Link
+                            to={"/tickets"}
+                            className="btn btn-outline-dark custom-min-width-85"
+                        >
+                            {t("BACK")}
+                        </Link>
                         <Dropdown>
                             <Dropdown.Toggle
                                 id="ticket-detail-status"

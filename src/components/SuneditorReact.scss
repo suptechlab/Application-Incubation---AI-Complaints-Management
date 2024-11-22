@@ -12,10 +12,10 @@
         border-color: var(--bs-border-color);
 
         .se-toolbar {
+            background: rgba(var(--bs-tertiary-bg-rgb), var(--bs-bg-opacity));
             border-top-left-radius: var(--bs-border-radius);
             border-top-right-radius: var(--bs-border-radius);
             outline-width: 0;
-            background-color: var(--bs-white);
             border-bottom: 1px solid var(--bs-border-color);
         }
 

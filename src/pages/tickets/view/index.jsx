@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Col, Dropdown, Image, Row, Stack } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
+import { Card, Col, Dropdown, Image, ListGroup, Row, Stack } from 'react-bootstrap';
 import { MdArrowDropDown, MdAttachFile, MdCalendarToday } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
@@ -13,7 +12,6 @@ import TicketViewHeader from './header';
 import TicketTabsSection from './tabs';
 
 const TicketsView = () => {
-  const { t } = useTranslation();
   const [selectedPriority, setSelectedPriority] = useState('Low');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
@@ -136,6 +134,34 @@ const TicketsView = () => {
     },
   ];
 
+  //Chat Reply Data
+  const chatReplyData = [
+    {
+      id: 1,
+      name: "John Smith",
+      action: <>added Internal Note</>,
+      date: "07-14-24 | 10:00 am",
+      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
+      avatar: defaultAvatar,
+    },
+    {
+      id: 2,
+      name: "John Smith",
+      action: <>replied & tagged <Link to="/" className='text-decoration-none fw-bold'>Kyle</Link></>,
+      date: "07-14-24 | 10:00 am",
+      message: <>Thanks i will update <Link to="/" className='text-decoration-none'>@Kyle</Link> about the same.</>,
+      avatar: defaultAvatar,
+    },
+    {
+      id: 3,
+      name: "Carlos P",
+      action: <>replied</>,
+      date: "07-14-24 | 10:00 am",
+      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
+      avatar: defaultAvatar,
+    },
+  ];
+
   return (
     <React.Fragment>
       <Loader isLoading={false} />
@@ -143,10 +169,10 @@ const TicketsView = () => {
         <TicketViewHeader
           title="#52541"
         />
-        <div className='d-flex flex-column flex-grow-1'>
-          <Row className='h-100 gy-3 gy-lg-0 gx-3 pb-3'>
-            <Col lg={6}>
-              <Card className="border-0 shadow h-100">
+        <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
+          <Row className='h-100 gy-3 gy-lg-0 gx-3'>
+            <Col lg={6} className='mh-100'>
+              <Card className="border-0 shadow h-100 overflow-auto">
                 <Card.Body>
                   <Row>
                     {viewTopData?.map((item, index) => (
@@ -158,7 +184,7 @@ const TicketsView = () => {
                 </Card.Body>
               </Card>
             </Col>
-            <Col lg={6}>
+            <Col lg={6} className='mh-100 d-flex flex-column'>
               <Card className="border-0 shadow">
                 <Card.Header className='bg-body border-0 py-3'>
                   <Row className='g-2'>
@@ -182,47 +208,37 @@ const TicketsView = () => {
                 </Card.Header>
                 <TicketTabsSection />
               </Card>
-              <Card className="border-0 shadow mt-3">
-                <Card.Body>
-                  <Row className='g-2'>
-                    <Col xs="auto">
-                      <Image
-                        className="object-fit-cover rounded-circle"
-                        src={defaultAvatar}
-                        width={36}
-                        height={36}
-                        alt="John Smith"
-                      />
-                    </Col>
-                    <Col xs className='small lh-sm'>
-                      <div className='fw-bold'>John Smith <span className='fw-normal'>added Internal Note</span></div>
-                      <Stack direction='horizontal' gap={2} className='text-secondary'>
-                        <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                        <span>07-14-24 | 10:00 am </span>
-                      </Stack>
-                      <p className='mt-2 mb-0'>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
-                    </Col>
-                  </Row>
+              <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                <Card.Body className='py-0'>
+                  <ListGroup variant="flush">
+                    {chatReplyData.map((reply) => (
+                      <ListGroup.Item key={reply.id} className='py-3'>
+                        <Row className='g-2'>
+                          <Col xs="auto">
+                            <Image
+                              className="object-fit-cover rounded-circle"
+                              src={reply.avatar}
+                              width={36}
+                              height={36}
+                              alt={reply.name}
+                            />
+                          </Col>
+                          <Col xs className='small lh-sm'>
+                            <div className='fw-bold'>{reply.name} <span className='fw-normal'>{reply.action}</span></div>
+                            <Stack direction='horizontal' gap={2} className='text-secondary'>
+                              <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                              <span>{reply.date}</span>
+                            </Stack>
+                            <p className='mt-2 mb-0'>{reply.message}</p>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
                 </Card.Body>
               </Card>
             </Col>
           </Row>
-        </div>
-
-        <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3 bg-body">
-          <Stack
-            direction="horizontal"
-            gap={3}
-            className="justify-content-end flex-wrap"
-          >
-            <Link
-              to={"/tickets"}
-              className="btn btn-outline-dark custom-min-width-85"
-            >
-              {t("BACK")}
-            </Link>
-
-          </Stack>
         </div>
       </div>
 
