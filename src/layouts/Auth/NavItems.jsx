@@ -11,7 +11,7 @@ export const NavItems = () => {
       menuName: "dashboard",
       title: t("DASHBOARD"),
       menuIcon: <MdDashboard size={20} />,
-      path: "/",
+      path: "/dashboard",
       roleName: "admin",
       disabled: false,
     },
