@@ -5,12 +5,18 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-  <changeSet id="1731950291396" author="matellio" labels="data">
+  <changeSet id="1731950291396-1" author="matellio" labels="data">
 
     <!-- Truncate tables before loading data -->
     <sql>
       TRUNCATE TABLE inquiry_sub_type CASCADE;
       TRUNCATE TABLE inquiry_type CASCADE;
+    </sql>
+
+    <!-- Reset sequences -->
+    <sql>
+      ALTER SEQUENCE inquiry_sub_type_id_seq RESTART WITH 1;
+      ALTER SEQUENCE inquiry_type_id_seq RESTART WITH 1;
     </sql>
 
     <!-- Load data into tables -->
@@ -37,6 +43,15 @@
       <column name="created_at" type="timestamp"/>
       <column name="updated_at" type="timestamp"/>
     </loadData>
+
+  </changeSet>
+  <changeSet id="1731950291396-2" author="matellio" labels="data">
+
+    <!-- Update sequences based on current max ID -->
+    <sql>
+      SELECT setval('inquiry_sub_type_id_seq', (SELECT MAX(id) FROM inquiry_type), true);
+      SELECT setval('inquiry_type_id_seq', (SELECT MAX(id) FROM inquiry_sub_type), true);
+    </sql>
 
   </changeSet>
 </databaseChangeLog>

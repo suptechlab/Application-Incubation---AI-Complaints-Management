@@ -2,6 +2,7 @@ package com.seps.user.web.rest.v1;
 
 import com.seps.user.service.*;
 import com.seps.user.service.dto.DropdownListDTO;
+import com.seps.user.service.dto.OrganizationDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -197,8 +198,8 @@ public class MasterResource {
     @Operation(summary = "GET the organization list", description = "GET the organization list.")
     @ApiResponse(responseCode = "200", description = "Organization list fetched successfully")
     @GetMapping("/organization-list")
-    public ResponseEntity<List<DropdownListDTO>> getOrganizationInfoInfoList() {
-        List<DropdownListDTO> orgList = organizationService.fetchOrganizationList();
+    public ResponseEntity<List<OrganizationDTO>> getOrganizationInfoInfoList() {
+        List<OrganizationDTO> orgList = organizationService.fetchOrganizationList();
         return ResponseEntity.ok(orgList);
     }
 }
