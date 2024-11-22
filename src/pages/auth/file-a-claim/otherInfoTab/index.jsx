@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Modal, Row, Stack } from 'react-bootstrap';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
 import FormInputBox from '../../../../components/FormInput';
@@ -9,15 +9,17 @@ import { useTranslation } from 'react-i18next';
 
 const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
-    const { customer_types, priority_care_group } = useSelector((state) => state?.masterSlice)
+    const { customer_types, priority_care_group, organizational_units } = useSelector((state) => state?.masterSlice)
 
-    const {t} = useTranslation()
+    const [selectedRuc , setSelectedRuc] = useState('')
+
+    const { t } = useTranslation()
 
     // Initial Values
     const initialValues = {
         priorityCareGroup: '',
         customerType: '',
-        entityName: '',
+        organizationId: '',
         entitysTaxID: '',
     };
 
@@ -27,7 +29,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
     };
     return (
         <CommonFormikComponent
-            // validationSchema={OtherInfoFormSchema}
+            validationSchema={OtherInfoFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
         >
@@ -101,27 +103,35 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("ENTITY_NAME")}
-                                    error={formikProps.errors.entityName}
+                                    error={formikProps.errors.organizationId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
-                                        { label: t("OPTION_1"), value: "option-1" },
+                                        ...organizational_units.map((group) => ({
+                                            label: group.label, // Ensure group has a `label` property
+                                            value: group.value, // Ensure group has a `value` property
+                                        })),
                                     ]}
-                                    value={formikProps.values.entityName}
+                                    value={formikProps.values.organizationId}
                                     onChange={(option) => {
+
+                                        const selectedUnit = organizational_units.find(
+                                            (unit) => unit.value === option?.target?.value
+                                        )
+                                        setSelectedRuc(selectedUnit?.label)
                                         formikProps.setFieldValue(
-                                            "entityName",
+                                            "organizationId",
                                             option?.target?.value ?? ""
                                         );
                                     }}
-                                    name="entityName"
+                                    name="organizationId"
                                     className={
-                                        formikProps.touched.entityName &&
-                                            formikProps.errors.entityName
+                                        formikProps.touched.organizationId &&
+                                            formikProps.errors.organizationId
                                             ? "is-invalid"
                                             : ""
                                     }
                                     onBlur={formikProps.handleBlur}
-                                    touched={formikProps.touched.entityName}
+                                    touched={formikProps.touched.organizationId}
                                 />
                             </Col>
                             <Col lg={6}>
@@ -134,7 +144,8 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                     onBlur={formikProps.handleBlur}
                                     onChange={formikProps.handleChange}
                                     touched={formikProps.touched.entitysTaxID}
-                                    value={formikProps.values.entitysTaxID || ""}
+                                    value={selectedRuc || ""}
+                                    readOnly={true}
                                 />
                             </Col>
                         </Row>

@@ -6,6 +6,9 @@ const initialState = {
   customer_types: [],
   priority_care_group: [],
   claim_types: [],
+  province_list: [],
+  city_list: [],
+  organizational_units: [],
   loading: false,
   error: null,
 };
@@ -15,7 +18,7 @@ const formatGeneralData = (data) =>
   Object.entries(data).map(([key, value]) => ({ label: value, value: key }));
 
 // HELPER FUNCTION TO FORMAT CLAM DATA FOR DROPDOWN
-const formatClaimData = (data) =>
+const formatListData = (data) =>
   data.map((item) => ({ label: item.name, value: item.id }));
 
 // Async Thunk to fetch and format all dropdown data
@@ -26,23 +29,34 @@ export const fetchMasterData = createAsyncThunk(
       const responses = await Promise.all([
         userApi.get(EndPoint.MASTER_DATA_API), // Customer types and priority care groups
         userApi.get(EndPoint.MASTER_CLAIM_TYPE_LIST), // Claim types
-        // userApi.post(EndPoint.MASTER_CLAIM_SUB_TYPE_LIST), // Claim sub-types
+        userApi.get(EndPoint.MASTER_ORGANIZATIONAL_UNIT), // Organizational unit
+        userApi.get(EndPoint.MASTER_PROVINCE_LIST), // Province list
       ]);
 
-      const [masterDataResponse, claimTypesResponse] = responses;
+      const [
+        masterDataResponse,
+        claimTypesResponse,
+        organizationalUnitResponse,
+        provinceListResponse,
+      ] = responses;
 
       return {
         customer_types: formatGeneralData(masterDataResponse.data.customerType),
         priority_care_group: formatGeneralData(masterDataResponse.data.priorityCareGroup),
-        claim_types: formatClaimData(claimTypesResponse.data),
+        claim_types: formatListData(claimTypesResponse.data),
+        organizational_units: formatListData(organizationalUnitResponse.data),
+        province_list: formatListData(provinceListResponse.data),
       };
     } catch (error) {
+      console.log({ ERROR: error })
       return rejectWithValue(
         error.response?.data?.message || error.message || "Failed to fetch master data"
       );
     }
   }
 );
+
+
 
 // FETCH CLAIM SUB TYPES
 export const fetchClaimSubTypes = createAsyncThunk(
@@ -64,6 +78,28 @@ export const fetchClaimSubTypes = createAsyncThunk(
     }
   }
 );
+
+// FETCH CITY LIST
+export const fetchCityList = createAsyncThunk(
+  'masterDropdownData/fetchCityList',
+  async (provinceId, { rejectWithValue }) => {
+    try {
+      const response = await userApi.get(`${EndPoint.MASTER_CITY_LIST}/${provinceId}`,);
+
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to fetch claim sub-types');
+      }
+
+      return response.data.map((item) => ({
+        label: item.name,
+        value: item.id,
+      })); // Format the response to [{label, value},...]
+    } catch (error) {
+      return rejectWithValue(error.message || 'Something went wrong');
+    }
+  }
+);
+
 // Slice to manage dropdown data
 const masterSlice = createSlice({
   name: "masterDropdownData",
@@ -80,7 +116,8 @@ const masterSlice = createSlice({
         state.customer_types = action.payload.customer_types;
         state.priority_care_group = action.payload.priority_care_group;
         state.claim_types = action.payload.claim_types;
-        state.claim_sub_types = action.payload.claim_sub_types;
+        state.province_list = action.payload.province_list
+        state.organizational_units = action.payload.organizational_units
       })
       .addCase(fetchMasterData.rejected, (state, action) => {
         state.loading = false;
@@ -94,9 +131,23 @@ const masterSlice = createSlice({
       })
       .addCase(fetchClaimSubTypes.fulfilled, (state, action) => {
         state.loading = false;
-        state.claim_sub_types = action.payload;
+        // state.claim_sub_types = action.payload;
       })
       .addCase(fetchClaimSubTypes.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // FETCH CITY LIST
+    builder
+      .addCase(fetchCityList.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCityList.fulfilled, (state, action) => {
+        state.loading = false;
+        // state.claim_sub_types = action.payload;
+      })
+      .addCase(fetchCityList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -1,9 +1,13 @@
 import React from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import SvgIcons from '../../../../components/SVGIcons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
-const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormBack }) => {
+const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormBack ,fileClaimData}) => {
+
+    const navigate = useNavigate()
+
+    
     return (
         <Modal
             show={handleShow}
@@ -20,7 +24,7 @@ const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormB
                     <div className='mb-3' aria-label='Success Launch Icon'>{SvgIcons.alertIcon}</div>
                     <h2 className='fw-bold'>Alert!</h2>
                     <h6 className='fw-semibold'>It looks like a duplicate entry and will be rejected by the authority.</h6>
-                    <div className='custom-font-size-18 fw-semibold text-danger mb-2'>Duplicate Claim ID. #52587</div>
+                    <div className='custom-font-size-18 fw-semibold text-danger mb-2'>Duplicate Claim ID. {fileClaimData?.newTicketId}</div>
                     <p className='lh-sm small mb-3 py-1'>Are you sure you want to file this claim?</p>
                     <Button
                         type="button"
@@ -33,7 +37,7 @@ const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormB
                     <Button
                         type="button"
                         variant="link"
-                        onClick={handleFormBack}
+                        onClick={()=>{handleClose() ; navigate('/my-account')}}
                         className='mt-3 text-black p-0 border-0 text-decoration-none fw-medium custom-font-size-12'
                     >
                         No, let me verify existing Claim

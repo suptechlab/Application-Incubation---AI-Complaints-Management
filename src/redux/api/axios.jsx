@@ -77,3 +77,4 @@ export const createAxiosInstance = (baseURL) => {
 // Usage example: creating an Axios instance for user API
 export const userApi = createAxiosInstance(`${process.env.REACT_APP_USER_API_URL}`);
 export const authApi = createAxiosInstance(`${process.env.REACT_APP_AUTH_API_URL}`);
+export const ticketsApi = createAxiosInstance(`${process.env.REACT_APP_TICKET_API_URL}`);

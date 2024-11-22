@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Modal, Row, Stack } from 'react-bootstrap';
 import { FiInfo } from 'react-icons/fi';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
@@ -7,30 +7,60 @@ import AppTooltip from '../../../../components/tooltip';
 import { BasicInfoFormSchema } from '../../validations';
 import ReactSelect from '../../../../components/ReactSelect';
 import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { countryCodes } from '../../../../constants/CountryCodes';
+import { fetchCityList } from '../../../../redux/slice/masterSlice';
 
 const BasicInfoTab = ({ handleFormSubmit }) => {
 
 
-    const {t} = useTranslation()
+    const dispatch = useDispatch()
+
+    const { user } = useSelector((state) => state?.authSlice)
+    const { province_list } = useSelector((state) => state?.masterSlice)
+    const formattedCountryCodes = countryCodes.map(country => ({
+        value: country?.value,
+        label: country?.value
+      }));
+    
+
+    const { t } = useTranslation()
+
+
+    const [cityList , setCityList] = useState([])
+
 
     // Initial Values
     const initialValues = {
-        nationalID: '',
-        email: '',
-        name: '',
-        gender: '',
-        cellphone: '',
-        provinceOfResidence: '',
-        cantonOfResidence: '',
+        identificacion: user?.identificacion ?? '',
+        email: user?.email ?? '',
+        name: user?.name ?? '',
+        gender: user?.gender ?? '',
+        countryCode: '',
+        phoneNumber: '',
+        provinceId: '',
+        cityId: '',
     };
-
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
         handleFormSubmit(values, actions);
     };
+
+    const getCityList = async (provinceId) => {
+        const response = await dispatch(fetchCityList(provinceId))
+
+        if (fetchCityList.fulfilled.match(response)) {
+
+            setCityList(response?.payload)
+
+        } else {
+            console.error('Sub types error:', response.error.message);
+        }
+    }
+
     return (
         <CommonFormikComponent
-            // validationSchema={BasicInfoFormSchema}
+            validationSchema={BasicInfoFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
         >
@@ -59,15 +89,16 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             <Col lg={6}>
                                 <FormInputBox
                                     autoComplete="off"
-                                    id="nationalID"
+                                    id="identificacion"
                                     label={t("NATIONAL_ID_NUMBER")}
-                                    name="nationalID"
+                                    name="identificacion"
                                     type="text"
-                                    error={formikProps.errors.nationalID}
+                                    error={formikProps.errors.identificacion}
                                     onBlur={formikProps.handleBlur}
                                     onChange={formikProps.handleChange}
-                                    touched={formikProps.touched.nationalID}
-                                    value={formikProps.values.nationalID || ""}
+                                    touched={formikProps.touched.identificacion}
+                                    value={formikProps.values.identificacion || ""}
+                                    readOnly={true}
                                 />
                             </Col>
                             <Col lg={6}>
@@ -82,6 +113,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                     onChange={formikProps.handleChange}
                                     touched={formikProps.touched.email}
                                     value={formikProps.values.email || ""}
+                                    readOnly={true}
                                 />
                             </Col>
                             <Col lg={6}>
@@ -95,83 +127,109 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                     onChange={formikProps.handleChange}
                                     touched={formikProps.touched.name}
                                     value={formikProps.values.name || ""}
+                                    readOnly={true}
                                 />
                             </Col>
                             <Col lg={6}>
-                                <ReactSelect
+                            <FormInputBox
+                                    id="gender"
                                     label={t("GENDER")}
-                                    error={formikProps.errors.gender}
-                                    options={[
-                                        { label: t("SELECT"), value: "" },
-                                        { label: t("MALE"), value: "MALE" },
-                                        { label: t("FEMALE"), value: "FEMALE" }
-                                    ]}
-                                    value={formikProps.values.gender}
-                                    onChange={(option) => {
-                                        formikProps.setFieldValue(
-                                            "gender",
-                                            option?.target?.value ?? ""
-                                        );
-                                    }}
                                     name="gender"
-                                    className={formikProps.touched.gender && formikProps.errors.gender ? "is-invalid" : ""}
-                                    onBlur={formikProps.handleBlur}
-                                    touched={formikProps.touched.gender}
-                                />
-                            </Col>
-                            <Col lg={6}>
-                                <FormInputBox
-                                    id="cellphone"
-                                    label={t("CELLPHONE")}
-                                    name="cellphone"
                                     type="text"
-                                    error={formikProps.errors.cellphone}
+                                    error={formikProps.errors.gender}
                                     onBlur={formikProps.handleBlur}
                                     onChange={formikProps.handleChange}
-                                    touched={formikProps.touched.cellphone}
-                                    value={formikProps.values.cellphone || ""}
+                                    touched={formikProps.touched.gender}
+                                    value={formikProps.values.gender || ""}
+                                    readOnly={true}
                                 />
                             </Col>
+                            <Col lg={6}>
+                                <Row>
+                                    <Col lg={4}>
+                                        <ReactSelect
+                                            label={t("COUNTRY_CODE")}
+                                            error={formikProps.errors.countryCode}
+                                            options={formattedCountryCodes ?? []}
+                                            value={formikProps.values.countryCode}
+                                            onChange={(option) => {
+                                                formikProps.setFieldValue(
+                                                    "countryCode",
+                                                    option?.target?.value ?? ""
+                                                );
+                                            }}
+                                            name="countryCode"
+                                            className={formikProps.touched.countryCode && formikProps.errors.countryCode ? "is-invalid" : ""}
+                                            onBlur={formikProps.handleBlur}
+                                            touched={formikProps.touched.countryCode}
+                                        />
+                                    </Col>
+                                    <Col lg={8}>
+                                        <FormInputBox
+                                            wrapperClassName="mb-4"
+                                            autoComplete="off"
+                                            id="phoneNumber"
+                                            label={t("PHONE_NUMBER")}
+                                            name="phoneNumber"
+                                            type="number"
+                                            error={formikProps.errors.phoneNumber}
+                                            onBlur={formikProps.handleBlur}
+                                            onChange={formikProps.handleChange}
+                                            touched={formikProps.touched.phoneNumber}
+                                            value={formikProps.values.phoneNumber || ""}
+                                        />
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col lg={6}></Col>
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("PROVINCE_OF_RESIDENCE")}
-                                    error={formikProps.errors.provinceOfResidence}
+                                    error={formikProps.errors.provinceId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
-                                        { label: t("RESIDENCE_1"), value: "residence1" }
+                                        ...province_list.map((group) => ({
+                                            label: group.label,
+                                            value: group.value,
+                                        })),
                                     ]}
-                                    value={formikProps.values.provinceOfResidence}
+                                    value={formikProps.values.provinceId}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(
-                                            "provinceOfResidence",
+                                            "provinceId",
                                             option?.target?.value ?? ""
                                         );
+                                        formikProps.setFieldValue("cityId", "");
+                                        getCityList(option?.target?.value);
                                     }}
-                                    name="provinceOfResidence"
-                                    className={formikProps.touched.provinceOfResidence && formikProps.errors.provinceOfResidence ? "is-invalid" : ""}
+                                    name="provinceId"
+                                    className={formikProps.touched.provinceId && formikProps.errors.provinceId ? "is-invalid" : ""}
                                     onBlur={formikProps.handleBlur}
-                                    touched={formikProps.touched.provinceOfResidence}
+                                    touched={formikProps.touched.provinceId}
                                 />
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("CANTON_OF_RESIDENCE")}
-                                    error={formikProps.errors.cantonOfResidence}
+                                    error={formikProps.errors.cityId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
-                                        { label: t("RESIDENCE_2"), value: "residence2" }
+                                        ...cityList.map((group) => ({
+                                            label: group.label,
+                                            value: group.value,
+                                        })),
                                     ]}
-                                    value={formikProps.values.cantonOfResidence}
+                                    value={formikProps.values.cityId}
                                     onChange={(option) => {
                                         formikProps.setFieldValue(
-                                            "cantonOfResidence",
+                                            "cityId",
                                             option?.target?.value ?? ""
                                         );
                                     }}
-                                    name="cantonOfResidence"
-                                    className={formikProps.touched.cantonOfResidence && formikProps.errors.cantonOfResidence ? "is-invalid" : ""}
+                                    name="cityId"
+                                    className={formikProps.touched.cityId && formikProps.errors.cityId ? "is-invalid" : ""}
                                     onBlur={formikProps.handleBlur}
-                                    touched={formikProps.touched.cantonOfResidence}
+                                    touched={formikProps.touched.cityId}
                                 />
                             </Col>
                         </Row>

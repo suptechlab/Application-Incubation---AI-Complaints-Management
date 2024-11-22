@@ -87,6 +87,7 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
       setIsFileClaimModalShow(true)
     } else {
       console.error('VERIFY OTP ERROR:', result.error.message);
+      actions.setSubmitting(false)
     }
   }
 

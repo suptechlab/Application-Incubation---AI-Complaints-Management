@@ -16,15 +16,14 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
     const { t } = useTranslation()
 
-
     const { claim_types } = useSelector((state) => state?.masterSlice)
 
     const dispatch = useDispatch()
 
     // Initial Values
     const initialValues = {
-        claimType: '',
-        claimSubtype: '',
+        claimTypeId: '',
+        claimSubTypeId: '',
         precedents: '',
         specificPetition: '',
         attachments: '',
@@ -62,7 +61,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
     return (
         <CommonFormikComponent
-            // validationSchema={ClaimDetailsFormSchema}
+            validationSchema={ClaimDetailsFormSchema}
             initialValues={initialValues}
             onSubmit={handleSubmit}
         >
@@ -80,7 +79,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("CLAIM_TYPE")}
-                                    error={formikProps.errors.claimType}
+                                    error={formikProps.errors.claimTypeId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
                                         ...claim_types.map((group) => ({
@@ -88,22 +87,22 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             value: group.value,
                                         })),
                                     ]}
-                                    value={formikProps.values.claimType}
+                                    value={formikProps.values.claimTypeId}
                                     onChange={(option) => {
-                                        formikProps.setFieldValue("claimType", option?.target?.value ?? "");
+                                        formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
                                         formikProps.setFieldValue("claimSubtype", "");
                                         getClaimSubTypes(option?.target?.value);
                                     }}
-                                    name="claimType"
-                                    className={formikProps.touched.claimType && formikProps.errors.claimType ? "is-invalid" : ""}
+                                    name="claimTypeId"
+                                    className={formikProps.touched.claimTypeId && formikProps.errors.claimTypeId ? "is-invalid" : ""}
                                     onBlur={formikProps.handleBlur}
-                                    touched={formikProps.touched.claimType}
+                                    touched={formikProps.touched.claimTypeId}
                                 />
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("CLAIM_SUBTYPE")}
-                                    error={formikProps.errors.claimSubtype}
+                                    error={formikProps.errors.claimSubTypeId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
                                         ...claimSubTypes.map((group) => ({
@@ -111,14 +110,14 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             value: group.value,
                                         })),
                                     ]}
-                                    value={formikProps.values.claimSubtype}
+                                    value={formikProps.values.claimSubTypeId}
                                     onChange={(option) => {
-                                        formikProps.setFieldValue("claimSubtype", option?.target?.value ?? "");
+                                        formikProps.setFieldValue("claimSubTypeId", option?.target?.value ?? "");
                                     }}
-                                    name="claimSubtype"
-                                    className={formikProps.touched.claimSubtype && formikProps.errors.claimSubtype ? "is-invalid" : ""}
+                                    name="claimSubTypeId"
+                                    className={formikProps.touched.claimSubTypeId && formikProps.errors.claimSubTypeId ? "is-invalid" : ""}
                                     onBlur={formikProps.handleBlur}
-                                    touched={formikProps.touched.claimSubtype}
+                                    touched={formikProps.touched.claimSubTypeId}
                                 />
                             </Col>
                             <Col xs={12}>
@@ -151,7 +150,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                     value={formikProps.values.specificPetition || ""}
                                 />
                             </Col>
-                            <Col xs={12} className="mb-3">
+                            {/* <Col xs={12} className="mb-3">
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                     <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
@@ -178,7 +177,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         </Link>
                                     )}
                                 </div>
-                            </Col>
+                            </Col> */}
                             <Col xs={12}>
                                 <FormCheckbox
                                     wrapperClassName="mb-0"
@@ -209,7 +208,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             variant="warning"
                             className="custom-min-width-100"
                         >
-                            {t("NEXT")}<span className="ms-1">&gt;</span>
+                            {t("FINISH")}<span className="ms-1">&gt;</span>
                         </Button>
                     </Modal.Footer>
                 </React.Fragment>

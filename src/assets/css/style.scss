@@ -42,6 +42,11 @@
         background-image: none;
         padding-right: $input-padding-x;
     }
+    &:read-only {
+        color: $input-disabled-color;
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
+    }
 }
 
 .btn-outline-primary {

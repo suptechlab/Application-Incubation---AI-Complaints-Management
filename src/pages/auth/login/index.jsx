@@ -48,6 +48,7 @@ const LoginModal = ({ handleSignUpClick, handleLoginSucccesSubmit }) => {
             // toast.success(result?.message ?? "OTP Sent succesfully")
         } else {
             console.error('OTP Send error:', result.error.message);
+            actions.setSubmitting(false);
         }
     };
 

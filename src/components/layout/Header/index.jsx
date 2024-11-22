@@ -50,7 +50,7 @@ const Header = () => {
     <header className="theme-header">
       <Navbar key={expand} expand={expand} className="bg-body-tertiary py-0">
         <Container className="custom-min-height-70">
-          <Navbar.Brand as={Link} href="/" className="me-auto px-1">
+          <Navbar.Brand as={Link} to="/" className="me-auto px-1">
             <Image fluid src={Logo} alt="Logo" width={258} height={55} />
           </Navbar.Brand>
 
@@ -98,12 +98,12 @@ const Header = () => {
                 alt={"Alex Boston"}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-150 fs-6 lh-sm fw-semibold">
-              {user?.firstName}
+              {user?.name}
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="shadow border-0 mt-3">
               <Dropdown.Header className="fw-semibold d-md-none">
-              {user?.firstName ?? ''} 
+              {user?.name ?? ''} 
               </Dropdown.Header>
               <Dropdown.Item as={Link} to="/my-account">
                 {t("MY ACCOUNT")}
