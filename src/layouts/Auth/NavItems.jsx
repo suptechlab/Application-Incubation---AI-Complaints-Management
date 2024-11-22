@@ -57,7 +57,7 @@ export const NavItems = () => {
       menuIcon: <MdSupervisorAccount size={20} />,
       path: "/team-management",
       roleName: "admin",
-      disabled: true,
+      disabled: false,
     },
     {
       id: 4,
@@ -122,7 +122,7 @@ export const NavItems = () => {
           path: "/template-master",
           moduleName: ["Master Management"],
           roleName: "admin",
-          disabled: true,
+          disabled: false,
         }
       ],
     },

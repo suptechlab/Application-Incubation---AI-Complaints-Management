@@ -1,32 +1,40 @@
-import { Form, Formik } from "formik";
-import React from "react";
+import { Formik, Form as FormikForm } from "formik";
+import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import FormInput from "../../../components/FormInput";
-// import { handleAddDistrict } from "../../../services/district.service";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import SunEditorReact from "../../../components/SuneditorReact";
 import { validationSchema } from "../../../validations/templateMaster.validation";
+import ReactSelect from "../../../components/ReactSelect";
 
-const Add = ({ modal, toggle }) => {
+import {
+  createNewTemplateMaster,
+  editTemplateMaster,
+  getTemplateMaster,
+} from "../../../services/templateMaster.service";
+
+const Add = ({ provinces, modal, toggle, dataQuery }) => {
+
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const handleSubmit = async (values) => {
-    console.log("values::", values);
-    toast.success("Template master added successfully.");
+  const [loading, setLoading] = useState(false);
+  const [templateTypeOption, setTemplateTypeOption] = useState([
+    { value: "EMAIL", label: t('EMAIL') },
+    { value: "NOTIFICATION", label: t('NOTIFICATION') }
+  ])
 
-    // handleAddDistrict(values).then(response => {
-    //     console.log("Add District::", response);
-    //     toast.success(response.data.message);
-    //     navigate("/districts");
-    // }).catch((error) => {
-    //     if(error.response.data.fieldErrors){
-    //         toast.error(error.response.data.fieldErrors[0].message);
-    //     }else{
-    //         toast.error(error.response.data.detail);
-    //     }
-    // });
+  const onSubmit = async (values, actions) => {
+
+    createNewTemplateMaster(values).then(response => {
+      toast.success(response.data.message);
+      toggle();
+      dataQuery.refetch()
+    }).catch((error) => {
+      console.log('error', error)
+      toast.error(error);
+    });
   };
 
   return (
@@ -48,26 +56,45 @@ const Add = ({ modal, toggle }) => {
       <Formik
         initialValues={{
           templateName: "",
-          description: "",
+          subject: "",
+          content: "",
+          templateType: "", 
         }}
-        onSubmit={(values, actions) => {
-          actions.setSubmitting(false);
-          handleSubmit(values, actions);
-        }}
+        // onSubmit={(values, actions) => {
+        //   actions.setSubmitting(false); // Stops the loading spinner in Formik
+        //   handleSubmit(values, actions); // Calls the submit handler
+        // }}
         validationSchema={validationSchema}
+        onSubmit={onSubmit}
       >
         {({
           handleChange,
           handleBlur,
+          handleSubmit,
           values,
           setFieldValue,
-          setFieldError,
           touched,
-          isValid,
           errors,
         }) => (
-          <Form>
+          <FormikForm
+                  onSubmit={handleSubmit}
+                  className="d-flex flex-column h-100"
+                >
             <Modal.Body className="text-break py-0">
+              <ReactSelect
+                error={errors?.templateType}
+                options={templateTypeOption ?? []}
+                value={values.templateType}
+                onChange={(option) => {
+                    setFieldValue('templateType', option.target.value);
+                }}
+                name="templateType"
+                label={t("PROVINCE")}
+                className={`${touched?.templateType && errors?.templateType ? "is-invalid" : ""
+                  } mb-3 pb-1`}
+                onBlur={handleBlur}
+                touched={touched?.templateType}
+              />
               <FormInput
                 error={errors.templateName}
                 id="templateName"
@@ -80,9 +107,21 @@ const Add = ({ modal, toggle }) => {
                 type="text"
                 value={values.templateName || ""}
               />
+              <FormInput
+                error={errors.subject}
+                id="subject"
+                key={"subject"}
+                label={t("NAME OF TEMPLATE MASTER")}
+                name="subject"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                touched={touched.subject}
+                type="text"
+                value={values.subject || ""}
+              />
               <SunEditorReact
-                id="description"
-                name="description"
+                id="content"
+                name="content"
                 label="Template Details *"
                 height="215"
                 content={values.description}
@@ -90,14 +129,9 @@ const Add = ({ modal, toggle }) => {
                 touched={touched?.description}
                 handleBlur={handleBlur}
                 handleChange={(value) => {
-                  if (value === "<p><br></p>") {
-                    setFieldValue("description", "");
-                  } else {
-                    setFieldValue("description", value);
-                  }
+                  setFieldValue("content", value === "<p><br></p>" ? "" : value);
                 }}
               />
-              {/* NEED TO ADD TEXT EDITOR HERE */}
             </Modal.Body>
             <Modal.Footer className="pt-0">
               <Button
@@ -109,17 +143,17 @@ const Add = ({ modal, toggle }) => {
                 {t("CANCEL")}
               </Button>
               <Button
-                type="submit"
+                type="submit" // This ensures Formik handles the submission
                 variant="warning"
                 className="custom-min-width-85"
-                onClick={handleSubmit}
               >
                 {t("SUBMIT")}
               </Button>
             </Modal.Footer>
-          </Form>
+          </FormikForm>
         )}
       </Formik>
+
     </Modal>
   );
 };

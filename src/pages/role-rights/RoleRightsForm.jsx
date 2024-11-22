@@ -32,6 +32,7 @@ const RoleRightsForm = () => {
 
   const [modules, setModules] = useState([]);
   const [userType, setUserType] = useState('SEPS_USER');
+  
 
   useEffect(() => {
     if (isEdit) {
@@ -66,7 +67,7 @@ const RoleRightsForm = () => {
     } else {
       
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, userType]);
 
 
   useEffect(() => {
