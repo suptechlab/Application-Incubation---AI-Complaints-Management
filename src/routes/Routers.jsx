@@ -16,6 +16,7 @@ const Routers = () => {
             path={route.path}
             element={
               <LayoutComponent layoutType={route.layoutType}>
+                {/* {console.log('route routers.jsx 19 -',route)} */}
                 {route.isPrivate ? (
                   <PrivateRoute path={route.path} element={route.element} />
                 ) : (
