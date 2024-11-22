@@ -205,6 +205,7 @@ const RoleRightsForm = () => {
                                           setFieldValue("userType", "SEPS_USER");
                                           setUserType('SEPS_USER');
                                         }}
+                                        disabled={isEdit} // Disable in edit mode
                                       />
                                       {t('SEPS USER')}
                                     </label>
@@ -221,6 +222,7 @@ const RoleRightsForm = () => {
                                           setFieldValue("userType", "FI_USER");
                                           setUserType('FI_USER');
                                         }}
+                                        disabled={isEdit} // Disable in edit mode
                                       />
                                       {t('FI USER')}
                                     </label>
