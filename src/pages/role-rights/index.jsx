@@ -64,30 +64,37 @@ export default function RoleRightsList() {
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
+    queryFn: async () => {
       setLoading(true); // Start loading
       try {
-            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-            Object.keys(filterObj).forEach(
-              (key) => filterObj[key] === "" && delete filterObj[key]
-            );
-
-            if (sorting.length === 0) {
-              return handleGetRoleRights({
-                page: pagination.pageIndex,
-                size: pagination.pageSize,
-                ...filterObj,
-              });
-            } else {
-              return handleGetRoleRights({
-                page: pagination.pageIndex,
-                size: pagination.pageSize,
-                sort: sorting
-                  .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-                  .join(","),
-                ...filterObj,
-              });
-            }
+            
+              //   starting
+              const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+              Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+      
+              // Make the API request based on sorting
+              let response;
+              if (sorting.length === 0) {
+                response = await handleGetRoleRights({
+                  page: pagination.pageIndex,
+                  size: pagination.pageSize,
+                  ...filterObj,
+                });
+              } else {
+                response = await handleGetRoleRights({
+                  page: pagination.pageIndex,
+                  size: pagination.pageSize,
+                  sort: sorting
+                    .map(
+                      (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                    )
+                    .join(","),
+                  ...filterObj,
+                });
+              }
+      
+              // Return the API response data
+              return response;
       } catch (error) {
         setLoading(false); // Start loading
       } finally {
@@ -218,9 +225,9 @@ export default function RoleRightsList() {
 
   return (
     <React.Fragment>
-      {
-          loading ? <Loader isLoading={loading} />
-          :
+      
+       <Loader isLoading={loading} />
+      
           <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
             <PageHeader
               title={t('ROLE & RIGHTS')}
@@ -242,7 +249,7 @@ export default function RoleRightsList() {
               </Card.Body>
             </Card>
           </div>
-      }
+      
 
       {/* Delete Modal */}
       <GenericModal

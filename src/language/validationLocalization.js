@@ -52,6 +52,9 @@ export const messages = {
     subjectRequired: "Subject name is required",
     templateContentMax1500: "Template details cannot exceed 8500 characters.",
     templateContentRequired: "Template details is required.",
+    // Team Managment
+    teamNameRequired: "Team name is required", // For team name
+    descriptionRequired: "Description is required", // For description
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -106,5 +109,8 @@ export const messages = {
     subjectRequired: "Se requiere el nombre del asunto.",
     templateContentMax1500: "Los detalles de la plantilla no pueden exceder los 8500 caracteres.",
     templateContentRequired: "Se requieren los detalles de la plantilla.",
+    // Team managment
+    teamNameRequired: "Se requiere el nombre del equipo", // For team name
+    descriptionRequired: "Se requiere la descripción", // For description
   }
 };

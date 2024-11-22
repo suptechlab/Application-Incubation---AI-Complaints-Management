@@ -62,9 +62,10 @@ export default function TeamManagementAddEdit() {
 
     //  Handle Assign Button Click
     const handleAssign = () => {
-        if (!selectedMember || Object.keys(selectedMember).length === 0) {
+        console.log('selectedMember',selectedMember)
+        if (!selectedMember || Object.keys(selectedMember).length === 0 || selectedMember.value == '') {
             setLoading(false);
-            toast.error("Please select a team member before assigning.");
+            toast.error(t('SELECT A TEAM MEMBER BEFORE ASSIGNING'));
             return;
         }
 
@@ -74,7 +75,7 @@ export default function TeamManagementAddEdit() {
         );
 
         if (isDuplicate) {
-            toast.error("This team member has already been assigned.");
+            toast.error(t('TEAM MEMBER HAS ALREADY BEEN ASSIGNED'));
             return;
         }
 
@@ -84,7 +85,7 @@ export default function TeamManagementAddEdit() {
         };
 
         setNewTeamMember((prev) => [...prev, newMember]); // Add to the list
-        setSelectedMember(null); // Clear selection
+        //setSelectedMember(null); // Clear selection
     };
 
     useEffect(() => {
@@ -414,11 +415,11 @@ export default function TeamManagementAddEdit() {
             <GenericModal
                 show={deleteShow}
                 handleClose={() => setDeleteShow(false)}
-                modalHeaderTitle={`Delete Team Member`}
-                modalBodyContent={`Are you sure, you want to delete the team member - ${selectedRow?.name}?`}
+                modalHeaderTitle={t('DELETE TEAM MEMBER')}
+                modalBodyContent={`${t('ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER')} - ${selectedRow?.name}?`}
                 handleAction={() => recordDelete(deleteId)}
-                buttonName="Delete"
-                ActionButtonVariant="danger"
+                buttonName={t('DELETE')}
+                ActionButtonVariant={t('CANCEL')}
             />
 
         </React.Fragment>

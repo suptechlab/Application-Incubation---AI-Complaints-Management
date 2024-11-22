@@ -24,11 +24,13 @@ import {
   changeTemplateMaster,
   downloadTemplateList,
 } from "../../../services/templateMaster.service";
+import Loader from "../../../components/Loader";
 
 const TemplateMaster = () => {
   const { t } = useTranslation();
 
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
   const [isDownloading, setDownloading] = useState(false)
   const [pagination, setPagination] = useState({
@@ -107,47 +109,68 @@ const TemplateMaster = () => {
     //   ];
     // },
     queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
-      if (sorting.length === 0) {
-        return handleGetTemplateMaster({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetTemplateMaster({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map(
-              (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-            )
-            .join(","),
-          ...filterObj,
-        });
+      setLoading(true); // Start loading
+      try {
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+        if (sorting.length === 0) {
+          return handleGetTemplateMaster({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            ...filterObj,
+          });
+        } else {
+          return handleGetTemplateMaster({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            sort: sorting
+              .map(
+                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+              )
+              .join(","),
+            ...filterObj,
+          });
+        }
+      } catch (error) {
+        setLoading(false); // Start loading
+      } finally {
+        setLoading(false); // Start loading
       }
     },
+    onError: () => setLoading(false), // Ensure loading state is reset on error
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
 
   const changeStatus = async (id, currentStatus) => {
-    
+    setLoading(true);
     try {
       await changeTemplateMaster(id, { status: !currentStatus });
-      
+
       dataQuery.refetch();
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       toast.error();
+    } finally {
+      setLoading(false); // Start loading
     }
+    
   };
   useEffect(() => {
+    setLoading(true);
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
+    setLoading(false);
   }, [dataQuery.data?.data?.totalPages]);
   // }, []);
 
@@ -163,7 +186,7 @@ const TemplateMaster = () => {
         id: "templateType",
         header: () => t("TEMPLATE TYPE"),
       },
-      
+
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
@@ -197,7 +220,7 @@ const TemplateMaster = () => {
                 enabled: permission.current.editModule,
                 type: "button",
                 title: "Edit",
-                icon: <MdEdit size={18} />, 
+                icon: <MdEdit size={18} />,
                 handler: () => editCityMaster(rowData?.row?.original),
               },
             ]}
@@ -223,7 +246,7 @@ const TemplateMaster = () => {
   // EXPORT TO CSV CLICK HANDLER
   const exportHandler = () => {
     setDownloading(true)
-    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
+    toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading })
     downloadTemplateList({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -243,7 +266,7 @@ const TemplateMaster = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
-        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -263,30 +286,38 @@ const TemplateMaster = () => {
   }
 
   return (
-    <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-      <PageHeader
-        title={t("TEMPLATE MASTER")}
-        actions={[
-          {  label: "Export to CSV", onClick: exportHandler, variant: "outline-dark",disabled : isDownloading ?? false},
-          { label: "Add New", onClick: toggle, variant: "warning" },
-        ]}
-      />
-      <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-        <Card.Body className="d-flex flex-column">
-          <ListingSearchForm filter={filter} setFilter={setFilter} />
-          <CommonDataTable
-            columns={columns}
-            dataQuery={dataQuery}
-            pagination={pagination}
-            setPagination={setPagination}
-            sorting={sorting}
-            setSorting={setSorting}
-          />
-        </Card.Body>
-      </Card>
-      <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
-      <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
-    </div>
+    <React.Fragment>
+      {
+        loading ? <Loader isLoading={loading} />
+          :
+
+          <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+
+            <PageHeader
+              title={t("TEMPLATE MASTER")}
+              actions={[
+                { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+                { label: "Add New", onClick: toggle, variant: "warning" },
+              ]}
+            />
+            <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+              <Card.Body className="d-flex flex-column">
+                <ListingSearchForm filter={filter} setFilter={setFilter} />
+                <CommonDataTable
+                  columns={columns}
+                  dataQuery={dataQuery}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                  sorting={sorting}
+                  setSorting={setSorting}
+                />
+              </Card.Body>
+            </Card>
+            <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
+            <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
+          </div>
+      }
+    </React.Fragment>
   );
 };
 
