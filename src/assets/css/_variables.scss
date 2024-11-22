@@ -19,6 +19,8 @@ $input-border-color: #7F7F7F;
 $input-focus-border-color: $link-color;
 $border-radius: .25rem;
 $input-padding-y: 0.5rem;
+$input-padding-x-sm: 0.75rem;
+$input-padding-y-sm: 0.282rem;
 $input-disabled-color: rgba($body-color, .50);
 $input-disabled-bg: #E9E9E9;
 $border-radius: .25rem;
@@ -93,6 +95,7 @@ $theme-header-height: 4rem;
 $custom-bg-light-green: #28A745;
 $custom-bg-light-blue: #1B7ACE;
 $custom-gray: #D9D9D9;
+$custom-bg-orange: #F47133;
 
 // Generate custom classes for width, min-width, height, min-height
 @mixin custom-class($property, $value) {

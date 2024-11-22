@@ -8,6 +8,7 @@
 @include custom-class('font-size', 12);
 @include custom-class('font-size', 18);
 @include custom-class('font-size', 26);
+@include custom-class('font-size', 30);
 @include custom-class('width', 32);
 @include custom-class('height', 32);
 @include custom-class('width', 42);
@@ -244,6 +245,14 @@ body {
 
 .bg-primary-90 {
     background-color: rgba($primary, .90);
+}
+
+.bg-orange {
+    background-color: $custom-bg-orange;
+}
+
+.text-orange {
+    color: $custom-bg-orange;
 }
 
 .text-custom-gray {
