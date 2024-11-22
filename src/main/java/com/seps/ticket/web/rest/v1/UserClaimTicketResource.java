@@ -2,8 +2,12 @@ package com.seps.ticket.web.rest.v1;
 
 import com.seps.ticket.service.UserClaimTicketService;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
-import com.seps.ticket.service.dto.TicketDTO;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,12 +26,23 @@ public class UserClaimTicketResource {
         this.userClaimTicketService = userClaimTicketService;
     }
 
+
+    @Operation(
+        summary = "File a claim API",
+        description = "Allows a user to file a claim.",
+        tags = {"File Claim"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Claimed file successfully.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ClaimTicketResponseDTO.class))),
+    })
     // Endpoint for Users to create a claim ticket
     @PostMapping("/file-claim")
     @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<ClaimTicketResponseDTO> fileClaim(@RequestBody @Valid ClaimTicketRequest claimTicketRequest) {
         ClaimTicketResponseDTO claimTicketResponseDTO = userClaimTicketService.fileClaim(claimTicketRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(claimTicketResponseDTO);
     }
 
 }

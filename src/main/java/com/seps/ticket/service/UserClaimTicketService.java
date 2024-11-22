@@ -5,7 +5,6 @@ import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
-import com.seps.ticket.service.dto.TicketDTO;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
