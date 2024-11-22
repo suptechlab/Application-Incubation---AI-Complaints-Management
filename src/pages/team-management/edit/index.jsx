@@ -12,7 +12,7 @@ import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import ReactSelect from "../../../components/ReactSelect";
 import AppTooltip from "../../../components/tooltip";
-import { getOrganizationList, getTeamMemberList, handleAddUser, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
+import { assignUserIntoTeam, handleDeleteUserFromTeam, getOrganizationList, getTeamMemberList, handleAddUser, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
 export default function TeamManagementEdit() {
@@ -37,18 +37,6 @@ export default function TeamManagementEdit() {
 
     const location = useLocation();
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-    const [pagination, setPagination] = React.useState({
-        pageIndex: params.page ? parseInt(params.page) - 1 : 0,
-        pageSize: params.limit ? parseInt(params.limit) : 10,
-    });
-
-    const [sorting, setSorting] = React.useState([]);
-
-    const [filter, setFilter] = React.useState({
-        search: "",
-        subscription: "",
-        status: "",
-    });
     const [selectedRow, setSelectedRow] = useState();
     const [deleteShow, setDeleteShow] = useState(false);
     const [deleteId, setDeleteId] = useState();
@@ -58,10 +46,12 @@ export default function TeamManagementEdit() {
     const [newTeamMember, setNewTeamMember] = useState([]);
     const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
     const [selectedMemberName, setSelectedMemberName] = useState(null); // To hold the selected member
+    const [membersArr, setMembersArr] = useState([]);
 
 
     //  Handle Assign Button Click
     const handleAssign = () => {
+        setLoading(true);
         console.log('selectedMember',selectedMember)
         if (!selectedMember || Object.keys(selectedMember).length === 0 || selectedMember.value == '') {
             setLoading(false);
@@ -85,26 +75,38 @@ export default function TeamManagementEdit() {
         };
 
         setNewTeamMember((prev) => [...prev, newMember]); // Add to the list
-        //setSelectedMember(null); // Clear selection
-    };
+        //setSelectedMember(null); // Clear selection    
+        setMembersArr((prevNumbers) => [...prevNumbers, selectedMember.value]);
+        console.log('membersArr',membersArr)
+        const data = {
+            userIds: membersArr
+        }
+        // calling api to assign member into team
+        assignUserIntoTeam(userData.id,data).then((response) => {
+            getDataById()
+        })
+        .catch((error) => {
+            
+        })    
+        .finally(() => {
+            // Reset loading state regardless of success or failure
+            setDeleteShow(false);
+            setLoading(false);
+        });
+        setLoading(false);
 
+        
+    };
+    
     useEffect(() => {
         setLoading(true);
         if (isEdit) {
-            setLoading(true);
-            handleGetUserById(id).then((response) => {
-                setUserData(response.data);
-                setInitialValues({
-                    name: response.data?.name ? response.data?.name : "",
-                    email: response.data?.email ? response.data?.email : "",
-                    roleId: response.data?.roleId ?? "",
-                });
-                setLoading(false);
-            });
+            getDataById()
         } else {
         }
 
     }, [id, isEdit]);
+    
 
     // Get Assign members list
     useEffect(() => {
@@ -129,6 +131,23 @@ export default function TeamManagementEdit() {
 
         // setOrganizationArr
     }, [userType]);
+
+    // Get form data by id 
+    const getDataById = () => {
+        setLoading(true);
+        handleGetUserById(id).then((response) => {
+            setUserData(response.data);
+            setInitialValues({
+                teamName: response.data?.teamName ? response.data?.teamName : "",
+                description: response.data?.description ? response.data?.description : "",
+                entityId: response.data?.entityId ?? "",
+                entityType: response.data?.entityType ?? "",
+            });
+            setNewTeamMember(response.data?.members)
+            setLoading(false);
+        });
+        setLoading(false);
+    }
 
     const onSubmit = async (values, actions) => {
         setLoading(true);
@@ -176,9 +195,24 @@ export default function TeamManagementEdit() {
         setDeleteShow(true);
     };
 
+    // Delete API calling 
     const recordDelete = (deleteId) => {
+        setLoading(true);
         setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
+        handleDeleteUserFromTeam(userData.id,deleteId).then((response) => {
+            getDataById()
+        })
+        .catch((error) => {
+            
+        })    
+        .finally(() => {
+            // Reset loading state regardless of success or failure
+            setDeleteShow(false);
+            setLoading(false);
+        });
         setDeleteShow(false);
+        setLoading(false);
+
     };
 
     return (
@@ -206,8 +240,8 @@ export default function TeamManagementEdit() {
                                     onSubmit={handleSubmit}
                                     className="d-flex flex-column h-100"
                                 >
-                                    {/* <pre>{JSON.stringify(values,null,2)}</pre>
-                                    <pre>{JSON.stringify(errors,null,2)}</pre> */}
+                                    <pre>{JSON.stringify(userData,null,2)}</pre>
+                                    <pre>{JSON.stringify(initialValues,null,2)}</pre>
                                     <Row>
                                         <Col xs={12} className="mb-3">
                                             <div className='status-radio'>
@@ -218,7 +252,8 @@ export default function TeamManagementEdit() {
                                                         id="entityType"
                                                         name="entityType"
                                                         value="SEPS"
-                                                        checked={values.entityType === 'SEPS'}
+                                                        checked={userData.entityType == 'SEPS'}
+                                                        // checked={values.entityType === 'SEPS'}
                                                         onBlur={handleBlur}
                                                         onChange={() => {
                                                             setFieldValue("entityType", "SEPS");
@@ -232,7 +267,8 @@ export default function TeamManagementEdit() {
                                                         id="entityTypeFi"
                                                         name="entityType"
                                                         value="FI"
-                                                        checked={values.entityType === 'FI'}
+                                                        checked={userData.entityType == 'FI'}
+                                                        // checked={values.entityType === 'FI'}
                                                         onBlur={handleBlur}
                                                         onChange={() => {
                                                             setFieldValue("entityType", "FI");
@@ -252,7 +288,8 @@ export default function TeamManagementEdit() {
                                                         label="Pawan organizationArr"
                                                         error={errors.entityId}
                                                         options={organizationArr}
-                                                        value={values.entityId}
+                                                        value={userData.entityId}
+                                                        // value={values.entityId}
                                                         onChange={(option) => {
                                                             setFieldValue(
                                                                 "entityId",
@@ -282,7 +319,7 @@ export default function TeamManagementEdit() {
                                                 onChange={handleChange}
                                                 error={errors.teamName}
                                                 touched={touched.teamName}
-                                                value={values.teamName || ""}
+                                                value={userData.teamName || ""}
                                             />
                                         </Col>
                                     </Row>
@@ -299,7 +336,7 @@ export default function TeamManagementEdit() {
                                                 onChange={handleChange}
                                                 error={errors.description}
                                                 touched={touched.description}
-                                                value={values.description || ""}
+                                                value={userData.description || ""}
                                             />
                                         </Col>
                                        
@@ -422,8 +459,8 @@ export default function TeamManagementEdit() {
                 show={deleteShow}
                 handleClose={() => setDeleteShow(false)}
                 modalHeaderTitle={t('DELETE TEAM MEMBER')}
-                modalBodyContent={`${t('ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER')} - ${selectedRow?.name}?`}
-                handleAction={() => recordDelete(deleteId)}
+                modalBodyContent={`${t('ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER')} - ${deleteId} - ${selectedRow?.name}?`}
+                handleAction={() => recordDelete(deleteId || selectedRow?.userId)}
                 buttonName={t('DELETE')}
                 ActionButtonVariant={t('CANCEL')}
             />

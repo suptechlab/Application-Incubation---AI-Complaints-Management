@@ -25,6 +25,14 @@ export const handleGetTableData = async (params) => {
     });
 }
 
+export const handleDeleteUserFromTeam = async (teamId,memberId) => {
+    return await adminApi.delete(`/${API_VERSION}/teams/${teamId}/unassign-member/${memberId}`);
+}
+
+export const assignUserIntoTeam = async (teamId,data) => {
+    return await adminApi.post(`/${API_VERSION}/teams/${teamId}/assign-members`, data);
+}
+
 
 export const handleGetUserById = async (id) => {
     return await adminApi.get(`/${API_VERSION}/teams/${id}`);
