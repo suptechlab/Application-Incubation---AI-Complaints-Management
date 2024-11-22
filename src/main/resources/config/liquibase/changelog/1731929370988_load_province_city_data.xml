@@ -5,12 +5,18 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-  <changeSet id="1732177298941" author="matellio" labels="data">
+  <changeSet id="1732177298941-1" author="matellio" labels="data">
 
     <!-- Truncate tables before loading data -->
     <sql>
       TRUNCATE TABLE city CASCADE;
       TRUNCATE TABLE province CASCADE;
+    </sql>
+
+    <!-- Reset sequences -->
+    <sql>
+      ALTER SEQUENCE province_id_seq RESTART WITH 1;
+      ALTER SEQUENCE city_id_seq RESTART WITH 1;
     </sql>
 
     <!-- Load data into tables -->
@@ -36,6 +42,15 @@
       <column name="created_at" type="timestamp"/>
       <column name="updated_at" type="timestamp"/>
     </loadData>
+
+  </changeSet>
+  <changeSet id="1732177298942-2" author="matellio" labels="data">
+
+    <!-- Update sequences based on current max ID -->
+    <sql>
+      SELECT setval('province_id_seq', (SELECT MAX(id) FROM province), true);
+      SELECT setval('city_id_seq', (SELECT MAX(id) FROM city), true);
+    </sql>
 
   </changeSet>
 </databaseChangeLog>
