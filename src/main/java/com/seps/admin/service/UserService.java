@@ -576,4 +576,10 @@ public class UserService {
         }
         return userDetails;
     }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CURRENT_USER_NOT_FOUND, null, null));
+    }
+
 }

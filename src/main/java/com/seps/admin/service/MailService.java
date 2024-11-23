@@ -1,5 +1,6 @@
 package com.seps.admin.service;
 
+import com.seps.admin.domain.Team;
 import com.seps.admin.domain.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -16,7 +17,9 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * Service for sending emails asynchronously.
@@ -40,16 +43,20 @@ public class MailService {
 
     private final SpringTemplateEngine templateEngine;
 
+    private final UserService userService;
+
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
-        SpringTemplateEngine templateEngine
+        SpringTemplateEngine templateEngine,
+        UserService userService
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
+        this.userService = userService;
     }
 
     @Async
@@ -114,4 +121,34 @@ public class MailService {
         this.sendEmailFromTemplateSync(user, "mail/fiUserCreationEmail", "email.fi.user.creation.title");
     }
 
+    // Send a welcome email to the new member
+    @Async
+    public void sendWelcomeToTeamEmail(User newUser, String teamName) {
+        LOG.debug("Sending welcome email to new assigned User '{}'", newUser.getEmail());
+        String subject = "Welcome to Team " + teamName;
+        String content = "Dear " + newUser.getFirstName() + ",\n\n"
+            + "Welcome to the team \"" + teamName + "\"! We are excited to have you onboard.\n\n"
+            + "Best regards,\nThe Team";
+
+        this.sendEmailSync(newUser.getEmail(), subject, content, false, false);
+    }
+
+    // Notify existing members about the new member addition
+    @Async
+    public void sendNewMemberAddedNotification(User existingUser, String teamName, List<Long> newMemberIds) {
+        String subject = "New Member Added to Team " + teamName;
+        String content = "Dear " + existingUser.getFirstName() + ",\n\n"
+            + "The following new member(s) have been added to your team \"" + teamName + "\":\n"
+            + getMemberNames(newMemberIds) + "\n\n"
+            + "Best regards,\nThe Team";
+
+        this.sendEmailSync(existingUser.getEmail(), subject, content, false, false);
+    }
+
+    private String getMemberNames(List<Long> memberIds) {
+        // Fetch user details and concatenate their names
+        return memberIds.stream()
+            .map(memberId -> userService.getUserById(memberId).getFirstName())
+            .collect(Collectors.joining(", "));
+    }
 }

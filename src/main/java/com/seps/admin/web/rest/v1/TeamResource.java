@@ -105,9 +105,9 @@ public class TeamResource {
         @ApiResponse(responseCode = "400", description = "Invalid entity type provided")
     })
     @GetMapping("/members/{entityType}")
-    public ResponseEntity<List<DropdownListDTO>> getAllMember(@Valid @PathVariable TeamEntityTypeEnum entityType) {
+    public ResponseEntity<List<TeamDTO.MemberDropdownDTO>> getAllMember(@Valid @PathVariable TeamEntityTypeEnum entityType) {
         log.debug("REST request to get all Members");
-        List<DropdownListDTO> members = teamService.findAllMembers(entityType);
+        List<TeamDTO.MemberDropdownDTO> members = teamService.findAllMembers(entityType);
         return ResponseEntity.ok(members);
     }
 

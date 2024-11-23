@@ -128,7 +128,7 @@ public class OrganizationService {
             .map(org->{
                 DropdownListDTO orgDto = new DropdownListDTO();
                 orgDto.setId(org.getId());
-                orgDto.setName(org.getNemonicoTipoOrganizacion() + " (" + org.getRuc() + ")" );
+                orgDto.setName(org.getRazonSocial() + " (" + org.getRuc() + ")" );
                 return orgDto;
             })
             .toList();
