@@ -24,7 +24,7 @@ public class CustomException extends AbstractThrowableProblem {
         this.message = sepsStatusCode.getReasonPhrase();
         this.sepsStatusCode = sepsStatusCode;
         this.messageArgs = messageArgs;
-        this.useMessageDirectly = true;
+        this.useMessageDirectly = false;
     }
 
     public <T extends StatusType> CustomException(Status status, T sepsStatusCode, String message) {

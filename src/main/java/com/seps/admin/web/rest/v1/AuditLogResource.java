@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.domain.AuditLog;
 import com.seps.admin.enums.ActivityTypeEnum;
 import com.seps.admin.service.AuditLogService;
@@ -25,11 +26,13 @@ public class AuditLogResource {
     }
 
     @GetMapping("/{id}")
+    @PermissionCheck({"AUDIT_TRAILS_VIEW"})
     public ResponseEntity<AuditLog> getAuditLogById(@PathVariable Long id) {
         return ResponseEntity.ok(auditLogService.getAuditLogById(id));
     }
 
     @GetMapping
+    @PermissionCheck({"AUDIT_TRAILS_VIEW"})
     public ResponseEntity<List<AuditListDTO>> listAuditLogs(Pageable pageable,
                                                             @RequestParam(required = false) String search,
                                                             @RequestParam(required = false) ActivityTypeEnum activityType,

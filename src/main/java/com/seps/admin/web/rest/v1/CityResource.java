@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.service.CityService;
 import com.seps.admin.service.dto.CityDTO;
 import com.seps.admin.service.dto.RequestInfo;
@@ -47,6 +48,7 @@ public class CityResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
+    @PermissionCheck({"CITY_CREATE"})
     public ResponseEntity<ResponseStatus> addCity(@RequestBody CityDTO cityDTO, HttpServletRequest request) throws URISyntaxException {
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = cityService.addCity(cityDTO, requestInfo);
@@ -64,6 +66,7 @@ public class CityResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PutMapping("/{id}")
+    @PermissionCheck({"CITY_UPDATE"})
     public ResponseEntity<ResponseStatus> updateCity(@PathVariable Long id, @RequestBody CityDTO cityDTO, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         cityService.updateCity(id, cityDTO, requestInfo);
@@ -80,6 +83,7 @@ public class CityResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = CityDTO.class)))
     @GetMapping("/{id}")
+    @PermissionCheck({"CITY_UPDATE"})
     public ResponseEntity<CityDTO> getCityById(@PathVariable Long id) {
         return ResponseEntity.ok(cityService.getCityById(id));
     }
@@ -89,6 +93,7 @@ public class CityResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = CityDTO.class)))
     @GetMapping
+    @PermissionCheck({"CITY_CREATE","CITY_UPDATE","CITY_STATUS_CHANGE"})
     public ResponseEntity<List<CityDTO>> listCities(Pageable pageable,
                                                     @RequestParam(value = "search", required = false) String search,
                                                     @Parameter(description = "Filter by status (true for active, false for inactive)") @RequestParam(required = false) Boolean status) {
@@ -100,6 +105,7 @@ public class CityResource {
     @Operation(summary = "Change the status of a City", description = "Update the status of a city to active or inactive")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/status")
+    @PermissionCheck({"CITY_STATUS_CHANGE"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         cityService.changeStatus(id, status, requestInfo);
@@ -110,6 +116,7 @@ public class CityResource {
     @ApiResponse(responseCode = "200", description = "File downloaded successfully",
         content = @Content(mediaType = "application/octet-stream"))
     @GetMapping("/download")
+    @PermissionCheck({"CITY_CREATE","CITY_UPDATE","CITY_STATUS_CHANGE"})
     public ResponseEntity<byte[]> listCitiesDownload(@RequestParam(required = false) String search,
                                                         @RequestParam(required = false) Boolean status) throws IOException {
         ByteArrayInputStream in = cityService.listCitiesDownload(search, status);

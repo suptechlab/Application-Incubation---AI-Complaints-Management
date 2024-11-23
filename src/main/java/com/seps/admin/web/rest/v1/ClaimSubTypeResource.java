@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.service.ClaimSubTypeService;
 import com.seps.admin.service.dto.ClaimSubTypeDTO;
 import com.seps.admin.service.dto.RequestInfo;
@@ -36,6 +37,7 @@ public class ClaimSubTypeResource {
     }
 
     @PostMapping
+    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE"})
     public ResponseEntity<ResponseStatus> addClaimSubType(@RequestBody ClaimSubTypeDTO claimSubTypeDTO, HttpServletRequest request) throws URISyntaxException {
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = claimSubTypeService.addClaimSubType(claimSubTypeDTO, requestInfo);
@@ -49,6 +51,7 @@ public class ClaimSubTypeResource {
     }
 
     @PutMapping("/{id}")
+    @PermissionCheck({"CLAIM_SUB_TYPE_UPDATE"})
     public ResponseEntity<ResponseStatus> updateClaimSubType(@PathVariable Long id, @RequestBody ClaimSubTypeDTO claimSubTypeDTO, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         claimSubTypeService.updateClaimSubType(id, claimSubTypeDTO, requestInfo);
@@ -61,11 +64,13 @@ public class ClaimSubTypeResource {
     }
 
     @GetMapping("/{id}")
+    @PermissionCheck({"CLAIM_SUB_TYPE_UPDATE"})
     public ResponseEntity<ClaimSubTypeDTO> getClaimSubTypeById(@PathVariable Long id) {
         return ResponseEntity.ok(claimSubTypeService.getClaimSubTypeById(id));
     }
 
     @GetMapping
+    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE","CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_STATUS_CHANGE"})
     public ResponseEntity<List<ClaimSubTypeDTO>> listClaimSubTypes(Pageable pageable, @RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) {
         Page<ClaimSubTypeDTO> page = claimSubTypeService.listClaimSubTypes(pageable, search, status);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -73,6 +78,7 @@ public class ClaimSubTypeResource {
     }
 
     @PatchMapping("/{id}/status")
+    @PermissionCheck({"CLAIM_SUB_TYPE_STATUS_CHANGE"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         claimSubTypeService.changeStatus(id, status, requestInfo);
@@ -80,6 +86,7 @@ public class ClaimSubTypeResource {
     }
 
     @GetMapping("/download")
+    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE","CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_STATUS_CHANGE"})
     public ResponseEntity<byte[]> listClaimSubTypesDownload(@RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) throws IOException {
         ByteArrayInputStream in = claimSubTypeService.listClaimSubTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();

@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.service.InquirySubTypeService;
 import com.seps.admin.service.dto.InquirySubTypeDTO;
 import com.seps.admin.service.dto.RequestInfo;
@@ -43,11 +44,10 @@ public class InquirySubTypeResource {
     }
 
     @Operation(summary = "Create a new Inquiry Sub-Type", description = "Adds a new inquiry sub-type to the system.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Inquiry Sub-Type created successfully", content = @Content(schema = @Schema(implementation = ResponseStatus.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content)
-    })
+    @ApiResponse(responseCode = "201", description = "Inquiry Sub-Type created successfully", content = @Content(schema = @Schema(implementation = ResponseStatus.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content)
     @PostMapping
+    @PermissionCheck({"INQUIRY_SUB_TYPE_CREATE"})
     public ResponseEntity<ResponseStatus> addInquirySubType(@Valid @RequestBody InquirySubTypeDTO dto, HttpServletRequest request) throws URISyntaxException {
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = service.addInquirySubType(dto, requestInfo);
@@ -61,11 +61,10 @@ public class InquirySubTypeResource {
     }
 
     @Operation(summary = "Update an existing Inquiry Sub-Type", description = "Updates the details of an existing inquiry sub-type.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Inquiry Sub-Type updated successfully", content = @Content(schema = @Schema(implementation = ResponseStatus.class))),
-        @ApiResponse(responseCode = "404", description = "Inquiry Sub-Type not found", content = @Content)
-    })
+    @ApiResponse(responseCode = "200", description = "Inquiry Sub-Type updated successfully", content = @Content(schema = @Schema(implementation = ResponseStatus.class)))
+    @ApiResponse(responseCode = "404", description = "Inquiry Sub-Type not found", content = @Content)
     @PutMapping("/{id}")
+    @PermissionCheck({"INQUIRY_SUB_TYPE_UPDATE"})
     public ResponseEntity<ResponseStatus> updateInquirySubType(
         @Parameter(description = "ID of the inquiry sub-type to update", required = true) @PathVariable Long id,
         @Valid @RequestBody InquirySubTypeDTO dto, HttpServletRequest request) {
@@ -80,11 +79,10 @@ public class InquirySubTypeResource {
     }
 
     @Operation(summary = "Get an Inquiry Sub-Type by ID", description = "Retrieves the details of a specific inquiry sub-type by its ID.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Inquiry Sub-Type found", content = @Content(schema = @Schema(implementation = InquirySubTypeDTO.class))),
-        @ApiResponse(responseCode = "404", description = "Inquiry Sub-Type not found", content = @Content)
-    })
+    @ApiResponse(responseCode = "200", description = "Inquiry Sub-Type found", content = @Content(schema = @Schema(implementation = InquirySubTypeDTO.class)))
+    @ApiResponse(responseCode = "404", description = "Inquiry Sub-Type not found", content = @Content)
     @GetMapping("/{id}")
+    @PermissionCheck({"INQUIRY_SUB_TYPE_UPDATE"})
     public ResponseEntity<InquirySubTypeDTO> getInquiryType(
         @Parameter(description = "ID of the inquiry sub-type to retrieve", required = true) @PathVariable Long id) {
         InquirySubTypeDTO inquiryType = service.getInquirySubTypeById(id);
@@ -92,11 +90,10 @@ public class InquirySubTypeResource {
     }
 
     @Operation(summary = "List Inquiry Sub-Types with filters", description = "Lists all inquiry sub-types with optional filters for search (by name or description) and status (active/inactive).")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "List of Inquiry Sub-Types", content = @Content(schema = @Schema(implementation = InquirySubTypeDTO.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid filters", content = @Content)
-    })
+    @ApiResponse(responseCode = "200", description = "List of Inquiry Sub-Types", content = @Content(schema = @Schema(implementation = InquirySubTypeDTO.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid filters", content = @Content)
     @GetMapping
+    @PermissionCheck({"INQUIRY_SUB_TYPE_CREATE","INQUIRY_SUB_TYPE_UPDATE","INQUIRY_SUB_TYPE_STATUS_CHANGE"})
     public ResponseEntity<List<InquirySubTypeDTO>> listInquirySubTypes(
         @Parameter(description = "Pagination information") Pageable pageable,
         @Parameter(description = "Search term to filter by name or description") @RequestParam(required = false) String search,
@@ -107,11 +104,10 @@ public class InquirySubTypeResource {
     }
 
     @Operation(summary = "Change Inquiry Sub-Type Status", description = "Change the status (active/inactive) of an inquiry sub-type.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Status changed successfully"),
-        @ApiResponse(responseCode = "404", description = "Inquiry Sub-Type not found", content = @Content)
-    })
+    @ApiResponse(responseCode = "204", description = "Status changed successfully")
+    @ApiResponse(responseCode = "404", description = "Inquiry Sub-Type not found", content = @Content)
     @PatchMapping("/{id}/status")
+    @PermissionCheck({"INQUIRY_SUB_TYPE_STATUS_CHANGE"})
     public ResponseEntity<Void> changeStatus(
         @Parameter(description = "ID of the inquiry sub-type", required = true) @PathVariable Long id,
         @Parameter(description = "New status of the inquiry sub-type", required = true) @RequestParam Boolean status, HttpServletRequest request) {
@@ -121,6 +117,7 @@ public class InquirySubTypeResource {
     }
 
     @GetMapping("/download")
+    @PermissionCheck({"INQUIRY_SUB_TYPE_CREATE","INQUIRY_SUB_TYPE_UPDATE","INQUIRY_SUB_TYPE_STATUS_CHANGE"})
     public ResponseEntity<byte[]> listInquirySubTypesDownload(@RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) throws IOException {
         ByteArrayInputStream in = service.listInquirySubTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();

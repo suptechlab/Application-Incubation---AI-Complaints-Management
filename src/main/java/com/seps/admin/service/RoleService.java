@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.seps.admin.component.CommonHelper.convertEntityToMap;
 
@@ -43,9 +44,10 @@ public class RoleService {
     private final MessageSource messageSource;
     private final Gson gson;
     private final PermissionRepository permissionRepository;
+    private final UserRepository userRepository;
     public RoleService(RoleRepository roleRepository, RoleMapper roleMapper, ModuleRepository moduleRepository, RolePermissionRepository rolePermissionRepository,
                        AuditLogService auditLogService, UserService userService, MessageSource messageSource,
-                       Gson gson, PermissionRepository permissionRepository) {
+                       Gson gson, PermissionRepository permissionRepository, UserRepository userRepository) {
         this.roleRepository = roleRepository;
         this.roleMapper = roleMapper;
         this.moduleRepository = moduleRepository;
@@ -55,6 +57,7 @@ public class RoleService {
         this.messageSource = messageSource;
         this.gson = gson;
         this.permissionRepository = permissionRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -331,23 +334,25 @@ public class RoleService {
                 return roleDTO;
             });
     }
-//    public Set<Permission> getUserPermissions(Long userId, String permissionName) {
+//    public Set<Permission> getUserPermissions1(Long userId, String permissionName) {
 //        return userRepository.findById(userId)
-//            .map(user -> roleRepository.findById(user.getRole().getId())
+//            .map(user -> roleRepository.findById(user.getRoles().stream().map(Role::getId).toList().getFirst())
 //                .orElseThrow(() -> new IllegalArgumentException("Role not found"))
 //                .getPermissions().stream()
 //                .filter(permission -> permission.getName().equals(permissionName))
 //                .collect(Collectors.toSet()))
 //            .orElseThrow(() -> new IllegalArgumentException("User not found"));
 //    }
-//
-//    public long countRelatedUsers(Long roleId) {
-//        return userRepository.countByRoleId(roleId);
-//    }
-//
-//    public List<User> getDataReviewerUserList(Long companyId){
-//        return userRepository.findUsersWithPermission(Constants.DATA_REVIEWER_PERMISSION, companyId);
-//    }
+
+    public Set<Permission> getUserPermissions(Long userId, String permissionName) {
+        return userRepository.findById(userId)
+            .map(user -> user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream()) // Collect permissions from all roles
+                .filter(permission -> permissionName == null || permission.getName().equals(permissionName)) // Filter by permissionName if provided
+                .collect(Collectors.toSet())) // Collect as a Set to avoid duplicates
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
 
     private void validatePermissionsByUserType(List<Long> permissionIds, String userType) {
         // Fetch valid permissions based on the `userType` from the `Module`

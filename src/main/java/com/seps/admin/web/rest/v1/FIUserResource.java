@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.UserStatusEnum;
 import com.seps.admin.repository.UserRepository;
@@ -8,7 +9,6 @@ import com.seps.admin.service.UserService;
 import com.seps.admin.service.dto.FIUserDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
-import com.seps.admin.service.dto.SEPSUserDTO;
 import com.seps.admin.suptech.service.dto.PersonInfoDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -79,6 +79,7 @@ public class FIUserResource {
         )
     })
     @PostMapping
+    @PermissionCheck({"FI_USER_CREATE_BY_SEPS","FI_USER_CREATE_BY_FI"})
     public ResponseEntity<ResponseStatus> addFIUser(@Valid @RequestBody FIUserDTO dto, HttpServletRequest request)
         throws URISyntaxException {
         LOG.info("Attempting to create a new FI user with email: {}", dto.getEmail());
@@ -99,6 +100,7 @@ public class FIUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = FIUserDTO.class)))
     @GetMapping("/{id}")
+    @PermissionCheck({"FI_UPDATE_CREATE_BY_SEPS","FI_UPDATE_CREATE_BY_FI"})
     public ResponseEntity<FIUserDTO> getFIUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getFIUserById(id));
     }
@@ -108,6 +110,7 @@ public class FIUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = FIUserDTO.class)))
     @GetMapping
+    @PermissionCheck({"FI_USER_CREATE_BY_SEPS","FI_USER_CREATE_BY_FI","FI_UPDATE_CREATE_BY_SEPS","FI_UPDATE_CREATE_BY_FI","FI_STATUS_CHANGE_CREATE_BY_SEPS","FI_STATUS_CHANGE_CREATE_BY_FI"})
     public ResponseEntity<List<FIUserDTO>> listFIUsers(Pageable pageable,
                                                        @RequestParam(value = "search", required = false) String search,
                                                        @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
@@ -118,14 +121,13 @@ public class FIUserResource {
     }
 
     @Operation(summary = "Update an existing SEPS User", description = "Update the details of an existing SEPS user.")
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "SEPS User updated successfully",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseStatus.class))
-        )
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = "SEPS User updated successfully",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseStatus.class))
+    )
     @PutMapping("/{id}")
+    @PermissionCheck({"FI_UPDATE_CREATE_BY_SEPS","FI_UPDATE_CREATE_BY_FI"})
     public ResponseEntity<ResponseStatus> editFIUser(@PathVariable Long id, @Valid @RequestBody FIUserDTO dto,
                                                      HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
@@ -141,6 +143,7 @@ public class FIUserResource {
     @Operation(summary = "Change the status of a FI User", description = "Update the status of a FI User (ACTIVE/BLOCKED).")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/{status}")
+    @PermissionCheck({"FI_STATUS_CHANGE_CREATE_BY_SEPS","FI_STATUS_CHANGE_CREATE_BY_FI"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @PathVariable(name = "status") UserStatusEnum status,
                                              HttpServletRequest request) {
         // Perform the status update

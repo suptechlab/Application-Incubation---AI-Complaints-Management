@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.service.ProvinceService;
 import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.ProvinceDTO;
@@ -49,6 +50,7 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
+    @PermissionCheck({"PROVINCE_CREATE"})
     public ResponseEntity<ResponseStatus> addProvince(@Valid @RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) throws URISyntaxException {
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = provinceService.addProvince(provinceDTO, requestInfo);
@@ -66,6 +68,7 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PutMapping("/{id}")
+    @PermissionCheck({"PROVINCE_UPDATE"})
     public ResponseEntity<ResponseStatus> updateProvince(@PathVariable Long id, @Valid @RequestBody ProvinceDTO provinceDTO, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         provinceService.updateProvince(id, provinceDTO, requestInfo);
@@ -82,6 +85,7 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ProvinceDTO.class)))
     @GetMapping("/{id}")
+    @PermissionCheck({"PROVINCE_UPDATE"})
     public ResponseEntity<ProvinceDTO> getProvinceById(@PathVariable Long id) {
         return ResponseEntity.ok(provinceService.getProvinceById(id));
     }
@@ -91,6 +95,7 @@ public class ProvinceResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ProvinceDTO.class)))
     @GetMapping
+    @PermissionCheck({"PROVINCE_CREATE","PROVINCE_UPDATE","PROVINCE_STATUS_CHANGE"})
     public ResponseEntity<List<ProvinceDTO>> listProvinces(Pageable pageable,
                                                            @RequestParam(value = "search", required = false) String search,
                                                            @Parameter(description = "Filter by status (true for active, false for inactive)") @RequestParam(required = false) Boolean status) {
@@ -102,6 +107,7 @@ public class ProvinceResource {
     @Operation(summary = "Change the status of a Province", description = "Update the status of a province (active/inactive).")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/status")
+    @PermissionCheck({"PROVINCE_STATUS_CHANGE"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         provinceService.changeStatus(id, status, requestInfo);
@@ -112,6 +118,7 @@ public class ProvinceResource {
     @ApiResponse(responseCode = "200", description = "File downloaded successfully",
         content = @Content(mediaType = "application/octet-stream"))
     @GetMapping("/download")
+    @PermissionCheck({"PROVINCE_CREATE","PROVINCE_UPDATE","PROVINCE_STATUS_CHANGE"})
     public ResponseEntity<byte[]> listProvincesDownload(@RequestParam(required = false) String search,
                                                         @RequestParam(required = false) Boolean status) throws IOException {
         ByteArrayInputStream in = provinceService.listProvincesDownload(search, status);

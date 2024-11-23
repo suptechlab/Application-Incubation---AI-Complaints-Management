@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.service.InquiryTypeService;
 import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.InquiryTypeDTO;
@@ -54,6 +55,7 @@ public class InquiryTypeResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
+    @PermissionCheck({"INQUIRY_TYPE_CREATE"})
     public ResponseEntity<ResponseStatus> createInquiryType(@Valid @RequestBody InquiryTypeDTO inquiryType, HttpServletRequest request) throws URISyntaxException {
         log.debug("create request with {}", inquiryType);
         RequestInfo requestInfo = new RequestInfo(request);
@@ -72,6 +74,7 @@ public class InquiryTypeResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PutMapping("/{id}")
+    @PermissionCheck({"INQUIRY_TYPE_UPDATE"})
     public ResponseEntity<ResponseStatus> updateInquiryType(
         @Parameter(description = "ID of the inquiry type to update", required = true) @PathVariable Long id,
         @RequestBody InquiryTypeDTO inquiryType, HttpServletRequest request) {
@@ -90,6 +93,7 @@ public class InquiryTypeResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = InquiryTypeDTO.class)))
     @GetMapping("/{id}")
+    @PermissionCheck({"INQUIRY_TYPE_UPDATE"})
     public ResponseEntity<InquiryTypeDTO> getInquiryType(
         @Parameter(description = "ID of the inquiry type to retrieve", required = true) @PathVariable Long id) {
         InquiryTypeDTO inquiryType = inquiryTypeService.getInquiryTypeById(id);
@@ -101,6 +105,7 @@ public class InquiryTypeResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = InquiryTypeDTO.class)))
     @GetMapping
+    @PermissionCheck({"INQUIRY_TYPE_CREATE","INQUIRY_TYPE_UPDATE","INQUIRY_TYPE_STATUS_CHANGE"})
     public ResponseEntity<List<InquiryTypeDTO>> getAllInquiryTypes(
         @PageableDefault Pageable pageable,
         @RequestParam(value = "search", required = false) String search,
@@ -114,6 +119,7 @@ public class InquiryTypeResource {
     @Operation(summary = "Change the status of an Inquiry Type", description = "Update the status of an inquiry type to either active or inactive")
     @ApiResponse(responseCode = "204", description = "Inquiry Type status updated successfully")
     @PatchMapping("/{id}/status")
+    @PermissionCheck({"INQUIRY_TYPE_STATUS_CHANGE"})
     public ResponseEntity<Void> changeInquiryTypeStatus(
         @Parameter(description = "ID of the inquiry type to update status", required = true) @PathVariable("id") Long inquiryTypeId,
         @Parameter(description = "New status of the inquiry type (true for active, false for inactive)", required = true) @RequestParam("status") Boolean status,
@@ -125,6 +131,7 @@ public class InquiryTypeResource {
     }
 
     @GetMapping("/download")
+    @PermissionCheck({"INQUIRY_TYPE_CREATE","INQUIRY_TYPE_UPDATE","INQUIRY_TYPE_STATUS_CHANGE"})
     public ResponseEntity<byte[]> listInquiryTypesDownload(@RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) throws IOException {
         ByteArrayInputStream in = inquiryTypeService.listInquiryTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();

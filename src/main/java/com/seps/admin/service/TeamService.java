@@ -11,7 +11,6 @@ import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.service.dto.*;
 import com.seps.admin.service.mapper.TeamMapper;
 import com.seps.admin.service.mapper.UserMapper;
-import com.seps.admin.service.specification.ProvinceSpecification;
 import com.seps.admin.service.specification.TeamSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;

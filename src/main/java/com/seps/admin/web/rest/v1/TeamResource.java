@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.enums.TeamEntityTypeEnum;
 import com.seps.admin.service.TeamService;
 import com.seps.admin.service.dto.*;
@@ -54,6 +55,7 @@ public class TeamResource {
         @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content(schema = @Schema(implementation = ResponseStatus.class)))
     })
     @PostMapping
+    @PermissionCheck({"TEAMS_CREATE_BY_SEPS","TEAMS_CREATE_BY_FI"})
     public ResponseEntity<ResponseStatus> createTeam(@Valid @RequestBody TeamDTO teamDTO, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to create Team : {}", teamDTO);
         RequestInfo requestInfo = new RequestInfo(request);
@@ -74,6 +76,7 @@ public class TeamResource {
         @ApiResponse(responseCode = "404", description = "Team not found", content = @Content(schema = @Schema(implementation = ResponseStatus.class)))
     })
     @PutMapping("/{id}")
+    @PermissionCheck({"TEAMS_UPDATED_BY_SEPS","TEAMS_UPDATED_BY_FI"})
     public ResponseEntity<ResponseStatus> updateTeam(@Valid @PathVariable Long id, @RequestBody TeamDTO teamDTO, HttpServletRequest request) {
         log.debug("REST request to update Team : {}", teamDTO);
         RequestInfo requestInfo = new RequestInfo(request);
@@ -94,6 +97,7 @@ public class TeamResource {
         @ApiResponse(responseCode = "404", description = "Team not found", content = @Content(schema = @Schema(implementation = ResponseStatus.class)))
     })
     @GetMapping("/{id}")
+    @PermissionCheck({"TEAMS_UPDATED_BY_SEPS","TEAMS_UPDATED_BY_FI"})
     public ResponseEntity<TeamDTO> getRole(@PathVariable Long id) {
         log.debug("REST request to get team : {}", id);
         return ResponseEntity.ok(teamService.findOne(id));
@@ -105,6 +109,7 @@ public class TeamResource {
         @ApiResponse(responseCode = "400", description = "Invalid entity type provided")
     })
     @GetMapping("/members/{entityType}")
+    @PermissionCheck({"TEAMS_CREATE_BY_SEPS","TEAMS_CREATE_BY_FI","TEAMS_UPDATED_BY_SEPS","TEAMS_UPDATED_BY_FI"})
     public ResponseEntity<List<TeamDTO.MemberDropdownDTO>> getAllMember(@Valid @PathVariable TeamEntityTypeEnum entityType) {
         log.debug("REST request to get all Members");
         List<TeamDTO.MemberDropdownDTO> members = teamService.findAllMembers(entityType);
@@ -117,6 +122,7 @@ public class TeamResource {
         @ApiResponse(responseCode = "404", description = "Team not found")
     })
     @PostMapping("/{teamId}/assign-members")
+    @PermissionCheck({"TEAMS_UPDATED_BY_SEPS","TEAMS_UPDATED_BY_FI"})
     public ResponseEntity<Void> assignMembersToTeam(
         @PathVariable Long teamId,
         @RequestBody @Valid AssignMembersRequestDTO assignMembersRequestDTO,
@@ -135,6 +141,7 @@ public class TeamResource {
         @ApiResponse(responseCode = "404", description = "Team or member not found")
     })
     @DeleteMapping("/{teamId}/unassign-member/{userId}")
+    @PermissionCheck({"TEAMS_UPDATED_BY_SEPS","TEAMS_UPDATED_BY_FI"})
     public ResponseEntity<Void> unassignMemberFromTeam(
         @PathVariable Long teamId,
         @PathVariable Long userId,
@@ -153,6 +160,7 @@ public class TeamResource {
         @ApiResponse(responseCode = "404", description = "Team not found")
     })
     @PatchMapping("/{id}/status")
+    @PermissionCheck({"TEAMS_CHANGE_STATUS_BY_SEPS","TEAMS_CHANGE_STATUS_BY_FI"})
     public ResponseEntity<Void> teamChangeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         teamService.changeStatus(id, status, requestInfo);
@@ -164,6 +172,7 @@ public class TeamResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ProvinceDTO.class)))
     @GetMapping
+    @PermissionCheck({"TEAMS_CREATE_BY_SEPS","TEAMS_CREATE_BY_FI","TEAMS_UPDATED_BY_SEPS","TEAMS_UPDATED_BY_FI","TEAMS_CHANGE_STATUS_BY_SEPS","TEAMS_CHANGE_STATUS_BY_FI"})
     public ResponseEntity<List<TeamListDTO>> listTeams(Pageable pageable,
                                                            @RequestParam(value = "search", required = false) String search,
                                                            @Parameter(description = "Filter by status (true for active, false for inactive)") @RequestParam(required = false) Boolean status) {

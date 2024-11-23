@@ -1,5 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.UserStatusEnum;
 import com.seps.admin.repository.UserRepository;
@@ -68,14 +69,13 @@ public class SEPSUserResource {
                 Upon successful creation, an account creation email is sent to the new user.
             """
     )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "201",
-            description = "SEPS User created successfully",
-            content = @Content(schema = @Schema(implementation = ResponseStatus.class))
-        )
-    })
+    @ApiResponse(
+        responseCode = "201",
+        description = "SEPS User created successfully",
+        content = @Content(schema = @Schema(implementation = ResponseStatus.class))
+    )
     @PostMapping
+    @PermissionCheck({"SEPS_USER_CREATE_BY_SEPS"})
     public ResponseEntity<ResponseStatus> addSEPSUser(@Valid @RequestBody SEPSUserDTO dto, HttpServletRequest request)
         throws URISyntaxException {
         LOG.info("Attempting to create a new SEPS user with email: {}", dto.getEmail());
@@ -102,6 +102,7 @@ public class SEPSUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = SEPSUserDTO.class)))
     @GetMapping("/{id}")
+    @PermissionCheck({"SEPS_USER_UPDATE_BY_SEPS"})
     public ResponseEntity<SEPSUserDTO> getSepsUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getSEPSUserById(id));
     }
@@ -111,6 +112,7 @@ public class SEPSUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = SEPSUserDTO.class)))
     @GetMapping
+    @PermissionCheck({"SEPS_USER_CREATE_BY_SEPS","SEPS_USER_UPDATE_BY_SEPS","SEPS_USER_STATUS_CHANGE_BY_SEPS"})
     public ResponseEntity<List<SEPSUserDTO>> listSEPSUsers(Pageable pageable,
                                                            @RequestParam(value = "search", required = false) String search,
                                                            @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
@@ -130,6 +132,7 @@ public class SEPSUserResource {
         )
     })
     @PutMapping("/{id}")
+    @PermissionCheck({"SEPS_USER_UPDATE_BY_SEPS"})
     public ResponseEntity<ResponseStatus> editSEPSUser(@PathVariable Long id, @Valid @RequestBody SEPSUserDTO dto,
                                                        HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
@@ -145,6 +148,7 @@ public class SEPSUserResource {
     @Operation(summary = "Change the status of a SEPS User", description = "Update the status of a SEPS User (ACTIVE/BLOCKED).")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/{status}")
+    @PermissionCheck({"SEPS_USER_STATUS_CHANGE_BY_SEPS"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @PathVariable(name = "status") UserStatusEnum status,
                                              HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);

@@ -47,7 +47,7 @@ public class RoleResource {
 
     @Operation(tags = {"Role Management"}, summary = "Create a new role", description = "Add a new role to the system")
     @PostMapping
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    //@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<ResponseStatus> createRole(@Valid @RequestBody RoleDTO roleDTO, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to save Role : {}", roleDTO);
         RequestInfo requestInfo = new RequestInfo(request);
