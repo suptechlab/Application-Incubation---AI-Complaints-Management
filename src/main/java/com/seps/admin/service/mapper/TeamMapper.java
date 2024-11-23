@@ -1,15 +1,18 @@
 package com.seps.admin.service.mapper;
 
+import com.seps.admin.domain.Role;
 import com.seps.admin.domain.Team;
 import com.seps.admin.domain.TeamMember;
 import com.seps.admin.service.dto.TeamDTO;
 import com.seps.admin.service.dto.TeamListDTO;
+import java.util.Collections;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface TeamMapper {
@@ -33,7 +36,7 @@ public interface TeamMapper {
     @Named("mapTeamMembersToDTOs")
     default List<TeamDTO.MemberDTO> mapTeamMembersToDTOs(List<TeamMember> teamMembers) {
         if (teamMembers == null) {
-            return null;
+            return Collections.emptyList();
         }
         return teamMembers.stream().map(teamMember -> {
             TeamDTO.MemberDTO memberDTO = new TeamDTO.MemberDTO();
@@ -45,6 +48,8 @@ public interface TeamMapper {
             memberDTO.setAssignedByEmail(
                 teamMember.getAssigned() != null ? teamMember.getAssigned().getEmail() : null
             ); // Assigned by email
+            String roles = teamMember.getUser().getRoles().stream().map(Role::getName).collect(Collectors.joining(", "));
+            memberDTO.setRole(roles);
             return memberDTO;
         }).toList();
     }

@@ -16,6 +16,8 @@ import com.seps.admin.service.specification.TeamSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -25,12 +27,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.seps.admin.component.CommonHelper.convertEntityToMap;
 
 @Service
 @Transactional
 public class TeamService {
+
+    private static final Logger log = LoggerFactory.getLogger(TeamService.class);
 
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
@@ -42,6 +47,8 @@ public class TeamService {
     private final MessageSource messageSource;
     private final Gson gson;
     private final TeamMapper teamMapper;
+    private final MailService mailService;
+
     /**
      * Service class responsible for handling operations related to teams and team members.
      * This service provides methods to manage teams, their members, and the interactions between them,
@@ -59,6 +66,7 @@ public class TeamService {
      *     <li>{@link MessageSource} - Source for retrieving internationalized messages.</li>
      *     <li>{@link Gson} - Utility class for serializing and deserializing JSON data.</li>
      *     <li>{@link TeamMapper} - Mapper to convert between team entity and DTO objects.</li>
+     *     <li>{@link MailService} - Service to send mails</li>
      * </ul>
      * </p>
      *
@@ -72,11 +80,12 @@ public class TeamService {
      * @param messageSource Service for retrieving messages for internationalization.
      * @param gson Utility for converting objects to JSON and vice versa.
      * @param teamMapper Mapper for converting between team entities and DTOs.
+     * @param mailService Service for send mails.
      */
     @Autowired
     public TeamService(TeamRepository teamRepository, TeamMemberRepository teamMemberRepository, OrganizationService organizationService,
                        UserRepository userRepository, UserMapper userMapper, AuditLogService auditLogService, UserService userService, MessageSource messageSource,
-                       Gson gson, TeamMapper teamMapper) {
+                       Gson gson, TeamMapper teamMapper, MailService mailService) {
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
         this.userService = userService;
@@ -87,6 +96,7 @@ public class TeamService {
         this.messageSource = messageSource;
         this.gson = gson;
         this.teamMapper = teamMapper;
+        this.mailService = mailService;
     }
 
     /**
@@ -392,27 +402,35 @@ public class TeamService {
     }
 
     @Transactional(readOnly = true)
-    public List<DropdownListDTO> findAllMembers(TeamEntityTypeEnum entityType) {
+    public List<TeamDTO.MemberDropdownDTO> findAllMembers(TeamEntityTypeEnum entityType) {
         User currentUser = userService.getCurrentUser();
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
+
+        // Determine the user role
         String userRole = AuthoritiesConstants.SEPS;
-        if (authority.contains(AuthoritiesConstants.FI) || (authority.contains(AuthoritiesConstants.ADMIN) && entityType.equals(TeamEntityTypeEnum.FI))) {
+        if (authority.contains(AuthoritiesConstants.FI) ||
+            (authority.contains(AuthoritiesConstants.ADMIN) && entityType.equals(TeamEntityTypeEnum.FI))) {
             userRole = AuthoritiesConstants.FI;
         }
 
-        // Fetch valid member IDs based on the specified role
+        // Fetch users not assigned to a team by role
         List<User> users = userRepository.findUsersNotAssignedToTeamByRole(userRole);
 
-        // Map the User entity to DropdownListDTO
+        // Map User entities to MemberDropdownDTO
         return users.stream()
-            .map(user -> new DropdownListDTO(
-                user.getId(),
-                user.getFirstName() // Assuming `getFirstName` provides the name to display
-            ))
+            .map(user -> {
+                String roles = user.getRoles().stream().map(Role::getName).collect(Collectors.joining(", "));
+                TeamDTO.MemberDropdownDTO dropdown = new TeamDTO.MemberDropdownDTO();
+                dropdown.setId(user.getId());
+                dropdown.setName(user.getFirstName() != null ? user.getFirstName() + " (" + roles + ")" : ""); // Handle null names
+                dropdown.setRole(roles); // Ensure compatibility
+                return dropdown;
+            })
             .toList();
     }
+
 
     public List<Long> assignMembersToTeam(Long teamId, AssignMembersRequestDTO requestDto) {
         Team team = teamRepository.findById(teamId)
@@ -448,6 +466,21 @@ public class TeamService {
             .toList();
 
         teamMemberRepository.saveAll(newTeamMembers);
+
+        log.debug("userIdsToAssign: {}",userIdsToAssign);
+        // Send emails to new members
+        userIdsToAssign.forEach(userId -> {
+            log.debug("userId: {}",userId);
+            User newUser = userService.getUserById(userId);
+            mailService.sendWelcomeToTeamEmail(newUser, team.getTeamName());
+        });
+
+        // Notify existing team members
+        alreadyAssignedUserIds.forEach(userId -> {
+            User existingUser = userService.getUserById(userId);
+            mailService.sendNewMemberAddedNotification(existingUser, team.getTeamName(), userIdsToAssign);
+        });
+
         return userIdsToAssign;
     }
     public void assignMembersToTeamLoad(Map<String, Object> oldData, Long teamId,List<Long> userIdsToAssign, AssignMembersRequestDTO requestDto, RequestInfo requestInfo){

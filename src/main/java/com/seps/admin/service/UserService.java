@@ -531,4 +531,10 @@ public class UserService {
         auditLogService.logActivity(null, currenUser.getId(), requestInfo, "changeFIStatus", ActionTypeEnum.FI_USER_STATUS_CHANGE.name(), user.getId(), User.class.getSimpleName(),
             null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), requestBody);
     }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CURRENT_USER_NOT_FOUND, null, null));
+    }
+
 }
