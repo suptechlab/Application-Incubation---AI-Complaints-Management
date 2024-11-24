@@ -78,8 +78,14 @@ export default function TeamManagementEdit() {
         //setSelectedMember(null); // Clear selection    
         setMembersArr((prevNumbers) => [...prevNumbers, selectedMember.value]);
         console.log('membersArr',membersArr)
+        console.log('newTeamMember',selectedMember.value)
+        let assignMemberArr = [];
+        assignMemberArr.push(selectedMember.value)
+        console.log('assignMemberArr',assignMemberArr)
+        
         const data = {
-            userIds: membersArr
+            // userIds: membersArr
+            userIds: assignMemberArr
         }
         // calling api to assign member into team
         assignUserIntoTeam(userData.id,data).then((response) => {
@@ -240,8 +246,7 @@ export default function TeamManagementEdit() {
                                     onSubmit={handleSubmit}
                                     className="d-flex flex-column h-100"
                                 >
-                                    <pre>{JSON.stringify(userData,null,2)}</pre>
-                                    <pre>{JSON.stringify(initialValues,null,2)}</pre>
+                                    
                                     <Row>
                                         <Col xs={12} className="mb-3">
                                             <div className='status-radio'>
@@ -340,7 +345,6 @@ export default function TeamManagementEdit() {
                                             />
                                         </Col>
                                        
-                                        <pre>newTeamMember: {JSON.stringify(newTeamMember,null,2)}</pre>
                                         <Col xs={12}>
                                             <h5 className="fw-semibold mb-1 border-bottom mb-3 py-2">{t('ASSIGN TEAM MEMBERS')}</h5>
                                             <Row>
