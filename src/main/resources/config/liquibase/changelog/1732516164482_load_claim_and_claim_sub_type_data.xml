@@ -5,24 +5,25 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-  <changeSet id="1731950291396-1" author="matellio" labels="data">
+  <changeSet id="1732516164482" author="matellio" labels="data">
 
     <!-- Truncate tables before loading data -->
     <sql>
-      TRUNCATE TABLE inquiry_sub_type CASCADE;
-      TRUNCATE TABLE inquiry_type CASCADE;
+      TRUNCATE TABLE claim_sub_type CASCADE;
+      TRUNCATE TABLE claim_type CASCADE;
     </sql>
 
     <!-- Reset sequences -->
     <sql>
-      ALTER SEQUENCE inquiry_sub_type_id_seq RESTART WITH 1;
-      ALTER SEQUENCE inquiry_type_id_seq RESTART WITH 1;
+      ALTER SEQUENCE claim_sub_type_id_seq RESTART WITH 1;
+      ALTER SEQUENCE claim_type_id_seq RESTART WITH 1;
     </sql>
 
     <!-- Load data into tables -->
     <loadData
-      file="config/liquibase/data/inquiryTypeData.csv"
-      tableName="inquiry_type">
+      file="config/liquibase/data/claim_type_data.csv"
+      separator=";"
+      tableName="claim_type">
       <column name="id" type="numeric"/>
       <column name="name" type="string"/>
       <column name="description" type="string"/>
@@ -32,25 +33,26 @@
     </loadData>
 
     <loadData
-      file="config/liquibase/data/inquirySubTypeData.csv"
+      file="config/liquibase/data/claim_sub_type_data.csv"
       separator=";"
-      tableName="inquiry_sub_type">
+      tableName="claim_sub_type">
       <column name="id" type="numeric"/>
       <column name="name" type="string"/>
       <column name="description" type="string"/>
-      <column name="inquiry_type_id" type="numeric"/>
+      <column name="claim_type_id" type="numeric"/>
+      <column name="sla_breach_days" type="numeric"/>
       <column name="status" type="boolean"/>
       <column name="created_at" type="timestamp"/>
       <column name="updated_at" type="timestamp"/>
     </loadData>
 
   </changeSet>
-  <changeSet id="1731950291396-3" author="matellio" labels="data">
+  <changeSet id="1732516429730" author="matellio" labels="data">
 
     <!-- Update sequences based on current max ID -->
     <sql>
-      SELECT setval('inquiry_sub_type_id_seq', (SELECT MAX(id) FROM inquiry_sub_type), true);
-      SELECT setval('inquiry_type_id_seq', (SELECT MAX(id) FROM inquiry_type), true);
+      SELECT setval('claim_sub_type_id_seq', (SELECT MAX(id) FROM claim_sub_type), true);
+      SELECT setval('claim_type_id_seq', (SELECT MAX(id) FROM claim_type), true);
     </sql>
 
   </changeSet>

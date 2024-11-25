@@ -1,0 +1,49 @@
+id;name;description;claim_type_id;sla_breach_days;status;created_at;updated_at
+1;Refinancing Request;Refinancing Request;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+2;Unauthorized and/or Unrequested Refinancing;Unauthorized and/or Unrequested Refinancing;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+3;Restructuring Request;Restructuring Request;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+4;Unauthorized and/or Unrequested Restructuring;Unauthorized and/or Unrequested Restructuring;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+5;Novation Request;Novation Request;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+6;Unauthorized and/or Unrequested Novation;Unauthorized and/or Unrequested Novation;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+7;Unrequested Credits;Unrequested Credits;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+8;Inconsistencies in the Amortization Schedule;Inconsistencies in the Amortization Schedule;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+9;Pending Interest Payments for Novation, Refinanced, or Restructured Accounts;Pending Interest Payments for Novation, Refinanced, or Restructured Accounts;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+10;Sale of Credit Portfolio;Sale of Credit Portfolio;1;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+11;Asset Allocation Due to Credit Operation Cancellation;Asset Allocation Due to Credit Operation Cancellation;2;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+12;Non-Return of Demand Deposits;Non-Return of Demand Deposits;3;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+13;Non-Return of Matured Time Deposits;Non-Return of Matured Time Deposits;3;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+14;Non-Return of Upcoming Time Deposits;Non-Return of Upcoming Time Deposits;3;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+15;Deposits Restricted Due to Credit Reserve Requirements;Deposits Restricted Due to Credit Reserve Requirements;3;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+16;Unauthorized Electronic Transfers;Unauthorized Electronic Transfers;3;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+17;Unjustified Retention of Any Other Type of Demand Deposit Without Explicit Restriction;Unjustified Retention of Any Other Type of Demand Deposit Without Explicit Restriction;3;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+18;Settlement of Benefits Due to Partner's Death;Settlement of Benefits Due to Partner's Death;4;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+19;Settlement of Benefits Due to Voluntary Withdrawal or Exclusion;Settlement of Benefits Due to Voluntary Withdrawal or Exclusion;4;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+20;Request for Removal of Credit Report as Direct Debtor;Request for Removal of Credit Report as Direct Debtor;5;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+21;Request for Removal of Credit Report as Indirect Debtor;Request for Removal of Credit Report as Indirect Debtor;5;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+22;Correction of Credit Terms Reported to Credit Registry;Correction of Credit Terms Reported to Credit Registry;5;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+23;Lack of Prior and Explicit Authorization from the Client or User for Charges or Collections Related to Financial Products and Services;Lack of Prior and Explicit Authorization from the Client or User for Charges or Collections Related to Financial Products and Services;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+24;Financial Services or Products Not Actually Provided;Financial Services or Products Not Actually Provided;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+25;Charges for Financial Services or Products That Have Not Been Previously Disclosed and/or Agreed Upon (Accepted);Charges for Financial Services or Products That Have Not Been Previously Disclosed and/or Agreed Upon (Accepted);6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+26;Interest Rates, Service Fees, and/or Expenses That Do Not Comply with the Criteria (Maximum Rates) Established in Current Legal Framework;Interest Rates, Service Fees, and/or Expenses That Do Not Comply with the Criteria (Maximum Rates) Established in Current Legal Framework;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+27;Conducting Financial Activities Not Properly Authorized by Regulations, Statutes, or the Regulatory Body;Conducting Financial Activities Not Properly Authorized by Regulations, Statutes, or the Regulatory Body;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+28;Unjustified-Retention of Any Other Type of Demand Deposit Without Explicit Restriction;Unjustified-Retention of Any Other Type of Demand Deposit Without Explicit Restriction;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+29;Inaccessibility to Financial Services and Products Due to Operational and/or Technological Issues;Inaccessibility to Financial Services and Products Due to Operational and/or Technological Issues;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+30;Use of Inappropriate Judicial and Extrajudicial Collection Methods;Use of Inappropriate Judicial and Extrajudicial Collection Methods;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+31;Demand and Collection of Complementary Insurance to the Debt Reduction Insurance;Demand and Collection of Complementary Insurance to the Debt Reduction Insurance;6;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+32;Existence of Prohibited Clauses or Clauses That Violate the Rights of Financial Services Users;Existence of Prohibited Clauses or Clauses That Violate the Rights of Financial Services Users;7;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+33;Denial of Access to Personal and Credit Information;Denial of Access to Personal and Credit Information;7;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+34;Unilateral Modifications of the Terms and Conditions Included in Contracts Related to Financial Products and Services;Unilateral Modifications of the Terms and Conditions Included in Contracts Related to Financial Products and Services;7;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+35;Refusal to Provide Information and Documentation of All Acts Supporting the Negotiation, Contracting, Execution, and Termination of the Contract, and/or the Provision of Products and Services;Refusal to Provide Information and Documentation of All Acts Supporting the Negotiation, Contracting, Execution, and Termination of the Contract, and/or the Provision of Products and Services;7;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+36;Refusal to Obtain Documents That Have Been Properly Cancelled or Endorsed Due to Subrogation of the Obligation as an Indirect Debtor;Refusal to Obtain Documents That Have Been Properly Cancelled or Endorsed Due to Subrogation of the Obligation as an Indirect Debtor;7;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+37;Failure to Provide Information Related to Each Amortization System of the Credit for Decision-Making;Failure to Provide Information Related to Each Amortization System of the Credit for Decision-Making;7;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+38;Provision of Other Documentation Related to Internal Management of the Entity;Provision of Other Documentation Related to Internal Management of the Entity;7;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+39;Unauthorized Credit Card Transactions;Unauthorized Credit Card Transactions;8;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+40;Unauthorized Debit Card Transactions;Unauthorized Debit Card Transactions;8;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+41;Violation of the Protection of Personal Data and Financial Records;Violation of the Protection of Personal Data and Financial Records;9;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+42;Acquisition of Personal Data and Financial Records Without the Holder's Consent;Acquisition of Personal Data and Financial Records Without the Holder's Consent;9;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+43;Internal Conflicts Between Partners;Internal Conflicts Between Partners;10;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+44;Conflicts Between Internal Bodies;Conflicts Between Internal Bodies;10;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+45;Challenge to Assembly Resolutions;Challenge to Assembly Resolutions;10;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+46;Election Processes for Boards and Representatives;Election Processes for Boards and Representatives;10;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+47;Appointment of Managers;Appointment of Managers;10;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054
+48;Unjustified Exclusion of Partners;Unjustified Exclusion of Partners;10;15;TRUE;2024-11-25 09:45:27.054;2024-11-25 09:45:27.054

@@ -15,6 +15,7 @@
     <include file="config/liquibase/changelog/1731074890841_chatbot_session_schema.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1731929370955_load_inquiry_data.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1731929370988_load_province_city_data.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1732516164482_load_claim_and_claim_sub_type_data.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
