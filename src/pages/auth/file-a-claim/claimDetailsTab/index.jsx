@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchClaimSubTypes } from '../../../../redux/slice/masterSlice';
 import { useTranslation } from 'react-i18next';
 
-const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
+const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading }) => {
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
     const { t } = useTranslation()
@@ -46,15 +46,14 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
         handleFormSubmit(values, actions);
     };
 
-
     const getClaimSubTypes = async (claimTypeId) => {
+        setIsLoading(true)
         const response = await dispatch(fetchClaimSubTypes(claimTypeId))
-
         if (fetchClaimSubTypes.fulfilled.match(response)) {
-
             setClaimSubTypes(response?.payload)
-
+            setIsLoading(false)
         } else {
+            setIsLoading(false)
             console.error('Sub types error:', response.error.message);
         }
     }
@@ -207,6 +206,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             type="submit"
                             variant="warning"
                             className="custom-min-width-100"
+                            disabled={formikProps?.isSubmitting ?? false}
                         >
                             {t("FINISH")}<span className="ms-1">&gt;</span>
                         </Button>

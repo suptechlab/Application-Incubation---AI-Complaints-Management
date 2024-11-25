@@ -4,7 +4,7 @@ import EndPoint from '../api/endpoint';
 import { removeLocalStorage, setLocalStorage } from '../../utils/storage';
 
 const initialState = {
-    token: '',
+    token: null,
     loading: false,
     error: null,
     user: {},
@@ -160,7 +160,7 @@ const authSlice = createSlice({
     initialState: initialState,
     reducers: {
         setLogout: (state) => {
-            state.token = '';
+            state.token = null;
             state.user = {};
             state.isLoggedIn = false
             removeLocalStorage('id_token');

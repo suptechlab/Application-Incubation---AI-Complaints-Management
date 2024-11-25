@@ -9,6 +9,8 @@ import OtherInfoTab from "./otherInfoTab";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { fileClaimForm } from "../../../redux/slice/fileClaimSlice";
+import { useNavigate } from "react-router-dom";
+import Loader from "../../../components/Loader";
 
 const FileClaimModal = ({ handleShow, handleClose }) => {
 
@@ -20,7 +22,11 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     const [fileSuccesModalShow, setFileSuccesModalShow] = useState(false);
     const [fileAlertModalShow, setFileAlertModalShow] = useState(false);
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const [fileClaimResponse, setFileClaimResponse] = useState({})
+
+    const navigate = useNavigate()
 
 
     const dispatch = useDispatch()
@@ -72,26 +78,18 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     // HANDLE CLAIM DETAILS  AND FORM WILL BE FINISH HERE
     const handleClaimDetailsSubmit = async (values, actions) => {
 
-        // {
-        //     "checkDuplicate": true,
-        //     "foundDuplicate": false,
-        //     "duplicateTicketId": null,
-        //     "newTicketId": 1732278855,
-        //     "email": "jay@yopmail.com"
-        // }
         let formData = { ...fileClaimValues, ...values }
-    
+
         formData.checkDuplicate = true
 
         setFileClaimValues((prev) => ({ ...prev, ...values }))
 
         const result = await dispatch(fileClaimForm(formData));
         if (fileClaimForm.fulfilled.match(result)) {
+            console.log({ result: result?.payload?.data })
             setFileClaimResponse(result?.payload?.data)
             // console.log(result?.payload?.data)
             // console.log('Claim Details values', values)
-
-
             if (result?.payload?.data?.foundDuplicate === true) {
                 setFileAlertModalShow(true)
             } else {
@@ -99,44 +97,36 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
             }
             actions.setSubmitting(false);
             handleCloseReset()
-
-
         } else {
             console.error('Verification error:', result.error.message);
+            actions.setSubmitting(false)
         }
     };
-    const handleFileDuplicateClaim =async ()=>{
 
-        let formData ={...fileClaimValues,checkDuplicate : false }
-       
+    // HANDLE FILE DUPLICATE CLAIM
+    const handleFileDuplicateClaim = async () => {
+        let formData = { ...fileClaimValues, checkDuplicate: false }
         const result = await dispatch(fileClaimForm(formData));
         if (fileClaimForm.fulfilled.match(result)) {
             setFileClaimResponse(result?.payload?.data)
-            // console.log(result?.payload?.data)
-            // console.log('Claim Details values', values)
             setFileAlertModalShow(false)
             setFileSuccesModalShow(true)
             handleCloseReset()
-
-
         } else {
             console.error('Verification error:', result.error.message);
         }
     }
     // Handle File Alert Click
     const handleFileAlertClick = () => {
-        console.log('handleFileAlertClick')
         setFileAlertModalShow(false)
         setFileSuccesModalShow(true)
     };
-
     // Handle File Succes Click
     const handleFileSuccesClick = () => {
-        console.log('handleFileSuccesClick')
         setFileSuccesModalShow(false)
         setActiveTab(0)
+        navigate('/my-account')
     };
-
     //Steps Data
     const stepData = [
         {
@@ -167,7 +157,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     const tabData = [
         {
             eventKey: 0,
-            content: <BasicInfoTab handleFormSubmit={handleBasicInfoSubmit} />,
+            content: <BasicInfoTab handleFormSubmit={handleBasicInfoSubmit} setIsLoading={setIsLoading} />,
         },
         {
             eventKey: 1,
@@ -175,11 +165,12 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
         },
         {
             eventKey: 2,
-            content: <ClaimDetailsTab backButtonClickHandler={backButtonClaimDetailsClickHandler} handleFormSubmit={handleClaimDetailsSubmit} />,
+            content: <ClaimDetailsTab backButtonClickHandler={backButtonClaimDetailsClickHandler} handleFormSubmit={handleClaimDetailsSubmit} setIsLoading={setIsLoading} />,
         },
     ];
     return (
         <React.Fragment>
+            <Loader isLoading={isLoading} />
             <Modal
                 show={handleShow}
                 onHide={handleClose}
@@ -227,7 +218,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
                 handleShow={fileAlertModalShow}
                 handleClose={() => setFileAlertModalShow(false)}
                 handleFormSubmit={handleFileDuplicateClaim}
-                fileClaimData ={fileClaimResponse}
+                fileClaimData={fileClaimResponse}
             />
 
             {/* FILE A CLAIM SUCCESS */}
@@ -235,7 +226,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
                 handleShow={fileSuccesModalShow}
                 handleClose={() => setFileSuccesModalShow(false)}
                 handleFormSubmit={handleFileSuccesClick}
-                fileClaimData ={fileClaimResponse}
+                fileClaimData={fileClaimResponse}
             />
         </React.Fragment>
     );

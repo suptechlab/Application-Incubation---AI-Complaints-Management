@@ -66,7 +66,7 @@ const LoginFormSection = ({ handleFormSubmit }) => {
                         <Button
                             type="submit"
                             variant="warning"
-                            className="custom-min-width-100 ms-auto"
+                            className="custom-min-width-100 ms-auto mt-2"
                             disabled={formikProps?.isSubmitting}
                         >
                             {t('SEND_OTP_BUTTON')}

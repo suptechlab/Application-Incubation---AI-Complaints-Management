@@ -21,6 +21,10 @@ const formatGeneralData = (data) =>
 const formatListData = (data) =>
   data.map((item) => ({ label: item.name, value: item.id }));
 
+// HELPER FUNCTION TO FORMAT CLAM DATA FOR DROPDOWN
+const formatOrganizationalUnits = (data) =>
+  data.map((item) => ({ label: item.nemonicoTipoOrganizacion, value: item.id , ruc : item.ruc }));
+
 // Async Thunk to fetch and format all dropdown data
 export const fetchMasterData = createAsyncThunk(
   "masterDropdownData/fetchMasterData",
@@ -44,7 +48,7 @@ export const fetchMasterData = createAsyncThunk(
         customer_types: formatGeneralData(masterDataResponse.data.customerType),
         priority_care_group: formatGeneralData(masterDataResponse.data.priorityCareGroup),
         claim_types: formatListData(claimTypesResponse.data),
-        organizational_units: formatListData(organizationalUnitResponse.data),
+        organizational_units: formatOrganizationalUnits(organizationalUnitResponse.data),
         province_list: formatListData(provinceListResponse.data),
       };
     } catch (error) {

@@ -66,7 +66,6 @@ export const BasicInfoFormSchema = yup.object({
     // .required("Country code is required")
     .matches(/^\+\d{1,4}$/, "Country code must be a valid international dialing code (e.g., +1, +91)")
     .max(5, "Country code must not exceed 5 characters"),
-
   phoneNumber: yup.string()
     // .required("Phone number is required")
     .matches(/^\d+$/, "Phone number must contain only digits")

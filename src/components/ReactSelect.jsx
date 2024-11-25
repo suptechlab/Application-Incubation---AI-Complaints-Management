@@ -14,16 +14,18 @@ const ReactSelect = ({
   placeholder,
   error,
   defaultValue = null,
+  touched,
+  readOnly
 }) => {
   const customStyles = {
     control: (base, state) => ({
       ...base,
-      borderColor: state.isFocused ? "#00549E" : error ? "#FF1418" : "#7F7F7F",
+      borderColor: state.isFocused ? "#00549E" : error && touched ? "#FF1418" : "#7F7F7F",
       boxShadow: state.isFocused ? "0 0 0 .2rem rgba(0,123,255,.25)" : null,
       "&:hover": {
         borderColor: state.isFocused
           ? "#00549E"
-          : error
+          : error && touched
           ? "#FF1418"
           : "#7F7F7F",
       },
@@ -93,6 +95,7 @@ const ReactSelect = ({
         onChange={(option) =>
           onChange({ target: { name, value: option ? option.value : "" } })
         }
+        isDisabled={readOnly ?? false}
         options={formattedOptions}
         placeholder={placeholder || ''}
         isClearable={selectedOption?.value != ""}
@@ -110,7 +113,7 @@ const ReactSelect = ({
         menuPlacement="auto"
         // menuIsOpen={true}
       />
-      {error ? <div className="form-text text-danger small">{error}</div> : null}
+      {error && touched ? <div className="form-text text-danger small">{error}</div> : null}
     </div>
   );
 };

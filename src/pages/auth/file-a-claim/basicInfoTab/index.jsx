@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { countryCodes } from '../../../../constants/CountryCodes';
 import { fetchCityList } from '../../../../redux/slice/masterSlice';
 
-const BasicInfoTab = ({ handleFormSubmit }) => {
+const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
 
     const dispatch = useDispatch()
@@ -21,13 +21,11 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
     const formattedCountryCodes = countryCodes.map(country => ({
         value: country?.value,
         label: country?.value
-      }));
-    
+    }));
+
 
     const { t } = useTranslation()
-
-
-    const [cityList , setCityList] = useState([])
+    const [cityList, setCityList] = useState([])
 
 
     // Initial Values
@@ -36,8 +34,8 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
         email: user?.email ?? '',
         name: user?.name ?? '',
         gender: user?.gender ?? '',
-        countryCode: '',
-        phoneNumber: '',
+        countryCode: user?.countryCode ?? '',
+        phoneNumber:user?.phoneNumber ?? '',
         provinceId: '',
         cityId: '',
     };
@@ -47,14 +45,14 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
     };
 
     const getCityList = async (provinceId) => {
+        setIsLoading(true)
         const response = await dispatch(fetchCityList(provinceId))
-
         if (fetchCityList.fulfilled.match(response)) {
-
             setCityList(response?.payload)
-
+            setIsLoading(false)
         } else {
             console.error('Sub types error:', response.error.message);
+            setIsLoading(false)
         }
     }
 
@@ -131,7 +129,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                 />
                             </Col>
                             <Col lg={6}>
-                            <FormInputBox
+                                <FormInputBox
                                     id="gender"
                                     label={t("GENDER")}
                                     name="gender"
@@ -162,6 +160,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                             className={formikProps.touched.countryCode && formikProps.errors.countryCode ? "is-invalid" : ""}
                                             onBlur={formikProps.handleBlur}
                                             touched={formikProps.touched.countryCode}
+                                            readOnly={user?.countryCode ? true : false}
                                         />
                                     </Col>
                                     <Col lg={8}>
@@ -177,6 +176,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                             onChange={formikProps.handleChange}
                                             touched={formikProps.touched.phoneNumber}
                                             value={formikProps.values.phoneNumber || ""}
+                                            readOnly={user?.phoneNumber ? true : false}
                                         />
                                     </Col>
                                 </Row>
@@ -185,7 +185,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("PROVINCE_OF_RESIDENCE")}
-                                    error={formikProps.errors.provinceId}
+                                    error={formikProps?.errors?.provinceId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
                                         ...province_list.map((group) => ({
@@ -195,12 +195,21 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                     ]}
                                     value={formikProps.values.provinceId}
                                     onChange={(option) => {
+
                                         formikProps.setFieldValue(
                                             "provinceId",
                                             option?.target?.value ?? ""
                                         );
-                                        formikProps.setFieldValue("cityId", "");
-                                        getCityList(option?.target?.value);
+
+                                        if (option?.target?.value && option?.target?.value !== "") {
+                                            // formikProps.setFieldTouched("cityId", false);
+
+                                            if(formikProps?.values?.city && formikProps?.values?.city !== ""){
+                                                formikProps.setFieldValue("cityId", ""); // Reset cityId
+                                            }
+                                            getCityList(option?.target?.value);
+                                        }
+
                                     }}
                                     name="provinceId"
                                     className={formikProps.touched.provinceId && formikProps.errors.provinceId ? "is-invalid" : ""}
@@ -211,7 +220,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("CANTON_OF_RESIDENCE")}
-                                    error={formikProps.errors.cityId}
+                                    error={formikProps?.errors?.cityId }
                                     options={[
                                         { label: t("SELECT"), value: "" },
                                         ...cityList.map((group) => ({
@@ -227,7 +236,7 @@ const BasicInfoTab = ({ handleFormSubmit }) => {
                                         );
                                     }}
                                     name="cityId"
-                                    className={formikProps.touched.cityId && formikProps.errors.cityId ? "is-invalid" : ""}
+                                    className={formikProps?.touched?.cityId && formikProps?.errors?.cityId ? "is-invalid" : ""}
                                     onBlur={formikProps.handleBlur}
                                     touched={formikProps.touched.cityId}
                                 />

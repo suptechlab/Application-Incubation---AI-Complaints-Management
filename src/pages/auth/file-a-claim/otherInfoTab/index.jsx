@@ -45,7 +45,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("PRIORITY_CARE_GROUP")}
-                                    error={formikProps.errors.priorityCareGroup}
+                                    error={formikProps.errors.priorityCareGroup }
                                     options={[
                                         { label: t("SELECT"), value: "" },
                                         ...priority_care_group.map((group) => ({
@@ -103,7 +103,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("ENTITY_NAME")}
-                                    error={formikProps.errors.organizationId}
+                                    error={formikProps.errors.organizationId }
                                     options={[
                                         { label: t("SELECT"), value: "" },
                                         ...organizational_units.map((group) => ({
@@ -113,11 +113,10 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                     ]}
                                     value={formikProps.values.organizationId}
                                     onChange={(option) => {
-
                                         const selectedUnit = organizational_units.find(
                                             (unit) => unit.value === option?.target?.value
                                         )
-                                        setSelectedRuc(selectedUnit?.label)
+                                        setSelectedRuc(selectedUnit?.ruc)
                                         formikProps.setFieldValue(
                                             "organizationId",
                                             option?.target?.value ?? ""
