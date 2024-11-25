@@ -117,7 +117,7 @@ export default function AddStatePage() {
           navigate('/users')
         }).catch((error) => {
           setUserLoading(false);
-          toast.error(error.response.data.detail);
+          toast.error(error.response.data.errorDescription ?? error.response.data.detail);
 
         }).finally(() => {
           actions.setSubmitting(false)
