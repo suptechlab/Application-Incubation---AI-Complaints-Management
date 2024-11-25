@@ -21,8 +21,9 @@ const EndPoint = {
   MASTER_ORGANIZATIONAL_UNIT : `/${version}/masters/organization-list`,
   MASTER_PROVINCE_LIST :  `/${version}/masters/province-list`,
   MASTER_CITY_LIST :  `/${version}/masters/city-list`,
-  FILE_CLAIM_SUBMIT : `/${version}/user/claim-tickets/file-claim`
-
+  FILE_CLAIM_SUBMIT : `/${version}/user/claim-tickets/file-claim`,
+  LIST_CLAIMS : `/${version}/user/claim-tickets`,
+  CLAIM_TICKETS : `/${version}/user/claim-tickets`
 };
 
 export default EndPoint;

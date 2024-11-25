@@ -30,10 +30,11 @@ export default function ReactTable({
 
 
   const { data } = dataQuery;
+
   // console.log('32 table',dataQuery?.data)
   const table = useReactTable({
     // data: dataQuery.data?.data?.data ?? defaultData,
-    data: data?.data ?? defaultData,
+    data: data?.payload ?? defaultData,
     columns,
     defaultColumn: {
       size: '200px',
@@ -53,34 +54,25 @@ export default function ReactTable({
     enableSortingRemoval: true,
   });
 
+
   React.useEffect(() => {
     let path = "";
-  
-    // Check if pagination is enabled
-    if (pagination && showPagination) {
-      if (sorting && sorting.length === 0) {
-        path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize}`;
-      } else {
-        path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize}&sortBy=${sorting
+
+    if (sorting.length === 0) {
+      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
+        }`;
+    } else {
+      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
+        }&sortBy=${sorting
           .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
           .join(",")}`;
-      }
-    } else if (sorting && sorting.length > 0) {
-      // If only sorting is enabled, exclude pagination parameters
-      path = `${location.pathname}?sortBy=${sorting
-        .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
-        .join(",")}`;
-    } else {
-      // If neither pagination nor sorting is enabled, keep the base path
-      path = `${location.pathname}`;
     }
-  
+
     navigate(path);
-  }, [sorting, pagination, showPagination]);
-  
+  }, [sorting, pagination]);
 
   return (
-    <div className="d-flex flex-column flex-grow-1 small table-cover-main">
+    <div className="d-flex flex-column h-100 small table-cover-main">
       {/* <Loader isLoading={isLoading} /> */}
       <BTable striped bordered hover responsive className="mb-0">
         <thead>
@@ -96,7 +88,7 @@ export default function ReactTable({
                     {header.column.getCanSort() ? (
                       <Button
                         variant="link"
-                        className="align-items-center border-0 cursor-pointer d-flex fw-semibold gap-2 text-body p-0 table-sorting text-decoration-none user-select-none w-100 text-start"
+                        className="align-items-center border-0 cursor-pointer d-flex fw-semibold gap-2 link-dark p-0 table-sorting text-decoration-none user-select-none w-100 text-start"
                         onClick={header.column.getToggleSortingHandler()}
                         title={
                           header.column.getCanSort()
@@ -110,10 +102,8 @@ export default function ReactTable({
                       >
                         {flexRender(
                           header.column.columnDef.header,
-
                           header.getContext()
                         )}
-
                         {{
                           asc: (
                             <span>
@@ -162,8 +152,8 @@ export default function ReactTable({
       {showPagination && (
         <div className="mt-auto pt-3 pb-1 pagination-cover">
           <DataGridPagination
-            rowsPerPage={pagination?.pageSize}
-            currentPage={pagination?.pageIndex + 1}
+            rowsPerPage={pagination.pageSize}
+            currentPage={pagination.pageIndex + 1}
             totalPages={Math.ceil(totalRecords / pagination.pageSize)}
             totalRecords={totalRecords}
             setCurrentPage={(selected) => {
