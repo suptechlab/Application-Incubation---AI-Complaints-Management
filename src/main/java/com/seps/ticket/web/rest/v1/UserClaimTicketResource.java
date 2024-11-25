@@ -82,9 +82,9 @@ public class UserClaimTicketResource {
     })
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<List<UserClaimTicketDTO>> listClaimTickets(Pageable pageable,
-                                                                     @Parameter(description = "Filter by year") Integer year) {
-        Page<UserClaimTicketDTO> page = userClaimTicketService.listClaimTickets(pageable, year);
+    public ResponseEntity<List<UserClaimTicketDTO>> listUserClaimTickets(Pageable pageable,
+                                                                         @Parameter(description = "Filter by year") Integer year) {
+        Page<UserClaimTicketDTO> page = userClaimTicketService.listUserClaimTickets(pageable, year);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -115,9 +115,7 @@ public class UserClaimTicketResource {
     @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<ClaimStatusCountResponseDTO> countClaimsByStatusAndTotal(
         @Parameter(description = "Filter by year") @RequestParam(required = false) Integer year) {
-        User currentUser = userService.getCurrentUser();
-        Long userId = currentUser.getId();
-        ClaimStatusCountResponseDTO count = userClaimTicketService.countClaimsByStatusAndTotal(year, userId);
+        ClaimStatusCountResponseDTO count = userClaimTicketService.countClaimsByStatusAndTotal(year);
         return ResponseEntity.ok(count);
     }
 }

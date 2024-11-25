@@ -165,7 +165,7 @@ public class UserClaimTicketService {
         return claimSubTypeRepository.findByIdAndClaimTypeId(claimSubTypeId, claimTypeId)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_SUB_TYPE_NOT_FOUND, null, null));
     }
-    
+
     /**
      * Creates a new claim ticket with the provided details.
      */
@@ -282,7 +282,7 @@ public class UserClaimTicketService {
      * @return a paginated list of UserClaimTicketDTOs
      */
     @Transactional(readOnly = true)
-    public Page<UserClaimTicketDTO> listClaimTickets(Pageable pageable, Integer year) {
+    public Page<UserClaimTicketDTO> listUserClaimTickets(Pageable pageable, Integer year) {
         User currentUser = userService.getCurrentUser();
         Long userId = currentUser.getId();
         return claimTicketRepository.findAll(ClaimTicketSpecification.byFilter(year, userId), pageable)
@@ -298,12 +298,13 @@ public class UserClaimTicketService {
      * <p>
      * If there are no claims for a specific status, the status is included in the result with a count of 0.
      *
-     * @param year   The year for which the claim counts should be retrieved. If {@code null}, counts for all years are considered.
-     * @param userId The ID of the user whose claims are being counted.
+     * @param year The year for which the claim counts should be retrieved. If {@code null}, counts for all years are considered.
      * @return A {@link ClaimStatusCountResponseDTO} containing the counts of claims grouped by status and the total claim count.
      * @throws IllegalArgumentException if the {@code userId} is {@code null} or invalid.
      */
-    public ClaimStatusCountResponseDTO countClaimsByStatusAndTotal(Integer year, Long userId) {
+    public ClaimStatusCountResponseDTO countClaimsByStatusAndTotal(Integer year) {
+        User currentUser = userService.getCurrentUser();
+        Long userId = currentUser.getId();
         ClaimStatusCountResponseDTO result = new ClaimStatusCountResponseDTO();
         // Fetch counts by status using the repository
         List<ClaimStatusCountProjection> projections = claimTicketRepository.countClaimsByStatusAndTotal(year, userId);
