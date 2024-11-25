@@ -99,7 +99,7 @@ export default function MyAccount() {
 
   // Data query for fetching paginated and sorted data
   const dataQuery = useQuery({
-    queryKey: ['myAccountData', pagination, sorting, filter],
+    queryKey: ['myAccountData'],
     queryFn: async () => {
       return {
         data: mockData,
@@ -113,15 +113,15 @@ export default function MyAccount() {
     retry: 0,
   });
 
-  // Handle table pagination changes
-  const handlePaginationChange = (newPagination) => {
-    setPagination(newPagination);
-  };
+  // // Handle table pagination changes
+  // const handlePaginationChange = (newPagination) => {
+  //   setPagination(newPagination);
+  // };
 
-  // Handle table sorting changes
-  const handleSortingChange = (newSorting) => {
-    setSorting(newSorting);
-  };
+  // // Handle table sorting changes
+  // const handleSortingChange = (newSorting) => {
+  //   setSorting(newSorting);
+  // };
 
   // Info Cards Data
   const cardsData = [
@@ -177,10 +177,11 @@ export default function MyAccount() {
           <DataTable
             columns={columns}
             dataQuery={dataQuery}
-            pagination={pagination}
-            setPagination={handlePaginationChange}
-            sorting={sorting}
-            setSorting={handleSortingChange}
+            setPagination={() => { }}
+            setSorting={() => { }}
+            pagination={{ pageIndex: 0, pageSize: 100 }}
+            sorting={[]}
+            showPagination={false} // Hide pagination
           />
         </div>
       </div>

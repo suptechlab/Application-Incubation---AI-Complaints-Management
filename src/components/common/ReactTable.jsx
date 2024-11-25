@@ -53,22 +53,31 @@ export default function ReactTable({
     enableSortingRemoval: true,
   });
 
-
   React.useEffect(() => {
     let path = "";
-
-    if (sorting.length === 0) {
-      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
-        }`;
-    } else {
-      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
-        }&sortBy=${sorting
+  
+    // Check if pagination is enabled
+    if (pagination && showPagination) {
+      if (sorting && sorting.length === 0) {
+        path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize}`;
+      } else {
+        path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize}&sortBy=${sorting
           .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
           .join(",")}`;
+      }
+    } else if (sorting && sorting.length > 0) {
+      // If only sorting is enabled, exclude pagination parameters
+      path = `${location.pathname}?sortBy=${sorting
+        .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
+        .join(",")}`;
+    } else {
+      // If neither pagination nor sorting is enabled, keep the base path
+      path = `${location.pathname}`;
     }
-
+  
     navigate(path);
-  }, [sorting, pagination]);
+  }, [sorting, pagination, showPagination]);
+  
 
   return (
     <div className="d-flex flex-column h-100 small table-cover-main">
@@ -153,8 +162,8 @@ export default function ReactTable({
       {showPagination && (
         <div className="mt-auto pt-3 pb-1 pagination-cover">
           <DataGridPagination
-            rowsPerPage={pagination.pageSize}
-            currentPage={pagination.pageIndex + 1}
+            rowsPerPage={pagination?.pageSize}
+            currentPage={pagination?.pageIndex + 1}
             totalPages={Math.ceil(totalRecords / pagination.pageSize)}
             totalRecords={totalRecords}
             setCurrentPage={(selected) => {
