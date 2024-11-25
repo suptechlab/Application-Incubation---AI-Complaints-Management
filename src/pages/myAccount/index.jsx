@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import qs from 'qs';
+import React, { useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
+import { MdDelete, MdEditDocument, MdHourglassEmpty, MdTask } from 'react-icons/md';
 import DataTable from '../../components/common/DataTable';
-import { Modal, Button } from 'react-bootstrap';
+import InfoCards from './cards';
+import PageHeader from './header';
 
 export default function MyAccount() {
   const [pagination, setPagination] = useState({
@@ -121,17 +123,67 @@ export default function MyAccount() {
     setSorting(newSorting);
   };
 
+  // Info Cards Data
+  const cardsData = [
+    {
+      bgColor: 'bg-primary',
+      Icon: <MdEditDocument size={30} />,
+      title: 'Total Claims',
+      value: 3,
+      colProps: { sm: 6, lg: 3 }
+    },
+    {
+      bgColor: 'bg-orange',
+      Icon: <MdHourglassEmpty size={30} />,
+      title: 'Claims in Progress',
+      value: 1,
+      colProps: { sm: 6, lg: 3 }
+    },
+    {
+      bgColor: 'bg-success',
+      Icon: <MdTask size={30} />,
+      title: 'Claims Closed',
+      value: 2,
+      colProps: { sm: 6, lg: 3 }
+    },
+    {
+      bgColor: 'bg-danger',
+      Icon: <MdDelete size={30} />,
+      title: 'Claims Rejected',
+      value: 0,
+      colProps: { sm: 6, lg: 3 }
+    },
+  ];
+
   return (
-    <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-      {/* <Loader isLoading={dataQuery.isLoading} /> */}
-      <DataTable
-        columns={columns}
-        dataQuery={dataQuery}
-        pagination={pagination}
-        setPagination={handlePaginationChange}
-        sorting={sorting}
-        setSorting={handleSortingChange}
-      />
+    <React.Fragment>
+      <div className="d-flex flex-column flex-grow-1 p-3 pageContainer">
+
+
+        <div className="pb-2">
+          <PageHeader
+            title="My Account"
+            filter={filter}
+            setFilter={setFilter}
+          />
+          <InfoCards cardsData={cardsData} />
+
+          <div className="fw-bold fs-5 pt-4 mt-2">
+            Recent Activity
+          </div>
+        </div>
+
+        <div className="flex-grow-1 d-flex flex-column">
+          <DataTable
+            columns={columns}
+            dataQuery={dataQuery}
+            pagination={pagination}
+            setPagination={handlePaginationChange}
+            sorting={sorting}
+            setSorting={handleSortingChange}
+          />
+        </div>
+      </div>
 
       {/* CLIAM DETAILS MODAL */}
       <Modal show={showViewModal} onHide={handleCloseModal}>
@@ -175,6 +227,6 @@ export default function MyAccount() {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </React.Fragment>
   );
 }
