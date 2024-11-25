@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Form } from "react-bootstrap";
 import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
@@ -21,7 +21,6 @@ export default function TicketsList() {
     });
 
     const [sorting, setSorting] = React.useState([]);
-
     const [filter, setFilter] = React.useState({
         search: "",
         subscription: "",
@@ -37,25 +36,57 @@ export default function TicketsList() {
             Object.keys(filterObj).forEach(
                 (key) => filterObj[key] === "" && delete filterObj[key]
             );
-
-            if (sorting.length === 0) {
-                return handleGetUsers({
-                    page: pagination.pageIndex,
-                    size: pagination.pageSize,
-                    ...filterObj,
-                });
+            if (sorting?.length === 0) {
+                return { data: sampleData, page: 1 };
             } else {
-                return handleGetUsers({
-                    page: pagination.pageIndex,
-                    size: pagination.pageSize,
-                    sort: sorting
-                        .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-                        .join(","),
-                    ...filterObj,
-                });
+                return { data: sampleData, page: 1 };
             }
         },
     });
+
+    const sampleData = [
+        {
+            ticketId: "TCK-1001",
+            creationDate: "2024-11-20",
+            claimType: "Health Insurance",
+            claimFilledBy: "John Doe",
+            sla: "5 Days",
+            status: "Closed",
+        },
+        {
+            ticketId: "TCK-1002",
+            creationDate: "2024-11-21",
+            claimType: "Auto Insurance",
+            claimFilledBy: "Jane Smith",
+            sla: "3 Days",
+            status: "In Progress",
+        },
+        {
+            ticketId: "TCK-1003",
+            creationDate: "2024-11-22",
+            claimType: "Travel Insurance",
+            claimFilledBy: "Robert Brown",
+            sla: "7 Days",
+            status: "Rejected",
+        },
+        {
+            ticketId: "TCK-1004",
+            creationDate: "2024-11-23",
+            claimType: "Property Insurance",
+            claimFilledBy: "Emily Davis",
+            sla: "2 Days",
+            status: "New",
+        },
+        {
+            ticketId: "TCK-1005",
+            creationDate: "2024-11-24",
+            claimType: "Life Insurance",
+            claimFilledBy: "Michael Wilson",
+            sla: "10 Days",
+            status: "Closed",
+        },
+    ];
+
 
     //handle last page deletion item
     useEffect(() => {
@@ -67,39 +98,59 @@ export default function TicketsList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
+    
     const columns = React.useMemo(
         () => [
             {
-                // accessorFn: (row) => row.ticketId,
+                id: 'select-col',
+                header: ({ table }) => (
+                  <Form.Check
+                    checked={table.getIsAllRowsSelected()}
+                    indeterminate={table.getIsSomeRowsSelected()}
+                    onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                  />
+                ),
+                cell: ({ row }) => (
+                  <Form.Check
+                    checked={row.getIsSelected()}
+                    disabled={!row.getCanSelect()}
+                    onChange={row.getToggleSelectedHandler()}
+                  />
+                ),
+              },
+            {
+                accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => "Ticket ID",
+                header: () => "Ticket Id",
+                enableSorting: true
             },
+
             {
-                // accessorFn: (row) => row.creationDate,
-                id: "creationDate",
-                header: () => "Creation Date",
-                enableSorting: true,
-            },
-            {
-                // accessorFn: (row) => row.claimType,
+                accessorFn: (row) => row?.claimType,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
             },
             {
-                // accessorFn: (row) => row.claimFilledBy,
+                accessorFn: (row) => row?.creationDate,
+                id: "creationDate",
+                header: () => "Creation Date",
+                enableSorting: true,
+            },
+            {
+                accessorFn: (row) => row?.claimFilledBy,
                 id: "claimFilledBy",
                 header: () => "Claim filled by",
                 enableSorting: true,
             },
             {
-                // accessorFn: (row) => row.sla,
+                accessorFn: (row) => row?.sla,
                 id: "sla",
                 header: () => "SLA",
                 enableSorting: true,
             },
             {
-                // accessorFn: "Closed",
+                accessorFn: (row) => row?.status,
                 id: "status",
                 header: () => "Status",
                 size: "90",
@@ -107,7 +158,7 @@ export default function TicketsList() {
         ],
         []
     );
-
+   
     useEffect(() => {
         setPagination({
             pageIndex: 0,

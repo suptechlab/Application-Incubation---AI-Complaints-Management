@@ -115,7 +115,7 @@ const ClaimType = () => {
         }
 
         // Return the API response data
-        return response;
+        return response?.payload;
       } catch (error) {
         console.error("Error fetching data", error);
         // Optionally, handle errors here
