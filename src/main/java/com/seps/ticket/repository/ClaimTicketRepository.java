@@ -21,4 +21,6 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
     boolean existsByTicketId(long ticketId);
 
     Page<ClaimTicket> findAll(Specification<ClaimTicket> claimTicketSpecification, Pageable pageable);
+
+    Optional<ClaimTicket> findByIdAndOrganizationId(Long id, Long organizationId);
 }
