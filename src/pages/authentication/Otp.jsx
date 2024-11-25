@@ -35,7 +35,7 @@ export default function Otp() {
     const handleResend = async () => {
         try {
             let data = {
-                'otpToken': 'Admin*123#' //otpToken
+                'otpToken': otpToken
             }
             
             let res = await handleResendOTP(data);
