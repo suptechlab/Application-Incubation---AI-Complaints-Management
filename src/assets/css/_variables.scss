@@ -87,8 +87,11 @@ $accordion-padding-x: 0;
 $accordion-button-active-color: $body-color;
 $accordion-button-active-bg: var(--bs-body-bg);
 $accordion-button-active-color: $body-color;
-$accordion-button-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='#{$body-color}' stroke-linecap='round' stroke-linejoin='round'><path d='M2 5L8 11L14 5'/></svg>");
-$accordion-button-active-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='#{$body-color}' stroke-linecap='round' stroke-linejoin='round'><path d='M2 5L8 11L14 5'/></svg>");
+$accordion-icon-width: 1.5rem;
+$accordion-button-focus-box-shadow: none;
+$accordion-icon-transform: rotate(-90deg);
+$accordion-button-icon: url("data:image/svg+xml,<svg width='6' height='9' viewBox='0 0 8 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M0.294922 10.59L4.87492 6L0.294922 1.41L1.70492 0L7.70492 6L1.70492 12L0.294922 10.59Z' fill='#{$body-color}'/></svg>");
+$accordion-button-active-icon: $accordion-button-icon;
 
 // Custom Variables
 $theme-size-10: 0.625rem;

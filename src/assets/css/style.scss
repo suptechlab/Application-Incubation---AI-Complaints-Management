@@ -160,7 +160,7 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
 
-body {
+* {
     // Show numeric values in aligned
     font-feature-settings: "lnum" 1;
     font-variant-numeric: lining-nums;
@@ -334,6 +334,15 @@ body {
         >.accordion-item {
             border-top: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
             border-bottom: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+
+            .accordion-button {
+                font-weight: bold;
+
+                &::after {
+                    background-size: 10px;
+                    background-position: center;
+                }
+            }
         }
     }
 }

@@ -1,7 +1,9 @@
 import React from 'react';
-import { Accordion, Col, Modal, Row } from 'react-bootstrap';
+import { Accordion, Col, ListGroup, Modal, Row } from 'react-bootstrap';
+import { MdAttachFile, MdDownload } from 'react-icons/md';
+import { Link } from 'react-router-dom';
 import CommonViewData from "../../../../components/CommonViewData";
-import { MdAttachFile } from 'react-icons/md';
+import AppTooltip from '../../../../components/tooltip';
 
 const ViewClaim = ({ handleShow, handleClose }) => {
     // The color class based on the status
@@ -54,6 +56,62 @@ const ViewClaim = ({ handleShow, handleClose }) => {
         },
     ]
 
+    // Accordion Items
+    const accordionItems = [
+        {
+            eventKey: "0",
+            header: "Attachments",
+            body: [
+                {
+                    title: "Document 1.docx",
+                    dowlnloadUrl: "/",
+                },
+                {
+                    title: "Document 2.xlsx",
+                    dowlnloadUrl: "/",
+                },
+                {
+                    title: "Document 3.pdf",
+                    dowlnloadUrl: "/",
+                },
+            ]
+        },
+        {
+            eventKey: "1",
+            header: "Attachments send by Entity",
+            body: [
+                {
+                    title: "Document 1.docx",
+                    dowlnloadUrl: "/",
+                },
+                {
+                    title: "Document 2.xlsx",
+                    dowlnloadUrl: "/",
+                },
+            ]
+        }
+    ];
+
+    // View Bottom Data
+    const viewBottomData = [
+        {
+            label: "Precedents",
+            value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+            colProps: { xs: 12 }
+        },
+        {
+            label: "Specific Petition",
+            value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+            colProps: { xs: 12 }
+        },
+        {
+            label: "Entity's Response",
+            value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+            colProps: { xs: 12 }
+        },
+    ]
+
+
     return (
         <Modal
             show={handleShow}
@@ -76,6 +134,8 @@ const ViewClaim = ({ handleShow, handleClose }) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body className="text-break small">
+
+                {/* View Top Data */}
                 <Row>
                     {viewTopData?.map((item, index) => (
                         <Col key={"data_view_" + index} {...item.colProps}>
@@ -83,32 +143,49 @@ const ViewClaim = ({ handleShow, handleClose }) => {
                         </Col>
                     ))}
                 </Row>
+
+                {/* Accordion Items */}
                 <Accordion flush className='custom-accordion'>
-                    <Accordion.Item eventKey="0" className='mb-4'>
-                        <Accordion.Header><span className='text-info me-2'><MdAttachFile size={24} /></span> Accordion Item #1</Accordion.Header>
-                        <Accordion.Body>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                            minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                            aliquip ex ea commodo consequat. Duis aute irure dolor in
-                            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                            culpa qui officia deserunt mollit anim id est laborum.
-                        </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey="1" className='mb-4'>
-                        <Accordion.Header>Accordion Item #2</Accordion.Header>
-                        <Accordion.Body>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-                            minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                            aliquip ex ea commodo consequat. Duis aute irure dolor in
-                            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                            culpa qui officia deserunt mollit anim id est laborum.
-                        </Accordion.Body>
-                    </Accordion.Item>
+                    {accordionItems.map(item => (
+                        <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
+                            <Accordion.Header>
+                                <span className='text-info me-2'><MdAttachFile size={24} /></span>
+                                {item.header}
+                            </Accordion.Header>
+                            <Accordion.Body className='py-0'>
+                                <ListGroup variant="flush">
+                                    {item?.body?.map((item, index) => (
+                                        <ListGroup.Item
+                                            key={"data_body_view_" + index}
+                                            className="px-1 d-flex gap-2 justify-content-between align-items-start"
+                                        >
+                                            <span className="me-auto py-1">{item.title}</span>
+                                            <AppTooltip title="Download" placement="left">
+                                                <Link
+                                                    to={item.dowlnloadUrl}
+                                                    className="text-decoration-none link-primary"
+                                                    target="_blank"
+                                                    aria-label="Download"
+                                                >
+                                                    <MdDownload size={20} />
+                                                </Link>
+                                            </AppTooltip>
+                                        </ListGroup.Item>
+                                    ))}
+                                </ListGroup>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    ))}
                 </Accordion>
+
+                {/* View Bottom Data */}
+                <Row>
+                    {viewBottomData?.map((item, index) => (
+                        <Col key={"data_view_bottom_" + index} {...item.colProps}>
+                            <CommonViewData label={item.label} value={item.value} />
+                        </Col>
+                    ))}
+                </Row>
             </Modal.Body>
         </Modal>
     )
