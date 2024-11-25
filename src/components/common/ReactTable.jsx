@@ -80,7 +80,7 @@ export default function ReactTable({
   
 
   return (
-    <div className="d-flex flex-column h-100 small table-cover-main">
+    <div className="d-flex flex-column flex-grow-1 small table-cover-main">
       {/* <Loader isLoading={isLoading} /> */}
       <BTable striped bordered hover responsive className="mb-0">
         <thead>
@@ -96,7 +96,7 @@ export default function ReactTable({
                     {header.column.getCanSort() ? (
                       <Button
                         variant="link"
-                        className="align-items-center border-0 cursor-pointer d-flex fw-semibold gap-2 link-dark p-0 table-sorting text-decoration-none user-select-none w-100 text-start"
+                        className="align-items-center border-0 cursor-pointer d-flex fw-semibold gap-2 text-body p-0 table-sorting text-decoration-none user-select-none w-100 text-start"
                         onClick={header.column.getToggleSortingHandler()}
                         title={
                           header.column.getCanSort()

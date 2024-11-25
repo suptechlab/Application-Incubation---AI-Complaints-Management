@@ -1,27 +1,10 @@
-import React, { useState } from 'react';
-import { Button, Stack } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { Stack } from 'react-bootstrap';
 import CustomDateRangePicker from '../../../components/CustomDateRangePicker';
-import moment from 'moment';
 
-const PageHeader = ({ title = "", filter, setFilter }) => {
-    const { t } = useTranslation();
-    // Temporary state to hold the selected dates
-    const [tempDateRange, setTempDateRange] = useState([null, null]);
-
-    const handleDateFilterChange = ([newStartDate, newEndDate]) => {
-        setTempDateRange([newStartDate, newEndDate]);
-
-        // Update filter state only if both dates are selected
-        if (newStartDate && newEndDate) {
-            setFilter({
-                startDate: moment(newStartDate).format("YYYY-MM-DD"),
-                endDate: moment(newEndDate).format("YYYY-MM-DD")
-            });
-        }
-    };
+const PageHeader = ({ title = "" }) => {
+    const [startDate, setStartDate] = useState();
 
     return (
         <div className="contentHeader pb-3">
@@ -35,15 +18,14 @@ const PageHeader = ({ title = "", filter, setFilter }) => {
                 </h1>
 
                 <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
-                    <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                    <div className="custom-width-140 flex-grow-1 flex-md-grow-0">
                         <CustomDateRangePicker
                             wrapperClassName="mb-0"
-                            tempDateRange={tempDateRange}
-                            handleChange={handleDateFilterChange}
-                            startDate={filter?.startDate ?? null}
-                            endDate={filter?.endDate}
-                            selectsRange={true}
-                            placeholder="Select Date Range"
+                            placeholder="Select"
+                            selected={startDate}
+                            onChange={(date) => setStartDate(date)}
+                            dateFormat="yyyy"
+                            showYearPicker
                         />
                     </div>
                 </Stack>
