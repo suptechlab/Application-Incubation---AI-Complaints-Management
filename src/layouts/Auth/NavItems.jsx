@@ -29,7 +29,7 @@ export const NavItems = () => {
           title: t("SEPS USERS"),
           path: "/users",
           roleName: "user",
-          disabled: false,
+          disabled: true,
 
         },
         {

@@ -7,7 +7,7 @@ import { OtpValidationSchema } from "../../validations/login.validation";
 import toast from "react-hot-toast";
 import { Stack, Form, Image, Button, Col, Row, Spinner } from "react-bootstrap";
 import Logo from "../../assets/images/logo.svg"
-import {Link, useLocation } from 'react-router-dom';
+import {Link, useLocation, useNavigate } from 'react-router-dom';
 import OtpInput from 'react-otp-input';
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,7 @@ export default function Otp() {
     const location = useLocation();
     const { login, OtpVerify } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
+    const navigate = useNavigate()
     const [username, setUsername] = useState(location?.state?.username ? location?.state?.username : 'admin@yopmail.com');
     const [otpToken, setOtpToken] = useState(location?.state?.otpToken ? location?.state?.otpToken : '');
 
@@ -34,13 +35,14 @@ export default function Otp() {
     const handleResend = async () => {
         try {
             let data = {
-                'otpToken': otpToken
+                'otpToken': 'Admin*123#' //otpToken
             }
             
             let res = await handleResendOTP(data);
             toast.success("OTP enviado con éxito.");
         } catch (error) {
-            toast.error("No se pudo reenviar el OTP. Inténtalo nuevamente.");
+            toast.error(error.response.data.errorDescription ?? "No se pudo reenviar el OTP. Inténtalo nuevamente.");
+            navigate("/login")
         }
     }
 
