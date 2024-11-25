@@ -106,11 +106,12 @@ public class AccountResource {
      * @throws RuntimeException {@code 400 Bad Request} if the user couldn't be returned.
      */
     @GetMapping("/account")
-    public AdminUserDTO getAccount() {
-        return userService
-            .getUserWithAuthorities()
-            .map(AdminUserDTO::new)
-            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
+    public ResponseEntity<AdminUserDTO>  getAccount() {
+        AdminUserDTO adminUserDTO = userService
+            .getUserWithAuthoritiesWithPermission(); //
+            //.map(AdminUserDTO::new)
+            //.orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
+        return ResponseEntity.ok(adminUserDTO);
     }
 
     /**

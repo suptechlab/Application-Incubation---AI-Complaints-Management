@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,7 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 15)
     private String phoneNumber;
 
+    private List<RoleDTO> roles;
 
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
@@ -201,6 +203,14 @@ public class AdminUserDTO implements Serializable {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public List<RoleDTO> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleDTO> roles) {
+        this.roles = roles;
     }
 
     // prettier-ignore

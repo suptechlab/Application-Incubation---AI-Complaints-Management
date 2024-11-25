@@ -137,6 +137,15 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "fingerprint_verified_at")
     private Instant fingerprintVerifiedAt;
 
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "user_role",
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
+    )
+    @BatchSize(size = 20)
+    private Set<Role> roles = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -353,6 +362,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setFingerprintVerifiedAt(Instant fingerprintVerifiedAt) {
         this.fingerprintVerifiedAt = fingerprintVerifiedAt;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override

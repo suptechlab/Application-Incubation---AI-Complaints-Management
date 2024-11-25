@@ -6,10 +6,7 @@ import com.seps.auth.enums.UserStatusEnum;
 import com.seps.auth.repository.*;
 import com.seps.auth.security.AuthoritiesConstants;
 import com.seps.auth.security.SecurityUtils;
-import com.seps.auth.service.dto.AdminUserDTO;
-import com.seps.auth.service.dto.ConsultationRequest;
-import com.seps.auth.service.dto.RegisterUserDTO;
-import com.seps.auth.service.dto.UserDTO;
+import com.seps.auth.service.dto.*;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -67,9 +64,11 @@ public class UserService {
     private final PersonaRepository personaRepository;
 
     private final OtpRepository otpRepository;
+    private final RoleService roleService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository,
-                       LoginLogRepository loginLogRepository, RecaptchaService recaptchaService, ExternalAPIService externalAPIService, OtpService otpService, PersonaRepository personaRepository, OtpRepository otpRepository) {
+                       LoginLogRepository loginLogRepository, RecaptchaService recaptchaService, ExternalAPIService externalAPIService, OtpService otpService, PersonaRepository personaRepository, OtpRepository otpRepository,
+                       RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
@@ -79,6 +78,7 @@ public class UserService {
         this.otpService = otpService;
         this.personaRepository = personaRepository;
         this.otpRepository = otpRepository;
+        this.roleService =roleService;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -315,6 +315,25 @@ public class UserService {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
     }
 
+    @Transactional(readOnly = true)
+    public AdminUserDTO getUserWithAuthoritiesWithPermission() {
+        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin).map(user->{
+            AdminUserDTO adminUserDTO = new AdminUserDTO(user);
+            // Fetch roles associated with the user
+            List<Long> roleIds = user.getRoles().stream().map(Role::getId).toList();
+
+            // Retrieve roles with their permissions using findRolesWithPermissions method
+            if (!roleIds.isEmpty()) {
+                // Fetch roles with their permissions in a single call
+                List<RoleDTO> rolesWithPermissions = roleService.findRolesWithPermissions(roleIds);
+                adminUserDTO.setRoles(rolesWithPermissions);
+            } else {
+                adminUserDTO.setRoles(List.of()); // Set empty roles if no roles are found
+            }
+
+            return adminUserDTO;
+        }).orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
+    }
     /**
      * Not activated users should be automatically deleted after 3 days.
      * <p>
