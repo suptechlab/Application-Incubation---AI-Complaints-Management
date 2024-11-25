@@ -14,7 +14,7 @@ public class ClaimTicketSpecification {
     private ClaimTicketSpecification() {
     }
 
-    public static Specification<ClaimTicket> byFilter(Integer year) {
+    public static Specification<ClaimTicket> byFilter(Integer year, Long userId) {
         return (root, query, criteriaBuilder) -> {
             // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
@@ -28,10 +28,18 @@ public class ClaimTicketSpecification {
                 Instant endDate = endOfYear.toInstant(ZoneOffset.UTC);
                 // Add predicate to filter by createdAt between the start and end of the year
                 predicates.add(
-                    criteriaBuilder.between(root.get("createdAt"), startDate, endDate)
+                        criteriaBuilder.between(root.get("createdAt"), startDate, endDate)
                 );
 
             }
+
+            // Filter by status (if provided)
+            if (userId != null) {
+                predicates.add(
+                        criteriaBuilder.equal(root.get("userId"), userId)
+                );
+            }
+
             // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
