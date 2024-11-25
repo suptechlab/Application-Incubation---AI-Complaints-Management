@@ -4,27 +4,20 @@ import "react-datepicker/dist/react-datepicker.css";
 import { MdCalendarToday, MdDateRange } from "react-icons/md";
 import "./datepicker.scss";
 
-const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleChange, startDate, endDate, tempDateRange, selectsRange, placeholder, size, disabled }) => {
+const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, selectsRange, size, placeholder, ...rest }) => {
 
   return (
     <div className={wrapperClassName || ''}>
       {label ? <div className='mb-1 fs-14'>{label}</div> : ""}
       <DatePicker
-        placeholderText={placeholder}
-        selected={startDate}
-        onChange={handleChange}
-        selectsRange={selectsRange}
-        startDate={tempDateRange[0]}
-        endDate={tempDateRange[1]}
-        dateFormat="YYYY-MM-dd"
-        showDatePicker
         isClearable
         showIcon
         toggleCalendarOnIconClick
+        placeholderText={placeholder}
         icon={selectsRange ? <MdDateRange size={18} /> : <MdCalendarToday size={18} />}
         className={`form-control ${size === 'sm' ? 'form-control-sm' : ''}`}
-        disabled={disabled}
         portalId="root"
+        {...rest}
       />
     </div>
   );
