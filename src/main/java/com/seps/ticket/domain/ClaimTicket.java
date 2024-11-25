@@ -100,6 +100,10 @@ public class ClaimTicket {
     private Instant assignedAt;
 
     @Enumerated
+    @Column(name = "instance_type")
+    private InstanceTypeEnum instanceType;
+
+    @Enumerated
     @Column(name = "status", nullable = false)
     private ClaimTicketStatusEnum status;
 
@@ -111,6 +115,9 @@ public class ClaimTicket {
 
     @Column(name = "status_comment")
     private String statusComment;
+
+    @Column(name = "resolvedOn")
+    private Instant resolvedOn;
 
     @Column(name = "created_by", nullable = false, insertable = false, updatable = false)
     private Long createdBy;
@@ -133,5 +140,6 @@ public class ClaimTicket {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
 
 }

@@ -1,7 +1,9 @@
 package com.seps.ticket.repository;
 
 import com.seps.ticket.domain.ClaimTicket;
-import io.github.resilience4j.core.functions.Either;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +17,8 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
                                                                                    Long claimSubTypeId, Long organizationId);
 
     Optional<ClaimTicket> findByIdAndUserId(Long id, Long userId);
+
+    boolean existsByTicketId(long ticketId);
+
+    Page<ClaimTicket> findAll(Specification<ClaimTicket> claimTicketSpecification, Pageable pageable);
 }

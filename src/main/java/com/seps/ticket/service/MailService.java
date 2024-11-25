@@ -135,6 +135,8 @@ public class MailService {
             context.setVariable("claimSubType", claimTicket.getClaimSubType().getName());
             context.setVariable("priority", claimTicket.getPriority());
             context.setVariable("status", claimTicket.getStatus());
+            context.setVariable("razonSocial", claimTicket.getOrganization().getRazonSocial());
+            context.setVariable("ruc", claimTicket.getOrganization().getRuc());
             String content = templateEngine.process("mail/claimTicketCreationEmail", context);
             String subject = messageSource.getMessage("email.claim.creation.title", null, locale);
             this.sendEmailSync(claimTicket.getUser().getEmail(), subject, content, false, true);

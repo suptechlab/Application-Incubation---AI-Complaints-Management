@@ -184,4 +184,15 @@
   <changeSet id="1732201075289" author="matellio">
     <modifyDataType tableName="claim_ticket" columnName="ticket_id" newDataType="bigint"/>
   </changeSet>
+  <changeSet id="1732520772310" author="matellio">
+    <addColumn tableName="claim_ticket">
+      <column name="instance_type" type="int" remarks="Instance type of ticket (e.g., first,second,claim etc)"
+              defaultValue="0">
+        <constraints nullable="true"/>
+      </column>
+      <column name="resolved_on" type="timestamp" remarks="When ticket is marked as resolved or closed">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

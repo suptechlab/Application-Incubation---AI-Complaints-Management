@@ -4,13 +4,12 @@ import com.seps.ticket.enums.*;
 import lombok.Data;
 import lombok.ToString;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 
 @Data
 @ToString
-public class UserClaimTicketDTO {
+public class ClaimTicketDTO {
     private Long id;
     private Long ticketId;
     private Long userId;
@@ -48,26 +47,4 @@ public class UserClaimTicketDTO {
     private UserDTO updatedByUser;
     private Instant updatedAt;
     // Getters and Setters
-
-    @Data
-    public static class UserDTO implements Serializable {
-        private Long id;
-        private String name;
-        private String email;
-        private String langKey;
-        private UserStatusEnum status;
-    }
-
-    @Data
-    public static class FIUserDTO implements Serializable {
-        private Long id;
-        private String name;
-        private String email;
-        private String langKey;
-        private UserStatusEnum status;
-        private Long organizationId;
-        private String ruc;                // RUC
-        private String razonSocial;        // Corporate Name
-    }
-
 }

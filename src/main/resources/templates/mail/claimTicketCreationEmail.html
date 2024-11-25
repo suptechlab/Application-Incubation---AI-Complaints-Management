@@ -25,6 +25,14 @@
     <span th:text="${claimSubType}">Refinancing Request</span>
   </li>
   <li>
+    <strong th:text="#{email.claim.creation.razonSocial}">Entity Name:</strong>
+    <span th:text="${razonSocial}">Medium</span>
+  </li>
+  <li>
+    <strong th:text="#{email.claim.creation.ruc}">Entity Tax ID(RUC):</strong>
+    <span th:text="${ruc}">Medium</span>
+  </li>
+  <li>
     <strong th:text="#{email.claim.creation.priority}">Priority:</strong>
     <span th:text="${priority}">Medium</span>
   </li>

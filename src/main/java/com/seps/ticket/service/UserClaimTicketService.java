@@ -5,20 +5,24 @@ import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
+import com.seps.ticket.service.dto.ClaimTicketDTO;
 import com.seps.ticket.service.dto.RequestInfo;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
+import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
+import com.seps.ticket.service.specification.ClaimTicketSpecification;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 
-import java.time.Instant;
 import java.util.*;
 
 import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
@@ -38,10 +42,14 @@ public class UserClaimTicketService {
     private final AuditLogService auditLogService;
     private final Gson gson;
     private final MessageSource messageSource;
+    private final ClaimTicketMapper claimTicketMapper;
 
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
                                   OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository,
-                                  ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource) {
+                                  ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository,
+                                  UserService userService, UserClaimTicketMapper userClaimTicketMapper,
+                                  AuditLogService auditLogService, Gson gson, MessageSource messageSource,
+                                  ClaimTicketMapper claimTicketMapper) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -53,6 +61,7 @@ public class UserClaimTicketService {
         this.auditLogService = auditLogService;
         this.gson = gson;
         this.messageSource = messageSource;
+        this.claimTicketMapper = claimTicketMapper;
     }
 
 
@@ -80,16 +89,16 @@ public class UserClaimTicketService {
         // Check for duplicate tickets
         if (Boolean.TRUE.equals(claimTicketRequest.getCheckDuplicate())) {
             List<ClaimTicket> duplicateTickets = claimTicketRepository.findByUserIdAndClaimTypeIdAndClaimSubTypeIdAndOrganizationId(
-                    currentUserId,
-                    claimTicketRequest.getClaimTypeId(),
-                    claimTicketRequest.getClaimSubTypeId(),
-                    claimTicketRequest.getOrganizationId()
+                currentUserId,
+                claimTicketRequest.getClaimTypeId(),
+                claimTicketRequest.getClaimSubTypeId(),
+                claimTicketRequest.getOrganizationId()
             );
 
             if (!duplicateTickets.isEmpty()) {
                 ClaimTicket duplicateTicket = duplicateTickets.stream()
-                        .findAny()
-                        .orElseThrow(() -> new IllegalStateException("Duplicate ticket expected but not found."));
+                    .findAny()
+                    .orElseThrow(() -> new IllegalStateException("Duplicate ticket expected but not found."));
                 responseDTO.setFoundDuplicate(true);
                 responseDTO.setDuplicateTicketId(duplicateTicket.getTicketId());
                 return responseDTO;
@@ -98,19 +107,20 @@ public class UserClaimTicketService {
         responseDTO.setFoundDuplicate(false);
         // Fetch and validate associated entities
         Province province = provinceRepository.findById(claimTicketRequest.getProvinceId())
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PROVINCE_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PROVINCE_NOT_FOUND, null, null));
 
         City city = cityRepository.findByIdAndProvinceId(claimTicketRequest.getCityId(), claimTicketRequest.getProvinceId())
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CITY_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CITY_NOT_FOUND, null, null));
 
         Organization organization = organizationRepository.findById(claimTicketRequest.getOrganizationId())
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_NOT_FOUND, null, null));
 
         ClaimType claimType = claimTypeRepository.findById(claimTicketRequest.getClaimTypeId())
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TYPE_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TYPE_NOT_FOUND, null, null));
 
         ClaimSubType claimSubType = claimSubTypeRepository.findByIdAndClaimTypeId(claimTicketRequest.getClaimSubTypeId(), claimTicketRequest.getClaimTypeId())
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_SUB_TYPE_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_SUB_TYPE_NOT_FOUND, null, null));
+
 
         // Create and save the new claim ticket
         ClaimTicket newClaimTicket = new ClaimTicket();
@@ -127,6 +137,7 @@ public class UserClaimTicketService {
         newClaimTicket.setSpecificPetition(claimTicketRequest.getSpecificPetition());
         newClaimTicket.setPriority(ClaimTicketPriorityEnum.MEDIUM);
         newClaimTicket.setSlaBreachDays(claimSubType.getSlaBreachDays());
+        newClaimTicket.setInstanceType(InstanceTypeEnum.FIRST_INSTANCE);
         newClaimTicket.setStatus(ClaimTicketStatusEnum.NEW);
         newClaimTicket.setCreatedByUser(currentUser);
         claimTicketRepository.save(newClaimTicket);
@@ -134,31 +145,34 @@ public class UserClaimTicketService {
         responseDTO.setNewTicketId(newClaimTicket.getTicketId());
         responseDTO.setNewId(newClaimTicket.getId());
         responseDTO.setEmail(currentUser.getEmail());
-
         //Audit Logs
         Map<String, String> activityMessageMap = new HashMap<>();
         Map<String, String> auditMessageMap = new HashMap<>();
-        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> activityData = new HashMap<>();
+        Map<String, Object> auditData = new HashMap<>();
+
         String plainTicketId = String.valueOf(newClaimTicket.getTicketId());
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("activity.log.file.a.claim",
-                    new Object[]{plainTicketId}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{plainTicketId}, Locale.forLanguageTag(language.getCode()));
             activityMessageMap.put(language.getCode(), messageAudit);
         });
 
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.claim.ticket.created",
-                    new Object[]{currentUser.getEmail(), plainTicketId}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), plainTicketId}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
-        entityData.put(Constants.NEW_DATA, convertEntityToMap(this.getClaimTicketById(newClaimTicket.getId())));
+        activityData.put(Constants.NEW_DATA, convertEntityToMap(this.getUserClaimTicketById(newClaimTicket.getId())));
+        auditData.put(Constants.NEW_DATA, convertEntityToMap(this.getClaimTicketById(newClaimTicket.getId())));
+
         String requestBody = gson.toJson(claimTicketRequest);
         //Activity
         auditLogService.logActivity(currentUser.getId(), currentUser.getId(), requestInfo, "fileClaimTicket", ActionTypeEnum.CLAIM_TICKET_ADD.name(), newClaimTicket.getId(), ClaimTicket.class.getSimpleName(),
-                null, activityMessageMap, entityData, ActivityTypeEnum.ACTIVITY.name(), requestBody);
+            null, activityMessageMap, activityData, ActivityTypeEnum.ACTIVITY.name(), requestBody);
         //Audit
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "fileClaimTicket", ActionTypeEnum.CLAIM_TICKET_ADD.name(), newClaimTicket.getId(), ClaimTicket.class.getSimpleName(),
-                null, auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
+            null, auditMessageMap, auditData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
 
         return responseDTO;
     }
@@ -168,8 +182,17 @@ public class UserClaimTicketService {
      *
      * @return a 10-digit ticket ID
      */
-    public Long generateTicketId() {
-        return Instant.now().getEpochSecond();
+
+    public long generateTicketId() {
+        // Calculate the integer part dynamically; example logic:
+        int integerPart = calculateIntegerPart();
+        // Generate the ticket ID using the utility class
+        return TicketIdGenerator.generateUniqueTicketId(integerPart, claimTicketRepository);
+    }
+
+    private int calculateIntegerPart() {
+        // Example: Get the last 2 digits of a random number (or other business logic)
+        return (int) (Math.random() * 100); // Replace with your actual logic
     }
 
     /**
@@ -180,14 +203,41 @@ public class UserClaimTicketService {
      * @throws CustomException if the Claimed ticket is not found
      */
     @Transactional(readOnly = true)
-    public UserClaimTicketDTO getClaimTicketById(Long id) {
+    public UserClaimTicketDTO getUserClaimTicketById(Long id) {
         User currentUser = userService.getCurrentUser();
         Long userId = currentUser.getId();
         return claimTicketRepository.findByIdAndUserId(id, userId)
-                .map(userClaimTicketMapper::toDTO)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
-                        new String[]{id.toString()}, null));
+            .map(userClaimTicketMapper::toUserClaimTicketDTO)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{id.toString()}, null));
     }
 
 
+    /**
+     * Retrieves a Claim Ticket by its ID.
+     *
+     * @param id the ID of the Claimed ticket to retrieve
+     * @return the DTO representing the city
+     * @throws CustomException if the Claimed ticket is not found
+     */
+    @Transactional(readOnly = true)
+    public ClaimTicketDTO getClaimTicketById(Long id) {
+        return claimTicketRepository.findById(id)
+            .map(claimTicketMapper::toDTO)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{id.toString()}, null));
+    }
+
+    /**
+     * Retrieves a paginated list of claim tickets, filtered by year.
+     *
+     * @param pageable the pagination information
+     * @param year     the search term to filter claim tickets by year (optional)
+     * @return a paginated list of CityDTOs
+     */
+    @Transactional(readOnly = true)
+    public Page<UserClaimTicketDTO> listClaimTickets(Pageable pageable, Integer year) {
+        return claimTicketRepository.findAll(ClaimTicketSpecification.byFilter(year), pageable)
+            .map(userClaimTicketMapper::toUserClaimTicketDTO);
+    }
 }
