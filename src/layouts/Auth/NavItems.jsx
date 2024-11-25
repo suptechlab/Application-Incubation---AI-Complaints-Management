@@ -12,7 +12,7 @@ export const NavItems = () => {
       title: t("DASHBOARD"),
       menuIcon: <MdDashboard size={20} />,
       path: "/dashboard",
-      roleName: "admin",
+      roleName: "Dashboard",
       disabled: false,
     },
     {
@@ -21,23 +21,23 @@ export const NavItems = () => {
       title: t("User Management"),
       menuIcon: <MdPerson size={20} />,
       path: '#',
-      roleName: "admin",
+      roleName: "user",
       subMenu: [
         {
           id: 21,
           menuName: t("SEPS USERS"),
           title: t("SEPS USERS"),
           path: "/users",
-          roleName: "user",
+          roleName: "FI User",
           disabled: false,
 
         },
         {
           id: 22,
-          menuName: t("FI USERS"),
+          menuName: 'FI User',
           title: t("FI USERS"),
           path: "/fi-users",
-          roleName: "admin",
+          roleName: "FI User",
           disabled: false,
         },
         {

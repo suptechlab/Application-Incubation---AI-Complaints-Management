@@ -45,6 +45,7 @@ export const messages = {
     descriptionMin5: "Description must be at least 5 characters",
     descriptionMax255: "Description cannot be longer than 255 characters",
     rightsAtLeastOnePermission: "At least one permission per module must be selected",
+    roleIdRequired: "Role is required.", // Add this
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -92,5 +93,6 @@ export const messages = {
     descriptionMin5: "La descripción debe tener al menos 5 caracteres",
     descriptionMax255: "La descripción no puede tener más de 255 caracteres",
     rightsAtLeastOnePermission: "Se debe seleccionar al menos un permiso por módulo",
+    roleIdRequired: "El rol es obligatorio.", // Add this
   }
 };

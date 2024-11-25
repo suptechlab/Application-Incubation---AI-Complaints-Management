@@ -17,7 +17,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
   const sidebarRef = useRef(null);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null);
 
-  const handleSubmenu = (idx) => {
+  const handleSubmenu = (idx) => { 
     if (isSubMenuOpen === idx) {
       setIsSubMenuOpen(null);
     } else {
@@ -132,7 +132,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                         onClick={handleNavLinkClick}
                       >
                         <span className="py-1 text-center min-w-44 sidebarIcon">
-                          {menuIcon}
+                          {menuIcon} 
                         </span>
                         <span className="hideInSmallSidebar text-wrap lh-sm">
                           {title}
@@ -168,7 +168,10 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
 
                     {isSubMenuOpen === id && subMenu && (
                       <Nav as="ul" className="flex-column p-0">
+                        {console.log('subMenu',subMenu)}
                         {subMenu.map((subItems) => {
+                          {console.log('permission.current.list 172---', permission)}
+                          {console.log('roleName 173---', subItems)}
                           return (
                             <Nav.Item as="li" key={subItems.id}>
                               {permission.current.isAdmin ||

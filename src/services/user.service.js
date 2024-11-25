@@ -32,7 +32,9 @@ export const handleStatusChangeState = async (id, status) => {
     return await adminApi.patch(`/${API_VERSION}/seps-users/${id}/${status}`, {});
 }
 
-
+export const handleSEPSUserVerification = async (data) => {
+    return await adminApi.post(`/${API_VERSION}/seps-users/verify`, data);
+}
 
 export const handleGetCompany = async (id) => {
     return await adminApi.get(`/${API_VERSION}/companies`);

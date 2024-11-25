@@ -42,7 +42,6 @@ export const handleRefreshToken = async () => {
     });
 }
 
-
 export const handleResendOTP = async (params) => {
     return await authApi.get(`/resend-login-otp`, {params});
 }
