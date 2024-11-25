@@ -334,15 +334,7 @@ public class RoleService {
                 return roleDTO;
             });
     }
-//    public Set<Permission> getUserPermissions1(Long userId, String permissionName) {
-//        return userRepository.findById(userId)
-//            .map(user -> roleRepository.findById(user.getRoles().stream().map(Role::getId).toList().getFirst())
-//                .orElseThrow(() -> new IllegalArgumentException("Role not found"))
-//                .getPermissions().stream()
-//                .filter(permission -> permission.getName().equals(permissionName))
-//                .collect(Collectors.toSet()))
-//            .orElseThrow(() -> new IllegalArgumentException("User not found"));
-//    }
+
 
     public Set<Permission> getUserPermissions(Long userId, String permissionName) {
         return userRepository.findById(userId)
