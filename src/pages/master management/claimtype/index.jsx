@@ -282,13 +282,15 @@ const ClaimType = () => {
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
+    {permission.current.addModule
+        ?
     <PageHeader
       title={t("CLAIM TYPE")}
       actions={[
         { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
-    />
+    /> : ''}
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

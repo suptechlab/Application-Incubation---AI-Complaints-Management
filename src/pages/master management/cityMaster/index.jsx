@@ -315,13 +315,15 @@ const CityMaster = () => {
   return (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
       <Loader isLoading={isLoading} />
+      {permission.current.addModule
+        ?
       <PageHeader
         title={t("CITY MASTER")}
         actions={[
           {  label: "Export to CSV", onClick: exportHandler, variant: "outline-dark",disabled : isDownloading ? true : false},
           { label: "Add New", onClick: toggle, variant: "warning" },
         ]}
-      />
+      /> : ''}
       <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
         <Card.Body className="d-flex flex-column">
           <ListingSearchForm filter={filter} setFilter={setFilter} />

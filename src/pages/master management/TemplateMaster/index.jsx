@@ -216,6 +216,8 @@ const TemplateMaster = () => {
 
   return (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+      {permission.current.addModule
+        ?
       <PageHeader
         title={t("TEMPLATE MASTER")}
         actions={[
@@ -223,6 +225,7 @@ const TemplateMaster = () => {
           { label: "Add New", onClick: toggle, variant: "warning" },
         ]}
       />
+      : ''}
       <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
         <Card.Body className="d-flex flex-column">
           <ListingSearchForm filter={filter} setFilter={setFilter} />
