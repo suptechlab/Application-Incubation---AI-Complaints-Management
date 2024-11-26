@@ -258,7 +258,7 @@ export default function MyAccount() {
           </div>
         </div>
 
-        <div className="flex-grow-1 d-flex flex-column">
+        <div className="flex-grow-1 d-flex flex-column pb-4">
           <DataTable
             columns={columns}
             dataQuery={dataQuery}

@@ -291,7 +291,12 @@ input:-webkit-autofill:active {
 
 // Help Desk
 .help-desk-button {
+    box-shadow: 0px 0px 20px 0px rgba($black, 0.25);
     bottom: 4.5rem;
+
+    &.footer-layout-full {
+        bottom: 1.5rem;
+    }
 }
 
 .offcanvas {

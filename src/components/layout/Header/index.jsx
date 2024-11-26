@@ -16,11 +16,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLogout } from "../../../redux/slice/authSlice";
 import { useTranslation } from "react-i18next";
 
-const Header = () => {
+const Header = ({ layout }) => {
 
-  const { isLoggedIn , user } = useSelector((state) => state?.authSlice)
+  const { isLoggedIn, user } = useSelector((state) => state?.authSlice)
 
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   const dispatch = useDispatch()
 
@@ -42,14 +42,14 @@ const Header = () => {
     },
   ];
 
-  const handleLogout = ()=>{
+  const handleLogout = () => {
     dispatch(setLogout())
   }
 
   return (
     <header className="theme-header">
       <Navbar key={expand} expand={expand} className="bg-body-tertiary py-0">
-        <Container className="custom-min-height-70">
+        <Container className="custom-min-height-70" fluid={layout === 'full'}>
           <Navbar.Brand as={Link} href="/" className="me-auto px-1">
             <Image fluid src={Logo} alt="Logo" width={258} height={55} />
           </Navbar.Brand>
@@ -75,7 +75,7 @@ const Header = () => {
                     to={link.path}
                     className="mx-md-3"
                     key={"menu_link_" + index}
-                    disabled = {true}
+                    disabled={true}
                   >
                     {link.label}
                   </Nav.Link>
@@ -84,7 +84,7 @@ const Header = () => {
             </Offcanvas.Body>
           </Navbar.Offcanvas>
 
-          <Dropdown className={`${!isLoggedIn ? 'd-none' :'' } ms-md-4`}>
+          <Dropdown className={`${!isLoggedIn ? 'd-none' : ''} ms-md-4`}>
             <Dropdown.Toggle
               variant="link"
               id="dropdown-profile"
@@ -98,12 +98,12 @@ const Header = () => {
                 alt={"Alex Boston"}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-150 fs-6 lh-sm fw-semibold">
-              {user?.firstName}
+                {user?.firstName}
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="shadow border-0 mt-3">
               <Dropdown.Header className="fw-semibold d-md-none">
-              {user?.firstName ?? ''} 
+                {user?.firstName ?? ''}
               </Dropdown.Header>
               <Dropdown.Item as={Link} to="/my-account">
                 {t("MY ACCOUNT")}
