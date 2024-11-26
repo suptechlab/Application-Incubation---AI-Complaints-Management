@@ -1,5 +1,5 @@
 global:
-  appVersion: 0.0.1-SNAPSHOT
+  appVersion: 0.1.5-SNAPSHOT
   name: ms-user-service
 deployment:
   # Default values for deployment.
