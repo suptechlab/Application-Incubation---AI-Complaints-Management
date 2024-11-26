@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { getLocalStorage, removeLocalStorage } from './storage';
-import { useNavigate } from 'react-router-dom';
+import { getLocalStorage } from './storage';
+import toast from "react-hot-toast";
 
 // const BASE_URL = process.env.REACT_APP_API_URL;
 // console.log('BASE_URL',BASE_URL)
@@ -43,33 +43,18 @@ const createAxiosInstance = (baseURL) => {
             return Promise.reject(error);
         }
     );
-
+    
     instance.interceptors.response.use(
         (response) => {
             return response;
         },
         (error) => {
             if (error.response?.status === 401) {
-                // Clear local storage and navigate to the dashboard
-                removeLocalStorage("access_token")
-                removeLocalStorage("refresh_token")
-                removeLocalStorage("imageUrl")
-                removeLocalStorage("firstName")
-                removeLocalStorage("lastName")
-                removeLocalStorage("companyTitle")
-                removeLocalStorage("user_type")
-                removeLocalStorage("email")
-                removeLocalStorage("password")
-                removeLocalStorage("langKey")
-                removeLocalStorage("user_roles")
-                // const navigate = useNavigate();
-                // navigate('/dashboard');
+                toast.error('No autorizado');
                 // Force redirect to the login page
-                const loginURL = `${process.env.REACT_APP_BASE_URL}/login`;
-                console.log('loginURL',loginURL)
-                window.location.href = loginURL;
+                const dashboardURL = `${process.env.REACT_APP_BASE_URL}/dashboard`;
+                window.location.href = dashboardURL;
             }
-
             return Promise.reject(error);
         }
     );
