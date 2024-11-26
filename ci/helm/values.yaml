@@ -1,5 +1,5 @@
 global:
-  appVersion: 0.0.2-SNAPSHOT
+  appVersion: 0.5.1-SNAPSHOT
   name: ms-ticket-service
 deployment:
   # Default values for deployment.
