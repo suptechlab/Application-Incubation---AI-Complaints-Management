@@ -1,9 +1,7 @@
 import {adminApi} from "../utils/instance";
 
 const API_VERSION = process.env.REACT_APP_API_VERSION
-// const port = process.env.REACT_APP_SEPS_USER_PORT
 
-// instance.defaults.baseURL = `${process.env.REACT_APP_API_URL}:${port}`;
 
 export const handleAddUser = async (data) => {
     return await adminApi.post(`/${API_VERSION}/seps-users`, data);

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { getLocalStorage } from './storage';
+import { getLocalStorage, removeLocalStorage } from './storage';
+import { useNavigate } from 'react-router-dom';
 
 // const BASE_URL = process.env.REACT_APP_API_URL;
 // console.log('BASE_URL',BASE_URL)
@@ -16,10 +17,7 @@ const createAxiosInstance = (baseURL) => {
 
     instance.interceptors.request.use(
         (config) => {
-             const token = getLocalStorage('access_token');
-            // AS OF NOW SET TOKEN STATICALLY BECAUSE LOGIN IS BY PASSSED
-            // const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZXBzLmFkbWluQHlvcG1haWwuY29tIiwiZXhwIjoxNzMzNDYwMzM4LCJhdXRoIjoiUk9MRV9BRE1JTiBST0xFX1VTRVIiLCJpYXQiOjE3MzA4NjgzMzh9.XLjAjQZfztMmJoPTT9rhlSyM8Mye-2sUsMCYcTfjHCbzj0W_ZbpIYLb_8N8nQt7Tu-Kho4IDTYQP5t6eZZajFQ"
-
+            const token = getLocalStorage('access_token');
             const userLanguage = 'es';
 
             // Set Accept-Language header
@@ -51,6 +49,27 @@ const createAxiosInstance = (baseURL) => {
             return response;
         },
         (error) => {
+            if (error.response?.status === 401) {
+                // Clear local storage and navigate to the dashboard
+                removeLocalStorage("access_token")
+                removeLocalStorage("refresh_token")
+                removeLocalStorage("imageUrl")
+                removeLocalStorage("firstName")
+                removeLocalStorage("lastName")
+                removeLocalStorage("companyTitle")
+                removeLocalStorage("user_type")
+                removeLocalStorage("email")
+                removeLocalStorage("password")
+                removeLocalStorage("langKey")
+                removeLocalStorage("user_roles")
+                // const navigate = useNavigate();
+                // navigate('/dashboard');
+                // Force redirect to the login page
+                const loginURL = `${process.env.REACT_APP_BASE_URL}/login`;
+                console.log('loginURL',loginURL)
+                window.location.href = loginURL;
+            }
+
             return Promise.reject(error);
         }
     );
