@@ -1,8 +1,6 @@
 import { lazy } from "react";
-
 const Layout = lazy(() => import("../components/layout/Layout"));
 const Home = lazy(() => import("../pages/home"));
-const MyAccount = lazy(() => import("../pages/myAccount"));
 
 export const PublicRoutes = [
   {

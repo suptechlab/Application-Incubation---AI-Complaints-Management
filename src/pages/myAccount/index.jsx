@@ -49,6 +49,7 @@ export default function MyAccount() {
     setSelectedRow(null);
     setTicketModal(false);
   };
+  
 
 
 
@@ -59,7 +60,7 @@ export default function MyAccount() {
         return 'bg-success bg-opacity-25 text-success';
       case 'In Progress':
         return 'bg-orange-25 text-orange';
-      case 'New':
+      case 'NEW':
         return 'bg-primary bg-opacity-25 text-primary';
       case 'Rejected':
         return 'bg-danger bg-opacity-25 text-danger';
@@ -106,7 +107,7 @@ export default function MyAccount() {
         header: 'Instance Type',
         enableSorting: true,
         cell: (rowData) => (
-          <span className={rowData.row.original.instanceType === 'Complaint' ? 'text-danger' : ''}>{rowData.row.original.instanceType}</span>
+          <span className={rowData.row.original.instanceType === 'COMPLAINT' ? 'text-danger' : ''}>{rowData.row.original.instanceType}</span>
         )
       },
       {
@@ -289,7 +290,7 @@ export default function MyAccount() {
           </div>
         </div>
 
-        <div className="flex-grow-1 d-flex flex-column">
+        <div className="flex-grow-1 d-flex flex-column pb-4">
           <DataTable
             columns={columns}
             dataQuery={dataQuery}

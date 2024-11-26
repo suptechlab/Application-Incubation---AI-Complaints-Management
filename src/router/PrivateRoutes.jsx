@@ -1,9 +1,8 @@
 import { lazy } from "react";
-
 const Layout = lazy(() => import("../components/layout/Layout"));
 const MyAccount = lazy(() => import("../pages/myAccount"));
 
-export const ProtectedRoutes = [
+export const PrivateRoutes = [
   {
     path: "/",
     element: <Layout layout="full" />,
