@@ -1,7 +1,6 @@
 package com.seps.user.service;
 
-import com.seps.user.enums.CustomerTypeEnum;
-import com.seps.user.enums.PriorityCareGroupEnum;
+import com.seps.user.enums.*;
 import com.seps.user.component.EnumUtil;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +42,21 @@ public class MasterDataService {
 
         // Adding localized data for Priority Care Group enum
         masterData.put("priorityCareGroup", enumUtil.enumToLocalizedMap(PriorityCareGroupEnum.class, locale));
+
+        // Adding localized data for Claim Ticket Priority enum
+        masterData.put("claimTicketPriority", enumUtil.enumToLocalizedMap(ClaimTicketPriorityEnum.class, locale));
+
+        // Adding localized data for Claim Ticket Status enum
+        masterData.put("claimTicketStatus", enumUtil.enumToLocalizedMap(ClaimTicketStatusEnum.class, locale));
+
+        // Adding localized data for Closed Status enum
+        masterData.put("closedStatus", enumUtil.enumToLocalizedMap(ClosedStatusEnum.class, locale));
+
+        // Adding localized data for Instance Type enum
+        masterData.put("instanceType", enumUtil.enumToLocalizedMap(InstanceTypeEnum.class, locale));
+
+        // Adding localized data for Rejected Status enum
+        masterData.put("rejectedStatus", enumUtil.enumToLocalizedMap(RejectedStatusEnum.class, locale));
 
         return masterData;
     }
