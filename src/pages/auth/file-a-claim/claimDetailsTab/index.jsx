@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Button, Col, Modal, Row, Stack } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
+import FormCheckbox from '../../../../components/formCheckbox';
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
-import { ClaimDetailsFormSchema } from '../../validations';
-import FormCheckbox from '../../../../components/formCheckbox';
-import { MdBackup } from 'react-icons/md';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import SvgIcons from '../../../../components/SVGIcons';
 import { fetchClaimSubTypes } from '../../../../redux/slice/masterSlice';
-import { useTranslation } from 'react-i18next';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
@@ -158,7 +157,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             htmlFor="files"
                                             className="btn btn-secondary"
                                         >
-                                            <span className='me-2'><MdBackup size={20} /></span>{t("UPLOAD_OPTIONAL_ATTACHMENTS")}
+                                            <span className='me-2'>{SvgIcons.uploadIcon}</span>{t("UPLOAD_OPTIONAL_ATTACHMENTS")}
                                         </label>
                                         <input
                                             id="files"

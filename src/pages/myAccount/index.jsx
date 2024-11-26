@@ -9,6 +9,8 @@ import InfoCards from './cards';
 import PageHeader from './header';
 import ViewClaim from './modals/view';
 import ClaimChat from './modals/chat';
+import InstanceModal from './modals/instance';
+import RaisedComplaintModal from './modals/raised-complaint';
 
 export default function MyAccount() {
   const [pagination, setPagination] = useState({
@@ -27,6 +29,8 @@ export default function MyAccount() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showTicketModal, setTicketModal] = useState(false);
+  const [instanceModalShow, setInstanceModalShow] = useState(false);
+  const [raisedComplaintModalShow, setRaisedComplaintModalShow] = useState(false);
 
   const handleShowModal = (row) => {
     setSelectedRow(row);
@@ -46,6 +50,14 @@ export default function MyAccount() {
     setSelectedRow(null);
     setTicketModal(false);
   };
+
+  const instanceClickHandler = () => {
+    setInstanceModalShow(true)
+  }
+
+  const raisedComplaintClickHandler = () => {
+    setRaisedComplaintModalShow(true)
+  }
 
   // Mock data to display in the table
   const mockData = [
@@ -132,54 +144,80 @@ export default function MyAccount() {
         id: 'actions',
         header: 'Actions',
         enableSorting: false,
-        cell: (info) => (
-          <Stack direction='horizontal' gap={3}>
-            <AppTooltip title="View">
-              <Button
-                variant="link"
-                onClick={() => handleShowModal(info.row.original)}
-                className='p-0 border-0 lh-sm text-body'
-                aria-label='View'
-              >
-                <MdOutlineVisibility size={24} />
-              </Button>
-            </AppTooltip>
-            <AppTooltip title="Chat">
-              <Button
-                variant="link"
-                onClick={() => handleTicketModal(info.row.original)}
-                className='p-0 border-0 lh-sm text-body position-relative'
-                aria-label='Chat'
-              >
-                <MdChatBubbleOutline size={24} />
-                <Badge
-                  bg="danger"
-                  className="border border-white custom-font-size-12 fw-semibold ms-n1 p-1 position-absolute rounded-pill start-100 top-0 translate-middle custom-min-width-22"
-                >
-                  2 <span className="visually-hidden">Unread Chat</span>
-                </Badge>
-              </Button>
-            </AppTooltip>
-            <Stack direction='horizontal' gap={2}>
-              <Button
-                variant="link"
-                className='p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none text-body text-opacity-50'
-                aria-label='Chat'
-              >
-                File a 2nd Instance
-              </Button>
-              <AppTooltip title="Info Tooltip">
+        cell: (info) => {
+          const renderButton = (label, onClickHandler, textColorClass) => (
+            <Button
+              variant="link"
+              className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none ${textColorClass}`}
+              aria-label={label}
+              onClick={onClickHandler}
+            >
+              {label}
+            </Button>
+          );
+
+          let instanceButton = null;
+          let tooltipTitle = '';
+          switch (info.row.original.instance_type) {
+            case "1st Instance":
+              instanceButton = renderButton("File a 2nd Instance", instanceClickHandler, 'text-body text-opacity-50');
+              tooltipTitle = "File a 2nd instance Tooltip";
+              break;
+            case "2nd Instance":
+              instanceButton = renderButton("Raised a Complaint", raisedComplaintClickHandler, 'text-info');
+              tooltipTitle = "Raise a complaint Tooltip";
+              break;
+            case "Complaint":
+              break;
+            default:
+              break;
+          }
+
+          return (
+            <Stack direction='horizontal' gap={3}>
+              <AppTooltip title="View">
                 <Button
                   variant="link"
-                  className='p-0 border-0 lh-sm position-relative text-body'
-                  aria-label='Info'
+                  onClick={() => handleShowModal(info.row.original)}
+                  className='p-0 border-0 lh-sm text-body'
+                  aria-label='View'
                 >
-                  <MdOutlineInfo size={24} />
+                  <MdOutlineVisibility size={24} />
                 </Button>
               </AppTooltip>
+              <AppTooltip title="Chat">
+                <Button
+                  variant="link"
+                  onClick={() => handleTicketModal(info.row.original)}
+                  className='p-0 border-0 lh-sm text-body position-relative'
+                  aria-label='Chat'
+                >
+                  <MdChatBubbleOutline size={24} />
+                  <Badge
+                    bg="danger"
+                    className="border border-white custom-font-size-12 fw-semibold ms-n1 p-1 position-absolute rounded-pill start-100 top-0 translate-middle custom-min-width-22"
+                  >
+                    2 <span className="visually-hidden">Unread Chat</span>
+                  </Badge>
+                </Button>
+              </AppTooltip>
+              {instanceButton && (
+                <Stack direction='horizontal' gap={2}>
+                  {instanceButton}
+                  <AppTooltip title={tooltipTitle}>
+                    <Button
+                      variant="link"
+                      className='p-0 border-0 lh-sm position-relative text-body'
+                      aria-label={tooltipTitle}
+                    >
+                      <MdOutlineInfo size={24} />
+                    </Button>
+                  </AppTooltip>
+                </Stack>
+              )}
             </Stack>
-          </Stack>
-        ),
+          )
+        },
       },
     ],
     []
@@ -243,6 +281,7 @@ export default function MyAccount() {
     },
   ];
 
+
   return (
     <React.Fragment>
       <div className="d-flex flex-column flex-grow-1 p-3 pageContainer">
@@ -281,6 +320,18 @@ export default function MyAccount() {
       <ClaimChat
         handleShow={showTicketModal}
         handleClose={handleCloseTicketModal}
+      />
+
+      {/* Instance MODAL */}
+      <InstanceModal
+        handleShow={instanceModalShow}
+        handleClose={() => setInstanceModalShow(false)}
+      />
+      
+      {/* Raised Complaint MODAL */}
+      <RaisedComplaintModal
+        handleShow={raisedComplaintModalShow}
+        handleClose={() => setRaisedComplaintModalShow(false)}
       />
 
     </React.Fragment>
