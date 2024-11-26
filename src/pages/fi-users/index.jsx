@@ -51,7 +51,7 @@ export default function FIUserList() {
           } else {
               getModulePermissions("FI User").then(response => {
                 console.log('response',response)
-                  if (response.includes("FI_STATUS_CHANGE_CREATE_BY_FI")) {
+                  if (response.includes("FI_USER_CREATE_BY_FI")) {
                       permission.current.addModule = true;
                   }
                   if (response.includes("FI_UPDATE_CREATE_BY_FI")) {
@@ -70,8 +70,9 @@ export default function FIUserList() {
 
   }, []);
 
-    // DATA QUERY
-    const dataQuery = useQuery({
+    
+  // DATA QUERY
+  const dataQuery = useQuery({
       queryKey: ["data", pagination, sorting, filter],
       queryFn: async () => {
         // Set loading state to true before the request starts
@@ -117,8 +118,7 @@ export default function FIUserList() {
       refetchOnWindowFocus: false, // Disable refetching on window focus
       refetchOnMount: false, // Prevent refetching on component remount
       retry: 0, //Disable retry on failure
-    });
-
+  });
 
 
   //handle last page deletion item
@@ -130,6 +130,7 @@ export default function FIUserList() {
       });
     }
   }, [dataQuery.data?.data?.totalPages]);
+
 
   const changeStatus = async (id, currentStatus) => {
     setLoading(true)

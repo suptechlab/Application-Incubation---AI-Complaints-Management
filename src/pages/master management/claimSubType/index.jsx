@@ -48,7 +48,7 @@ const ClaimSubType = () => {
   const [claimTypes, setClaimTypes] = useState([])
 
 
-  const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
+  const permission = useRef({ addModule: false, editModule: false, deleteModule: false ,statusModule: false, });
 
   useEffect(() => {
     isAdminUser().then(response => {
@@ -56,6 +56,7 @@ const ClaimSubType = () => {
         permission.current.addModule = true;
         permission.current.editModule = true;
         permission.current.deleteModule = true;
+        permission.current.statusModule = true;
       } else {
         getModulePermissions("Master management").then(response => {
           if (response.includes("CLAIM_TYPE_CREATE")) {
@@ -225,15 +226,19 @@ const ClaimSubType = () => {
       {
         cell: (info) => {
           return (
-            <Toggle
-              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            />
+            <div className="d-flex items-center gap-2 pointer">
+                    {permission.current.statusModule ?
+                    <Toggle
+                      tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
+                      id={`status-${info?.row?.original?.id}`}
+                      key={"status"}
+                      name="status"
+                      value={info?.row?.original?.status}
+                      checked={info?.row?.original?.status}
+                      onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+                    />
+                  : ''}
+            </div>      
           )
         },
         id: "status",
@@ -245,20 +250,24 @@ const ClaimSubType = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          <DataGridActions
-            controlId="province-master"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permission.current.editModule,
-                type: "button",
-                title: t("EDIT"),
-                icon: <MdEdit size={18} />,
-                handler: () => editClaimSubType(rowData?.row?.original),
-              },
-            ]}
-          />
+          <div>
+              {permission.current.editModule ?
+                <DataGridActions
+                  controlId="province-master"
+                  rowData={rowData}
+                  customButtons={[
+                    {
+                      name: "edit",
+                      enabled: permission.current.editModule,
+                      type: "button",
+                      title: t("EDIT"),
+                      icon: <MdEdit size={18} />,
+                      handler: () => editClaimSubType(rowData?.row?.original),
+                    },
+                  ]}
+                />
+            : ''}
+          </div>
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,

@@ -49,11 +49,12 @@ const InquirySubType = () => {
 
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
-  const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
+  const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
 
   useEffect(() => {
     isAdminUser().then(response => {
       if (response) {
+        permission.current.statusModule = true;
         permission.current.addModule = true;
         permission.current.editModule = true;
         permission.current.deleteModule = true;
@@ -212,6 +213,7 @@ const InquirySubType = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
+            permission.current.statusModule ?
             <Toggle
               tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
               id={`status-${info?.row?.original?.id}`}
@@ -221,7 +223,8 @@ const InquirySubType = () => {
               value={info?.row?.original?.status}
               checked={info?.row?.original?.status}
               onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            />
+            /> 
+            : ''
           )
         },
         id: "status",
@@ -232,6 +235,7 @@ const InquirySubType = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
+          permission.current.editModule ?
           <DataGridActions
             controlId="province-master"
             rowData={rowData}
@@ -245,7 +249,7 @@ const InquirySubType = () => {
                 handler: () => editInquiryType(rowData?.row?.original),
               },
             ]}
-          />
+          /> : ''
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,

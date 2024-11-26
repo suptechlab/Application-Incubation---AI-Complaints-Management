@@ -43,6 +43,7 @@ const TemplateMaster = () => {
     addModule: false,
     editModule: false,
     deleteModule: false,
+    statusModule: false,
   });
 
   useEffect(() => {
@@ -52,6 +53,7 @@ const TemplateMaster = () => {
           permission.current.addModule = true;
           permission.current.editModule = true;
           permission.current.deleteModule = true;
+          permission.current.statusModule = true;
         } else {
           getModulePermissions("Master management")
             .then((response) => {
@@ -153,6 +155,7 @@ const TemplateMaster = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
+            permission.current.statusModule ?
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
@@ -162,7 +165,7 @@ const TemplateMaster = () => {
               checked={info?.row?.original?.status}
               // onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
               tooltip="Active"
-            />
+            /> : ''
           )
         },
         id: "status",
@@ -173,6 +176,7 @@ const TemplateMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
+          permission.current.editModule ? 
           <DataGridActions
             controlId="role-rights"
             rowData={rowData}
@@ -186,7 +190,7 @@ const TemplateMaster = () => {
                 handler: () => editCityMaster(rowData?.row?.original?.id),
               },
             ]}
-          />
+          /> : ''
         ),
         header: () => (
           <div className="text-center">{t("ACTIONS")}</div>

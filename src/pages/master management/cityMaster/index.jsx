@@ -20,6 +20,7 @@ import Edit from "./Edit";
 import { changeCityStatus, downloadCityList, handleGetCities, provinceDropdownData } from "../../../services/cityMaster.service";
 import Loader from "../../../components/Loader";
 
+
 const CityMaster = () => {
   const { t } = useTranslation();
 
@@ -52,44 +53,39 @@ const CityMaster = () => {
 
   const editToggle = () => setEditModal({ id: "", open: !editModal?.open });
 
-  const permission = useRef({
-    addModule: false,
-    editModule: false,
-    deleteModule: false,
-  });
-
+  // Permissoin work
+  const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
   useEffect(() => {
-    isAdminUser()
-      .then((response) => {
-        if (response) {
-          permission.current.addModule = true;
-          permission.current.editModule = true;
-          permission.current.deleteModule = true;
-        } else {
-          getModulePermissions("Master management")
-            .then((response) => {
-              if (response.includes("CLAIM_TYPE_CREATE")) {
-                permission.current.addModule = true;
-              }
-              if (response.includes("CLAIM_TYPE_UPDATE")) {
-                permission.current.editModule = true;
-              }
-              if (response.includes("CLAIM_TYPE_DELETE")) {
-                permission.current.deleteModule = true;
-              }
-            })
-            .catch((error) => {
-              console.error("Error fetching permissions:", error);
-            });
-        }
+      isAdminUser().then(response => {
+          if (response) {
+              permission.current.statusModule = true;
+              permission.current.addModule = true;
+              permission.current.editModule = true;
+              permission.current.deleteModule = true;
+          } else {
+              getModulePermissions("FI User").then(response => {
+                  console.log('response',response)
+                  if (response.includes("FI_USER_CREATE_BY_FI")) {
+                      permission.current.addModule = true;
+                  }
+                  if (response.includes("FI_UPDATE_CREATE_BY_FI")) {
+                      permission.current.editModule = true;
+                  }
+                  if (response.includes("FI_STATUS_CHANGE_CREATE_BY_FI")) {
+                      permission.current.statusModule = true;
+                  }
+              }).catch(error => {
+                  console.error("Error fetching permissions:", error);
+              });
+          }
+      }).catch(error => {
+          console.error("Error get during to fetch User Type", error);
       })
-      .catch((error) => {
-        console.error("Error get during to fetch Province Master", error);
-      });
+
   }, []);
 
   const editCityMaster = async (rowData) => {
-    setEditModal({ row: rowData, open: !editModal?.open })
+     setEditModal({ row: rowData, open: !editModal?.open })
   };
 
   // FETCH DATA
@@ -177,23 +173,28 @@ const CityMaster = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
-            <Toggle
-              tooltip={
-                info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
-              }
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              // label="Status"
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() =>
-                changeStatus(
-                  info?.row?.original?.id,
-                  info?.row?.original?.status
-                )
-              }
-            />
+            <div className="d-flex items-center gap-2 pointer">
+                    {permission.current.statusModule ?
+                        <Toggle
+                            tooltip={
+                              info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
+                            }
+                            id={`status-${info?.row?.original?.id}`}
+                            key={"status"}
+                            // label="Status"
+                            name="status"
+                            value={info?.row?.original?.status}
+                            checked={info?.row?.original?.status}
+                            onChange={() =>
+                              changeStatus(
+                                info?.row?.original?.id,
+                                info?.row?.original?.status
+                              )
+                            }
+                          />
+                    : ""}
+              </div>
+            
           );
         },
         id: "status",
@@ -204,20 +205,25 @@ const CityMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          <DataGridActions
-            controlId="province-master"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permission.current.editModule,
-                type: "button",
-                title: t("EDIT"),
-                icon: <MdEdit size={18} />,
-                handler: () => editCityMaster(rowData?.row?.original),
-              },
-            ]}
-          />
+              <div className="d-flex items-center gap-2 pointer">
+                    {permission.current.editModule ?
+                        <DataGridActions
+                            controlId="province-master"
+                            rowData={rowData}
+                            customButtons={[
+                              {
+                                name: "edit",
+                                enabled: permission.current.editModule,
+                                type: "button",
+                                title: t("EDIT"),
+                                icon: <MdEdit size={18} />,
+                                handler: () => editCityMaster(rowData?.row?.original),
+                              },
+                            ]}
+                          />
+                    : ""}
+              </div> 
+          
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
