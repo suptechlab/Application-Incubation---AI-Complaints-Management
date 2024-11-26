@@ -49,20 +49,24 @@ export default function MyAccount() {
     setSelectedRow(null);
     setTicketModal(false);
   };
-  
+
 
 
 
   // The color class based on the status
   const getStatusClass = (status) => {
     switch (status) {
-      case 'Closed':
+      case 'CLOSED':
         return 'bg-success bg-opacity-25 text-success';
-      case 'In Progress':
+      case 'IN_PROGRESS':
         return 'bg-orange-25 text-orange';
       case 'NEW':
         return 'bg-primary bg-opacity-25 text-primary';
-      case 'Rejected':
+      case 'REJECTED':
+        return 'bg-danger bg-opacity-25 text-danger';
+      case 'PENDING':
+        return 'bg-danger bg-opacity-25 text-danger';
+      case 'ASSIGNED':
         return 'bg-danger bg-opacity-25 text-danger';
       default:
         return 'bg-body bg-opacity-25 text-body';
@@ -298,11 +302,11 @@ export default function MyAccount() {
             setPagination={setPagination}
             sorting={sorting}
             setSorting={setSorting}
-            // setPagination={() => { }}
-            // setSorting={() => { }}
-            // pagination={{ pageIndex: 0, pageSize: 100 }}
-            // sorting={[]}
-            // showPagination={false} // Hide pagination
+          // setPagination={() => { }}
+          // setSorting={() => { }}
+          // pagination={{ pageIndex: 0, pageSize: 100 }}
+          // sorting={[]}
+          // showPagination={false} // Hide pagination
           />
         </div>
       </div>

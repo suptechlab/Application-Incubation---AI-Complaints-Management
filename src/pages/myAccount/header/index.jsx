@@ -2,10 +2,15 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Stack } from 'react-bootstrap';
 import CustomDateRangePicker from '../../../components/CustomDateRangePicker';
+import moment from 'moment';
 
-const PageHeader = ({ title = "" }) => {
-    const [startDate, setStartDate] = useState();
+const PageHeader = ({ title = "", filter, setFilter }) => {
+    const [startDate, setStartDate] = useState()
 
+    const handleDateChange = (date) => {
+        setStartDate(date)
+        setFilter({ year: moment(date).format('yyyy') })
+    };
     return (
         <div className="contentHeader pb-3">
             <Stack
@@ -23,9 +28,10 @@ const PageHeader = ({ title = "" }) => {
                             wrapperClassName="mb-0"
                             placeholder="Select"
                             selected={startDate}
-                            onChange={(date) => setStartDate(date)}
+                            onChange={handleDateChange}
                             dateFormat="yyyy"
                             showYearPicker
+
                         />
                     </div>
                 </Stack>
