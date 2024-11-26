@@ -1,7 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Row, Stack } from 'react-bootstrap';
 
 const InfoCards = ({ cardsData }) => {
+
+
+  const [claimStatsData, setClaimsStatsData] = useState([])
+
+
+  // GET CLAIM TYPE DROPDOWN LIST
+  const getClaimTypeStatsData = () => {
+    // claimTypesDropdownList().then(response => {
+    //   setClaimTypes(response?.data)
+    // }).catch((error) => {
+    //   if (error?.response?.data?.errorDescription) {
+    //     toast.error(error?.response?.data?.errorDescription);
+    //   } else {
+    //     toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+    //   }
+    // })
+  }
+
+  useEffect(() => {
+    getClaimTypeStatsData()
+  }, [])
+
+
   return (
     <Row className='g-3 g-lg-4'>
       {cardsData.map((card, index) => (

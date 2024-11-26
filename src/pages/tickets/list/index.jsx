@@ -10,6 +10,7 @@ import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { handleGetUsers } from "../../../services/user.service";
 import TicketsListFilters from "./filters";
+import { handleGetTicketList } from "../../../services/ticketmanagement.service";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -31,18 +32,51 @@ export default function TicketsList() {
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
-        queryFn: () => {
+        queryFn: async () => {
+          // Set loading state to true before the request starts
+          setLoading(true);
+    
+          try {
             const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-            Object.keys(filterObj).forEach(
-                (key) => filterObj[key] === "" && delete filterObj[key]
-            );
-            if (sorting?.length === 0) {
-                return { data: sampleData, page: 1 };
+            Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+    
+            // Make the API request based on sorting
+            let response;
+            if (sorting.length === 0) {
+              response = await handleGetTicketList({
+                page: pagination.pageIndex,
+                size: pagination.pageSize,
+                ...filterObj,
+              });
             } else {
-                return { data: sampleData, page: 1 };
+              response = await handleGetTicketList({
+                page: pagination.pageIndex,
+                size: pagination.pageSize,
+                sort: sorting
+                  .map(
+                    (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                  )
+                  .join(","),
+                ...filterObj,
+              });
             }
+    
+            // Return the API response data
+            return response;
+          } catch (error) {
+            console.error("Error fetching data", error);
+            // Optionally, handle errors here
+          } finally {
+            // Set loading state to false when the request finishes (whether successful or not)
+            setLoading(false);
+          }
         },
-    });
+        staleTime: 0, // Data is always stale, so it refetches
+        cacheTime: 0, // Cache expires immediately
+        refetchOnWindowFocus: false, // Disable refetching on window focus
+        refetchOnMount: false, // Prevent refetching on component remount
+        retry: 0, //Disable retry on failure
+      });
 
     const sampleData = [
         {
@@ -126,26 +160,29 @@ export default function TicketsList() {
             },
 
             {
-                accessorFn: (row) => row?.claimType,
+                accessorFn: (row) => row?.claimType?.name,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row?.creationDate,
-                id: "creationDate",
+                accessorFn: (row) => row?.createdAt,
+                id: "createdAt",
                 header: () => "Creation Date",
                 enableSorting: true,
+                 cell: ({ row }) => (
+                    row?.original?.createdAt
+                ),
             },
             {
-                accessorFn: (row) => row?.claimFilledBy,
+                accessorFn: (row) => row?.user?.name,
                 id: "claimFilledBy",
                 header: () => "Claim filled by",
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row?.sla,
-                id: "sla",
+                accessorFn: (row) => row?.slaBreachDays,
+                id: "slaBreachDays",
                 header: () => "SLA",
                 enableSorting: true,
             },
