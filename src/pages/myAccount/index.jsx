@@ -8,6 +8,7 @@ import AppTooltip from '../../components/tooltip';
 import InfoCards from './cards';
 import PageHeader from './header';
 import ViewClaim from './modals/view';
+import ClaimChat from './modals/chat';
 
 export default function MyAccount() {
   const [pagination, setPagination] = useState({
@@ -277,25 +278,11 @@ export default function MyAccount() {
       />
 
       {/* TICKET MODAL */}
-      <Modal show={showTicketModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Claim Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedRow ? (
-            <div>
-              Ticket modal
-            </div>
-          ) : (
-            <p>No details available</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseTicketModal}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ClaimChat
+        handleShow={showTicketModal}
+        handleClose={handleCloseTicketModal}
+      />
+
     </React.Fragment>
   );
 }
