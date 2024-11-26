@@ -5,7 +5,7 @@
 
     <groupId>com.seps.admin</groupId>
     <artifactId>admin</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>ms-admin-service</name>
     <description>Description for Admin</description>
