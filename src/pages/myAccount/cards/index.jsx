@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Row, Stack } from 'react-bootstrap';
+import { fileClaimStats } from '../../../redux/slice/fileClaimSlice';
+import { useDispatch } from 'react-redux';
 
 const InfoCards = ({ cardsData }) => {
+
+  const dispatch = useDispatch()
+  const [loading , setLoading] = useState(false)
+  const [claimStatsData , setClaimsStatsData] = useState([])
+
+  const getClaimStats = async() => {
+    const result = await dispatch(fileClaimStats());
+    if (fileClaimStats.fulfilled.match(result)) {
+      setClaimsStatsData(result?.payload)
+    } else {
+      console.error('Verification error:', result.error.message);
+    }
+  }
+
+  useEffect(()=>{
+    // getClaimStats()
+  },[])
+
   return (
     <Row className='g-3 g-lg-4'>
       {cardsData.map((card, index) => (

@@ -1,11 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Accordion, Col, ListGroup, Modal, Row } from 'react-bootstrap';
 import { MdAttachFile, MdDownload } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import CommonViewData from "../../../../components/CommonViewData";
 import AppTooltip from '../../../../components/tooltip';
+import { useDispatch } from 'react-redux';
+import { getClaimDetails } from '../../../../redux/slice/fileClaimSlice';
+import moment from 'moment/moment';
 
-const ViewClaim = ({ handleShow, handleClose }) => {
+const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
+
+    const dispatch = useDispatch()
+    const [loading, setLoading] = useState(false)
+    const [claimStatsData, setClaimsStatsData] = useState([])
+
+    const fetchClaimDetails = async () => {
+        try {
+            const result = await dispatch(getClaimDetails(selectedRow?.id));
+            if (getClaimDetails.fulfilled.match(result)) {
+                setClaimsStatsData(result?.payload?.data);
+            } else {
+                console.error('Verification error:', result.error?.message || 'Unknown error');
+            }
+        } catch (error) {
+            console.error('Unexpected error:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedRow?.id) {
+            fetchClaimDetails();
+        }
+    }, [selectedRow]);
+
     // The color class based on the status
     const getStatusClass = (status) => {
         switch (status) {
@@ -26,32 +53,32 @@ const ViewClaim = ({ handleShow, handleClose }) => {
     const viewTopData = [
         {
             label: "Created on",
-            value: "07-10-24 | 03:33 pm",
+            value:   claimStatsData?.createdAt ? moment(claimStatsData?.createdAt).format('DD-MM-YY | hh : ss : a') : "" ,// "07-10-24 | 03:33 pm",
             colProps: { sm: 6, lg: 3 }
         },
         {
             label: "Entity",
-            value: "Entity - 1",
+            value:  claimStatsData?.organization?.nemonicoTipoOrganizacion ?? 'N/A',
             colProps: { sm: 6, lg: 3 }
         },
         {
             label: "Claim Type",
-            value: "Credit Portfolio",
+            value: claimStatsData?.claimType?.name,
             colProps: { sm: 6, lg: 3 }
         },
         {
             label: "Claim Sub Type",
-            value: "Refinancing Request",
+            value: claimStatsData?.claimSubType?.name,
             colProps: { sm: 6, lg: 3 }
         },
         {
             label: "Resolved on",
-            value: "06-25-24 | 06:10 pm",
+            value: claimStatsData?.resolvedOn ? moment(claimStatsData?.resolvedOn).format('DD-MM-YY | hh : ss : a') : "Not resolved",
             colProps: { sm: 6, lg: 3 }
         },
         {
             label: "Claim Status",
-            value: <span className='text-success fw-semibold'>Closed and in favor</span>,
+            value: <span className='text-success fw-semibold'>{claimStatsData?.status}</span>,
             colProps: { sm: 6, lg: 3 }
         },
     ]
@@ -96,19 +123,19 @@ const ViewClaim = ({ handleShow, handleClose }) => {
     const viewBottomData = [
         {
             label: "Precedents",
-            value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
+            value: claimStatsData?.precedents ?? 'N/A',
             colProps: { xs: 12 }
         },
         {
             label: "Specific Petition",
-            value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+            value: claimStatsData?.specificPetition ?? 'N/A',
             colProps: { xs: 12 }
         },
-        {
-            label: "Entity's Response",
-            value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-            colProps: { xs: 12 }
-        },
+        // {
+        //     label: "Entity's Response",
+        //     value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+        //     colProps: { xs: 12 }
+        // },
     ]
 
 
@@ -126,10 +153,10 @@ const ViewClaim = ({ handleShow, handleClose }) => {
         >
             <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
                 <Modal.Title as="h4" className="fw-bold d-inline-flex align-items-center flex-wrap gap-2">
-                    Claim ID: #52541 <span
+                    Claim ID: #{claimStatsData?.ticketId} <span
                         className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass('Closed')}`}
                     >
-                        First Instance
+                        {claimStatsData?.instanceType}
                     </span>
                 </Modal.Title>
             </Modal.Header>
@@ -144,8 +171,9 @@ const ViewClaim = ({ handleShow, handleClose }) => {
                     ))}
                 </Row>
 
-                {/* Accordion Items */}
-                <Accordion flush className='custom-accordion'>
+                {/* Accordion Items */} 
+                {/* WILL DO IT LATER */}
+                {/* <Accordion flush className='custom-accordion'>
                     {accordionItems.map(item => (
                         <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
                             <Accordion.Header>
@@ -176,7 +204,7 @@ const ViewClaim = ({ handleShow, handleClose }) => {
                             </Accordion.Body>
                         </Accordion.Item>
                     ))}
-                </Accordion>
+                </Accordion> */}
 
                 {/* View Bottom Data */}
                 <Row>

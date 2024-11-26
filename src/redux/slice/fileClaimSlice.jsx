@@ -40,8 +40,8 @@ export const fileClaimList = createAsyncThunk(
   }
 );
 // GET CLAIMS DETAILS
-export const getClaimTickets = createAsyncThunk(
-  'getClaimTickets',
+export const getClaimDetails = createAsyncThunk(
+  'getClaimDetails',
   async (id, { rejectWithValue }) => {
     try {
       const response = await ticketsApi.get(`${EndPoint.CLAIM_TICKETS}/${id}`, );
@@ -51,6 +51,23 @@ export const getClaimTickets = createAsyncThunk(
       }
 
       return response; // RETURN RESPONSE
+    } catch (error) {
+      return rejectWithValue(error.message || 'Something went wrong');
+    }
+  }
+);
+// GET CLAIMS STATS
+export const fileClaimStats = createAsyncThunk(
+  'fileClaimStats',
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await ticketsApi.get(`${EndPoint.LIST_CLAIMS}`, { params });
+
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to get claim stats!');
+      }
+
+      return response?.data; // RETURN RESPONSE
     } catch (error) {
       return rejectWithValue(error.message || 'Something went wrong');
     }
@@ -81,8 +98,6 @@ const fileClaimSlice = createSlice({
         state.error = null;
       })
       .addCase(fileClaimList.fulfilled, (state, action) => {
-
-        console.log(action.payload)
         state.loading = false;
       })
       .addCase(fileClaimList.rejected, (state, action) => {
@@ -90,14 +105,26 @@ const fileClaimSlice = createSlice({
         state.error = action.payload || "Something went wrong";
       })
        // CLAIM DETAILS
-       .addCase(getClaimTickets.pending, (state) => {
+       .addCase(getClaimDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getClaimTickets.fulfilled, (state, action) => {
+      .addCase(getClaimDetails.fulfilled, (state, action) => {
         state.loading = false;
       })
-      .addCase(getClaimTickets.rejected, (state, action) => {
+      .addCase(getClaimDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
+      })
+      // CLAIM STATS
+      .addCase(fileClaimStats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fileClaimStats.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(fileClaimStats.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       });

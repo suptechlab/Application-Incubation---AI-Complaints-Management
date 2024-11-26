@@ -68,6 +68,7 @@ export default function MyAccount() {
     }
   };
 
+  // TABLE COLUMNS
   const columns = React.useMemo(
     () => [
       { accessorFn: (row) => row.ticketId, id: 'ticketId', header: 'Ticket Id', enableSorting: false },
@@ -134,7 +135,6 @@ export default function MyAccount() {
                 onClick={() => handleShowModal(info.row.original)}
                 className='p-0 border-0 lh-sm text-body'
                 aria-label='View'
-                disabled={true}
               >
                 <MdOutlineVisibility size={24} />
               </Button>
@@ -290,30 +290,26 @@ export default function MyAccount() {
         </div>
 
         <div className="flex-grow-1 d-flex flex-column">
-          {console.log(dataQuery?.data)}
           <DataTable
-            columns={columns}
-            dataQuery={dataQuery}
-            setPagination={() => { }}
-            setSorting={() => { }}
-            pagination={{ pageIndex: 0, pageSize: 100 }}
-            sorting={[]}
-            showPagination={false} // Hide pagination
-          />
-          {/* <DataTable
             columns={columns}
             dataQuery={dataQuery}
             pagination={pagination}
             setPagination={setPagination}
             sorting={sorting}
             setSorting={setSorting}
-          /> */}
+            // setPagination={() => { }}
+            // setSorting={() => { }}
+            // pagination={{ pageIndex: 0, pageSize: 100 }}
+            // sorting={[]}
+            // showPagination={false} // Hide pagination
+          />
         </div>
       </div>
 
       {/* CLIAM DETAILS MODAL */}
       <ViewClaim
         handleShow={showViewModal}
+        selectedRow={selectedRow}
         handleClose={handleCloseModal}
       />
 
