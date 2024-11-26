@@ -5,6 +5,10 @@
 
     .react-datepicker__year-wrapper {
         max-width: 136px;
+
+        .react-datepicker__year-text {
+            padding: 4px;
+        }
     }
 }
 
