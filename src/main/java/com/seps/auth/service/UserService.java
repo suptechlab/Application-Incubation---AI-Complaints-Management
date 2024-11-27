@@ -505,6 +505,12 @@ public class UserService {
             });
 
         Persona persona = getPersonaByIdentificacion(identificacion);
+        //Validate Fingerprint
+        ConsultationRequest consultationRequest = new ConsultationRequest();
+        consultationRequest.setIdentificacion(identificacion);
+        consultationRequest.setIndividualDactilar(userDTO.getIndividualDactilar());
+//        Boolean validatedPersonIndividual = validatePersonIndividual(consultationRequest);
+        Boolean validatedPersonIndividual = false;
         String normalizeEmail = userDTO.getEmail().toLowerCase();
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
@@ -521,7 +527,7 @@ public class UserService {
         newUser.setPasswordSet(false);
         newUser.setIdentificacion(identificacion);
         newUser.setGender(persona.getGenero());
-        newUser.setFingerprintVerified(false);
+        newUser.setFingerprintVerified(validatedPersonIndividual);
         //Set Authorities
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);

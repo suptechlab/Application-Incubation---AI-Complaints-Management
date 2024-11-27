@@ -1,0 +1,31 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+<head>
+  <title th:text="#{email.account.setup.title}">Welcome to Your New Account</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
+</head>
+<body>
+<p th:text="#{email.account.setup.greeting(${user.firstName})}">Dear User</p>
+<p th:text="#{email.account.setup.text1}">We’re excited to have you on board. Your account has been successfully set up.</p>
+<h3 th:text="#{email.account.setup.account.details}">Account Details:</h3>
+<ul>
+  <li>
+    <strong th:text="#{email.account.setup.account.email}">Email:</strong>
+    <span th:text="${user.email}">[Your Email Address]</span>
+  </li>
+</ul>
+<h3 th:text="#{email.account.setup.account.next.steps}">Next Steps:</h3>
+<ul>
+  <li>
+    <span th:text="#{email.account.setup.text2}">You can file a claim via this link:</span>
+    <a th:href="${baseUrl}" th:text="${baseUrl}" style="color: #007BFF; text-decoration: none;">[Website Home Page]</a>
+  </li>
+</ul>
+<p>
+  <span th:text="#{email.account.setup.text3}">Regards, </span>
+  <br/>
+  <em th:text="#{email.signature}">SEPS-Cambridge Team.</em>
+</p>
+</body>
+</html>
