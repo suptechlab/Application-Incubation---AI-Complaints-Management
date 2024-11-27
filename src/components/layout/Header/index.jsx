@@ -52,7 +52,7 @@ const Header = ({ layout }) => {
     <header className="theme-header">
       <Navbar key={expand} expand={expand} className="bg-body-tertiary py-0">
         <Container className="custom-min-height-70" fluid={layout === 'full'}>
-          <Navbar.Brand as={Link} href="/" className="me-auto px-1">
+          <Navbar.Brand as={Link} to="/" className="me-auto px-1">
             <Image fluid src={Logo} alt="Logo" width={258} height={55} />
           </Navbar.Brand>
 
