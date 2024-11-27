@@ -56,14 +56,14 @@ const ProvinceMaster = () => {
         permission.current.deleteModule = true;
         permission.current.statusModule = true;
       } else {
-        getModulePermissions("Master management").then(response => {
-          if (response.includes("CLAIM_TYPE_CREATE")) {
+        getModulePermissions("Province Master").then(response => {
+          if (response.includes("PROVINCE_CREATE")) {
             permission.current.addModule = true;
           }
-          if (response.includes("CLAIM_TYPE_UPDATE")) {
+          if (response.includes("PROVINCE_UPDATE")) {
             permission.current.editModule = true;
           }
-          if (response.includes("CLAIM_TYPE_DELETE")) {
+          if (response.includes("PROVINCE_STATUS_CHANGE")) {
             permission.current.deleteModule = true;
           }
         }).catch(error => {

@@ -63,15 +63,15 @@ const CityMaster = () => {
               permission.current.editModule = true;
               permission.current.deleteModule = true;
           } else {
-              getModulePermissions("FI User").then(response => {
+              getModulePermissions("City Master").then(response => {
                   console.log('response',response)
-                  if (response.includes("FI_USER_CREATE_BY_FI")) {
+                  if (response.includes("CITY_CREATE")) {
                       permission.current.addModule = true;
                   }
-                  if (response.includes("FI_UPDATE_CREATE_BY_FI")) {
+                  if (response.includes("CITY_UPDATE")) {
                       permission.current.editModule = true;
                   }
-                  if (response.includes("FI_STATUS_CHANGE_CREATE_BY_FI")) {
+                  if (response.includes("CITY_STATUS_CHANGE")) {
                       permission.current.statusModule = true;
                   }
               }).catch(error => {

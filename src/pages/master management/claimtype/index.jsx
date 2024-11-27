@@ -59,15 +59,15 @@ const ClaimType = () => {
         permission.current.deleteModule = true;
         permission.current.statusModule = true;
       } else {
-        getModulePermissions("Master management").then(response => {
+        getModulePermissions("Claim Type Master").then(response => {
           if (response.includes("CLAIM_TYPE_CREATE")) {
             permission.current.addModule = true;
           }
           if (response.includes("CLAIM_TYPE_UPDATE")) {
             permission.current.editModule = true;
           }
-          if (response.includes("CLAIM_TYPE_DELETE")) {
-            permission.current.deleteModule = true;
+          if (response.includes("CLAIM_TYPE_STATUS_CHANGE")) {
+            permission.current.statusModule = true;
           }
         }).catch(error => {
           console.error("Error fetching permissions:", error);

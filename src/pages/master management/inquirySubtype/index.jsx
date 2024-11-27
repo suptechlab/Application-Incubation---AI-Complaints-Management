@@ -59,15 +59,15 @@ const InquirySubType = () => {
         permission.current.editModule = true;
         permission.current.deleteModule = true;
       } else {
-        getModulePermissions("Master management").then(response => {
-          if (response.includes("CLAIM_TYPE_CREATE")) {
+        getModulePermissions("Inquiry Sub Type Master").then(response => {
+          if (response.includes("INQUIRY_SUB_TYPE_CREATE")) {
             permission.current.addModule = true;
           }
-          if (response.includes("CLAIM_TYPE_UPDATE")) {
+          if (response.includes("INQUIRY_SUB_TYPE_UPDATE")) {
             permission.current.editModule = true;
           }
-          if (response.includes("CLAIM_TYPE_DELETE")) {
-            permission.current.deleteModule = true;
+          if (response.includes("INQUIRY_SUB_TYPE_STATUS_CHANGE")) {
+            permission.current.statusModule = true;
           }
         }).catch(error => {
           console.error("Error fetching permissions:", error);

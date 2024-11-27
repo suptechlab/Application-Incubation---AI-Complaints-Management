@@ -51,13 +51,13 @@ export default function FIUserList() {
           } else {
               getModulePermissions("FI User").then(response => {
                 console.log('response',response)
-                  if (response.includes("FI_USER_CREATE_BY_FI")) {
+                  if (response.includes("FI_USER_CREATE_BY_SEPS")) {
                       permission.current.addModule = true;
                   }
-                  if (response.includes("FI_UPDATE_CREATE_BY_FI")) {
+                  if (response.includes("FI_UPDATE_CREATE_BY_SEPS")) {
                       permission.current.editModule = true;
                   }
-                  if (response.includes("FI_STATUS_CHANGE_CREATE_BY_FI")) {
+                  if (response.includes("FI_STATUS_CHANGE_CREATE_BY_SEPS")) {
                       permission.current.statusModule = true;
                   }
               }).catch(error => {
@@ -198,71 +198,64 @@ export default function FIUserList() {
           return <span>{moment(info.row.original.createdAt).format("l")}</span>;
         },
       },
-      
-      // Conditionally add the "status" column
-      ...(permission.current.statusModule
-          ? [
-              {
-                id: "status",
-                isAction: true,
-                cell: (info) => {
-                  
-                  if(info?.row?.original?.status === "ACTIVE" || info?.row?.original?.status === "BLOCKED" ){
-                    return (
-                      <Toggle
-                        id={`status-${info?.row?.original?.id}`}
-                        key={"status"}
-                        name="status"
-                        value={info?.row?.original?.status ===  "ACTIVE"}
-                        checked={info?.row?.original?.status === "ACTIVE"}
-                        onChange={() =>
-                          changeStatus(
-                            info?.row?.original?.id,
-                            info?.row?.original?.status
-                          )
-                        }
-                        tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
-                      />
-                    );
-                  }else{
-                    return <span>{info?.row?.original?.status} </span>
-                  }
+      {
+        id: "status",
+        isAction: true,
+        cell: (info) => {
+           
+          if(info?.row?.original?.status === "ACTIVE" || info?.row?.original?.status === "BLOCKED" ){
+            return (
+              permission.current.statusModule ?
+              <Toggle
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                name="status"
+                value={info?.row?.original?.status ===  "ACTIVE"}
+                checked={info?.row?.original?.status === "ACTIVE"}
+                onChange={() =>
+                  changeStatus(
+                    info?.row?.original?.id,
+                    info?.row?.original?.status
+                  )
+                }
+                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+              />
+              : ''
+            );
+          }else{
+            return <span>{info?.row?.original?.status} </span>
+          }
+        },
+        header: () => t("STATUS"),
+        enableSorting: false,
+        size: "80",
+      },
+      {
+        id: "actions",
+        isAction: true,
+        cell: (rowData) => (
+          permission.current.editModule ? 
+          <div className="pointer">
+            <DataGridActions
+              controlId="fi-users"
+              rowData={rowData}
+              customButtons={[
+                {
+                  name: "edit",
+                  enabled: true,
+                  type: "link",
+                  title: t("EDIT"),
+                  icon: <MdEdit size={18} />,
                 },
-                header: () => t("STATUS"),
-                enableSorting: false,
-                size: "80",
-              },
-            ]
-          : []),
-      // Conditionally add the "actions" column
-      ...(permission.current.editModule
-        ? [
-            {
-              id: "actions",
-              isAction: true,
-              cell: (rowData) => (
-                <div className="pointer">
-                  <DataGridActions
-                    controlId="fi-users"
-                    rowData={rowData}
-                    customButtons={[
-                      {
-                        name: "edit",
-                        enabled: true,
-                        type: "link",
-                        title: t("EDIT"),
-                        icon: <MdEdit size={18} />,
-                      },
-                    ]}
-                  />
-                </div>
-              ),
-              header: () => <div className="text-center">{t("ACTIONS")}</div>,
-              enableSorting: false,
-              size: "80",
-            },
-          ]
-        : []),
+              ]}
+            />
+          </div>
+          : ''
+        ),
+        header: () => <div className="text-center">{t("ACTIONS")}</div>,
+        enableSorting: false,
+        size: "80",
+      },
     ],
     []
   );
