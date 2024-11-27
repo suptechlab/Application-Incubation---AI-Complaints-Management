@@ -80,15 +80,15 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         value={filter.search}
                     />
                 </div>
-                <Button
+                {/* <Button
                     type="button"
                     variant="warning"
                     onClick={returnToAdminClick}
                     className="flex-grow-1 flex-sm-grow-0"
                 >
                     Return to Admin
-                </Button>
-                <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                </Button> */}
+                {/* <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                     <ReactSelect
                         wrapperClassName="mb-0"
                         class="form-select "
@@ -109,6 +109,65 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             });
                         }}
                         value={filter?.claimTypeId}
+                    />
+                </div> */}
+                <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                    <ReactSelect
+                        wrapperClassName="mb-0"
+                        class="form-select "
+                        placeholder="Assign/Reassign"
+                        id="floatingSelect"
+                        size="sm"
+                        disabled ={true}
+                        options={[
+                            {
+                                label: "Claim Type",
+                                value: "",
+                            },
+                            ...claimTypes
+                        ]}
+                        onChange={(e) => {
+                            setFilter({
+                                ...filter,
+                                claimTypeId: e.target.value,
+                            });
+                        }}
+                        value={filter?.claimTypeId}
+                    />
+                </div>
+                <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                    <ReactSelect
+                        wrapperClassName="mb-0"
+                        class="form-select "
+                        placeholder={t("PRIORITY")}
+                        id="floatingSelect"
+                        size="sm"
+                        options={[
+                            {
+                                label: t("PRIORITY"),
+                                value: "",
+                                class: "label-class",
+                            },
+                            {
+                                label: t("LOW"),
+                                value: "LOW",
+                            },
+                            {
+                                label: t("MEDIUM"),
+                                value: "MEDIUM",
+                            },
+                            {
+                                label: t("HIGH"),
+                                value: "HIGH",
+                            }
+                        ]}
+                        onChange={(e) => {
+                            setFilter({
+                                ...filter,
+                                claimTicketPriority: e.target.value,
+                            });
+                        }}
+                        value={filter?.claimTicketPriority}
                     />
                 </div>
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
@@ -156,41 +215,6 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             });
                         }}
                         value={filter?.claimTicketStatus}
-                    />
-                </div>
-                <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder={t("PRIORITY")}
-                        id="floatingSelect"
-                        size="sm"
-                        options={[
-                            {
-                                label: t("PRIORITY"),
-                                value: "",
-                                class: "label-class",
-                            },
-                            {
-                                label: t("LOW"),
-                                value: "LOW",
-                            },
-                            {
-                                label: t("MEDIUM"),
-                                value: "MEDIUM",
-                            },
-                            {
-                                label: t("HIGH"),
-                                value: "HIGH",
-                            }
-                        ]}
-                        onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                claimTicketPriority: e.target.value,
-                            });
-                        }}
-                        value={filter?.claimTicketPriority}
                     />
                 </div>
                 <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap">

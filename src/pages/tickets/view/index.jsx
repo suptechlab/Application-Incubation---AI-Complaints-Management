@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Col, Dropdown, Image, ListGroup, Row, Stack } from 'react-bootstrap';
 import { MdArrowDropDown, MdAttachFile, MdCalendarToday } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from '../../../components/CommonViewData';
 import Loader from '../../../components/Loader';
@@ -10,26 +10,53 @@ import AttachmentsModal from '../modals/attachmentsModal';
 import UserInfoModal from '../modals/userInfoModal';
 import TicketViewHeader from './header';
 import TicketTabsSection from './tabs';
+import { ticketDetailsApi } from '../../../services/ticketmanagement.service';
+import toast from 'react-hot-toast';
+import moment from 'moment/moment';
 
 const TicketsView = () => {
   const [selectedPriority, setSelectedPriority] = useState('Low');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
 
+  const {id} = useParams()
+
+  const [ticketData, setTicketData] = useState({})
+
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
     setSelectedPriority(priority);
   };
 
+  // GET TICKET DETAILS
+  const getTicketDetails = () => {
+    ticketDetailsApi(id).then(response => {
+      if (response?.data) {
+        setTicketData(response?.data)
+        setSelectedPriority(response?.data?.priority)
+      }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
+      }
+    })
+  }
+
+  useEffect(() => {
+    getTicketDetails()
+  }, [id])
+
   // The color class based on the priority level
-  const priorityOptions = ['Low', 'Medium', 'High', 'NIL'];
+  const priorityOptions = ['LOW', 'MEDIUM', 'HIGH', 'NIL'];
   const getPriorityClass = (priority) => {
     switch (priority) {
-      case 'Low':
+      case 'LOW':
         return 'text-success';
-      case 'Medium':
+      case 'MEDIUM':
         return 'text-orange';
-      case 'High':
+      case 'HIGH':
         return 'text-danger';
       case 'NIL':
         return 'text-muted';
@@ -52,17 +79,17 @@ const TicketsView = () => {
   const viewTopData = [
     {
       label: "Created on",
-      value: "07-10-24 | 03:33 pm",
+      value:    ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
       label: "Due Date",
-      value: "07-26-24 | 05:30 pm",
+      value:  ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY | hh:mm:a") : 'N/A',
       colProps: { sm: 6 }
     },
     {
       label: "Claim filed by",
-      value: <Link onClick={handleUserInfoClick} className='text-decoration-none'>Veronica Andres</Link>,
+      value: <Link onClick={handleUserInfoClick} className='text-decoration-none'>{ticketData?.createdByUser?.name}</Link>,
       colProps: { sm: 6 }
     },
     {
@@ -97,39 +124,39 @@ const TicketsView = () => {
     },
     {
       label: "Claim Type",
-      value: "Credit Portfolio",
+      value: ticketData?.claimType?.name,
       colProps: { sm: 6 }
     },
     {
       label: "Claim Sub Type",
-      value: "Refinancing Request",
+      value: ticketData?.claimSubType?.name,
       colProps: { sm: 6 }
     },
     {
       label: "Agent",
-      value: "John Duo",
+      value: ticketData?.fiAgent ?? "N/A",
       colProps: { sm: 6 }
     },
     {
       label: "Team",
-      value: "Finance -1 Team",
+      value: ticketData?.team ?? "N/A",
       colProps: { sm: 6 }
     },
-    {
-      value: (<Stack direction='horizontal' gap={1}>
-        <span><MdAttachFile size={16} /></span>
-        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
-      </Stack>),
-      colProps: { xs: 12, className: "pb-4" }
-    },
+    // {
+    //   value: (<Stack direction='horizontal' gap={1}>
+    //     <span><MdAttachFile size={16} /></span>
+    //     <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
+    //   </Stack>),
+    //   colProps: { xs: 12, className: "pb-4" }
+    // },
     {
       label: "Precedents",
-      value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s book.",
+      value:ticketData?.precedents,
       colProps: { xs: 12, className: "py-2" }
     },
     {
       label: "Specific Petition",
-      value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+      value: ticketData?.specificPetition ?? 'N/A',
       colProps: { xs: 12 }
     },
   ];
@@ -167,7 +194,7 @@ const TicketsView = () => {
       <Loader isLoading={false} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <TicketViewHeader
-          title="#52541"
+          title={"#"+ticketData?.ticketId}
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -245,6 +272,7 @@ const TicketsView = () => {
       {/* User Info Modals */}
       <UserInfoModal
         modal={userInfoModalShow}
+        userData = {ticketData}
         toggle={() => setUserInfoModalShow(false)}
       />
 

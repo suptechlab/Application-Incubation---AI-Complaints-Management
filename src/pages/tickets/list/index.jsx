@@ -3,7 +3,7 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Card, Form } from "react-bootstrap";
 import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
@@ -34,42 +34,45 @@ export default function TicketsList() {
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
           // Set loading state to true before the request starts
-          setLoading(true);
+
+         return {data : sampleData ,page : 1 , size : 10} 
+
+        //   setLoading(true);
     
-          try {
-            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-            Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+        //   try {
+        //     const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        //     Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
     
-            // Make the API request based on sorting
-            let response;
-            if (sorting.length === 0) {
-              response = await handleGetTicketList({
-                page: pagination.pageIndex,
-                size: pagination.pageSize,
-                ...filterObj,
-              });
-            } else {
-              response = await handleGetTicketList({
-                page: pagination.pageIndex,
-                size: pagination.pageSize,
-                sort: sorting
-                  .map(
-                    (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-                  )
-                  .join(","),
-                ...filterObj,
-              });
-            }
+        //     // Make the API request based on sorting
+        //     let response;
+        //     if (sorting.length === 0) {
+        //       response = await handleGetTicketList({
+        //         page: pagination.pageIndex,
+        //         size: pagination.pageSize,
+        //         ...filterObj,
+        //       });
+        //     } else {
+        //       response = await handleGetTicketList({
+        //         page: pagination.pageIndex,
+        //         size: pagination.pageSize,
+        //         sort: sorting
+        //           .map(
+        //             (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+        //           )
+        //           .join(","),
+        //         ...filterObj,
+        //       });
+        //     }
     
-            // Return the API response data
-            return response;
-          } catch (error) {
-            console.error("Error fetching data", error);
-            // Optionally, handle errors here
-          } finally {
-            // Set loading state to false when the request finishes (whether successful or not)
-            setLoading(false);
-          }
+        //     // Return the API response data
+        //     return response;
+        //   } catch (error) {
+        //     console.error("Error fetching data", error);
+        //     // Optionally, handle errors here
+        //   } finally {
+        //     // Set loading state to false when the request finishes (whether successful or not)
+        //     setLoading(false);
+        //   }
         },
         staleTime: 0, // Data is always stale, so it refetches
         cacheTime: 0, // Cache expires immediately
@@ -81,42 +84,42 @@ export default function TicketsList() {
     const sampleData = [
         {
             ticketId: "TCK-1001",
-            creationDate: "2024-11-20",
+            createdAt: "2024-11-20",
             claimType: "Health Insurance",
             claimFilledBy: "John Doe",
-            sla: "5 Days",
+            slaBreachDays: "5 Days",
             status: "Closed",
         },
         {
             ticketId: "TCK-1002",
-            creationDate: "2024-11-21",
+            createdAt: "2024-11-21",
             claimType: "Auto Insurance",
             claimFilledBy: "Jane Smith",
-            sla: "3 Days",
+            slaBreachDays: "3 Days",
             status: "In Progress",
         },
         {
             ticketId: "TCK-1003",
-            creationDate: "2024-11-22",
+            createdAt: "2024-11-22",
             claimType: "Travel Insurance",
             claimFilledBy: "Robert Brown",
-            sla: "7 Days",
+            slaBreachDays: "7 Days",
             status: "Rejected",
         },
         {
             ticketId: "TCK-1004",
-            creationDate: "2024-11-23",
+            createdAt: "2024-11-23",
             claimType: "Property Insurance",
             claimFilledBy: "Emily Davis",
-            sla: "2 Days",
+            slaBreachDays: "2 Days",
             status: "New",
         },
         {
             ticketId: "TCK-1005",
-            creationDate: "2024-11-24",
+            createdAt: "2024-11-24",
             claimType: "Life Insurance",
             claimFilledBy: "Michael Wilson",
-            sla: "10 Days",
+            slaBreachDays: "10 Days",
             status: "Closed",
         },
     ];
@@ -156,11 +159,14 @@ export default function TicketsList() {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
                 header: () => "Ticket Id",
-                enableSorting: true
+                enableSorting: true,
+                cell :({row})=>(
+                    <Link to={`/tickets/view/${row?.original?.id}`}>{"#"+row?.original?.ticketId}</Link>
+                )
             },
-
             {
-                accessorFn: (row) => row?.claimType?.name,
+                // accessorFn: (row) => row?.claimType?.name,
+                accessorFn: (row) => row?.claimType,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
@@ -175,7 +181,8 @@ export default function TicketsList() {
                 ),
             },
             {
-                accessorFn: (row) => row?.user?.name,
+                accessorFn: (row) => row?.claimFilledBy,
+                // accessorFn: (row) => row?.user?.name,
                 id: "claimFilledBy",
                 header: () => "Claim filled by",
                 enableSorting: true,
@@ -248,7 +255,7 @@ export default function TicketsList() {
                 <PageHeader
                     title="Tickets"
                     actions={[
-                        { label: "Add New", onClick: addNewClickHanlder, variant: "warning" },
+                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning" , disabled: true },
                     ]}
                 />
                 <div className="info-cards mb-3">

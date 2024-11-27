@@ -8,3 +8,9 @@ export const handleGetTicketList = async (params) => {
     params
   });
 }
+
+
+// GET TICKET DETAILS
+export const ticketDetailsApi = async (id) => {
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${id}`);
+}

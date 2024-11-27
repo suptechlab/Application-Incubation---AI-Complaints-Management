@@ -15,6 +15,7 @@ const ReactSelect = ({
   error,
   touched,
   defaultValue = null,
+  disabled
 }) => {
   const customStyles = {
     control: (base, state) => ({
@@ -108,6 +109,7 @@ const ReactSelect = ({
           ),
           IndicatorSeparator: () => null,
         }}
+        isDisabled={disabled}
         menuPlacement="auto"
         // menuIsOpen={true}
       />
