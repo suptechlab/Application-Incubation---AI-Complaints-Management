@@ -11,7 +11,7 @@ const initialState = {
     queryError: null,
     querySuccess: false,
     apiResponse: {},
-  
+
 };
 
 // DPA ACCEPTANCE 
@@ -73,11 +73,15 @@ const helpDeskSlice = createSlice({
             state.querySuccess = false;
             state.queryError = null;
         },
-       
+
         clearApiResponse(state) {
             state.apiResponse = null;
-          },
-    
+        },
+        resetDPAState(state) {
+            console.log({"HELLO" : state})
+            state.isAgree = false
+        }
+
     },
     extraReducers: (builder) => {
         // DPA ACCEPTANCE
@@ -114,6 +118,6 @@ const helpDeskSlice = createSlice({
     },
 });
 
-export const { toggleChatbot ,clearApiResponse} = helpDeskSlice.actions;
+export const { toggleChatbot, clearApiResponse, resetDPAState } = helpDeskSlice.actions;
 
 export default helpDeskSlice.reducer;

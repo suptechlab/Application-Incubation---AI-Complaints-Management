@@ -412,6 +412,8 @@ const ChatBotForm = () => {
 
     }, [apiResponse, queryError]);
 
+    console.log({queryError : queryError})
+
     return (
         <React.Fragment>
             <Offcanvas.Header closeButton className='align-items-start pb-1'></Offcanvas.Header>

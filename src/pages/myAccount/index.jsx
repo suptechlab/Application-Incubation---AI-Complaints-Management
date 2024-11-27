@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Badge, Button, Modal, Stack } from 'react-bootstrap';
-import { MdChatBubbleOutline, MdEditDocument, MdOutlineInfo, MdOutlineVisibility, MdTask } from 'react-icons/md';
+import { MdChatBubbleOutline, MdOutlineInfo, MdOutlineVisibility } from 'react-icons/md';
 import DataTable from '../../components/common/DataTable';
-import SvgIcons from '../../components/SVGIcons';
+
+import moment from 'moment';
+import qs from "qs";
+import { useDispatch } from 'react-redux';
 import AppTooltip from '../../components/tooltip';
+import { fileClaimList } from '../../redux/slice/fileClaimSlice';
 import InfoCards from './cards';
 import PageHeader from './header';
 import ViewClaim from './modals/view';
-import qs from "qs";
-import { fileClaimList } from '../../redux/slice/fileClaimSlice';
-import { useDispatch } from 'react-redux';
-import moment from 'moment';
+import Loader from '../../components/Loader';
 
 
 export default function MyAccount() {
@@ -246,40 +247,10 @@ export default function MyAccount() {
     setSorting(newSorting);
   };
 
-  // Info Cards Data
-  const cardsData = [
-    {
-      bgColor: 'bg-primary',
-      Icon: <MdEditDocument size={30} />,
-      title: 'Total Claims',
-      value: 3,
-      colProps: { sm: 6, lg: 3 }
-    },
-    {
-      bgColor: 'bg-orange',
-      Icon: SvgIcons.fileInfoIcon,
-      title: 'Claims in Progress',
-      value: 1,
-      colProps: { sm: 6, lg: 3 }
-    },
-    {
-      bgColor: 'bg-success',
-      Icon: <MdTask size={30} />,
-      title: 'Claims Closed',
-      value: 2,
-      colProps: { sm: 6, lg: 3 }
-    },
-    {
-      bgColor: 'bg-danger',
-      Icon: SvgIcons.fileCloseIcon,
-      title: 'Claims Rejected',
-      value: 0,
-      colProps: { sm: 6, lg: 3 }
-    },
-  ];
-
+  
   return (
     <React.Fragment>
+    <Loader isLoading={loading} />
       <div className="d-flex flex-column flex-grow-1 p-3 pageContainer">
         <div className="pb-2">
           <PageHeader
@@ -287,7 +258,7 @@ export default function MyAccount() {
             filter={filter}
             setFilter={setFilter}
           />
-          <InfoCards cardsData={cardsData} />
+          <InfoCards filter={filter} setLoading={setLoading}/>
           {/* RECENT ACTIVITY */}
           <div className="fw-bold fs-5 pt-4 mt-2">
             Recent Activity

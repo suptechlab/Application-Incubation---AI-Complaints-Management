@@ -15,6 +15,7 @@ import "./header.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogout } from "../../../redux/slice/authSlice";
 import { useTranslation } from "react-i18next";
+import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
 
 const Header = ({ layout }) => {
 
@@ -44,6 +45,7 @@ const Header = ({ layout }) => {
 
   const handleLogout = () => {
     dispatch(setLogout())
+    dispatch(resetDPAState())
   }
 
   return (

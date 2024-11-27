@@ -61,7 +61,7 @@ export const fileClaimStats = createAsyncThunk(
   'fileClaimStats',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await ticketsApi.get(`${EndPoint.LIST_CLAIMS}`, { params });
+      const response = await ticketsApi.get(`${EndPoint.CLAIM_STATS}`, { params });
 
       if (response.status !== 200) {
         return rejectWithValue('Failed to get claim stats!');

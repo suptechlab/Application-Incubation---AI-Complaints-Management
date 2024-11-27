@@ -24,7 +24,7 @@ const EndPoint = {
   FILE_CLAIM_SUBMIT : `/${version}/user/claim-tickets/file-claim`,
   LIST_CLAIMS : `/${version}/user/claim-tickets`,
   CLAIM_TICKETS : `/${version}/user/claim-tickets`,
-  CLAIM_STATS:`/${version}/user/claim-stats`
+  CLAIM_STATS:`/${version}/user/claim-tickets/count-by-status`
 };
 
 export default EndPoint;
