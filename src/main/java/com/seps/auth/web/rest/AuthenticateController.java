@@ -291,7 +291,8 @@ public class AuthenticateController {
      * @return a {@link ResponseEntity} containing the generated {@link JWTToken} and an HTTP header with the Bearer token.
      */
     @PostMapping("/register")
-    public ResponseEntity<JWTToken> register(@Valid @RequestBody RegisterUserDTO dto) {
+    public ResponseEntity<JWTToken> register(@Valid @RequestBody RegisterUserDTO dto,HttpServletRequest request) {
+        String clientIp = request.getRemoteAddr();
         User newUser = userService.registerUser(dto);
         List<GrantedAuthority> authorities = newUser.getAuthorities().stream()
             .map(role -> new SimpleGrantedAuthority(role.getName()))
@@ -303,6 +304,8 @@ public class AuthenticateController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
         mailService.sendAccountSetupEmail(newUser);
+        // Log the successful login attempt
+        userService.saveLoginLog(newUser,UserService.SUCCESS, clientIp);
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
