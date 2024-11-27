@@ -1,0 +1,8 @@
+id,module_id,name,description,description_es
+50,18,TEAMS_CREATE_BY_FI,Create,Crear
+51,18,TEAMS_UPDATED_BY_FI,Update,Actualizar
+52,18,TEAMS_CHANGE_STATUS_BY_FI,Status Change,Cambio de estado
+53,16,TICKET_ASSIGNED_TO_AGENT_FI,Ticket Assigned to Agent,Boleto asignado al agente
+54,16,TICKET_ASSIGNED_TO_ADMIN_FI,Ticket Assigned to Admin,Ticket asignado al administrador
+55,10,TICKET_ASSIGNED_TO_AGENT_SEPS,Ticket Assigned to Agent,Boleto asignado al agente
+56,10,TICKET_ASSIGNED_TO_ADMIN_SEPS,Ticket Assigned to Admin,Ticket asignado al administrador
