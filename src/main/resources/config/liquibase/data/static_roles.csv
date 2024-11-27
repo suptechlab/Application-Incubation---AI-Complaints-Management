@@ -1,0 +1,8 @@
+id;name;description;user_type;created_by;created_at;updated_at;status;deleted;role_slug
+1;Fi Admin;Fi Admin;FI_USER;1;2024-11-27 07:25:32.946;2024-11-27 07:25:32.946;TRUE;FALSE;fi-admin
+2;Fi Agent;Fi Agent;FI_USER;1;2024-11-27 07:25:32.946;2024-11-27 07:25:32.946;TRUE;FALSE;fi-agent
+3;SEPS Admin;SEPS Admin;SEPS_USER;1;2024-11-27 07:25:32.946;2024-11-27 07:25:32.946;TRUE;FALSE;seps-admin
+4;SEPS Agent;SEPS Agent;SEPS_USER;1;2024-11-27 07:25:32.946;2024-11-27 07:25:32.946;TRUE;FALSE;seps-agent
+5;SEPS SuperAdmin IT;SEPS SuperAdmin IT;SEPS_USER;1;2024-11-27 07:25:32.946;2024-11-27 07:25:32.946;TRUE;FALSE;seps-superadmin-it
+6;SEPS Analytic Admin;SEPS Analytic Admin;SEPS_USER;1;2024-11-27 07:25:32.946;2024-11-27 07:25:32.946;TRUE;FALSE;seps-analytic-admin
+7;SEPS Analytic Agent;SEPS Analytic Agent;SEPS_USER;1;2024-11-27 07:25:32.946;2024-11-27 07:25:32.946;TRUE;FALSE;seps-analytic-agent

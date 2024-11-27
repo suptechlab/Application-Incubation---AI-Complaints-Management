@@ -25,7 +25,7 @@ public class RoleDTO implements Serializable {
     private Boolean status;
     private List<Long> permissionIds;
     private List<ModuleDTO> modules;
-
+    private String roleSlug;
 
     @Data
     public static class ModuleDTO implements Serializable {
