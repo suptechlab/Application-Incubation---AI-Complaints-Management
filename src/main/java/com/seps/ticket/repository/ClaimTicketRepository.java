@@ -32,4 +32,6 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "GROUP BY ct.status")
     List<ClaimStatusCountProjection> countClaimsByStatusAndTotal(@Param("year") Integer year, @Param("userId") Long userId);
 
+
+    Optional<ClaimTicket> findByIdAndOrganizationId(Long id, Long organizationId);
 }
