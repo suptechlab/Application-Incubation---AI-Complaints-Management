@@ -251,6 +251,10 @@ input:-webkit-autofill:active {
     }
 }
 
+.bg-primary-4 {
+    background-color: rgba($primary, .04);
+}
+
 .bg-primary-90 {
     background-color: rgba($primary, .90);
 }
