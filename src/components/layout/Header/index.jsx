@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Container,
@@ -15,8 +15,10 @@ import "./header.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogout } from "../../../redux/slice/authSlice";
 import { useTranslation } from "react-i18next";
+import ProfileModal from "../../../pages/profile";
 
 const Header = ({ layout }) => {
+  const [profileModalShow, setProfileModalShow] = useState(false);
 
   const { isLoggedIn, user } = useSelector((state) => state?.authSlice)
 
@@ -44,6 +46,10 @@ const Header = ({ layout }) => {
 
   const handleLogout = () => {
     dispatch(setLogout())
+  }
+
+  const handleProfileClick = () => {
+    setProfileModalShow(true)
   }
 
   return (
@@ -105,6 +111,9 @@ const Header = ({ layout }) => {
               <Dropdown.Header className="fw-semibold d-md-none">
                 {user?.firstName ?? ''}
               </Dropdown.Header>
+              <Dropdown.Item as={Button} onClick={handleProfileClick} disabled>
+                {t("PROFILE")}
+              </Dropdown.Item>
               <Dropdown.Item as={Link} to="/my-account">
                 {t("MY ACCOUNT")}
               </Dropdown.Item>
@@ -122,6 +131,12 @@ const Header = ({ layout }) => {
           />
         </Container>
       </Navbar>
+      
+      {/* Profile Modal */}
+      <ProfileModal
+        handleShow={profileModalShow}
+        handleClose={() => setProfileModalShow(false)}
+      />
     </header>
   );
 };
