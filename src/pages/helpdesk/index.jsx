@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Offcanvas } from 'react-bootstrap';
 import ChatBotForm from './chatForm';
 import PrivacyForm from './privacyForm';
@@ -26,6 +26,11 @@ const HelpDeskBot = ({ handleShow, handleClose }) => {
             console.log(err);
         });
     };
+
+
+    useEffect(()=>{
+        setIsPrivacyFormSubmitted(isAgree)
+    },[isAgree])
 
     return (
         <Offcanvas

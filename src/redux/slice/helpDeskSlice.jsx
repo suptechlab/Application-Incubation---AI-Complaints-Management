@@ -78,7 +78,6 @@ const helpDeskSlice = createSlice({
             state.apiResponse = null;
         },
         resetDPAState(state) {
-            console.log({"HELLO" : state})
             state.isAgree = false
         }
 
