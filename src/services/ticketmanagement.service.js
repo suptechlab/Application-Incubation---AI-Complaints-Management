@@ -14,3 +14,16 @@ export const handleGetTicketList = async (params) => {
 export const ticketDetailsApi = async (id) => {
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${id}`);
 }
+
+// CALL MASTERS API
+export const ticketMastersData = async()=>{
+  return await ticketApi.get(`/${API_VERSION}/masters`);
+}
+
+// FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN
+export const convertToLabelValue=(obj)=> {
+  return Object.entries(obj).map(([key, value]) => ({
+    label: value, // Use the value as the label
+    value: key    // Use the key as the value
+  }));
+}
