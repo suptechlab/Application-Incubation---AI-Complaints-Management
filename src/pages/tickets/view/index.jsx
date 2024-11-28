@@ -1,43 +1,62 @@
-import React, { useState } from 'react';
-import { Button, Card, Col, Dropdown, Image, Row, Stack } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Dropdown, Image, ListGroup, Row, Stack } from 'react-bootstrap';
 import { MdArrowDropDown, MdAttachFile, MdCalendarToday } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from '../../../components/CommonViewData';
 import Loader from '../../../components/Loader';
 import AppTooltip from '../../../components/tooltip';
+import AttachmentsModal from '../modals/attachmentsModal';
+import UserInfoModal from '../modals/userInfoModal';
 import TicketViewHeader from './header';
-import defaultAvatar from "../../../assets/images/default-avatar.jpg";
+import TicketTabsSection from './tabs';
+import { ticketDetailsApi } from '../../../services/ticketmanagement.service';
+import toast from 'react-hot-toast';
+import moment from 'moment/moment';
 
 const TicketsView = () => {
-  const { t } = useTranslation();
   const [selectedPriority, setSelectedPriority] = useState('Low');
-  const [fileName, setFileName] = useState("");
+  const [userInfoModalShow, setUserInfoModalShow] = useState(false);
+  const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
 
-  //Handle File Change
-  const handleFileChange = (event) => {
-    const file = event.currentTarget.files[0];
-    if (file) {
-      setFileName(file.name);
-    } else {
-      setFileName("Fi_Users_data.xlsx");
-    }
-  };
+  const {id} = useParams()
+
+  const [ticketData, setTicketData] = useState({})
 
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
     setSelectedPriority(priority);
   };
 
+  // GET TICKET DETAILS
+  const getTicketDetails = () => {
+    ticketDetailsApi(id).then(response => {
+      if (response?.data) {
+        setTicketData(response?.data)
+        setSelectedPriority(response?.data?.priority)
+      }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
+      }
+    })
+  }
+
+  useEffect(() => {
+    getTicketDetails()
+  }, [id])
+
   // The color class based on the priority level
-  const priorityOptions = ['Low', 'Medium', 'High', 'NIL'];
+  const priorityOptions = ['LOW', 'MEDIUM', 'HIGH', 'NIL'];
   const getPriorityClass = (priority) => {
     switch (priority) {
-      case 'Low':
+      case 'LOW':
         return 'text-success';
-      case 'Medium':
+      case 'MEDIUM':
         return 'text-orange';
-      case 'High':
+      case 'HIGH':
         return 'text-danger';
       case 'NIL':
         return 'text-muted';
@@ -46,21 +65,31 @@ const TicketsView = () => {
     }
   };
 
+  // Handle File a Claim Button
+  const handleUserInfoClick = () => {
+    setUserInfoModalShow(true)
+  }
+
+  // Handle Attachments Button
+  const handleAttachmentsClick = () => {
+    setAttachmentsModalShow(true)
+  }
+
   // View Top Data
   const viewTopData = [
     {
       label: "Created on",
-      value: "07-10-24 | 03:33 pm",
+      value:    ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
       label: "Due Date",
-      value: "07-26-24 | 05:30 pm",
+      value:  ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY | hh:mm:a") : 'N/A',
       colProps: { sm: 6 }
     },
     {
       label: "Claim filed by",
-      value: <Link to="/" className='text-decoration-none'>Veronica Andres</Link>,
+      value: <Link onClick={handleUserInfoClick} className='text-decoration-none'>{ticketData?.createdByUser?.name}</Link>,
       colProps: { sm: 6 }
     },
     {
@@ -95,156 +124,165 @@ const TicketsView = () => {
     },
     {
       label: "Claim Type",
-      value: "Credit Portfolio",
+      value: ticketData?.claimType?.name,
       colProps: { sm: 6 }
     },
     {
       label: "Claim Sub Type",
-      value: "Refinancing Request",
+      value: ticketData?.claimSubType?.name,
       colProps: { sm: 6 }
     },
     {
       label: "Agent",
-      value: "John Duo",
+      value: ticketData?.fiAgent ?? "N/A",
       colProps: { sm: 6 }
     },
     {
       label: "Team",
-      value: "Finance -1 Team",
+      value: ticketData?.team ?? "N/A",
       colProps: { sm: 6 }
     },
-    {
-      value: (<Stack direction='horizontal' gap={1}>
-        <span><MdAttachFile size={16} /></span>
-        <Link className='fw-semibold text-decoration-none'>Attachments</Link>
-      </Stack>),
-      colProps: { xs: 12, className: "pb-4" }
-    },
+    // {
+    //   value: (<Stack direction='horizontal' gap={1}>
+    //     <span><MdAttachFile size={16} /></span>
+    //     <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
+    //   </Stack>),
+    //   colProps: { xs: 12, className: "pb-4" }
+    // },
     {
       label: "Precedents",
-      value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s book.",
+      value:ticketData?.precedents,
       colProps: { xs: 12, className: "py-2" }
     },
     {
       label: "Specific Petition",
-      value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+      value: ticketData?.specificPetition ?? 'N/A',
       colProps: { xs: 12 }
     },
   ];
 
+  //Chat Reply Data
+  const chatReplyData = [
+    {
+      id: 1,
+      name: "John Smith",
+      action: <>added Internal Note</>,
+      date: "07-14-24 | 10:00 am",
+      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
+      avatar: defaultAvatar,
+    },
+    {
+      id: 2,
+      name: "John Smith",
+      action: <>replied & tagged <Link to="/" className='text-decoration-none fw-bold'>Kyle</Link></>,
+      date: "07-14-24 | 10:00 am",
+      message: <>Thanks i will update <Link to="/" className='text-decoration-none'>@Kyle</Link> about the same.</>,
+      avatar: defaultAvatar,
+    },
+    {
+      id: 3,
+      name: "Carlos P",
+      action: <>replied</>,
+      date: "07-14-24 | 10:00 am",
+      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
+      avatar: defaultAvatar,
+    },
+  ];
+
   return (
-    <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+    <React.Fragment>
       <Loader isLoading={false} />
-      <TicketViewHeader
-        title="#52541"
-      />
-      <div className='d-flex flex-column flex-grow-1'>
-        <Row className='h-100 gy-3 gy-lg-0 gx-3 pb-3'>
-          <Col lg={6}>
-            <Card className="border-0 shadow h-100">
-              <Card.Body>
-                <Row>
-                  {viewTopData?.map((item, index) => (
-                    <Col key={"data_view_" + index} {...item.colProps}>
-                      <CommonViewData label={item.label} value={item.value} />
+      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+        <TicketViewHeader
+          title={"#"+ticketData?.ticketId}
+        />
+        <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
+          <Row className='h-100 gy-3 gy-lg-0 gx-3'>
+            <Col lg={6} className='mh-100'>
+              <Card className="border-0 shadow h-100 overflow-auto">
+                <Card.Body>
+                  <Row>
+                    {viewTopData?.map((item, index) => (
+                      <Col key={"data_view_" + index} {...item.colProps}>
+                        <CommonViewData label={item.label} value={item.value} />
+                      </Col>
+                    ))}
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col lg={6} className='mh-100 d-flex flex-column'>
+              <Card className="border-0 shadow">
+                <Card.Header className='bg-body border-0 py-3'>
+                  <Row className='g-2'>
+                    <Col xs="auto">
+                      <Image
+                        className="object-fit-cover rounded-circle"
+                        src={defaultAvatar}
+                        width={36}
+                        height={36}
+                        alt="John Smith"
+                      />
                     </Col>
-                  ))}
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col lg={6}>
-            <Card className="border-0 shadow">
-              <Card.Header className='bg-body border-0 py-3'>
-                <Row className='g-2 align-items-center'>
-                  <Col xs="auto">
-                    <Image
-                      className="object-fit-cover rounded-circle"
-                      src={defaultAvatar}
-                      width={36}
-                      height={36}
-                      alt="John Smith"
-                    />
-                  </Col>
-                  <Col xs className='small lh-sm'>
-                    <div className='fw-bold'>John Smith</div>
-                    <Stack direction='horizontal' gap={2} className='text-secondary'>
-                      <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                      <span>07-14-24 | 10:00 am </span>
-                    </Stack>
-                  </Col>
-                </Row>
-              </Card.Header>
-              <Card.Body>
-                Body
-                {fileName && (
-                  <div className='mx-n3 px-3 mt-3 mb-n2'>
-                    <Link
-                      target="_blank"
-                      to="/fi-users/import"
-                      className="text-decoration-none small mw-100 text-break"
-                    >
-                      {fileName}
-                    </Link>
-                  </div>
-                )}
-              </Card.Body>
-              <Card.Footer className='bg-body py-3'>
-                <Stack direction='horizontal' gap={2} className='flex-wrap'>
-                  <div className="overflow-hidden position-relative z-1 flex-shrink-0 me-auto">
-                    <label
-                      htmlFor="files"
-                      className="small link-info align-middle cursor-pointer"
-                    >
-                      <span className='align-text-bottom'><MdAttachFile size={16} /></span> Add attachment
-                    </label>
-                    <input
-                      id="files"
-                      accept="image/png, image/jpeg, image/jpg"
-                      className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                      type="file"
-                      onChange={handleFileChange}
-                    />
-                  </div>
-                  <Stack direction='horizontal' gap={2} className='flex-wrap justify-content-between justify-content-sm-end flex-fill'>
-                    <Button
-                      type='button'
-                      size="sm"
-                      variant='outline-dark'
-                    >
-                      Reply to Customer
-                    </Button>
-                    <Button
-                      type='button'
-                      size="sm"
-                      variant='warning'
-                    >
-                      Reply Internally
-                    </Button>
-                  </Stack>
-                </Stack>
-              </Card.Footer>
-            </Card>
-          </Col>
-        </Row>
+                    <Col xs className='small lh-sm'>
+                      <div className='fw-bold'>John Smith</div>
+                      <Stack direction='horizontal' gap={2} className='text-secondary'>
+                        <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                        <span>07-14-24 | 10:00 am </span>
+                      </Stack>
+                    </Col>
+                  </Row>
+                </Card.Header>
+                <TicketTabsSection />
+              </Card>
+              <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                <Card.Body className='py-0'>
+                  <ListGroup variant="flush">
+                    {chatReplyData.map((reply) => (
+                      <ListGroup.Item key={reply.id} className='py-3'>
+                        <Row className='g-2'>
+                          <Col xs="auto">
+                            <Image
+                              className="object-fit-cover rounded-circle"
+                              src={reply.avatar}
+                              width={36}
+                              height={36}
+                              alt={reply.name}
+                            />
+                          </Col>
+                          <Col xs className='small lh-sm'>
+                            <div className='fw-bold'>{reply.name} <span className='fw-normal'>{reply.action}</span></div>
+                            <Stack direction='horizontal' gap={2} className='text-secondary'>
+                              <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                              <span>{reply.date}</span>
+                            </Stack>
+                            <p className='mt-2 mb-0'>{reply.message}</p>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </div>
       </div>
 
-      <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3 bg-body">
-        <Stack
-          direction="horizontal"
-          gap={3}
-          className="justify-content-end flex-wrap"
-        >
-          <Link
-            to={"/tickets"}
-            className="btn btn-outline-dark custom-min-width-85"
-          >
-            {t("BACK")}
-          </Link>
+      {/* User Info Modals */}
+      <UserInfoModal
+        modal={userInfoModalShow}
+        userData = {ticketData}
+        toggle={() => setUserInfoModalShow(false)}
+      />
 
-        </Stack>
-      </div>
-    </div>
+      {/* Attachments Modals */}
+      <AttachmentsModal
+        modal={attachmentsModalShow}
+        toggle={() => setAttachmentsModalShow(false)}
+      />
+
+    </React.Fragment>
   )
 }
 

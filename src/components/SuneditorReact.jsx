@@ -15,6 +15,7 @@ const SunEditorReact = ({
   handleBlur,
   dir,
   wrapperClassName = "mb-3 pb-1",
+  height,
 }) => {
   const { i18n } = useTranslation();
   return (
@@ -28,17 +29,19 @@ const SunEditorReact = ({
       )}
       <div className={`sun-editor-cover ${touched && error ? "is-invalid" : ""}`}>
         <SunEditor
+          name="name"
           setOptions={{
             buttonList: [
               ["undo", "redo"],
               ["font", "fontSize", "formatBlock"],
               ["bold", "underline", "italic", "strike", "removeFormat"],
-              ["link", "image"],
+              // ["link", "image"],
+              ["link"],
               ["fontColor", "hiliteColor", "textStyle"],
               ["outdent", "indent"],
               ["align", "horizontalRule", "list", "table"],
-              ["fullScreen", "showBlocks", "codeView"],
-              ["preview", "print"],
+              // ["fullScreen", "showBlocks", "codeView"],
+              // ["preview", "print"],
             ],
             defaultStyle: {
               "font-size": "14px",
@@ -48,7 +51,7 @@ const SunEditorReact = ({
           onBlur={handleBlur}
           onChange={handleChange}
           setContents={content}
-          height="215"
+          height={height}
           lang={i18n.language}
         />
       </div>

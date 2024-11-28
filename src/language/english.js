@@ -137,5 +137,17 @@ export const englishLang = {
     "SELECT ROLE" : "Select Role",
     "PENDING":"Pending",
     "BLOCKED" : "Blocked",
-    "DELETED":"Deleted"
+    "DELETED":"Deleted",
+    "USER TYPE":"User Type",
+    "NOTIFICATION": "Notification",
+    "TEMPLATE TYPE" : "Template Type",
+    "ASSOCIATION" : "Association",
+    // Team managment
+    "ENTITY NAME": "Entity Name",
+    "TEAM NAME": "Team Name",
+    "ASSIGN TEAM MEMBERS": "Assign Team Members",
+    "MEMBER NAME": "Member Name",
+    "ASSIGN": "Assign",
+
+
 }

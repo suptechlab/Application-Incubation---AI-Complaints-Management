@@ -45,6 +45,13 @@ export const messages = {
     descriptionMin5: "Description must be at least 5 characters",
     descriptionMax255: "Description cannot be longer than 255 characters",
     rightsAtLeastOnePermission: "At least one permission per module must be selected",
+    // master template
+    maximum250Characters: "Maximum 250 characters allowed",
+    templateNameRequired: "Template name is required.",
+    templateTypeRequired: "Template type is required.",
+    subjectRequired: "Subject name is required",
+    templateContentMax1500: "Template details cannot exceed 8500 characters.",
+    templateContentRequired: "Template details is required.",
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -92,5 +99,12 @@ export const messages = {
     descriptionMin5: "La descripción debe tener al menos 5 caracteres",
     descriptionMax255: "La descripción no puede tener más de 255 caracteres",
     rightsAtLeastOnePermission: "Se debe seleccionar al menos un permiso por módulo",
+    // master template
+    maximum250Characters: "Se permiten un máximo de 250 caracteres.",
+    templateNameRequired: "Se requiere el nombre de la plantilla.",
+    templateTypeRequired: "Se requiere el tipo de plantilla.",
+    subjectRequired: "Se requiere el nombre del asunto.",
+    templateContentMax1500: "Los detalles de la plantilla no pueden exceder los 8500 caracteres.",
+    templateContentRequired: "Se requieren los detalles de la plantilla.",
   }
 };

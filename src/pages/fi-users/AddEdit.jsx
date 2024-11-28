@@ -252,6 +252,7 @@ export default function FIUserAddEdit() {
                         touched={touched?.identification}
                         type="number"
                         value={values?.identification || ""}
+                        readOnly={isEdit ? true : false}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
@@ -281,6 +282,7 @@ export default function FIUserAddEdit() {
                         touched={touched.email}
                         type="text"
                         value={values.email || ""}
+                        readOnly={isEdit ? true : false}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
@@ -340,6 +342,7 @@ export default function FIUserAddEdit() {
                         touched={touched?.ruc}
                         type="number"
                         value={values?.ruc || ""}
+                        readOnly={isEdit ? true : false}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>

@@ -158,6 +158,19 @@ export default function FIUserList() {
         },
       },
       {
+        accessorFn: (row) => row?.roles?.name,
+        id: "role",
+        header: () => t("ROLE"),
+        enableSorting: false,
+        cell: (info) => {
+          return (
+            <span>
+              {info?.row?.original?.roles[0]?.name ?? "N/A"}
+            </span>
+          );
+        },
+      },
+      {
         accessorFn: (row) => row.createdAt,
         id: "createdAt",
         header: () => t("CREATION DATE"),

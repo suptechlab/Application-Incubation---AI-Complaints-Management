@@ -4,13 +4,14 @@ import { useTranslation } from "react-i18next";
 /**
  * Common Generic Modal Reusable Component
  *
- * @param {{ show: any; handleClose: any; handleAction: any; modalBodyContent: any; modalHeaderTitle: any; buttonName: any; ActionButtonVariant: any; }} param0
+ * @param {{ show: any; handleClose: any; handleAction: any; modalBodyContent: any; modalHeaderTitle: any; buttonName: any; cancelButtonName: any; ActionButtonVariant: any; }} param0
  * @param {*} param0.show
  * @param {*} param0.handleClose
  * @param {*} param0.handleAction
  * @param {*} param0.modalBodyContent
  * @param {*} param0.modalHeaderTitle
  * @param {*} param0.buttonName
+ * @param {*} param0.cancelButtonName
  * @param {*} param0.ActionButtonVariant
  * @returns {*}
  */
@@ -22,6 +23,7 @@ const GenericModal = ({
   modalBodyContent,
   modalHeaderTitle,
   buttonName,
+  cancelButtonName,
   ActionButtonVariant,
 }) => {
   const { t } = useTranslation();
@@ -57,7 +59,7 @@ const GenericModal = ({
           onClick={handleClose}
           className="custom-min-width-85"
         >
-          {t("CANCEL")}
+          {cancelButtonName || t("CANCEL")}
         </Button>
         <Button
           type="submit"

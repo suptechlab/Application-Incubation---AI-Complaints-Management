@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Formik, Form as FormikForm, isEmptyArray } from "formik";
+import { Formik, Form as FormikForm } from "formik";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Row, Stack } from "react-bootstrap";
@@ -57,36 +57,13 @@ export default function TeamManagementAddEdit() {
     const [userType, setUserType] = useState('FI'); // SEPS or FI
     const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show 
     const [assignedData, setAssignedData] = useState([]);
-    const [newTeamMember, setNewTeamMember] = useState([]);
-    const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
-    const [selectedMemberName, setSelectedMemberName] = useState(null); // To hold the selected member
-
 
     //  Handle Assign Button Click
     const handleAssign = () => {
-        if (!selectedMember || Object.keys(selectedMember).length === 0) {
-            setLoading(false);
-            alert("Please select a team member before assigning."); // Guard condition
-            return;
-        }
-    
-        // Check if the member is already in the list
-        const isDuplicate = newTeamMember.some(
-            (member) => member.id === selectedMember.value
-        );
-    
-        if (isDuplicate) {
-            alert("This team member has already been assigned."); // Duplicate alert
-            return;
-        }
-    
-        const newMember = {
-            id: selectedMember.value, // ID from ReactSelect
-            name: selectedMember.label, // Name from ReactSelect
-        };
-    
-        setNewTeamMember((prev) => [...prev, newMember]); // Add to the list
-        setSelectedMember(null); // Clear selection
+        // Simulating new data
+        const newData = { id: 1202, name: "New Team Member" };
+
+        setAssignedData((prev) => [...prev, newData]);
     };
 
     useEffect(() => {
@@ -115,7 +92,6 @@ export default function TeamManagementAddEdit() {
                 value: item.id
             }));
             setEntityIdArr([{ label: "Select", value: "" }, ...formattedData]);
-            // setEntityIdArr([formattedData]);
             setLoading(false);
         });
 
@@ -167,9 +143,61 @@ export default function TeamManagementAddEdit() {
         }
     };
 
-    // handle deletion from team member
-    const deleteAction = (id) => {
-        setNewTeamMember((prev) => prev.filter((member) => member.id !== id));
+    const dataQuery = useQuery({
+        queryKey: ["data", pagination, sorting, filter],
+        queryFn: () => {
+            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+            Object.keys(filterObj).forEach(
+                (key) => filterObj[key] === "" && delete filterObj[key]
+            );
+
+            if (sorting.length === 0) {
+                return handleGetUsers({
+                    page: pagination.pageIndex,
+                    size: pagination.pageSize,
+                    ...filterObj,
+                });
+            } else {
+                return handleGetUsers({
+                    page: pagination.pageIndex,
+                    size: pagination.pageSize,
+                    sort: sorting
+                        .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+                        .join(","),
+                    ...filterObj,
+                });
+            }
+        },
+    });
+
+    //handle last page deletion item
+    useEffect(() => {
+        if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
+            setPagination({
+                pageIndex: dataQuery.data?.data?.totalPages - 1,
+                pageSize: 10,
+            });
+        }
+    }, [dataQuery.data?.data?.totalPages]);
+
+    //Handle Delete
+    const deleteAction = (rowData) => {
+        setSelectedRow(rowData);
+        setDeleteId(rowData.id);
+        setDeleteShow(true);
+    };
+
+    const recordDelete = async (deleteId) => {
+        setLoading(true);
+        try {
+            await handleDeleteUser(deleteId);
+            toast.success("Your data has been deleted successfully");
+            dataQuery.refetch();
+            setDeleteShow(false);
+        } catch (error) {
+        } finally {
+            setLoading(false);
+        }
     };
 
     const columns = React.useMemo(
@@ -206,7 +234,6 @@ export default function TeamManagementAddEdit() {
         ],
         []
     );
-
 
     return (
         <React.Fragment>
@@ -345,30 +372,24 @@ export default function TeamManagementAddEdit() {
                                                     <Row className="gx-3">
                                                         <Col xs>
                                                             <ReactSelect
-                                                                getOptionLabel={(option) => option.value}
-                                                                getOptionValue={(option) => option.label}
-
                                                                 label="Member Name"
-                                                                error={errors.orgId}
+                                                                error={errors.entityId}
                                                                 options={entityIdArr}
-                                                                value={values.orgId}
+                                                                value={values.entityId}
                                                                 onChange={(option) => {
-                                                                    console.log('onChange option',option)
-                                                                    setSelectedMemberName(option.target.label);
                                                                     setFieldValue(
                                                                         "entityId",
                                                                         option?.target?.value ?? ""
                                                                     );
-                                                                    setSelectedMember(option.target); // Store the selected member
                                                                 }}
-                                                                // name="orgId"
+                                                                name="entityId"
                                                                 className={
-                                                                    touched.orgId && errors.orgId
+                                                                    touched.entityId && errors.entityId
                                                                         ? "is-invalid"
                                                                         : ""
                                                                 }
                                                                 onBlur={handleBlur}
-                                                                touched={touched.orgId}
+                                                                touched={touched.entityId}
                                                             />
                                                         </Col>
                                                         <Col xs="auto" className="mb-3 pb-1 pt-4">
@@ -381,23 +402,17 @@ export default function TeamManagementAddEdit() {
                                                                 {t('ASSIGN')}
                                                             </Button>
                                                         </Col>
-                                                        
+
                                                         <Col xs={12} className="mb-3 pb-1">
-                                                        
-                                                            <div>
-                                                                {newTeamMember.map((member) => (
-                                                                    <div key={member.id} className="team-member">
-                                                                        <span>{member.id} - </span>
-                                                                        <span>{member.name}</span>
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() => deleteAction(member.id)} // Attach delete action
-                                                                        >
-                                                                            Delete
-                                                                        </button>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
+                                                            <CommonDataTable
+                                                                columns={columns}
+                                                                dataQuery={dataQuery}
+                                                                pagination={pagination}
+                                                                setPagination={setPagination}
+                                                                sorting={sorting}
+                                                                setSorting={setSorting}
+                                                                showPagination={false}
+                                                            />
                                                         </Col>
                                                     </Row>
                                                 </Col>
@@ -433,7 +448,16 @@ export default function TeamManagementAddEdit() {
                 </Card>
             </div>
 
-
+            {/* Delete Modal */}
+            <GenericModal
+                show={deleteShow}
+                handleClose={() => setDeleteShow(false)}
+                modalHeaderTitle={`Delete Team Member`}
+                modalBodyContent={`Are you sure, you want to delete the team member - ${selectedRow?.name}?`}
+                handleAction={() => recordDelete(deleteId)}
+                buttonName="Delete"
+                ActionButtonVariant="danger"
+            />
         </React.Fragment>
     );
 }

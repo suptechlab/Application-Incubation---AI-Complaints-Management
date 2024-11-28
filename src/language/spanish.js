@@ -138,5 +138,15 @@ export const spanishLang = {
     "SELECT ROLE": "Seleccionar rol",
     "PENDING": "Pendiente",
     "BLOCKED": "Bloqueado",
-    "DELETED": "Eliminado"
+    "DELETED": "Eliminado",
+    "USER TYPE": "Tipo de usuario",
+    "NOTIFICATION": "Notificación",
+    "TEMPLATE TYPE": "Tipo de plantilla",
+    "ASSOCIATION": "Asociación",
+     // Team managment
+     "ENTITY NAME": "Nombre de la entidad",
+     "TEAM NAME": "Nombre del equipo",
+     "ASSIGN TEAM MEMBERS": "Asignar miembros del equipo",
+     "MEMBER NAME": "Nombre del miembro",
+     "ASSIGN": "Asignar"
 }

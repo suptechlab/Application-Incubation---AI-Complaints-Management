@@ -4,6 +4,8 @@
 // Custom height and width classes
 @include custom-class('font-size', 13);
 @include custom-class('font-size', 30);
+@include custom-class('padding-top', 2);
+@include custom-class('padding-bottom', 2);
 @include custom-class('height', 26);
 @include custom-class('width', 26);
 @include custom-class('min-height', 38);
@@ -261,9 +263,32 @@ input:-webkit-autofill:active {
     }
 }
 
+.custom-border-tabs {
+    .link-dark {
+        &.active {
+            --bs-link-opacity: 1;
+            border-color: var(--bs-black) !important;
+        }
+    }
+}
+
+.tickets-tab-content {
+    .editor-for-tab-view {
+        .sun-editor-cover {
+            .sun-editor {
+                border-radius: 0;
+                border-color: transparent;
+
+                .se-resizing-bar {
+                    display: none;
+                }
+            }
+        }
+    }
+}
 .form-control {&:read-only {
     color: $input-disabled-color;
     background-color: $input-disabled-bg;
     border-color: $input-disabled-border-color;
-}
-}
+    }
+}    

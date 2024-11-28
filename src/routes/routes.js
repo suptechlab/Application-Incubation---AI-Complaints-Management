@@ -18,6 +18,8 @@ import ChangePassword from "../pages/Profile/ChangePassword";
 import RoleRightsList from "../pages/role-rights";
 import StatesList from "../pages/states";
 import UserList from "../pages/users";
+import SLAComplianceReport from "../pages/sla-reports";
+import ClaimOverviewReport from "../pages/clamOverviewReport";
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
@@ -238,6 +240,18 @@ const routes = [
   {
     path: "/reports/audit-trail/:id",
     element: <ViewAuditTrail />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/reports/sla-compliance",
+    element: <SLAComplianceReport />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/reports/claim-overview",
+    element: <ClaimOverviewReport />,
     isPrivate: true,
     layoutType: "Auth",
   },

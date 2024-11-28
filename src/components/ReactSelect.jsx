@@ -15,6 +15,7 @@ const ReactSelect = ({
   error,
   touched,
   defaultValue = null,
+  disabled
 }) => {
   const customStyles = {
     control: (base, state) => ({
@@ -92,7 +93,7 @@ const ReactSelect = ({
         name={name}
         value={selectedOption}
         onChange={(option) =>
-          onChange({ target: { name, value: option ? option.value : "" } })
+          onChange({ target: { name, value: option ? option.value : "", label: option ? option.label : "" } })
         }
         options={formattedOptions}
         placeholder={placeholder || 'Select'}
@@ -108,6 +109,7 @@ const ReactSelect = ({
           ),
           IndicatorSeparator: () => null,
         }}
+        isDisabled={disabled}
         menuPlacement="auto"
         // menuIsOpen={true}
       />
