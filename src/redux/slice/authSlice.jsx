@@ -8,8 +8,20 @@ const initialState = {
     loading: false,
     error: null,
     user: {},
-    isLoggedIn : false
+    isLoggedIn: false
 };
+// NATIONAL ID VERIFICATION STATUS
+export const nationalIDVerificationStatus = createAsyncThunk(
+    'nationalIDVerificationStatus',
+    async (nationalId, { rejectWithValue }) => {
+        try {
+            const response = await authApi.get(`${EndPoint.NATIONAL_ID_VERIFICATION_STATUS}?identificacion=${nationalId}`);
+            return response?.data;
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+)
 
 // NATIONAL ID VERIFY
 export const nationalIdVerify = createAsyncThunk(
@@ -51,7 +63,7 @@ export const sendLoginOTPonEmail = createAsyncThunk(
 // VERIFY LOGIN OTP 
 export const verifyLoginOTP = createAsyncThunk(
     'verifyLoginOTP',
-    async (values, { rejectWithValue,dispatch }) => {
+    async (values, { rejectWithValue, dispatch }) => {
         try {
             const response = await authApi.post(`${EndPoint.VERIFY_LOGIN_OTP}`, values);
 
@@ -181,6 +193,18 @@ const authSlice = createSlice({
             .addCase(getAccountInfo.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message;
+            })
+            //NATIONAL ID VERIFICATION STATUS 
+            .addCase(nationalIDVerificationStatus.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(nationalIDVerificationStatus.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(nationalIDVerificationStatus.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
             })
             // NATIONAL ID VERIFICATION
             .addCase(nationalIdVerify.pending, (state) => {

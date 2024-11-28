@@ -7,12 +7,12 @@ import SvgIcons from "../../../../components/SVGIcons";
 import AppTooltip from "../../../../components/tooltip";
 import { IdVerificationFormSchema } from "../../validations";
 import { useDispatch } from "react-redux";
-import { fingerPrintValidate, nationalIdVerify } from "../../../../redux/slice/authSlice";
+import { fingerPrintValidate, nationalIDVerificationStatus, nationalIdVerify } from "../../../../redux/slice/authSlice";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
-    const {t} = useTranslation()
+const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
+    const { t } = useTranslation()
     const [isFormSubmitted, setIsFormSubmitted] = useState(false)
     const dispatch = useDispatch()
     // Initial Values
@@ -28,7 +28,7 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
         isSubmitted(true);
         setIsFormSubmitted(true)
 
-        setNewAccountData((prev)=> ({...prev , identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
+        setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
 
 
         // UNCOMMENT THIS CODE ONCE FINGERPRINT API STARTS
@@ -47,16 +47,16 @@ const IdVerificationTab = ({ isSubmitted,setNewAccountData }) => {
     // Handle National ID Verification
     const handleNationalIdVerify = async (value) => {
         if (value && value !== '') {
+            const isVerifiedId = await dispatch(nationalIDVerificationStatus(value));
 
-            setIsVerified(true)
-            setNewAccountData((prev)=> ({...prev , identificacion: value}))
-
-            const result = await dispatch(nationalIdVerify(value));
-            if (nationalIdVerify.fulfilled.match(result)) {
-                setIsVerified(true)
-                setNewAccountData((prev)=> ({...prev , identificacion: value}))
-            } else {
-                console.error('Verification error:', result.error.message);
+            if (isVerifiedId?.payload === true) {
+                const result = await dispatch(nationalIdVerify(value));
+                if (nationalIdVerify.fulfilled.match(result)) {
+                    setIsVerified(true)
+                    setNewAccountData((prev) => ({ ...prev, identificacion: value }))
+                } else {
+                    console.error('Verification error:', result.error.message);
+                }
             }
         }
     };
