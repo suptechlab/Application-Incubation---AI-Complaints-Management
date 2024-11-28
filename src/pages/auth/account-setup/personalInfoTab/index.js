@@ -192,7 +192,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                     <FormInputBox
                       autoComplete="off"
                       id="email"
-                      label={("EMAIL_ADDRESS")}
+                      label={t("EMAIL_ADDRESS")}
                       name="email"
                       type="email"
                       error={formikProps.errors.email}

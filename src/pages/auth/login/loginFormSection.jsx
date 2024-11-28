@@ -39,7 +39,7 @@ const LoginFormSection = ({ handleFormSubmit }) => {
                         wrapperClassName="mb-3"
                         autoComplete="off"
                         id="email"
-                        label={t('EMAIL_ADDRESS_LABEL')}
+                        label={t('EMAIL_ADDRESS')}
                         name="email"
                         type="email"
                         error={formikProps.errors.email}

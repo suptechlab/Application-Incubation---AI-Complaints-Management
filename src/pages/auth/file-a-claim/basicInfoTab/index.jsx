@@ -170,7 +170,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                             id="phoneNumber"
                                             label={t("PHONE_NUMBER")}
                                             name="phoneNumber"
-                                            type="number"
+                                            type="text"
                                             error={formikProps.errors.phoneNumber}
                                             onBlur={formikProps.handleBlur}
                                             onChange={formikProps.handleChange}
