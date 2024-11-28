@@ -199,12 +199,13 @@ const RoleRightsForm = () => {
                                     onBlur={handleBlur}
                                     checked={userType == 'SEPS_USER'}
                                     onChange={() => {
-                                      setFieldValue("rights", {});
+                                      setFieldValue("rights", {}); 
                                       setFieldValue("userType", "SEPS_USER");
                                       setUserType('SEPS_USER');
                                     }}
                                     type="radio"
                                     label={t('SEPS USER')}
+                                    disabled={isEdit} // Disable in edit mode
                                   />
                                   <Form.Check
                                     className="me-3 me-lg-4"
@@ -214,12 +215,13 @@ const RoleRightsForm = () => {
                                     onBlur={handleBlur}
                                     checked={values.userType == 'FI_USER'}
                                     onChange={() => {
-                                      setFieldValue("rights", {});
+                                      setFieldValue("rights", {}); 
                                       setFieldValue("userType", "FI_USER");
                                       setUserType('FI_USER');
                                     }}
                                     type="radio"
                                     label={t('FI USER')}
+                                    disabled={isEdit} // Disable in edit mode
                                   />
                                 </Stack>
                               </div>
