@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 
+import java.util.List;
+
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -31,4 +33,16 @@ public class UserService {
             .orElse(null);
     }
 
+    public List<User> getUserListByRoleSlug(String  roleSlug){
+        return userRepository.findAllByRoleSlug(roleSlug);
+    }
+
+    public List<User> getUserListByRoleSlug(Long organizationId, String  roleSlug){
+        return userRepository.findAllByOrganizationIdAndRoleSlug(organizationId, roleSlug);
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
+    }
 }

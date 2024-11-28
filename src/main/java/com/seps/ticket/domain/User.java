@@ -424,6 +424,11 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
         return getClass().hashCode();
     }
 
+    public boolean hasRoleSlug(String roleSlug) {
+        return roles.stream()
+            .anyMatch(role -> roleSlug.equalsIgnoreCase(role.getRoleSlug()));
+    }
+
     // prettier-ignore
     @Override
     public String toString() {

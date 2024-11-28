@@ -46,7 +46,7 @@ public class ClaimTicketSpecification {
         };
     }
 
-    public static Specification<ClaimTicket> bySepsFiFilter(String search, Long organizationId, ClaimTicketStatusEnum claimTicketStatus, ClaimTicketPriorityEnum claimTicketPriority, String startDate, String endDate, Long fiAgentId) {
+    public static Specification<ClaimTicket> bySepsFiFilter(String search, Long organizationId, ClaimTicketStatusEnum claimTicketStatus, ClaimTicketPriorityEnum claimTicketPriority, String startDate, String endDate, Long fiAgentId, Long claimTypeId) {
         return (root, query, criteriaBuilder) -> {
             // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
@@ -85,6 +85,12 @@ public class ClaimTicketSpecification {
             if(fiAgentId !=null){
                 predicates.add(
                     criteriaBuilder.equal(root.get("fiAgentId"), fiAgentId)
+                );
+            }
+            //Filter by claimTypeId (if provided)
+            if(claimTypeId != null){
+                predicates.add(
+                    criteriaBuilder.equal(root.get("claimTypeId"), claimTypeId)
                 );
             }
 

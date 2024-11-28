@@ -1,6 +1,7 @@
 package com.seps.ticket.repository;
 
 import com.seps.ticket.domain.ClaimTicket;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,4 +24,6 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
     Page<ClaimTicket> findAll(Specification<ClaimTicket> claimTicketSpecification, Pageable pageable);
 
     Optional<ClaimTicket> findByIdAndOrganizationId(Long id, Long organizationId);
+
+    List<ClaimTicket> findAllByIdInAndOrganizationId(List<Long> ids, Long organizationId);
 }
