@@ -13,7 +13,7 @@ import {
   handleAddUser,
   handleGetRole,
   handleGetUserById,
-  handleGetUserCompany,
+  handleSEPSUserVerification,
   handleUpdateUser,
 } from "../../services/user.service";
 import { validationSchema } from "../../validations/user.validation";
@@ -42,6 +42,7 @@ export default function AddStatePage() {
   const [initialValues, setInitialValues] = useState({
     name: "",
     email: "",
+    department: "",
     roleId: "",
     mobileCode: "+91",
     mobileNo: "",
@@ -60,6 +61,7 @@ export default function AddStatePage() {
       }
       setRolesOptions(roleList);
     });
+    
   }, []);
 
   useEffect(() => {
@@ -73,9 +75,9 @@ export default function AddStatePage() {
           name: response.data?.name ? response.data?.name : "",
           email: response.data?.email ? response.data?.email : "",
           roleId: response.data?.roleId ??  "",
+          department: response.data?.department ? response.data?.department : "",
           // activated: response.data?.status == 'ACTIVE' ? true : false,
           //mobileCode: "+91",
-          // mobileNo: userData?.mobileNo ? userData?.mobileNo : "",
           // activated: userData?.activated ? userData?.activated : false,
           // profileImage: userData?.imageUrl ? userData?.imageUrl : "",
         });
@@ -85,6 +87,31 @@ export default function AddStatePage() {
       setLoading(false);
     }
   }, [id, isEdit]);
+
+  // Get SEPS user verification
+  const verifyEmail = async (email,setFieldValue) => {
+    if (!email) return;
+
+    try {
+      setUserLoading(true);
+      const data = { email };
+      const response = await handleSEPSUserVerification(data);
+      if (response.data) {
+        const { displayName, department } = response.data;
+        toast.success("Email verified successfully.");
+        
+        // Update the Formik fields with the response data
+        setFieldValue("name", displayName || "");
+        setFieldValue("department", department || "");
+      } else {
+        toast.error(response.data.errorDescription);
+      }
+    } catch (error) {
+      toast.error(error.response.data.errorDescription);
+    } finally {
+      setUserLoading(false);
+    }
+  };
 
   const onSubmit = async (values, actions) => {
     setUserLoading(true);
@@ -136,7 +163,7 @@ export default function AddStatePage() {
           navigate('/users')
         }).catch((error) => {
           setUserLoading(false);
-          toast.error(error.response.data.detail);
+          toast.error(error.response.data.errorDescription ?? error.response.data.detail);
 
         }).finally(() => {
           actions.setSubmitting(false)
@@ -183,9 +210,7 @@ export default function AddStatePage() {
                   className="d-flex flex-column h-100"
                 >
                   <Row>
-                    {/* <pre>{JSON.stringify(initialValues,null,2)}</pre> */}
-                    {/* <pre>{JSON.stringify(values,null,2)}</pre> */}
-                    {/* <pre>{JSON.stringify(errors,null,2)}</pre> */}
+                    
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
                         error={errors.email}
@@ -193,7 +218,11 @@ export default function AddStatePage() {
                         key={"email"}
                         label={t('EMAIL')}
                         name="email"
-                        onBlur={handleBlur}
+                        // onBlur={handleBlur}
+                        onBlur={(e) => {
+                          handleBlur(e);
+                          verifyEmail(e.target.value, setFieldValue); // Pass setFieldValue here
+                        }}
                         onChange={handleChange}
                         touched={touched.email}
                         type="text"
@@ -213,100 +242,56 @@ export default function AddStatePage() {
                         touched={touched.name}
                         type="text"
                         value={values.name || ""}
+                        disabled={true}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
-                        error={errors.unidadOrganizacional}
-                        id="unidadOrganizacional"
-                        key={"unidadOrganizacional"}
+                        error={errors.department}
+                        id="department"
+                        key={"department"}
                         label={t('UNIDAD ORGANIZACIONAL')}
-                        name="unidadOrganizacional"
+                        name="department"
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        touched={touched.unidadOrganizacional}
+                        touched={touched.department}
                         type="text"
-                        value={values.unidadOrganizacional || ""}
+                        value={values.department || ""}
                         disabled={true}
                       />
                     </Col>
-                    {/* <Col sm={6} md={6} lg={4}>
-                      <label htmlFor="mobileCode" className="mb-1 fs-14">
-                        Phone
-                      </label>
-                      <Row className="gx-2">
-                        <Col xs="auto">
-                          <div className="custom-min-width-75 pe-1">
-                            <ReactSelect
-                              error={errors.mobileCode}
-                              options={countryCodeData}
-                              value={values.mobileCode}
-                              onChange={(option) => {
-                                setFieldValue(
-                                  "mobileCode",
-                                  option?.target?.value ?? ""
-                                );
-                              }}
-                              name="mobileCode"
-                              className={
-                                touched.mobileCode && errors.mobileCode
-                                  ? "is-invalid"
-                                  : ""
-                              }
-                              onBlur={handleBlur}
-                              touched={touched.mobileCode}
-                            />
-                          </div>
-                        </Col>
-                        <Col xs>
-                          <FormInput
-                            error={errors.mobileNo}
-                            id="mobileNo"
-                            key={"mobileNo"}
-                            name="mobileNo"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            touched={touched.mobileNo}
-                            type="text"
-                            value={values.mobileNo || ""}
-                          />
-                        </Col>
-                      </Row>
-                    </Col> */}
                     <Col sm={6} md={6} lg={4}>
-                      <ReactSelect
-                        label={t('ROLE')}
-                        error={errors.roleId}
-                        options={rolesOptions}
-                        value={values.roleId}
-                        onChange={(option) => {
-                          setFieldValue(
-                            "roleId",
-                            option?.target?.value ?? ""
-                          );
-                        }}
-                        name="roleId"
-                        className={
-                          touched.roleId && errors.roleId
-                            ? "is-invalid"
-                            : ""
-                        }
-                        onBlur={handleBlur}
-                        touched={touched.roleId}
-                      />
+                    <div>
+                        <ReactSelect
+                            label={t('ROLE')}
+                            error={errors.roleId}
+                            options={rolesOptions}
+                            value={values.roleId}
+                            onChange={(option) => {
+                              setFieldValue(
+                                "roleId",
+                                option?.target?.value ?? ""
+                              );
+                            }}
+                            name="roleId"
+                            className={
+                              touched.roleId && errors.roleId
+                                ? "is-invalid"
+                                : ""
+                            }
+                            onBlur={handleBlur}
+                            touched={touched.roleId}
+                          />
+                    </div>
+                      {/* Separate error box for roleId */}
+                      {touched.roleId && errors.roleId && (
+                        <div className="error-box">
+                          {/* {errors.roleId} */}
+                        </div>
+                      )}
+                      
                     </Col>
-                    {/* <Col xs={12} className="mb-3 pb-1">
-                      <label htmlFor="activated" className="mb-1 fs-14">
-                        {t('STATUS')}
-                      </label>
-                      <Toggle
-                        id="activated"
-                        key={"activated"}
-                        name="activated"
-                        onChange={handleChange}
-                        value={values.activated}
-                      />
-                    </Col> */}
+                    
                   </Row>
 
                   <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">

@@ -50,6 +50,7 @@ const TemplateMaster = () => {
     addModule: false,
     editModule: false,
     deleteModule: false,
+    statusModule: false,
   });
 
   useEffect(() => {
@@ -59,17 +60,18 @@ const TemplateMaster = () => {
           permission.current.addModule = true;
           permission.current.editModule = true;
           permission.current.deleteModule = true;
+          permission.current.statusModule = true;
         } else {
-          getModulePermissions("Master management")
+          getModulePermissions("Template Master")
             .then((response) => {
-              if (response.includes("CLAIM_TYPE_CREATE")) {
+              if (response.includes("TEMPLATE_CREATE")) {
                 permission.current.addModule = true;
               }
-              if (response.includes("CLAIM_TYPE_UPDATE")) {
+              if (response.includes("TEMPLATE_UPDATE")) {
                 permission.current.editModule = true;
               }
-              if (response.includes("CLAIM_TYPE_DELETE")) {
-                permission.current.deleteModule = true;
+              if (response.includes("TEMPLATE_STATUS_CHANGE")) {
+                permission.current.statusModule = true;
               }
             })
             .catch((error) => {
@@ -168,6 +170,7 @@ const TemplateMaster = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
+            permission.current.statusModule ?
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
@@ -177,7 +180,7 @@ const TemplateMaster = () => {
               checked={info?.row?.original?.status}
               onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
               tooltip="Active"
-            />
+            /> : ''
           )
         },
         id: "status",
@@ -188,6 +191,7 @@ const TemplateMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
+          permission.current.editModule ? 
           <DataGridActions
             controlId="role-rights"
             rowData={rowData}
@@ -201,7 +205,7 @@ const TemplateMaster = () => {
                 handler: () => editCityMaster(rowData?.row?.original),
               },
             ]}
-          />
+          /> : ''
         ),
         header: () => (
           <div className="text-center">{t("ACTIONS")}</div>
@@ -264,6 +268,8 @@ const TemplateMaster = () => {
 
   return (
     <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+      {permission.current.addModule
+        ?
       <PageHeader
         title={t("TEMPLATE MASTER")}
         actions={[
@@ -271,6 +277,7 @@ const TemplateMaster = () => {
           { label: "Add New", onClick: toggle, variant: "warning" },
         ]}
       />
+      : ''}
       <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
         <Card.Body className="d-flex flex-column">
           <ListingSearchForm filter={filter} setFilter={setFilter} />

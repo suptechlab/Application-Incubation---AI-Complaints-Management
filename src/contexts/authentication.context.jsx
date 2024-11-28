@@ -67,7 +67,7 @@ export default function AuthenticationProvider({ children }) {
     const OtpVerify = async (data) => {
         
         return handleVerifyOtp(data).then((response) => {
-            console.log('otp verify 60',response)
+            console.log('otp verify 70',response)
             //toast.success(response.data.message);
             console.log('accessToken:', response.data);
             if (response.data.id_token) {
@@ -75,29 +75,69 @@ export default function AuthenticationProvider({ children }) {
                 setLocalStorage("refresh_token", response.data.id_token);
                 setIsAuthenticated(true);
                 
-                handleGetAccountDetail().then((accountResponse)=>{
-                    console.log("Account Detail:::", accountResponse);
-                    setLocalStorage("imageUrl", accountResponse.data?.imageUrl);
-                    setLocalStorage("firstName", accountResponse.data?.firstName);
-                    setLocalStorage("lastName", accountResponse.data?.lastName);
-                    setLocalStorage("companyTitle", '');
+                // handleGetAccountDetail().then((accountResponse)=>{
+                //     console.log("Account Detail:::", accountResponse);
+                //     setLocalStorage("imageUrl", accountResponse.data?.imageUrl);
+                //     setLocalStorage("firstName", accountResponse.data?.firstName);
+                //     setLocalStorage("lastName", accountResponse.data?.lastName);
+                //     setLocalStorage("companyTitle", '');
                     
-                    const authorities = accountResponse.data?.authorities;
-                    const role = 'ROLE_ADMIN' //accountResponse.data?.role;
-                    setLocalStorage("user_type", authorities);
-                    if(!authorities.includes("ROLE_ADMIN")){
-                        const roleMap = role.modules.reduce((acc, module) => {
-                            acc[module.name] = module.permissions.map(permission => permission.name);
-                            return acc;
-                        }, {});
-                        setLocalStorage("user_roles", roleMap);
-                    }
-                    navigate("/dashboard");  
-                }).catch((error) => {
-                    toast.error(error);
-                });
+                //     const authorities = accountResponse.data?.authorities;
+                //     const role = 'ROLE_ADMIN' //accountResponse.data?.role;
+                //     setLocalStorage("user_type", authorities);
+                //     if(!authorities.includes("ROLE_ADMIN")){
+                //         const roleMap = role.modules.reduce((acc, module) => {
+                //             acc[module.name] = module.permissions.map(permission => permission.name);
+                //             return acc;
+                //         }, {});
+                //         setLocalStorage("user_roles", roleMap);
+                //     }
+                //     navigate("/dashboard");  
+                // }).catch((error) => {
+                //     toast.error('Something went wrong.');
+                //     console.log('errorOTP 98 ',error);
+                // });
+
+                            handleGetAccountDetail()
+                            .then((accountResponse) => {
+                                console.log("Account Detail:::", accountResponse);
+
+                                const { data } = accountResponse;
+
+                                // Set user details in local storage
+                                setLocalStorage("imageUrl", data?.imageUrl);
+                                setLocalStorage("firstName", data?.firstName);
+                                setLocalStorage("lastName", data?.lastName);
+                                setLocalStorage("companyTitle", "");
+
+                                // Set authorities
+                                const authorities = data?.authorities || [];
+                                setLocalStorage("user_type", authorities);
+
+                                // Check for roles and create role map
+                                const roles = data?.roles || [];
+                                if (!authorities.includes("ROLE_ADMIN")) {
+                                    const roleMap = roles.reduce((acc, role) => {
+                                        const modules = role.modules || [];
+                                        modules.forEach((module) => {
+                                            acc[module.name] = module.permissions.map(
+                                                (permission) => permission.name
+                                            );
+                                        });
+                                        return acc;
+                                    }, {});
+                                    setLocalStorage("user_roles", roleMap);
+                                }
+
+                                // Navigate to dashboard
+                                navigate("/dashboard");
+                            })
+                            .catch((error) => {
+                                toast.error("Something went wrong.");
+                                console.log("Error in handleGetAccountDetail:", error);
+                            });
+
             } else {
-                console.error('Tokens are missing in the response');
                 toast.error('Tokens are missing in the response');
             }
             

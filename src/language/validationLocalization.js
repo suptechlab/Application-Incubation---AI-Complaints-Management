@@ -52,6 +52,7 @@ export const messages = {
     subjectRequired: "Subject name is required",
     templateContentMax1500: "Template details cannot exceed 8500 characters.",
     templateContentRequired: "Template details is required.",
+    roleIdRequired: "Role is required.", // Add this
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -106,5 +107,6 @@ export const messages = {
     subjectRequired: "Se requiere el nombre del asunto.",
     templateContentMax1500: "Los detalles de la plantilla no pueden exceder los 8500 caracteres.",
     templateContentRequired: "Se requieren los detalles de la plantilla.",
+    roleIdRequired: "El rol es obligatorio.", // Add this
   }
 };

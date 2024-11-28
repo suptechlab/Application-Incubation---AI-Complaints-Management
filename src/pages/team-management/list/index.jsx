@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,7 @@ import ListingSearchForm from "../../../components/ListingSearchForm";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { handleDeleteUser, handleGetUsers } from "../../../services/user.service";
+import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 
 export default function TeamManagementList() {
 
@@ -36,6 +37,37 @@ export default function TeamManagementList() {
     const [selectedRow, setSelectedRow] = useState();
     const [deleteShow, setDeleteShow] = useState(false);
     const [deleteId, setDeleteId] = useState();
+
+    // Permissoin work
+    const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
+    useEffect(() => {
+        isAdminUser().then(response => {
+            if (response) {
+                permission.current.statusModule = true;
+                permission.current.addModule = true;
+                permission.current.editModule = true;
+                permission.current.deleteModule = true;
+            } else {
+                getModulePermissions("FI User").then(response => {
+                    console.log('response',response)
+                    if (response.includes("FI_USER_CREATE_BY_FI")) {
+                        permission.current.addModule = true;
+                    }
+                    if (response.includes("FI_UPDATE_CREATE_BY_FI")) {
+                        permission.current.editModule = true;
+                    }
+                    if (response.includes("FI_STATUS_CHANGE_CREATE_BY_FI")) {
+                        permission.current.statusModule = true;
+                    }
+                }).catch(error => {
+                    console.error("Error fetching permissions:", error);
+                });
+            }
+        }).catch(error => {
+            console.error("Error get during to fetch User Type", error);
+        })
+
+    }, []);
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
@@ -114,36 +146,65 @@ export default function TeamManagementList() {
                 header: () => t('ASSOCIATION'),
                 enableSorting: false,
             },
-            {
-                id: "actions",
-                isAction: true,
-                cell: (rowData) => (
-                    <DataGridActions
-                        controlId="team-management"
-                        rowData={rowData}
-                        customButtons={[
-                            {
-                                name: "edit",
-                                enabled: true,
-                                type: "link",
-                                title: "Edit",
-                                icon: <MdEdit size={18} />,
-                            },
-                            {
-                                name: "delete",
-                                enabled: true,
-                                type: "button",
-                                title: "Delete",
-                                icon: <MdDelete size={18} />,
-                                handler: () => deleteAction(rowData.row.original),
-                            },
-                        ]}
-                    />
-                ),
-                header: () => <div className="text-center">{t('ACTIONS')}</div>,
-                enableSorting: false,
-                size: "80",
-            },
+             // Conditionally add the "actions" column
+            ...(permission.current.editModule
+                ? [
+                    {
+                    id: "actions",
+                    isAction: true,
+                    cell: (rowData) => (
+                        <div className="pointer">
+                        <DataGridActions
+                            controlId="team-management"
+                            rowData={rowData}
+                            customButtons={[
+                                {
+                                    name: "edit",
+                                    enabled: true,
+                                    type: "link",
+                                    title: "Edit",
+                                    icon: <MdEdit size={18} />,
+                                },
+                            ]}
+                        />
+                        </div>
+                    ),
+                    header: () => <div className="text-center">{t("ACTIONS")}</div>,
+                    enableSorting: false,
+                    size: "80",
+                    },
+                ]
+                : []),
+            // {
+            //     id: "actions",
+            //     isAction: true,
+            //     cell: (rowData) => (
+            //         <DataGridActions
+            //             controlId="team-management"
+            //             rowData={rowData}
+            //             customButtons={[
+            //                 {
+            //                     name: "edit",
+            //                     enabled: true,
+            //                     type: "link",
+            //                     title: "Edit",
+            //                     icon: <MdEdit size={18} />,
+            //                 },
+            //                 {
+            //                     name: "delete",
+            //                     enabled: true,
+            //                     type: "button",
+            //                     title: "Delete",
+            //                     icon: <MdDelete size={18} />,
+            //                     handler: () => deleteAction(rowData.row.original),
+            //                 },
+            //             ]}
+            //         />
+            //     ),
+            //     header: () => <div className="text-center">{t('ACTIONS')}</div>,
+            //     enableSorting: false,
+            //     size: "80",
+            // },
         ],
         []
     );

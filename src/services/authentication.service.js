@@ -1,11 +1,6 @@
 import {authApi} from "../utils/instance";
 
 const API_VERSION = process.env.REACT_APP_API_VERSION
-// const port = process.env.REACT_APP_AUTH_PORT
-
-// instance.defaults.baseURL=`${instance.defaults.baseURL}`
-// instance.defaults.baseURL=`${instance.defaults.baseURL}:${port}/`
-// instance.defaults.baseURL = `${process.env.REACT_APP_API_URL}:${port}`;
 
 export const handleChangePassword = async (data) => {
     return await authApi.post('/account/change-password', data);
@@ -41,7 +36,6 @@ export const handleRefreshToken = async () => {
         refreshToken: JSON.parse(localStorage.getItem("refresh_token"))
     });
 }
-
 
 export const handleResendOTP = async (params) => {
     return await authApi.get(`/resend-login-otp`, {params});

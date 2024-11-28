@@ -49,7 +49,7 @@ const ClaimType = () => {
 
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
-  const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
+  const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
 
   useEffect(() => {
     isAdminUser().then(response => {
@@ -57,16 +57,17 @@ const ClaimType = () => {
         permission.current.addModule = true;
         permission.current.editModule = true;
         permission.current.deleteModule = true;
+        permission.current.statusModule = true;
       } else {
-        getModulePermissions("Master management").then(response => {
+        getModulePermissions("Claim Type Master").then(response => {
           if (response.includes("CLAIM_TYPE_CREATE")) {
             permission.current.addModule = true;
           }
           if (response.includes("CLAIM_TYPE_UPDATE")) {
             permission.current.editModule = true;
           }
-          if (response.includes("CLAIM_TYPE_DELETE")) {
-            permission.current.deleteModule = true;
+          if (response.includes("CLAIM_TYPE_STATUS_CHANGE")) {
+            permission.current.statusModule = true;
           }
         }).catch(error => {
           console.error("Error fetching permissions:", error);
@@ -219,15 +220,17 @@ const ClaimType = () => {
       {
         cell: (info) => {
           return (
-            <Toggle
-              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            />
+            permission.current.statusModule ?
+              <Toggle
+                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                name="status"
+                value={info?.row?.original?.status}
+                checked={info?.row?.original?.status}
+                onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+              />
+            : ''
           )
         },
         id: "status",
@@ -238,6 +241,7 @@ const ClaimType = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
+          permission.current.editModule ?
           <DataGridActions
             controlId="province-master"
             rowData={rowData}
@@ -251,7 +255,7 @@ const ClaimType = () => {
                 handler: () => editClaimType(rowData?.row?.original),
               },
             ]}
-          />
+          /> : ''
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
@@ -278,13 +282,15 @@ const ClaimType = () => {
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
+    {permission.current.addModule
+        ?
     <PageHeader
       title={t("CLAIM TYPE")}
       actions={[
         { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
-    />
+    /> : ''}
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

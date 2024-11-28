@@ -62,7 +62,7 @@ export default function FIUserAddEdit() {
         setLoading(false);
       });
     } else {
-      setLoading(false);
+        setLoading(false);
     }
   }, [id, isEdit]);
 
