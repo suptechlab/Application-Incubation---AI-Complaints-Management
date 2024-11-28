@@ -82,6 +82,8 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
     const result = await dispatch(verifyLoginOTP(values));
     if (verifyLoginOTP.fulfilled.match(result)) {
       setSetupSuccesModalShow(false)
+      handleCloseReset()
+      setIsFileClaimModalShow(true)
       actions.setSubmitting(false)
     } else {
       console.error('VERIFY OTP ERROR:', result.error.message);
