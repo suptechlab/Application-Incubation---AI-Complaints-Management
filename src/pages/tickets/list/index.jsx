@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { Card, Form } from "react-bootstrap";
-import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
+import { Button, Card, Form, Stack } from "react-bootstrap";
+import { MdAttachFile, MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
@@ -11,6 +11,8 @@ import PageHeader from "../../../components/PageHeader";
 import { handleGetUsers } from "../../../services/user.service";
 import TicketsListFilters from "./filters";
 import { handleGetTicketList } from "../../../services/ticketmanagement.service";
+import AppTooltip from "../../../components/tooltip";
+import AttachmentsModal from "../modals/attachmentsModal";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -29,13 +31,14 @@ export default function TicketsList() {
     });
 
     const [loading, setLoading] = useState(false);
+    const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
-          // Set loading state to true before the request starts
+            // Set loading state to true before the request starts
 
-         return {data : sampleData ,page : 1 , size : 10} 
+            return { data: sampleData, page: 1, size: 10 }
 
         //   setLoading(true);
     
@@ -88,6 +91,7 @@ export default function TicketsList() {
             claimType: "Health Insurance",
             claimFilledBy: "John Doe",
             slaBreachDays: "5 Days",
+            priority: "Low",
             status: "Closed",
         },
         {
@@ -96,6 +100,7 @@ export default function TicketsList() {
             claimType: "Auto Insurance",
             claimFilledBy: "Jane Smith",
             slaBreachDays: "3 Days",
+            priority: "Medium",
             status: "In Progress",
         },
         {
@@ -104,6 +109,7 @@ export default function TicketsList() {
             claimType: "Travel Insurance",
             claimFilledBy: "Robert Brown",
             slaBreachDays: "7 Days",
+            priority: "High",
             status: "Rejected",
         },
         {
@@ -112,6 +118,7 @@ export default function TicketsList() {
             claimType: "Property Insurance",
             claimFilledBy: "Emily Davis",
             slaBreachDays: "2 Days",
+            priority: "NIL",
             status: "New",
         },
         {
@@ -120,6 +127,7 @@ export default function TicketsList() {
             claimType: "Life Insurance",
             claimFilledBy: "Michael Wilson",
             slaBreachDays: "10 Days",
+            priority: "NIL",
             status: "Closed",
         },
     ];
@@ -135,34 +143,87 @@ export default function TicketsList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
-    
+    // The color class based on the status
+    const getPriorityClass = (priority) => {
+        switch (priority) {
+            case 'Low':
+                return 'text-success';
+            case 'Medium':
+                return 'text-custom-warning';
+            case 'High':
+                return 'text-custom-danger';
+            default:
+                return 'text-body';
+        }
+    };
+
+    // The color class based on the status
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'Closed':
+                return 'bg-success text-success';
+            case 'In Progress':
+                return 'bg-custom-info text-custom-info';
+            case 'New':
+                return 'bg-custom-primary text-custom-primary';
+            case 'Rejected':
+                return 'bg-custom-danger text-custom-danger';
+            default:
+                return 'bg-body text-body';
+        }
+    };
+
+    // Handle Attachments Button
+    const handleAttachmentsClick = () => {
+        setAttachmentsModalShow(true)
+    }
+
     const columns = React.useMemo(
         () => [
             {
                 id: 'select-col',
                 header: ({ table }) => (
-                  <Form.Check
-                    checked={table.getIsAllRowsSelected()}
-                    indeterminate={table.getIsSomeRowsSelected()}
-                    onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
-                  />
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={table.getIsAllRowsSelected()}
+                        indeterminate={table.getIsSomeRowsSelected()}
+                        onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                    />
                 ),
                 cell: ({ row }) => (
-                  <Form.Check
-                    checked={row.getIsSelected()}
-                    disabled={!row.getCanSelect()}
-                    onChange={row.getToggleSelectedHandler()}
-                  />
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={row.getIsSelected()}
+                        disabled={!row.getCanSelect()}
+                        onChange={row.getToggleSelectedHandler()}
+                    />
                 ),
-              },
+                size: "15",
+                meta: {
+                    thClassName: 'pe-0 fs-6',
+                    tdClassName: 'pe-0 fs-6',
+                },
+            },
             {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => "Ticket Id",
+                header: () => "Ticket ID",
                 enableSorting: true,
-                cell :({row})=>(
-                    <Link to={`/tickets/view/${row?.original?.id}`}>{"#"+row?.original?.ticketId}</Link>
-                )
+                cell: ({ row }) => (
+                    <Stack direction="horizontal" gap={2}>
+                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+                        <AppTooltip title="Attachments">
+                            <Button
+                                variant="link"
+                                className="p-0 border-0 link-dark"
+                                onClick={handleAttachmentsClick}
+                                aria-label="Attachments"
+                            >
+                                <MdAttachFile size={16} />
+                            </Button>
+                        </AppTooltip>
+                    </Stack>
+                ),
             },
             {
                 // accessorFn: (row) => row?.claimType?.name,
@@ -194,10 +255,30 @@ export default function TicketsList() {
                 enableSorting: true,
             },
             {
+                accessorFn: (row) => row?.priority,
+                id: "priority",
+                header: () => "Priority",
+                size: "100",
+                cell: (rowData) => (
+                    <span
+                        className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
+                    >
+                        {rowData.row.original.priority}
+                    </span>
+                )
+            },
+            {
                 accessorFn: (row) => row?.status,
                 id: "status",
                 header: () => "Status",
-                size: "90",
+                size: "100",
+                cell: (rowData) => (
+                    <span
+                        className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+                    >
+                        {rowData.row.original.status}
+                    </span>
+                )
             },
         ],
         []
@@ -275,6 +356,13 @@ export default function TicketsList() {
                     </Card.Body>
                 </Card>
             </div>
+
+            {/* Attachments Modals */}
+            <AttachmentsModal
+                modal={attachmentsModalShow}
+                toggle={() => setAttachmentsModalShow(false)}
+            />
+
         </React.Fragment>
     );
 }
