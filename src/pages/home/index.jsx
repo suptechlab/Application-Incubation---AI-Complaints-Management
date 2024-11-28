@@ -17,6 +17,8 @@ const Home = () => {
   // GET IS LOGGED IN STATUS OF USER FROM REDUX
   const { isLoggedIn } = useSelector((state) => state?.authSlice)
 
+  const [loading ,setLoading] = useState(false)
+
   // THIS STATE IS FOR OPEN MAIN MODAL IF USER NOT LOGGED IN
   const [fileClaimMainModalShow, setFileClaimMainModalShow] = useState(false);
   // THIS STATE IS FOR OPEN FILE CLAIM MODAL DIRECTLY IF USER IS LOGGED IN
@@ -30,10 +32,11 @@ const Home = () => {
       setFileClaimMainModalShow(true);
     }
   };
+  
 
   return (
     <React.Fragment>
-      <Loader isLoading={false} />
+      <Loader isLoading={loading} />
       <div className="d-flex flex-column flex-grow-1 position-relative w-100 z-1">
         <Image
           src={homeBg}
@@ -99,6 +102,7 @@ const Home = () => {
         handleClose={() => setFileClaimMainModalShow(false)}
         isFileClaimModalShow={isFileClaimModalShow}
         setIsFileClaimModalShow={setIsFileClaimModalShow}
+        setLoading={setLoading}
       />
     </React.Fragment>
   );

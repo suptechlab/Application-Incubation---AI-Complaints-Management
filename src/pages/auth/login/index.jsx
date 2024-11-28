@@ -11,10 +11,10 @@ const LoginModal = ({ handleSignUpClick, handleLoginSucccesSubmit }) => {
 
 
     const dispatch = useDispatch()
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const [isloginFormSubmitted, setIsloginFormSubmitted] = useState(false);
     const [otpToken, setOtpToken] = useState("")
-    const [otpTokenExpirationTime , setOTPTokenExpirationTime] = useState('')
+    const [otpTokenExpirationTime, setOTPTokenExpirationTime] = useState('')
 
     useEffect(() => {
         if (otpTokenExpirationTime) {
@@ -69,7 +69,9 @@ const LoginModal = ({ handleSignUpClick, handleLoginSucccesSubmit }) => {
                         <div className="border-black border-dashed border-top d-lg-none opacity-100 w-100" />
                     </Col>
                     <Col lg>
-                        {isloginFormSubmitted ? <OtpFormSection otpToken={otpToken} handleFormSubmit={handleLoginSucccesSubmit} /> : <LoginFormSection handleFormSubmit={handleLoginFormSubmit} />}
+                        {isloginFormSubmitted ?
+                            <OtpFormSection otpToken={otpToken} handleFormSubmit={handleLoginSucccesSubmit} /> :
+                            <LoginFormSection handleFormSubmit={handleLoginFormSubmit} />}
                     </Col>
                 </Row>
             </Modal.Body>

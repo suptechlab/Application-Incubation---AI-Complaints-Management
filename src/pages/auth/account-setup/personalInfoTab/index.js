@@ -15,7 +15,7 @@ import { sendOTPonEmail, verifyRegisterOTP } from "../../../../redux/slice/authS
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
+const PersonalInfoTab = ({ isSubmitted, setNewAccountData,isFormSubmitted, setIsFormSubmitted }) => {
 
 
   const dispatch = useDispatch()
@@ -29,7 +29,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
 
 
   const [isFormEmailValidate, setIsFormEmailValidate] = useState(false);
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
   const [optSendStatus, setOptSendStatus] = useState(false);
 
   const formikRef = useRef();
@@ -61,11 +61,13 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
 
   // HANDLE SEND OTP ON REGISTER
   const handleSubmit = async (values, actions) => {
+    actions.setSubmitting(true);
     const isOtpSent = await sendOTP(values?.email);
     if (isOtpSent) {
       setIsFormSubmitted(true);
+      actions.setSubmitting(false);
     }
-    actions.setSubmitting(false);
+    
   };
 
   // Handle Resend OTP
@@ -83,6 +85,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
 
   // HANDLE REGISTER OTP VERIFICATION
   const handleOtpSubmit = async (values, actions) => {
+    actions.setSubmitting(true)
     try {
       const result = await dispatch(verifyRegisterOTP({ email: values?.email, otpCode: values?.otpCode }));
       if (verifyRegisterOTP?.fulfilled?.match(result)) {
@@ -104,7 +107,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
     } catch (error) {
       console.error("VERIFY OTP ERROR : ", error?.message)
     } finally {
-      // actions.setSubmitting(false)
+      actions.setSubmitting(false)
     }
 
 
@@ -219,6 +222,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                         type="submit"
                         variant="warning"
                         className="custom-min-width-100 custom-margin-top-1"
+                        disabled={formikProps?.isSubmitting ?? false}
                       >
                         {t("SEND_OTP_BUTTON")}
                       </Button>
@@ -252,6 +256,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
                     <Button
                       type="submit"
                       variant="warning"
+                      disabled={formikProps?.isSubmitting ?? false}
                       className="custom-min-width-100 custom-margin-top-1"
                     >
                       {t("OTP_VERIFICATION")}

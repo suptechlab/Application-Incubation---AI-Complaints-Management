@@ -17,13 +17,14 @@ const HelpDeskBot = ({ handleShow, handleClose }) => {
     // HANDLE PRIVACY FORM SUBMIT
     const handlePrivacyFormSubmit = (values, actions) => {
         setIsPrivacyFormSubmitted(true);
-        actions.setSubmitting(false);
         dispatch(dpaAcceptance(values?.agreePrivacy)).then((data) => {
             if (data.payload.status == 200) {
                 toast.success(data?.payload?.message ?? "")
             }
         }).catch((err) => {
             console.log(err);
+        }).finally(()=>{
+            actions.setSubmitting(false);
         });
     };
 

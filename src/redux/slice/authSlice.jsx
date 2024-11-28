@@ -131,12 +131,12 @@ export const registerUser = createAsyncThunk(
     async (values, { rejectWithValue, dispatch }) => {
         try {
             // Step 1: Register the user
-            const registerResponse = await authApi.post(EndPoint.REGISTER_API, values);
+            // const registerResponse = await authApi.post(EndPoint.REGISTER_API, values);
 
             // Extract the id_token
-            const { id_token } = registerResponse.data;
+            // const { id_token } = registerResponse.data;
 
-            // const id_token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huQHlvcG1haWwuY29tIiwiZXhwIjoxNzM0NTE4MTc5LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMxOTI2MTc5fQ.0SpNU-4fkn-lGqKzvyQB_6QHOHjhJTW1mWwyXVCN0uf-522GLVcNrG7izfI9rzxRNhatI3R-LFe1kodjZFtaeQ"
+            const id_token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqb2huQHlvcG1haWwuY29tIiwiZXhwIjoxNzM0NTE4MTc5LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMxOTI2MTc5fQ.0SpNU-4fkn-lGqKzvyQB_6QHOHjhJTW1mWwyXVCN0uf-522GLVcNrG7izfI9rzxRNhatI3R-LFe1kodjZFtaeQ"
 
             // Step 2: Save the id_token to localStorage
             setLocalStorage('id_token', id_token);

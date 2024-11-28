@@ -7,16 +7,16 @@ import { fingerPrintValidate } from "../../../redux/slice/authSlice";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
+const AccountSetupModal = ({ handleBack, handleFormSubmit }) => {
 
     const dispatch = useDispatch()
 
-    const {t} = useTranslation()
+    const { t } = useTranslation()
 
     const [activeTab, setActiveTab] = useState(0);
     const [isIdVerificationSubmitted, setIsIdVerificationSubmitted] = useState(false);
     const [isPersonalInfoSubmitted, setIsPersonalInfoSubmitted] = useState(false);
-
+    const [isFormSubmitted, setIsFormSubmitted] = useState(false);
     const [newAccountData, setNewAccountData] = useState({})
 
     // Handle ID Verification Submit
@@ -65,11 +65,11 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
     const tabData = [
         {
             eventKey: 0,
-            content: <IdVerificationTab setNewAccountData={setNewAccountData} isSubmitted={setIsIdVerificationSubmitted} />,
+            content: <IdVerificationTab setNewAccountData={setNewAccountData} newAccountData={newAccountData} isSubmitted={setIsIdVerificationSubmitted} />,
         },
         {
             eventKey: 1,
-            content: <PersonalInfoTab setNewAccountData={setNewAccountData} isSubmitted={setIsPersonalInfoSubmitted} />,
+            content: <PersonalInfoTab setNewAccountData={setNewAccountData} isSubmitted={setIsPersonalInfoSubmitted} isFormSubmitted={isFormSubmitted} setIsFormSubmitted={setIsFormSubmitted} />,
         },
     ];
 
@@ -112,9 +112,13 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
                         type="button"
                         variant="secondary"
                         onClick={() => {
-                            setActiveTab(0)
-                            if (activeTab === 0) {
-                                handleClose()
+                            // activeTab === 1 && isPersonalInfoSubmitted
+
+                            if (isFormSubmitted ) {
+                                setIsFormSubmitted(false);
+                                // setIsPersonalInfoSubmitted(false)
+                            } else {
+                                activeTab === 0 ? handleBack() : setActiveTab(0);
                             }
                         }}
                         className="custom-min-width-100 me-auto"
@@ -127,7 +131,7 @@ const AccountSetupModal = ({ handleClose, handleFormSubmit }) => {
                         className="custom-min-width-100"
                         onClick={() => {
                             setActiveTab(1)
-                            if (isPersonalInfoSubmitted) {
+                            if (activeTab === 1 && isPersonalInfoSubmitted) {
                                 handleFinishClick()
                             }
                         }}

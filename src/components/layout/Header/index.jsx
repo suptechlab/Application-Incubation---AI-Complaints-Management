@@ -8,7 +8,7 @@ import {
   Navbar,
   Offcanvas,
 } from "react-bootstrap";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import Logo from "../../../assets/images/logo.svg";
 import "./header.scss";
@@ -26,6 +26,8 @@ const Header = ({ layout }) => {
   const { t } = useTranslation()
 
   const dispatch = useDispatch()
+
+  const navigate = useNavigate()
 
   let expand = "md";
 
@@ -48,6 +50,7 @@ const Header = ({ layout }) => {
   const handleLogout = () => {
     dispatch(setLogout())
     dispatch(resetDPAState())
+    navigate('/')
   }
 
   const handleProfileClick = () => {
@@ -61,7 +64,6 @@ const Header = ({ layout }) => {
           <Navbar.Brand as={Link} to="/" className="me-auto px-1">
             <Image fluid src={Logo} alt="Logo" width={258} height={55} />
           </Navbar.Brand>
-
           <Navbar.Offcanvas
             id={`headerNavbar-expand-${expand}`}
             aria-labelledby={`headerNavbarLabel-expand-${expand}`}

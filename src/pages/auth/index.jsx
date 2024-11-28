@@ -19,7 +19,8 @@ import { registerUser, verifyLoginOTP } from "../../redux/slice/authSlice";
  * @returns {*}
  */
 
-const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, setIsFileClaimModalShow}) => {
+const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, setIsFileClaimModalShow, setLoading }) => {
+
 
 
   // CHECK IF USER HAS ACCEPTED DPA OR NOT FROM REDUX STATE
@@ -27,20 +28,21 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
   // const [isPrivacyFormSubmitted, setIsPrivacyFormSubmitted] = useState(isAgree);
   const [isSignupClicked, setIsSignupClicked] = useState(false);
   const [setupSuccesModalShow, setSetupSuccesModalShow] = useState(false);
- 
+
 
   const dispatch = useDispatch()
 
   // Handle Privacy Form Submit
   const handlePrivacyFormSubmit = (values, actions) => {
     // setIsPrivacyFormSubmitted(true);
-    actions.setSubmitting(false);
     dispatch(dpaAcceptance(values?.agreePrivacy)).then((data) => {
       if (data.payload.status == 200) {
         toast.success(data?.payload?.message ?? "")
       }
     }).catch((err) => {
       console.log(err);
+    }).finally(() => {
+      actions?.setSubmitting(false)
     });
   };
 
@@ -65,13 +67,17 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
 
   // HANDLE FINISH BUTTON
   const handleFinishButtonClick = async (values) => {
-    // handleCloseReset();
+    setLoading(true)
+
     const result = await dispatch(registerUser(values));
     if (registerUser.fulfilled.match(result)) {
-      handleCloseReset()
+      // handleCloseReset()
       setSetupSuccesModalShow(true)
+      setLoading(false)
+      handleCloseReset();
       // toast.success(result?.message ?? "Account setup success.")
     } else {
+      setLoading(false)
       console.error('Registration error:', result.error.message);
     }
   }
@@ -91,10 +97,14 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
     }
   }
 
+  const handleAccountSetupBack = () => {
+    setIsSignupClicked(false)
+  }
+
   // Show Component
   let modalChildren;
   if (isSignupClicked) {
-    modalChildren = <AccountSetupModal handleClose={handleClose} handleFormSubmit={handleFinishButtonClick} />;
+    modalChildren = <AccountSetupModal handleBack={handleAccountSetupBack} handleFormSubmit={handleFinishButtonClick} />;
   } else if (isAgree) {
     modalChildren = <LoginModal handleSignUpClick={handleSignupButtonClick} handleLoginSucccesSubmit={handleSuccessButtonClick} />;
   } else {
@@ -102,14 +112,15 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
   }
 
 
-  const handleFileClaimNow = ()=>{
+  const handleFileClaimNow = () => {
     handleCloseReset()
     setIsFileClaimModalShow(true)
+    setSetupSuccesModalShow(false)
   }
 
   return (
     <React.Fragment>
-     <Modal
+      <Modal
         show={handleShow}
         onHide={handleCloseReset}
         backdrop="static"
@@ -121,7 +132,7 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
         enforceFocus={false}
       >
         {modalChildren}
-      </Modal> 
+      </Modal>
       {/* File a Claim Setup Success Modal */}
       <SetupSuccesModal
         handleShow={setupSuccesModalShow}
@@ -133,7 +144,7 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
       <FileClaimModal
         handleShow={isFileClaimModalShow}
         handleClose={() => setIsFileClaimModalShow(false)}
-      // handleFormSubmit={handleFileClaimButtonClick}
+        // handleFormSubmit={()=>setIsFileClaimModalShow(false)}
       />
     </React.Fragment>
   );

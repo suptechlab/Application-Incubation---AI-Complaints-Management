@@ -70,7 +70,7 @@ const LoginFormSection = ({ handleFormSubmit }) => {
                             type="submit"
                             variant="warning"
                             className="custom-min-width-100 ms-auto mt-2"
-                            disabled={formikProps?.isSubmitting}
+                            disabled={formikProps?.isSubmitting ?? false}
                         >
                             {t('SEND_OTP_BUTTON')}
                         </Button>

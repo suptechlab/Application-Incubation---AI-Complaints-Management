@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Col, Row, Stack } from "react-bootstrap";
+import { Button, Col, Row, Spinner, Stack } from "react-bootstrap";
 import { FiInfo } from "react-icons/fi";
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormInputBox from "../../../../components/FormInput";
@@ -11,7 +11,7 @@ import { fingerPrintValidate, nationalIDVerificationStatus, nationalIdVerify } f
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
+const IdVerificationTab = ({ isSubmitted, setNewAccountData, newAccountData }) => {
     const { t } = useTranslation()
     const [isFormSubmitted, setIsFormSubmitted] = useState(false)
     const dispatch = useDispatch()
@@ -22,31 +22,37 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
     });
 
     const [isIdVerified, setIsVerified] = useState(false)
+
+    const [isVeifying, setVerifying] = useState(false)
+
     // Handle Submit Handler
     const handleSubmit = async (values, actions) => {
 
         // UNCOMMENT THIS CODE ONCE FINGERPRINT API STARTS
-
+        actions.setSubmitting(true)
         const result = await dispatch(fingerPrintValidate({ identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }));
         if (fingerPrintValidate.fulfilled.match(result)) {
-            if(result.payload === true){
+            if (result.payload === true) {
                 isSubmitted(true);
                 setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
                 setIsFormSubmitted(true)
-            }else{
+            } else {
                 toast.error("Fingerprint not verified.")
             }
-          
+            actions.setSubmitting(false);
         } else {
             console.log("ARE YOU IN ELSE PART NA")
             setIsFormSubmitted(false)
+            actions.setSubmitting(false);
         }
-        actions.setSubmitting(false);
+
     };
 
     // Handle National ID Verification
     const handleNationalIdVerify = async (value) => {
-        if (value && value !== '') {
+
+        if (value && value !== '' && !isIdVerified) {
+            setVerifying(true)
             const isVerifiedId = await dispatch(nationalIDVerificationStatus(value));
 
             if (isVerifiedId?.payload === true) {
@@ -54,9 +60,14 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
                 if (nationalIdVerify.fulfilled.match(result)) {
                     setIsVerified(true)
                     setNewAccountData((prev) => ({ ...prev, identificacion: value }))
+                    setVerifying(false)
                 } else {
                     console.error('Verification error:', result.error.message);
+                    setVerifying(false)
                 }
+            } else {
+                setVerifying(false)
+                setNewAccountData((prev) => ({ ...prev, identificacion: '' }))
             }
         }
     };
@@ -97,11 +108,18 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
                                 type="text"
                                 error={formikProps.errors.nationalID}
                                 onBlur={(event) => handleNationalIdVerify(event?.target?.value)}
-                                onChange={formikProps.handleChange}
+                                onChange={(e) => {
+                                    if (e.target.value !== formikProps.values.nationalID) {
+                                        formikProps.handleChange(e);
+                                        setIsVerified(false);
+                                        setIsFormSubmitted(false)
+                                    }
+
+                                }}
                                 touched={formikProps.touched.nationalID}
                                 value={formikProps.values.nationalID || ""}
-                                inputIcon={isFormSubmitted && <span className="text-success position-absolute top-0 end-0 p-1 custom-width-42 h-100 d-inline-flex align-items-center justify-content-center pe-none user-select-none">{SvgIcons.checkBadgeIcon}</span>}
-                                inputClassName={isFormSubmitted && "custom-padding-right-42"}
+                                inputIcon={(isFormSubmitted || isIdVerified) && <span className="text-success position-absolute top-0 end-0 p-1 custom-width-42 h-100 d-inline-flex align-items-center justify-content-center pe-none user-select-none">{SvgIcons.checkBadgeIcon}</span>}
+                                inputClassName={(isFormSubmitted || isIdVerified) && "custom-padding-right-42"}
                             />
                         </Col>
                         <Col lg>
@@ -113,7 +131,14 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
                                 type="text"
                                 error={formikProps.errors.fingerprintCode}
                                 onBlur={formikProps?.handleBlur}
-                                onChange={formikProps.handleChange}
+                                onChange={(e) => {
+
+                                    if (e.target.value !== formikProps.values.fingerprintCode) {
+                                        formikProps.handleChange(e);
+                                        setIsFormSubmitted(false)
+                                    }
+
+                                }}
                                 touched={formikProps.touched.fingerprintCode}
                                 value={formikProps.values.fingerprintCode || ""}
                                 inputIcon={isFormSubmitted && <span className="text-success position-absolute top-0 end-0 p-1 custom-width-42 h-100 d-inline-flex align-items-center justify-content-center pe-none user-select-none">{SvgIcons.checkBadgeIcon}</span>}
@@ -126,9 +151,10 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
                                 type="submit"
                                 variant="warning"
                                 className="custom-min-width-90 custom-margin-top-1"
-                                disabled={isFormSubmitted || !isIdVerified}
+                                disabled={formikProps?.isSubmitting || isFormSubmitted || !isIdVerified}
                             >
-                                {isFormSubmitted ? t('VERIFIED_BUTTON') : t('VERIFY_BUTTON')}
+                                {isFormSubmitted ? t('VERIFIED_BUTTON') : isVeifying ? <><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Verifying... </> : t('VERIFY_BUTTON')}
                             </Button>
                         </Col>
                     </Row>

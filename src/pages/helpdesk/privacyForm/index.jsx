@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import { Button, Col, Offcanvas, Row } from 'react-bootstrap';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormCheckbox from '../../../components/formCheckbox';
@@ -17,6 +17,7 @@ const PrivacyForm = ({ handleClose, onSubmit }) => {
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
+        actions?.setSubmitting(true)
         onSubmit(values, actions);  
     };
 
@@ -73,6 +74,7 @@ const PrivacyForm = ({ handleClose, onSubmit }) => {
                                         type="submit"
                                         variant="warning"
                                         className="w-100"
+                                        disabled={formikProps?.isSubmitting ?? false}
                                     >
                                         Accept
                                     </Button>
