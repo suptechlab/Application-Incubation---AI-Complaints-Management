@@ -45,6 +45,9 @@ public class MailService {
 
     private final SpringTemplateEngine templateEngine;
 
+    private static final String BASE_URL_USER = "baseUrlUser";
+
+
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
@@ -101,6 +104,7 @@ public class MailService {
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable(BASE_URL_USER, " https://user-suptechdev.seps.gob.ec");
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
         this.sendEmailSync(user.getEmail(), subject, content, false, true);
