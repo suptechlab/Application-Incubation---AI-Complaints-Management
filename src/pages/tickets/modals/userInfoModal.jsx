@@ -4,7 +4,9 @@ import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from "../../../components/CommonViewData";
 import Loader from "../../../components/Loader";
 
-const UserInfoModal = ({ modal, toggle }) => {
+const UserInfoModal = ({ userData, modal, toggle }) => {
+
+    // PHONE NO AND NATIONAL ID IS PENDING IN THIS
     // Info Modal Data
     const InfoModalData = [
         {
@@ -14,7 +16,7 @@ const UserInfoModal = ({ modal, toggle }) => {
         },
         {
             label: "Email",
-            value: "vero@gmail.com",
+            value: userData?.createdByUser?.email,
             colProps: { sm: 6, lg: 4 }
         },
         {
@@ -24,22 +26,22 @@ const UserInfoModal = ({ modal, toggle }) => {
         },
         {
             label: "Province of residence",
-            value: "Canar",
+            value: userData?.province?.name,
             colProps: { sm: 6, lg: 4 }
         },
         {
             label: "Canton of residence",
-            value: "XXXXXXXX",
+            value: userData?.city?.name,
             colProps: { sm: 6, lg: 4 }
         },
         {
             label: "Priority care group",
-            value: "Adult/or older",
+            value: userData?.priorityCareGroup,
             colProps: { sm: 6, lg: 4 }
         },
         {
             label: "Customer Type",
-            value: "Partner/Associate",
+            value: userData?.customerType,
             colProps: { xs: 12 }
         },
     ];

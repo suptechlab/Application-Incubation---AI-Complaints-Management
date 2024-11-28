@@ -1,23 +1,20 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useRef, useState } from "react";
-import PageHeader from "../../../components/PageHeader";
 import qs from "qs";
-import CommonDataTable from "../../../components/CommonDataTable";
-import ListingSearchForm from "../../../components/ListingSearchForm";
+import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
-import DataGridActions from "../../../components/DataGridActions";
-import Toggle from "../../../components/Toggle";
-import { changeClaimTypeStatus, downloadClaimTypes, handleGetClaimTypes } from "../../../services/claimType.service";
-import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
-import Add from "./Add";
-import Edit from "./Edit";
-import Loader from "../../../components/Loader";
+import CommonDataTable from "../../components/CommonDataTable";
+import DataGridActions from "../../components/DataGridActions";
+import ListingSearchForm from "../../components/ListingSearchForm";
+import Loader from "../../components/Loader";
+import PageHeader from "../../components/PageHeader";
+import Toggle from "../../components/Toggle";
+import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
 
-const ClaimType = () => {
+const ClaimOverviewReport = () => {
 
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -47,7 +44,6 @@ const ClaimType = () => {
 
   const toggle = () => setModal(!modal);
 
-  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
 
@@ -95,24 +91,24 @@ const ClaimType = () => {
 
         // Make the API request based on sorting
         let response;
-        if (sorting.length === 0) {
-          response = await handleGetClaimTypes({
-            page: pagination.pageIndex,
-            size: pagination.pageSize,
-            ...filterObj,
-          });
-        } else {
-          response = await handleGetClaimTypes({
-            page: pagination.pageIndex,
-            size: pagination.pageSize,
-            sort: sorting
-              .map(
-                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-              )
-              .join(","),
-            ...filterObj,
-          });
-        }
+        // if (sorting.length === 0) {
+        //   response = await handleGetClaimTypes({
+        //     page: pagination.pageIndex,
+        //     size: pagination.pageSize,
+        //     ...filterObj,
+        //   });
+        // } else {
+        //   response = await handleGetClaimTypes({
+        //     page: pagination.pageIndex,
+        //     size: pagination.pageSize,
+        //     sort: sorting
+        //       .map(
+        //         (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+        //       )
+        //       .join(","),
+        //     ...filterObj,
+        //   });
+        // }
 
         // Return the API response data
         return response?.payload;
@@ -135,62 +131,62 @@ const ClaimType = () => {
   const changeStatus = async (id, currentStatus) => {
     setLoading(true)
     // await handleEditDistricts(id, { status: !currentStatus });
-    changeClaimTypeStatus(id, !currentStatus).then(response => {
-      toast.success(t("STATUS UPDATED"));
-      dataQuery.refetch();
-    }).catch((error) => {
-      if (error?.response?.data?.errorDescription) {
-        toast.error(error?.response?.data?.errorDescription);
-      } else {
-        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-      }
-    }).finally(() => {
-      setLoading(false)
-    })
+    // changeClaimTypeStatus(id, !currentStatus).then(response => {
+    //   toast.success(t("STATUS UPDATED"));
+    //   dataQuery.refetch();
+    // }).catch((error) => {
+    //   if (error?.response?.data?.errorDescription) {
+    //     toast.error(error?.response?.data?.errorDescription);
+    //   } else {
+    //     toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+    //   }
+    // }).finally(() => {
+    //   setLoading(false)
+    // })
   };
 
   // DOWNLOAD CLAIM TYPES LIST
   const handleDownload = () => {
     setDownloading(true)
     toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading })
-    downloadClaimTypes({ search: filter?.search ?? "" }).then(response => {
-      if (response?.data) {
-        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const blobUrl = window.URL.createObjectURL(blob);
+    // downloadClaimTypes({ search: filter?.search ?? "" }).then(response => {
+    //   if (response?.data) {
+    //     const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //     const blobUrl = window.URL.createObjectURL(blob);
 
-        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+    //     toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
 
 
-        const tempLink = document.createElement('a');
-        tempLink.href = blobUrl;
-        tempLink.setAttribute('download', 'claim-types.xlsx');
+    //     const tempLink = document.createElement('a');
+    //     tempLink.href = blobUrl;
+    //     tempLink.setAttribute('download', 'claim-types.xlsx');
 
-        // Append the link to the document body before clicking it
-        document.body.appendChild(tempLink);
+    //     // Append the link to the document body before clicking it
+    //     document.body.appendChild(tempLink);
 
-        tempLink.click();
+    //     tempLink.click();
 
-        // Clean up by revoking the Blob URL
-        window.URL.revokeObjectURL(blobUrl);
+    //     // Clean up by revoking the Blob URL
+    //     window.URL.revokeObjectURL(blobUrl);
 
-        // Remove the link from the document body after clicking
-        document.body.removeChild(tempLink);
-      } else {
-        throw new Error(t("EMPTY RESPONSE"));
-      }
-      // toast.success(t("STATUS UPDATED"));
-    }).catch((error) => {
-      if (error?.response?.data?.errorDescription) {
-        toast.error(error?.response?.data?.errorDescription);
-      } else {
-        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-      }
-      toast.dismiss("downloading");
-    }).finally(() => {
-      // Ensure the loading toast is dismissed
-      // toast.dismiss("downloading");
-      setDownloading(false)
-    });
+    //     // Remove the link from the document body after clicking
+    //     document.body.removeChild(tempLink);
+    //   } else {
+    //     throw new Error(t("EMPTY RESPONSE"));
+    //   }
+    //   // toast.success(t("STATUS UPDATED"));
+    // }).catch((error) => {
+    //   if (error?.response?.data?.errorDescription) {
+    //     toast.error(error?.response?.data?.errorDescription);
+    //   } else {
+    //     toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+    //   }
+    //   toast.dismiss("downloading");
+    // }).finally(() => {
+    //   // Ensure the loading toast is dismissed
+    //   // toast.dismiss("downloading");
+    //   setDownloading(false)
+    // });
   }
 
   useEffect(() => {
@@ -298,9 +294,9 @@ const ClaimType = () => {
         />
       </Card.Body>
     </Card>
-    <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
-    <Edit modal={editModal?.open} dataQuery={dataQuery} toggle={editToggle} rowData={editModal?.row} />
+  
   </div>
 };
 
-export default ClaimType;
+export default ClaimOverviewReport;
+

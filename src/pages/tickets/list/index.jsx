@@ -1,18 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Form } from "react-bootstrap";
 import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { handleGetUsers } from "../../../services/user.service";
 import TicketsListFilters from "./filters";
+import { handleGetTicketList } from "../../../services/ticketmanagement.service";
 
 export default function TicketsList() {
     const location = useLocation();
+    const navigate = useNavigate();
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -20,7 +22,6 @@ export default function TicketsList() {
     });
 
     const [sorting, setSorting] = React.useState([]);
-
     const [filter, setFilter] = React.useState({
         search: "",
         subscription: "",
@@ -31,30 +32,98 @@ export default function TicketsList() {
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
-        queryFn: () => {
-            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-            Object.keys(filterObj).forEach(
-                (key) => filterObj[key] === "" && delete filterObj[key]
-            );
+        queryFn: async () => {
+          // Set loading state to true before the request starts
 
-            if (sorting.length === 0) {
-                return handleGetUsers({
-                    page: pagination.pageIndex,
-                    size: pagination.pageSize,
-                    ...filterObj,
-                });
-            } else {
-                return handleGetUsers({
-                    page: pagination.pageIndex,
-                    size: pagination.pageSize,
-                    sort: sorting
-                        .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-                        .join(","),
-                    ...filterObj,
-                });
-            }
+         return {data : sampleData ,page : 1 , size : 10} 
+
+        //   setLoading(true);
+    
+        //   try {
+        //     const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        //     Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+    
+        //     // Make the API request based on sorting
+        //     let response;
+        //     if (sorting.length === 0) {
+        //       response = await handleGetTicketList({
+        //         page: pagination.pageIndex,
+        //         size: pagination.pageSize,
+        //         ...filterObj,
+        //       });
+        //     } else {
+        //       response = await handleGetTicketList({
+        //         page: pagination.pageIndex,
+        //         size: pagination.pageSize,
+        //         sort: sorting
+        //           .map(
+        //             (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+        //           )
+        //           .join(","),
+        //         ...filterObj,
+        //       });
+        //     }
+    
+        //     // Return the API response data
+        //     return response;
+        //   } catch (error) {
+        //     console.error("Error fetching data", error);
+        //     // Optionally, handle errors here
+        //   } finally {
+        //     // Set loading state to false when the request finishes (whether successful or not)
+        //     setLoading(false);
+        //   }
         },
-    });
+        staleTime: 0, // Data is always stale, so it refetches
+        cacheTime: 0, // Cache expires immediately
+        refetchOnWindowFocus: false, // Disable refetching on window focus
+        refetchOnMount: false, // Prevent refetching on component remount
+        retry: 0, //Disable retry on failure
+      });
+
+    const sampleData = [
+        {
+            ticketId: "TCK-1001",
+            createdAt: "2024-11-20",
+            claimType: "Health Insurance",
+            claimFilledBy: "John Doe",
+            slaBreachDays: "5 Days",
+            status: "Closed",
+        },
+        {
+            ticketId: "TCK-1002",
+            createdAt: "2024-11-21",
+            claimType: "Auto Insurance",
+            claimFilledBy: "Jane Smith",
+            slaBreachDays: "3 Days",
+            status: "In Progress",
+        },
+        {
+            ticketId: "TCK-1003",
+            createdAt: "2024-11-22",
+            claimType: "Travel Insurance",
+            claimFilledBy: "Robert Brown",
+            slaBreachDays: "7 Days",
+            status: "Rejected",
+        },
+        {
+            ticketId: "TCK-1004",
+            createdAt: "2024-11-23",
+            claimType: "Property Insurance",
+            claimFilledBy: "Emily Davis",
+            slaBreachDays: "2 Days",
+            status: "New",
+        },
+        {
+            ticketId: "TCK-1005",
+            createdAt: "2024-11-24",
+            claimType: "Life Insurance",
+            claimFilledBy: "Michael Wilson",
+            slaBreachDays: "10 Days",
+            status: "Closed",
+        },
+    ];
+
 
     //handle last page deletion item
     useEffect(() => {
@@ -66,39 +135,66 @@ export default function TicketsList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
+    
     const columns = React.useMemo(
         () => [
             {
-                // accessorFn: (row) => row.ticketId,
+                id: 'select-col',
+                header: ({ table }) => (
+                  <Form.Check
+                    checked={table.getIsAllRowsSelected()}
+                    indeterminate={table.getIsSomeRowsSelected()}
+                    onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                  />
+                ),
+                cell: ({ row }) => (
+                  <Form.Check
+                    checked={row.getIsSelected()}
+                    disabled={!row.getCanSelect()}
+                    onChange={row.getToggleSelectedHandler()}
+                  />
+                ),
+              },
+            {
+                accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => "Ticket ID",
-            },
-            {
-                // accessorFn: (row) => row.creationDate,
-                id: "creationDate",
-                header: () => "Creation Date",
+                header: () => "Ticket Id",
                 enableSorting: true,
+                cell :({row})=>(
+                    <Link to={`/tickets/view/${row?.original?.id}`}>{"#"+row?.original?.ticketId}</Link>
+                )
             },
             {
-                // accessorFn: (row) => row.claimType,
+                // accessorFn: (row) => row?.claimType?.name,
+                accessorFn: (row) => row?.claimType,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
             },
             {
-                // accessorFn: (row) => row.claimFilledBy,
+                accessorFn: (row) => row?.createdAt,
+                id: "createdAt",
+                header: () => "Creation Date",
+                enableSorting: true,
+                 cell: ({ row }) => (
+                    row?.original?.createdAt
+                ),
+            },
+            {
+                accessorFn: (row) => row?.claimFilledBy,
+                // accessorFn: (row) => row?.user?.name,
                 id: "claimFilledBy",
                 header: () => "Claim filled by",
                 enableSorting: true,
             },
             {
-                // accessorFn: (row) => row.sla,
-                id: "sla",
+                accessorFn: (row) => row?.slaBreachDays,
+                id: "slaBreachDays",
                 header: () => "SLA",
                 enableSorting: true,
             },
             {
-                // accessorFn: "Closed",
+                accessorFn: (row) => row?.status,
                 id: "status",
                 header: () => "Status",
                 size: "90",
@@ -106,7 +202,7 @@ export default function TicketsList() {
         ],
         []
     );
-
+   
     useEffect(() => {
         setPagination({
             pageIndex: 0,
@@ -116,7 +212,8 @@ export default function TicketsList() {
 
     //Add New Click Hanlder
     const addNewClickHanlder = () => {
-        console.log('Soon...')
+        // navigate tickets/view/1
+        navigate('/tickets/view/1')
     }
 
     // Info Cards Data
@@ -158,7 +255,7 @@ export default function TicketsList() {
                 <PageHeader
                     title="Tickets"
                     actions={[
-                        { label: "Add New", onClick: addNewClickHanlder, variant: "warning" },
+                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning" , disabled: true },
                     ]}
                 />
                 <div className="info-cards mb-3">

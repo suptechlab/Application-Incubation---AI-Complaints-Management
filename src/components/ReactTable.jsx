@@ -30,6 +30,7 @@ export default function ReactTable({
 
 
   const { data } = dataQuery;
+
   const tableData = React.useMemo(() => data?.data ?? defaultData, [data, defaultData]);
   // console.log('32 table',dataQuery?.data)
   const table = useReactTable({

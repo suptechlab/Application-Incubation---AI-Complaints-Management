@@ -62,3 +62,4 @@ const createAxiosInstance = (baseURL) => {
 
 export const adminApi = createAxiosInstance(`${process.env.REACT_APP_ADMIN_API_URL}`);
 export const authApi = createAxiosInstance(`${process.env.REACT_APP_AUTH_API_URL}`);
+export const ticketApi = createAxiosInstance(`${process.env.REACT_APP_TICKETS_API_URL}`);
