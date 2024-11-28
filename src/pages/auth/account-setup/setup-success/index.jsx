@@ -26,7 +26,7 @@ const SetupSuccesModal = ({ handleShow, handleClose, handleFormSubmit }) => {
                     <h5 className='custom-font-size-18 fw-semibold'>{t('ACCOUNT_SETUP_SUCCESS')}</h5>
                     <p className='lh-sm small mb-4 pt-1'>
                         {t('ACCOUNT_CREATION_MESSAGE')}
-                        <Link to={`mainto:email ${user?.email}`} className='text-decoration-none'>{user?.email}</Link>.
+                        <Link to={`mainto:email ${user?.email}`} className='text-decoration-none'> {user?.email}</Link>.
                     </p>
                     <Button
                         type="button"

@@ -83,8 +83,6 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
     if (verifyLoginOTP.fulfilled.match(result)) {
       setSetupSuccesModalShow(false)
       actions.setSubmitting(false)
-      handleCloseReset()
-      setIsFileClaimModalShow(true)
     } else {
       console.error('VERIFY OTP ERROR:', result.error.message);
       actions.setSubmitting(false)
@@ -99,6 +97,12 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
     modalChildren = <LoginModal handleSignUpClick={handleSignupButtonClick} handleLoginSucccesSubmit={handleSuccessButtonClick} />;
   } else {
     modalChildren = <PrivacyModal handleClose={handleClose} handleFormSubmit={handlePrivacyFormSubmit} />;
+  }
+
+
+  const handleFileClaimNow = ()=>{
+    handleCloseReset()
+    setIsFileClaimModalShow(true)
   }
 
   return (
@@ -120,7 +124,7 @@ const FileClaimMainModal = ({ handleShow, handleClose ,isFileClaimModalShow, set
       <SetupSuccesModal
         handleShow={setupSuccesModalShow}
         handleClose={() => setSetupSuccesModalShow(false)}
-        handleFormSubmit={handleSuccessButtonClick}
+        handleFormSubmit={handleFileClaimNow}
       />
 
       {/* File a Claim Modals */}

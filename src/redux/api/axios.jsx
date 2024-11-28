@@ -65,6 +65,7 @@ export const createAxiosInstance = (baseURL) => {
       } else if (error.request) {
         toast.error('Error: No response received');
       } else {
+        console.log(error)
         toast.error('Error: Request setup failed');
       }
       return Promise.reject(error); // Reject the promise with the error

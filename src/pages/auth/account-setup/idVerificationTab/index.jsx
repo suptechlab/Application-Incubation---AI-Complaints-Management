@@ -29,9 +29,14 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
 
         const result = await dispatch(fingerPrintValidate({ identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }));
         if (fingerPrintValidate.fulfilled.match(result)) {
-            isSubmitted(true);
-            setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
-            setIsFormSubmitted(true)
+            if(result.payload === true){
+                isSubmitted(true);
+                setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
+                setIsFormSubmitted(true)
+            }else{
+                toast.error("Fingerprint not verified.")
+            }
+          
         } else {
             console.log("ARE YOU IN ELSE PART NA")
             setIsFormSubmitted(false)

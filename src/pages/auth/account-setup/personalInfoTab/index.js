@@ -104,7 +104,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData }) => {
     } catch (error) {
       console.error("VERIFY OTP ERROR : ", error?.message)
     } finally {
-      actions.setSubmitting(false)
+      // actions.setSubmitting(false)
     }
 
 
