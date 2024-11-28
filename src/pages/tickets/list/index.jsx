@@ -38,51 +38,51 @@ export default function TicketsList() {
         queryFn: async () => {
             // Set loading state to true before the request starts
 
-            return { data: sampleData, page: 1, size: 10 }
+            // return { data: sampleData, page: 1, size: 10 }
 
-        //   setLoading(true);
-    
-        //   try {
-        //     const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-        //     Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-    
-        //     // Make the API request based on sorting
-        //     let response;
-        //     if (sorting.length === 0) {
-        //       response = await handleGetTicketList({
-        //         page: pagination.pageIndex,
-        //         size: pagination.pageSize,
-        //         ...filterObj,
-        //       });
-        //     } else {
-        //       response = await handleGetTicketList({
-        //         page: pagination.pageIndex,
-        //         size: pagination.pageSize,
-        //         sort: sorting
-        //           .map(
-        //             (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-        //           )
-        //           .join(","),
-        //         ...filterObj,
-        //       });
-        //     }
-    
-        //     // Return the API response data
-        //     return response;
-        //   } catch (error) {
-        //     console.error("Error fetching data", error);
-        //     // Optionally, handle errors here
-        //   } finally {
-        //     // Set loading state to false when the request finishes (whether successful or not)
-        //     setLoading(false);
-        //   }
+            setLoading(true);
+
+            try {
+                const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+                Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+                // Make the API request based on sorting
+                let response;
+                if (sorting.length === 0) {
+                    response = await handleGetTicketList({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        ...filterObj,
+                    });
+                } else {
+                    response = await handleGetTicketList({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        sort: sorting
+                            .map(
+                                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                            )
+                            .join(","),
+                        ...filterObj,
+                    });
+                }
+
+                // Return the API response data
+                return response;
+            } catch (error) {
+                console.error("Error fetching data", error);
+                // Optionally, handle errors here
+            } finally {
+                // Set loading state to false when the request finishes (whether successful or not)
+                setLoading(false);
+            }
         },
         staleTime: 0, // Data is always stale, so it refetches
         cacheTime: 0, // Cache expires immediately
         refetchOnWindowFocus: false, // Disable refetching on window focus
         refetchOnMount: false, // Prevent refetching on component remount
         retry: 0, //Disable retry on failure
-      });
+    });
 
     const sampleData = [
         {
@@ -212,7 +212,7 @@ export default function TicketsList() {
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
-                        <AppTooltip title="Attachments">
+                        {/* <AppTooltip title="Attachments">
                             <Button
                                 variant="link"
                                 className="p-0 border-0 link-dark"
@@ -221,13 +221,13 @@ export default function TicketsList() {
                             >
                                 <MdAttachFile size={16} />
                             </Button>
-                        </AppTooltip>
+                        </AppTooltip> */}
                     </Stack>
                 ),
             },
             {
-                // accessorFn: (row) => row?.claimType?.name,
-                accessorFn: (row) => row?.claimType,
+                accessorFn: (row) => row?.claimType?.name,
+                // accessorFn: (row) => row?.claimType,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
@@ -237,13 +237,13 @@ export default function TicketsList() {
                 id: "createdAt",
                 header: () => "Creation Date",
                 enableSorting: true,
-                 cell: ({ row }) => (
+                cell: ({ row }) => (
                     row?.original?.createdAt
                 ),
             },
             {
-                accessorFn: (row) => row?.claimFilledBy,
-                // accessorFn: (row) => row?.user?.name,
+                // accessorFn: (row) => row?.claimFilledBy,
+                accessorFn: (row) => row?.user?.name,
                 id: "claimFilledBy",
                 header: () => "Claim filled by",
                 enableSorting: true,
@@ -283,7 +283,7 @@ export default function TicketsList() {
         ],
         []
     );
-   
+
     useEffect(() => {
         setPagination({
             pageIndex: 0,
@@ -336,7 +336,7 @@ export default function TicketsList() {
                 <PageHeader
                     title="Tickets"
                     actions={[
-                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning" , disabled: true },
+                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning", disabled: true },
                     ]}
                 />
                 <div className="info-cards mb-3">

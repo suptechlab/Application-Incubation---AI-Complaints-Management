@@ -20,6 +20,14 @@ export const ticketMastersData = async()=>{
   return await ticketApi.get(`/${API_VERSION}/masters`);
 }
 
+// AGENT LISTING
+export const agentListingApi = async()=>{
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/agents-list`);
+}
+
+
+
+
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN
 export const convertToLabelValue=(obj)=> {
   return Object.entries(obj).map(([key, value]) => ({

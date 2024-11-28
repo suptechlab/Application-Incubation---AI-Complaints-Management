@@ -10,10 +10,12 @@ import ReactSelect from "../../../../components/ReactSelect";
 import AppTooltip from "../../../../components/tooltip";
 import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
 import toast from "react-hot-toast";
+import { agentListingApi } from "../../../../services/ticketmanagement.service";
 
 const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla }) => {
     const { t } = useTranslation();
     const [claimTypes , setClaimTypes] =useState([])
+    const [agentList, setAgentListing] = useState([])
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
 
@@ -48,8 +50,29 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
         })
     }
 
+    // GET AGENT DROPDOWN LISTING
+    const getAgentDropdownListing = () => {
+        agentListingApi().then(response => {
+            console.log({agent : response})
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setAgentListing(dropdownData)
+            }
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        })
+    }
+
     useEffect(() => {
         getClaimTypeDropdownList()
+        getAgentDropdownListing()
     }, [])
 
     return (
@@ -118,13 +141,12 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         placeholder="Assign/Reassign"
                         id="floatingSelect"
                         size="sm"
-                        disabled ={true}
                         options={[
                             {
-                                label: "Claim Type",
+                                label: "Select",
                                 value: "",
                             },
-                            ...claimTypes
+                            ...agentList
                         ]}
                         onChange={(e) => {
                             setFilter({
