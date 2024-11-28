@@ -10,13 +10,17 @@ import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { handleGetUsers } from "../../../services/user.service";
 import TicketsListFilters from "./filters";
-import { handleGetTicketList } from "../../../services/ticketmanagement.service";
+import { agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
 import AppTooltip from "../../../components/tooltip";
 import AttachmentsModal from "../modals/attachmentsModal";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 export default function TicketsList() {
     const location = useLocation();
     const navigate = useNavigate();
+
+    const { t } = useTranslation()
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -32,6 +36,10 @@ export default function TicketsList() {
 
     const [loading, setLoading] = useState(false);
     const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
+    const [ticketIdsArr, setTicketIdsArr] = useState([]);
+
+    const [clearTableSelection ,setClearTableSelection] = useState(false)
+
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
@@ -178,6 +186,7 @@ export default function TicketsList() {
         setAttachmentsModalShow(true)
     }
 
+
     const columns = React.useMemo(
         () => [
             {
@@ -187,7 +196,15 @@ export default function TicketsList() {
                         className="form-check-cursor"
                         checked={table.getIsAllRowsSelected()}
                         indeterminate={table.getIsSomeRowsSelected()}
-                        onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                        onChange={(e) => {
+                            table.toggleAllRowsSelected(e.target.checked);
+                            const allSelectedIds = e.target.checked
+                                ? table.getRowModel().rows.map((row) => row.original.id)
+                                : [];
+                            setTicketIdsArr(allSelectedIds);
+                            setClearTableSelection(false)
+                        }}
                     />
                 ),
                 cell: ({ row }) => (
@@ -195,7 +212,21 @@ export default function TicketsList() {
                         className="form-check-cursor"
                         checked={row.getIsSelected()}
                         disabled={!row.getCanSelect()}
-                        onChange={row.getToggleSelectedHandler()}
+                        // onChange={row.getToggleSelectedHandler()}
+                        onChange={(e) => {
+                            row.toggleSelected(e.target.checked);
+
+                            if (e.target.checked) {
+                                // Add the ID to the array if the row is selected
+                                setTicketIdsArr((prev) => [...prev, row.original.id]);
+                            } else {
+                                // Remove the ID from the array if the row is deselected
+                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+                            }
+
+                            setClearTableSelection(false)
+                            //     console.log({some : currentSelectedIds})
+                        }}
                     />
                 ),
                 size: "15",
@@ -284,6 +315,25 @@ export default function TicketsList() {
         []
     );
 
+    const handleTicketAssignment = (agentId) => {
+        // agentTicketToSEPSagent
+        if (agentId && agentId !== '') {
+            agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
+                toast.success(t("TICKETS ASSIGNED"));
+                setClearTableSelection(true)
+                setTicketIdsArr([])
+            }).catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                }
+            }).finally(() => {
+                setLoading(false)
+            })
+        }
+    }
+
     useEffect(() => {
         setPagination({
             pageIndex: 0,
@@ -294,7 +344,7 @@ export default function TicketsList() {
     //Add New Click Hanlder
     const addNewClickHanlder = () => {
         // navigate tickets/view/1
-        navigate('/tickets/view/1')
+        // navigate('/tickets/view/1')
     }
 
     // Info Cards Data
@@ -344,7 +394,7 @@ export default function TicketsList() {
                 </div>
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <TicketsListFilters filter={filter} setFilter={setFilter} />
+                        <TicketsListFilters filter={filter} setFilter={setFilter} handleTicketAssign={handleTicketAssignment} ticketArr={ticketIdsArr} clearTableSelection={clearTableSelection} />
                         <CommonDataTable
                             columns={columns}
                             dataQuery={dataQuery}
@@ -352,6 +402,7 @@ export default function TicketsList() {
                             setPagination={setPagination}
                             sorting={sorting}
                             setSorting={setSorting}
+                            clearTableSelection={clearTableSelection}
                         />
                     </Card.Body>
                 </Card>

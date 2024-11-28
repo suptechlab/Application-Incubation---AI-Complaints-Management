@@ -19,7 +19,8 @@ export default function ReactTable({
   setSorting,
   pagination,
   sorting,
-  showPagination=true,
+  showPagination = true,
+  clearTableSelection = false
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,6 +57,18 @@ export default function ReactTable({
   });
 
 
+
+  React.useEffect(() => {
+    if (table && clearTableSelection === true) {
+      const isAnyRowSelected = table.getSelectedRowModel().rows.length > 0;
+
+      if (isAnyRowSelected) {
+        table.toggleAllRowsSelected(false); // Clear selection
+        
+      }
+    }
+  }, [clearTableSelection])
+
   React.useEffect(() => {
     let path = "";
 
@@ -71,6 +84,7 @@ export default function ReactTable({
 
     navigate(path);
   }, [sorting, pagination]);
+
 
   return (
     <div className="d-flex flex-column h-100 small table-cover-main">
@@ -141,7 +155,7 @@ export default function ReactTable({
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => {
                 const tdClassName = cell.column.columnDef.meta?.tdClassName || '';
-                return(
+                return (
                   <td
                     key={cell.id}
                     align={cell.column.columnDef.meta?.align}

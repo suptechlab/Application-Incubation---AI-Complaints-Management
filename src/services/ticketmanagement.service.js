@@ -24,7 +24,10 @@ export const ticketMastersData = async()=>{
 export const agentListingApi = async()=>{
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/agents-list`);
 }
-
+//ASSIGN / REASSIGN TICKET TO SEPS AGENT
+export const agentTicketToSEPSagent= async(agentId,tickets)=>{
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${agentId}/assign-tickets-seps-agent`,tickets);
+}
 
 
 
