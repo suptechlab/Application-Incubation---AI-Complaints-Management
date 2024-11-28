@@ -213,7 +213,7 @@ export default function TicketsList() {
     //Add New Click Hanlder
     const addNewClickHanlder = () => {
         // navigate tickets/view/1
-        navigate('/tickets/view/1')
+        navigate('/tickets/add')
     }
 
     // Info Cards Data
@@ -255,7 +255,7 @@ export default function TicketsList() {
                 <PageHeader
                     title="Tickets"
                     actions={[
-                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning" , disabled: true },
+                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning" , disabled: false },
                     ]}
                 />
                 <div className="info-cards mb-3">
