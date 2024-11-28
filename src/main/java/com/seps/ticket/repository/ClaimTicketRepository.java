@@ -2,6 +2,7 @@ package com.seps.ticket.repository;
 
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,4 +35,6 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
 
 
     Optional<ClaimTicket> findByIdAndOrganizationId(Long id, Long organizationId);
+
+    List<ClaimTicket> findAllByIdInAndOrganizationId(List<Long> ids, Long organizationId);
 }
