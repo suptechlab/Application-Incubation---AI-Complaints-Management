@@ -72,7 +72,7 @@ export default function ReactTable({
   }, [sorting, pagination]);
 
   return (
-    <div className="d-flex flex-column h-100 small table-cover-main">
+    <div className="flex-grow-1 d-flex flex-column h-100 small table-cover-main">
       {/* <Loader isLoading={isLoading} /> */}
       <BTable striped bordered hover responsive className="mb-0">
         <thead>
@@ -129,8 +129,6 @@ export default function ReactTable({
             </tr>
           ))}
         </thead>
-
-
         <tbody>
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>

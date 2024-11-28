@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { Button, Col, Modal, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
 import FormCheckbox from '../../../../components/formCheckbox';
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
-import SvgIcons from '../../../../components/SVGIcons';
 import { fetchClaimSubTypes } from '../../../../redux/slice/masterSlice';
+import { ClaimDetailsFormSchema } from '../../validations';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading }) => {
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
