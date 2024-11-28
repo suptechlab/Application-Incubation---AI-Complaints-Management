@@ -162,4 +162,10 @@ public class MailService {
         String subject = messageSource.getMessage("email.register.otp.title", null, locale);
         this.sendEmailSync(otp.getEmail(), subject, content, false, true);
     }
+
+    @Async
+    public void sendAccountSetupEmail(User user) {
+        LOG.debug("Sending account setup email to '{}'", user.getEmail());
+        this.sendEmailFromTemplateSync(user, "mail/accountSetupEmail", "email.account.setup.title");
+    }
 }

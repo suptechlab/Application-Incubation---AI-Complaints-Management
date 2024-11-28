@@ -493,7 +493,11 @@ public class UserService {
         } catch (PersonNotFoundException e) {
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.PERSON_NOT_FOUND,
                 new String[]{identificacion}, null);
+        } catch (Exception e) {
+            LOG.error("Error while fetching person details:{}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.SOMETHING_GOES_WRONG, e.getMessage());
         }
+
     }
 
     @Transactional
@@ -524,6 +528,20 @@ public class UserService {
             });
 
         Persona persona = getPersonaByIdentificacion(identificacion);
+        //Validate Fingerprint
+        ConsultationRequest consultationRequest = new ConsultationRequest();
+        consultationRequest.setIdentificacion(identificacion);
+        consultationRequest.setIndividualDactilar(userDTO.getIndividualDactilar());
+        Boolean validatedPersonIndividual;
+        try {
+            validatedPersonIndividual = externalAPIService.validateIndividualPerson(consultationRequest);
+        } catch (PersonValidationException e) {
+            LOG.error("PersonValidationException while validateIndividualPerson person individual at registerUser :{}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FINGERPRINT_CODE_NOT_MATCHED, e.getMessage());
+        } catch (Exception e) {
+            LOG.error("Error while validate person individual at registerUser:{}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.SOMETHING_GOES_WRONG, e.getMessage());
+        }
         String normalizeEmail = userDTO.getEmail().toLowerCase();
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
@@ -540,7 +558,10 @@ public class UserService {
         newUser.setPasswordSet(false);
         newUser.setIdentificacion(identificacion);
         newUser.setGender(persona.getGenero());
-        newUser.setFingerprintVerified(false);
+        newUser.setFingerprintVerified(validatedPersonIndividual);
+        if (validatedPersonIndividual) {
+            newUser.setFingerprintVerifiedAt(Instant.now());
+        }
         //Set Authorities
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
@@ -560,7 +581,11 @@ public class UserService {
         try {
             return externalAPIService.validateIndividualPerson(request);
         } catch (PersonValidationException e) {
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_ACCOUNT_NOT_EXIST, e.getMessage());
+            LOG.error("PersonValidationException while validateIndividualPerson person individual:{}", e.getMessage());
+            return false;
+        } catch (Exception e) {
+            LOG.error("Error while validate person individual:{}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.SOMETHING_GOES_WRONG, e.getMessage());
         }
     }
 
@@ -604,6 +629,9 @@ public class UserService {
         } catch (PersonNotFoundException e) {
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.PERSON_NOT_FOUND,
                 new String[]{identificacion}, null);
+        } catch (Exception e) {
+            LOG.error("Error while fetching person details:{}", e.getMessage());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.SOMETHING_GOES_WRONG, e.getMessage());
         }
     }
 }
