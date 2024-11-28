@@ -110,7 +110,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
             }
         } catch (Exception e) {
             LOG.error("Unexpected error during validation", e);
-            throw new RuntimeException("Se produjo un error al validar la persona individual", e);
+            throw new RuntimeException("Se produjo un error al validar la persona individual: ", e);
         }
     }
 }
