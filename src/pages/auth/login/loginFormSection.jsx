@@ -55,18 +55,21 @@ const LoginFormSection = ({ handleFormSubmit }) => {
                         onChange={formikProps.handleChange}
                         type="checkbox"
                         label={t('REMEMBER_ME_LABEL')}
+                        wrapperClassName="fs-6 mb-3"
                     />
-                    <Captcha
-                        reCaptchaRef={reCaptchaRef}
-                        onChangeCaptchaCode={(value) => {
-                            setCaptcha(value);
-                        }}
-                    />
+                    <div className="mb-3 pb-1">
+                        <Captcha
+                            reCaptchaRef={reCaptchaRef}
+                            onChangeCaptchaCode={(value) => {
+                                setCaptcha(value);
+                            }}
+                        />
+                    </div>
                     <Stack direction="horizontal" gap={3} className="flex-wrap">
                         <Button
                             type="submit"
                             variant="warning"
-                            className="custom-min-width-100 ms-auto"
+                            className="custom-min-width-100 ms-auto mt-2"
                             disabled={formikProps?.isSubmitting}
                         >
                             {t('SEND_OTP_BUTTON')}

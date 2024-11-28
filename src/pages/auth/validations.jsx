@@ -45,7 +45,7 @@ export const PersonalInfoTabSchema = yup.object({
 });
 
 export const BasicInfoFormSchema = yup.object({
-  nationalID: yup
+  identificacion: yup
     .string()
     .required()
     .label("National ID number"),
@@ -62,15 +62,19 @@ export const BasicInfoFormSchema = yup.object({
     .string()
     .required()
     .label("Gender"),
-  cellphone: yup
-    .string()
-    .required()
-    .label("Cellphone"),
-  provinceOfResidence: yup
+  countryCode: yup.string()
+    // .required("Country code is required")
+    .matches(/^\+\d{1,4}$/, "Country code must be a valid international dialing code (e.g., +1, +91)")
+    .max(5, "Country code must not exceed 5 characters"),
+  phoneNumber: yup.string()
+    // .required("Phone number is required")
+    .matches(/^\d+$/, "Phone number must contain only digits")
+    .max(15, "Phone number must not exceed 15 characters"),
+  provinceId: yup
     .string()
     .required()
     .label("Province of residence"),
-  cantonOfResidence: yup
+  cityId: yup
     .string()
     .required()
     .label("canton of residence"),
@@ -85,32 +89,34 @@ export const OtherInfoFormSchema = yup.object({
     .string()
     .required()
     .label("Customer type"),
-  entityName: yup
+  organizationId: yup
     .string()
     .required()
     .label("Entity name"),
-  entitysTaxID: yup
-    .string()
-    .required()
-    .label("Entity's tax ID (RUC)"),
+  // entitysTaxID: yup
+  //   .string()
+  //   .required()
+  //   .label("Entity's tax ID (RUC)"),
 });
 
 export const ClaimDetailsFormSchema = yup.object({
-  claimType: yup
+  claimTypeId: yup
     .string()
     .required()
     .label("Claim type"),
-  claimSubtype: yup
+  claimSubTypeId: yup
     .string()
     .required()
     .label("Claim subtype"),
   precedents: yup
     .string()
     .required()
+    .max(1024, "Precedents must not exceed 1024 characters.")
     .label("Precedents"),
   specificPetition: yup
     .string()
     .required()
+    .max(1024, "Precedents must not exceed 1024 characters.")
     .label("Specific Petition"),
   attachments: yup
     .string()

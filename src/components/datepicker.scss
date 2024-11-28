@@ -1,0 +1,45 @@
+@import "../../src/assets/css/variables";
+
+.react-datepicker {
+    font-family: var(--bs-body-font-family);
+
+    .react-datepicker__year-wrapper {
+        max-width: 136px;
+
+        .react-datepicker__year-text {
+            padding: 4px;
+        }
+    }
+}
+
+.react-datepicker-wrapper {
+    .react-datepicker__input-container {
+        .form-control {
+            padding: $input-padding-y 2rem $input-padding-y $input-padding-x-sm;
+
+            &.form-control-sm {
+                padding: $input-padding-y-sm 2rem $input-padding-y-sm $input-padding-x-sm;
+            }
+        }
+
+        .react-datepicker__calendar-icon {
+            padding: 0 $input-padding-x-sm;
+            right: 0;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .react-datepicker__close-icon {
+            padding: 0 $input-padding-x-sm;
+
+            &::after {
+                border-radius: 0;
+                height: 1.5rem;
+                font-size: 1.5rem;
+                background-color: var(--bs-white);
+                color: var(--bs-secondary);
+                padding: 0;
+            }
+        }
+    }
+}

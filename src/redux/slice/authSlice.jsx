@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { authApi } from '../api/axios';
+import { authApi, userApi } from '../api/axios';
 import EndPoint from '../api/endpoint';
 import { removeLocalStorage, setLocalStorage } from '../../utils/storage';
 
 const initialState = {
-    token: '',
+    token: null,
     loading: false,
     error: null,
     user: {},
@@ -159,7 +159,7 @@ export const getAccountInfo = createAsyncThunk(
     'getAccountInfo',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await authApi.get(EndPoint.ACCOUNT_API);
+            const response = await userApi.get(EndPoint.ACCOUNT_API);
             return response?.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
@@ -172,7 +172,7 @@ const authSlice = createSlice({
     initialState: initialState,
     reducers: {
         setLogout: (state) => {
-            state.token = '';
+            state.token = null;
             state.user = {};
             state.isLoggedIn = false
             removeLocalStorage('id_token');

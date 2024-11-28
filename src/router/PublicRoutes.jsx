@@ -1,8 +1,6 @@
 import { lazy } from "react";
-
 const Layout = lazy(() => import("../components/layout/Layout"));
 const Home = lazy(() => import("../pages/home"));
-const MyAccount = lazy(() => import("../pages/myAccount"));
 
 export const PublicRoutes = [
   {
@@ -14,9 +12,9 @@ export const PublicRoutes = [
         element: <Home />,
       },
       {
-        path: "/my-account",
-        element: <MyAccount />,
-      },
+        path: "*",
+        element: <p>PAGE NOT FOUND</p>
+      }
     ],
   },
 ];

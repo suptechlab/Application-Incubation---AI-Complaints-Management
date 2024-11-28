@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Container,
@@ -15,12 +15,15 @@ import "./header.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogout } from "../../../redux/slice/authSlice";
 import { useTranslation } from "react-i18next";
+import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
+import ProfileModal from "../../../pages/profile";
 
-const Header = () => {
+const Header = ({ layout }) => {
+  const [profileModalShow, setProfileModalShow] = useState(false);
 
-  const { isLoggedIn , user } = useSelector((state) => state?.authSlice)
+  const { isLoggedIn, user } = useSelector((state) => state?.authSlice)
 
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   const dispatch = useDispatch()
 
@@ -42,15 +45,20 @@ const Header = () => {
     },
   ];
 
-  const handleLogout = ()=>{
+  const handleLogout = () => {
     dispatch(setLogout())
+    dispatch(resetDPAState())
+  }
+
+  const handleProfileClick = () => {
+    setProfileModalShow(true)
   }
 
   return (
     <header className="theme-header">
       <Navbar key={expand} expand={expand} className="bg-body-tertiary py-0">
-        <Container className="custom-min-height-70">
-          <Navbar.Brand as={Link} href="/" className="me-auto px-1">
+        <Container className="custom-min-height-70" fluid={layout === 'full'}>
+          <Navbar.Brand as={Link} to="/" className="me-auto px-1">
             <Image fluid src={Logo} alt="Logo" width={258} height={55} />
           </Navbar.Brand>
 
@@ -75,7 +83,7 @@ const Header = () => {
                     to={link.path}
                     className="mx-md-3"
                     key={"menu_link_" + index}
-                    disabled = {true}
+                    disabled={true}
                   >
                     {link.label}
                   </Nav.Link>
@@ -84,7 +92,7 @@ const Header = () => {
             </Offcanvas.Body>
           </Navbar.Offcanvas>
 
-          <Dropdown className={`${!isLoggedIn ? 'd-none' :'' } ms-md-4`}>
+          <Dropdown className={`${!isLoggedIn ? 'd-none' : ''} ms-md-4`}>
             <Dropdown.Toggle
               variant="link"
               id="dropdown-profile"
@@ -98,15 +106,18 @@ const Header = () => {
                 alt={"Alex Boston"}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-150 fs-6 lh-sm fw-semibold">
-              {user?.firstName}
+              {user?.name}
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="shadow border-0 mt-3">
               <Dropdown.Header className="fw-semibold d-md-none">
-              {user?.firstName ?? ''} 
+              {user?.name ?? ''} 
               </Dropdown.Header>
-              <Dropdown.Item as={Link} to="/profile" disabled>
+              <Dropdown.Item as={Button} onClick={handleProfileClick} disabled>
                 {t("PROFILE")}
+              </Dropdown.Item>
+              <Dropdown.Item as={Link} to="/my-account">
+                {t("MY ACCOUNT")}
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password" disabled>
                 {t("CHANGE_PASSWORD")}
@@ -122,6 +133,12 @@ const Header = () => {
           />
         </Container>
       </Navbar>
+      
+      {/* Profile Modal */}
+      <ProfileModal
+        handleShow={profileModalShow}
+        handleClose={() => setProfileModalShow(false)}
+      />
     </header>
   );
 };

@@ -8,6 +8,8 @@
 @include custom-class('font-size', 12);
 @include custom-class('font-size', 18);
 @include custom-class('font-size', 26);
+@include custom-class('font-size', 30);
+@include custom-class('min-width', 22);
 @include custom-class('width', 32);
 @include custom-class('height', 32);
 @include custom-class('width', 42);
@@ -22,6 +24,8 @@
 @include custom-class('height', 80);
 @include custom-class('min-width', 90);
 @include custom-class('min-width', 100);
+@include custom-class('width', 140);
+@include custom-class('max-width', 150);
 @include custom-class('width', 400);
 
 // Bootstrap Custom CSS
@@ -41,6 +45,11 @@
     &.is-invalid {
         background-image: none;
         padding-right: $input-padding-x;
+    }
+    &:read-only {
+        color: $input-disabled-color;
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
     }
 }
 
@@ -157,7 +166,7 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
 
-body {
+* {
     // Show numeric values in aligned
     font-feature-settings: "lnum" 1;
     font-variant-numeric: lining-nums;
@@ -190,7 +199,7 @@ body {
 }
 
 .theme-loader-z-index {
-    z-index: 1002 !important;
+    z-index: 1060 !important;
 }
 
 .spin {
@@ -242,8 +251,24 @@ body {
     }
 }
 
+.bg-primary-4 {
+    background-color: rgba($primary, .04);
+}
+
 .bg-primary-90 {
     background-color: rgba($primary, .90);
+}
+
+.bg-orange {
+    background: $custom-bg-orange;
+}
+
+.bg-orange-25 {
+    background: rgba($custom-bg-orange, .25);
+}
+
+.text-orange {
+    color: $custom-bg-orange;
 }
 
 .text-custom-gray {
@@ -275,7 +300,12 @@ body {
 
 // Help Desk
 .help-desk-button {
+    box-shadow: 0px 0px 20px 0px rgba($black, 0.25);
     bottom: 4.5rem;
+
+    &.footer-layout-full {
+        bottom: 1.5rem;
+    }
 }
 
 .offcanvas {
@@ -311,5 +341,23 @@ body {
 .form-otp-mobile-width {
     @include below-sm() {
         width: 40px !important;
+    }
+}
+
+.custom-accordion {
+    &.accordion-flush {
+        >.accordion-item {
+            border-top: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+            border-bottom: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+
+            .accordion-button {
+                font-weight: bold;
+
+                &::after {
+                    background-size: 10px;
+                    background-position: center;
+                }
+            }
+        }
     }
 }
