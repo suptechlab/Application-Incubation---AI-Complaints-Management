@@ -25,22 +25,17 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData }) => {
     // Handle Submit Handler
     const handleSubmit = async (values, actions) => {
 
-        isSubmitted(true);
-        setIsFormSubmitted(true)
-
-        setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
-
-
         // UNCOMMENT THIS CODE ONCE FINGERPRINT API STARTS
 
-        // const result = await dispatch(fingerPrintValidate({ identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }));
-        // if (fingerPrintValidate.fulfilled.match(result)) {
-        //     isSubmitted(true);
-        //     setIsFormSubmitted(true)
-        // } else {
-        //     console.log("ARE YOU IN ELSE PART NA")
-        //     setIsFormSubmitted(false)
-        // }
+        const result = await dispatch(fingerPrintValidate({ identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }));
+        if (fingerPrintValidate.fulfilled.match(result)) {
+            isSubmitted(true);
+            setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
+            setIsFormSubmitted(true)
+        } else {
+            console.log("ARE YOU IN ELSE PART NA")
+            setIsFormSubmitted(false)
+        }
         actions.setSubmitting(false);
     };
 

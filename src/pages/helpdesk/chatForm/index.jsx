@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Offcanvas, Stack } from 'react-bootstrap';
 import { MdKeyboardBackspace, MdPerson } from 'react-icons/md';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
@@ -9,7 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearApiResponse, sendQuery } from '../../../redux/slice/helpDeskSlice';
 
 const ChatBotForm = () => {
-
+    const chatEndRef = useRef(null);
+    const [isLoading, setLoading] = useState(false)
     const dispatch = useDispatch()
     // Initial Values
     const initialValues = {
@@ -18,7 +19,7 @@ const ChatBotForm = () => {
 
     const { apiResponse, queryError } = useSelector((state) => state.helpDeskSlice);
     const [chatEnded, setChatEnded] = useState(false)
- 
+
 
     const [chatData, setChatData] = useState([{
         id: 1,
@@ -32,39 +33,6 @@ const ChatBotForm = () => {
 
     const [senderId, setSenderId] = useState("")
 
-
-    // Handle Submit Handler
-    const handleSubmit = (values, actions) => {
-        // Send the message to the API
-
-
-        if(values?.message && values?.message!== null){
-            const msgData = {
-                message: values?.message
-            }
-            if (senderId) {
-                msgData.sender = senderId
-            }
-            dispatch(sendQuery(msgData));
-    
-            // Add user message to the chat state
-            const userMessage = {
-                id: chatData.length + 1,
-                message: values.message,
-                userMode: true,
-                botViewMode: false,
-                botReview: [], //buttons
-                botSuggestion: [],
-            };
-    
-            setChatData([...chatData, userMessage])
-    
-            actions.setSubmitting(false);
-            actions.resetForm();
-        }
-
-      
-    };
     //Dummy Chat 
     const dummy_chat = [
         {
@@ -267,13 +235,128 @@ const ChatBotForm = () => {
         },
     ]
     // Action Button Handler
-    const actionButtonHandler = (event ,msgData) => {
+    const actionButtonHandler = async (event, msgData) => {
         event.preventDefault();
-        // Send the message to the API
-        dispatch(sendQuery(msgData));
+        setLoading(true);
+
+        try {
+            // Send the message to the API
+            const result = await dispatch(sendQuery(msgData));
+            if (sendQuery.fulfilled.match(result)) {
+                setChatResponse(result.payload); // Handle successful response
+            } else {
+                setChatError(); // Set specific error message if needed
+            }
+        } catch (error) {
+            setChatError(); // Handle unexpected errors
+            console.error("Error in actionButtonHandler:", error);
+        } finally {
+            setLoading(false); // Ensure loading is turned off
+        }
+    };
+    // Handle Submit Handler
+    const handleSubmit = async (values, actions) => {
+        actions.setSubmitting(true); // Set submitting state
+        setLoading(true)
+        try {
+            // Prepare user message
+            const userMessage = {
+                id: chatData.length + 1,
+                message: values.message,
+                userMode: true,
+                botViewMode: false,
+                botReview: [], // buttons
+                botSuggestion: [],
+            };
+
+            // Update chat data with the new user message
+            setChatData([...chatData, userMessage]);
+            actions.resetForm(); // Reset the form
+
+            // Proceed only if the message is valid
+            if (values?.message) {
+                const msgData = { message: values.message };
+
+                // Add sender ID if available
+                if (senderId) {
+                    msgData.sender = senderId;
+                }
+
+                // Dispatch the API query
+                const result = await dispatch(sendQuery(msgData));
+                if (sendQuery.fulfilled.match(result)) {
+                    setChatResponse(result.payload); // Set chat response on success
+                } else {
+                    setChatError(); // Handle API failure
+                }
+            }
+        } catch (error) {
+            setChatError(); // Handle unexpected errors
+            console.error("Error in handleSubmit:", error);
+        } finally {
+            setLoading(false)
+            actions.setSubmitting(false); // Ensure submitting is turned off
+        }
     };
 
-    const [prevApiResponse, setPrevApiResponse] = useState(null);
+    // SET CHAT RESPONSE IN STATE
+    const setChatResponse = (chatResponse) => {
+        setChatData((prevChatData) => {
+            // Map through the apiResponse to create new chat data
+            const newChatData = chatResponse?.map((item, index) => {
+                const hasButtons = item.buttons && item.buttons.length > 0;
+                return {
+                    id: prevChatData.length + index + 1,
+                    message: <>{item.text}</>,
+                    userMode: false,
+                    botViewMode: true,
+                    recipientId: item.recipientId,
+                    botReview: hasButtons
+                        ? item.buttons.map((btn, idx) => ({
+                            id: idx + 1,
+                            suggestion: btn.title,
+                            positive: idx === 0, // Assuming the first button is positive
+                            payload: btn.payload,
+                        }))
+                        : [],
+                    botSuggestion: [],
+                };
+            });
+
+            // Return the new chat data
+            return [...prevChatData, ...newChatData];
+        });
+        const lastRecipientId = chatResponse.at(-1)?.recipientId;
+        if (lastRecipientId) setSenderId(lastRecipientId);
+    }
+
+    const setChatError = () => {
+        setChatData((prevChatData) => {
+            const lastError = prevChatData.at(-1)?.error;
+
+            // Avoid adding duplicate error messages
+            if (lastError === queryError) return prevChatData;
+
+            const userMessage = {
+                id: prevChatData.length + 1, // Use prevChatData length for unique ID
+                message: '',
+                userMode: false,
+                botViewMode: false,
+                botReview: [],
+                botSuggestion: [],
+                error: 'Something went wrong! try again later',
+            };
+
+            return [...prevChatData, userMessage];
+        });
+    }
+
+    // Scroll to the bottom of the messages container when new messages are added
+    useEffect(() => {
+        if (chatEndRef?.current) {
+            chatEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [chatData]);
 
     // useEffect(() => {
     //     if (Array.isArray(apiResponse) && apiResponse.length > 0) {
@@ -319,24 +402,24 @@ const ChatBotForm = () => {
 
     //     if (queryError) {
     //         // Add queryError as a new message if not already added
-    //         setChatData((prevChatData) => {
-    //             const lastError = prevChatData.at(-1)?.error;
+    // setChatData((prevChatData) => {
+    //     const lastError = prevChatData.at(-1)?.error;
 
-    //             // Avoid adding duplicate error messages
-    //             if (lastError === queryError) return prevChatData;
+    //     // Avoid adding duplicate error messages
+    //     if (lastError === queryError) return prevChatData;
 
-    //             const userMessage = {
-    //                 id: prevChatData.length + 1, // Use prevChatData length for unique ID
-    //                 message: '',
-    //                 userMode: false,
-    //                 botViewMode: false,
-    //                 botReview: [],
-    //                 botSuggestion: [],
-    //                 error: queryError,
-    //             };
+    //     const userMessage = {
+    //         id: prevChatData.length + 1, // Use prevChatData length for unique ID
+    //         message: '',
+    //         userMode: false,
+    //         botViewMode: false,
+    //         botReview: [],
+    //         botSuggestion: [],
+    //         error: queryError,
+    //     };
 
-    //             return [...prevChatData, userMessage];
-    //         });
+    //     return [...prevChatData, userMessage];
+    // });
     //     }
 
     // }, [apiResponse, queryError]);
@@ -344,75 +427,74 @@ const ChatBotForm = () => {
 
 
 
-    useEffect(() => {
-        let updatedChatData = [...chatData]; // Start with existing chat data
+    // useEffect(() => {
+    //     let updatedChatData = [...chatData]; // Start with existing chat data
 
-        // Step 2: Handle new API responses
-        if (Array.isArray(apiResponse) && apiResponse.length > 0) {
-            const isDuplicateResponse = JSON.stringify(apiResponse) === JSON.stringify(prevApiResponse);
+    //     // Step 2: Handle new API responses
+    //     if (Array.isArray(apiResponse) && apiResponse.length > 0) {
+    //         const isDuplicateResponse = JSON.stringify(apiResponse) === JSON.stringify(prevApiResponse);
 
-            if (!isDuplicateResponse) {
-                // Map through the apiResponse to create new chat entries
-                const newChatData = apiResponse.map((item, index) => {
-                    const hasButtons = item.buttons && item.buttons.length > 0;
-                    return {
-                        id: chatData.length + index + 1,
-                        message: <>{item.text}</>,
-                        userMode: false,
-                        botViewMode: true,
-                        recipientId: item.recipientId,
-                        botReview: hasButtons
-                            ? item.buttons.map((btn, idx) => ({
-                                id: idx + 1,
-                                suggestion: btn.title,
-                                positive: idx === 0, // Assuming the first button is positive
-                                payload: btn.payload,
-                            }))
-                            : [],
-                        botSuggestion: [],
-                    };
-                });
+    //         if (!isDuplicateResponse) {
+    //             // Map through the apiResponse to create new chat entries
+    //             const newChatData = apiResponse.map((item, index) => {
+    //                 const hasButtons = item.buttons && item.buttons.length > 0;
+    //                 return {
+    //                     id: chatData.length + index + 1,
+    //                     message: <>{item.text}</>,
+    //                     userMode: false,
+    //                     botViewMode: true,
+    //                     recipientId: item.recipientId,
+    //                     botReview: hasButtons
+    //                         ? item.buttons.map((btn, idx) => ({
+    //                             id: idx + 1,
+    //                             suggestion: btn.title,
+    //                             positive: idx === 0, // Assuming the first button is positive
+    //                             payload: btn.payload,
+    //                         }))
+    //                         : [],
+    //                     botSuggestion: [],
+    //                 };
+    //             });
 
-                updatedChatData = [...chatData, ...newChatData];
-                setPrevApiResponse(apiResponse); 
-              
-               // Update the previous response to avoid duplicates
-            }
-        }
+    //             updatedChatData = [...chatData, ...newChatData];
+    //             setPrevApiResponse(apiResponse);
 
-        // Step 3: Handle query errors
-        if (queryError) {
-            const lastError = chatData.at(-1)?.error;
+    //             // Update the previous response to avoid duplicates
+    //         }
+    //     }
 
-            if (lastError !== queryError) {
-                const errorMessage = {
-                    id: updatedChatData.length + 1,
-                    message: '',
-                    userMode: false,
-                    botViewMode: false,
-                    botReview: [],
-                    botSuggestion: [],
-                    error: queryError,
-                };
-                updatedChatData.push(errorMessage);
-            }
-        }
+    //     // Step 3: Handle query errors
+    //     if (queryError) {
+    //         const lastError = chatData.at(-1)?.error;
 
-        // Step 4: Update chat data state and persist it
-        if (updatedChatData.length !== chatData.length) {
-            setChatData(updatedChatData);
-            dispatch(clearApiResponse())
-        }
+    //         if (lastError !== queryError) {
+    //             const errorMessage = {
+    //                 id: updatedChatData.length + 1,
+    //                 message: '',
+    //                 userMode: false,
+    //                 botViewMode: false,
+    //                 botReview: [],
+    //                 botSuggestion: [],
+    //                 error: queryError,
+    //             };
+    //             updatedChatData.push(errorMessage);
+    //         }
+    //     }
 
-        // Step 5: Update senderId if there's a new recipientId
-        if (Array.isArray(apiResponse) && apiResponse.length > 0) {
-            const lastRecipientId = apiResponse.at(-1)?.recipientId;
-            if (lastRecipientId) setSenderId(lastRecipientId);
-        }
+    //     // Step 4: Update chat data state and persist it
+    //     if (updatedChatData.length !== chatData.length) {
+    //         setChatData(updatedChatData);
+    //         dispatch(clearApiResponse())
+    //     }
 
-    }, [apiResponse, queryError]);
+    //     // Step 5: Update senderId if there's a new recipientId
+    // if (Array.isArray(apiResponse) && apiResponse.length > 0) {
+    //     const lastRecipientId = apiResponse.at(-1)?.recipientId;
+    //     if (lastRecipientId) setSenderId(lastRecipientId);
+    // }
 
-    console.log({queryError : queryError})
+    // }, [apiResponse, queryError]);
+
 
     return (
         <React.Fragment>
@@ -464,7 +546,7 @@ const ChatBotForm = () => {
                                                                     type="button"
                                                                     variant={positive ? "success" : "light"}
                                                                     className={`bot-tag-btns text-start border-opacity-50 border-primary fs-6 lh-sm py-2 ${positive ? "text-white" : "text-body"}`}
-                                                                    onClick={(event) => actionButtonHandler(event , { message: payload, sender: recipientId })}
+                                                                    onClick={(event) => actionButtonHandler(event, { message: payload, sender: recipientId })}
                                                                 >
                                                                     {suggestion}
                                                                 </Button>
@@ -500,18 +582,21 @@ const ChatBotForm = () => {
                                 )
 
                             })}
+
                             {/* WHEN CHAT ENDS USE THIS */}
                             {
                                 chatEnded ? <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
                                     <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
                                 </Stack> : ''
                             }
-
+                            <div ref={chatEndRef} />
                         </div>
 
                         {/* Chatbot Body Footer */}
                         <div className='chatbot-body-footer p-3'>
+                        {isLoading === true ? <div className='chat-loader mb-1'></div> : ""}
                             <div className='position-relative'>
+                      
                                 <FormInputBox
                                     wrapperClassName='mb-0'
                                     id="message"
@@ -524,12 +609,14 @@ const ChatBotForm = () => {
                                     type="text"
                                     value={formikProps.values.message || ""}
                                     autoComplete="off"
+                                    readOnly={isLoading}
                                 />
                                 <Button
                                     type="submit"
                                     variant="link"
                                     aria-label='Send Message'
                                     className='p-2 theme-flip-x link-dark position-absolute top-0 end-0 z-1'
+                                    readOnly={isLoading}
                                 >
                                     <MdKeyboardBackspace size={24} />
                                 </Button>

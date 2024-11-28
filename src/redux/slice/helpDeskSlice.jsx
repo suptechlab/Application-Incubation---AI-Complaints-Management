@@ -108,7 +108,7 @@ const helpDeskSlice = createSlice({
             })
             .addCase(sendQuery.fulfilled, (state, action) => {
                 state.queryLoading = false;
-                state.apiResponse = action?.payload
+                // state.apiResponse = action?.payload
                 state.queryError = null
             })
             .addCase(sendQuery.rejected, (state, action) => {
