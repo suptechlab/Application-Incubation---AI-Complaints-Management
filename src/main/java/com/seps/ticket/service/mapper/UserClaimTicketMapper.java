@@ -1,10 +1,16 @@
 package com.seps.ticket.service.mapper;
 
+import com.seps.ticket.domain.Authority;
 import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.domain.ClaimTicketDocument;
 import com.seps.ticket.domain.User;
 import com.seps.ticket.service.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = {ProvinceMapper.class, CityMapper.class, ClaimTypeMapper.class, ClaimSubTypeMapper.class})
 public interface UserClaimTicketMapper {
@@ -13,6 +19,7 @@ public interface UserClaimTicketMapper {
     @Mapping(source = "fiAgent", target = "fiAgent")
     @Mapping(source = "createdByUser", target = "createdByUser")
     @Mapping(source = "updatedByUser", target = "updatedByUser")
+    @Mapping(source = "claimTicketDocuments", target = "claimTicketDocuments")
     UserClaimTicketDTO toUserClaimTicketDTO(ClaimTicket claimTicket);
 
     // Map User to UserDTO
@@ -47,4 +54,33 @@ public interface UserClaimTicketMapper {
         }
         return fiUserDTO;
     }
+
+
+    default UserClaimTicketDocumentDTO.UserDTO mapUserToUserDocumentDTO(User user) {
+        if (user == null) {
+            return null;
+        }
+        UserClaimTicketDocumentDTO.UserDTO userDTO = new UserClaimTicketDocumentDTO.UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setName(user.getFirstName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setLangKey(user.getLangKey());
+        userDTO.setStatus(user.getStatus());
+        userDTO.setAuthorities(mapAuthoritiesToStrings(user.getAuthorities()));
+        return userDTO;
+    }
+
+    // Map ClaimTicketDocument to ClaimTicketDocumentDTO
+    List<UserClaimTicketDocumentDTO> toClaimTicketDocumentDTOs(List<ClaimTicketDocument> claimTicketDocuments);
+
+    // Helper method to map Set<Authority> to Set<String>
+    default Set<String> mapAuthoritiesToStrings(Set<Authority> authorities) {
+        if (authorities == null) {
+            return null;
+        }
+        return authorities.stream()
+            .map(Authority::getName)
+            .collect(Collectors.toSet());
+    }
+
 }

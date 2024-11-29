@@ -10,17 +10,30 @@ import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import com.seps.ticket.service.specification.ClaimTicketSpecification;
+import com.seps.ticket.suptech.service.DocumentService;
+import com.seps.ticket.suptech.service.FileStorageException;
+import com.seps.ticket.suptech.service.InvalidFileTypeException;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketRequestForJson;
+import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Status;
 
+import java.io.IOException;
 import java.util.*;
 
 import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
@@ -28,6 +41,7 @@ import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
 
 @Service
 public class UserClaimTicketService {
+    private static final Logger LOG = LoggerFactory.getLogger(UserClaimTicketService.class);
 
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
@@ -41,13 +55,16 @@ public class UserClaimTicketService {
     private final Gson gson;
     private final MessageSource messageSource;
     private final ClaimTicketMapper claimTicketMapper;
+    private final DocumentService documentService;
+    private final ClaimTicketDocumentRepository claimTicketDocumentRepository;
+    private static final boolean IS_INTERNAL_DOCUMENT = false;
 
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
                                   OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository,
                                   ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository,
                                   UserService userService, UserClaimTicketMapper userClaimTicketMapper,
                                   AuditLogService auditLogService, Gson gson, MessageSource messageSource,
-                                  ClaimTicketMapper claimTicketMapper) {
+                                  ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -60,6 +77,8 @@ public class UserClaimTicketService {
         this.gson = gson;
         this.messageSource = messageSource;
         this.claimTicketMapper = claimTicketMapper;
+        this.documentService = documentService;
+        this.claimTicketDocumentRepository = claimTicketDocumentRepository;
     }
 
 
@@ -104,11 +123,19 @@ public class UserClaimTicketService {
         // Create and save the new claim ticket
         ClaimTicket newClaimTicket = createClaimTicket(claimTicketRequest, currentUser, province, city, organization, claimType, claimSubType);
         claimTicketRepository.save(newClaimTicket);
+        DocumentSourceEnum source = DocumentSourceEnum.FILE_A_CLAIM;
+        // Handle attachments and save documents
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(claimTicketRequest.getAttachments(), newClaimTicket, currentUser, source);
+        // Save documents if any were uploaded
+        if (!claimTicketDocuments.isEmpty()) {
+            claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+        }
         // Populate response
         responseDTO.setNewTicketId(newClaimTicket.getTicketId());
         responseDTO.setNewId(newClaimTicket.getId());
         responseDTO.setEmail(currentUser.getEmail());
         // Log activity and audit
+        newClaimTicket.setClaimTicketDocuments(claimTicketDocuments);
         logActivityAndAudit(newClaimTicket, claimTicketRequest, requestInfo, currentUser);
         return responseDTO;
     }
@@ -159,7 +186,7 @@ public class UserClaimTicketService {
     }
 
     /**
-     * Fetches the claim sub-type from the repository, throwing an exception if not found.
+     * Fetches the claim subtype from the repository, throwing an exception if not found.
      */
     private ClaimSubType findClaimSubType(Long claimSubTypeId, Long claimTypeId) {
         return claimSubTypeRepository.findByIdAndClaimTypeId(claimSubTypeId, claimTypeId)
@@ -211,13 +238,19 @@ public class UserClaimTicketService {
                 new Object[]{currentUser.getEmail(), plainTicketId}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), auditMessage);
         });
-        activityData.put(Constants.NEW_DATA, convertEntityToMap(this.getUserClaimTicketById(newClaimTicket.getId())));
-        auditData.put(Constants.NEW_DATA, convertEntityToMap(this.getClaimTicketById(newClaimTicket.getId())));
-        String requestBody = gson.toJson(claimTicketRequest);
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketMapper.toUserClaimTicketDTO(newClaimTicket);
+        ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(newClaimTicket);
+
+        activityData.put(Constants.NEW_DATA, convertEntityToMap(userClaimTicketDTO));
+        auditData.put(Constants.NEW_DATA, convertEntityToMap(claimTicketDTO));
+        // Convert ClaimTicketRequest to ClaimTicketRequestJson using the new method
+        ClaimTicketRequestForJson claimTicketRequestJson = convertToClaimTicketRequestJson(claimTicketRequest);
+        // Convert the ClaimTicketRequestJson object to JSON string using Gson
+        Gson gson = new Gson();
+        String requestBody = gson.toJson(claimTicketRequestJson);  // Convert ClaimTicketRequestJson to JSON
         // Activity Log
         auditLogService.logActivity(currentUser.getId(), currentUser.getId(), requestInfo, "fileClaimTicket", ActionTypeEnum.CLAIM_TICKET_ADD.name(), newClaimTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, activityMessageMap, activityData, ActivityTypeEnum.ACTIVITY.name(), requestBody);
-
         // Audit Log
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "fileClaimTicket", ActionTypeEnum.CLAIM_TICKET_ADD.name(), newClaimTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap, auditData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
@@ -274,6 +307,14 @@ public class UserClaimTicketService {
                 new String[]{id.toString()}, null));
     }
 
+    @Transactional(readOnly = true)
+    public ClaimTicket getClaimTicketByTicketId(Long ticketId) {
+        return claimTicketRepository.findByTicketId(ticketId)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{ticketId.toString()}, null));
+    }
+
+
     /**
      * Retrieves a paginated list of claim tickets, filtered by year.
      *
@@ -323,5 +364,96 @@ public class UserClaimTicketService {
         result.setCountsByStatus(countsByStatus);
         result.setTotalClaims(totalClaims);
         return result;
+    }
+
+    private List<ClaimTicketDocument> uploadFileAttachments(List<MultipartFile> attachments, ClaimTicket newClaimTicket, User currentUser, DocumentSourceEnum source) {
+        List<ClaimTicketDocument> claimTicketDocuments = new ArrayList<>();
+        // Handle file uploads and create documents
+        if (!CollectionUtils.isEmpty(attachments)) {
+            for (MultipartFile file : attachments) {
+                try {
+                    // Generate a unique file name for storage
+                    String uniqueFileName = documentService.generateUniqueFileName(file.getOriginalFilename());
+                    // Get the original file name, trimmed to fit within 255 characters and replace spaces with underscores
+                    String originalFileName = documentService.fitFileNameToMaxLength(file.getOriginalFilename());
+                    // Upload the document and get the external document ID
+                    ResponseEntity<String> response = documentService.uploadDocument(file.getBytes(), String.valueOf(newClaimTicket.getTicketId()), uniqueFileName);
+                    String externalDocumentId = response.getBody();  // Assuming the response body contains the externalDocumentId
+                    // Create a ClaimTicketDocument and add to the list
+                    ClaimTicketDocument claimTicketDocument = new ClaimTicketDocument();
+                    claimTicketDocument.setClaimTicket(newClaimTicket);
+                    claimTicketDocument.setExternalDocumentId(externalDocumentId);
+                    claimTicketDocument.setTitle(uniqueFileName);  // Set the appropriate title (can customize as needed)
+                    claimTicketDocument.setOriginalTitle(originalFileName);
+                    claimTicketDocument.setInstanceType(newClaimTicket.getInstanceType());
+                    claimTicketDocument.setSource(source);
+                    claimTicketDocument.setInternal(IS_INTERNAL_DOCUMENT);
+                    claimTicketDocument.setUploadedByUser(currentUser);
+                    // Add the document to the list
+                    claimTicketDocuments.add(claimTicketDocument);
+                } catch (InvalidFileTypeException e) {
+                    LOG.error("InvalidFileTypeException while uploadDocument:{}", e.getMessage());
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FILE_STORAGE_ERROR, e.getMessage());
+                } catch (FileStorageException e) {
+                    LOG.error("Exception while uploadDocument:{}", e.getMessage());
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FILE_STORAGE_ERROR, e.getMessage());
+                } catch (IOException e) {
+                    LOG.error("IOException while uploadDocument:{}", e.getMessage());
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FILE_STORAGE_ERROR, e.getMessage());
+                } catch (Exception e) {
+                    String errorMessage = messageSource.getMessage("error.file.upload.unexpected", null, LocaleContextHolder.getLocale());
+                    // Catch any other unexpected exceptions
+                    throw new CustomException(Status.INTERNAL_SERVER_ERROR, SepsStatusCode.FILE_STORAGE_ERROR, errorMessage);
+                }
+            }
+        }
+        return claimTicketDocuments;
+    }
+
+    private ClaimTicketRequestForJson convertToClaimTicketRequestJson(ClaimTicketRequest claimTicketRequest) {
+        // Create a new ClaimTicketRequestJson object
+        ClaimTicketRequestForJson claimTicketRequestJson = new ClaimTicketRequestForJson();
+        // Map properties from ClaimTicketRequest to ClaimTicketRequestJson
+        claimTicketRequestJson.setIdentificacion(claimTicketRequest.getIdentificacion());
+        claimTicketRequestJson.setEmail(claimTicketRequest.getEmail());
+        claimTicketRequestJson.setName(claimTicketRequest.getName());
+        claimTicketRequestJson.setGender(claimTicketRequest.getGender());
+        claimTicketRequestJson.setCountryCode(claimTicketRequest.getCountryCode());
+        claimTicketRequestJson.setPhoneNumber(claimTicketRequest.getPhoneNumber());
+        claimTicketRequestJson.setProvinceId(claimTicketRequest.getProvinceId());
+        claimTicketRequestJson.setCityId(claimTicketRequest.getCityId());
+        claimTicketRequestJson.setPriorityCareGroup(claimTicketRequest.getPriorityCareGroup());
+        claimTicketRequestJson.setCustomerType(claimTicketRequest.getCustomerType());
+        claimTicketRequestJson.setOrganizationId(claimTicketRequest.getOrganizationId());
+        claimTicketRequestJson.setClaimTypeId(claimTicketRequest.getClaimTypeId());
+        claimTicketRequestJson.setClaimSubTypeId(claimTicketRequest.getClaimSubTypeId());
+        claimTicketRequestJson.setPrecedents(claimTicketRequest.getPrecedents());
+        claimTicketRequestJson.setSpecificPetition(claimTicketRequest.getSpecificPetition());
+        claimTicketRequestJson.setCheckDuplicate(claimTicketRequest.getCheckDuplicate());
+        // Convert attachments (MultipartFile to filenames)
+        List<String> attachments = new ArrayList<>();
+        if (claimTicketRequest.getAttachments() != null) {
+            for (MultipartFile file : claimTicketRequest.getAttachments()) {
+                attachments.add(file.getOriginalFilename());  // Add only file name to the list
+            }
+        }
+        claimTicketRequestJson.setAttachments(attachments);
+        return claimTicketRequestJson;
+    }
+
+
+    @Transactional
+    public ResponseEntity<String> uploadDocument(@Valid UploadDocumentRequest request) {
+        User currentUser = userService.getCurrentUser();
+        ClaimTicket claimTicket = getClaimTicketByTicketId(Long.valueOf(request.getTicketId()));
+        List<MultipartFile> attachments = new ArrayList<>();
+        attachments.add(request.getMultipartFile());
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(attachments, claimTicket, currentUser, DocumentSourceEnum.CONVERSATION_ON_TICKET);
+        claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+        // Safely handle the first document (if available) and extract its externalDocumentId
+        return claimTicketDocuments.stream()
+            .findFirst()  // Get the first document (Optional)
+            .map(doc -> ResponseEntity.ok(doc.getExternalDocumentId()))  // Map to ResponseEntity with document ID
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).body("No document uploaded"));  // Fallback if no documents
     }
 }

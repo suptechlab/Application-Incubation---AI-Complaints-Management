@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1732711473632" author="matellio">
+    <createTable tableName="claim_ticket_document">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ticket_id" type="bigint" remarks="Claim Ticket ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="external_document_id" type="varchar(255)" remarks="External Document ID">
+        <constraints nullable="false"/>
+      </column>
+      <column name="title" type="varchar(255)" remarks="Title of the document">
+        <constraints nullable="false"/>
+      </column>
+      <column name="original_title" type="varchar(255)" remarks="Original title of the document">
+        <constraints nullable="false"/>
+      </column>
+      <column name="source" type="int" remarks="source of the documents">
+        <constraints nullable="false"/>
+      </column>
+      <column name="instance_type" type="int" remarks="Instance type of ticket (e.g., first,second,claim etc)"
+              defaultValue="0">
+        <constraints nullable="true"/>
+      </column>
+      <column name="internal" type="boolean" defaultValue="true">
+        <constraints nullable="false"/>
+      </column>
+      <!-- User who created the ticket -->
+      <column name="uploaded_by" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Timestamp when the document was uploaded -->
+      <column name="uploaded_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- Foreign Key constraint for created_by linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="ticket_id"
+                             baseTableName="claim_ticket_document"
+                             constraintName="fk_claim_ticket_document_ticket_id"
+                             referencedColumnNames="id"
+                             referencedTableName="claim_ticket"/>
+
+    <!-- Foreign Key constraint for created_by linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="uploaded_by"
+                             baseTableName="claim_ticket_document"
+                             constraintName="fk_claim_ticket_document_created_by"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+  </changeSet>
+  <changeSet id="1732871998345" author="matellio">
+    <renameColumn tableName="claim_ticket_document" oldColumnName="ticket_id" newColumnName="claim_ticket_id"/>
+  </changeSet>
+</databaseChangeLog>

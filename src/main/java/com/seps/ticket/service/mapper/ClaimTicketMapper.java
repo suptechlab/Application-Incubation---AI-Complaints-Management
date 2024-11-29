@@ -2,14 +2,13 @@ package com.seps.ticket.service.mapper;
 
 import com.seps.ticket.domain.Authority;
 import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.domain.ClaimTicketDocument;
 import com.seps.ticket.domain.User;
-import com.seps.ticket.service.dto.ClaimTicketDTO;
-import com.seps.ticket.service.dto.FIUserDTO;
-import com.seps.ticket.service.dto.UserClaimTicketDTO;
-import com.seps.ticket.service.dto.UserDTO;
+import com.seps.ticket.service.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,6 +19,8 @@ public interface ClaimTicketMapper {
     @Mapping(source = "fiAgent", target = "fiAgent")
     @Mapping(source = "createdByUser", target = "createdByUser")
     @Mapping(source = "updatedByUser", target = "updatedByUser")
+    @Mapping(source = "claimTicketDocuments", target = "claimTicketDocuments")
+        // Add this line to map the documents
     ClaimTicketDTO toDTO(ClaimTicket claimTicket);
 
     // Map authorities to string set
@@ -41,4 +42,8 @@ public interface ClaimTicketMapper {
     @Mapping(target = "authorities", expression = "java(mapAuthorities(user.getAuthorities()))")
     @Mapping(source = "firstName", target = "name")
     FIUserDTO toFIUserDTO(User user);
+
+    // Map ClaimTicketDocument to ClaimTicketDocumentDTO
+    List<ClaimTicketDocumentDTO> toClaimTicketDocumentDTOs(List<ClaimTicketDocument> claimTicketDocuments);
+
 }

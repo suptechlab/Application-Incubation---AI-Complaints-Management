@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @ToString
@@ -47,4 +48,5 @@ public class ClaimTicketDTO {
     private UserDTO updatedByUser;
     private Instant updatedAt;
     // Getters and Setters
+    private List<ClaimTicketDocumentDTO> claimTicketDocuments; // Added this line to include documents in DTO
 }
