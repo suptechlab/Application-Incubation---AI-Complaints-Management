@@ -9,7 +9,7 @@ import ClaimDetailsTab from "./claimDetailsTab";
 import FileAlertModal from "./file-alert";
 import FileSuccesModal from "./file-success";
 import OtherInfoTab from "./otherInfoTab";
-import PageHeader from "../../../components/PageHeader";
+import PageHeader from "./header";
 
 export default function CreateClaim() {
 
@@ -34,6 +34,7 @@ export default function CreateClaim() {
 
     // Handle Basic Info Submit
     const handleBasicInfoSubmit = (values, actions) => {
+        console.log('step 1 completed')
         setFileClaimValues((prev) => ({ ...prev, ...values }))
         setActiveTab(1)
         setIsBasicInfoSubmitted(true);
@@ -153,31 +154,25 @@ export default function CreateClaim() {
         <React.Fragment>
             <Loader isLoading={isLoading} />
 
+
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-                <Row className="g-0">
-                    <Col lg={6}>
-                        <PageHeader title={t("CREATE_A_CLAIM")} />
-                    </Col>
-                    <Col lg="auto" className="ms-auto mb-2 mb-sm-0">
-                        <div className="text-end">
-                            <StepsProgress stepData={stepData} />
-                        </div>
-                    </Col>
-                </Row>
+                <PageHeader title={t("CREATE_A_CLAIM")} stepData={stepData} />
+                <Tab.Container
+                    id="file-clainm-steps-tabs"
+                    activeKey={activeTab}
+                >
+                    <Tab.Content
+                        className='flex-grow-1'
+                    >
+                        {tabData.map((tab) => (
+                            <Tab.Pane className="h-100" key={tab.eventKey} eventKey={tab.eventKey}>
+                                {tab.content}
+                            </Tab.Pane>
+                        ))}
+                    </Tab.Content>
+                </Tab.Container>
             </div>
 
-            <Tab.Container
-                id="file-clainm-steps-tabs"
-                activeKey={activeTab}
-            >
-                <Tab.Content >
-                    {tabData.map((tab) => (
-                        <Tab.Pane key={tab.eventKey} eventKey={tab.eventKey}>
-                            {tab.content}
-                        </Tab.Pane>
-                    ))}
-                </Tab.Content>
-            </Tab.Container>
             {/* FILE A CLAIM ALERT MODAL IF DUPLICATE FOUND */}
             <FileAlertModal
                 handleShow={fileAlertModalShow}

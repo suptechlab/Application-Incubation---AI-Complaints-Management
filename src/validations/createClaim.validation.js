@@ -1,84 +1,86 @@
 import * as yup from "yup";
+import { getValidationMessages } from "../services/Validation.service";
+
+const msg = getValidationMessages();
 
 
 export const BasicInfoFormSchema = yup.object({
-    identificacion: yup
-      .string()
-      .required()
-      .label("National ID number"),
-    email: yup
-      .string()
-      .email()
-      .required()
-      .label("Email address"),
-    name: yup
-      .string()
-      .required()
-      .label("Name"),
-    gender: yup
-      .string()
-      .required()
-      .label("Gender"),
-    countryCode: yup.string()
-      // .required("Country code is required")
-      .matches(/^\+\d{1,4}$/, "Country code must be a valid international dialing code (e.g., +1, +91)")
-      .max(5, "Country code must not exceed 5 characters"),
-    phoneNumber: yup.string()
-      // .required("Phone number is required")
-      .matches(/^\d+$/, "Phone number must contain only digits")
-      .max(15, "Phone number must not exceed 15 characters"),
-    provinceId: yup
-      .string()
-      .required()
-      .label("Province of residence"),
-    cityId: yup
-      .string()
-      .required()
-      .label("canton of residence"),
-  });
-  
-  export const OtherInfoFormSchema = yup.object({
-    priorityCareGroup: yup
-      .string()
-      .required()
-      .label("Priority care group"),
-    customerType: yup
-      .string()
-      .required()
-      .label("Customer type"),
-    organizationId: yup
-      .string()
-      .required()
-      .label("Entity name"),
-    // entitysTaxID: yup
-    //   .string()
-    //   .required()
-    //   .label("Entity's tax ID (RUC)"),
-  });
-  
-  export const ClaimDetailsFormSchema = yup.object({
-    claimTypeId: yup
-      .string()
-      .required()
-      .label("Claim type"),
-    claimSubTypeId: yup
-      .string()
-      .required()
-      .label("Claim subtype"),
-    precedents: yup
-      .string()
-      .required()
-      .max(1024, "Precedents must not exceed 1024 characters.")
-      .label("Precedents"),
-    specificPetition: yup
-      .string()
-      .required()
-      .max(1024, "Precedents must not exceed 1024 characters.")
-      .label("Specific Petition"),
-    attachments: yup
-      .string()
-      .label("Attachments"),
-    agreeDeclarations: yup
-      .boolean()
-      .oneOf([true], 'Please agree to all declarations and conditions to proceed.'),
-  });
+
+  identification: yup
+    .string()
+    .required(msg.nationalIDRequired),
+
+  email: yup
+    .string()
+    .email()
+    .required(msg.emailRequired),
+
+  name: yup
+    .string()
+    .required(msg.nameRequired),
+
+  gender: yup
+    .string()
+    .required(msg.genderRequired),
+
+  countryCode: yup.string(),
+
+  phoneNumber: yup.string()
+    .max(10, msg.phoneNumberInvalid),
+
+  provinceId: yup
+    .string()
+    .required(msg.provinceRequired),
+
+  cityId: yup
+    .string()
+    .required(msg.cantonRequired)
+});
+
+export const OtherInfoFormSchema = yup.object({
+
+  priorityCareGroup: yup
+    .string()
+    .required(msg.priorityCareRequired),
+
+  customerType: yup
+    .string()
+    .required(msg.customterTypeRequired),
+
+  organizationId: yup
+    .string()
+    .required(msg.entityNameRequired),
+
+  entitysTaxID: yup
+    .string()
+    .required(msg.rucRequired)
+});
+
+export const ClaimDetailsFormSchema = yup.object({
+
+  claimTypeId: yup
+    .string()
+    .required(msg.claimTypeIdRequired),
+
+  claimSubTypeId: yup
+    .string()
+    .required(msg.claimSubTypeRequired),
+
+  precedents: yup
+    .string()
+    .required(msg.precedentsRequired)
+    .max(1024, msg.invalidPrecedents),
+
+  specificPetition: yup
+    .string()
+    .required(msg.precedentsRequired)
+    .max(1024, msg.invalidPrecedents),
+
+  attachments: yup
+    .string()
+    .label("Attachments"),
+
+  agreeDeclarations: yup
+    .boolean()
+    .oneOf([true], msg.agreeDeclarations),
+});

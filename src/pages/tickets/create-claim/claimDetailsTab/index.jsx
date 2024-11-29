@@ -6,6 +6,7 @@ import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.validation';
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
+import FormCheckbox from "../../../../components/formCheckbox";
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
@@ -145,26 +146,72 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                             value={formikProps.values.specificPetition || ""}
                                         />
                                     </Col>
-
+                                    {/* <Col xs={12} className="mb-3">
+                                        <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
+                                            <div className="overflow-hidden position-relative z-1 flex-shrink-0">
+                                                <label
+                                                    htmlFor="files"
+                                                    className="btn btn-secondary"
+                                                >
+                                                    <span className='me-2'>{SvgIcons.uploadIcon}</span>{t("UPLOAD_OPTIONAL_ATTACHMENTS")}
+                                                </label>
+                                                <input
+                                                    id="files"
+                                                    accept="image/png, image/jpeg, image/jpg"
+                                                    className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                                    type="file"
+                                                    onChange={handleFileChange}
+                                                />
+                                            </div>
+                                            {fileName && (
+                                                <Link
+                                                    target="_blank"
+                                                    to="/fi-users/import"
+                                                    className="text-decoration-none small mw-100 text-break"
+                                                >
+                                                    {fileName}
+                                                </Link>
+                                            )}
+                                        </div>
+                                    </Col> */}
+                                    <Col xs={12}>
+                                        <FormCheckbox
+                                            wrapperClassName="mb-0"
+                                            className='fs-6 fw-medium'
+                                            id="agreeDeclarations"
+                                            checked={formikProps.values.agreeDeclarations}
+                                            onBlur={formikProps.handleBlur}
+                                            onChange={formikProps.handleChange}
+                                            touched={formikProps.touched.agreeDeclarations}
+                                            error={formikProps.errors.agreeDeclarations}
+                                            type="checkbox"
+                                            label={t("AGREE_DECLARATIONS")}
+                                        />
+                                    </Col>
                                 </Row>
                             </div>
-                            <div className="border-top">
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    onClick={backButtonClickHandler}
-                                    className="custom-min-width-100 me-auto"
+                            <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
+                                <Stack
+                                    direction="horizontal"
+                                    gap={3}
+                                    className="justify-content-end flex-wrap"
                                 >
-                                    <span className="me-1">&lt;</span>{t("BACK")}
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    variant="warning"
-                                    className="custom-min-width-100"
-                                    disabled={formikProps?.isSubmitting ?? false}
-                                >
-                                    {t("FINISH")}<span className="ms-1">&gt;</span>
-                                </Button>
+
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={backButtonClickHandler}
+                                    >
+                                        {t('BACK')}
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        variant="warning"
+                                        className="custom-min-width-85"
+                                    >
+                                        {t("FINISH")}<span className="ms-1">&gt;</span>
+                                    </Button>
+                                </Stack>
                             </div>
                         </React.Fragment>
 

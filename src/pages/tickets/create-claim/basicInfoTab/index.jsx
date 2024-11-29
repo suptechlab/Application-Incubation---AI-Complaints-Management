@@ -34,19 +34,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         cityId: '',
     });
 
-
-
-    // Initial Values
-    // const initialValues = {
-    //     identification: user?.identification ?? '',
-    //     email: user?.email ?? '',
-    //     name: user?.name ?? '',
-    //     gender: user?.gender ?? '',
-    //     countryCode: user?.countryCode ?? '',
-    //     phoneNumber: user?.phoneNumber ?? '',
-    //     provinceId: '',
-    //     cityId: '',
-    // };
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
         handleFormSubmit(values, actions);
@@ -290,7 +277,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                             variant="warning"
                                             className="custom-min-width-85"
                                         >
-                                            {t('NEXT')}
+                                            {t('NEXT')}<span className="ms-1">&gt;</span>
                                         </Button>
                                     </Stack>
                                 </div>

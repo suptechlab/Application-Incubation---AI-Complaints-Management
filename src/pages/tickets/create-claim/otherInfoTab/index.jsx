@@ -150,29 +150,35 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                     </Col>
                                 </Row>
                             </div>
-                            <div className="border-top">
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    onClick={backButtonClickHandler}
-                                    className="custom-min-width-100 me-auto"
+                            <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
+                                <Stack
+                                    direction="horizontal"
+                                    gap={3}
+                                    className="justify-content-end flex-wrap"
                                 >
-                                    <span className="me-1">&lt;</span>{t("BACK")}
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    variant="warning"
-                                    className="custom-min-width-100"
-                                >
-                                    {t("NEXT")}<span className="ms-1">&gt;</span>
-                                </Button>
+
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={backButtonClickHandler}
+                                    >
+                                        {t('BACK')}
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        variant="warning"
+                                        className="custom-min-width-85"
+                                    >
+                                        {t('NEXT')}<span className="ms-1">&gt;</span>
+                                    </Button>
+                                </Stack>
                             </div>
                         </React.Fragment>
 
                     )}
                 </CommonFormikComponent>
             </Card.Body>
-        </Card>
+        </Card >
     )
 }
 
