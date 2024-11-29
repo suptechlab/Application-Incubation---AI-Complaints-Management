@@ -1,5 +1,17 @@
 @import "../../src/assets/css/variables";
 
+.react-datepicker {
+    font-family: var(--bs-body-font-family);
+
+    .react-datepicker__year-wrapper {
+        max-width: 136px;
+
+        .react-datepicker__year-text {
+            padding: 4px;
+        }
+    }
+}
+
 .react-datepicker-wrapper {
     .react-datepicker__input-container {
         .form-control {

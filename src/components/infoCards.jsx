@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Stack } from 'react-bootstrap';
 
-const InfoCards = ({ cardsData }) => {
+const InfoCards = ({ cardsData, rowClassName = 'g-3 g-lg-4' }) => {
 
 
   const [claimStatsData, setClaimsStatsData] = useState([])
@@ -26,7 +26,7 @@ const InfoCards = ({ cardsData }) => {
 
 
   return (
-    <Row className='g-3 g-lg-4'>
+    <Row className={rowClassName}>
       {cardsData.map((card, index) => (
         <Col key={index} {...card.colProps}>
           <Stack
