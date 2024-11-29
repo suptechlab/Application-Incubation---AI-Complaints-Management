@@ -49,7 +49,6 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
 
     // Handle Basic Info Submit
     const handleBasicInfoSubmit = (values, actions) => {
-        console.log('Basic Info values', values)
         setFileClaimValues((prev) => ({ ...prev, ...values }))
         setActiveTab(1)
         setIsBasicInfoSubmitted(true);
@@ -168,12 +167,19 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
             content: <ClaimDetailsTab backButtonClickHandler={backButtonClaimDetailsClickHandler} handleFormSubmit={handleClaimDetailsSubmit} setIsLoading={setIsLoading} />,
         },
     ];
+
+
+    const handleModalClose = ()=>{
+        handleClose()
+        setActiveTab(0)
+        setIsBasicInfoSubmitted(false)
+    }
     return (
         <React.Fragment>
             <Loader isLoading={isLoading} />
             <Modal
                 show={handleShow}
-                onHide={handleClose}
+                onHide={handleModalClose}
                 backdrop="static"
                 keyboard={false}
                 centered={true}

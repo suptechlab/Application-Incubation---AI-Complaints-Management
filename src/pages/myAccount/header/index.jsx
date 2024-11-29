@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import { Stack } from 'react-bootstrap';
 import CustomDateRangePicker from '../../../components/CustomDateRangePicker';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 const PageHeader = ({ title = "", filter, setFilter }) => {
-    const [startDate, setStartDate] = useState()
 
+    const {t} = useTranslation()
+    const [startDate, setStartDate] = useState()
     const handleDateChange = (date) => {
         setStartDate(date)
         setFilter({ year: moment(date).format('yyyy') })
@@ -26,7 +28,7 @@ const PageHeader = ({ title = "", filter, setFilter }) => {
                     <div className="custom-width-140 flex-grow-1 flex-md-grow-0">
                         <CustomDateRangePicker
                             wrapperClassName="mb-0"
-                            placeholder="Select"
+                            placeholder={t("SELECT")}
                             selected={startDate}
                             onChange={handleDateChange}
                             dateFormat="yyyy"

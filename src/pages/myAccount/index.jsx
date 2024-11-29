@@ -1,24 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import { Badge, Button, Modal, Stack } from 'react-bootstrap';
+import { Badge, Button, Stack } from 'react-bootstrap';
 import { MdChatBubbleOutline, MdOutlineInfo, MdOutlineVisibility } from 'react-icons/md';
 import DataTable from '../../components/common/DataTable';
 
 import moment from 'moment';
 import qs from "qs";
 import { useDispatch } from 'react-redux';
+import Loader from '../../components/Loader';
 import AppTooltip from '../../components/tooltip';
 import { fileClaimList } from '../../redux/slice/fileClaimSlice';
 import InfoCards from './cards';
 import PageHeader from './header';
 import ViewClaim from './modals/view';
-import Loader from '../../components/Loader';
 
+import { useTranslation } from 'react-i18next';
 import ClaimChat from './modals/chat';
 import InstanceModal from './modals/instance';
 import RaisedComplaintModal from './modals/raised-complaint';
 
 export default function MyAccount() {
+
+  const { t } = useTranslation()
+
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
@@ -65,41 +69,6 @@ export default function MyAccount() {
   const raisedComplaintClickHandler = () => {
     setRaisedComplaintModalShow(true)
   }
-
-  // Mock data to display in the table
-  const mockData = [
-    {
-      claimId: '#53541',
-      entity_name: 'Entity 1',
-      claim_type: 'Credit Portfolio',
-      claim_sub_type: 'Refinancing Request',
-      created_on: '07-10-2024 | 03:30 pm',
-      resolved_on: '09-10-2024 | 05:40 pm',
-      instance_type: '1st Instance',
-      status: 'Closed',
-    },
-    {
-      claimId: '#53542',
-      entity_name: 'Entity 2',
-      claim_type: 'Loan Application',
-      claim_sub_type: 'Personal Loan',
-      created_on: '08-10-2024 | 10:00 am',
-      resolved_on: '10-10-2024 | 11:15 am',
-      instance_type: '2nd Instance',
-      status: 'In Progress',
-    },
-    {
-      claimId: '#53542',
-      entity_name: 'Entity 2',
-      claim_type: 'Loan Application',
-      claim_sub_type: 'Personal Loan',
-      created_on: '08-10-2024 | 10:00 am',
-      resolved_on: '10-10-2024 | 11:15 am',
-      instance_type: 'Complaint',
-      status: 'Rejected',
-    },
-  ];
-
   // The color class based on the status
   const getStatusClass = (status) => {
     switch (status) {
@@ -123,48 +92,50 @@ export default function MyAccount() {
   // TABLE COLUMNS
   const columns = React.useMemo(
     () => [
-      { accessorFn: (row) => row.ticketId, id: 'ticketId', header: 'Ticket Id', enableSorting: false },
+      { accessorFn: (row) => row.ticketId, id: 'ticketId', header: t("TICKET_ID"), enableSorting: false },
       {
         accessorFn: (row) => row.entity_name,
         id: 'entity_name',
-        header: 'Entity Name',
+        header: t("ENTITY_NAME"),
         enableSorting: false,
         cell: (rowData) => (
           <span>{rowData.row.original.organization?.nemonicoTipoOrganizacion}</span>
         )
       },
-      { accessorFn: (row) => row.claimType.name, id: 'claimType.name', header: 'Claim Type', enableSorting: false },
-      { accessorFn: (row) => row.claimSubType.name, id: 'claimSubType.name', header: 'Claim Sub Type', enableSorting: false },
+      { accessorFn: (row) => row.claimType.name, id: 'claimType.name', header: t("CLAIM_TYPE"), enableSorting: false },
+      { accessorFn: (row) => row.claimSubType.name, id: 'claimSubType.name', header: t("CLAIM_SUB_TYPE"), enableSorting: false },
       {
         accessorFn: (row) => row.createdAt,
         id: "createdAt",
-        header: "Created On",
+        header: t("CREATED_ON"),
         enableSorting: false,
-        cell: (rowData) => moment(rowData.row.original.createdAt).format("YYYY-MM-DD HH:mm"), // Format as needed
+        cell: (rowData) => moment(rowData.row.original.createdAt).format("YYYY-MM-DD HH:mm"),
       },
       {
         accessorFn: (row) => row.resolvedOn,
         id: "resolvedOn",
-        header: "Resolved On",
+        header: t("RESOLVED_ON"),
         enableSorting: false,
         cell: (rowData) =>
           rowData?.row?.original?.resolvedOn
-            ? moment(rowData?.row?.original?.resolvedOn).format("YYYY-MM-DD HH:mm") // Format if value exists
-            : "N/A", // Handle null or undefined values
+            ? moment(rowData?.row?.original?.resolvedOn).format("YYYY-MM-DD HH:mm")
+            : t("N/A"),
       },
       {
         accessorFn: (row) => row.instanceType,
         id: 'instanceType',
-        header: 'Instance Type',
+        header: t("INSTANCE_TYPE"),
         enableSorting: true,
         cell: (rowData) => (
-          <span className={rowData.row.original.instanceType === 'COMPLAINT' ? 'text-danger' : ''}>{rowData.row.original.instanceType}</span>
+          <span className={rowData.row.original.instanceType === 'COMPLAINT' ? 'text-danger' : ''}>
+            {rowData.row.original.instanceType}
+          </span>
         )
       },
       {
         accessorFn: (row) => row.status,
         id: 'status',
-        header: 'Status',
+        header: t("STATUS"),
         enableSorting: true,
         cell: (rowData) => (
           <span
@@ -177,7 +148,7 @@ export default function MyAccount() {
       {
         accessorFn: (row) => row.actions,
         id: 'actions',
-        header: 'Actions',
+        header: t("ACTIONS"),
         enableSorting: false,
         cell: (info) => {
           const renderButton = (label, onClickHandler, textColorClass) => (
@@ -187,7 +158,7 @@ export default function MyAccount() {
               aria-label={label}
               onClick={onClickHandler}
             >
-              {label}
+              {t(label)}
             </Button>
           );
 
@@ -195,12 +166,12 @@ export default function MyAccount() {
           let tooltipTitle = '';
           switch (info.row.original.instance_type) {
             case "1st Instance":
-              instanceButton = renderButton("File a 2nd Instance", instanceClickHandler, 'text-body text-opacity-50');
-              tooltipTitle = "File a 2nd instance Tooltip";
+              instanceButton = renderButton("FILE_SECOND_INSTANCE", instanceClickHandler, 'text-body text-opacity-50');
+              tooltipTitle = "FILE_SECOND_INSTANCE_TOOLTIP";
               break;
             case "2nd Instance":
-              instanceButton = renderButton("Raised a Complaint", raisedComplaintClickHandler, 'text-info');
-              tooltipTitle = "Raise a complaint Tooltip";
+              instanceButton = renderButton("RAISE_COMPLAINT", raisedComplaintClickHandler, 'text-info');
+              tooltipTitle = "RAISE_COMPLAINT_TOOLTIP";
               break;
             case "Complaint":
               break;
@@ -210,22 +181,22 @@ export default function MyAccount() {
 
           return (
             <Stack direction='horizontal' gap={3}>
-              <AppTooltip title="View">
+              <AppTooltip title={t("VIEW")}>
                 <Button
                   variant="link"
                   onClick={() => handleShowModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body'
-                  aria-label='View'
+                  aria-label={t("VIEW")}
                 >
                   <MdOutlineVisibility size={24} />
                 </Button>
               </AppTooltip>
-              <AppTooltip title="Chat">
+              <AppTooltip title={t("CHAT")}>
                 <Button
                   variant="link"
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
-                  aria-label='Chat'
+                  aria-label={t("CHAT")}
                   disabled={true}
                 >
                   <MdChatBubbleOutline size={24} />
@@ -233,18 +204,18 @@ export default function MyAccount() {
                     bg="danger"
                     className="border border-white custom-font-size-12 fw-semibold ms-n1 p-1 position-absolute rounded-pill start-100 top-0 translate-middle custom-min-width-22"
                   >
-                    2 <span className="visually-hidden">Unread Chat</span>
+                    2 <span className="visually-hidden">{t("UNREAD_CHAT")}</span>
                   </Badge>
                 </Button>
               </AppTooltip>
               {instanceButton && (
                 <Stack direction='horizontal' gap={2} className="d-none">
                   {instanceButton}
-                  <AppTooltip title={tooltipTitle}>
+                  <AppTooltip title={t(tooltipTitle)}>
                     <Button
                       variant="link"
                       className='p-0 border-0 lh-sm position-relative text-body'
-                      aria-label={tooltipTitle}
+                      aria-label={t(tooltipTitle)}
                     >
                       <MdOutlineInfo size={24} />
                     </Button>
@@ -252,7 +223,7 @@ export default function MyAccount() {
                 </Stack>
               )}
             </Stack>
-          )
+          );
         },
       },
     ],
@@ -319,21 +290,21 @@ export default function MyAccount() {
     setSorting(newSorting);
   };
 
-  
+
   return (
     <React.Fragment>
-    <Loader isLoading={loading} />
+      <Loader isLoading={loading} />
       <div className="d-flex flex-column flex-grow-1 p-3 pageContainer">
         <div className="pb-2">
           <PageHeader
-            title="My Account"
+            title={t("MY_ACCOUNT")}
             filter={filter}
             setFilter={setFilter}
           />
-          <InfoCards filter={filter} setLoading={setLoading}/>
+          <InfoCards filter={filter} setLoading={setLoading} />
           {/* RECENT ACTIVITY */}
           <div className="fw-bold fs-5 pt-4 mt-2">
-            Recent Activity
+            {t("RECENT_ACTIVITY")}
           </div>
         </div>
 
@@ -372,7 +343,7 @@ export default function MyAccount() {
         handleShow={instanceModalShow}
         handleClose={() => setInstanceModalShow(false)}
       />
-      
+
       {/* Raised Complaint MODAL */}
       <RaisedComplaintModal
         handleShow={raisedComplaintModalShow}

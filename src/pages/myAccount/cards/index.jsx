@@ -4,9 +4,11 @@ import { MdEditDocument, MdTask } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { fileClaimStats } from '../../../redux/slice/fileClaimSlice';
 import SvgIcons from '../../../components/SVGIcons';
+import { useTranslation } from 'react-i18next';
 const InfoCards = ({filter,setLoading}) => {
 
   const dispatch = useDispatch()
+  const {t} = useTranslation()
   const [claimStatsData , setClaimsStatsData] = useState([])
 
   const getClaimStats = async () => {
@@ -35,32 +37,33 @@ const InfoCards = ({filter,setLoading}) => {
     {
       bgColor: 'bg-primary',
       Icon: <MdEditDocument size={30} />,
-      title: 'Total Claims',
+      title: t('TOTAL_CLAIMS'),
       value: claimStatsData?.totalClaims,
       colProps: { sm: 6, lg: 3 }
     },
     {
       bgColor: 'bg-orange',
       Icon: SvgIcons.fileInfoIcon,
-      title: 'Claims in Progress',
+      title: t('CLAIMS_IN_PROGRESS'),
       value: claimStatsData?.countsByStatus?.IN_PROGRESS,
       colProps: { sm: 6, lg: 3 }
     },
     {
       bgColor: 'bg-success',
       Icon: <MdTask size={30} />,
-      title: 'Claims Closed',
+      title: t('CLAIMS_CLOSED'),
       value: claimStatsData?.countsByStatus?.CLOSED,
       colProps: { sm: 6, lg: 3 }
     },
     {
       bgColor: 'bg-danger',
       Icon: SvgIcons.fileCloseIcon,
-      title: 'Claims Rejected',
+      title: t('CLAIMS_REJECTED'),
       value: claimStatsData?.countsByStatus?.REJECTED,
       colProps: { sm: 6, lg: 3 }
     },
   ];
+  
   return (
     <Row className='g-3 g-lg-4'>
       {cardsData.map((card, index) => (

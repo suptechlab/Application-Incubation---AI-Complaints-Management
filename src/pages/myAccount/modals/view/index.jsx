@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Accordion, Col, ListGroup, Modal, Row } from 'react-bootstrap';
-import { MdAttachFile, MdDownload } from 'react-icons/md';
-import { Link } from 'react-router-dom';
-import CommonViewData from "../../../../components/CommonViewData";
-import AppTooltip from '../../../../components/tooltip';
-import { useDispatch } from 'react-redux';
-import { getClaimDetails } from '../../../../redux/slice/fileClaimSlice';
 import moment from 'moment/moment';
+import React, { useEffect, useState } from 'react';
+import { Col, Modal, Row } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import CommonViewData from "../../../../components/CommonViewData";
+import { getClaimDetails } from '../../../../redux/slice/fileClaimSlice';
 
 const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
+    const { t } = useTranslation()
+
     const dispatch = useDispatch()
-    const [loading, setLoading] = useState(false)
-    const [claimStatsData, setClaimsStatsData] = useState([])
+    // const [loading, setLoading] = useState(false)
+    const [claimTicketData, csetCaimTicketData] = useState([])
 
     const fetchClaimDetails = async () => {
         try {
             const result = await dispatch(getClaimDetails(selectedRow?.id));
             if (getClaimDetails.fulfilled.match(result)) {
-                setClaimsStatsData(result?.payload?.data);
+                csetCaimTicketData(result?.payload?.data);
             } else {
                 console.error('Verification error:', result.error?.message || 'Unknown error');
             }
@@ -36,13 +36,13 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     // The color class based on the status
     const getStatusClass = (status) => {
         switch (status) {
-            case 'Closed':
+            case 'CLOSED':
                 return 'bg-success bg-opacity-25 text-success';
-            case 'In Progress':
+            case 'IN_PROGRESS':
                 return 'bg-orange-25 text-orange';
-            case 'New':
+            case 'new':
                 return 'bg-primary bg-opacity-25 text-primary';
-            case 'Rejected':
+            case 'REJECTED':
                 return 'bg-danger bg-opacity-25 text-danger';
             default:
                 return 'bg-body bg-opacity-25 text-body';
@@ -52,69 +52,62 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     // View Top Data
     const viewTopData = [
         {
-            label: "Created on",
-            value:   claimStatsData?.createdAt ? moment(claimStatsData?.createdAt).format('DD-MM-YY | hh : ss : a') : "" ,// "07-10-24 | 03:33 pm",
+            label: t('CREATED_ON'),
+            value: claimTicketData?.createdAt
+                ? moment(claimTicketData?.createdAt).format('DD-MM-YY | hh:mm:ss a')
+                : t('NOT_AVAILABLE'),
             colProps: { sm: 6, lg: 3 }
         },
         {
-            label: "Entity",
-            value:  claimStatsData?.organization?.nemonicoTipoOrganizacion ?? 'N/A',
+            label: t('ENTITY'),
+            value: claimTicketData?.organization?.nemonicoTipoOrganizacion ?? t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
         {
-            label: "Claim Type",
-            value: claimStatsData?.claimType?.name,
+            label: t('CLAIM_TYPE'),
+            value: claimTicketData?.claimType?.name ?? t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
         {
-            label: "Claim Sub Type",
-            value: claimStatsData?.claimSubType?.name,
+            label: t('CLAIM_SUB_TYPE'),
+            value: claimTicketData?.claimSubType?.name ?? t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
         {
-            label: "Resolved on",
-            value: claimStatsData?.resolvedOn ? moment(claimStatsData?.resolvedOn).format('DD-MM-YY | hh : ss : a') : "Not resolved",
+            label: t('RESOLVED_ON'),
+            value: claimTicketData?.resolvedOn
+                ? moment(claimTicketData?.resolvedOn).format('DD-MM-YY | hh:mm:ss a')
+                : t('NOT_RESOLVED'),
             colProps: { sm: 6, lg: 3 }
         },
         {
-            label: "Claim Status",
-            value: <span className='text-success fw-semibold'>{claimStatsData?.status}</span>,
+            label: t('CLAIM_STATUS'),
+            value: (
+                <span className="text-success fw-semibold">
+                    {claimTicketData?.status ?? t('N/A')}
+                </span>
+            ),
             colProps: { sm: 6, lg: 3 }
-        },
-    ]
+        }
+    ];
 
     // Accordion Items
     const accordionItems = [
         {
-            eventKey: "0",
-            header: "Attachments",
+            eventKey: '0',
+            header: t('ATTACHMENTS'),
             body: [
-                {
-                    title: "Document 1.docx",
-                    dowlnloadUrl: "/",
-                },
-                {
-                    title: "Document 2.xlsx",
-                    dowlnloadUrl: "/",
-                },
-                {
-                    title: "Document 3.pdf",
-                    dowlnloadUrl: "/",
-                },
+                { title: 'Document 1.docx', dowlnloadUrl: '/' },
+                { title: 'Document 2.xlsx', dowlnloadUrl: '/' },
+                { title: 'Document 3.pdf', dowlnloadUrl: '/' }
             ]
         },
         {
-            eventKey: "1",
-            header: "Attachments send by Entity",
+            eventKey: '1',
+            header: t('ATTACHMENTS_SENT_BY_ENTITY'),
             body: [
-                {
-                    title: "Document 1.docx",
-                    dowlnloadUrl: "/",
-                },
-                {
-                    title: "Document 2.xlsx",
-                    dowlnloadUrl: "/",
-                },
+                { title: 'Document 1.docx', dowlnloadUrl: '/' },
+                { title: 'Document 2.xlsx', dowlnloadUrl: '/' }
             ]
         }
     ];
@@ -122,22 +115,21 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     // View Bottom Data
     const viewBottomData = [
         {
-            label: "Precedents",
-            value: claimStatsData?.precedents ?? 'N/A',
+            label: t('PRECEDENTS'),
+            value: claimTicketData?.precedents ?? t('N/A'),
             colProps: { xs: 12 }
         },
         {
-            label: "Specific Petition",
-            value: claimStatsData?.specificPetition ?? 'N/A',
+            label: t('SPECIFIC_PETITION'),
+            value: claimTicketData?.specificPetition ?? t('N/A'),
             colProps: { xs: 12 }
         },
         // {
-        //     label: "Entity's Response",
+        //     label: t("ENTITY_RESPONSE"),
         //     value: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
         //     colProps: { xs: 12 }
         // },
-    ]
-
+    ];
 
     return (
         <Modal
@@ -153,15 +145,17 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         >
             <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
                 <Modal.Title as="h4" className="fw-bold d-inline-flex align-items-center flex-wrap gap-2">
-                    Claim ID: #{claimStatsData?.ticketId} <span
-                        className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass('Closed')}`}
+                    {t("CLAIM_ID")}: #{claimTicketData?.ticketId}{" "}
+                    <span
+                        className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass(
+                            claimTicketData?.status
+                        )}`}
                     >
-                        {claimStatsData?.instanceType}
+                        {claimTicketData?.instanceType}
                     </span>
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body className="text-break small">
-
                 {/* View Top Data */}
                 <Row>
                     {viewTopData?.map((item, index) => (
@@ -170,8 +164,8 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                         </Col>
                     ))}
                 </Row>
-
-                {/* Accordion Items */} 
+    
+                {/* Accordion Items */}
                 {/* WILL DO IT LATER */}
                 {/* <Accordion flush className='custom-accordion'>
                     {accordionItems.map(item => (
@@ -188,12 +182,12 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                                             className="px-1 d-flex gap-2 justify-content-between align-items-start"
                                         >
                                             <span className="me-auto py-1">{item.title}</span>
-                                            <AppTooltip title="Download" placement="left">
+                                            <AppTooltip title={t("DOWNLOAD")} placement="left">
                                                 <Link
                                                     to={item.dowlnloadUrl}
                                                     className="text-decoration-none link-primary"
                                                     target="_blank"
-                                                    aria-label="Download"
+                                                    aria-label={t("DOWNLOAD")}
                                                 >
                                                     <MdDownload size={20} />
                                                 </Link>
@@ -205,7 +199,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                         </Accordion.Item>
                     ))}
                 </Accordion> */}
-
+    
                 {/* View Bottom Data */}
                 <Row>
                     {viewBottomData?.map((item, index) => (
@@ -216,7 +210,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 </Row>
             </Modal.Body>
         </Modal>
-    )
-}
+    );
+};
 
 export default ViewClaim

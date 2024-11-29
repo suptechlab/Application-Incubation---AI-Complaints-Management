@@ -1,127 +1,104 @@
 import * as yup from "yup";
+import { getValidationMessages } from "../../utils/Validation.service";
+
+const msg = getValidationMessages();
 
 export const LoginFormSchema = yup.object({
   email: yup
     .string()
-    .email()
-    .required()
-    .label("Email address"),
+    .email(msg.emailMustBeValid)
+    .required(msg.emailRequired),
 });
 
 export const OtpFormSchema = yup.object({
   otpCode: yup
     .string()
-    .required()
-    .label("OTP")
-    .matches(/^\d{6}$/, "OTP max 6 digits and only numbers"),
+    .required(msg.otpRequired)
+    .matches(/^\d{6}$/, msg.otpMax6Digits),
 });
 
 export const IdVerificationFormSchema = yup.object({
   nationalID: yup
     .string()
-    .required()
-    .label("National ID number"),
+    .required(msg.nationalIdRequired),
   fingerprintCode: yup
     .string()
-    .required()
-    .label("Fingerprint code"),
+    .required(msg.fingerprintCodeRequired),
 });
 
 export const PersonalInfoTabSchema = yup.object({
   countryCode: yup
     .string()
-    .required()
-    .label("Country Code"),
+    .required(msg.countryCodeRequired),
   phoneNumber: yup
     .string()
-    .matches(/^[1-9][\s-]?\d{9,14}$/, 'Phone number must be valid')
-    .required()
-    .label("Phone number"),
+    .matches(/^[1-9][\s-]?\d{9,14}$/, msg.phoneNumberMustBeValid)
+    .required(msg.phoneNumberRequired),
   email: yup
     .string()
-    .email()
-    .required()
-    .label("Email address"),
+    .email(msg.emailMustBeValid)
+    .required(msg.emailRequired),
 });
 
 export const BasicInfoFormSchema = yup.object({
   identificacion: yup
     .string()
-    .required()
-    .label("National ID number"),
+    .required(msg.nationalIdRequired),
   email: yup
     .string()
-    .email()
-    .required()
-    .label("Email address"),
+    .email(msg.emailMustBeValid)
+    .required(msg.emailRequired),
   name: yup
     .string()
-    .required()
-    .label("Name"),
+    .required(msg.nameRequired),
   gender: yup
     .string()
-    .required()
-    .label("Gender"),
+    .required(msg.genderRequired),
   countryCode: yup.string()
-    // .required("Country code is required")
-    .matches(/^\+\d{1,4}$/, "Country code must be a valid international dialing code (e.g., +1, +91)")
-    .max(5, "Country code must not exceed 5 characters"),
+    .matches(/^\+\d{1,4}$/, msg.countryCodeMustBeValid)
+    .max(5, msg.countryCodeMaxLength),
   phoneNumber: yup.string()
-    // .required("Phone number is required")
-    .matches(/^\d+$/, "Phone number must contain only digits")
-    .max(15, "Phone number must not exceed 15 characters"),
+    .matches(/^\d+$/, msg.phoneNumberMustBeDigits)
+    .max(15, msg.phoneNumberMaxLength),
   provinceId: yup
     .string()
-    .required()
-    .label("Province of residence"),
+    .required(msg.provinceRequired),
   cityId: yup
     .string()
-    .required()
-    .label("canton of residence"),
+    .required(msg.cityRequired),
 });
 
 export const OtherInfoFormSchema = yup.object({
   priorityCareGroup: yup
     .string()
-    .required()
-    .label("Priority care group"),
+    .required(msg.priorityCareGroupRequired),
   customerType: yup
     .string()
-    .required()
-    .label("Customer type"),
+    .required(msg.customerTypeRequired),
   organizationId: yup
     .string()
-    .required()
-    .label("Entity name"),
-  // entitysTaxID: yup
-  //   .string()
-  //   .required()
-  //   .label("Entity's tax ID (RUC)"),
+    .required(msg.organizationRequired),
 });
 
 export const ClaimDetailsFormSchema = yup.object({
   claimTypeId: yup
     .string()
-    .required()
-    .label("Claim type"),
+    .required(msg.claimTypeRequired),
   claimSubTypeId: yup
     .string()
-    .required()
-    .label("Claim subtype"),
+    .required(msg.claimSubTypeRequired),
   precedents: yup
     .string()
-    .required()
-    .max(1024, "Precedents must not exceed 1024 characters.")
-    .label("Precedents"),
+    .required(msg.precedentsRequired)
+    .max(1024, msg.precedentsMaxLength),
   specificPetition: yup
     .string()
-    .required()
-    .max(1024, "Precedents must not exceed 1024 characters.")
-    .label("Specific Petition"),
+    .required(msg.specificPetitionRequired)
+    .max(1024, msg.specificPetitionMaxLength),
   attachments: yup
     .string()
-    .label("Attachments"),
+    .label(msg.attachments),
   agreeDeclarations: yup
     .boolean()
-    .oneOf([true], 'Please agree to all declarations and conditions to proceed.'),
+    .oneOf([true], msg.agreeDeclarationsRequired),
 });

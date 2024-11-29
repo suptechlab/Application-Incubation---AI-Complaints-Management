@@ -119,7 +119,7 @@ const Header = ({ layout }) => {
                 {t("PROFILE")}
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/my-account">
-                {t("MY ACCOUNT")}
+                {t("MY_ACCOUNT")}
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password" disabled>
                 {t("CHANGE_PASSWORD")}

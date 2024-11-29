@@ -5,10 +5,11 @@ import FormCheckbox from '../../../components/formCheckbox';
 import PrivacyData from '../../auth/privacy/privacyData';
 import HelpDeskHeader from '../chatHeader';
 import { PrivacyFormSchema } from '../validations';
+import { useTranslation } from 'react-i18next';
 
 const PrivacyForm = ({ handleClose, onSubmit }) => {
 
-
+    const {t} = useTranslation()
 
     // Initial Values
     const initialValues = {
@@ -26,65 +27,67 @@ const PrivacyForm = ({ handleClose, onSubmit }) => {
 
     return (
         <React.Fragment>
-            <HelpDeskHeader />
-            <CommonFormikComponent
-                validationSchema={PrivacyFormSchema}
-                initialValues={initialValues}
-                onSubmit={handleSubmit}
-            >
-                {(formikProps) => (
-                    <Offcanvas.Body className="text-break d-flex flex-column small p-0">
-                        {/* Chatbot Body */}
-                        <div className='chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-3'>
-                            <div className='chatbot-body-inner flex-grow-1 overflow-auto mx-n3 px-3'>
-                                <div className='custom-font-size-18 fw-semibold mb-2'>Your Privacy Matters</div>
-                                <PrivacyData />
-                            </div>
-                            <div className='pt-2'>
-                                <FormCheckbox
-                                    wrapperClassName="mb-0"
-                                    className='fs-6 fw-semibold'
-                                    id="agreePrivacy"
-                                    checked={formikProps.values.agreePrivacy}
-                                    onBlur={formikProps.handleBlur}
-                                    onChange={formikProps.handleChange}
-                                    touched={formikProps.touched.agreePrivacy}
-                                    error={formikProps.errors.agreePrivacy}
-                                    type="checkbox"
-                                    label="I agreed to the data protection and privacy terms"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Chatbot Body Footer */}
-                        <div className='chatbot-body-footer p-3'>
-                            <Row direction="horizontal" className="justify-content-end gx-3">
-                                <Col xs={6}>
-                                    <Button
-                                        type="button"
-                                        variant="secondary"
-                                        onClick={handleClose}
-                                        className="w-100"
-                                    >
-                                        Decline
-                                    </Button>
-                                </Col>
-                                <Col xs={6}>
-                                    <Button
-                                        type="submit"
-                                        variant="warning"
-                                        className="w-100"
-                                        disabled={formikProps?.isSubmitting ?? false}
-                                    >
-                                        Accept
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </div>
-                    </Offcanvas.Body>
-                )}
-            </CommonFormikComponent>
-        </React.Fragment>
+        <HelpDeskHeader />
+        <CommonFormikComponent
+          validationSchema={PrivacyFormSchema}
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+        >
+          {(formikProps) => (
+            <Offcanvas.Body className="text-break d-flex flex-column small p-0">
+              {/* Chatbot Body */}
+              <div className="chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-3">
+                <div className="chatbot-body-inner flex-grow-1 overflow-auto mx-n3 px-3">
+                  <div className="custom-font-size-18 fw-semibold mb-2">
+                    {t("PRIVACY_TITLE")}
+                  </div>
+                  <PrivacyData />
+                </div>
+                <div className="pt-2">
+                  <FormCheckbox
+                    wrapperClassName="mb-0"
+                    className="fs-6 fw-semibold"
+                    id="agreePrivacy"
+                    checked={formikProps.values.agreePrivacy}
+                    onBlur={formikProps.handleBlur}
+                    onChange={formikProps.handleChange}
+                    touched={formikProps.touched.agreePrivacy}
+                    error={formikProps.errors.agreePrivacy}
+                    type="checkbox"
+                    label={t("AGREE_PRIVACY_LABEL")}
+                  />
+                </div>
+              </div>
+  
+              {/* Chatbot Body Footer */}
+              <div className="chatbot-body-footer p-3">
+                <Row direction="horizontal" className="justify-content-end gx-3">
+                  <Col xs={6}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleClose}
+                      className="w-100"
+                    >
+                      {t("DECLINE_BUTTON")}
+                    </Button>
+                  </Col>
+                  <Col xs={6}>
+                    <Button
+                      type="submit"
+                      variant="warning"
+                      className="w-100"
+                      disabled={formikProps?.isSubmitting ?? false}
+                    >
+                      {t("ACCEPT_BUTTON")}
+                    </Button>
+                  </Col>
+                </Row>
+              </div>
+            </Offcanvas.Body>
+          )}
+        </CommonFormikComponent>
+      </React.Fragment>
     )
 }
 
