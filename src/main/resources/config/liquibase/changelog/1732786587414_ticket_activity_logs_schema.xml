@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <!-- Create the "activity" table -->
+  <changeSet id="1732787019574" author="matellio">
+    <createTable tableName="claim_ticket_activity_log">
+      <column name="id" type="BIGINT" autoIncrement="true" remarks="This is the unique identifier for each activity.">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ticket_id" type="BIGINT" remarks="Foreign key to the ticket this activity belongs to.">
+        <constraints nullable="false"/>
+      </column>
+      <column name="performed_by" type="BIGINT" remarks="ID of the user who performed this activity.">
+        <constraints nullable="false"/>
+      </column>
+      <column name="performed_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP" remarks="Timestamp indicating when the activity occurred.">
+        <constraints nullable="false"/>
+      </column>
+      <column name="activity_type" type="VARCHAR(50)" remarks="Type of activity, such as CREATED, ASSIGNED, COMMENT, etc.">
+        <constraints nullable="false"/>
+      </column>
+      <column name="activity_title" type="JSON" remarks="Formatted title of the activity, with placeholders for links or user mentions.">
+        <constraints nullable="true"/>
+      </column>
+      <column name="activity_details" type="JSON" remarks="Details of the activity, such as changes made or text of the comment.">
+        <constraints nullable="true"/>
+      </column>
+      <column name="linked_users" type="JSON" remarks="JSON array of user IDs and names linked in the activity, e.g., assignees or mentions.">
+        <constraints nullable="true"/>
+      </column>
+      <column name="tagged_users" type="JSON" remarks="JSON array of user IDs and names tagged in the activity, e.g., mentions in a comment.">
+        <constraints nullable="true"/>
+      </column>
+      <column name="attachment_url" type="JSON" remarks="URL or path to the attachment, if any, included in the activity.">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <!-- Add foreign key constraint for ticket_id -->
+    <addForeignKeyConstraint
+      baseTableName="claim_ticket_activity_log"
+      baseColumnNames="ticket_id"
+      referencedTableName="claim_ticket"
+      referencedColumnNames="id"
+      constraintName="fk_claim_ticket_activity_log_ticket_id"
+      onDelete="CASCADE"/>
+  </changeSet>
+</databaseChangeLog>
