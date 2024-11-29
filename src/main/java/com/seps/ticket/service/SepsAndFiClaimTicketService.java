@@ -1,5 +1,6 @@
 package com.seps.ticket.service;
 
+import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
@@ -13,6 +14,7 @@ import com.seps.ticket.service.specification.ClaimTicketSpecification;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import jakarta.validation.Valid;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
+
 
 @Service
 public class SepsAndFiClaimTicketService {
@@ -30,13 +34,18 @@ public class SepsAndFiClaimTicketService {
     private final ClaimTicketRepository claimTicketRepository;
     private final UserService userService;
     private final ClaimTicketMapper claimTicketMapper;
-
-    public SepsAndFiClaimTicketService(ClaimTicketRepository claimTicketRepository,
-                                       UserService userService,
-                                       ClaimTicketMapper claimTicketMapper) {
+    private final ClaimTicketActivityLogService claimTicketActivityLogService;
+    private final MessageSource messageSource;
+    private final EnumUtil enumUtil;
+    public SepsAndFiClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService,
+                                       ClaimTicketMapper claimTicketMapper, ClaimTicketActivityLogService claimTicketActivityLogService,
+                                       MessageSource messageSource, EnumUtil enumUtil) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
+        this.claimTicketActivityLogService = claimTicketActivityLogService;
+        this.messageSource = messageSource;
+        this.enumUtil = enumUtil;
     }
 
     @Transactional
@@ -91,25 +100,27 @@ public class SepsAndFiClaimTicketService {
             .toList();
         Long organizationId = null;
         List<DropdownListDTO> agentList = new ArrayList<>();
-        if(authority.contains(AuthoritiesConstants.FI)){
+        if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganization().getId();
-            if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)){
+            if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
                 List<User> userList = userService.getUserListByRoleSlug(organizationId, Constants.RIGHTS_FI_AGENT);
-                // Map user list to DropdownListDTO
                 agentList = userList.stream()
-                    .map(user -> new DropdownListDTO(user.getId(), user.getFirstName() + " " + user.getLastName()))
+                    .map(this::mapToDropdown)
                     .toList();
             }
-        }else{
-            if(currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) || authority.contains(AuthoritiesConstants.ADMIN)){
-                List<User> userList = userService.getUserListByRoleSlug(Constants.RIGHTS_SEPS_AGENT);
-                // Map user list to DropdownListDTO
-                agentList = userList.stream()
-                    .map(user -> new DropdownListDTO(user.getId(), user.getFirstName() + " " + user.getLastName()))
-                    .toList();
-            }
+        } else if (currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) || authority.contains(AuthoritiesConstants.ADMIN)) {
+            List<User> userList = userService.getUserListByRoleSlug(Constants.RIGHTS_SEPS_AGENT);
+            agentList = userList.stream()
+                .map(this::mapToDropdown)
+                .toList();
         }
         return agentList;
+    }
+
+    private DropdownListDTO mapToDropdown(User user) {
+        String fullName = user.getFirstName() +
+            (user.getLastName() != null && !user.getLastName().isEmpty() ? " " + user.getLastName() : "");
+        return new DropdownListDTO(user.getId(), fullName);
     }
 
     @Transactional
@@ -132,9 +143,13 @@ public class SepsAndFiClaimTicketService {
             if (tickets.isEmpty()) {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NO_TICKET_FOUND_WITH_PROVIDED_IDS, new String[]{assignTicketRequestDTO.toString()}, null);
             }
-
+            List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
             // Assign the agent to each ticket
             tickets.forEach(ticket -> {
+                if(ticket.getFiAgentId() != null && ticket.getFiAgentId().equals(agentId)) {
+                    return;
+                }
+                ClaimTicketActivityLog activityLog = createAssignToAgentActivityLog(currentUser, ticket, agent);
                 // Calculate and set SLA breach date
                 if (ticket.getSlaBreachDays() != null) {
                     LocalDate slaBreachDate = LocalDate.now().plusDays(ticket.getSlaBreachDays());
@@ -143,11 +158,54 @@ public class SepsAndFiClaimTicketService {
                 ticket.setFiAgentId(agent.getId());
                 ticket.setFiAgent(agent);
                 ticket.setAssignedAt(Instant.now());
+
+                activityLogList.add(activityLog);
             });
 
             // Save the updated tickets
             claimTicketRepository.saveAll(tickets);
+
+            activityLogList.forEach(claimTicketActivityLogService::saveActivityLog);
+        }else{
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, new String[]{assignTicketRequestDTO.toString()}, null);
         }
+    }
+
+    private ClaimTicketActivityLog createAssignToAgentActivityLog(User currentUser, ClaimTicket ticket, User agent){
+        ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
+        activityLog.setTicketId(ticket.getId());
+        activityLog.setPerformedBy(currentUser.getId());
+        Map<String, String> activityTitle = new HashMap<>();
+        Map<String, String> linkedUser = new HashMap<>();
+        Map<String, Object> activityDetail = new HashMap<>();
+        if(ticket.getFiAgentId() != null) {
+            activityLog.setActivityType(ClaimTicketActivityEnum.REASSIGNED.name());
+            linkedUser.put(ticket.getFiAgentId().toString(),ticket.getFiAgent().getFirstName());
+            Arrays.stream(LanguageEnum.values()).forEach(language -> {
+                String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.reassigned.to.agent",
+                    new Object[]{"@"+currentUser.getId(), "@"+ticket.getFiAgentId(), "@"+agent.getId()}, Locale.forLanguageTag(language.getCode()));
+                activityTitle.put(language.getCode(), messageAudit);
+            });
+            activityDetail.put("previousAssignee",convertEntityToMap(claimTicketMapper.toFIUserDTO(ticket.getFiAgent())));
+            activityDetail.put("newAssignee", convertEntityToMap(claimTicketMapper.toFIUserDTO(agent)));
+        }else{
+            activityLog.setActivityType(ClaimTicketActivityEnum.ASSIGNED.name());
+            Arrays.stream(LanguageEnum.values()).forEach(language -> {
+                String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.assigned.to.agent",
+                    new Object[]{"@"+currentUser.getId(), "@"+agent.getId()}, Locale.forLanguageTag(language.getCode()));
+                activityTitle.put(language.getCode(), messageAudit);
+            });
+            activityDetail.put("newAssignee",convertEntityToMap(claimTicketMapper.toFIUserDTO(agent)));
+        }
+        activityDetail.put("performBy",convertEntityToMap(claimTicketMapper.toFIUserDTO(currentUser)));
+        activityDetail.put("ticketId",ticket.getTicketId().toString());
+        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+        linkedUser.put(agent.getId().toString(),agent.getFirstName());
+
+        activityLog.setActivityTitle(activityTitle);
+        activityLog.setLinkedUsers(linkedUser);
+        activityLog.setActivityDetails(activityDetail);
+        return activityLog;
     }
 
     @Transactional
@@ -218,10 +276,42 @@ public class SepsAndFiClaimTicketService {
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
+        ClaimTicketActivityLog activityLog = createUpdatePriorityActivityLog(currentUser,ticket,priority);
         // Update the priority
         ticket.setPriority(priority);
 
         // Save the updated ticket
         claimTicketRepository.save(ticket);
+        claimTicketActivityLogService.saveActivityLog(activityLog);
+    }
+
+    private ClaimTicketActivityLog createUpdatePriorityActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketPriorityEnum priority){
+        ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
+        activityLog.setTicketId(ticket.getId());
+        activityLog.setPerformedBy(currentUser.getId());
+        Map<String, String> activityTitle = new HashMap<>();
+        Map<String, String> linkedUser = new HashMap<>();
+        Map<String, Object> activityDetail = new HashMap<>();
+        Map<String, String> oldPriority = new HashMap<>();
+        Map<String, String> newPriority = new HashMap<>();
+        activityLog.setActivityType(ClaimTicketActivityEnum.CHANGED_PRIORITY.name());
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.changed.priority",
+                new Object[]{"@"+currentUser.getId(), enumUtil.getLocalizedEnumValue(priority, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+            activityTitle.put(language.getCode(), messageAudit);
+            oldPriority.put(language.getCode(), enumUtil.getLocalizedEnumValue(ticket.getPriority(), Locale.forLanguageTag(language.getCode())));
+            newPriority.put(language.getCode(), enumUtil.getLocalizedEnumValue(priority, Locale.forLanguageTag(language.getCode())));
+        });
+        activityDetail.put("oldPriority",oldPriority);
+        activityDetail.put("newPriority", newPriority);
+
+        activityDetail.put("performBy",convertEntityToMap(claimTicketMapper.toFIUserDTO(currentUser)));
+        activityDetail.put("ticketId",ticket.getTicketId().toString());
+        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+
+        activityLog.setActivityTitle(activityTitle);
+        activityLog.setLinkedUsers(linkedUser);
+        activityLog.setActivityDetails(activityDetail);
+        return activityLog;
     }
 }
