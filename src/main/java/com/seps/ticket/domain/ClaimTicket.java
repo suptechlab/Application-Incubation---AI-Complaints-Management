@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "claim_ticket")
@@ -140,6 +142,10 @@ public class ClaimTicket {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @OneToMany(mappedBy = "claimTicket", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClaimTicketDocument> claimTicketDocuments = new ArrayList<>();  // List of associated documents
+
 
 
 }

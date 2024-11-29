@@ -34,4 +34,6 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
 
 
     Optional<ClaimTicket> findByIdAndOrganizationId(Long id, Long organizationId);
+
+    Optional<ClaimTicket> findByTicketId(Long ticketId);
 }
