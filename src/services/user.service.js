@@ -1,9 +1,7 @@
 import {adminApi} from "../utils/instance";
 
 const API_VERSION = process.env.REACT_APP_API_VERSION
-// const port = process.env.REACT_APP_SEPS_USER_PORT
 
-// instance.defaults.baseURL = `${process.env.REACT_APP_API_URL}:${port}`;
 
 export const handleAddUser = async (data) => {
     return await adminApi.post(`/${API_VERSION}/seps-users`, data);
@@ -32,7 +30,9 @@ export const handleStatusChangeState = async (id, status) => {
     return await adminApi.patch(`/${API_VERSION}/seps-users/${id}/${status}`, {});
 }
 
-
+export const handleSEPSUserVerification = async (data) => {
+    return await adminApi.post(`/${API_VERSION}/seps-users/verify`, data);
+}
 
 export const handleGetCompany = async (id) => {
     return await adminApi.get(`/${API_VERSION}/companies`);

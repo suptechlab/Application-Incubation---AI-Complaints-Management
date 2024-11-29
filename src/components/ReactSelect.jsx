@@ -15,7 +15,7 @@ const ReactSelect = ({
   error,
   touched,
   defaultValue = null,
-  disabled
+  disabled,
 }) => {
   const customStyles = {
     control: (base, state) => ({

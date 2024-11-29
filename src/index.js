@@ -9,7 +9,7 @@ import reportWebVitals from './reportWebVitals';
 import 'sweetalert2/src/sweetalert2.scss'
 import './index.scss';
 import './assets/css/style.scss';
-
+import { MasterDataProvider } from './contexts/masters.context';
 const queryClient = new QueryClient();
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -18,8 +18,10 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <Router basename={process.env.REACT_APP_BASE_NAME}>
         <AuthenticationProvider>
-          <App />
-          <Toaster position='top-right' />
+          <MasterDataProvider>
+            <App />
+            <Toaster position='top-right' />
+          </MasterDataProvider>
         </AuthenticationProvider>
       </Router>
     </QueryClientProvider>

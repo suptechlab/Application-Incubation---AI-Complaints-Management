@@ -212,8 +212,7 @@ export default function RoleRightsList() {
   useEffect(() => {
     return () => {
       queryClient.removeQueries("data");
-    };
-    console.log('215: removeQueries called')
+    };    
   }, [queryClient]);
 
   return (

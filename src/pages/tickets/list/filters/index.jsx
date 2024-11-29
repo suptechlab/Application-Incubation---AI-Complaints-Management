@@ -10,10 +10,13 @@ import ReactSelect from "../../../../components/ReactSelect";
 import AppTooltip from "../../../../components/tooltip";
 import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
 import toast from "react-hot-toast";
+import { agentListingApi } from "../../../../services/ticketmanagement.service";
 
-const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla }) => {
+const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign,ticketArr,clearTableSelection    }) => {
     const { t } = useTranslation();
-    const [claimTypes , setClaimTypes] =useState([])
+    const [claimTypes, setClaimTypes] = useState([])
+    const [agentList, setAgentListing] = useState([])
+    const [selectedAgent, setSelectedAgent] = useState(null)
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
 
@@ -48,9 +51,40 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
         })
     }
 
+    // GET AGENT DROPDOWN LISTING
+    const getAgentDropdownListing = () => {
+        agentListingApi().then(response => {
+            console.log({ agent: response })
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setAgentListing(dropdownData)
+            }
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        })
+    }
+
     useEffect(() => {
         getClaimTypeDropdownList()
+        getAgentDropdownListing()
     }, [])
+
+
+    useEffect(()=>{
+
+        if(clearTableSelection === true){
+            setSelectedAgent('')
+        }
+    },[clearTableSelection])
+
+    console.log({selectedAgent : selectedAgent})
 
     return (
         <div className="theme-card-header header-search mb-3">
@@ -118,21 +152,19 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         placeholder="Assign/Reassign"
                         id="floatingSelect"
                         size="sm"
-                        disabled ={true}
                         options={[
                             {
-                                label: "Claim Type",
+                                label: "Assign/Reassign",
                                 value: "",
                             },
-                            ...claimTypes
+                            ...agentList
                         ]}
+                        disabled={ticketArr?.length > 0 ? false : true }
                         onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                claimTypeId: e.target.value,
-                            });
+                            handleTicketAssign(e.target.value)
+                            setSelectedAgent(e.target.value)
                         }}
-                        value={filter?.claimTypeId}
+                        value={selectedAgent ?? null}
                     />
                 </div>
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">

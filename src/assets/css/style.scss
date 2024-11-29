@@ -2,7 +2,9 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom height and width classes
+@include custom-class('font-size', 12);
 @include custom-class('font-size', 13);
+@include custom-class('font-size', 18);
 @include custom-class('font-size', 30);
 @include custom-class('padding-top', 2);
 @include custom-class('padding-bottom', 2);
@@ -39,6 +41,7 @@
 @include custom-class('min-width', 210);
 @include custom-class('width', 250);
 @include custom-class('max-width', 320);
+@include generate-color-classes($custom-colors);
 
 // Bootstrap Custom CSS
 .tooltip {
@@ -57,6 +60,12 @@
     &.is-invalid {
         background-image: none;
         padding-right: $input-padding-x;
+    }
+
+    &:read-only {
+        color: $input-disabled-color;
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
     }
 }
 
@@ -80,7 +89,8 @@
     @include btn-outline-styles($danger);
 }
 
-.form-check {
+.form-check,
+.form-check-cursor {
     .form-check-input {
         cursor: pointer;
     }
@@ -286,9 +296,8 @@ input:-webkit-autofill:active {
         }
     }
 }
-.form-control {&:read-only {
-    color: $input-disabled-color;
-    background-color: $input-disabled-bg;
-    border-color: $input-disabled-border-color;
-    }
-}    
+.error-box {
+    color: red;
+    margin-top: 5px;
+    font-size: 14px;
+}

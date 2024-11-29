@@ -5,7 +5,7 @@ export default function NotFoundPage() {
         <center>
             <h4>
                 <br></br>
-            <div>Page Not Found</div>
+            <div>Página no encontrada</div>
             </h4>
         </center>
     )

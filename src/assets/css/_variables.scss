@@ -104,6 +104,34 @@ $custom-gray: #D9D9D9;
   --bs-btn-active-bg: #{rgba($color, .20)};
 }
 
+// Custom colors
+$custom-colors: (
+  primary: #00549E,
+  danger: #DC3545,
+  info: #007BFF,
+  warning: #FF7438,
+  yellow: #F6C300,
+  pink: #A256F3,
+);
+
+// Mixin to generate CSS variables and background/text color classes
+@mixin generate-color-classes($colors) {
+  @each $name, $color in $colors {
+    // Convert the hex color to RGB
+    $rgb: red($color), green($color), blue($color);
+
+    // Background color class
+    .bg-custom-#{$name} {
+      background-color: rgba($rgb, var(--bs-bg-opacity)) !important;
+    }
+
+    // Text color class
+    .text-custom-#{$name} {
+      color: $color !important;
+    }
+  }
+}
+
 //Responsive Mixins
 $below-xsm: 374px;
 $below-sm: 575px;

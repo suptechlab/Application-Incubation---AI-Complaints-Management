@@ -2,8 +2,10 @@ import { Formik, Form as FormikForm } from "formik";
 import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import FormInput from "../../components/FormInput";
+import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import {
   fetchModulesAndPermissions,
@@ -11,8 +13,6 @@ import {
   handleEditRoleRight,
   handleGetRoleRightById,
 } from "../../services/rolerights.service";
-import Loader from "../../components/Loader";
-import { useTranslation } from "react-i18next";
 import { validationSchema } from "../../validations/rolerights.validation";
 
 const RoleRightsForm = () => {
@@ -32,7 +32,7 @@ const RoleRightsForm = () => {
 
   const [modules, setModules] = useState([]);
   const [userType, setUserType] = useState('SEPS_USER');
-  
+
 
   useEffect(() => {
     if (isEdit) {
@@ -59,13 +59,13 @@ const RoleRightsForm = () => {
           rights: rights,
           userType: roleData.userType,
         });
-        
+
         setUserType(roleData.userType); // SEPS_USER/FI_USER
         setModules(response.data.modules);
       });
       setLoading(false);
     } else {
-      
+
     }
   }, [id, isEdit, userType]);
 
@@ -187,51 +187,45 @@ const RoleRightsForm = () => {
                         {/* <pre>{JSON.stringify(values,null,2)}</pre> */}
                         <Col xs={12}>
                           <Row>
-                            <Col md={4}>
-                              <div className='d-flex justify-content-between status-radio'>
-                                <div>
-                                  <label className='fs-13 fw-bolder'>{t('USER TYPE')}</label>
-                                </div>
-                                <div className='d-flex'>
-                                    <label className="form-check-label">
-                                      <input
-                                        className="form-check-input radio-inline"
-                                        type="radio"
-                                        name="userType"
-                                        value="SEPS_USER"
-                                        checked={userType == 'SEPS_USER'}
-                                        onChange={() => {
-                                          setFieldValue("rights", {}); 
-                                          setFieldValue("userType", "SEPS_USER");
-                                          setUserType('SEPS_USER');
-                                        }}
-                                        disabled={isEdit} // Disable in edit mode
-                                      />
-                                      {t('SEPS USER')}
-                                    </label>
-                                    <label className="form-check-label ms-3">
-                                      <input
-                                        className="form-check-input radio-inline"
-                                        type="radio"
-                                        name="userType"
-                                        value="FI_USER"
-                                        checked={values.userType == 'FI_USER'}
-                                        onChange={() => {
-                                          
-                                          setFieldValue("rights", {}); 
-                                          setFieldValue("userType", "FI_USER");
-                                          setUserType('FI_USER');
-                                        }}
-                                        disabled={isEdit} // Disable in edit mode
-                                      />
-                                      {t('FI USER')}
-                                    </label>
-                                  </div>
+                            <Col xs={12} className="mb-3">
+                              <div className='status-radio'>
+                                <div className='mb-1 fs-14'>{t('USER TYPE')}</div>
+                                <Stack direction="horizontal" gap={3} className="flex-wrap">
+                                  <Form.Check
+                                    className="me-3 me-lg-4"
+                                    id="userType"
+                                    name="userType"
+                                    value="SEPS_USER"
+                                    onBlur={handleBlur}
+                                    checked={userType == 'SEPS_USER'}
+                                    onChange={() => {
+                                      setFieldValue("rights", {}); 
+                                      setFieldValue("userType", "SEPS_USER");
+                                      setUserType('SEPS_USER');
+                                    }}
+                                    type="radio"
+                                    label={t('SEPS USER')}
+                                    disabled={isEdit} // Disable in edit mode
+                                  />
+                                  <Form.Check
+                                    className="me-3 me-lg-4"
+                                    id="userTypeFi"
+                                    name="userType"
+                                    value="FI_USER"
+                                    onBlur={handleBlur}
+                                    checked={values.userType == 'FI_USER'}
+                                    onChange={() => {
+                                      setFieldValue("rights", {}); 
+                                      setFieldValue("userType", "FI_USER");
+                                      setUserType('FI_USER');
+                                    }}
+                                    type="radio"
+                                    label={t('FI USER')}
+                                    disabled={isEdit} // Disable in edit mode
+                                  />
+                                </Stack>
                               </div>
-
                             </Col>
-                          </Row>
-                          <Row>
                             <Col md={4}>
                               <FormInput
                                 error={errors.name}
@@ -261,7 +255,7 @@ const RoleRightsForm = () => {
                               />
                             </Col>
                           </Row>
-                                            {/* <pre>{JSON.stringify(values.rights,null,2)}</pre> */}
+                          {/* <pre>{JSON.stringify(values.rights,null,2)}</pre> */}
                           <div className="mt-2">
                             <h5 className="fw-semibold border-bottom pb-1 mb-3">
                               Ceder derechos
@@ -288,7 +282,7 @@ const RoleRightsForm = () => {
                                           ]?.checked || false
                                         }
                                         onChange={(e) => {
-                                          
+
                                           handleCheckboxChange(
                                             e,
                                             module.name,

@@ -52,7 +52,7 @@ const getPermissionsModuleNameList = async()=>{
         })
         return allValues;
     } else {
-        return [];
+        return []; 
     }
 }
 
@@ -64,5 +64,7 @@ const isAdminUser = async()=>{
         return false;
     }
 }
+
+
 
 export { isAccessible, getModulePermissions, isAdminUser, getPermissionsModuleNameList }

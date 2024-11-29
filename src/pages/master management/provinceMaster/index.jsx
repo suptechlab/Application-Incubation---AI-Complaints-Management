@@ -46,7 +46,7 @@ const ProvinceMaster = () => {
 
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
-  const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
+  const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
 
   useEffect(() => {
     isAdminUser().then(response => {
@@ -54,15 +54,16 @@ const ProvinceMaster = () => {
         permission.current.addModule = true;
         permission.current.editModule = true;
         permission.current.deleteModule = true;
+        permission.current.statusModule = true;
       } else {
-        getModulePermissions("Master management").then(response => {
-          if (response.includes("CLAIM_TYPE_CREATE")) {
+        getModulePermissions("Province Master").then(response => {
+          if (response.includes("PROVINCE_CREATE")) {
             permission.current.addModule = true;
           }
-          if (response.includes("CLAIM_TYPE_UPDATE")) {
+          if (response.includes("PROVINCE_UPDATE")) {
             permission.current.editModule = true;
           }
-          if (response.includes("CLAIM_TYPE_DELETE")) {
+          if (response.includes("PROVINCE_STATUS_CHANGE")) {
             permission.current.deleteModule = true;
           }
         }).catch(error => {
@@ -74,6 +75,7 @@ const ProvinceMaster = () => {
     })
 
   }, []);
+  
   const editProvinceMaster = async (rowData) => {
     setEditModal({ row: rowData, open: !editModal?.open })
   };
@@ -133,6 +135,7 @@ const ProvinceMaster = () => {
       setIsLoading(false)
     })
   };
+
   useEffect(() => {
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
@@ -154,6 +157,7 @@ const ProvinceMaster = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
+            permission.current.statusModule ? 
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
@@ -165,7 +169,7 @@ const ProvinceMaster = () => {
               value={info?.row?.original?.status}
               checked={info?.row?.original?.status}
               onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            />
+            /> : ''
           )
         },
         id: "status",
@@ -176,6 +180,7 @@ const ProvinceMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
+          permission.current.editModule ?
           <DataGridActions
             controlId="province-master"
             rowData={rowData}
@@ -189,7 +194,7 @@ const ProvinceMaster = () => {
                 handler: () => editProvinceMaster(rowData?.row?.original),
               },
             ]}
-          />
+          /> : ''
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
@@ -250,6 +255,8 @@ const ProvinceMaster = () => {
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
+    {permission.current.addModule
+        ?
     <PageHeader
       title={t("PROVINCE MASTER")}
       actions={[
@@ -257,6 +264,7 @@ const ProvinceMaster = () => {
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
     />
+    : ''}
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

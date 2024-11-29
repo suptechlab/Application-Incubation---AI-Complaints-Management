@@ -19,7 +19,8 @@ export default function ReactTable({
   setSorting,
   pagination,
   sorting,
-  showPagination=true,
+  showPagination = true,
+  clearTableSelection = false
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,6 +57,18 @@ export default function ReactTable({
   });
 
 
+
+  React.useEffect(() => {
+    if (table && clearTableSelection === true) {
+      const isAnyRowSelected = table.getSelectedRowModel().rows.length > 0;
+
+      if (isAnyRowSelected) {
+        table.toggleAllRowsSelected(false); // Clear selection
+        
+      }
+    }
+  }, [clearTableSelection])
+
   React.useEffect(() => {
     let path = "";
 
@@ -72,6 +85,7 @@ export default function ReactTable({
     navigate(path);
   }, [sorting, pagination]);
 
+
   return (
     <div className="d-flex flex-column h-100 small table-cover-main">
       {/* <Loader isLoading={isLoading} /> */}
@@ -80,11 +94,13 @@ export default function ReactTable({
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const thClassName = header.column.columnDef.meta?.thClassName || '';
                 return (
                   <th
                     key={header.id}
                     colSpan={header.colSpan}
                     style={{ width: header.getSize() }}
+                    className={thClassName}
                   >
                     {header.column.getCanSort() ? (
                       <Button
@@ -137,15 +153,19 @@ export default function ReactTable({
         <tbody>
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  align={cell.column.columnDef.meta?.align}
-                  style={{ width: cell.column.getSize() }}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+              {row.getVisibleCells().map((cell) => {
+                const tdClassName = cell.column.columnDef.meta?.tdClassName || '';
+                return (
+                  <td
+                    key={cell.id}
+                    align={cell.column.columnDef.meta?.align}
+                    style={{ width: cell.column.getSize() }}
+                    className={tdClassName}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                )
+              })}
             </tr>
           ))}
         </tbody>
