@@ -27,8 +27,8 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
         handleFormSubmit(values, actions);
     };
     return (
-        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-            <Card.Body className="d-flex flex-column">
+        <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
+            <Card.Body className="d-flex flex-column h-100">
                 <CommonFormikComponent
                     validationSchema={OtherInfoFormSchema}
                     initialValues={initialValues}
@@ -37,13 +37,9 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                     {(formikProps) => (
                         <React.Fragment>
                             <div className="text-break d-flex flex-column small pt-0">
-                                <Stack direction="horizontal" gap={2} className="mb-2 pb-1 flex-wrap">
-                                    <h5 className="custom-font-size-18 mb-0 fw-bold">
-                                        {t("OTHER_INFORMATION")}
-                                    </h5>
-                                </Stack>
+                                <h6 className="mb-3 pb-1 fw-semibold">{t("OTHER_INFORMATION")}</h6>
                                 <Row className="gx-4">
-                                    <Col lg={6}>
+                                    <Col sm={6} lg={4}>
                                         <ReactSelect
                                             label={t("PRIORITY_CARE_GROUP")}
                                             error={formikProps.errors.priorityCareGroup}
@@ -72,7 +68,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             touched={formikProps.touched.priorityCareGroup}
                                         />
                                     </Col>
-                                    <Col lg={6}>
+                                    <Col sm={6} lg={4}>
                                         <ReactSelect
                                             label={t("CUSTOMER_TYPE")}
                                             error={formikProps.errors.customerType}
@@ -101,7 +97,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             touched={formikProps.touched.customerType}
                                         />
                                     </Col>
-                                    <Col lg={6}>
+                                    <Col sm={6} lg={4}>
                                         <ReactSelect
                                             label={t("ENTITY_NAME")}
                                             error={formikProps.errors.organizationId}
@@ -134,7 +130,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             touched={formikProps.touched.organizationId}
                                         />
                                     </Col>
-                                    <Col lg={6}>
+                                    <Col sm={6} lg={4}>
                                         <FormInputBox
                                             id="entitysTaxID"
                                             label={t("ENTITYS_TAX_ID")}
@@ -159,8 +155,9 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
                                     <Button
                                         type="button"
-                                        variant="secondary"
+                                        variant="outline-dark"
                                         onClick={backButtonClickHandler}
+                                        className="custom-min-width-85"
                                     >
                                         {t('BACK')}
                                     </Button>
@@ -169,7 +166,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         variant="warning"
                                         className="custom-min-width-85"
                                     >
-                                        {t('NEXT')}<span className="ms-1">&gt;</span>
+                                        {t('NEXT')}
                                     </Button>
                                 </Stack>
                             </div>

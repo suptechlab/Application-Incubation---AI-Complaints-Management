@@ -2,6 +2,7 @@
 @import '~bootstrap/scss/bootstrap';
 
 // Custom height and width classes
+@include custom-class('font-size', 10);
 @include custom-class('font-size', 12);
 @include custom-class('font-size', 13);
 @include custom-class('font-size', 18);
@@ -22,6 +23,7 @@
 @include custom-class('min-width', 50);
 @include custom-class('height', 60);
 @include custom-class('width', 60);
+@include custom-class('min-width', 65);
 @include custom-class('min-width', 75);
 @include custom-class('width', 85);
 @include custom-class('min-width', 85);

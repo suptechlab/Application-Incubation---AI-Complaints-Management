@@ -86,8 +86,8 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     return (
         <React.Fragment>
             <Loader isLoading={loadingInfo} />
-            <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-                <Card.Body className="d-flex flex-column">
+            <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
+                <Card.Body className="d-flex flex-column h-100">
                     <CommonFormikComponent
                         validationSchema={BasicInfoFormSchema}
                         initialValues={initialValues}
@@ -96,15 +96,9 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                         {(formikProps) => (
                             <React.Fragment>
                                 <div className="text-break d-flex flex-column small pt-0">
-                                    <Stack
-                                        direction="horizontal"
-                                        gap={2}
-                                        className="mb-3 flex-wrap"
-                                    >
-                                        <h5 className="custom-font-size-18 mb-0 fw-bold">{t("BASIC_INFORMATION")}</h5>
-                                    </Stack>
+                                    <h6 className="mb-3 pb-1 fw-semibold">{t("BASIC_INFORMATION")}</h6>
                                     <Row className="gx-4">
-                                        <Col lg={6}>
+                                        <Col sm={6} lg={4}>
                                             <FormInputBox
                                                 autoComplete="off"
                                                 id="identification"
@@ -118,7 +112,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 value={formikProps.values.identification || ""}
                                             />
                                         </Col>
-                                        <Col lg={6}>
+                                        <Col sm={6} lg={4}>
                                             <FormInputBox
                                                 autoComplete="off"
                                                 id="email"
@@ -132,60 +126,38 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 value={formikProps.values.email || ""}
                                             />
                                         </Col>
-                                        <Col lg={6}>
-                                            <FormInputBox
-                                                id="name"
-                                                label={t("NAME")}
-                                                name="name"
-                                                type="text"
-                                                error={formikProps.errors.name}
-                                                onBlur={formikProps.handleBlur}
-                                                onChange={formikProps.handleChange}
-                                                touched={formikProps.touched.name}
-                                                value={formikProps.values.name || ""}
-                                            />
-                                        </Col>
-                                        <Col lg={6}>
-                                            <FormInputBox
-                                                id="gender"
-                                                label={t("GENDER")}
-                                                name="gender"
-                                                type="text"
-                                                error={formikProps.errors.gender}
-                                                onBlur={formikProps.handleBlur}
-                                                onChange={formikProps.handleChange}
-                                                touched={formikProps.touched.gender}
-                                                value={formikProps.values.gender || ""}
-                                            />
-                                        </Col>
-                                        <Col lg={6}>
-                                            <Row>
-                                                <Col lg={4}>
-                                                    <ReactSelect
-                                                        label={t("COUNTRY_CODE")}
-                                                        error={formikProps.errors.countryCode}
-                                                        options={formattedCountryCodes ?? []}
-                                                        placeholder={t("SELECT")}
-                                                        value={formikProps.values.countryCode}
-                                                        onChange={(option) => {
-                                                            formikProps.setFieldValue(
-                                                                "countryCode",
-                                                                option?.target?.value ?? ""
-                                                            );
-                                                        }}
-                                                        name="countryCode"
-                                                        className={formikProps.touched.countryCode && formikProps.errors.countryCode ? "is-invalid" : ""}
-                                                        onBlur={formikProps.handleBlur}
-                                                        touched={formikProps.touched.countryCode}
-                                                        readOnly={user?.countryCode ? true : false}
-                                                    />
+                                        <Col sm={6} lg={4}>
+                                            <label htmlFor="countryCode" className="mb-1 fs-14">
+                                                {t("Cellphone")}
+                                            </label>
+                                            <Row className="gx-2">
+                                                <Col xs="auto">
+                                                    <div className="custom-min-width-75 pe-1">
+                                                        <ReactSelect
+                                                            // label={t("COUNTRY_CODE")}
+                                                            error={formikProps.errors.countryCode}
+                                                            options={formattedCountryCodes ?? []}
+                                                            placeholder={t("SELECT")}
+                                                            value={formikProps.values.countryCode}
+                                                            onChange={(option) => {
+                                                                formikProps.setFieldValue(
+                                                                    "countryCode",
+                                                                    option?.target?.value ?? ""
+                                                                );
+                                                            }}
+                                                            name="countryCode"
+                                                            className={formikProps.touched.countryCode && formikProps.errors.countryCode ? "is-invalid" : ""}
+                                                            onBlur={formikProps.handleBlur}
+                                                            touched={formikProps.touched.countryCode}
+                                                            readOnly={user?.countryCode ? true : false}
+                                                        />
+                                                    </div>
                                                 </Col>
-                                                <Col lg={8}>
+                                                <Col xs>
                                                     <FormInputBox
-                                                        wrapperClassName="mb-4"
                                                         autoComplete="off"
                                                         id="phoneNumber"
-                                                        label={t("PHONE_NUMBER")}
+                                                        // label={t("PHONE_NUMBER")}
                                                         name="phoneNumber"
                                                         type="number"
                                                         error={formikProps.errors.phoneNumber}
@@ -198,8 +170,33 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 </Col>
                                             </Row>
                                         </Col>
-                                        <Col lg={6}></Col>
-                                        <Col lg={6}>
+                                        <Col sm={6} lg={4}>
+                                            <FormInputBox
+                                                id="name"
+                                                label={t("NAME")}
+                                                name="name"
+                                                type="text"
+                                                error={formikProps.errors.name}
+                                                onBlur={formikProps.handleBlur}
+                                                onChange={formikProps.handleChange}
+                                                touched={formikProps.touched.name}
+                                                value={formikProps.values.name || ""}
+                                            />
+                                        </Col>
+                                        <Col sm={6} lg={4}>
+                                            <FormInputBox
+                                                id="gender"
+                                                label={t("GENDER")}
+                                                name="gender"
+                                                type="text"
+                                                error={formikProps.errors.gender}
+                                                onBlur={formikProps.handleBlur}
+                                                onChange={formikProps.handleChange}
+                                                touched={formikProps.touched.gender}
+                                                value={formikProps.values.gender || ""}
+                                            />
+                                        </Col>
+                                        <Col sm={6} lg={4}>
                                             <ReactSelect
                                                 label={t("PROVINCE_OF_RESIDENCE")}
                                                 error={formikProps?.errors?.provinceId}
@@ -234,7 +231,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 touched={formikProps.touched.provinceId}
                                             />
                                         </Col>
-                                        <Col lg={6}>
+                                        <Col sm={6} lg={4}>
                                             <ReactSelect
                                                 label={t("CANTON_OF_RESIDENCE")}
                                                 error={formikProps?.errors?.cityId}
@@ -277,7 +274,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                             variant="warning"
                                             className="custom-min-width-85"
                                         >
-                                            {t('NEXT')}<span className="ms-1">&gt;</span>
+                                            {t('NEXT')}
                                         </Button>
                                     </Stack>
                                 </div>

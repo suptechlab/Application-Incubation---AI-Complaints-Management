@@ -7,6 +7,7 @@ import ReactSelect from '../../../../components/ReactSelect';
 import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.validation';
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormCheckbox from "../../../../components/formCheckbox";
+import { Link } from "react-router-dom";
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
@@ -54,8 +55,8 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     }
 
     return (
-        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-            <Card.Body className="d-flex flex-column">
+        <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
+            <Card.Body className="d-flex flex-column h-100">
                 <CommonFormikComponent
                     validationSchema={ClaimDetailsFormSchema}
                     initialValues={initialValues}
@@ -64,15 +65,9 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                     {(formikProps) => (
                         <React.Fragment>
                             <div className="text-break d-flex flex-column small pt-0">
-                                <Stack
-                                    direction="horizontal"
-                                    gap={2}
-                                    className="mb-2 pb-1 flex-wrap"
-                                >
-                                    <h5 className="custom-font-size-18 mb-0 fw-bold">{t("CLAIM_DETAILS")}</h5>
-                                </Stack>
+                                <h6 className="mb-3 pb-1 fw-semibold">{t("CLAIM_DETAILS")}</h6>
                                 <Row className="gx-4">
-                                    <Col lg={6}>
+                                    <Col sm={6} lg={4}>
                                         <ReactSelect
                                             label={t("CLAIM_TYPE")}
                                             error={formikProps.errors.claimTypeId}
@@ -95,7 +90,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                             touched={formikProps.touched.claimTypeId}
                                         />
                                     </Col>
-                                    <Col lg={6}>
+                                    <Col sm={6} lg={4}>
                                         <ReactSelect
                                             label={t("CLAIM_SUBTYPE")}
                                             error={formikProps.errors.claimSubTypeId}
@@ -146,14 +141,14 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                             value={formikProps.values.specificPetition || ""}
                                         />
                                     </Col>
-                                    {/* <Col xs={12} className="mb-3">
+                                    <Col xs={12} className="mb-3 py-1">
                                         <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                             <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                                 <label
                                                     htmlFor="files"
-                                                    className="btn btn-secondary"
+                                                    className="btn btn-warning"
                                                 >
-                                                    <span className='me-2'>{SvgIcons.uploadIcon}</span>{t("UPLOAD_OPTIONAL_ATTACHMENTS")}
+                                                    {t("UPLOAD_OPTIONAL_ATTACHMENTS")}
                                                 </label>
                                                 <input
                                                     id="files"
@@ -163,17 +158,20 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
-                                            {fileName && (
+                                            <span className="opacity-75">Multiple attachment can be uploaded.</span>                                            
+                                        </div>
+                                        {fileName && (
+                                            <div className="pt-1">
                                                 <Link
                                                     target="_blank"
                                                     to="/fi-users/import"
-                                                    className="text-decoration-none small mw-100 text-break"
+                                                    className="text-decoration-none mw-100 text-break"
                                                 >
                                                     {fileName}
                                                 </Link>
-                                            )}
-                                        </div>
-                                    </Col> */}
+                                            </div>
+                                        )}
+                                    </Col>
                                     <Col xs={12}>
                                         <FormCheckbox
                                             wrapperClassName="mb-0"
@@ -199,8 +197,9 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
                                     <Button
                                         type="button"
-                                        variant="secondary"
+                                        variant="outline-dark"
                                         onClick={backButtonClickHandler}
+                                        className="custom-min-width-85"
                                     >
                                         {t('BACK')}
                                     </Button>
@@ -209,7 +208,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         variant="warning"
                                         className="custom-min-width-85"
                                     >
-                                        {t("FINISH")}<span className="ms-1">&gt;</span>
+                                        {t("FINISH")}
                                     </Button>
                                 </Stack>
                             </div>

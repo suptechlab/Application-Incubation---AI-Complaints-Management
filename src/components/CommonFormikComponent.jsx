@@ -45,7 +45,7 @@ const CommonFormikComponent = ({
         };
 
         return (
-          <Form noValidate onSubmit={formikProps.handleSubmit} className="theme-common-form h-100">
+          <Form noValidate onSubmit={formikProps.handleSubmit} className="d-flex flex-column theme-common-form h-100">
             <>
               {children(formikProps, formikProps.isSubmitting, formikProps.isValid)}
               {formikProps?.submitCount > 0 && Object.keys(formikProps?.errors).length > 0 && scrollToError()}
