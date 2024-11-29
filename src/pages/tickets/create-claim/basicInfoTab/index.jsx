@@ -128,7 +128,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                         </Col>
                                         <Col sm={6} lg={4}>
                                             <label htmlFor="countryCode" className="mb-1 fs-14">
-                                                {t("Cellphone")}
+                                                {t("CELLPHONE")}
                                             </label>
                                             <Row className="gx-2">
                                                 <Col xs="auto">

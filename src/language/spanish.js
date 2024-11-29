@@ -175,5 +175,6 @@ export const spanishLang = {
     "AGREE_DECLARATIONS": "Acepto todas las declaraciones y condiciones",
     "NEXT": "Siguiente",
     "FINISH": "Finalizar",
+    "CELLPHONE": "Teléfono móvil"
 
 }
