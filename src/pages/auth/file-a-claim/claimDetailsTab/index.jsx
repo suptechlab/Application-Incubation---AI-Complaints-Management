@@ -86,9 +86,18 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading
                                     ]}
                                     value={formikProps.values.claimTypeId}
                                     onChange={(option) => {
+
                                         formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
-                                        formikProps.setFieldValue("claimSubtype", "");
-                                        getClaimSubTypes(option?.target?.value);
+                                        if (option?.target?.value && option?.target?.value !== "") {
+                                            // formikProps.setFieldTouched("cityId", false);
+                                            if(option?.target?.value !== formikProps?.values?.claimTypeId){
+                                                formikProps.setFieldValue("claimSubtype", ""); // Reset cityId
+                                                getClaimSubTypes(option?.target?.value);
+                                            }
+                                        }
+                                    
+                                        // formikProps.setFieldValue("claimSubtype", "");
+                                       
                                     }}
                                     name="claimTypeId"
                                     className={formikProps.touched.claimTypeId && formikProps.errors.claimTypeId ? "is-invalid" : ""}

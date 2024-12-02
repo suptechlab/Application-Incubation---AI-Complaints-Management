@@ -203,13 +203,11 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
                                         if (option?.target?.value && option?.target?.value !== "") {
                                             // formikProps.setFieldTouched("cityId", false);
-
-                                            if(formikProps?.values?.city && formikProps?.values?.city !== ""){
+                                            if(option?.target?.value !== formikProps?.values?.provinceId){
                                                 formikProps.setFieldValue("cityId", ""); // Reset cityId
+                                                getCityList(option?.target?.value);
                                             }
-                                            getCityList(option?.target?.value);
                                         }
-
                                     }}
                                     name="provinceId"
                                     className={formikProps.touched.provinceId && formikProps.errors.provinceId ? "is-invalid" : ""}
