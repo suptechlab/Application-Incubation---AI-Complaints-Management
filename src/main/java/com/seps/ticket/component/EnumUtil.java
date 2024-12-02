@@ -49,4 +49,16 @@ public class EnumUtil {
                 e -> messageSource.getMessage(e.getDescription(), null, locale)
             ));
     }
+
+    /**
+     * Fetches the localized description for a specific enum value.
+     *
+     * @param <E>       the type of the enum, extending {@link Enum} and implementing {@link EnumWithDescription}
+     * @param enumValue the specific enum value
+     * @param locale    the {@link Locale} for localization
+     * @return the localized description of the enum value
+     */
+    public <E extends Enum<E> & EnumWithDescription> String getLocalizedEnumValue(E enumValue, Locale locale) {
+        return messageSource.getMessage(enumValue.getDescription(), null, locale);
+    }
 }

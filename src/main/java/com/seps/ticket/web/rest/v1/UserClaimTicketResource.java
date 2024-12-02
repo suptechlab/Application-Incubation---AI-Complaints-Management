@@ -1,6 +1,5 @@
 package com.seps.ticket.web.rest.v1;
 
-import com.seps.ticket.domain.User;
 import com.seps.ticket.service.MailService;
 import com.seps.ticket.service.UserClaimTicketService;
 import com.seps.ticket.service.UserService;
@@ -8,7 +7,11 @@ import com.seps.ticket.service.dto.ClaimStatusCountResponseDTO;
 import com.seps.ticket.service.dto.RequestInfo;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
+import com.seps.ticket.suptech.service.DocumentService;
+import com.seps.ticket.suptech.service.FileStorageException;
+import com.seps.ticket.suptech.service.InvalidFileTypeException;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,8 +31,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Tag(name = "User Claim Ticket Management", description = "APIs for Users to manage their Claim Tickets")
 @RestController
@@ -39,11 +42,13 @@ public class UserClaimTicketResource {
     private final UserClaimTicketService userClaimTicketService;
     private final MailService mailService;
     private final UserService userService;
+    private final DocumentService documentService;
 
-    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, UserService userService) {
+    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, UserService userService, DocumentService documentService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.userService = userService;
+        this.documentService = documentService;
     }
 
     @Operation(
@@ -60,7 +65,7 @@ public class UserClaimTicketResource {
     })
     @PostMapping("/file-claim")
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<ClaimTicketResponseDTO> fileClaimTicket(@RequestBody @Valid ClaimTicketRequest claimTicketRequest,
+    public ResponseEntity<ClaimTicketResponseDTO> fileClaimTicket(@ModelAttribute @Valid ClaimTicketRequest claimTicketRequest,
                                                                   HttpServletRequest httpServletRequest) {
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
         ClaimTicketResponseDTO claimTicketResponseDTO = userClaimTicketService.fileClaimTicket(claimTicketRequest, requestInfo);
@@ -118,4 +123,17 @@ public class UserClaimTicketResource {
         ClaimStatusCountResponseDTO count = userClaimTicketService.countClaimsByStatusAndTotal(year);
         return ResponseEntity.ok(count);
     }
+
+    // Endpoint for uploading document
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadDocument(@Valid @ModelAttribute UploadDocumentRequest request) {
+        return userClaimTicketService.uploadDocument(request);
+    }
+
+    // Endpoint for downloading a document
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") String documentId) {
+        return documentService.downloadDocument(documentId);
+    }
+
 }

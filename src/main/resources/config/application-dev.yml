@@ -112,3 +112,5 @@ jhipster:
 # ===================================================================
 
 # application:
+website:
+  user-base-url: https://user-suptechdev.seps.gob.ec

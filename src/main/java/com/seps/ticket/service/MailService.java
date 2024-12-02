@@ -1,6 +1,10 @@
 package com.seps.ticket.service;
 
+import com.seps.ticket.component.EnumUtil;
+import com.seps.ticket.domain.TemplateMaster;
 import com.seps.ticket.domain.User;
+import com.seps.ticket.repository.TemplateMasterRepository;
+import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -19,7 +23,9 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Service for sending emails asynchronously.
@@ -37,6 +43,10 @@ public class MailService {
 
     private static final String BASE_URL_USER = "baseUrlUser";
 
+    private static final String USERNAME = "username";
+
+    private static final String URL = "url";
+
     private final JHipsterProperties jHipsterProperties;
 
     private final JavaMailSender javaMailSender;
@@ -45,16 +55,27 @@ public class MailService {
 
     private final SpringTemplateEngine templateEngine;
 
+    private final TemplateMasterRepository templateMasterRepository;
+
+    private final EnumUtil enumUtil;
+
+    @Value("${website.user-base-url:test}")
+    private String userBaseUrl;
+
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
-        SpringTemplateEngine templateEngine
+        SpringTemplateEngine templateEngine,
+        TemplateMasterRepository templateMasterRepository,
+        EnumUtil enumUtil
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
+        this.templateMasterRepository = templateMasterRepository;
+        this.enumUtil = enumUtil;
     }
 
     @Async
@@ -122,28 +143,67 @@ public class MailService {
         }
         LOG.debug("Preparing claim ticket creation email for user '{}'", claimTicket.getUser().getName());
         try {
-            Locale locale = Locale.forLanguageTag(claimTicket.getUser().getLangKey());
-            if (locale == null) {
-                locale = Locale.ENGLISH; // Default fallback locale
-            }
-            Context context = new Context(locale);
-            context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
-            context.setVariable(BASE_URL_USER, " https://user-suptechdev.seps.gob.ec");
-            context.setVariable("userName", claimTicket.getUser().getName());
-            context.setVariable("ticketId", claimTicket.getTicketId().toString());
-            context.setVariable("claimType", claimTicket.getClaimType().getName());
-            context.setVariable("claimSubType", claimTicket.getClaimSubType().getName());
-            context.setVariable("priority", claimTicket.getPriority());
-            context.setVariable("status", claimTicket.getStatus());
-            context.setVariable("razonSocial", claimTicket.getOrganization().getRazonSocial());
-            context.setVariable("ruc", claimTicket.getOrganization().getRuc());
-            String content = templateEngine.process("mail/claimTicketCreationEmail", context);
-            String subject = messageSource.getMessage("email.claim.creation.title", null, locale);
-            this.sendEmailSync(claimTicket.getUser().getEmail(), subject, content, false, true);
+            
+            MailDTO mailDTO = new MailDTO();
+            mailDTO.setLocale(claimTicket.getUser().getLangKey());
+            mailDTO.setTo(claimTicket.getUser().getEmail());
+            mailDTO.setTemplateKey("CLAIM_TICKET_CREATED");
+            Map<String, String> dataVariables = new HashMap<>();
+            dataVariables.put(USERNAME, claimTicket.getUser().getName());
+            dataVariables.put("ticketNumber", claimTicket.getTicketId().toString());
+            dataVariables.put("claimType", claimTicket.getClaimType().getName());
+            dataVariables.put("claimSubType", claimTicket.getClaimSubType().getName());
+            dataVariables.put("priority", enumUtil.getLocalizedEnumValue(claimTicket.getPriority(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
+            dataVariables.put("status", enumUtil.getLocalizedEnumValue(claimTicket.getStatus(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
+            dataVariables.put("razonSocial", claimTicket.getOrganization().getRazonSocial());
+            dataVariables.put("ruc", claimTicket.getOrganization().getRuc());
+            dataVariables.put(URL, userBaseUrl + "/my-account/" + claimTicket.getTicketId().toString());
+            mailDTO.setDataVariables(dataVariables);
+            this.sendDynamicContentEmail(mailDTO);
+
             LOG.info("Claim ticket creation email sent successfully to {}", claimTicket.getUser().getEmail());
         } catch (Exception e) {
             LOG.error("Failed to send claim ticket creation email to {}: {}", claimTicket.getUser().getEmail(), e.getMessage());
         }
     }
 
+    public void sendDynamicContentEmail(MailDTO mailDTO) {
+        TemplateMaster template = templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
+            .orElse(null);
+
+        if(template != null) {
+            // Prepare dynamic content
+            String subject = replacePlaceholders(template.getSubject(), mailDTO.getDataVariables());
+            String content = replacePlaceholders(template.getContent(), mailDTO.getDataVariables());
+
+            // Render HTML template with Thymeleaf
+            String renderedContent = renderEmailTemplate(subject, content, Locale.forLanguageTag(mailDTO.getLocale()));
+
+            // Send email
+            this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
+        }else {
+            LOG.debug("Template with key '{}' not found or inactive. Using default content.", mailDTO.getTemplateKey());
+        }
+    }
+
+    private String replacePlaceholders(String template, Map<String, String> variables) {
+        if (template == null || variables == null) return template;
+
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
+        }
+        return template;
+    }
+
+    private String renderEmailTemplate(String subject, String content, Locale locale) {
+        if (locale == null) {
+            locale = Locale.ENGLISH; // Default fallback locale
+        }
+        Context context = new Context(locale);
+        context.setVariable("subject", subject);
+        context.setVariable("content", content);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        // Render the template
+        return templateEngine.process("mail/commonEmailTemplate", context);
+    }
 }
