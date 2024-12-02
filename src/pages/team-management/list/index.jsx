@@ -70,27 +70,42 @@ export default function TeamManagementList() {
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
-        queryFn: () => {
-            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-            Object.keys(filterObj).forEach(
-                (key) => filterObj[key] === "" && delete filterObj[key]
-            );
+        queryFn: async () => {
 
-            if (sorting.length === 0) {
-                return handleGetTableData({
-                    page: pagination.pageIndex,
-                    size: pagination.pageSize,
-                    ...filterObj,
-                });
-            } else {
-                return handleGetTableData({
-                    page: pagination.pageIndex,
-                    size: pagination.pageSize,
-                    sort: sorting
-                        .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-                        .join(","),
-                    ...filterObj,
-                });
+            setLoading(true);
+
+            try {
+                const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+                Object.keys(filterObj).forEach(
+                    (key) => filterObj[key] === "" && delete filterObj[key]
+                );
+
+                let response;
+                if (sorting.length === 0) {
+                    response = await handleGetTableData({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        ...filterObj,
+                    });
+                } else {
+                    response = await handleGetTableData({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        sort: sorting
+                            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+                            .join(","),
+                        ...filterObj,
+                    });
+                }
+
+                // Return the API response data
+                return response;
+            } catch (error) {
+                console.error("Error fetching data", error);
+                // Optionally, handle errors here
+            } finally {
+                // Set loading state to false when the request finishes (whether successful or not)
+                setLoading(false);
             }
         },
     });
@@ -145,32 +160,32 @@ export default function TeamManagementList() {
                 header: () => t('ASSOCIATION'),
                 enableSorting: false,
             },
-             // Conditionally add the "actions" column
+            // Conditionally add the "actions" column
             ...(permission.current.editModule
                 ? [
                     {
-                    id: "actions",
-                    isAction: true,
-                    cell: (rowData) => (
-                        <div className="pointer">
-                        <DataGridActions
-                            controlId="team-management"
-                            rowData={rowData}
-                            customButtons={[
-                                {
-                                    name: "edit",
-                                    enabled: true,
-                                    type: "link",
-                                    title: "Edit",
-                                    icon: <MdEdit size={18} />,
-                                },
-                            ]}
-                        />
-                        </div>
-                    ),
-                    header: () => <div className="text-center">{t("ACTIONS")}</div>,
-                    enableSorting: false,
-                    size: "80",
+                        id: "actions",
+                        isAction: true,
+                        cell: (rowData) => (
+                            <div className="pointer">
+                                <DataGridActions
+                                    controlId="team-management"
+                                    rowData={rowData}
+                                    customButtons={[
+                                        {
+                                            name: "edit",
+                                            enabled: true,
+                                            type: "link",
+                                            title: "Edit",
+                                            icon: <MdEdit size={18} />,
+                                        },
+                                    ]}
+                                />
+                            </div>
+                        ),
+                        header: () => <div className="text-center">{t("ACTIONS")}</div>,
+                        enableSorting: false,
+                        size: "80",
                     },
                 ]
                 : []),

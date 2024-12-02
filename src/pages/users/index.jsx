@@ -50,35 +50,36 @@ export default function UserList() {
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      setLoading(true); // Start loading
+    queryFn: async() => {
+      setLoading(true);
       try {
-          const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-          Object.keys(filterObj).forEach(
-            (key) => filterObj[key] === "" && delete filterObj[key]
-          );
-    
-          if (sorting.length === 0) {
-            return handleGetUsers({
-              page: pagination.pageIndex,
-              size: pagination.pageSize,
-              ...filterObj,
-            });
-          } else {
-            return handleGetUsers({
-              page: pagination.pageIndex,
-              size: pagination.pageSize,
-              sort: sorting
-                .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-                .join(","),
-              ...filterObj,
-            });
-          } 
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach(
+          (key) => filterObj[key] === "" && delete filterObj[key]
+        );
+
+        let response;
+        if (sorting.length === 0) {
+          response = await handleGetUsers({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            ...filterObj,
+          });
+        } else {
+          response = await handleGetUsers({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            sort: sorting
+              .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+              .join(","),
+            ...filterObj,
+          });
+        }
+        return response;
       } catch (error) {
-        setLoading(false); // Start loading
       } finally {
         setLoading(false); // Start loading
-      }  
+      }
     },
     onError: () => setLoading(false), // Ensure loading state is reset on error
     staleTime: 0, // Data is always stale, so it refetches
@@ -90,14 +91,14 @@ export default function UserList() {
 
   //handle last page deletion item
   useEffect(() => {
-    
+
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
-    
+
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
@@ -115,30 +116,30 @@ export default function UserList() {
   // Permissoin work
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
   useEffect(() => {
-      isAdminUser().then(response => {
-          if (response) {
-              permission.current.statusModule = true;
-              permission.current.addModule = true;
-              permission.current.editModule = true;
-              permission.current.deleteModule = true;
-          } else {
-              getModulePermissions("SEPS User").then(response => {
-                  if (response.includes("SEPS_USER_CREATE_BY_SEPS")) {
-                      permission.current.addModule = true;
-                  }
-                  if (response.includes("SEPS_USER_UPDATE_BY_SEPS")) {
-                      permission.current.editModule = true;
-                  }
-                  if (response.includes("SEPS_USER_STATUS_CHANGE_BY_SEPS")) {
-                      permission.current.statusModule = true;
-                  }
-              }).catch(error => {
-                  console.error("Error fetching permissions:", error);
-              });
+    isAdminUser().then(response => {
+      if (response) {
+        permission.current.statusModule = true;
+        permission.current.addModule = true;
+        permission.current.editModule = true;
+        permission.current.deleteModule = true;
+      } else {
+        getModulePermissions("SEPS User").then(response => {
+          if (response.includes("SEPS_USER_CREATE_BY_SEPS")) {
+            permission.current.addModule = true;
           }
-      }).catch(error => {
-          console.error("Error get during to fetch User Type", error);
-      })
+          if (response.includes("SEPS_USER_UPDATE_BY_SEPS")) {
+            permission.current.editModule = true;
+          }
+          if (response.includes("SEPS_USER_STATUS_CHANGE_BY_SEPS")) {
+            permission.current.statusModule = true;
+          }
+        }).catch(error => {
+          console.error("Error fetching permissions:", error);
+        });
+      }
+    }).catch(error => {
+      console.error("Error get during to fetch User Type", error);
+    })
 
   }, []);
 
@@ -165,50 +166,50 @@ export default function UserList() {
   const columns = React.useMemo(
     () => [
       {
-        accessorFn: (row) => row.name,
+        accessorFn: (row) => row?.name,
         id: "firstName",
         header: () => t('NAME'),
         enableSorting: false,
       },
       {
-        accessorFn: (row) => row.roles[0].name ?? "N/A",
+        accessorFn: (row) => row?.roles.length !== 0 ? row?.roles[0]?.name : 'N/A',
         id: "role",
-        header: () =>  t('ROLE'),
+        header: () => t('ROLE'),
         enableSorting: false,
       },
       {
-        accessorFn: (row) => row.email,
+        accessorFn: (row) => row?.email,
         id: "email",
         header: () => t('EMAIL'),
       },
       {
-        accessorFn: (row) => row.createdDate,
+        accessorFn: (row) => row?.createdDate,
         id: "createdDate",
         header: () => "Fecha de creación",
         cell: (info) => {
-          return <span>{moment(info.row.original.createdDate).format("l")}</span>;
+          return <span>{moment(info.row?.original.createdDate).format("l")}</span>;
         },
       },
 
       {
         cell: (info) => {
           return (
-            permission.current.statusModule ? 
-            <Toggle
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.status == 'ACTIVE' ? true : false }
-              checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
-              onChange={() =>
-                changeStatus(
-                  info?.row?.original?.id,
-                  info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
-                )
-              }
-              tooltip="Activo / Bloquear"
-            /> 
-            : ''
+            permission.current.statusModule ?
+              <Toggle
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                name="status"
+                value={info?.row?.original?.status == 'ACTIVE' ? true : false}
+                checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
+                onChange={() =>
+                  changeStatus(
+                    info?.row?.original?.id,
+                    info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE'
+                  )
+                }
+                tooltip="Activo / Bloquear"
+              />
+              : ''
           );
         },
         id: "status",
@@ -220,21 +221,21 @@ export default function UserList() {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ? 
-          <DataGridActions
-            controlId="users"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: true,
-                type: "link",
-                title: "Edit",
-                icon: <MdEdit size={18} />,
-              },
-            ]}
-          /> 
-          : ''
+          permission.current.editModule ?
+            <DataGridActions
+              controlId="users"
+              rowData={rowData}
+              customButtons={[
+                {
+                  name: "edit",
+                  enabled: true,
+                  type: "link",
+                  title: "Edit",
+                  icon: <MdEdit size={18} />,
+                },
+              ]}
+            />
+            : ''
         ),
         header: () => <div className="text-center">{t('ACTIONS')}</div>,
         enableSorting: false,
@@ -257,19 +258,19 @@ export default function UserList() {
       queryClient.removeQueries("data");
     };
   }, [queryClient]);
-  
+
   return (
     <React.Fragment>
 
-      { loading ? <Loader isLoading={loading} />
-      :
+      {loading ? <Loader isLoading={loading} />
+        :
         <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-          {permission.current.addModule ? 
-          <PageHeader
-            title="Usuarios de SEPS"
-            actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
-          />
-          : ''}
+          {permission.current.addModule ?
+            <PageHeader
+              title="Usuarios de SEPS"
+              actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
+            />
+            : ''}
           <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
             <Card.Body className="d-flex flex-column">
               <ListingSearchFormUsers filter={filter} setFilter={setFilter} />

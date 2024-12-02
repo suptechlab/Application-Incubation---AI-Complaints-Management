@@ -92,39 +92,22 @@ const TemplateMaster = () => {
 
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    // queryFn: () => {
-    //   const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-    //   Object.keys(filterObj).forEach(
-    //     (key) => filterObj[key] === "" && delete filterObj[key]
-    //   );
+    queryFn: async () => {
 
-    //   // For now, returning default data without API request
-    //   return [
-    //     {
-    //       id: 1,
-    //       templateMaster: "Cuenca",
-    //     },
-    //     {
-    //       id: 2,
-    //       templateMaster: "Guaranda",
-    //     },
-    //   ];
-    // },
-    queryFn: () => {
-
-      setLoading(true); // Start loading
+      setLoading(true);
       try {
         const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
         Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
+        let response;
         if (sorting.length === 0) {
-          return handleGetTemplateMaster({
+          response = await handleGetTemplateMaster({
             page: pagination.pageIndex,
             size: pagination.pageSize,
             ...filterObj,
           });
         } else {
-          return handleGetTemplateMaster({
+          response = await handleGetTemplateMaster({
             page: pagination.pageIndex,
             size: pagination.pageSize,
             sort: sorting
@@ -135,8 +118,9 @@ const TemplateMaster = () => {
             ...filterObj,
           });
         }
-      } catch (error) {
-        setLoading(false); // Start loading
+        // Return the API response data
+        return response;
+      } catch (error) { // Start loading
       } finally {
         setLoading(false); // Start loading
       }
@@ -162,17 +146,15 @@ const TemplateMaster = () => {
     } finally {
       setLoading(false); // Start loading
     }
-    
+
   };
   useEffect(() => {
-    setLoading(true);
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
-    setLoading(false);
   }, [dataQuery.data?.data?.totalPages]);
   // }, []);
 
@@ -194,16 +176,16 @@ const TemplateMaster = () => {
         cell: (info) => {
           return (
             permission.current.statusModule ?
-            <Toggle
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              // label="Status"
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-              tooltip="Active"
-            /> : ''
+              <Toggle
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                // label="Status"
+                name="status"
+                value={info?.row?.original?.status}
+                checked={info?.row?.original?.status}
+                onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+                tooltip="Active"
+              /> : ''
           )
         },
         id: "status",
@@ -214,21 +196,21 @@ const TemplateMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ? 
-          <DataGridActions
-            controlId="role-rights"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permission.current.editModule,
-                type: "button",
-                title: "Edit",
-                icon: <MdEdit size={18} />,
-                handler: () => editCityMaster(rowData?.row?.original),
-              },
-            ]}
-          /> : ''
+          permission.current.editModule ?
+            <DataGridActions
+              controlId="role-rights"
+              rowData={rowData}
+              customButtons={[
+                {
+                  name: "edit",
+                  enabled: permission.current.editModule,
+                  type: "button",
+                  title: "Edit",
+                  icon: <MdEdit size={18} />,
+                  handler: () => editCityMaster(rowData?.row?.original),
+                },
+              ]}
+            /> : ''
         ),
         header: () => (
           <div className="text-center">{t("ACTIONS")}</div>

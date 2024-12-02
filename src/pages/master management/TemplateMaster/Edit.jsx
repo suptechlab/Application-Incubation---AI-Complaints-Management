@@ -29,7 +29,6 @@ const Edit = ({ provinces, modal, toggle,rowData,dataQuery }) => {
   useEffect(() => {
     if(rowData){
       setLoading(true);
-      //actions.ressetForm()
       getTemplateMaster(rowData?.id)
       .then((response) => {
         console.log('response.data?.templateType',response.data?.templateType)
