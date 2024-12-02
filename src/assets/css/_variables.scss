@@ -114,6 +114,8 @@ $custom-colors: (
   pink: #A256F3,
   orange: #E7652D,
   green: #009E0B,
+  red: #DA220B,
+  gray: #DFDFDF,
 );
 
 // Mixin to generate CSS variables and background/text color classes
@@ -121,6 +123,10 @@ $custom-colors: (
   @each $name, $color in $colors {
     // Convert the hex color to RGB
     $rgb: red($color), green($color), blue($color);
+
+    :root {
+      --bs-border-opacity: 1;
+    }
 
     // Background color class
     .bg-custom-#{$name} {
@@ -131,6 +137,12 @@ $custom-colors: (
     .text-custom-#{$name} {
       color: $color !important;
     }
+
+    // Background color class
+    .border-custom-#{$name} {
+      border-color: rgba($rgb, var(--bs-border-opacity)) !important;
+    }
+
   }
 }
 
