@@ -28,9 +28,9 @@ export const NavItems = () => {
           menuName: t("SEPS USERS"),
           title: t("SEPS USERS"),
           path: "/users",
-          roleName: "user",
-          // disabled: true,
-
+          roleName: "SEPS User",
+          permissions: ["FI_USER_CREATE_BY_FI"], // Match against userRoles
+          disabled: false,
         },
         {
           id: 22,

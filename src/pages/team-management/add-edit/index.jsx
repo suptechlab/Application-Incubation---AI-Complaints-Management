@@ -1,18 +1,20 @@
+import { useQuery } from "@tanstack/react-query";
 import { Formik, Form as FormikForm } from "formik";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Form, Row, Stack, Table } from "react-bootstrap";
+import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdDelete } from "react-icons/md";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import CommonDataTable from "../../../components/CommonDataTable";
+import DataGridActions from "../../../components/DataGridActions";
 import FormInput from "../../../components/FormInput";
 import GenericModal from "../../../components/GenericModal";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import ReactSelect from "../../../components/ReactSelect";
-import AppTooltip from "../../../components/tooltip";
-import { getOrganizationList, getTeamMemberList, handleAddUser, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
+import { getOrganizationList, getTeamMemberList, handleAddUser, handleDeleteUser, handleGetUserById, handleGetUsers, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
 export default function TeamManagementAddEdit() {
@@ -55,36 +57,13 @@ export default function TeamManagementAddEdit() {
     const [userType, setUserType] = useState('FI'); // SEPS or FI
     const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show 
     const [assignedData, setAssignedData] = useState([]);
-    const [newTeamMember, setNewTeamMember] = useState([]);
-    const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
-    const [selectedMemberName, setSelectedMemberName] = useState(null); // To hold the selected member
-
 
     //  Handle Assign Button Click
     const handleAssign = () => {
-        if (!selectedMember || Object.keys(selectedMember).length === 0) {
-            setLoading(false);
-            toast.error("Please select a team member before assigning.");
-            return;
-        }
+        // Simulating new data
+        const newData = { id: 1202, name: "New Team Member" };
 
-        // Check if the member is already in the list
-        const isDuplicate = newTeamMember.some(
-            (member) => member.id === selectedMember.value
-        );
-
-        if (isDuplicate) {
-            toast.error("This team member has already been assigned.");
-            return;
-        }
-
-        const newMember = {
-            id: selectedMember.value, // ID from ReactSelect
-            name: selectedMember.label, // Name from ReactSelect
-        };
-
-        setNewTeamMember((prev) => [...prev, newMember]); // Add to the list
-        setSelectedMember(null); // Clear selection
+        setAssignedData((prev) => [...prev, newData]);
     };
 
     useEffect(() => {
@@ -113,7 +92,6 @@ export default function TeamManagementAddEdit() {
                 value: item.id
             }));
             setEntityIdArr([{ label: "Select", value: "" }, ...formattedData]);
-            // setEntityIdArr([formattedData]);
             setLoading(false);
         });
 
@@ -165,6 +143,43 @@ export default function TeamManagementAddEdit() {
         }
     };
 
+    const dataQuery = useQuery({
+        queryKey: ["data", pagination, sorting, filter],
+        queryFn: () => {
+            const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+            Object.keys(filterObj).forEach(
+                (key) => filterObj[key] === "" && delete filterObj[key]
+            );
+
+            if (sorting.length === 0) {
+                return handleGetUsers({
+                    page: pagination.pageIndex,
+                    size: pagination.pageSize,
+                    ...filterObj,
+                });
+            } else {
+                return handleGetUsers({
+                    page: pagination.pageIndex,
+                    size: pagination.pageSize,
+                    sort: sorting
+                        .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+                        .join(","),
+                    ...filterObj,
+                });
+            }
+        },
+    });
+
+    //handle last page deletion item
+    useEffect(() => {
+        if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
+            setPagination({
+                pageIndex: dataQuery.data?.data?.totalPages - 1,
+                pageSize: 10,
+            });
+        }
+    }, [dataQuery.data?.data?.totalPages]);
+
     //Handle Delete
     const deleteAction = (rowData) => {
         setSelectedRow(rowData);
@@ -172,10 +187,53 @@ export default function TeamManagementAddEdit() {
         setDeleteShow(true);
     };
 
-    const recordDelete = (deleteId) => {
-        setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
-        setDeleteShow(false);
+    const recordDelete = async (deleteId) => {
+        setLoading(true);
+        try {
+            await handleDeleteUser(deleteId);
+            toast.success("Your data has been deleted successfully");
+            dataQuery.refetch();
+            setDeleteShow(false);
+        } catch (error) {
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const columns = React.useMemo(
+        () => [
+            {
+                accessorFn: (row) => row.name,
+                id: "name",
+                header: () => t('Team Members'),
+                enableSorting: false,
+            },
+            {
+                id: "actions",
+                isAction: true,
+                cell: (rowData) => (
+                    <DataGridActions
+                        controlId="team-management"
+                        rowData={rowData}
+                        customButtons={[
+                            {
+                                name: "delete",
+                                enabled: true,
+                                type: "button",
+                                title: "Delete",
+                                icon: <MdDelete size={18} />,
+                                handler: () => deleteAction(rowData.row.original),
+                            },
+                        ]}
+                    />
+                ),
+                header: () => <div className="text-center">{t('ACTIONS')}</div>,
+                enableSorting: false,
+                size: "80",
+            },
+        ],
+        []
+    );
 
     return (
         <React.Fragment>
@@ -202,44 +260,52 @@ export default function TeamManagementAddEdit() {
                                     onSubmit={handleSubmit}
                                     className="d-flex flex-column h-100"
                                 >
+                                    <Row>
+                                        <Col md={4}>
+                                            <div className='d-flex justify-content-between status-radio'>
+                                                <div>
+                                                    <label className='fs-13 fw-bolder'>{t('USER TYPE')}</label>
+                                                </div>
+                                                <div className='d-flex'>
+                                                    <label className="form-check-label">
+                                                        <input
+                                                            className="form-check-input radio-inline"
+                                                            type="radio"
+                                                            name="entityType"
+                                                            value="SEPS"
+                                                            checked={values.entityType === 'SEPS'}
+                                                            // onChange={() => setFieldValue("entityType", "SEPS")}
+                                                            onChange={() => {
+                                                                setFieldValue("entityType", "SEPS");
+                                                                setShowEntityOrgId(false);
+                                                            }}
+                                                        />
+                                                        {t('SEPS USER')}
+                                                    </label>
+                                                    <label className="form-check-label ms-3">
+                                                        <input
+                                                            className="form-check-input radio-inline"
+                                                            type="radio"
+                                                            name="entityType"
+                                                            value="FI"
+                                                            checked={values.entityType === 'FI'}
+                                                            // onChange={() => setFieldValue("entityType", "FI")}
+                                                            onChange={() => {
+                                                                setFieldValue("entityType", "FI");
+                                                                setShowEntityOrgId(true);
+                                                            }}
+                                                        />
+                                                        {t('FI USER')}
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        </Col>
+                                        <br></br>
+                                    </Row>
                                     {/* <pre>{JSON.stringify(values,null,2)}</pre>
                                     <pre>{JSON.stringify(errors,null,2)}</pre> */}
                                     <Row>
-                                        <Col xs={12} className="mb-3">
-                                            <div className='status-radio'>
-                                                <div className='mb-1 fs-14'>{t('USER TYPE')}</div>
-                                                <Stack direction="horizontal" gap={3} className="flex-wrap">
-                                                    <Form.Check
-                                                        className="me-3 me-lg-4"
-                                                        id="entityType"
-                                                        name="entityType"
-                                                        value="SEPS"
-                                                        checked={values.entityType === 'SEPS'}
-                                                        onBlur={handleBlur}
-                                                        onChange={() => {
-                                                            setFieldValue("entityType", "SEPS");
-                                                            setShowEntityOrgId(false);
-                                                        }}
-                                                        type="radio"
-                                                        label={t('SEPS USER')}
-                                                    />
-                                                    <Form.Check
-                                                        className="me-3 me-lg-4"
-                                                        id="entityTypeFi"
-                                                        name="entityType"
-                                                        value="FI"
-                                                        checked={values.entityType === 'FI'}
-                                                        onBlur={handleBlur}
-                                                        onChange={() => {
-                                                            setFieldValue("entityType", "FI");
-                                                            setShowEntityOrgId(true);
-                                                        }}
-                                                        type="radio"
-                                                        label={t('FI USER')}
-                                                    />
-                                                </Stack>
-                                            </div>
-                                        </Col>
                                         {
                                             showEntityOrgId ?
                                                 <Col sm={6} lg={4}>
@@ -282,6 +348,8 @@ export default function TeamManagementAddEdit() {
                                         </Col>
                                     </Row>
                                     <Row>
+
+
                                         <Col lg={8}>
                                             <FormInput
                                                 id="description"
@@ -304,30 +372,24 @@ export default function TeamManagementAddEdit() {
                                                     <Row className="gx-3">
                                                         <Col xs>
                                                             <ReactSelect
-                                                                getOptionLabel={(option) => option.value}
-                                                                getOptionValue={(option) => option.label}
-
                                                                 label="Member Name"
-                                                                error={errors.orgId}
+                                                                error={errors.entityId}
                                                                 options={entityIdArr}
-                                                                value={values.orgId}
+                                                                value={values.entityId}
                                                                 onChange={(option) => {
-                                                                    console.log('onChange option', option)
-                                                                    setSelectedMemberName(option.target.label);
                                                                     setFieldValue(
                                                                         "entityId",
                                                                         option?.target?.value ?? ""
                                                                     );
-                                                                    setSelectedMember(option.target); // Store the selected member
                                                                 }}
-                                                                // name="orgId"
+                                                                name="entityId"
                                                                 className={
-                                                                    touched.orgId && errors.orgId
+                                                                    touched.entityId && errors.entityId
                                                                         ? "is-invalid"
                                                                         : ""
                                                                 }
                                                                 onBlur={handleBlur}
-                                                                touched={touched.orgId}
+                                                                touched={touched.entityId}
                                                             />
                                                         </Col>
                                                         <Col xs="auto" className="mb-3 pb-1 pt-4">
@@ -341,41 +403,17 @@ export default function TeamManagementAddEdit() {
                                                             </Button>
                                                         </Col>
 
-                                                        {newTeamMember?.length > 0 &&
-                                                            <Col xs={12} className="mb-3 pb-1">
-                                                                <div className="d-flex flex-column h-100 small table-cover-main">
-                                                                    <Table striped bordered hover responsive className="mb-0">
-                                                                        <thead className="fs-15">
-                                                                            <tr>
-                                                                                <th scope="col" className="text-nowrap">
-                                                                                    Team Members
-                                                                                </th>
-                                                                                <th scope="col" className="custom-width-85 text-nowrap text-center">{t('ACTIONS')}</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            {newTeamMember.map((member) => (
-                                                                                <tr key={member.id}>
-                                                                                    <td className="text-nowrap">{member.name}</td>
-                                                                                    <td className="custom-width-85 text-nowrap text-center">
-                                                                                        <AppTooltip title="Delete" placement="top">
-                                                                                            <Button
-                                                                                                className={`custom-width-26 custom-height-26 d-inline-flex align-items-center justify-content-center p-1 lh-1 fs-5 theme-delete-btn link-dark`}
-                                                                                                variant="link"
-                                                                                                onClick={() => deleteAction(member)}
-                                                                                                aria-label="Delete"
-                                                                                            >
-                                                                                                <MdDelete size={18} />
-                                                                                            </Button>
-                                                                                        </AppTooltip>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            ))}
-                                                                        </tbody>
-                                                                    </Table>
-                                                                </div>
-                                                            </Col>
-                                                        }
+                                                        <Col xs={12} className="mb-3 pb-1">
+                                                            <CommonDataTable
+                                                                columns={columns}
+                                                                dataQuery={dataQuery}
+                                                                pagination={pagination}
+                                                                setPagination={setPagination}
+                                                                sorting={sorting}
+                                                                setSorting={setSorting}
+                                                                showPagination={false}
+                                                            />
+                                                        </Col>
                                                     </Row>
                                                 </Col>
                                             </Row>
@@ -420,7 +458,6 @@ export default function TeamManagementAddEdit() {
                 buttonName="Delete"
                 ActionButtonVariant="danger"
             />
-
         </React.Fragment>
     );
 }

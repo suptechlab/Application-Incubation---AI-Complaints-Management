@@ -175,5 +175,12 @@ export const englishLang = {
     "AGREE_DECLARATIONS": "I agreed on all the Declarations, and conditions",
     "NEXT": "Next",
     "FINISH": "Finish",
-    "CELLPHONE": "Cellphone"
+    "CELLPHONE": "Cellphone"    "TEAM MEMBER HAS ALREADY BEEN ASSIGNED": "This team member has already been assigned.",
+    "SELECT A TEAM MEMBER BEFORE ASSIGNING": "Please select a team member before assigning.",
+    "DELETE TEAM MEMBER": "Delete Team Member",
+    "ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER": "Are you sure, you want to delete the team member",
+    "DELETE": "Eliminado",
+
+
+
 }
