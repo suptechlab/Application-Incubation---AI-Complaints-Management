@@ -54,9 +54,9 @@ export default function AuthenticationProvider({ children }) {
             console.log('success',response?.data?.otpToken)
             const otpToken = response?.data?.otpToken;
             //toast.success(response.data.message);
-            //setLocalStorage("access_token", response.data.tokens.access.token)
-            //setLocalStorage("refresh_token", response.data.tokens.refresh.token)
-            setIsAuthenticated(true)
+            // setLocalStorage("access_token", response.data.tokens.access.token)
+            // setLocalStorage("refresh_token", response.data.tokens.refresh.token)
+            // setIsAuthenticated(true)
             navigate("/otp",{ state: {username, otpToken}})
         }).catch((error) => {
             console.log('error 53->',error)

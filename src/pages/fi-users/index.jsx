@@ -198,7 +198,7 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info?.row?.original?.roles[0]?.name ?? "N/A"}
+              {info?.row?.original?.roles?.length > 0 ? info?.row?.original?.roles[0]?.name : "N/A"}
             </span>
           );
         },
