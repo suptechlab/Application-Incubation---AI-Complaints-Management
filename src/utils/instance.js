@@ -49,11 +49,12 @@ const createAxiosInstance = (baseURL) => {
             return response;
         },
         (error) => {
+            console.log(error?.response)
             if (error.response?.status === 401) {
                 toast.error('No autorizado');
                 // Force redirect to the login page
-                const dashboardURL = `${process.env.REACT_APP_BASE_URL}/dashboard`;
-                window.location.href = dashboardURL;
+                // const dashboardURL = `${process.env.REACT_APP_BASE_URL}/dashboard`;
+                // window.location.href = dashboardURL;
             }
             return Promise.reject(error);
         }
