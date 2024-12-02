@@ -10,7 +10,7 @@ import AttachmentsModal from '../modals/attachmentsModal';
 import UserInfoModal from '../modals/userInfoModal';
 import TicketViewHeader from './header';
 import TicketTabsSection from './tabs';
-import { ticketDetailsApi } from '../../../services/ticketmanagement.service';
+import { changeTicketPriority, ticketDetailsApi } from '../../../services/ticketmanagement.service';
 import toast from 'react-hot-toast';
 import moment from 'moment/moment';
 
@@ -18,14 +18,29 @@ const TicketsView = () => {
   const [selectedPriority, setSelectedPriority] = useState('Low');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
+  const [loading , setLoading] = useState(false)
 
-  const {id} = useParams()
+  const { id } = useParams()
 
   const [ticketData, setTicketData] = useState({})
 
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
     setSelectedPriority(priority);
+    setLoading(true)
+    if (priority && priority !== '') {
+      changeTicketPriority(id).then(response => {
+        console.log(response)
+      }).catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
+        }
+      }).finally(()=>{
+        setLoading(false)
+      })
+    }
   };
 
   // GET TICKET DETAILS
@@ -79,12 +94,12 @@ const TicketsView = () => {
   const viewTopData = [
     {
       label: "Created on",
-      value:    ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
+      value: ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
       label: "Due Date",
-      value:  ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY | hh:mm:a") : 'N/A',
+      value: ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY | hh:mm:a") : 'N/A',
       colProps: { sm: 6 }
     },
     {
@@ -151,7 +166,7 @@ const TicketsView = () => {
     // },
     {
       label: "Precedents",
-      value:ticketData?.precedents,
+      value: ticketData?.precedents,
       colProps: { xs: 12, className: "py-2" }
     },
     {
@@ -239,25 +254,25 @@ const TicketsView = () => {
   // The color class based on the status
   const getReplyStatusClass = (status) => {
     switch (status) {
-        case 'Resolved':
-            return 'bg-custom-pink p-2 rounded';
-        case 'In Progress':
-            return 'bg-custom-yellow p-2 rounded';
-        case 'New':
-            return 'bg-custom-primary p-2 rounded';
-        case 'Rejected':
-            return 'bg-custom-danger p-2 rounded';
-        default:
-            return '';
+      case 'RESOLVED':
+        return 'bg-custom-pink p-2 rounded';
+      case 'IN_PROGRESS':
+        return 'bg-custom-yellow p-2 rounded';
+      case 'NEW':
+        return 'bg-custom-primary p-2 rounded';
+      case 'REJECTED':
+        return 'bg-custom-danger p-2 rounded';
+      default:
+        return '';  
     }
-};
+  };
 
   return (
     <React.Fragment>
-      <Loader isLoading={false} />
+      <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <TicketViewHeader
-          title={"#"+ticketData?.ticketId}
+          title={"#" + ticketData?.ticketId}
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -347,7 +362,7 @@ const TicketsView = () => {
       {/* User Info Modals */}
       <UserInfoModal
         modal={userInfoModalShow}
-        userData = {ticketData}
+        userData={ticketData}
         toggle={() => setUserInfoModalShow(false)}
       />
 

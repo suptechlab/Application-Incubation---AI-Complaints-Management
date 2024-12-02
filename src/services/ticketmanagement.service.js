@@ -29,7 +29,10 @@ export const agentTicketToSEPSagent= async(agentId,tickets)=>{
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${agentId}/assign-tickets-seps-agent`,tickets);
 }
 
-
+//CHANGE TICKET PRIORITY
+export const changeTicketPriority= async(ticketId,priority)=>{
+  return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/priority?${priority}`);
+}
 
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN
 export const convertToLabelValue=(obj)=> {
