@@ -67,34 +67,34 @@ export default function RoleRightsList() {
     queryFn: async () => {
       setLoading(true); // Start loading
       try {
-            
-              //   starting
-              const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-              Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-      
-              // Make the API request based on sorting
-              let response;
-              if (sorting.length === 0) {
-                response = await handleGetRoleRights({
-                  page: pagination.pageIndex,
-                  size: pagination.pageSize,
-                  ...filterObj,
-                });
-              } else {
-                response = await handleGetRoleRights({
-                  page: pagination.pageIndex,
-                  size: pagination.pageSize,
-                  sort: sorting
-                    .map(
-                      (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-                    )
-                    .join(","),
-                  ...filterObj,
-                });
-              }
-      
-              // Return the API response data
-              return response;
+
+        //   starting
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+        // Make the API request based on sorting
+        let response;
+        if (sorting.length === 0) {
+          response = await handleGetRoleRights({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            ...filterObj,
+          });
+        } else {
+          response = await handleGetRoleRights({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            sort: sorting
+              .map(
+                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+              )
+              .join(","),
+            ...filterObj,
+          });
+        }
+
+        // Return the API response data
+        return response;
       } catch (error) {
         setLoading(false); // Start loading
       } finally {
@@ -110,15 +110,12 @@ export default function RoleRightsList() {
   });
 
   useEffect(() => {
-    setLoading(true);
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
         pageIndex: dataQuery.data?.data?.totalPages - 1,
         pageSize: 10,
       });
     }
-    setLoading(false);
-    console.log('114: set page ')
   }, [dataQuery.data?.data?.totalPages]);
 
   const changeStatus = async (id, currentStatus) => {
@@ -219,36 +216,36 @@ export default function RoleRightsList() {
   useEffect(() => {
     return () => {
       queryClient.removeQueries("data");
-    };    
+    };
   }, [queryClient]);
 
   return (
     <React.Fragment>
-      
-       <Loader isLoading={loading} />
-      
-          <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-            <PageHeader
-              title={t('ROLE & RIGHTS')}
-              actions={[
-                { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
-              ]}
+
+      <Loader isLoading={loading} />
+
+      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+        <PageHeader
+          title={t('ROLE & RIGHTS')}
+          actions={[
+            { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
+          ]}
+        />
+        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+          <Card.Body className="d-flex flex-column">
+            {/* <ListingSearchFormUsers filter={filter} setFilter={setFilter} /> */}
+            <CommonDataTable
+              columns={columns}
+              dataQuery={dataQuery}
+              pagination={pagination}
+              setPagination={setPagination}
+              sorting={sorting}
+              setSorting={setSorting}
             />
-            <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-              <Card.Body className="d-flex flex-column">
-                {/* <ListingSearchFormUsers filter={filter} setFilter={setFilter} /> */}
-                <CommonDataTable
-                  columns={columns}
-                  dataQuery={dataQuery}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                  sorting={sorting}
-                  setSorting={setSorting}
-                />
-              </Card.Body>
-            </Card>
-          </div>
-      
+          </Card.Body>
+        </Card>
+      </div>
+
 
       {/* Delete Modal */}
       <GenericModal
