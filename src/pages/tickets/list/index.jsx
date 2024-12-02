@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { Card, Form } from "react-bootstrap";
-import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
+import { Button, Card, Form, Stack } from "react-bootstrap";
+import { MdAttachFile, MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
@@ -10,11 +10,17 @@ import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { handleGetUsers } from "../../../services/user.service";
 import TicketsListFilters from "./filters";
-import { handleGetTicketList } from "../../../services/ticketmanagement.service";
+import { agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
+import AppTooltip from "../../../components/tooltip";
+import AttachmentsModal from "../modals/attachmentsModal";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 export default function TicketsList() {
     const location = useLocation();
     const navigate = useNavigate();
+
+    const { t } = useTranslation()
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -29,57 +35,62 @@ export default function TicketsList() {
     });
 
     const [loading, setLoading] = useState(false);
+    const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
+    const [ticketIdsArr, setTicketIdsArr] = useState([]);
+
+    const [clearTableSelection ,setClearTableSelection] = useState(false)
+
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
-          // Set loading state to true before the request starts
+            // Set loading state to true before the request starts
 
-         return {data : sampleData ,page : 1 , size : 10} 
+            // return { data: sampleData, page: 1, size: 10 }
 
-        //   setLoading(true);
-    
-        //   try {
-        //     const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-        //     Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-    
-        //     // Make the API request based on sorting
-        //     let response;
-        //     if (sorting.length === 0) {
-        //       response = await handleGetTicketList({
-        //         page: pagination.pageIndex,
-        //         size: pagination.pageSize,
-        //         ...filterObj,
-        //       });
-        //     } else {
-        //       response = await handleGetTicketList({
-        //         page: pagination.pageIndex,
-        //         size: pagination.pageSize,
-        //         sort: sorting
-        //           .map(
-        //             (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-        //           )
-        //           .join(","),
-        //         ...filterObj,
-        //       });
-        //     }
-    
-        //     // Return the API response data
-        //     return response;
-        //   } catch (error) {
-        //     console.error("Error fetching data", error);
-        //     // Optionally, handle errors here
-        //   } finally {
-        //     // Set loading state to false when the request finishes (whether successful or not)
-        //     setLoading(false);
-        //   }
+            setLoading(true);
+
+            try {
+                const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+                Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+                // Make the API request based on sorting
+                let response;
+                if (sorting.length === 0) {
+                    response = await handleGetTicketList({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        ...filterObj,
+                    });
+                } else {
+                    response = await handleGetTicketList({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        sort: sorting
+                            .map(
+                                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                            )
+                            .join(","),
+                        ...filterObj,
+                    });
+                }
+
+                // Return the API response data
+                return response;
+            } catch (error) {
+                console.error("Error fetching data", error);
+                // Optionally, handle errors here
+            } finally {
+                // Set loading state to false when the request finishes (whether successful or not)
+                setLoading(false);
+            }
         },
         staleTime: 0, // Data is always stale, so it refetches
         cacheTime: 0, // Cache expires immediately
         refetchOnWindowFocus: false, // Disable refetching on window focus
         refetchOnMount: false, // Prevent refetching on component remount
         retry: 0, //Disable retry on failure
-      });
+    });
 
     const sampleData = [
         {
@@ -88,6 +99,7 @@ export default function TicketsList() {
             claimType: "Health Insurance",
             claimFilledBy: "John Doe",
             slaBreachDays: "5 Days",
+            priority: "Low",
             status: "Closed",
         },
         {
@@ -96,6 +108,7 @@ export default function TicketsList() {
             claimType: "Auto Insurance",
             claimFilledBy: "Jane Smith",
             slaBreachDays: "3 Days",
+            priority: "Medium",
             status: "In Progress",
         },
         {
@@ -104,6 +117,7 @@ export default function TicketsList() {
             claimType: "Travel Insurance",
             claimFilledBy: "Robert Brown",
             slaBreachDays: "7 Days",
+            priority: "High",
             status: "Rejected",
         },
         {
@@ -112,6 +126,7 @@ export default function TicketsList() {
             claimType: "Property Insurance",
             claimFilledBy: "Emily Davis",
             slaBreachDays: "2 Days",
+            priority: "NIL",
             status: "New",
         },
         {
@@ -120,6 +135,7 @@ export default function TicketsList() {
             claimType: "Life Insurance",
             claimFilledBy: "Michael Wilson",
             slaBreachDays: "10 Days",
+            priority: "NIL",
             status: "Closed",
         },
     ];
@@ -135,38 +151,114 @@ export default function TicketsList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
-    
+    // The color class based on the status
+    const getPriorityClass = (priority) => {
+        switch (priority) {
+            case 'Low':
+                return 'text-success';
+            case 'Medium':
+                return 'text-custom-warning';
+            case 'High':
+                return 'text-custom-danger';
+            default:
+                return 'text-body';
+        }
+    };
+
+    // The color class based on the status
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'Closed':
+                return 'bg-success text-success';
+            case 'In Progress':
+                return 'bg-custom-info text-custom-info';
+            case 'New':
+                return 'bg-custom-primary text-custom-primary';
+            case 'Rejected':
+                return 'bg-custom-danger text-custom-danger';
+            default:
+                return 'bg-body text-body';
+        }
+    };
+
+    // Handle Attachments Button
+    const handleAttachmentsClick = () => {
+        setAttachmentsModalShow(true)
+    }
+
+
     const columns = React.useMemo(
         () => [
             {
                 id: 'select-col',
                 header: ({ table }) => (
-                  <Form.Check
-                    checked={table.getIsAllRowsSelected()}
-                    indeterminate={table.getIsSomeRowsSelected()}
-                    onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
-                  />
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={table.getIsAllRowsSelected()}
+                        indeterminate={table.getIsSomeRowsSelected()}
+                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                        onChange={(e) => {
+                            table.toggleAllRowsSelected(e.target.checked);
+                            const allSelectedIds = e.target.checked
+                                ? table.getRowModel().rows.map((row) => row.original.id)
+                                : [];
+                            setTicketIdsArr(allSelectedIds);
+                            setClearTableSelection(false)
+                        }}
+                    />
                 ),
                 cell: ({ row }) => (
-                  <Form.Check
-                    checked={row.getIsSelected()}
-                    disabled={!row.getCanSelect()}
-                    onChange={row.getToggleSelectedHandler()}
-                  />
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={row.getIsSelected()}
+                        disabled={!row.getCanSelect()}
+                        // onChange={row.getToggleSelectedHandler()}
+                        onChange={(e) => {
+                            row.toggleSelected(e.target.checked);
+
+                            if (e.target.checked) {
+                                // Add the ID to the array if the row is selected
+                                setTicketIdsArr((prev) => [...prev, row.original.id]);
+                            } else {
+                                // Remove the ID from the array if the row is deselected
+                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+                            }
+
+                            setClearTableSelection(false)
+                            //     console.log({some : currentSelectedIds})
+                        }}
+                    />
                 ),
-              },
+                size: "15",
+                meta: {
+                    thClassName: 'pe-0 fs-6',
+                    tdClassName: 'pe-0 fs-6',
+                },
+            },
             {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => "Ticket Id",
+                header: () => "Ticket ID",
                 enableSorting: true,
-                cell :({row})=>(
-                    <Link to={`/tickets/view/${row?.original?.id}`}>{"#"+row?.original?.ticketId}</Link>
-                )
+                cell: ({ row }) => (
+                    <Stack direction="horizontal" gap={2}>
+                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+                        {/* <AppTooltip title="Attachments">
+                            <Button
+                                variant="link"
+                                className="p-0 border-0 link-dark"
+                                onClick={handleAttachmentsClick}
+                                aria-label="Attachments"
+                            >
+                                <MdAttachFile size={16} />
+                            </Button>
+                        </AppTooltip> */}
+                    </Stack>
+                ),
             },
             {
-                // accessorFn: (row) => row?.claimType?.name,
-                accessorFn: (row) => row?.claimType,
+                accessorFn: (row) => row?.claimType?.name,
+                // accessorFn: (row) => row?.claimType,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
@@ -176,13 +268,13 @@ export default function TicketsList() {
                 id: "createdAt",
                 header: () => "Creation Date",
                 enableSorting: true,
-                 cell: ({ row }) => (
+                cell: ({ row }) => (
                     row?.original?.createdAt
                 ),
             },
             {
-                accessorFn: (row) => row?.claimFilledBy,
-                // accessorFn: (row) => row?.user?.name,
+                // accessorFn: (row) => row?.claimFilledBy,
+                accessorFn: (row) => row?.user?.name,
                 id: "claimFilledBy",
                 header: () => "Claim filled by",
                 enableSorting: true,
@@ -194,15 +286,54 @@ export default function TicketsList() {
                 enableSorting: true,
             },
             {
+                accessorFn: (row) => row?.priority,
+                id: "priority",
+                header: () => "Priority",
+                size: "100",
+                cell: (rowData) => (
+                    <span
+                        className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
+                    >
+                        {rowData.row.original.priority}
+                    </span>
+                )
+            },
+            {
                 accessorFn: (row) => row?.status,
                 id: "status",
                 header: () => "Status",
-                size: "90",
+                size: "100",
+                cell: (rowData) => (
+                    <span
+                        className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+                    >
+                        {rowData.row.original.status}
+                    </span>
+                )
             },
         ],
         []
     );
-   
+
+    const handleTicketAssignment = (agentId) => {
+        // agentTicketToSEPSagent
+        if (agentId && agentId !== '') {
+            agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
+                toast.success(t("TICKETS ASSIGNED"));
+                setClearTableSelection(true)
+                setTicketIdsArr([])
+            }).catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                }
+            }).finally(() => {
+                setLoading(false)
+            })
+        }
+    }
+
     useEffect(() => {
         setPagination({
             pageIndex: 0,
@@ -213,7 +344,7 @@ export default function TicketsList() {
     //Add New Click Hanlder
     const addNewClickHanlder = () => {
         // navigate tickets/view/1
-        navigate('/tickets/view/1')
+        // navigate('/tickets/view/1')
     }
 
     // Info Cards Data
@@ -255,7 +386,7 @@ export default function TicketsList() {
                 <PageHeader
                     title="Tickets"
                     actions={[
-                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning" , disabled: true },
+                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning", disabled: true },
                     ]}
                 />
                 <div className="info-cards mb-3">
@@ -263,7 +394,7 @@ export default function TicketsList() {
                 </div>
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <TicketsListFilters filter={filter} setFilter={setFilter} />
+                        <TicketsListFilters filter={filter} setFilter={setFilter} handleTicketAssign={handleTicketAssignment} ticketArr={ticketIdsArr} clearTableSelection={clearTableSelection} />
                         <CommonDataTable
                             columns={columns}
                             dataQuery={dataQuery}
@@ -271,10 +402,18 @@ export default function TicketsList() {
                             setPagination={setPagination}
                             sorting={sorting}
                             setSorting={setSorting}
+                            clearTableSelection={clearTableSelection}
                         />
                     </Card.Body>
                 </Card>
             </div>
+
+            {/* Attachments Modals */}
+            <AttachmentsModal
+                modal={attachmentsModalShow}
+                toggle={() => setAttachmentsModalShow(false)}
+            />
+
         </React.Fragment>
     );
 }

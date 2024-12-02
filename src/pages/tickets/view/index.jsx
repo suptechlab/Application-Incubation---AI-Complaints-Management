@@ -161,6 +161,32 @@ const TicketsView = () => {
     },
   ];
 
+  // View Bottom Data
+  const viewBottomData = [
+    {
+      label: "Created on",
+      value: `07-10-24 | 03:33 pm`,
+      colProps: { sm: 6 }
+    },
+    {
+      label: "Agent",
+      value: `John Duo`,
+      colProps: { sm: 6 }
+    },
+    {
+      value: (<Stack direction='horizontal' gap={1}>
+        <span><MdAttachFile size={16} /></span>
+        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
+      </Stack>),
+      colProps: { xs: 12, className: "pb-3" }
+    },
+    {
+      label: "Comments",
+      value: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus ante quis massa bibendum fringilla.`,
+      colProps: { xs: 12 }
+    },
+  ]
+
   //Chat Reply Data
   const chatReplyData = [
     {
@@ -170,6 +196,7 @@ const TicketsView = () => {
       date: "07-14-24 | 10:00 am",
       message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
       avatar: defaultAvatar,
+      variant: '',
     },
     {
       id: 2,
@@ -178,6 +205,7 @@ const TicketsView = () => {
       date: "07-14-24 | 10:00 am",
       message: <>Thanks i will update <Link to="/" className='text-decoration-none'>@Kyle</Link> about the same.</>,
       avatar: defaultAvatar,
+      variant: '',
     },
     {
       id: 3,
@@ -186,8 +214,43 @@ const TicketsView = () => {
       date: "07-14-24 | 10:00 am",
       message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
       avatar: defaultAvatar,
+      variant: '',
+    },
+    {
+      id: 4,
+      name: "Carlos P",
+      action: <>added Resolution Note and mark it Resolved</>,
+      date: "14-07-24 | 9:11 am",
+      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer.</>,
+      avatar: defaultAvatar,
+      variant: 'Resolved',
+    },
+    {
+      id: 5,
+      name: "Mic Johns",
+      action: <>added Internal Note</>,
+      date: "14-07-24 | 9:10 am",
+      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.</>,
+      avatar: defaultAvatar,
+      variant: 'In Progress',
     },
   ];
+
+  // The color class based on the status
+  const getReplyStatusClass = (status) => {
+    switch (status) {
+        case 'Resolved':
+            return 'bg-custom-pink p-2 rounded';
+        case 'In Progress':
+            return 'bg-custom-yellow p-2 rounded';
+        case 'New':
+            return 'bg-custom-primary p-2 rounded';
+        case 'Rejected':
+            return 'bg-custom-danger p-2 rounded';
+        default:
+            return '';
+    }
+};
 
   return (
     <React.Fragment>
@@ -198,11 +261,23 @@ const TicketsView = () => {
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
-            <Col lg={6} className='mh-100'>
-              <Card className="border-0 shadow h-100 overflow-auto">
+            <Col lg={6} className='mh-100 d-flex flex-column'>
+              <Card className="border-0 shadow h-100 custom-min-height-200 overflow-auto">
                 <Card.Body>
                   <Row>
                     {viewTopData?.map((item, index) => (
+                      <Col key={"data_view_" + index} {...item.colProps}>
+                        <CommonViewData label={item.label} value={item.value} />
+                      </Col>
+                    ))}
+                  </Row>
+                </Card.Body>
+              </Card>
+              <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                <Card.Body className='mh-100'>
+                  <h5 className='custom-font-size-18 fw-semibold mb-3'>2nd Instance Claim details</h5>
+                  <Row>
+                    {viewBottomData?.map((item, index) => (
                       <Col key={"data_view_" + index} {...item.colProps}>
                         <CommonViewData label={item.label} value={item.value} />
                       </Col>
@@ -256,7 +331,7 @@ const TicketsView = () => {
                               <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
                               <span>{reply.date}</span>
                             </Stack>
-                            <p className='mt-2 mb-0'>{reply.message}</p>
+                            <p className={`mt-2 mb-0 bg-opacity-25 ${getReplyStatusClass(reply.variant)}`}>{reply.message}</p>
                           </Col>
                         </Row>
                       </ListGroup.Item>
