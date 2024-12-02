@@ -17,7 +17,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
   const sidebarRef = useRef(null);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null);
 
-  const handleSubmenu = (idx) => {
+  const handleSubmenu = (idx) => { 
     if (isSubMenuOpen === idx) {
       setIsSubMenuOpen(null);
     } else {
@@ -58,6 +58,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
     list: [],
     isAdmin: false,
   });
+
   useEffect(() => {
     isAdminUser()
       .then((response) => {
@@ -132,14 +133,48 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                         onClick={handleNavLinkClick}
                       >
                         <span className="py-1 text-center min-w-44 sidebarIcon">
-                          {menuIcon}
+                          {menuIcon} 
                         </span>
                         <span className="hideInSmallSidebar text-wrap lh-sm">
                           {title}
                         </span>
                       </Nav.Link>
                     )}
+
+                    {/* {subMenu && ( */}
                     {/* {permission.current.isAdmin || permission.current.list.includes(roleName) ? subMenu && ( */}
+                    {/* { Yaha pe dono conditon me se permissoin wali use kr rhe h} */}
+                    
+                    {/* {console.log('roleName 143 - ',roleName)}
+                    {console.log('current list 144 - ',permission.current.list)}
+                    {permission.current.isAdmin || permission.current.list.includes(roleName) ? subMenu && ( 
+                      <Nav.Link
+                        key={menuName}
+                        as={Button}
+                        variant="link"
+                        onClick={() => handleSubmenu(id)}
+                        className={`align-items-center d-flex px-0 sidebarLink rounded w-100 text-white ${
+                          isSubMenuOpen === id ? "active" : ""
+                        } ${disabled ? "disabled" : ""}`}
+                    >
+                          <span className="py-1 text-center min-w-44 sidebarIcon">
+                            {menuIcon}
+                          </span>
+                          <span className="hideInSmallSidebar text-wrap text-start lh-sm">
+                            {title} 164
+                          </span>
+                          <span className="ms-auto sub-menu-arrow">
+                            {isSubMenuOpen === id ? (
+                              <MdOutlineKeyboardArrowDown size={20} />
+                            ) : (
+                              <MdOutlineKeyboardArrowRight size={20} />
+                            )}
+                          </span>
+                    </Nav.Link>
+                   
+                    ) : ''} */}
+
+                    
                     {subMenu && (
                       <Nav.Link
                         key={menuName}
@@ -165,10 +200,13 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                         </span>
                       </Nav.Link>
                     )}
-
+  
                     {isSubMenuOpen === id && subMenu && (
                       <Nav as="ul" className="flex-column p-0">
+                        {/* {console.log('subMenu',subMenu)} */}
                         {subMenu.map((subItems) => {
+                          // {console.log('permission.current.list 202---', permission.current.list)}
+                          // {console.log('roleName 203---', subItems.roleName)}
                           return (
                             <Nav.Item as="li" key={subItems.id}>
                               {permission.current.isAdmin ||
@@ -187,7 +225,8 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                                     {subItems.menuIcon}
                                   </span>
                                   <span className="hideInSmallSidebar text-wrap lh-sm">
-                                    {subItems.menuName}
+                                    {/* {subItems.menuName + ' - ' + subItems.roleName}  */}
+                                    {subItems.menuName} 
                                   </span>
                                 </Nav.Link>
                               ) : (

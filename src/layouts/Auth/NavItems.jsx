@@ -12,7 +12,7 @@ export const NavItems = () => {
       title: t("DASHBOARD"),
       menuIcon: <MdDashboard size={20} />,
       path: "/dashboard",
-      roleName: "admin",
+      roleName: "Dashboard",
       disabled: false,
     },
     {
@@ -21,23 +21,24 @@ export const NavItems = () => {
       title: t("User Management"),
       menuIcon: <MdPerson size={20} />,
       path: '#',
-      roleName: "admin",
+      // roleName: "user",
       subMenu: [
         {
           id: 21,
           menuName: t("SEPS USERS"),
           title: t("SEPS USERS"),
           path: "/users",
-          roleName: "user",
-          disabled: true,
-
+          roleName: "SEPS User",
+          permissions: ["FI_USER_CREATE_BY_FI"], // Match against userRoles
+          disabled: false,
         },
         {
           id: 22,
           menuName: t("FI USERS"),
           title: t("FI USERS"),
           path: "/fi-users",
-          roleName: "admin",
+          roleName: "FI User",
+          permissions: ["FI_USER_CREATE_BY_FI"],
           disabled: false,
         },
         {
@@ -46,6 +47,7 @@ export const NavItems = () => {
           title: t("ROLES AND RIGHTS LIST"),
           path: "/role-rights",
           roleName: "admin",
+          permissions: [], // No specific permission required for admin
           disabled: false,
         },
       ],
@@ -73,7 +75,7 @@ export const NavItems = () => {
           menuName: t("CLAIM TYPE"),
           path: "/claim-type",
           moduleName: ["Master Management"],
-          roleName: "admin",
+          roleName: "Claim Type Master",
           disabled: false,
         },
         {
@@ -81,7 +83,7 @@ export const NavItems = () => {
           menuName: t("CLAIM SUB TYPE"),
           path: "/claim-subtype",
           moduleName: ["Master Management"],
-          roleName: "admin",
+          roleName: "Claim Sub Type Master",
           disabled: false,
         },
         {
@@ -89,7 +91,7 @@ export const NavItems = () => {
           menuName: t("INQUIRY TYPE"),
           path: "/inquiry-type",
           moduleName: ["Master Management"],
-          roleName: "admin",
+          roleName: "Inquiry Type Master",
           disabled: false,
         },
         {
@@ -97,7 +99,7 @@ export const NavItems = () => {
           menuName: t("INQUIRY SUB TYPE"),
           path: "/inquiry-subtype",
           moduleName: ["Master Management"],
-          roleName: "admin",
+          roleName: "Inquiry Sub Type Master",
           disabled: false,
         },
         {
@@ -105,7 +107,7 @@ export const NavItems = () => {
           menuName: t("PROVINCE MASTER"),
           path: "/province-master",
           moduleName: ["Master Management"],
-          roleName: "admin",
+          roleName: "Province Master",
           disabled: false,
         },
         {
@@ -113,7 +115,7 @@ export const NavItems = () => {
           menuName: t("CITY MASTER"),
           path: "/city-master",
           moduleName: ["Master Management"],
-          roleName: "admin",
+          roleName: "City Master",
           disabled: false,
         },
         {
@@ -141,7 +143,7 @@ export const NavItems = () => {
       title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
-      roleName: "admin",
+      roleName: "Ticket Workflow",
       disabled: true,
     },
     {
@@ -151,14 +153,14 @@ export const NavItems = () => {
       menuIcon: <BsFillFileTextFill size={20} />,
       path: '#',
       moduleName: ["reports"],
-      roleName: "admin",
+      roleName: "Reports",
       subMenu: [
         {
           id: 71,
           menuName: t("CLAIM OVERVIEW"),
           path: "/reports/claim-overview",
           moduleName: ["reports"],
-          roleName: "admin",
+          roleName: "Reports",
           disabled: true,
         },
         {
@@ -166,7 +168,7 @@ export const NavItems = () => {
           menuName: t("SLA COMPLIANCE"),
           path: "/reports/sla-compliance",
           moduleName: ["reports"],
-          roleName: "admin",
+          roleName: "Reports",
           disabled: true,
         },
         {
@@ -174,7 +176,7 @@ export const NavItems = () => {
           menuName: t("AUDIT TRAIL REPORT"),
           path: "/reports/audit-trail",
           moduleName: ["reports"],
-          roleName: "admin",
+          roleName: "Audit Trails",
           disabled: false,
         },
       ],

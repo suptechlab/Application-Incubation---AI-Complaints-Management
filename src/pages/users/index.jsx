@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -21,6 +21,7 @@ import ListingSearchFormUsers from "./ListingSearchFormUsers";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
+import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
 
 export default function UserList() {
 
@@ -111,6 +112,36 @@ export default function UserList() {
     }
   };
 
+  // Permissoin work
+  const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
+  useEffect(() => {
+      isAdminUser().then(response => {
+          if (response) {
+              permission.current.statusModule = true;
+              permission.current.addModule = true;
+              permission.current.editModule = true;
+              permission.current.deleteModule = true;
+          } else {
+              getModulePermissions("SEPS User").then(response => {
+                  if (response.includes("SEPS_USER_CREATE_BY_SEPS")) {
+                      permission.current.addModule = true;
+                  }
+                  if (response.includes("SEPS_USER_UPDATE_BY_SEPS")) {
+                      permission.current.editModule = true;
+                  }
+                  if (response.includes("SEPS_USER_STATUS_CHANGE_BY_SEPS")) {
+                      permission.current.statusModule = true;
+                  }
+              }).catch(error => {
+                  console.error("Error fetching permissions:", error);
+              });
+          }
+      }).catch(error => {
+          console.error("Error get during to fetch User Type", error);
+      })
+
+  }, []);
+
   //Handle Delete
   const deleteAction = (rowData) => {
     setSelectedRow(rowData);
@@ -150,19 +181,6 @@ export default function UserList() {
         id: "email",
         header: () => t('EMAIL'),
       },
-      // {
-      //   accessorFn: (row) => row.mobileNo,
-      //   id: "mobileNo",
-      //   header: () => "Unidad Organizacional",
-      //   cell: (info) => {
-      //     return (
-      //       <span>
-      //         {info.row.original.mobileCode} {info.row.original.mobileNo}
-      //       </span>
-      //     );
-      //   },
-      // },
-
       {
         accessorFn: (row) => row.createdDate,
         id: "createdDate",
@@ -174,8 +192,8 @@ export default function UserList() {
 
       {
         cell: (info) => {
-          // console.log('rowstatus 100->',info?.row?.original?.status);
           return (
+            permission.current.statusModule ? 
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
@@ -189,7 +207,8 @@ export default function UserList() {
                 )
               }
               tooltip="Activo / Bloquear"
-            />
+            /> 
+            : ''
           );
         },
         id: "status",
@@ -200,87 +219,8 @@ export default function UserList() {
       {
         id: "actions",
         isAction: true,
-        // cell: (info) => {
-        //     return (
-        //         <div className="d-flex items-center gap-2">
-        //             <div
-        //                 onClick={() => {
-        //                     navigate(`/users/edit/${info.row.original.id}`);
-        //                 }}
-        //             >
-        //                 <span className=''>{SvgIcons.editIcon}</span>
-        //             </div>
-        //             <div
-        //                 onClick={() => {
-        //                     Swal.fire({
-        //                         title: "Reset Password",
-        //                         text: "Are you sure you want to reset password again?",
-        //                         icon: "warning",
-        //                         showCancelButton: true,
-        //                         confirmButtonText: "Yes!",
-        //                         cancelButtonText: "No, cancel!",
-        //                         reverseButtons: true,
-        //                     }).then((result) => {
-        //                         if (result.isConfirmed) {
-        //                             handleUserResetPassword(
-        //                                 info.row.original.id
-        //                             ).then((response) => {
-        //                                 Swal.fire(
-        //                                     "Reset Password",
-        //                                     response.data.message,
-        //                                     "success"
-        //                                 );
-        //                                 dataQuery.refetch();
-        //                             });
-        //                         } else if (result.dismiss === Swal.DismissReason.cancel) {
-        //                         }
-        //                     });
-        //                 }}
-        //             >
-        //                 <span className='' >{SvgIcons.keyIcon}</span>
-
-        //             </div>
-
-        //             <div
-        //                 onClick={() => {
-        //                     Swal.fire({
-        //                         title: "Are you sure?",
-        //                         text: "You will not be able to recover this data!",
-        //                         icon: "warning",
-        //                         showCancelButton: true,
-        //                         confirmButtonText: "Yes, delete it!",
-        //                         cancelButtonText: "No, cancel!",
-        //                         reverseButtons: true,
-        //                     }).then((result) => {
-        //                         if (result.isConfirmed) {
-        //                             console.log(
-        //                                 "Delete",
-        //                                 info.row.original
-        //                             );
-        //                             handleDeleteUser(
-        //                                 info.row.original.id
-        //                             ).then(() => {
-        //                                 Swal.fire(
-        //                                     "Deleted!",
-        //                                     "Your data has been deleted.",
-        //                                     "success"
-        //                                 );
-        //                                 dataQuery.refetch();
-        //                             });
-        //                         } else if (
-        //                             result.dismiss ===
-        //                             Swal.DismissReason.cancel
-        //                         ) {
-        //                         }
-        //                     });
-        //                 }}
-        //             >
-        //                 <span className=''>{SvgIcons.deleteIcon}</span>
-        //             </div>
-        //         </div>
-        //     );
-        // },
         cell: (rowData) => (
+          permission.current.editModule ? 
           <DataGridActions
             controlId="users"
             rowData={rowData}
@@ -292,16 +232,9 @@ export default function UserList() {
                 title: "Edit",
                 icon: <MdEdit size={18} />,
               },
-              // {
-              //   name: "delete",
-              //   enabled: true,
-              //   type: "button",
-              //   title: "Delete",
-              //   icon: <MdDelete size={18} />,
-              //   handler: () => deleteAction(rowData.row.original),
-              // },
             ]}
-          />
+          /> 
+          : ''
         ),
         header: () => <div className="text-center">{t('ACTIONS')}</div>,
         enableSorting: false,
@@ -331,10 +264,12 @@ export default function UserList() {
       { loading ? <Loader isLoading={loading} />
       :
         <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+          {permission.current.addModule ? 
           <PageHeader
             title="Usuarios de SEPS"
             actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
           />
+          : ''}
           <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
             <Card.Body className="d-flex flex-column">
               <ListingSearchFormUsers filter={filter} setFilter={setFilter} />
