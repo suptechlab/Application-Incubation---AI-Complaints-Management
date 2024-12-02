@@ -54,7 +54,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         {
             label: t('CREATED_ON'),
             value: claimTicketData?.createdAt
-                ? moment(claimTicketData?.createdAt).format('DD-MM-YY | hh:mm:ss a')
+                ? moment(claimTicketData?.createdAt).format('DD-MM-YY | hh:mm:ss')
                 : t('NOT_AVAILABLE'),
             colProps: { sm: 6, lg: 3 }
         },

@@ -47,7 +47,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData,isFormSubmitted, setIs
     try {
       const result = await dispatch(sendOTPonEmail({ email }));
       if (sendOTPonEmail.fulfilled.match(result)) {
-        toast.success(result?.message ?? "OTP Sent successfully.");
+        toast.success(result?.payload?.message ?? "OTP Sent successfully.");
         return true;
       } else {
         console.error(result?.error?.message ?? "Failed to send OTP.");
