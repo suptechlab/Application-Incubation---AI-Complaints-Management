@@ -8,7 +8,8 @@ export const BasicInfoFormSchema = yup.object({
 
   identification: yup
     .string()
-    .required(msg.nationalIDRequired),
+    // .required(msg.nationalIDRequired),
+    ,
 
   email: yup
     .string()
@@ -32,9 +33,10 @@ export const BasicInfoFormSchema = yup.object({
     .string()
     .required(msg.provinceRequired),
 
+
   cityId: yup
     .string()
-    .required(msg.cantonRequired)
+    // .required(msg.cantonRequired)
 });
 
 export const OtherInfoFormSchema = yup.object({

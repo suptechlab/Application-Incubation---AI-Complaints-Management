@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import { Col, Row, Tab } from "react-bootstrap";
+import { Tab } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../components/Loader";
-import StepsProgress from "../../../components/stepProgress/stepProgress";
 import BasicInfoTab from "./basicInfoTab";
 import ClaimDetailsTab from "./claimDetailsTab";
 import FileAlertModal from "./file-alert";
 import FileSuccesModal from "./file-success";
-import OtherInfoTab from "./otherInfoTab";
 import PageHeader from "./header";
+import OtherInfoTab from "./otherInfoTab";
 
 export default function CreateClaim() {
 
@@ -63,6 +62,8 @@ export default function CreateClaim() {
     const handleClaimDetailsSubmit = async (values, actions) => {
 
         let formData = { ...fileClaimValues, ...values }
+
+        console.log('values', formData);
 
         formData.checkDuplicate = true
 

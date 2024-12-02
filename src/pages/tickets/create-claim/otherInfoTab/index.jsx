@@ -1,16 +1,17 @@
-import { Formik } from "formik";
 import React, { useState } from 'react';
 import { Button, Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { OtherInfoFormSchema } from '../../../../validations/createClaim.validation';
-import CommonFormikComponent from "../../../../components/CommonFormikComponent";
+import { useMasterData } from '../../../../contexts/masters.context';
 
 const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
 
-    const [selectedRuc, setSelectedRuc] = useState('')
+    const [selectedRuc, setSelectedRuc] = useState('');
+    const { masterData } = useMasterData();
 
     const { t } = useTranslation()
 
