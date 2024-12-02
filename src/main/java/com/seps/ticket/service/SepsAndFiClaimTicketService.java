@@ -70,6 +70,7 @@ public class SepsAndFiClaimTicketService {
             .map(claimTicketMapper::toDTO);
     }
 
+    @Transactional
     public ClaimTicketDTO getSepsFiClaimTicketById(Long id) {
         User currentUser = userService.getCurrentUser();
         List<String> authority = currentUser.getAuthorities().stream()
