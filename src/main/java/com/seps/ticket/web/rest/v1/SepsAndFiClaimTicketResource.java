@@ -2,11 +2,9 @@ package com.seps.ticket.web.rest.v1;
 
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
+import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
-import com.seps.ticket.service.dto.AssignTicketRequestDTO;
-import com.seps.ticket.service.dto.ClaimTicketDTO;
-import com.seps.ticket.service.dto.DropdownListDTO;
-import com.seps.ticket.service.dto.RequestInfo;
+import com.seps.ticket.service.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,9 +28,10 @@ import java.util.List;
 public class SepsAndFiClaimTicketResource {
 
     private final SepsAndFiClaimTicketService sepsAndFiClaimTicketService;
-
-    public SepsAndFiClaimTicketResource(SepsAndFiClaimTicketService sepsAndFiClaimTicketService) {
+    private final ClaimTicketActivityLogService claimTicketActivityLogService;
+    public SepsAndFiClaimTicketResource(SepsAndFiClaimTicketService sepsAndFiClaimTicketService, ClaimTicketActivityLogService claimTicketActivityLogService) {
         this.sepsAndFiClaimTicketService =  sepsAndFiClaimTicketService;
+        this.claimTicketActivityLogService = claimTicketActivityLogService;
     }
 
     @Operation(summary = "List all Claim Ticket", description = "Retrieve a paginated list of all claim tickets")
@@ -101,4 +100,10 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{ticketId}/activity-logs")
+    public ResponseEntity<List<ClaimTicketActivityLogDTO>> claimTicketsActivityList(@PathVariable Long ticketId, Pageable pageable) {
+        Page<ClaimTicketActivityLogDTO> page = claimTicketActivityLogService.getAllActivities(ticketId, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
 }
