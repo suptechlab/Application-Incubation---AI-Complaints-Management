@@ -38,6 +38,9 @@ const AddEditRoleRights = React.lazy(() =>
 );
 const TicketsList = React.lazy(() => import("../pages/tickets/list"));
 const TicketsView = React.lazy(() => import("../pages/tickets/view"));
+const TeamManagementAdd = React.lazy(() => import("../pages/team-management/add"));
+const TeamManagementEdit = React.lazy(() => import("../pages/team-management/edit"));
+const TeamManagementList = React.lazy(() => import("../pages/team-management/list"));
 
 const routes = [
   // {
@@ -281,13 +284,13 @@ const routes = [
   },
   {
     path: "/team-management/add",
-    element: <TeamManagementAddEdit />,
+    element: <TeamManagementAdd />,
     isPrivate: true,
     layoutType: "Auth",
   },
   {
     path: "/team-management/edit/:id",
-    element: <TeamManagementAddEdit />,
+    element: <TeamManagementEdit />,
     isPrivate: true,
     layoutType: "Auth",
   },

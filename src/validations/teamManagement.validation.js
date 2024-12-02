@@ -5,12 +5,12 @@ const msg = getValidationMessages();
 
 const validationSchema = Yup.object({
       teamName: Yup.string()
-        .required(msg.nameRequired) // Dynamic message for name required
+        .required(msg.teamNameRequired) // Dynamic message for name required
         .max(100, msg.maximumLimit100), // Dynamic message for max length
 
       description: Yup.string()
-        .required(msg.nameRequired) // Dynamic message for email required
-        .max(100, msg.maximumLimit100), // Dynamic message for max length
+        .required(msg.descriptionRequired) // Dynamic message for email required
+        .max(255, msg.descriptionMax255), // Dynamic message for max length
 });
 
 export { validationSchema };

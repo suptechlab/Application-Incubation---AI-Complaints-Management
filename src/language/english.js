@@ -149,5 +149,12 @@ export const englishLang = {
     "MEMBER NAME": "Member Name",
     "ASSIGN": "Assign",
 
+    "TEAM MEMBER HAS ALREADY BEEN ASSIGNED": "This team member has already been assigned.",
+    "SELECT A TEAM MEMBER BEFORE ASSIGNING": "Please select a team member before assigning.",
+    "DELETE TEAM MEMBER": "Delete Team Member",
+    "ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER": "Are you sure, you want to delete the team member",
+    "DELETE": "Eliminado",
+
+
 
 }
