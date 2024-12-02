@@ -4,8 +4,14 @@ package com.seps.ticket.service.impl;
 import com.seps.ticket.domain.ClaimTicketActivityLog;
 import com.seps.ticket.repository.ClaimTicketActivityLogRepository;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
+import com.seps.ticket.service.dto.ClaimTicketActivityLogDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -16,5 +22,30 @@ public class ClaimTicketActivityLogServiceImpl implements ClaimTicketActivityLog
     @Override
     public void saveActivityLog(ClaimTicketActivityLog activityLog) {
         repository.save(activityLog);
+    }
+
+    @Override
+    public Page<ClaimTicketActivityLogDTO> getAllActivities(Long ticketId, Pageable pageable) {
+
+        Locale locale = LocaleContextHolder.getLocale();
+        return repository.findAllByTicketId(ticketId, pageable)
+                .map(activity -> mapToDTO(activity, locale));
+    }
+
+    private ClaimTicketActivityLogDTO mapToDTO(ClaimTicketActivityLog activity, Locale locale) {
+        String activityTitle = activity.getActivityTitle().getOrDefault(locale.getLanguage(), "Title not available");
+
+        return new ClaimTicketActivityLogDTO(
+                activity.getId(),
+                activity.getTicketId(),
+                activity.getPerformedBy(),
+                activity.getPerformedAt(),
+                activity.getActivityType(),
+                activityTitle,
+                activity.getActivityDetails(),
+                activity.getLinkedUsers(),
+                activity.getTaggedUsers(),
+                activity.getAttachmentUrl()
+        );
     }
 }
