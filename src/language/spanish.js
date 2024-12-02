@@ -54,7 +54,9 @@ export const spanishLang = {
     "PROVINCE": "Provincia",
     "CREATE TEMPLATE MASTER": "Crear maestro de plantillas",
     "EDIT TEMPLATE MASTER": "Editar maestro de plantillas",
-    "NAME OF TEMPLATE MASTER": "Nombre del maestro de plantillas",
+    "NAME OF TEMPLATE MASTER": "Nombre del maestro de plantillas*",
+    "SUBJECT": "Sujeto*",
+    "TEMPLATE_DETAILS": "Detalles de la plantilla*",
     "STATUS UPDATED": "Estado actualizado con éxito.",
     // Authentication
     "ONE TIME PASSWORD": "Contraseña de Un Solo Uso",
@@ -142,6 +144,7 @@ export const spanishLang = {
     "USER TYPE": "Tipo de usuario",
     "NOTIFICATION": "Notificación",
     "TEMPLATE TYPE": "Tipo de plantilla",
+    "TEMPLATE TYPE*": "Tipo de plantilla*",
     "ASSOCIATION": "Asociación",
      // Team managment
      "ENTITY NAME": "Nombre de la entidad",
