@@ -1,14 +1,19 @@
 package com.seps.auth.service;
 
 import com.seps.auth.domain.Otp;
+import com.seps.auth.domain.TemplateMaster;
 import com.seps.auth.domain.User;
+import com.seps.auth.repository.TemplateMasterRepository;
+import com.seps.auth.service.dto.MailDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +42,10 @@ public class MailService {
 
     private static final String BASE_URL = "baseUrl";
 
+    private static final String USERNAME = "username";
+
+    private static final String URL = "url";
+
     private final JHipsterProperties jHipsterProperties;
 
     private final JavaMailSender javaMailSender;
@@ -47,17 +56,20 @@ public class MailService {
 
     private static final String BASE_URL_USER = "baseUrlUser";
 
+    private final TemplateMasterRepository templateMasterRepository;
 
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
-        SpringTemplateEngine templateEngine
+        SpringTemplateEngine templateEngine,
+        TemplateMasterRepository templateMasterRepository
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
+        this.templateMasterRepository = templateMasterRepository;
     }
 
     @Async
@@ -113,19 +125,45 @@ public class MailService {
     @Async
     public void sendActivationEmail(User user) {
         LOG.debug("Sending activation email to '{}'", user.getEmail());
-        this.sendEmailFromTemplateSync(user, "mail/activationEmail", "email.activation.title");
+        //this.sendEmailFromTemplateSync(user, "mail/activationEmail", "email.activation.title");
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setTemplateKey("ACCOUNT_ACTIVATION");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, user.getFirstName());
+        dataVariables.put(URL, jHipsterProperties.getMail().getBaseUrl() + "/account/activate?key=" + user.getActivationKey());
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 
     @Async
     public void sendCreationEmail(User user) {
         LOG.debug("Sending creation email to '{}'", user.getEmail());
-        this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.activation.title");
+        //this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.activation.title");
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setTemplateKey("ACCOUNT_ACTIVATION");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, user.getFirstName());
+        dataVariables.put(URL, jHipsterProperties.getMail().getBaseUrl() + "/account/reset/finish?key=" + user.getResetKey());
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 
     @Async
     public void sendPasswordResetMail(User user) {
         LOG.debug("Sending password reset email to '{}'", user.getEmail());
-        this.sendEmailFromTemplateSync(user, "mail/passwordResetEmail", "email.reset.title");
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setTemplateKey("FORGOT_PASSWORD");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, user.getFirstName());
+        dataVariables.put(URL, jHipsterProperties.getMail().getBaseUrl() + "/reset-password?key=" + user.getResetKey());
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 
     @Async
@@ -138,14 +176,18 @@ public class MailService {
         Instant now = Instant.now();
         long secondsLeft = Duration.between(now, user.getOtpCodeExpirationTime()).getSeconds();
         long minutesLeft = (long) Math.ceil(secondsLeft / 60.0); // Round up to the nearest minute
-        Locale locale = Locale.forLanguageTag(user.getLangKey());
-        Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
-        context.setVariable("minutes", minutesLeft);
-        String content = templateEngine.process("mail/loginOtpEmail", context);
-        String subject = messageSource.getMessage("email.login.otp.title", null, locale);
-        this.sendEmailSync(user.getEmail(), subject, content, false, true);
+
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setTemplateKey("YOUR_OTP_CODE");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, user.getFirstName());
+        dataVariables.put("minutes", String.valueOf(minutesLeft));
+        dataVariables.put("otpCode", String.valueOf(user.getOtpCode()));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
     }
 
     @Async
@@ -158,18 +200,60 @@ public class MailService {
         Instant now = Instant.now();
         long secondsLeft = Duration.between(now, otp.getExpiryTime()).getSeconds();
         long minutesLeft = (long) Math.ceil(secondsLeft / 60.0); // Round up to the nearest minute
-        Context context = new Context(locale);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
-        context.setVariable("otpCode", otp.getOtpCode());
-        context.setVariable("minutes", minutesLeft);
-        String content = templateEngine.process("mail/registerOtpEmail", context);
-        String subject = messageSource.getMessage("email.register.otp.title", null, locale);
-        this.sendEmailSync(otp.getEmail(), subject, content, false, true);
+
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(locale.getLanguage());
+        mailDTO.setTo(otp.getEmail());
+        mailDTO.setTemplateKey("REGISTER_YOUR_OTP_CODE");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put("minutes", String.valueOf(minutesLeft));
+        dataVariables.put("otpCode", String.valueOf(otp.getOtpCode()));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
     }
 
     @Async
     public void sendAccountSetupEmail(User user) {
         LOG.debug("Sending account setup email to '{}'", user.getEmail());
         this.sendEmailFromTemplateSync(user, "mail/accountSetupEmail", "email.account.setup.title");
+    }
+
+    //@Async
+    public void sendDynamicContentEmail(MailDTO mailDTO) {
+        TemplateMaster template = templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
+            .orElse(null);
+
+        if(template != null) {
+            // Prepare dynamic content
+            String subject = replacePlaceholders(template.getSubject(), mailDTO.getDataVariables());
+            String content = replacePlaceholders(template.getContent(), mailDTO.getDataVariables());
+
+            // Render HTML template with Thymeleaf
+            String renderedContent = renderEmailTemplate(subject, content, Locale.forLanguageTag(mailDTO.getLocale()));
+
+            // Send email
+            this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
+        }else {
+            LOG.debug("Template with key '{}' not found or inactive. Using default content.", mailDTO.getTemplateKey());
+        }
+    }
+
+    private String replacePlaceholders(String template, Map<String, String> variables) {
+        if (template == null || variables == null) return template;
+
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
+        }
+        return template;
+    }
+
+    private String renderEmailTemplate(String subject, String content, Locale locale) {
+        Context context = new Context(locale);
+        context.setVariable("subject", subject);
+        context.setVariable("content", content);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        // Render the template
+        return templateEngine.process("mail/commonEmailTemplate", context);
     }
 }
