@@ -20,6 +20,8 @@ import StatesList from "../pages/states";
 import UserList from "../pages/users";
 import SLAComplianceReport from "../pages/sla-reports";
 import ClaimOverviewReport from "../pages/clamOverviewReport";
+import TeamManagementList from "../pages/team-management/list";
+import TeamManagementAddEdit from "../pages/team-management/add-edit";
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
@@ -36,8 +38,6 @@ const AddEditRoleRights = React.lazy(() =>
 );
 const TicketsList = React.lazy(() => import("../pages/tickets/list"));
 const TicketsView = React.lazy(() => import("../pages/tickets/view"));
-const TeamManagementAddEdit = React.lazy(() => import("../pages/team-management/add-edit"));
-const TeamManagementList = React.lazy(() => import("../pages/team-management/list"));
 
 const routes = [
   // {
