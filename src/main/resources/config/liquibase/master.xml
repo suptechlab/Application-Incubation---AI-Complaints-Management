@@ -15,6 +15,7 @@
   <include file="config/liquibase/changelog/1729851411887_login_log_schema.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/1731508018436_otp_schema.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/1731568550084_persona_schema.xml" relativeToChangelogFile="false"/>
+  <include file="config/liquibase/changelog/1733147820214_load_email_templates.xml" relativeToChangelogFile="false"/>
   <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
   <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
   <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->

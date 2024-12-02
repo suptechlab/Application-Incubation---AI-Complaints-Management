@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${subject}">Email</title>
+  <link rel="icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    /* Container */
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header */
+    .email-header {
+      text-align: center;
+      border-bottom: 2px solid #0055A6; /* PANTONE 2935 C */
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .email-header h1 {
+      font-size: 24px;
+      color: #E12726; /* PANTONE 485 C */
+    }
+
+    /* Content */
+    .email-content p {
+      line-height: 1.6;
+      font-size: 16px;
+      margin: 10px 0;
+      color: #333333;
+    }
+
+    .email-content ul {
+      margin: 10px 0;
+      padding-left: 20px;
+      color: #F96D16; /* PANTONE 7408 C */
+    }
+
+    .email-content ul li {
+      margin-bottom: 5px;
+    }
+
+    /* Footer */
+    .email-footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #888888;
+      font-size: 14px;
+    }
+
+    .email-footer em {
+      color: #0055A6; /* PANTONE 2935 C */
+    }
+
+    /* Button */
+    .email-button {
+      display: inline-block;
+      background-color: #F96D16; /* PANTONE 7408 C */
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .email-button:hover {
+      background-color: #E12726; /* PANTONE 485 C */
+    }
+  </style>
+</head>
+<body>
+<div class="email-container">
+  <div class="email-header">
+    <h1 th:text="${subject}">Subject</h1>
+  </div>
+  <div class="email-content">
+    <p th:utext="${content}">Email content here</p>
+  <p>
+    <span th:text="#{email.activation.text2}">Regards, </span>
+    <br />
+    <em th:text="#{email.signature}">JHipster.</em>
+  </p>
+  </div>
+  <div class="email-footer">
+    <p>
+      Recibiste este correo electrónico porque te registraste en nuestro servicio.
+    </p>
+  </div>
+</div>
+</body>
+</html>
