@@ -20,8 +20,8 @@ import StatesList from "../pages/states";
 import UserList from "../pages/users";
 import SLAComplianceReport from "../pages/sla-reports";
 import ClaimOverviewReport from "../pages/clamOverviewReport";
-import TeamManagementList from "../pages/team-management/list";
-import TeamManagementAddEdit from "../pages/team-management/add-edit";
+// import TeamManagementList from "../pages/team-management/list";
+// import TeamManagementAddEdit from "../pages/team-management/add-edit";
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
