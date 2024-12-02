@@ -181,6 +181,10 @@ public class UserService {
         user.setLangKey(userDTO.getLangKey());
         user.setCountryCode(userDTO.getCountryCode());
         user.setPhoneNumber(userDTO.getPhoneNumber());
+        //Set Role
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
         userRepository.save(user);
         //Audit Logs
         Map<String, String> auditMessageMap = new HashMap<>();

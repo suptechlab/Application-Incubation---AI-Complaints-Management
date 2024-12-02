@@ -1,7 +1,9 @@
 package com.seps.admin.service;
 
-import com.seps.admin.domain.Team;
+import com.seps.admin.domain.TemplateMaster;
 import com.seps.admin.domain.User;
+import com.seps.admin.repository.TemplateMasterRepository;
+import com.seps.admin.service.dto.MailDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -17,8 +19,10 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +39,10 @@ public class MailService {
 
     private static final String BASE_URL = "baseUrl";
 
+    private static final String USERNAME = "username";
+
+    private static final String URL = "url";
+
     private final JHipsterProperties jHipsterProperties;
 
     private final JavaMailSender javaMailSender;
@@ -45,18 +53,22 @@ public class MailService {
 
     private final UserService userService;
 
+    private final TemplateMasterRepository templateMasterRepository;
+
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
         SpringTemplateEngine templateEngine,
-        UserService userService
+        UserService userService,
+        TemplateMasterRepository templateMasterRepository
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
         this.userService = userService;
+        this.templateMasterRepository = templateMasterRepository;
     }
 
     @Async
@@ -112,37 +124,63 @@ public class MailService {
     @Async
     public void sendSepsUserCreationEmail(User user) {
         LOG.debug("Sending creation email to '{}'", user.getEmail());
-        this.sendEmailFromTemplateSync(user, "mail/sepsUserCreationEmail", "email.seps.user.creation.title");
+        //this.sendEmailFromTemplateSync(user, "mail/sepsUserCreationEmail", "email.seps.user.creation.title");
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setTemplateKey("SEPS_USER_CREATION");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, user.getFirstName());
+        dataVariables.put(URL, jHipsterProperties.getMail().getBaseUrl() + "/reset-password?key=" + user.getResetKey());
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 
     @Async
     public void sendFIUserCreationEmail(User user) {
         LOG.debug("Sending creation email to FI User '{}'", user.getEmail());
-        this.sendEmailFromTemplateSync(user, "mail/fiUserCreationEmail", "email.fi.user.creation.title");
+        //this.sendEmailFromTemplateSync(user, "mail/fiUserCreationEmail", "email.fi.user.creation.title");
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setTemplateKey("FI_USER_CREATION");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, user.getFirstName());
+        dataVariables.put("organizationName", user.getOrganization().getRazonSocial());
+        dataVariables.put(URL, jHipsterProperties.getMail().getBaseUrl() + "/reset-password?key=" + user.getResetKey());
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 
     // Send a welcome email to the new member
     @Async
     public void sendWelcomeToTeamEmail(User newUser, String teamName) {
         LOG.debug("Sending welcome email to new assigned User '{}'", newUser.getEmail());
-        String subject = "Welcome to Team " + teamName;
-        String content = "Dear " + newUser.getFirstName() + ",\n\n"
-            + "Welcome to the team \"" + teamName + "\"! We are excited to have you onboard.\n\n"
-            + "Best regards,\nThe Team";
-
-        this.sendEmailSync(newUser.getEmail(), subject, content, false, false);
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(newUser.getLangKey());
+        mailDTO.setTo(newUser.getEmail());
+        mailDTO.setTemplateKey("WELCOME_TO_TEAM_FOR_ASSIGNED_MEMBER");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, newUser.getFirstName());
+        dataVariables.put("teamName", teamName);
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 
     // Notify existing members about the new member addition
     @Async
     public void sendNewMemberAddedNotification(User existingUser, String teamName, List<Long> newMemberIds) {
-        String subject = "New Member Added to Team " + teamName;
-        String content = "Dear " + existingUser.getFirstName() + ",\n\n"
-            + "The following new member(s) have been added to your team \"" + teamName + "\":\n"
-            + getMemberNames(newMemberIds) + "\n\n"
-            + "Best regards,\nThe Team";
-
-        this.sendEmailSync(existingUser.getEmail(), subject, content, false, false);
+        LOG.debug("New Member Added to Team  '{}'", teamName);
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(existingUser.getLangKey());
+        mailDTO.setTo(existingUser.getEmail());
+        mailDTO.setTemplateKey("NEW_MEMBER_ADDED_TO_TEAM");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, existingUser.getFirstName());
+        dataVariables.put("teamName", teamName);
+        dataVariables.put("membersName", getMemberNames(newMemberIds));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 
     private String getMemberNames(List<Long> memberIds) {
@@ -150,5 +188,42 @@ public class MailService {
         return memberIds.stream()
             .map(memberId -> userService.getUserById(memberId).getFirstName())
             .collect(Collectors.joining(", "));
+    }
+
+    public void sendDynamicContentEmail(MailDTO mailDTO) {
+        TemplateMaster template = templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
+            .orElse(null);
+
+        if(template != null) {
+            // Prepare dynamic content
+            String subject = replacePlaceholders(template.getSubject(), mailDTO.getDataVariables());
+            String content = replacePlaceholders(template.getContent(), mailDTO.getDataVariables());
+
+            // Render HTML template with Thymeleaf
+            String renderedContent = renderEmailTemplate(subject, content, Locale.forLanguageTag(mailDTO.getLocale()));
+
+            // Send email
+            this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
+        }else {
+            LOG.debug("Template with key '{}' not found or inactive. Using default content.", mailDTO.getTemplateKey());
+        }
+    }
+
+    private String replacePlaceholders(String template, Map<String, String> variables) {
+        if (template == null || variables == null) return template;
+
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
+        }
+        return template;
+    }
+
+    private String renderEmailTemplate(String subject, String content, Locale locale) {
+        Context context = new Context(locale);
+        context.setVariable("subject", subject);
+        context.setVariable("content", content);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        // Render the template
+        return templateEngine.process("mail/commonEmailTemplate", context);
     }
 }

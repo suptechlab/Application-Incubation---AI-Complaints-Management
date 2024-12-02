@@ -17,4 +17,5 @@ public interface TemplateMasterRepository extends JpaRepository<TemplateMaster, 
     boolean existsByTemplateNameIgnoreCase(String templateName);
 
     Optional<TemplateMaster> findByTemplateNameIgnoreCase(@NotBlank String templateName);
+    Optional<TemplateMaster> findByTemplateKeyIgnoreCaseAndStatus(String templateKey, boolean status);
 }
