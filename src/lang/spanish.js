@@ -108,5 +108,6 @@ export const spanishLang = {
   "CLAIMS_CLOSED": "Reclamos Cerrados",
   "CLAIMS_REJECTED": "Reclamos Rechazados",
   "WELCOME_TO_THE": "Bienvenido al",
-  "SEPS_HELPDESK": "Helpdesk SEPS"
+  "SEPS_HELPDESK": "Helpdesk SEPS",
+  "UPLOAD_OPTIONAL_ATTACHMENTS": "Cargar archivos adjuntos opcionales"
 }

@@ -107,5 +107,6 @@ export const englishLang = {
   "CLAIMS_CLOSED": "Claims Closed",
   "CLAIMS_REJECTED": "Claims Rejected",
   "WELCOME_TO_THE": "Welcome to the",
-  "SEPS_HELPDESK": "SEPS Helpdesk"
+  "SEPS_HELPDESK": "SEPS Helpdesk",
+  "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments"
 }

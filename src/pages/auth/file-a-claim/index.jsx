@@ -76,31 +76,45 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
 
     // HANDLE CLAIM DETAILS  AND FORM WILL BE FINISH HERE
     const handleClaimDetailsSubmit = async (values, actions) => {
+        let combinedData = { ...fileClaimValues, ...values };
+        combinedData.checkDuplicate = true;
 
-        let formData = { ...fileClaimValues, ...values }
+        const formData = new FormData();
 
-        formData.checkDuplicate = true
-
-        setFileClaimValues((prev) => ({ ...prev, ...values }))
-
-        const result = await dispatch(fileClaimForm(formData));
-        if (fileClaimForm.fulfilled.match(result)) {
-            console.log({ result: result?.payload?.data })
-            setFileClaimResponse(result?.payload?.data)
-            // console.log(result?.payload?.data)
-            // console.log('Claim Details values', values)
-            if (result?.payload?.data?.foundDuplicate === true) {
-                setFileAlertModalShow(true)
+        Object.entries(combinedData).forEach(([key, value]) => {
+            if (key === "files") {
+                
+                value.forEach((file, index) => {
+                    formData.append(`attachments[${index}]`, file);
+                });
             } else {
-                setFileSuccesModalShow(true)
+                
+                formData.append(key, value);
             }
+        });
+
+        // Dispatch the FormData
+        setIsLoading(true);
+        const result = await dispatch(fileClaimForm(formData));
+        setIsLoading(false);
+
+        if (fileClaimForm.fulfilled.match(result)) {
+            setFileClaimResponse(result?.payload?.data);
+
+            if (result?.payload?.data?.foundDuplicate) {
+                setFileAlertModalShow(true);
+            } else {
+                setFileSuccesModalShow(true);
+            }
+
             actions.setSubmitting(false);
-            handleCloseReset()
+            handleCloseReset();
         } else {
-            console.error('Verification error:', result.error.message);
-            actions.setSubmitting(false)
+            console.error("Verification error:", result.error.message);
+            actions.setSubmitting(false);
         }
     };
+
 
     // HANDLE FILE DUPLICATE CLAIM
     const handleFileDuplicateClaim = async () => {
@@ -169,7 +183,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     ];
 
 
-    const handleModalClose = ()=>{
+    const handleModalClose = () => {
         handleClose()
         setActiveTab(0)
         setIsBasicInfoSubmitted(false)

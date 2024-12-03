@@ -8,14 +8,13 @@ import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { fetchClaimSubTypes } from '../../../../redux/slice/masterSlice';
 import { ClaimDetailsFormSchema } from '../../validations';
+import SvgIcons from '../../../../components/SVGIcons';
+import { Link } from 'react-router-dom';
 
-const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading }) => {
-    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
-
+const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
     const { t } = useTranslation()
-
-    const { claim_types } = useSelector((state) => state?.masterSlice)
-
+    const { claim_types } = useSelector((state) => state?.masterSlice);
+    const [files, setFiles] = useState([]);
     const dispatch = useDispatch()
 
     // Initial Values
@@ -24,24 +23,21 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading
         claimSubTypeId: '',
         precedents: '',
         specificPetition: '',
-        attachments: '',
         agreeDeclarations: false,
     };
 
     const [claimSubTypes, setClaimSubTypes] = useState([])
     //Handle File Change
     const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            setFileName(file.name);
-        } else {
-            setFileName("Fi_Users_data.xlsx");
+        if (event.target.files) {
+            const selectedFiles = Array.from(event.target.files);
+            setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
         }
     };
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
-        handleFormSubmit(values, actions);
+        handleFormSubmit({ ...values, files }, actions);
     };
 
     const getClaimSubTypes = async (claimTypeId) => {
@@ -90,14 +86,14 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading
                                         formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
                                         if (option?.target?.value && option?.target?.value !== "") {
                                             // formikProps.setFieldTouched("cityId", false);
-                                            if(option?.target?.value !== formikProps?.values?.claimTypeId){
+                                            if (option?.target?.value !== formikProps?.values?.claimTypeId) {
                                                 formikProps.setFieldValue("claimSubtype", ""); // Reset cityId
                                                 getClaimSubTypes(option?.target?.value);
                                             }
                                         }
-                                    
+
                                         // formikProps.setFieldValue("claimSubtype", "");
-                                       
+
                                     }}
                                     name="claimTypeId"
                                     className={formikProps.touched.claimTypeId && formikProps.errors.claimTypeId ? "is-invalid" : ""}
@@ -156,7 +152,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading
                                     value={formikProps.values.specificPetition || ""}
                                 />
                             </Col>
-                            {/* <Col xs={12} className="mb-3">
+                            <Col xs={12} className="mb-3">
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                     <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
@@ -168,22 +164,25 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit,setIsLoading
                                         <input
                                             id="files"
                                             accept="image/png, image/jpeg, image/jpg"
+                                            multiple
                                             className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                             type="file"
                                             onChange={handleFileChange}
                                         />
                                     </div>
-                                    {fileName && (
-                                        <Link
-                                            target="_blank"
-                                            to="/fi-users/import"
-                                            className="text-decoration-none small mw-100 text-break"
-                                        >
-                                            {fileName}
-                                        </Link>
+                                    {files.length > 0 && (
+                                        <div>
+                                            <ul>
+                                                {files.map((file, index) => (
+                                                    <li key={index} className="d-flex align-items-center">
+                                                        <span className="me-2">{file.name}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     )}
                                 </div>
-                            </Col> */}
+                            </Col>
                             <Col xs={12}>
                                 <FormCheckbox
                                     wrapperClassName="mb-0"
