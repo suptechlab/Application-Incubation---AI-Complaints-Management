@@ -35,16 +35,14 @@ export default function AuthenticationProvider({ children }) {
     }, [])
 
     const logout = () => {
-        removeLocalStorage("access_token")
-        removeLocalStorage("refresh_token")
-        setIsAuthenticated(false)
-        removeLocalStorage("imageUrl")
-        removeLocalStorage("firstName")
-        removeLocalStorage("lastName")
-        removeLocalStorage("companyTitle")
-        removeLocalStorage("user_type")
-        removeLocalStorage("email")
-        removeLocalStorage("password")
+        removeLocalStorage("access_token");
+        removeLocalStorage("refresh_token");
+        setIsAuthenticated(false);
+        removeLocalStorage("imageUrl");
+        removeLocalStorage("firstName");
+        removeLocalStorage("lastName");
+        removeLocalStorage("companyTitle");
+        removeLocalStorage("user_type");
        
     }
 

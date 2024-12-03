@@ -3,21 +3,17 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { useTranslation } from "react-i18next";
+import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
-import GenericModal from "../../components/GenericModal";
-import ListingSearchFormUsers from "../../components/ListingSearchFormUsers";
+import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import Toggle from "../../components/Toggle";
 import {
-  handleDeleteRoleRight,
-  handleGetRoleRights,
+  handleGetRoleRights
 } from "../../services/rolerights.service"; // Update the import to include delete function
 import { handleStatusChangeState } from "../../services/user.service";
-import { useTranslation } from "react-i18next";
-import Loader from "../../components/Loader";
 
 export default function RoleRightsList() {
 
@@ -30,38 +26,12 @@ export default function RoleRightsList() {
     pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
-  const [modal, setModal] = useState(false);
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
   });
 
   const [loading, setLoading] = useState(true);
-  const [selectedRow, setSelectedRow] = useState();
-  const [deleteShow, setDeleteShow] = useState(false);
-  const [deleteId, setDeleteId] = useState();
-
-  //Handle Delete
-  const deleteAction = (rowData) => {
-    setSelectedRow(rowData);
-    setDeleteId(rowData.id);
-    setDeleteShow(true);
-  };
-
-  const recordDelete = async (deleteId) => {
-    setLoading(true);
-    try {
-      await handleDeleteRoleRight(deleteId);
-      toast.success("Role right deleted successfully");
-      dataQuery.refetch();
-      setDeleteShow(false);
-    } catch (error) {
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: async () => {
@@ -185,15 +155,7 @@ export default function RoleRightsList() {
                 type: "link",
                 title: "Edit",
                 icon: <MdEdit size={18} />,
-              },
-              // {
-              //   name: "delete",
-              //   enabled: true,
-              //   type: "button",
-              //   title: "Delete",
-              //   icon: <MdDelete size={18} />,
-              //   handler: () => deleteAction(rowData.row.original),
-              // },
+              }
             ]}
           />
         ),
@@ -245,18 +207,6 @@ export default function RoleRightsList() {
           </Card.Body>
         </Card>
       </div>
-
-
-      {/* Delete Modal */}
-      <GenericModal
-        show={deleteShow}
-        handleClose={() => setDeleteShow(false)}
-        modalHeaderTitle={`Delete Role`}
-        modalBodyContent={`Are you sure, you want to delete the role - ${selectedRow?.name}?`}
-        handleAction={() => recordDelete(deleteId)}
-        buttonName="Delete"
-        ActionButtonVariant="danger"
-      />
     </React.Fragment>
   );
 }

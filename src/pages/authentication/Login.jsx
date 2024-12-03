@@ -1,6 +1,6 @@
 import { Form as FormikForm, Formik } from "formik";
-import React, { useContext, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useRef, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AuthBanner from "../../assets/images/banner.png";
 import FormInput from "../../components/FormInput";
 import { AuthenticationContext } from "../../contexts/authentication.context";
@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { Stack, Form, Image,Button,  Col, Row, Spinner } from "react-bootstrap";
 import Logo from "../../assets/images/logo.svg"
 import { useTranslation } from "react-i18next";
+import { getLocalStorage } from "../../utils/storage";
 
 
 export default function Login() {
@@ -17,6 +18,7 @@ export default function Login() {
     const [captcha, setCaptcha] = useState("");
     const { login } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
+    const navigate = useNavigate();
     
 
     const onSubmit = async (values, actions) => {
@@ -46,6 +48,14 @@ export default function Login() {
         actions.setSubmitting(false);
         setCaptcha('')
     };
+
+    useEffect(() => {
+        if (getLocalStorage("access_token")) {
+            navigate('/dashboard');
+        } else {
+            navigate('/login');
+        }
+    }, [])
 
     
 

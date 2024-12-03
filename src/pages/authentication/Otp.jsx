@@ -1,5 +1,5 @@
 import { Form as FormikForm, Formik } from "formik";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useState, useEffect } from "react";
 import AuthBanner from "../../assets/images/banner.png";
 import { AuthenticationContext } from "../../contexts/authentication.context";
 import { handleResendOTP } from '../../services/authentication.service';
@@ -7,25 +7,26 @@ import { OtpValidationSchema } from "../../validations/login.validation";
 import toast from "react-hot-toast";
 import { Stack, Form, Image, Button, Col, Row, Spinner } from "react-bootstrap";
 import Logo from "../../assets/images/logo.svg"
-import {Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import OtpInput from 'react-otp-input';
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useTranslation } from "react-i18next";
+import { getLocalStorage } from "../../utils/storage";
 
 export default function Otp() {
     const { t } = useTranslation(); // use the translation hook
     const location = useLocation();
     const { login, OtpVerify } = useContext(AuthenticationContext);
     const reCaptchaRef = useRef(true);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const [username, setUsername] = useState(location?.state?.username ? location?.state?.username : 'admin@yopmail.com');
     const [otpToken, setOtpToken] = useState(location?.state?.otpToken ? location?.state?.otpToken : '');
 
 
-    const onSubmit = async (values, actions) => {        
+    const onSubmit = async (values, actions) => {
         //values.username = username;
         values.otpToken = otpToken;
-        console.log('param',values)
+        console.log('param', values)
         //values.otp = otp;
         await OtpVerify({ ...values });
         actions.setSubmitting(false);
@@ -37,7 +38,7 @@ export default function Otp() {
             let data = {
                 'otpToken': otpToken
             }
-            
+
             let res = await handleResendOTP(data);
             toast.success("OTP enviado con éxito.");
         } catch (error) {
@@ -45,6 +46,12 @@ export default function Otp() {
             navigate("/login")
         }
     }
+
+    useEffect(() => {
+        if (getLocalStorage("access_token")) {
+            navigate('/dashboard');
+        }
+    }, [])
 
     return (
         <React.Fragment>
@@ -66,7 +73,7 @@ export default function Otp() {
                                             widht={225}
                                             height={48}
                                         />
-                                    </Link>                                    
+                                    </Link>
                                 </div>
                                 <h3 className="fw-semibold mb-1 fs-26">{t('ONE TIME PASSWORD')}</h3>
                                 <p className="text-body opacity-50 mb-4 pb-1 lh-sm">{t('WE VE SENT A ONE-TIME PASSWORD (OTP)')}</p>
@@ -94,11 +101,11 @@ export default function Otp() {
                                                     //onChange={setOtp()}
                                                     numInputs={6}
                                                     inputStyle={{
-                                                        width:"42px",
-                                                        height:"42px",
+                                                        width: "42px",
+                                                        height: "42px",
                                                     }}
                                                     containerStyle={{
-                                                    justifyContent:"space-between"
+                                                        justifyContent: "space-between"
                                                     }}
                                                     renderInput={(props) => (
                                                         <input {...props} className="form-control" />
@@ -115,7 +122,7 @@ export default function Otp() {
                                                     </div>
                                                 )}
                                             </Form.Group>
-                                            
+
                                             <Stack
                                                 direction="horizontal"
                                                 gap={3}
@@ -138,7 +145,7 @@ export default function Otp() {
                                                 </Button>
                                             </Stack>
                                             <Form.Group className="small">
-                                            {t('DIDN T RECEIVE THE CODE')}
+                                                {t('DIDN T RECEIVE THE CODE')}
                                                 <Link className="fw-semibold text-decoration-none" onClick={handleResend}> {t('RESEND CODE')} </Link>
                                             </Form.Group>
                                         </FormikForm>
@@ -158,7 +165,7 @@ export default function Otp() {
                         className="h-100 object-fit-cover w-100"
                         src={AuthBanner}
                         alt="OTP Banner"
-                    /> 
+                    />
                 </Col>
             </Row>
         </React.Fragment>
