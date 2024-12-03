@@ -23,7 +23,6 @@ export const spanishLang = {
     "NAME OF CLAIM TYPE": "Nombre del Tipo de Reclamación",
     "CREATE CLAIM TYPE": "Crear Tipo de Reclamación",
     "CREATE CLAIM SUB TYPE": "Crear Subtipo de Reclamación",
-    "EDIT CLAIM SUB TYPE": "Editar Subtipo de Reclamación",
     "EDIT CLAIM TYPE": "Editar Tipo de Reclamación",
     "NAME OF CLAIM SUB TYPE": "Nombre del Subtipo de Reclamación",
     "SLA BREACH": "Incumplimiento del SLA",
@@ -147,7 +146,6 @@ export const spanishLang = {
     "TEMPLATE TYPE*": "Tipo de plantilla*",
     "ASSOCIATION": "Asociación",
     // Team managment
-    "ENTITY NAME": "Nombre de la entidad",
     "TEAM NAME": "Nombre del equipo",
     "ASSIGN TEAM MEMBERS": "Asignar miembros del equipo",
     "MEMBER NAME": "Nombre del miembro",

@@ -88,7 +88,7 @@ export default function CreateClaim() {
 
     // HANDLE FILE DUPLICATE CLAIM
     const handleFileDuplicateClaim = async () => {
-        let formData = { ...fileClaimValues, checkDuplicate: false }
+        // let formData = { ...fileClaimValues, checkDuplicate: false }
         // const result = await dispatch(fileClaimForm(formData));
         // if (fileClaimForm.fulfilled.match(result)) {
         //     setFileClaimResponse(result?.payload?.data)
@@ -100,10 +100,10 @@ export default function CreateClaim() {
         // }
     }
     // Handle File Alert Click
-    const handleFileAlertClick = () => {
-        setFileAlertModalShow(false)
-        setFileSuccesModalShow(true)
-    };
+    // const handleFileAlertClick = () => {
+    //     setFileAlertModalShow(false)
+    //     setFileSuccesModalShow(true)
+    // };
     // Handle File Succes Click
     const handleFileSuccesClick = () => {
         setFileSuccesModalShow(false)

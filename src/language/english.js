@@ -31,7 +31,6 @@ export const englishLang = {
     "CANCEL": "Cancel",
     "SUBMIT": "Submit",
     "EDIT": "Edit",
-    "EDIT CLAIM SUB TYPE": "Edit Claim Sub Type",
     "INQUIRY CATEGORY": "Inquiry Category",
     "NAME OF INQUIRY": "Name of Inquiry",
     "CREATE INQUIRY TYPE": "Create Inquiry Type",
@@ -146,7 +145,6 @@ export const englishLang = {
     "TEMPLATE_DETAILS": "Template Details*",
     "ASSOCIATION": "Association",
     // Team managment
-    "ENTITY NAME": "Entity Name",
     "TEAM NAME": "Team Name",
     "ASSIGN TEAM MEMBERS": "Assign Team Members",
     "MEMBER NAME": "Member Name",
@@ -184,7 +182,4 @@ export const englishLang = {
     "DELETE TEAM MEMBER": "Delete Team Member",
     "ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER": "Are you sure, you want to delete the team member",
     "DELETE": "Eliminado",
-
-
-
 }

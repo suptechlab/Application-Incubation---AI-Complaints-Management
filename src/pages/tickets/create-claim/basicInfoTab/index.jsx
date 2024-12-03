@@ -47,14 +47,12 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
             const cityFormatList = response?.data
                 ? [{ label: response.data.name, value: response.data.id }]
                 : [];
-
-            console.log('formatted list', cityFormatList);
             setCityList(cityFormatList);
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);
         }
-    }, [setCityList])
+    }, [setCityList, setIsLoading])
 
     const getProvinceList = useCallback(async () => {
         setIsLoading(true);
@@ -72,11 +70,11 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         } catch (error) {
             setIsLoading(false);
         }
-    }, [setProvinceList])
+    }, [setProvinceList, setIsLoading])
 
     useEffect(() => {
         getProvinceList();
-    }, [])
+    }, [getProvinceList])
 
     // HANDLE IDENTIFICATION
     const handleIdentificationBlur = (event) => {
@@ -116,7 +114,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
             <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
                 <Card.Body className="d-flex flex-column h-100">
                     <CommonFormikComponent
-                        // validationSchema={BasicInfoFormSchema}
+                        validationSchema={BasicInfoFormSchema}
                         initialValues={initialValues}
                         onSubmit={handleSubmit}
                     >

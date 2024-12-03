@@ -8,7 +8,6 @@ export const messages = {
     countryCodeRequired: 'Mobile code is required',
     countryCodeInvalid: 'Invalid mobile code',
     rucRequired: "Entity's Tax ID (RUC) is required",
-    roleIdRequired: 'Role Id is required',
     nameMax: 'Claim type name cannot exceed 250 characters',
     nameInvalid: 'Name can only contain letters, spaces, and valid Spanish characters.',
     descriptionMax: 'Description cannot exceed 512 characters',

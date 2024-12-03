@@ -8,8 +8,7 @@ export const BasicInfoFormSchema = yup.object({
 
   identification: yup
     .string()
-    // .required(msg.nationalIDRequired),
-    ,
+    .required(msg.nationalIDRequired),
 
   email: yup
     .string()
