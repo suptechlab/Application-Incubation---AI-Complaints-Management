@@ -38,4 +38,17 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
     List<ClaimTicket> findAllByIdInAndOrganizationId(List<Long> ids, Long organizationId);
 
     Optional<ClaimTicket> findByTicketId(Long ticketId);
+
+    @Query("SELECT new com.seps.ticket.service.projection.ClaimStatusCountProjection(ct.status, COUNT(ct)) " +
+        "FROM ClaimTicket ct " +
+        "WHERE (:userId IS NULL OR ct.sepsAgentId = :userId) " +
+        "GROUP BY ct.status")
+    List<ClaimStatusCountProjection> countClaimsByStatusAndTotalSEPS(@Param("userId") Long userId);
+
+    @Query("SELECT new com.seps.ticket.service.projection.ClaimStatusCountProjection(ct.status, COUNT(ct)) " +
+        "FROM ClaimTicket ct " +
+        "WHERE organizationId = :organizationId " +
+        "AND (:userId IS NULL OR ct.fiAgentId = :userId) " +
+        "GROUP BY ct.status")
+    List<ClaimStatusCountProjection> countClaimsByStatusAndTotalFiAgentAndOrganizationId(@Param("userId") Long userId, @Param("organizationId") Long organizationId);
 }

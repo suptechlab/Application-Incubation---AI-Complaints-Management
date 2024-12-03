@@ -26,7 +26,10 @@ public enum SepsStatusCode implements StatusType {
     NO_TICKET_FOUND_WITH_PROVIDED_IDS(40013, "no.ticket.found.with.provided.ids"),
     YOU_NOT_AUTHORIZED_TO_PERFORM(40014, "not.authorized.to.perform"),
     INVALID_FILE(40015, "invalid.file"),
-    FILE_STORAGE_ERROR(40016, "file.storage.error");
+    FILE_STORAGE_ERROR(40016, "file.storage.error"),
+    INVALID_SLA_DATE(40017,"invalid.sla.date"),
+    CLAIM_TICKET_NOT_ASSIGNED(40018,"claim.ticket.not.assigned"),
+    INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE(40019,"invalid.instance.type.allow.only.instance");
 
     private final int code;
 

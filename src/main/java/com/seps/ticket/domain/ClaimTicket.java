@@ -146,6 +146,12 @@ public class ClaimTicket {
     @OneToMany(mappedBy = "claimTicket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClaimTicketDocument> claimTicketDocuments = new ArrayList<>();  // List of associated documents
 
+    @Column(name = "seps_agent_id", nullable = false, insertable = false, updatable = false)
+    private Long sepsAgentId;
+
+    @ManyToOne
+    @JoinColumn(name = "seps_agent_id")
+    private User sepsAgent;
 
 
 }
