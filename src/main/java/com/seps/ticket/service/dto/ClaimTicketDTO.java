@@ -49,4 +49,6 @@ public class ClaimTicketDTO {
     private Instant updatedAt;
     // Getters and Setters
     private List<ClaimTicketDocumentDTO> claimTicketDocuments; // Added this line to include documents in DTO
+    private Long sepsAgentId;
+    private UserDTO sepsAgent;
 }

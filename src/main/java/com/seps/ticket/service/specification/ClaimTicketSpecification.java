@@ -54,18 +54,18 @@ public class ClaimTicketSpecification {
         };
     }
 
-    public static Specification<ClaimTicket> bySepsFiFilter(String search, Long organizationId, ClaimTicketStatusEnum claimTicketStatus, ClaimTicketPriorityEnum claimTicketPriority, String startDate, String endDate, Long fiAgentId, Long claimTypeId) {
+    public static Specification<ClaimTicket> bySepsFiFilter(String search, Long organizationId, ClaimTicketStatusEnum claimTicketStatus, ClaimTicketPriorityEnum claimTicketPriority, String startDate, String endDate, Long fiAgentId, Long claimTypeId, Long sepsAgentId) {
         return (root, query, criteriaBuilder) -> {
             // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
 
             // Filter by search (ticketId)
             if (StringUtils.hasText(search)) {
-                predicates.add(
-                    criteriaBuilder.or(
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("ticketId")), "%" + search.toLowerCase() + "%")
-                    )
-                );
+
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.function("CONCAT", String.class, criteriaBuilder.literal("#"), root.get("ticketId")), "%" + search + "%"
+                ));
+
             }
 
             // Filter by organizationId (if provided)
@@ -102,6 +102,11 @@ public class ClaimTicketSpecification {
                 );
             }
 
+            if(sepsAgentId != null){
+                predicates.add(
+                    criteriaBuilder.equal(root.get("sepsAgentId"), sepsAgentId)
+                );
+            }
             // Parse and apply the date range filter only if both startDate and endDate are provided
             if (StringUtils.hasText(startDate) && StringUtils.hasText(endDate)) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

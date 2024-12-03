@@ -21,7 +21,8 @@ public final class Constants {
     public static final String RIGHTS_SEPS_SUPER_ADMIN_IT = "seps-superadmin-it";
     public static final String RIGHTS_SEPS_ANALYTIC_ADMIN = "seps-analytic-admin";
     public static final String RIGHTS_SEPS_ANALYTIC_AGENT = "seps-analytic-agent";
-
+    public static final String PERFORM_BY = "performBy";
+    public static final String TICKET_ID = "ticketId";
     private Constants() {
     }
 }

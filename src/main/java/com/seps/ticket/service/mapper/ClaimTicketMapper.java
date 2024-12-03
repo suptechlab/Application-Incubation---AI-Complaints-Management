@@ -17,6 +17,7 @@ public interface ClaimTicketMapper {
 
     @Mapping(source = "user", target = "user")
     @Mapping(source = "fiAgent", target = "fiAgent")
+    @Mapping(source = "sepsAgent", target = "sepsAgent")
     @Mapping(source = "createdByUser", target = "createdByUser")
     @Mapping(source = "updatedByUser", target = "updatedByUser")
     @Mapping(source = "claimTicketDocuments", target = "claimTicketDocuments")
