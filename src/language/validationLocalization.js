@@ -64,7 +64,7 @@ export const messages = {
     precedentsRequired: "Precedents is required.",
     invalidSpecialPetition: "Special Petition must not exceed 1024 characters.",
     specialPetitionRequired: "Special Petition is required.",
-    agreeDeclarations: "Please agree to all declarations and conditions to proceed."
+    agreeDeclarations: "Please agree to all declarations and conditions to proceed.",
 
     // Team Managment
     teamNameRequired: "Team name is required", // For team name
