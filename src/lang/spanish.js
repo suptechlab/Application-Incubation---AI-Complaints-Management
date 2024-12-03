@@ -82,7 +82,7 @@ export const spanishLang = {
   "PRECEDENTS": "Antecedentes*",
   "SPECIFIC_PETITION": "Petición específica*",
   "UPLOAD_OPTIONAL_ATTACHMENTS": "Subir archivos adjuntos opcionales",
-  "AGREE_DECLARATIONS": "Acepto todas las declaraciones y condiciones",
+  "AGREE_DECLARATIONS": "Acepto todas las declaraciones y condiciones.",
   "BASIC_INFO": "Información básica",
   "OTHER_INFO": "Otra información",
   "CLAIM_FORM_DESCRIPTION": "Complete el formulario de reclamación a continuación y guarde el número de referencia de la reclamación para futuras discusiones.",
@@ -94,7 +94,7 @@ export const spanishLang = {
   "INSTANCE_TYPE": "Tipo de Instancia",
   "STATUS": "Estado",
   "VIEW": "Ver",
-  "CHAT": "Chat",
+  "CHAT": "Charlar",
   "ACTIONS": "Acciones",
   "FILE_SECOND_INSTANCE": "Presentar una 2ª instancia",
   "FILE_SECOND_INSTANCE_TOOLTIP": "Tooltip de presentar una 2ª instancia",
@@ -108,5 +108,14 @@ export const spanishLang = {
   "CLAIMS_CLOSED": "Reclamos Cerrados",
   "CLAIMS_REJECTED": "Reclamos Rechazados",
   "WELCOME_TO_THE": "Bienvenido al",
-  "SEPS_HELPDESK": "Helpdesk SEPS"
+  "SEPS_HELPDESK": "Helpdesk SEPS",
+  "RAISE_A_SECOND_INSTANCE_CLAIM": "Presentar un reclamo en segunda instancia",
+  "FIRST_INSTANCE_COMPLAINT_TICKET": "Boleto de Denuncia de 1ra Instancia*",
+  "COMMENTS": "Comentarios*",
+  "ATTACH_NEW_EVIDENCE": "Adjunte la nueva evidencia",
+  "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Se pueden cargar varios archivos adjuntos.",
+  "CANCEL": "Cancelar",
+  "SUBMIT": "Entregar",
+  "CLAIM": "Afirmar",
+  "CLAIM_STATUS": "Estado del reclamo"
 }

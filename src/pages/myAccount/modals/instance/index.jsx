@@ -7,6 +7,7 @@ import FormCheckbox from '../../../../components/formCheckbox';
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import SvgIcons from '../../../../components/SVGIcons';
+import { InstanceFormSchema } from '../../validations';
 
 const InstanceModal = ({ handleShow, handleClose }) => {
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
@@ -49,11 +50,12 @@ const InstanceModal = ({ handleShow, handleClose }) => {
         >
             <Modal.Header closeButton className="pb-2">
                 <Modal.Title as="h4" className="fw-bold">
-                    Raise a 2nd Instance Claim
+                    {t('RAISE_A_SECOND_INSTANCE_CLAIM')}
                 </Modal.Title>
             </Modal.Header>
             <CommonFormikComponent
                 initialValues={initialValues}
+                validationSchema={InstanceFormSchema}
                 onSubmit={handleSubmit}
             >
                 {(formikProps) => (
@@ -62,7 +64,7 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                             <Row className="gx-4">
                                 <Col lg={6}>
                                     <ReactSelect
-                                        label={t("1st Instance Complaint Ticket")}
+                                        label={t("FIRST_INSTANCE_COMPLAINT_TICKET")}
                                         error={formikProps.errors.instanceTicket}
                                         options={[
                                             { label: t("SELECT"), value: "" }
@@ -80,7 +82,7 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                                 <Col xs={12}>
                                     <FormInputBox
                                         id="comments"
-                                        label={t("Comments*")}
+                                        label={t("COMMENTS")}
                                         name="comments"
                                         type="text"
                                         as="textarea"
@@ -100,7 +102,7 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                                                 className="btn btn-secondary"
                                             >
                                                 <span className='me-2'>{SvgIcons.uploadIcon}</span>
-                                                <span className='align-middle'>{t("Attach the new evidence")}</span>
+                                                <span className='align-middle'>{t("ATTACH_NEW_EVIDENCE")}</span>
                                             </label>
                                             <input
                                                 id="files"
@@ -110,7 +112,7 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                                                 onChange={handleFileChange}
                                             />
                                         </div>
-                                        <span className='custom-font-size-12 fw-medium'>Multiple attachment can be uploaded.</span>
+                                        <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
                                     </div>
                                     {fileName && (
                                         <div className='pt-1'>
@@ -147,14 +149,14 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                                 onClick={handleClose}
                                 className="custom-min-width-100"
                             >
-                                {t("Cancel")}
+                                {t("CANCEL")}
                             </Button>
                             <Button
                                 type="submit"
                                 variant="warning"
                                 className="custom-min-width-100"
                             >
-                                {t("Submit")}
+                                {t("SUBMIT")}
                             </Button>
                         </Modal.Footer>
                     </React.Fragment>

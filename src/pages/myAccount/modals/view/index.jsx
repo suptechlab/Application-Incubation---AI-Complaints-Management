@@ -2,34 +2,47 @@ import moment from 'moment/moment';
 import React, { useEffect, useState } from 'react';
 import { Col, Modal, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import CommonViewData from "../../../../components/CommonViewData";
 import { getClaimDetails } from '../../../../redux/slice/fileClaimSlice';
+import Loader from '../../../../components/Loader';
 
 const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
-    const { t } = useTranslation()
+    const { t } = useTranslation();
 
-    const dispatch = useDispatch()
-    // const [loading, setLoading] = useState(false)
-    const [claimTicketData, csetCaimTicketData] = useState([])
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
+    const [claimTicketData, csetCaimTicketData] = useState([]);
+    const [instanceTypeTranslated, setInstanceTypeTranslated] = useState("");
+    const { instance_types } = useSelector((state) => state?.masterSlice);
 
-    const fetchClaimDetails = async () => {
+
+    const fetchClaimDetails = async (row) => {
+        setLoading(true);
         try {
-            const result = await dispatch(getClaimDetails(selectedRow?.id));
+            const result = await dispatch(getClaimDetails(row?.id));
             if (getClaimDetails.fulfilled.match(result)) {
                 csetCaimTicketData(result?.payload?.data);
+                const matchedInstanceType = instance_types.find(
+                    (type) => type.value === result?.payload?.data?.instanceType
+                );
+                const displayLabel = matchedInstanceType ? matchedInstanceType.label : result?.payload?.data?.instanceType;
+                setInstanceTypeTranslated(displayLabel)
+                setLoading(false);
             } else {
                 console.error('Verification error:', result.error?.message || 'Unknown error');
+                setLoading(false);
             }
         } catch (error) {
             console.error('Unexpected error:', error);
+            setLoading(false);
         }
     };
 
     useEffect(() => {
         if (selectedRow?.id) {
-            fetchClaimDetails();
+            fetchClaimDetails(selectedRow);
         }
     }, [selectedRow]);
 
@@ -77,7 +90,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             label: t('RESOLVED_ON'),
             value: claimTicketData?.resolvedOn
                 ? moment(claimTicketData?.resolvedOn).format('DD-MM-YY | hh:mm:ss a')
-                : t('NOT_RESOLVED'),
+                : 'N/A',
             colProps: { sm: 6, lg: 3 }
         },
         {
@@ -132,42 +145,44 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     ];
 
     return (
-        <Modal
-            show={handleShow}
-            onHide={handleClose}
-            backdrop="static"
-            keyboard={false}
-            centered={true}
-            scrollable={true}
-            size="lg"
-            className="theme-modal"
-            enforceFocus={false}
-        >
-            <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
-                <Modal.Title as="h4" className="fw-bold d-inline-flex align-items-center flex-wrap gap-2">
-                    {t("CLAIM_ID")}: #{claimTicketData?.ticketId}{" "}
-                    <span
-                        className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass(
-                            claimTicketData?.status
-                        )}`}
-                    >
-                        {claimTicketData?.instanceType}
-                    </span>
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="text-break small">
-                {/* View Top Data */}
-                <Row>
-                    {viewTopData?.map((item, index) => (
-                        <Col key={"data_view_" + index} {...item.colProps}>
-                            <CommonViewData label={item.label} value={item.value} />
-                        </Col>
-                    ))}
-                </Row>
-    
-                {/* Accordion Items */}
-                {/* WILL DO IT LATER */}
-                {/* <Accordion flush className='custom-accordion'>
+        <React.Fragment>
+            <Loader isLoading={loading} />
+            <Modal
+                show={handleShow}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+                centered={true}
+                scrollable={true}
+                size="lg"
+                className="theme-modal"
+                enforceFocus={false}
+            >
+                <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
+                    <Modal.Title as="h4" className="fw-bold d-inline-flex align-items-center flex-wrap gap-2">
+                        {t("CLAIM")} ID: #{claimTicketData?.ticketId}{" "}
+                        <span
+                            className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass(
+                                claimTicketData?.status
+                            )}`}
+                        >
+                            {instanceTypeTranslated}
+                        </span>
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-break small">
+                    {/* View Top Data */}
+                    <Row>
+                        {viewTopData?.map((item, index) => (
+                            <Col key={"data_view_" + index} {...item.colProps}>
+                                <CommonViewData label={item.label} value={item.value} />
+                            </Col>
+                        ))}
+                    </Row>
+
+                    {/* Accordion Items */}
+                    {/* WILL DO IT LATER */}
+                    {/* <Accordion flush className='custom-accordion'>
                     {accordionItems.map(item => (
                         <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
                             <Accordion.Header>
@@ -199,17 +214,18 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                         </Accordion.Item>
                     ))}
                 </Accordion> */}
-    
-                {/* View Bottom Data */}
-                <Row>
-                    {viewBottomData?.map((item, index) => (
-                        <Col key={"data_view_bottom_" + index} {...item.colProps}>
-                            <CommonViewData label={item.label} value={item.value} />
-                        </Col>
-                    ))}
-                </Row>
-            </Modal.Body>
-        </Modal>
+
+                    {/* View Bottom Data */}
+                    <Row>
+                        {viewBottomData?.map((item, index) => (
+                            <Col key={"data_view_bottom_" + index} {...item.colProps}>
+                                <CommonViewData label={item.label} value={item.value} />
+                            </Col>
+                        ))}
+                    </Row>
+                </Modal.Body>
+            </Modal>
+        </React.Fragment>
     );
 };
 
