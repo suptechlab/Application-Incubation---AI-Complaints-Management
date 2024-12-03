@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.MailException;
@@ -57,6 +58,9 @@ public class MailService {
     private static final String BASE_URL_USER = "baseUrlUser";
 
     private final TemplateMasterRepository templateMasterRepository;
+
+    @Value("${website.user-base-url:test}")
+    private String userBaseUrl;
 
     public MailService(
         JHipsterProperties jHipsterProperties,
