@@ -3,6 +3,7 @@ import { Stack } from "react-bootstrap";
 import CommonDatePicker from "../../components/commonDatePicker";
 import Loader from "../../components/Loader";
 import TotalClaimsSection from "./sections/total-claims";
+import CaimsAndComplaints from "./sections/caims-and-complaints";
 
 export default function Dashboard() {
   const [startDate, setStartDate] = useState();
@@ -38,7 +39,7 @@ export default function Dashboard() {
         </div>
 
         <TotalClaimsSection />
-
+        <CaimsAndComplaints />
       </div>
     </React.Fragment>
   );
