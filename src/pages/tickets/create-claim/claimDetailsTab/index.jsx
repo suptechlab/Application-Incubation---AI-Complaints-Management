@@ -100,8 +100,12 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                             value={formikProps.values.claimTypeId}
                                             onChange={(option) => {
                                                 formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
-                                                formikProps.setFieldValue("claimSubtype", "");
-                                                getClaimSubTypes(option?.target?.value);
+                                                formikProps.setFieldValue("claimSubTypeId", "");
+                                                if (option?.target?.value && option?.target?.value !== "") {
+                                                    if (option?.target?.value !== formikProps?.values?.claimTypeId) {
+                                                        getClaimSubTypes(option?.target?.value);
+                                                    }
+                                                }
                                             }}
                                             name="claimTypeId"
                                             className={formikProps.touched.claimTypeId && formikProps.errors.claimTypeId ? "is-invalid" : ""}
@@ -171,7 +175,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
-                                            <span className="opacity-75">Multiple attachment can be uploaded.</span>                                            
+                                            <span className="opacity-75">Multiple attachment can be uploaded.</span>
                                         </div>
                                         {fileName && (
                                             <div className="pt-1">

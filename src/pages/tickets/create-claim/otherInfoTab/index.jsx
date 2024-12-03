@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button, Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
@@ -7,8 +7,9 @@ import ReactSelect from '../../../../components/ReactSelect';
 import { OtherInfoFormSchema } from '../../../../validations/createClaim.validation';
 import { useMasterData } from '../../../../contexts/masters.context';
 import { convertToLabelValue } from '../../../../services/ticketmanagement.service';
+import { getOrganizationList } from '../../../../services/teamManagment.service';
 
-const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
+const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
 
 
     // const [selectedRuc, setSelectedRuc] = useState('');
@@ -27,12 +28,31 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
         entitysTaxID: '',
     };
 
+    const getEntitynameList = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await getOrganizationList();
+
+            const entityNameList = response?.data?.map((data) => {
+                return {
+                    label: data?.name,
+                    value: data?.id
+                }
+            })
+            setEntityList(entityNameList);
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+        }
+    }, [setEntityList, setIsLoading])
+
     useEffect(() => {
+        getEntitynameList();
         if (masterData) {
             setPcGroupList(convertToLabelValue(masterData.priorityCareGroup || {}));
             setCustomerTypeList(convertToLabelValue(masterData.customerType || {}));
         }
-    }, [masterData])
+    }, [masterData, getEntitynameList])
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {

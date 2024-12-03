@@ -62,11 +62,7 @@ export default function CreateClaim() {
     const handleClaimDetailsSubmit = async (values, actions) => {
 
         let formData = { ...fileClaimValues, ...values }
-
-        console.log('values', formData);
-
         formData.checkDuplicate = true
-
         setFileClaimValues((prev) => ({ ...prev, ...values }))
 
         // const result = await dispatch(fileClaimForm(formData));
@@ -106,9 +102,9 @@ export default function CreateClaim() {
     // };
     // Handle File Succes Click
     const handleFileSuccesClick = () => {
-        setFileSuccesModalShow(false)
-        setActiveTab(0)
-        navigate('/my-account')
+        setFileSuccesModalShow(false);
+        setActiveTab(0);
+        navigate('/tickets');
     };
     //Steps Data
     const stepData = [
@@ -144,7 +140,7 @@ export default function CreateClaim() {
         },
         {
             eventKey: 1,
-            content: <OtherInfoTab backButtonClickHandler={backButtonOtherInfoClickHandler} handleFormSubmit={handleOtherInfoSubmit} />,
+            content: <OtherInfoTab backButtonClickHandler={backButtonOtherInfoClickHandler} handleFormSubmit={handleOtherInfoSubmit} setIsLoading={setIsLoading} />,
         },
         {
             eventKey: 2,

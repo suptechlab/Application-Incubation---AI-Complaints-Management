@@ -159,7 +159,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 <Col xs="auto">
                                                     <div className="custom-min-width-75 pe-1">
                                                         <ReactSelect
-                                                            // label={t("COUNTRY_CODE")}
                                                             error={formikProps.errors.countryCode}
                                                             options={formattedCountryCodes ?? []}
                                                             placeholder={t("SELECT")}
@@ -181,7 +180,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                     <FormInputBox
                                                         autoComplete="off"
                                                         id="phoneNumber"
-                                                        // label={t("PHONE_NUMBER")}
                                                         name="phoneNumber"
                                                         type="number"
                                                         error={formikProps.errors.phoneNumber}
