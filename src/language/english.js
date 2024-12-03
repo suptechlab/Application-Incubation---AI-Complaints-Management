@@ -60,7 +60,7 @@ export const englishLang = {
     "SUB-CLAIM": "Sub-claim",
     // Authentication
     "ONE TIME PASSWORD": "One Time Password",
-    "WE VE SENT A ONE-TIME PASSWORD (OTP)": "We’ve sent a One-Time Password (OTP) to your email&nbsp;address. Please enter it below to verify.",
+    "WE VE SENT A ONE-TIME PASSWORD (OTP)": "We’ve sent a One-Time Password (OTP) to your email address. Please enter it below to verify.",
     "BACK": "Back",
     "DIDN T RECEIVE THE CODE": "Didn’t receive the code?",
     "RESEND CODE": "Resend Code",
