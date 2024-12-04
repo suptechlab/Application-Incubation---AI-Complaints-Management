@@ -21,7 +21,7 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
     };
 
     // The color class based on the status
-    const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED','ASSIGNED'];
+    const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
     const getStatusClass = (status) => {
         switch (status) {
             case 'CLOSED':
@@ -39,9 +39,9 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
         }
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         setSelectedStatus(ticketData?.status)
-    },[ticketData?.status])
+    }, [ticketData?.status])
 
     // Handle Add Attachments Click
     const handleAddAttachmentsClick = () => {
@@ -77,8 +77,8 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                         {ticketData?.slaBreachDate && <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
                             <MdSchedule size={16} />
                             <span className='custom-font-size-13 fw-normal'>{timeRemaining(ticketData?.slaBreachDate)}</span>
-                        </Badge> }
-                       
+                        </Badge>}
+
                         <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
                             <span className='custom-font-size-13'>Second Instance</span>
                         </Badge>
@@ -157,6 +157,7 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
 
             {/* Date Extension Modals */}
             <DateExtensionModal
+                ticketData={ticketData}
                 modal={dateExtensionModalShow}
                 toggle={() => setDateExtensionModalShow(false)}
             />

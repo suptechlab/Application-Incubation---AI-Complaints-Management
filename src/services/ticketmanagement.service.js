@@ -1,4 +1,4 @@
-import { ticketApi} from "../utils/instance";
+import { ticketApi } from "../utils/instance";
 
 const API_VERSION = process.env.REACT_APP_API_VERSION
 
@@ -16,37 +16,42 @@ export const ticketDetailsApi = async (id) => {
 }
 
 // CALL MASTERS API
-export const ticketMastersData = async()=>{
+export const ticketMastersData = async () => {
   return await ticketApi.get(`/${API_VERSION}/masters`);
 }
 
 // AGENT LISTING
-export const agentListingApi = async()=>{
+export const agentListingApi = async () => {
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/agents-list`);
 }
 //ASSIGN / REASSIGN TICKET TO SEPS AGENT
-export const agentTicketToSEPSagent= async(agentId,tickets)=>{
-  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${agentId}/assign-tickets-seps-agent`,tickets);
+export const agentTicketToSEPSagent = async (agentId, tickets) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${agentId}/assign-tickets-seps-agent`, tickets);
 }
 
 //CHANGE TICKET PRIORITY
-export const changeTicketPriority= async(ticketId,priority)=>{
+export const changeTicketPriority = async (ticketId, priority) => {
   return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/priority?priority=${priority}`);
 }
 
 //CHANGE TICKET PRIORITY
-export const ticketActivityLogs= async(ticketId,params)=>{
-  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/activity-logs`,{params});
+export const ticketActivityLogs = async (ticketId, params) => {
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/activity-logs`, { params });
 }
 
 
 //CHANGE TICKET PRIORITY
-export const ticketOverviewAPI= async()=>{
+export const ticketOverviewAPI = async () => {
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/count-by-status`);
 }
 
+//SLA DATE EXTENSION API
+export const slaDateExtensionApi = async (ticketId, slaDate) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/extend-sla?slaDate=${slaDate}`);
+}
+
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN
-export const convertToLabelValue=(obj)=> {
+export const convertToLabelValue = (obj) => {
   return Object.entries(obj).map(([key, value]) => ({
     label: value, // Use the value as the label
     value: key    // Use the key as the value

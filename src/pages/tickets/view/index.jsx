@@ -92,7 +92,6 @@ const TicketsView = () => {
   const handleAttachmentsClick = () => {
     setAttachmentsModalShow(true)
   }
-
   // View Top Data
   const viewTopData = [
     {

@@ -5,8 +5,9 @@ import { useTranslation } from "react-i18next";
 import CommonViewData from "../../../components/CommonViewData";
 import CommonDatePicker from "../../../components/commonDatePicker";
 import { validationSchema } from "../../../validations/inquiryType.validation";
+import moment from "moment/moment";
 
-const DateExtensionModal = ({ modal, toggle }) => {
+const DateExtensionModal = ({ modal, toggle, ticketData }) => {
     const [startDate, setStartDate] = useState();
     const { t } = useTranslation();
 
@@ -32,9 +33,7 @@ const DateExtensionModal = ({ modal, toggle }) => {
             </Modal.Header>
             <Formik
                 initialValues={{
-                    comments: "",
-                    subStatus: "",
-                    attchment: ""
+                    date: "",
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
@@ -54,13 +53,19 @@ const DateExtensionModal = ({ modal, toggle }) => {
                         <Modal.Body className="text-break py-0">
                             <CommonViewData
                                 label="Due Date"
-                                value="06-25-24"
+                                value={ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY") : 'N/A'}
                             />
                             <CommonDatePicker
+                                error={errors?.name}
+                                id="date"
+                                key={"date"}
+                                name="date"
+                                touched={touched?.date}
                                 label="Enter Extended Date"
                                 placeholder="Select"
                                 selected={startDate}
                                 onChange={(date) => setStartDate(date)}
+                                isBackDateBlocked={true}
                             />
                         </Modal.Body>
                         <Modal.Footer className="pt-0">

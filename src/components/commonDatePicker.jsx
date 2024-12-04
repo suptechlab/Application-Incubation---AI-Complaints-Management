@@ -4,8 +4,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { MdDateRange, MdOutlineCalendarToday } from "react-icons/md";
 import "./datepicker.scss";
 
-const CommonDatePicker = ({ wrapperClassName = 'mb-3 pb-1', label, selectsRange, size, placeholder, ...rest }) => {
-
+const CommonDatePicker = ({ wrapperClassName = 'mb-3 pb-1', label, selectsRange, size, placeholder,isBackDateBlocked = false, ...rest }) => {
+  const today = new Date();
   return (
     <div className={wrapperClassName || ''}>
       {label ? <div className='mb-1 fs-14'>{label}</div> : ""}
@@ -17,6 +17,7 @@ const CommonDatePicker = ({ wrapperClassName = 'mb-3 pb-1', label, selectsRange,
         icon={selectsRange ? <MdDateRange size={18} /> : <MdOutlineCalendarToday size={18} />}
         className={`form-control ${size === 'sm' ? 'form-control-sm' : ''}`}
         portalId="root"
+        minDate={isBackDateBlocked ? today : undefined} // Block backdates if prop is true
         {...rest}
       />
     </div>

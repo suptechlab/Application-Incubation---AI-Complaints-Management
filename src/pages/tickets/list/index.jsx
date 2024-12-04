@@ -1,19 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { Button, Card, Form, Stack } from "react-bootstrap";
+import { Card, Form, Stack } from "react-bootstrap";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import { handleGetUsers } from "../../../services/user.service";
-import TicketsListFilters from "./filters";
 import { agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
-import AppTooltip from "../../../components/tooltip";
 import AttachmentsModal from "../modals/attachmentsModal";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import TicketsListFilters from "./filters";
 
 export default function TicketsList() {
     const location = useLocation();
