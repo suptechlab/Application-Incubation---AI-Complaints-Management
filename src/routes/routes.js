@@ -20,6 +20,7 @@ import StatesList from "../pages/states";
 import UserList from "../pages/users";
 import SLAComplianceReport from "../pages/sla-reports";
 import ClaimOverviewReport from "../pages/clamOverviewReport";
+import CreateClaim from "../pages/tickets/create-claim";
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
@@ -270,6 +271,12 @@ const routes = [
   {
     path: "/tickets/view/:id",
     element: <TicketsView />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/tickets/add",
+    element: <CreateClaim />,
     isPrivate: true,
     layoutType: "Auth",
   },
