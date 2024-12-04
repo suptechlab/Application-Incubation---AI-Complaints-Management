@@ -13,6 +13,8 @@
 }
 
 .react-datepicker-wrapper {
+    width: 100%;
+
     .react-datepicker__input-container {
         .form-control {
             padding: $input-padding-y 2rem $input-padding-y $input-padding-x-sm;
@@ -42,4 +44,8 @@
             }
         }
     }
+}
+
+.react-datepicker-popper {
+    z-index: 1060;
 }
