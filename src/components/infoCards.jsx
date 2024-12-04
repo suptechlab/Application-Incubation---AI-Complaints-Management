@@ -3,7 +3,9 @@ import { Col, Row, Stack } from 'react-bootstrap';
 import { ticketOverviewAPI } from '../services/ticketmanagement.service';
 import toast from 'react-hot-toast';
 import { MdAttachFile, MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
-const InfoCards = () => {
+
+
+const InfoCards = ({ rowClassName = 'g-3 g-lg-4' }) => {
 
 
   const [claimStatsData, setClaimsStatsData] = useState([])
@@ -60,7 +62,7 @@ const InfoCards = () => {
 
 
   return (
-    <Row className='g-3 g-lg-4'>
+    <Row className={rowClassName}>
       {cardsData.map((card, index) => (
         <Col key={index} {...card.colProps}>
           <Stack

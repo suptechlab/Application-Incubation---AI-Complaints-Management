@@ -1,17 +1,19 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
-import { Badge, Dropdown, Stack } from 'react-bootstrap';
+import { Badge, Button, Dropdown, Stack } from 'react-bootstrap';
 import { MdMoreVert, MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import AppTooltip from '../../../../components/tooltip';
 import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
+import DateExtensionModal from '../../modals/dateExtensionModal';
 
 const TicketViewHeader = ({ title = "", ticketData }) => {
     const { t } = useTranslation();
     const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);
     const [addAttachmentsModalShow, setAddAttachmentsModalShow] = useState(false);
+    const [dateExtensionModalShow, setDateExtensionModalShow] = useState(false);
 
     // Function to handle dropdown item selection
     const handleSelect = (priority) => {
@@ -57,6 +59,11 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
         }
     };
 
+    // Handle Date Extension Click
+    const handleDateExtensionClick = () => {
+        setDateExtensionModalShow(true)
+    }
+
     return (
         <React.Fragment>
             <div className="pb-3">
@@ -65,21 +72,38 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                     gap={2}
                     className="flex-wrap custom-min-height-38"
                 >
-                    <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-1">
+                    <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
                         {title}
-                        {ticketData?.slaBreachDate ? <Badge bg='danger-subtle' className='text-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                        {ticketData?.slaBreachDate && <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
                             <MdSchedule size={16} />
                             <span className='custom-font-size-13 fw-normal'>{timeRemaining(ticketData?.slaBreachDate)}</span>
-                        </Badge> : ""}
+                        </Badge> }
+                       
+                        <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                            <span className='custom-font-size-13'>Second Instance</span>
+                        </Badge>
                     </h1>
 
-                    <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
+                    <Stack direction="horizontal" gap={2} className='flex-wrap'>
                         <Link
                             to={"/tickets"}
                             className="btn btn-outline-dark custom-min-width-85"
                         >
                             {t("BACK")}
                         </Link>
+                        <Button
+                            type="submit"
+                            variant='outline-dark'
+                        >
+                            Assign To
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant='warning'
+                            onClick={handleDateExtensionClick}
+                        >
+                            Date Extension
+                        </Button>
                         <Dropdown>
 
                             <Dropdown.Toggle
@@ -129,6 +153,12 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
             <AddAttachmentsModal
                 modal={addAttachmentsModalShow}
                 toggle={() => setAddAttachmentsModalShow(false)}
+            />
+
+            {/* Date Extension Modals */}
+            <DateExtensionModal
+                modal={dateExtensionModalShow}
+                toggle={() => setDateExtensionModalShow(false)}
             />
         </React.Fragment>
     );
