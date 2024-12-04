@@ -11,12 +11,12 @@ const UserInfoModal = ({ userData, modal, toggle }) => {
     const InfoModalData = [
         {
             label: "National ID",
-            value: "235647874",
+            value: userData?.ticketId ?? '',
             colProps: { sm: 6, lg: 4 }
         },
         {
             label: "Email",
-            value: userData?.createdByUser?.email,
+            value: userData?.user?.email,
             colProps: { sm: 6, lg: 4 }
         },
         {
@@ -70,7 +70,7 @@ const UserInfoModal = ({ userData, modal, toggle }) => {
                                 height={36}
                                 alt="John Smith"
                             />
-                            <span className="text-truncate">Veronica Andres</span>
+                            <span className="text-truncate">{userData?.user?.name ?? ''}</span>
                         </Stack>
                     </Modal.Title>
                 </Modal.Header>

@@ -31,7 +31,18 @@ export const agentTicketToSEPSagent= async(agentId,tickets)=>{
 
 //CHANGE TICKET PRIORITY
 export const changeTicketPriority= async(ticketId,priority)=>{
-  return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/priority?${priority}`);
+  return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/priority?priority=${priority}`);
+}
+
+//CHANGE TICKET PRIORITY
+export const ticketActivityLogs= async(ticketId,params)=>{
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/activity-logs`,{params});
+}
+
+
+//CHANGE TICKET PRIORITY
+export const ticketOverviewAPI= async()=>{
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/count-by-status`);
 }
 
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN

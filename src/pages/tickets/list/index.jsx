@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Button, Card, Form, Stack } from "react-bootstrap";
-import { MdAttachFile, MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
@@ -38,7 +37,7 @@ export default function TicketsList() {
     const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
     const [ticketIdsArr, setTicketIdsArr] = useState([]);
 
-    const [clearTableSelection ,setClearTableSelection] = useState(false)
+    const [clearTableSelection, setClearTableSelection] = useState(false)
 
 
     const dataQuery = useQuery({
@@ -154,11 +153,11 @@ export default function TicketsList() {
     // The color class based on the status
     const getPriorityClass = (priority) => {
         switch (priority) {
-            case 'Low':
+            case 'LOW':
                 return 'text-success';
-            case 'Medium':
+            case 'MEDIUM':
                 return 'text-custom-warning';
-            case 'High':
+            case 'HIGH':
                 return 'text-custom-danger';
             default:
                 return 'text-body';
@@ -168,13 +167,15 @@ export default function TicketsList() {
     // The color class based on the status
     const getStatusClass = (status) => {
         switch (status) {
-            case 'Closed':
+            case 'CLOSED':
                 return 'bg-success text-success';
-            case 'In Progress':
+            case 'IN_PROGRESS':
                 return 'bg-custom-info text-custom-info';
-            case 'New':
+            case 'NEW':
                 return 'bg-custom-primary text-custom-primary';
-            case 'Rejected':
+            case 'ASSIGNED':
+                return 'bg-custom-warning text-custom-warning';
+            case 'REJECTED':
                 return 'bg-custom-danger text-custom-danger';
             default:
                 return 'bg-body text-body';
@@ -225,7 +226,6 @@ export default function TicketsList() {
                             }
 
                             setClearTableSelection(false)
-                            //     console.log({some : currentSelectedIds})
                         }}
                     />
                 ),
@@ -347,37 +347,6 @@ export default function TicketsList() {
         // navigate('/tickets/view/1')
     }
 
-    // Info Cards Data
-    const cardsData = [
-        {
-            bgColor: 'bg-primary',
-            Icon: <MdConfirmationNumber size={24} />,
-            title: 'New Tickets',
-            value: 5,
-            colProps: { sm: 6, lg: 3 }
-        },
-        {
-            bgColor: 'bg-orange',
-            Icon: <MdHourglassEmpty size={24} />,
-            title: 'Tickets in Progress',
-            value: 2,
-            colProps: { sm: 6, lg: 3 }
-        },
-        {
-            bgColor: 'bg-danger',
-            Icon: <MdPending size={24} />,
-            title: 'Rejected Tickets',
-            value: 1,
-            colProps: { sm: 6, lg: 3 }
-        },
-        {
-            bgColor: 'bg-success',
-            Icon: <MdTaskAlt size={24} />,
-            title: 'Closed Tickets',
-            value: 2,
-            colProps: { sm: 6, lg: 3 }
-        },
-    ];
 
     return (
         <React.Fragment>
@@ -390,7 +359,7 @@ export default function TicketsList() {
                     ]}
                 />
                 <div className="info-cards mb-3">
-                    <InfoCards cardsData={cardsData} />
+                    <InfoCards/>
                 </div>
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">

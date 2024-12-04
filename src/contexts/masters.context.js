@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import {  ticketMastersData } from '../services/ticketmanagement.service';
+import { AuthenticationContext } from './authentication.context';
 
 // Create the context
 const MasterDataContext = createContext();
@@ -9,12 +10,13 @@ export const useMasterData = () => useContext(MasterDataContext);
 
 // Create a provider component
 export const MasterDataProvider = ({ children }) => {
+
+  const { isAuthenticated } = useContext(AuthenticationContext);
   const [masterData, setMasterData] = useState(null); // State to hold the data
   const [loading, setLoading] = useState(true);       // State to handle loading
   const [error, setError] = useState(null);           // State to handle errors
 
   useEffect(() => {
-    
     const fetchMasterData = ()=>{
       ticketMastersData().then(response => {
         setMasterData(response.data);
@@ -28,10 +30,10 @@ export const MasterDataProvider = ({ children }) => {
         setLoading(false)
       })
     }
-    
-
-    fetchMasterData();
-  }, []);
+    if(isAuthenticated){
+      fetchMasterData();
+    }
+  }, [isAuthenticated]);
 
   // Provide the context value
   return (

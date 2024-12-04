@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, Dropdown, Stack } from 'react-bootstrap';
 import { MdMoreVert, MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import AppTooltip from '../../../../components/tooltip';
 import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import { useTranslation } from 'react-i18next';
+import moment from 'moment';
 
-const TicketViewHeader = ({ title = "" }) => {
+const TicketViewHeader = ({ title = "", ticketData }) => {
     const { t } = useTranslation();
-    const [selectedStatus, setSelectedStatus] = useState('In Progress');
+    const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);
     const [addAttachmentsModalShow, setAddAttachmentsModalShow] = useState(false);
 
     // Function to handle dropdown item selection
@@ -18,26 +19,43 @@ const TicketViewHeader = ({ title = "" }) => {
     };
 
     // The color class based on the status
-    const statusOptions = ['Closed', 'In Progress', 'New', 'Rejected'];
+    const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED','ASSIGNED'];
     const getStatusClass = (status) => {
         switch (status) {
-            case 'Closed':
+            case 'CLOSED':
                 return 'bg-success';
-            case 'In Progress':
+            case 'IN_PROGRESS':
                 return 'bg-info';
-            case 'New':
+            case 'NEW':
                 return 'bg-primary';
-            case 'Rejected':
+            case 'REJECTED':
                 return 'bg-danger';
+            case 'ASSIGNED':
+                return 'bg-warning';
             default:
                 return 'bg-body';
         }
     };
 
+    useEffect(()=>{
+        setSelectedStatus(ticketData?.status)
+    },[ticketData?.status])
+
     // Handle Add Attachments Click
     const handleAddAttachmentsClick = () => {
         setAddAttachmentsModalShow(true)
     }
+    // Custom function to display "remaining" for future dates
+    const timeRemaining = (date) => {
+        const now = moment();
+        const targetDate = moment(date);
+
+        if (targetDate.isAfter(now)) {
+            return `${targetDate.toNow(true)} remaining`; // 'true' omits 'in'/'ago'
+        } else {
+            return `${targetDate.fromNow()}`; // Uses default format for past dates
+        }
+    };
 
     return (
         <React.Fragment>
@@ -49,10 +67,10 @@ const TicketViewHeader = ({ title = "" }) => {
                 >
                     <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-1">
                         {title}
-                        <Badge bg='danger-subtle' className='text-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                        {ticketData?.slaBreachDate ? <Badge bg='danger-subtle' className='text-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
                             <MdSchedule size={16} />
-                            <span className='custom-font-size-13 fw-normal'>10 Days Remaning</span>
-                        </Badge>
+                            <span className='custom-font-size-13 fw-normal'>{timeRemaining(ticketData?.slaBreachDate)}</span>
+                        </Badge> : ""}
                     </h1>
 
                     <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
@@ -63,6 +81,7 @@ const TicketViewHeader = ({ title = "" }) => {
                             {t("BACK")}
                         </Link>
                         <Dropdown>
+
                             <Dropdown.Toggle
                                 id="ticket-detail-status"
                                 variant="info"

@@ -108,6 +108,7 @@ export default function AuthenticationProvider({ children }) {
                                 setLocalStorage("imageUrl", data?.imageUrl);
                                 setLocalStorage("firstName", data?.firstName);
                                 setLocalStorage("lastName", data?.lastName);
+                                setLocalStorage("role", JSON.stringify(data?.roles));
                                 setLocalStorage("companyTitle", "");
 
                                 // Set authorities

@@ -13,6 +13,7 @@ import TicketTabsSection from './tabs';
 import { changeTicketPriority, ticketDetailsApi } from '../../../services/ticketmanagement.service';
 import toast from 'react-hot-toast';
 import moment from 'moment/moment';
+import ActivityLogs from './activity-logs';
 
 const TicketsView = () => {
   const [selectedPriority, setSelectedPriority] = useState('Low');
@@ -26,11 +27,11 @@ const TicketsView = () => {
 
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
-    setSelectedPriority(priority);
+    
     setLoading(true)
     if (priority && priority !== '') {
-      changeTicketPriority(id).then(response => {
-        console.log(response)
+      changeTicketPriority(id,priority).then(response => {
+        setSelectedPriority(priority);
       }).catch((error) => {
         if (error?.response?.data?.errorDescription) {
           toast.error(error?.response?.data?.errorDescription);
@@ -45,6 +46,7 @@ const TicketsView = () => {
 
   // GET TICKET DETAILS
   const getTicketDetails = () => {
+    setLoading(true)
     ticketDetailsApi(id).then(response => {
       if (response?.data) {
         setTicketData(response?.data)
@@ -56,9 +58,10 @@ const TicketsView = () => {
       } else {
         toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
       }
+    }).finally(()=>{
+      setLoading(false)
     })
   }
-
   useEffect(() => {
     getTicketDetails()
   }, [id])
@@ -99,7 +102,7 @@ const TicketsView = () => {
     },
     {
       label: "Due Date",
-      value: ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY | hh:mm:a") : 'N/A',
+      value: ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY") : 'N/A',
       colProps: { sm: 6 }
     },
     {
@@ -110,16 +113,16 @@ const TicketsView = () => {
     {
       label: "Priority",
       value: (<Stack direction='horizontal' gap={1}>
-        <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span>
+        {/* <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> */}
         {/* Dropdown FILTER */}
         <Dropdown>
           <Dropdown.Toggle
             variant="link"
             id="filter-dropdown"
-            className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1"
+            className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
           >
             <AppTooltip title="Change Priority" placement="top">
-              <span><MdArrowDropDown size={14} /></span>
+              <span><span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> <MdArrowDropDown size={14} /></span>
             </AppTooltip>
           </Dropdown.Toggle>
           <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
@@ -149,7 +152,7 @@ const TicketsView = () => {
     },
     {
       label: "Agent",
-      value: ticketData?.fiAgent ?? "N/A",
+      value: ticketData?.fiAgent?.name ?? "N/A",
       colProps: { sm: 6 }
     },
     {
@@ -201,78 +204,13 @@ const TicketsView = () => {
       colProps: { xs: 12 }
     },
   ]
-
-  //Chat Reply Data
-  const chatReplyData = [
-    {
-      id: 1,
-      name: "John Smith",
-      action: <>added Internal Note</>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 2,
-      name: "John Smith",
-      action: <>replied & tagged <Link to="/" className='text-decoration-none fw-bold'>Kyle</Link></>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Thanks i will update <Link to="/" className='text-decoration-none'>@Kyle</Link> about the same.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 3,
-      name: "Carlos P",
-      action: <>replied</>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 4,
-      name: "Carlos P",
-      action: <>added Resolution Note and mark it Resolved</>,
-      date: "14-07-24 | 9:11 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer.</>,
-      avatar: defaultAvatar,
-      variant: 'Resolved',
-    },
-    {
-      id: 5,
-      name: "Mic Johns",
-      action: <>added Internal Note</>,
-      date: "14-07-24 | 9:10 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.</>,
-      avatar: defaultAvatar,
-      variant: 'In Progress',
-    },
-  ];
-
-  // The color class based on the status
-  const getReplyStatusClass = (status) => {
-    switch (status) {
-      case 'RESOLVED':
-        return 'bg-custom-pink p-2 rounded';
-      case 'IN_PROGRESS':
-        return 'bg-custom-yellow p-2 rounded';
-      case 'NEW':
-        return 'bg-custom-primary p-2 rounded';
-      case 'REJECTED':
-        return 'bg-custom-danger p-2 rounded';
-      default:
-        return '';  
-    }
-  };
-
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <TicketViewHeader
           title={"#" + ticketData?.ticketId}
+          ticketData={ticketData}
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -304,6 +242,7 @@ const TicketsView = () => {
             <Col lg={6} className='mh-100 d-flex flex-column'>
               <Card className="border-0 shadow">
                 <Card.Header className='bg-body border-0 py-3'>
+                {/* REPLY SECTION */}
                   <Row className='g-2'>
                     <Col xs="auto">
                       <Image
@@ -325,7 +264,9 @@ const TicketsView = () => {
                 </Card.Header>
                 <TicketTabsSection />
               </Card>
-              <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+              <ActivityLogs setLoading = {setLoading} ticketId ={id}/>
+
+              {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
                   <ListGroup variant="flush">
                     {chatReplyData.map((reply) => (
@@ -353,12 +294,11 @@ const TicketsView = () => {
                     ))}
                   </ListGroup>
                 </Card.Body>
-              </Card>
+              </Card> */}
             </Col>
           </Row>
         </div>
       </div>
-
       {/* User Info Modals */}
       <UserInfoModal
         modal={userInfoModalShow}
