@@ -31,6 +31,8 @@ export const messages = {
     maximumLimit5: 'Maximum limit of 5 characters exceeded',
     agreeDeclarationsRequired: 'Please agree to all declarations and conditions to proceed',
     attachmentsLabel: 'Attachments',
+    firstInstanceTicketRequired: 'First instance complaint ticket is required.',
+    commentsRequired: 'Comments are required.'
   },
   es: {
     agreePrivacy: 'Debes aceptar la política de privacidad',
@@ -64,5 +66,7 @@ export const messages = {
     maximumLimit5: 'Se ha excedido el límite máximo de 5 caracteres',
     agreeDeclarationsRequired: 'Por favor, acepte todas las declaraciones y condiciones para continuar',
     attachmentsLabel: 'Adjuntos',
+    firstInstanceTicketRequired: 'Se requiere ticket de denuncia de primera instancia.',
+    commentsRequired: 'Se requieren comentarios.'
   },
 };

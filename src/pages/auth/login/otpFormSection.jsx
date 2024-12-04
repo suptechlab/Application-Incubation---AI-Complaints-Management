@@ -96,7 +96,7 @@ const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
                             type="button"
                             variant="link"
                             className="fw-semibold text-decoration-none p-0 border-0"
-                            onClick={handleResend}
+                            onClick={()=>{handleResend(); formikProps.setFieldValue("otpCode", "");}}
                             disabled={isResendDisabled || timer > 0}
                         >
                             {timer > 0 ? `${t('RESEND_OTP_TIMER')} ${timer}s` : <>

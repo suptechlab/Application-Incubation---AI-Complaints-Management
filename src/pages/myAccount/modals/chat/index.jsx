@@ -7,10 +7,13 @@ import CommonFormikComponent from '../../../../components/CommonFormikComponent'
 import FormInputBox from '../../../../components/FormInput';
 import SvgIcons from '../../../../components/SVGIcons';
 import AppTooltip from '../../../../components/tooltip';
+import { useTranslation } from 'react-i18next';
+import { ChatSchema } from '../../validations';
 
-const ClaimChat = ({ handleShow, handleClose }) => {
+const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
     const messagesEndRef = useRef(null);
     const [fileName, setFileName] = useState("");
+    const { t } = useTranslation()
 
     // Initial Values
     const initialValues = {
@@ -94,11 +97,12 @@ const ClaimChat = ({ handleShow, handleClose }) => {
         >
             <Modal.Header closeButton className="border-bottom">
                 <Modal.Title as="h4" className="fw-bold">
-                    Claim ID: #52541
+                    {t('CLAIM')} ID: #{`${selectedRow?.ticketId}`}
                 </Modal.Title>
             </Modal.Header>
             <CommonFormikComponent
                 initialValues={initialValues}
+                validationSchema={ChatSchema}
                 onSubmit={handleSubmit}
             >
                 {(formikProps) => (

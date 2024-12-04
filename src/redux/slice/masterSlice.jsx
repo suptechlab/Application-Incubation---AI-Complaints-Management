@@ -9,6 +9,7 @@ const initialState = {
   province_list: [],
   city_list: [],
   organizational_units: [],
+  instance_types: [],
   loading: false,
   error: null,
 };
@@ -50,6 +51,7 @@ export const fetchMasterData = createAsyncThunk(
         claim_types: formatListData(claimTypesResponse.data),
         organizational_units: formatOrganizationalUnits(organizationalUnitResponse.data),
         province_list: formatListData(provinceListResponse.data),
+        instance_types: formatGeneralData(masterDataResponse.data.instanceType)
       };
     } catch (error) {
       console.log({ ERROR: error })
@@ -120,8 +122,9 @@ const masterSlice = createSlice({
         state.customer_types = action.payload.customer_types;
         state.priority_care_group = action.payload.priority_care_group;
         state.claim_types = action.payload.claim_types;
-        state.province_list = action.payload.province_list
-        state.organizational_units = action.payload.organizational_units
+        state.province_list = action.payload.province_list;
+        state.organizational_units = action.payload.organizational_units;
+        state.instance_types = action.payload.instance_types;
       })
       .addCase(fetchMasterData.rejected, (state, action) => {
         state.loading = false;

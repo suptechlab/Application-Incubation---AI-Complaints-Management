@@ -81,7 +81,7 @@ export const englishLang = {
   "PRECEDENTS": "Precedents*",
   "SPECIFIC_PETITION": "Specific Petition*",
   "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments",
-  "AGREE_DECLARATIONS": "I agreed on all the Declarations, and conditions",
+  "AGREE_DECLARATIONS": "I agreed on all the declarations and conditions.",
   "BASIC_INFO": "Basic Info",
   "OTHER_INFO": "Other Info",
   "CLAIM_FORM_DESCRIPTION": "Fill the claim form below and save the claim reference number for future discussions.",
@@ -108,5 +108,14 @@ export const englishLang = {
   "CLAIMS_REJECTED": "Claims Rejected",
   "WELCOME_TO_THE": "Welcome to the",
   "SEPS_HELPDESK": "SEPS Helpdesk",
-  "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments"
+  "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments",
+  "RAISE_A_SECOND_INSTANCE_CLAIM": "Raise a 2nd Instance Claim",
+  "FIRST_INSTANCE_COMPLAINT_TICKET": "1st Instance Complaint Ticket*",
+  "COMMENTS": "Comments*",
+  "ATTACH_NEW_EVIDENCE": "Attach the new evidence",
+  "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Multiple attachment can be uploaded.",
+  "CANCEL": "Cancel",
+  "SUBMIT": "Submit",
+  "CLAIM": "Claim",
+  "CLAIM_STATUS": "Claim Status"
 }

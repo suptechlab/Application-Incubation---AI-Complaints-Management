@@ -6,7 +6,7 @@ import DataTable from '../../components/common/DataTable';
 
 import moment from 'moment';
 import qs from "qs";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../components/Loader';
 import AppTooltip from '../../components/tooltip';
 import { fileClaimList } from '../../redux/slice/fileClaimSlice';
@@ -40,6 +40,8 @@ export default function MyAccount() {
   const [showTicketModal, setTicketModal] = useState(false);
   const [instanceModalShow, setInstanceModalShow] = useState(false);
   const [raisedComplaintModalShow, setRaisedComplaintModalShow] = useState(false);
+  const { instance_types } = useSelector((state) => state?.masterSlice);
+
 
   const handleShowModal = (row) => {
     setSelectedRow(row);
@@ -126,11 +128,18 @@ export default function MyAccount() {
         id: 'instanceType',
         header: t("INSTANCE_TYPE"),
         enableSorting: true,
-        cell: (rowData) => (
-          <span className={rowData.row.original.instanceType === 'COMPLAINT' ? 'text-danger' : ''}>
-            {rowData.row.original.instanceType}
-          </span>
-        )
+        cell: (rowData) => {
+          const matchedInstanceType = instance_types.find(
+            (type) => type.value === rowData.row.original.instanceType
+          );
+          const displayLabel = matchedInstanceType ? matchedInstanceType.label : rowData.row.original.instanceType;
+        
+          return (
+            <span className={rowData.row.original.instanceType === 'COMPLAINT' ? 'text-danger' : ''}>
+              {displayLabel}
+            </span>
+          );
+        }
       },
       {
         accessorFn: (row) => row.status,
@@ -164,12 +173,12 @@ export default function MyAccount() {
 
           let instanceButton = null;
           let tooltipTitle = '';
-          switch (info.row.original.instance_type) {
-            case "1st Instance":
+          switch (info.row.original.instanceType) {
+            case "FIRST_INSTANCE":
               instanceButton = renderButton("FILE_SECOND_INSTANCE", instanceClickHandler, 'text-body text-opacity-50');
               tooltipTitle = "FILE_SECOND_INSTANCE_TOOLTIP";
               break;
-            case "2nd Instance":
+            case "SECOND_INSTANCE":
               instanceButton = renderButton("RAISE_COMPLAINT", raisedComplaintClickHandler, 'text-info');
               tooltipTitle = "RAISE_COMPLAINT_TOOLTIP";
               break;
@@ -209,7 +218,7 @@ export default function MyAccount() {
                 </Button>
               </AppTooltip>
               {instanceButton && (
-                <Stack direction='horizontal' gap={2} className="d-none">
+                <Stack direction='horizontal' gap={2} className='d-none'>
                   {instanceButton}
                   <AppTooltip title={t(tooltipTitle)}>
                     <Button
@@ -335,6 +344,7 @@ export default function MyAccount() {
       {/* TICKET MODAL */}
       <ClaimChat
         handleShow={showTicketModal}
+        selectedRow={selectedRow}
         handleClose={handleCloseTicketModal}
       />
 
