@@ -1,8 +1,8 @@
 package com.seps.ticket.web.rest.v1;
 
+import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
-import com.seps.ticket.enums.ClosedStatusEnum;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
 import com.seps.ticket.service.dto.*;
@@ -11,7 +11,6 @@ import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.problem.Status;
@@ -80,34 +78,42 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok(sepsAndFiClaimTicketService.getSepsFiClaimTicketById(id));
     }
 
+    @Operation(summary = "Retrieve list of agents", description = "Get a list of agents available for ticket assignment")
+    @ApiResponse(responseCode = "200", description = "Agent list retrieved successfully",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = DropdownListDTO.class)))
     @GetMapping("/agents-list")
     public ResponseEntity<List<DropdownListDTO>> getAgentList() {
         return ResponseEntity.ok(sepsAndFiClaimTicketService.getAgentList());
     }
 
 
+    @Operation(summary = "Assign tickets to FI Agent", description = "Assign a list of tickets to a specific FI agent")
+    @ApiResponse(responseCode = "200", description = "Tickets assigned successfully")
     @PostMapping("/{agentId}/assign-tickets-fi-agent")
     public ResponseEntity<Void> assignTicketToFiAgent(
         @PathVariable Long agentId,
-        @RequestBody @Valid AssignTicketRequestDTO assignTicketRequestDTO,
-        HttpServletRequest request
+        @RequestBody @Valid AssignTicketRequestDTO assignTicketRequestDTO
     ) {
-        RequestInfo requestInfo = new RequestInfo(request);
-        sepsAndFiClaimTicketService.assignTicketsToFiAgent(agentId, assignTicketRequestDTO);
+        List<ClaimTicket> ticketList = sepsAndFiClaimTicketService.assignTicketsToFiAgent(agentId, assignTicketRequestDTO);
+        sepsAndFiClaimTicketService.sendAssignmentEmails(ticketList, agentId);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Assign tickets to SEPS Agent", description = "Assign a list of tickets to a specific SEPS agent")
+    @ApiResponse(responseCode = "200", description = "Tickets assigned successfully")
     @PostMapping("/{agentId}/assign-tickets-seps-agent")
     public ResponseEntity<Void> assignTicketToSepsAgent(
         @PathVariable Long agentId,
-        @RequestBody @Valid AssignTicketRequestDTO assignTicketRequestDTO,
-        HttpServletRequest request
+        @RequestBody @Valid AssignTicketRequestDTO assignTicketRequestDTO
     ) {
-        RequestInfo requestInfo = new RequestInfo(request);
-        sepsAndFiClaimTicketService.assignTicketsToSepsAgent(agentId, assignTicketRequestDTO);
+        List<ClaimTicket> ticketList = sepsAndFiClaimTicketService.assignTicketsToSepsAgent(agentId, assignTicketRequestDTO);
+        sepsAndFiClaimTicketService.sendAssignmentEmails(ticketList, agentId);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Update Claim Ticket Priority", description = "Update the priority of a specific claim ticket")
+    @ApiResponse(responseCode = "200", description = "Claim ticket priority updated successfully")
     @PatchMapping("/{ticketId}/priority")
     public ResponseEntity<Void> updateClaimTicketPriority(
         @PathVariable Long ticketId,
@@ -115,10 +121,12 @@ public class SepsAndFiClaimTicketResource {
         HttpServletRequest request
     ) {
         RequestInfo requestInfo = new RequestInfo(request);
-        sepsAndFiClaimTicketService.updatePriority(ticketId, priority);
+        sepsAndFiClaimTicketService.updatePriority(ticketId, priority, requestInfo);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Get Activity Logs for a Claim Ticket", description = "Retrieve activity logs for a specific claim ticket")
+    @ApiResponse(responseCode = "200", description = "Activity logs retrieved successfully")
     @GetMapping("/{ticketId}/activity-logs")
     public ResponseEntity<List<ClaimTicketActivityLogDTO>> claimTicketsActivityList(@PathVariable Long ticketId, Pageable pageable) {
         Page<ClaimTicketActivityLogDTO> page = claimTicketActivityLogService.getAllActivities(ticketId, pageable);
@@ -126,26 +134,22 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @Operation(summary = "Extend SLA for a Claim Ticket", description = "Extend the SLA (Service Level Agreement) for a specific claim ticket")
+    @ApiResponse(responseCode = "200", description = "Claim ticket SLA extended successfully")
     @PostMapping("/{ticketId}/extend-sla")
     public ResponseEntity<ResponseStatus> extendClaimTicketSla(
         @PathVariable Long ticketId,
         @RequestParam("slaDate") String slaDate,
         @RequestParam(required = false) String reason,
-        HttpServletRequest request
-    ) {
+        HttpServletRequest request) {
         try {
-            // Parse and validate SLA date in yyyy-MM-dd format
             LocalDate newSlaDate = LocalDate.parse(slaDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
             RequestInfo requestInfo = new RequestInfo(request);
-
-            // Delegate to service
             sepsAndFiClaimTicketService.extendSlaDate(ticketId, newSlaDate, reason, requestInfo);
             ResponseStatus responseStatus = new ResponseStatus(
                 messageSource.getMessage("claim.ticket.sla.extended.successfully", null, LocaleContextHolder.getLocale()),
                 HttpStatus.OK.value(),
-                System.currentTimeMillis()
-            );
+                System.currentTimeMillis());
             return ResponseEntity.ok(responseStatus);
         } catch (DateTimeParseException ex) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_DATE_FORMAT, null, null);
@@ -166,6 +170,20 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok(count);
     }
 
+    @Operation(
+        summary = "Close a Claim Ticket",
+        description = "Allows users to close a claim ticket by providing the necessary details and reason for closure.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Claim ticket closed successfully",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseStatus.class)
+                )
+            )
+        }
+    )
     @PostMapping("/{ticketId}/closed")
     public ResponseEntity<ResponseStatus> closeClaimTicket(
         @PathVariable Long ticketId, @Valid @RequestBody ClaimTicketClosedRequest claimTicketClosedRequest,
@@ -180,6 +198,5 @@ public class SepsAndFiClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
-
     }
 }

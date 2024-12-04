@@ -29,7 +29,8 @@ public enum SepsStatusCode implements StatusType {
     FILE_STORAGE_ERROR(40016, "file.storage.error"),
     INVALID_SLA_DATE(40017,"invalid.sla.date"),
     CLAIM_TICKET_NOT_ASSIGNED(40018,"claim.ticket.not.assigned"),
-    INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE(40019,"invalid.instance.type.allow.only.instance");
+    INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE(40019,"invalid.instance.type.allow.only.instance"),
+    CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT(40020,"claim.ticket.already.closed.or.reject");
 
     private final int code;
 

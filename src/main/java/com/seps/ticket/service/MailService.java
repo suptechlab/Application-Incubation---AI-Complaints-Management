@@ -1,11 +1,14 @@
 package com.seps.ticket.service;
 
 import com.seps.ticket.component.EnumUtil;
+import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.domain.TemplateMaster;
 import com.seps.ticket.domain.User;
+import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.repository.TemplateMasterRepository;
 import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
+import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +49,10 @@ public class MailService {
     private static final String USERNAME = "username";
 
     private static final String URL = "url";
+
+    private static final String TICKET_NUMBER = "ticketNumber";
+
+    private static final String STATUS = "status";
 
     private final JHipsterProperties jHipsterProperties;
 
@@ -143,18 +150,18 @@ public class MailService {
         }
         LOG.debug("Preparing claim ticket creation email for user '{}'", claimTicket.getUser().getName());
         try {
-            
+
             MailDTO mailDTO = new MailDTO();
             mailDTO.setLocale(claimTicket.getUser().getLangKey());
             mailDTO.setTo(claimTicket.getUser().getEmail());
             mailDTO.setTemplateKey("CLAIM_TICKET_CREATED");
             Map<String, String> dataVariables = new HashMap<>();
             dataVariables.put(USERNAME, claimTicket.getUser().getName());
-            dataVariables.put("ticketNumber", claimTicket.getTicketId().toString());
+            dataVariables.put(TICKET_NUMBER, claimTicket.getTicketId().toString());
             dataVariables.put("claimType", claimTicket.getClaimType().getName());
             dataVariables.put("claimSubType", claimTicket.getClaimSubType().getName());
             dataVariables.put("priority", enumUtil.getLocalizedEnumValue(claimTicket.getPriority(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
-            dataVariables.put("status", enumUtil.getLocalizedEnumValue(claimTicket.getStatus(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
+            dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(claimTicket.getStatus(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
             dataVariables.put("razonSocial", claimTicket.getOrganization().getRazonSocial());
             dataVariables.put("ruc", claimTicket.getOrganization().getRuc());
             dataVariables.put(URL, userBaseUrl + "/my-account/" + claimTicket.getTicketId().toString());
@@ -205,5 +212,69 @@ public class MailService {
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
         // Render the template
         return templateEngine.process("mail/commonEmailTemplate", context);
+    }
+
+    @Async
+    public void sendClosedTicketEmail(ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest, User currentUser){
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("CLAIM_TICKET_CLOSED");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put("reason", claimTicketClosedRequest.getReason());
+        dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
+        LOG.info("Claim ticket closed email sent successfully to {}", currentUser.getEmail());
+    }
+
+   @Async
+    public void sendPriorityChangeEmail(ClaimTicket ticket, ClaimTicketPriorityEnum newPriority, User currentUser, String updatedBy){
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("CLAIM_TICKET_PRIORITY_CHANGE_AGENT");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put("ticketPriority", enumUtil.getLocalizedEnumValue(newPriority,Locale.forLanguageTag(currentUser.getLangKey())));
+        dataVariables.put("updatedBy", updatedBy);
+        dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(ticket.getStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendToAgentTicketAssignmentEmail(ClaimTicket ticket, User currentUser){
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("ASSIGN_TICKET_NOTIFY_AGENT");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put("customerName", ticket.getUser().getFirstName());
+        dataVariables.put("customerEmail", ticket.getUser().getEmail());
+        dataVariables.put("assignedDate", ticket.getAssignedAt().toString());
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendToCustomerTicketAssignmentEmail(ClaimTicket ticket, User currentUser, String agentName){
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("ASSIGN_TICKET_NOTIFY_CUSTOMER");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put("agentName", agentName);
+        dataVariables.put("assignedDate", ticket.getAssignedAt().toString());
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 }
