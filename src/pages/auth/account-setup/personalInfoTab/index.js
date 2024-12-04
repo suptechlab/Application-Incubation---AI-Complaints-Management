@@ -15,12 +15,12 @@ import { sendOTPonEmail, verifyRegisterOTP } from "../../../../redux/slice/authS
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-const PersonalInfoTab = ({ isSubmitted, setNewAccountData,isFormSubmitted, setIsFormSubmitted }) => {
+const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setIsFormSubmitted }) => {
 
 
   const dispatch = useDispatch()
 
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   const formattedCountryCodes = countryCodes.map(country => ({
     value: country?.value,
@@ -67,7 +67,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData,isFormSubmitted, setIs
       setIsFormSubmitted(true);
       actions.setSubmitting(false);
     }
-    
+
   };
 
   // Handle Resend OTP
@@ -100,7 +100,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData,isFormSubmitted, setIs
         setIsFormSubmitted(false);
         setIsFormEmailValidate(true);
         isSubmitted(true)
-        toast.success(result?.message ?? "OTP Verified.")
+        toast.success(result?.payload?.message ?? "OTP Verified.")
       } else {
         console.error(result?.error?.message);
       }
@@ -267,7 +267,11 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData,isFormSubmitted, setIs
                       type="button"
                       variant="link"
                       className="fw-semibold text-decoration-none p-0 border-0"
-                      onClick={() => handleResend(formikProps?.values?.email)}
+                      onClick={() => {
+                        formikProps.setFieldValue("otpCode", "");
+                        handleResend(formikProps?.values?.email)
+                      }
+                      }
                     >
                       <span className="me-1">
                         <MdRefresh
