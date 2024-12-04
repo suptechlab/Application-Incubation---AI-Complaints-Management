@@ -2,12 +2,14 @@ package com.seps.ticket.web.rest.v1;
 
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
+import com.seps.ticket.enums.ClosedStatusEnum;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
+import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -162,5 +164,22 @@ public class SepsAndFiClaimTicketResource {
     public ResponseEntity<ClaimStatusCountResponseDTO> countClaimsByStatusAndTotal() {
         ClaimStatusCountResponseDTO count = sepsAndFiClaimTicketService.countClaimsByStatusAndTotal();
         return ResponseEntity.ok(count);
+    }
+
+    @PostMapping("/{ticketId}/closed")
+    public ResponseEntity<ResponseStatus> closeClaimTicket(
+        @PathVariable Long ticketId, @Valid @RequestBody ClaimTicketClosedRequest claimTicketClosedRequest,
+        HttpServletRequest request
+    ) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        // Delegate to service
+        sepsAndFiClaimTicketService.closedClaimTicket(ticketId, claimTicketClosedRequest, requestInfo);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.closed.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+
     }
 }

@@ -13,6 +13,7 @@ import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import com.seps.ticket.service.specification.ClaimTicketSpecification;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
+import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -42,11 +43,13 @@ public class SepsAndFiClaimTicketService {
     private final AuditLogService auditLogService;
     private final ClaimTicketAssignLogRepository claimTicketAssignLogRepository;
     private final ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository;
+    private final ClaimTicketStatusLogRepository claimTicketStatusLogRepository;
 
     public SepsAndFiClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService,
                                        ClaimTicketMapper claimTicketMapper, ClaimTicketActivityLogService claimTicketActivityLogService,
                                        MessageSource messageSource, EnumUtil enumUtil, Gson gson, AuditLogService auditLogService,
-                                       ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository) {
+                                       ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
+                                       ClaimTicketStatusLogRepository claimTicketStatusLogRepository) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
@@ -57,6 +60,7 @@ public class SepsAndFiClaimTicketService {
         this.auditLogService = auditLogService;
         this.claimTicketAssignLogRepository = claimTicketAssignLogRepository;
         this.claimTicketPriorityLogRepository = claimTicketPriorityLogRepository;
+        this.claimTicketStatusLogRepository = claimTicketStatusLogRepository;
     }
 
     @Transactional
@@ -158,6 +162,7 @@ public class SepsAndFiClaimTicketService {
             }
             List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
             List<ClaimTicketAssignLog> assignLogsList= new ArrayList<>();
+            List<ClaimTicketStatusLog> claimTicketStatusLogList= new ArrayList<>();
             // Assign the agent to each ticket
             tickets.forEach(ticket -> {
                 if(ticket.getFiAgentId() != null && ticket.getFiAgentId().equals(agentId)) {
@@ -176,12 +181,20 @@ public class SepsAndFiClaimTicketService {
 
                 activityLogList.add(activityLog);
 
+                //Save ClaimTicketAssignLog table
                 ClaimTicketAssignLog assignLog = new ClaimTicketAssignLog();
                 assignLog.setTicketId(ticket.getId());
                 assignLog.setUserId(agentId);
                 assignLog.setUserType(UserTypeEnum.FI_USER);
                 assignLog.setCreatedBy(currentUser.getId());
                 assignLogsList.add(assignLog);
+
+                //Save ClaimTicketStatusLog table
+                ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+                claimTicketStatusLog.setTicketId(ticket.getId());
+                claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.ASSIGNED);
+                claimTicketStatusLog.setCreatedBy(currentUser.getId());
+                claimTicketStatusLogList.add(claimTicketStatusLog);
             });
 
             // Save the updated tickets
@@ -189,6 +202,7 @@ public class SepsAndFiClaimTicketService {
 
             activityLogList.forEach(claimTicketActivityLogService::saveActivityLog);
             claimTicketAssignLogRepository.saveAll(assignLogsList);
+            claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
 
         }else{
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, new String[]{assignTicketRequestDTO.toString()}, null);
@@ -263,6 +277,7 @@ public class SepsAndFiClaimTicketService {
 
             List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
             List<ClaimTicketAssignLog> assignLogsList= new ArrayList<>();
+            List<ClaimTicketStatusLog> claimTicketStatusLogList= new ArrayList<>();
             // Assign the agent to each ticket
             tickets.forEach(ticket -> {
                 if(ticket.getSepsAgentId() != null && ticket.getSepsAgentId().equals(agentId)) {
@@ -279,18 +294,28 @@ public class SepsAndFiClaimTicketService {
                 ticket.setAssignedAt(Instant.now());
                 activityLogList.add(activityLog);
 
+                //Save ClaimTicketAssignLog table
                 ClaimTicketAssignLog assignLog = new ClaimTicketAssignLog();
                 assignLog.setTicketId(ticket.getId());
                 assignLog.setUserId(agentId);
                 assignLog.setUserType(UserTypeEnum.SEPS_USER);
                 assignLog.setCreatedBy(currentUser.getId());
                 assignLogsList.add(assignLog);
+
+                //Save ClaimTicketStatusLog table
+                ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+                claimTicketStatusLog.setTicketId(ticket.getId());
+                claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.ASSIGNED);
+                claimTicketStatusLog.setCreatedBy(currentUser.getId());
+                claimTicketStatusLogList.add(claimTicketStatusLog);
+
             });
 
             // Save the updated tickets
             claimTicketRepository.saveAll(tickets);
             activityLogList.forEach(claimTicketActivityLogService::saveActivityLog);
             claimTicketAssignLogRepository.saveAll(assignLogsList);
+            claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
         }else{
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, new String[]{assignTicketRequestDTO.toString()}, null);
         }
@@ -498,4 +523,123 @@ public class SepsAndFiClaimTicketService {
         result.setTotalClaims(totalClaims);
         return result;
     }
+
+    @Transactional
+    public void closedClaimTicket(Long ticketId, @Valid ClaimTicketClosedRequest claimTicketClosedRequest, RequestInfo requestInfo) {
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if(authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }else{
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
+        ClaimTicketActivityLog activityLog = createClosedClaimActivityLog(currentUser,ticket,claimTicketClosedRequest);
+
+        ticket.setStatus(ClaimTicketStatusEnum.CLOSED);
+        ticket.setClosedStatus(claimTicketClosedRequest.getCloseSubStatus());
+        ticket.setStatusComment(claimTicketClosedRequest.getReason());
+        ticket.setUpdatedBy(currentUser.getId());
+
+        // Save the updated ticket
+        ClaimTicket savedTicket = claimTicketRepository.save(ticket);
+        claimTicketActivityLogService.saveActivityLog(activityLog);
+
+        //Save ClaimTicketStatusLog table
+        ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+        claimTicketStatusLog.setTicketId(ticket.getId());
+        claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.CLOSED);
+        claimTicketStatusLog.setSubStatus(claimTicketClosedRequest.getCloseSubStatus().ordinal());
+        claimTicketStatusLog.setCreatedBy(currentUser.getId());
+        claimTicketStatusLogRepository.save(claimTicketStatusLog);
+
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.ticket.closed",
+                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(),Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(this.getSepsFiClaimTicketById(savedTicket.getId()));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        String requestBody = gson.toJson(claimTicketClosedRequest);
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "closedClaimTicket", ActionTypeEnum.CLAIM_TICKET_CLOSED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
+            null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+
+    }
+
+    private ClaimTicketActivityLog createClosedClaimActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest) {
+        ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
+        activityLog.setTicketId(ticket.getId());
+        activityLog.setPerformedBy(currentUser.getId());
+        Map<String, String> activityTitle = new HashMap<>();
+        Map<String, String> linkedUser = new HashMap<>();
+        Map<String, Object> activityDetail = new HashMap<>();
+        Map<String, String> subStatus = new HashMap<>();
+        activityLog.setActivityType(ClaimTicketActivityEnum.CLOSED.name());
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.closed",
+                new Object[]{"@"+currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
+            activityTitle.put(language.getCode(), messageAudit);
+            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(),Locale.forLanguageTag(language.getCode())));
+        });
+        activityDetail.put("subStatus",subStatus);
+        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
+        activityDetail.put("text",claimTicketClosedRequest.getReason());
+        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+
+        activityLog.setActivityTitle(activityTitle);
+        activityLog.setLinkedUsers(linkedUser);
+        activityLog.setActivityDetails(activityDetail);
+        return activityLog;
+    }
+
+//    private void sendClosedTicketEmail(ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest, User currentUser) {
+//        // Fetch related users
+//        User customer = userService.getUserById(ticket.getUserId());
+//        List<User> fiAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
+//        User agent = userService.getUserById(ticket.getFiAgentId());
+//
+//        // Create the email content
+//        String subject = "Claim Ticket #" + ticket.getTicketId() + " Closed";
+//        String message = String.format(
+//            "Dear %s,\n\n" +
+//                "This is to inform you that the claim ticket #%d has been closed.\n\n" +
+//                "Reason: %s\n" +
+//                "Status: %s\n\n" +
+//                "Thank you for your cooperation.\n\n" +
+//                "Regards,\nSupport Team",
+//            "%s", // Placeholder for user's name
+//            ticket.getTicketId(),
+//            claimTicketClosedRequest.getReason(),
+//            claimTicketClosedRequest.getCloseSubStatus().name()
+//        );
+//
+//        // Send email to the customer
+//        emailService.sendEmail(customer.getEmail(), subject, String.format(message, customer.getFullName()));
+//
+//        // Send email to FI Admin
+//        if (fiAdmin != null) {
+//            emailService.sendEmail(fiAdmin.getEmail(), subject, String.format(message, fiAdmin.getFullName()));
+//        }
+//
+//        // Send email to the agent
+//        if (agent != null) {
+//            emailService.sendEmail(agent.getEmail(), subject, String.format(message, agent.getFullName()));
+//        }
+//    }
+
 }
