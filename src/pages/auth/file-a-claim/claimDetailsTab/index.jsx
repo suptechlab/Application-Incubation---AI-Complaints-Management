@@ -71,7 +71,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                         <Row className="gx-4">
                             <Col lg={6}>
                                 <ReactSelect
-                                    label={t("CLAIM_TYPE")}
+                                    label={t("CLAIM_TYPE") + '*'}
                                     error={formikProps.errors.claimTypeId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
@@ -103,7 +103,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label={t("CLAIM_SUBTYPE")}
+                                    label={t("CLAIM_SUBTYPE") + '*'}
                                     error={formikProps.errors.claimSubTypeId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
@@ -125,7 +125,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                             <Col xs={12}>
                                 <FormInputBox
                                     id="precedents"
-                                    label={t("PRECEDENTS")}
+                                    label={t("PRECEDENTS") + '*'}
                                     name="precedents"
                                     type="text"
                                     as="textarea"
@@ -140,7 +140,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                             <Col xs={12}>
                                 <FormInputBox
                                     id="specificPetition"
-                                    label={t("SPECIFIC_PETITION")}
+                                    label={t("SPECIFIC_PETITION") + '*'}
                                     name="specificPetition"
                                     type="text"
                                     as="textarea"

@@ -141,7 +141,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setI
           <Row>
             <Col lg={2}>
               <ReactSelect
-                label={t("COUNTRY_CODE")}
+                label={t("COUNTRY_CODE") + '*'}
                 error={formikProps.errors.countryCode}
                 options={formattedCountryCodes ?? []}
                 value={formikProps.values.countryCode}
@@ -162,7 +162,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setI
                 wrapperClassName="mb-4"
                 autoComplete="off"
                 id="phoneNumber"
-                label={t("PHONE_NUMBER")}
+                label={t("PHONE_NUMBER") + '*'}
                 name="phoneNumber"
                 type="number"
                 error={formikProps.errors.phoneNumber}
@@ -195,7 +195,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setI
                     <FormInputBox
                       autoComplete="off"
                       id="email"
-                      label={t("EMAIL_ADDRESS")}
+                      label={t("EMAIL_ADDRESS") + '*'}
                       name="email"
                       type="email"
                       error={formikProps.errors.email}
