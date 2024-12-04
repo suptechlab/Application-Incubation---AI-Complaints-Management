@@ -161,34 +161,34 @@ export default function TeamManagementList() {
                 enableSorting: false,
             },
             // Conditionally add the "actions" column
-            ...(permission.current.editModule
-                ? [
-                    {
-                        id: "actions",
-                        isAction: true,
-                        cell: (rowData) => (
-                            <div className="pointer">
-                                <DataGridActions
-                                    controlId="team-management"
-                                    rowData={rowData}
-                                    customButtons={[
-                                        {
-                                            name: "edit",
-                                            enabled: true,
-                                            type: "link",
-                                            title: "Edit",
-                                            icon: <MdEdit size={18} />,
-                                        },
-                                    ]}
-                                />
-                            </div>
-                        ),
-                        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-                        enableSorting: false,
-                        size: "80",
-                    },
-                ]
-                : []),
+            // ...(permission.current.editModule
+            //     ? [
+            {
+                id: "actions",
+                isAction: true,
+                cell: (rowData) => (
+                    <div className="pointer">
+                        <DataGridActions
+                            controlId="team-management"
+                            rowData={rowData}
+                            customButtons={[
+                                {
+                                    name: "edit",
+                                    enabled: true,
+                                    type: "link",
+                                    title: "Edit",
+                                    icon: <MdEdit size={18} />,
+                                },
+                            ]}
+                        />
+                    </div>
+                ),
+                header: () => <div className="text-center">{t("ACTIONS")}</div>,
+                enableSorting: false,
+                size: "80",
+            },
+            // ]
+            // : []),
             // {
             //     id: "actions",
             //     isAction: true,

@@ -1,5 +1,4 @@
 import { Formik, Form as FormikForm } from "formik";
-import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row, Stack, Table } from "react-bootstrap";
 import toast from "react-hot-toast";
@@ -16,53 +15,36 @@ import { getOrganizationList, getTeamMemberList, handleAddUser, handleGetUserByI
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
 export default function TeamManagementAddEdit() {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
     const isEdit = !!id;
-    const [userData, setUserData] = useState([]);
     const { t } = useTranslation();
     const [initialValues, setInitialValues] = useState({
         teamName: "",
         description: "",
         entityId: "",
-        entityType: "FI", //Default value to ensure the radio is selected initially
+        entityType: "FI"
     });
+    const [userData, setUserData] = useState([]);
     const [entityIdArr, setEntityIdArr] = useState([
         { label: "Select", value: "" },
     ])
     const [organizationArr, setOrganizationArr] = useState([
         { label: "Select", value: "" },
     ])
-
-    const location = useLocation();
-    const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-    const [pagination, setPagination] = React.useState({
-        pageIndex: params.page ? parseInt(params.page) - 1 : 0,
-        pageSize: params.limit ? parseInt(params.limit) : 10,
-    });
-
-    const [sorting, setSorting] = React.useState([]);
-
-    const [filter, setFilter] = React.useState({
-        search: "",
-        subscription: "",
-        status: "",
-    });
     const [selectedRow, setSelectedRow] = useState();
     const [deleteShow, setDeleteShow] = useState(false);
     const [deleteId, setDeleteId] = useState();
-    const [userType, setUserType] = useState('FI'); // SEPS or FI
-    const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show 
-    const [assignedData, setAssignedData] = useState([]);
+    const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show
     const [newTeamMember, setNewTeamMember] = useState([]);
     const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
     const [selectedMemberName, setSelectedMemberName] = useState(null); // To hold the selected member
 
 
+
     //  Handle Assign Button Click
     const handleAssign = () => {
-        console.log('selectedMember',selectedMember)
         if (!selectedMember || Object.keys(selectedMember).length === 0 || selectedMember.value == '') {
             setLoading(false);
             toast.error(t('SELECT A TEAM MEMBER BEFORE ASSIGNING'));
@@ -88,47 +70,67 @@ export default function TeamManagementAddEdit() {
         //setSelectedMember(null); // Clear selection
     };
 
-    useEffect(() => {
+    const getTeamMemberLists = async (type) => {
         setLoading(true);
-        if (isEdit) {
-            setLoading(true);
-            handleGetUserById(id).then((response) => {
-                setUserData(response.data);
-                setInitialValues({
-                    name: response.data?.name ? response.data?.name : "",
-                    email: response.data?.email ? response.data?.email : "",
-                    roleId: response.data?.roleId ?? "",
-                });
+        try {
+            await getTeamMemberList(type).then((response) => {
+                const formattedData = response.data.map((item) => ({
+                    label: item.name,
+                    value: item.id
+                }));
+                setEntityIdArr([{ label: "Select", value: "" }, ...formattedData]);
                 setLoading(false);
             });
-        } else {
+        } catch (error) {
+            setLoading(false);
         }
 
-    }, [id, isEdit]);
+    }
 
-    // Get Assign members list
+    const getOrganizationLists = async (type) => {
+        setLoading(true);
+        try {
+            await getOrganizationList(type).then((response) => {
+                const formattedOrgData = response.data.map((item) => ({
+                    label: item.name,
+                    value: item.id
+                }));
+                setOrganizationArr([{ label: "Select", value: "" }, ...formattedOrgData]);
+                setLoading(false);
+            });
+        } catch (error) {
+            setLoading(false);
+        }
+    }
+
+    const getUserDetails = async (userId) => {
+        setLoading(true);
+        try {
+            const response = await handleGetUserById(userId);
+            console.log('resp', response)
+            setInitialValues({
+                teamName: response.data?.teamName ?? "",
+                description: response.data?.description ?? "",
+                entityId: response.data?.entityId ?? "",
+                entityType: response.data?.entityType ?? "",
+            });
+            setNewTeamMember(response.data?.members);
+            await getTeamMemberLists(response.data?.entityType);
+            await getOrganizationLists(response.data?.entityType);
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
-        getTeamMemberList(userType).then((response) => {
-            const formattedData = response.data.map((item) => ({
-                label: item.name,
-                value: item.id
-            }));
-            setEntityIdArr([{ label: "Select", value: "" }, ...formattedData]);
-            // setEntityIdArr([formattedData]);
-            setLoading(false);
-        });
-
-        getOrganizationList(userType).then((response) => {
-            const formattedOrgData = response.data.map((item) => ({
-                label: item.name,
-                value: item.id
-            }));
-            setOrganizationArr([{ label: "Select", value: "" }, ...formattedOrgData]);
-            setLoading(false);
-        });
-
-        // setOrganizationArr
-    }, [userType]);
+        if (isEdit && id) {
+            getUserDetails(id);
+        } else {
+            getTeamMemberLists("FI");
+            getOrganizationLists("FI");
+        }
+    }, [id, isEdit]);
 
     const onSubmit = async (values, actions) => {
         setLoading(true);
@@ -223,6 +225,7 @@ export default function TeamManagementAddEdit() {
                                                         onChange={() => {
                                                             setFieldValue("entityType", "SEPS");
                                                             setShowEntityOrgId(false);
+                                                            getTeamMemberLists("SEPS");
                                                         }}
                                                         type="radio"
                                                         label={t('SEPS USER')}
@@ -237,6 +240,8 @@ export default function TeamManagementAddEdit() {
                                                         onChange={() => {
                                                             setFieldValue("entityType", "FI");
                                                             setShowEntityOrgId(true);
+                                                            getOrganizationLists("FI");
+                                                            getTeamMemberLists("FI");
                                                         }}
                                                         type="radio"
                                                         label={t('FI USER')}
@@ -248,11 +253,10 @@ export default function TeamManagementAddEdit() {
                                             showEntityOrgId ?
                                                 <Col sm={6} lg={4}>
                                                     <ReactSelect
-                                                        // label={t('ENTITY NAME')}
-                                                        label="Pawan organizationArr"
+                                                        label={t('ENTITY NAME')}
                                                         error={errors.entityId}
                                                         options={organizationArr}
-                                                        value={values.entityId}
+                                                        value={values.entityId || ""}
                                                         onChange={(option) => {
                                                             setFieldValue(
                                                                 "entityId",
@@ -260,14 +264,8 @@ export default function TeamManagementAddEdit() {
                                                             );
                                                         }}
                                                         name="entityId"
-                                                        className={
-                                                            touched.entityId && errors.entityId
-                                                                ? "is-invalid"
-                                                                : ""
-                                                        }
                                                         onBlur={handleBlur}
                                                         touched={touched.entityId}
-
                                                     />
                                                 </Col>
                                                 : ''
@@ -302,8 +300,7 @@ export default function TeamManagementAddEdit() {
                                                 value={values.description || ""}
                                             />
                                         </Col>
-                                       
-                                        <pre>newTeamMember: {JSON.stringify(newTeamMember,null,2)}</pre>
+
                                         <Col xs={12}>
                                             <h5 className="fw-semibold mb-1 border-bottom mb-3 py-2">{t('ASSIGN TEAM MEMBERS')}</h5>
                                             <Row>
