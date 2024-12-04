@@ -81,7 +81,7 @@ const Edit = ({ provinces, modal, toggle, rowData, dataQuery }) => {
       >
         <Modal.Header className="pb-3">
           <Modal.Title as="h4" className="fw-semibold">
-            {t("CREATE TEMPLATE MASTER")}
+            {t("EDIT TEMPLATE MASTER")}
           </Modal.Title>
         </Modal.Header>
 
