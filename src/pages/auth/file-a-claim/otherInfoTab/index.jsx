@@ -73,7 +73,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label={t("CUSTOMER_TYPE")}
+                                    label={t("CUSTOMER_TYPE") + '*'}
                                     error={formikProps.errors.customerType}
                                     options={[
                                         { label: t("SELECT"), value: "" },
@@ -102,7 +102,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label={t("ENTITY_NAME")}
+                                    label={t("ENTITY_NAME") + '*'}
                                     error={formikProps.errors.organizationId }
                                     options={[
                                         { label: t("SELECT"), value: "" },
@@ -136,7 +136,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             <Col lg={6}>
                                 <FormInputBox
                                     id="entitysTaxID"
-                                    label={t("ENTITYS_TAX_ID")}
+                                    label={t("ENTITYS_TAX_ID") + '*'}
                                     name="entitysTaxID"
                                     type="text"
                                     error={formikProps.errors.entitysTaxID}

@@ -103,7 +103,7 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData, newAccountData }) =
                             <FormInputBox
                                 autoComplete="off"
                                 id="nationalID"
-                                label={t("NATIONAL_ID_NUMBER")}
+                                label={t("NATIONAL_ID_NUMBER") + '*'}
                                 name="nationalID"
                                 type="text"
                                 error={formikProps.errors.nationalID}
@@ -126,7 +126,7 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData, newAccountData }) =
                             <FormInputBox
                                 autoComplete="off"
                                 id="fingerprintCode"
-                                label={t("FINGERPRINT_CODE")}
+                                label={t("FINGERPRINT_CODE") + '*'}
                                 name="fingerprintCode"
                                 type="text"
                                 error={formikProps.errors.fingerprintCode}

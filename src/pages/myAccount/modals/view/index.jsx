@@ -72,7 +72,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             colProps: { sm: 6, lg: 3 }
         },
         {
-            label: t('ENTITY'),
+            label: t('ENTITY_NAME'),
             value: claimTicketData?.organization?.nemonicoTipoOrganizacion ?? t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
@@ -90,7 +90,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             label: t('RESOLVED_ON'),
             value: claimTicketData?.resolvedOn
                 ? moment(claimTicketData?.resolvedOn).format('DD-MM-YY | hh:mm:ss a')
-                : 'N/A',
+                : t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
         {

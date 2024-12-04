@@ -88,7 +88,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                 <FormInputBox
                                     autoComplete="off"
                                     id="identificacion"
-                                    label={t("NATIONAL_ID_NUMBER")}
+                                    label={t("NATIONAL_ID_NUMBER") + '*'}
                                     name="identificacion"
                                     type="text"
                                     error={formikProps.errors.identificacion}
@@ -103,7 +103,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                 <FormInputBox
                                     autoComplete="off"
                                     id="email"
-                                    label={t("EMAIL")}
+                                    label={t("EMAIL") + '*'}
                                     name="email"
                                     type="email"
                                     error={formikProps.errors.email}
@@ -117,7 +117,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                             <Col lg={6}>
                                 <FormInputBox
                                     id="name"
-                                    label={t("NAME")}
+                                    label={t("NAME") + '*'}
                                     name="name"
                                     type="text"
                                     error={formikProps.errors.name}
@@ -131,7 +131,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                             <Col lg={6}>
                                 <FormInputBox
                                     id="gender"
-                                    label={t("GENDER")}
+                                    label={t("GENDER") + '*'}
                                     name="gender"
                                     type="text"
                                     error={formikProps.errors.gender}
@@ -184,7 +184,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                             <Col lg={6}></Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label={t("PROVINCE_OF_RESIDENCE")}
+                                    label={t("PROVINCE_OF_RESIDENCE") + '*'}
                                     error={formikProps?.errors?.provinceId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
@@ -217,7 +217,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                             </Col>
                             <Col lg={6}>
                                 <ReactSelect
-                                    label={t("CANTON_OF_RESIDENCE")}
+                                    label={t("CANTON_OF_RESIDENCE") + '*'}
                                     error={formikProps?.errors?.cityId }
                                     options={[
                                         { label: t("SELECT"), value: "" },
