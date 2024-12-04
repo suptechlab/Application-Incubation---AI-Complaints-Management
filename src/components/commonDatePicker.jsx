@@ -1,7 +1,7 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { MdCalendarToday, MdDateRange } from "react-icons/md";
+import { MdDateRange, MdOutlineCalendarToday } from "react-icons/md";
 import "./datepicker.scss";
 
 const CommonDatePicker = ({ wrapperClassName = 'mb-3 pb-1', label, selectsRange, size, placeholder, ...rest }) => {
@@ -14,7 +14,7 @@ const CommonDatePicker = ({ wrapperClassName = 'mb-3 pb-1', label, selectsRange,
         showIcon
         toggleCalendarOnIconClick
         placeholderText={placeholder}
-        icon={selectsRange ? <MdDateRange size={18} /> : <MdCalendarToday size={18} />}
+        icon={selectsRange ? <MdDateRange size={18} /> : <MdOutlineCalendarToday size={18} />}
         className={`form-control ${size === 'sm' ? 'form-control-sm' : ''}`}
         portalId="root"
         {...rest}
