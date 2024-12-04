@@ -20,7 +20,7 @@ import StatesList from "../pages/states";
 import UserList from "../pages/users";
 import SLAComplianceReport from "../pages/sla-reports";
 import ClaimOverviewReport from "../pages/clamOverviewReport";
-import TeamManagementAddEdit from "../pages/team-management/add";
+import TeamManagementAddEdit from "../pages/team-management/addedit";
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));

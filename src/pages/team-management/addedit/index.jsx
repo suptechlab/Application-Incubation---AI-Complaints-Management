@@ -11,7 +11,7 @@ import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import ReactSelect from "../../../components/ReactSelect";
 import AppTooltip from "../../../components/tooltip";
-import { getOrganizationList, getTeamMemberList, handleAddUser, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
+import { assignUserIntoTeam, getOrganizationList, getTeamMemberList, handleAddUser, handleDeleteUserFromTeam, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
 export default function TeamManagementAddEdit() {
@@ -26,7 +26,6 @@ export default function TeamManagementAddEdit() {
         entityId: "",
         entityType: "FI"
     });
-    const [userData, setUserData] = useState([]);
     const [entityIdArr, setEntityIdArr] = useState([
         { label: "Select", value: "" },
     ])
@@ -38,6 +37,7 @@ export default function TeamManagementAddEdit() {
     const [deleteId, setDeleteId] = useState();
     const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show
     const [newTeamMember, setNewTeamMember] = useState([]);
+    const [userData, setUserData] = useState([]);
     const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
     const [selectedMemberName, setSelectedMemberName] = useState(null); // To hold the selected member
 
@@ -66,8 +66,9 @@ export default function TeamManagementAddEdit() {
             name: selectedMember.label, // Name from ReactSelect
         };
 
-        setNewTeamMember((prev) => [...prev, newMember]); // Add to the list
-        //setSelectedMember(null); // Clear selection
+        assignUserIntoTeam(userData?.id, selectedMember?.value);
+
+        setNewTeamMember((prev) => [...prev, newMember]);
     };
 
     const getTeamMemberLists = async (type) => {
@@ -108,6 +109,7 @@ export default function TeamManagementAddEdit() {
         try {
             const response = await handleGetUserById(userId);
             console.log('resp', response)
+            setUserData(response.data);
             setInitialValues({
                 teamName: response.data?.teamName ?? "",
                 description: response.data?.description ?? "",
@@ -115,6 +117,11 @@ export default function TeamManagementAddEdit() {
                 entityType: response.data?.entityType ?? "",
             });
             setNewTeamMember(response.data?.members);
+            if(response.data?.entityType === 'FI'){
+                setShowEntityOrgId(true);
+            } else {
+                setShowEntityOrgId(false);
+            }
             await getTeamMemberLists(response.data?.entityType);
             await getOrganizationLists(response.data?.entityType);
             setLoading(false);
@@ -134,40 +141,33 @@ export default function TeamManagementAddEdit() {
 
     const onSubmit = async (values, actions) => {
         setLoading(true);
-        const teamMembersIdArr = newTeamMember.map(member => member.id);
-        values.teamMembers = teamMembersIdArr // add into teamMembers
-        try {
-            if (isEdit) {
-                // values.entityId.toString();
-                await handleUpdateUser(id, { ...values }).then((response) => {
-                    toast.success(response.data.message)
-                    actions.resetForm()
-                    navigate('/team-management')
-                }).catch((error) => {
-                    setLoading(false);
-                    toast.error(error.response.data.detail);
 
-                }).finally(() => {
-                    actions.setSubmitting(false)
-                })
-            }
-            else {
-
-                await handleAddUser({ ...values }).then((response) => {
-                    toast.success(response.data.message)
-                    actions.resetForm()
-                    navigate('/team-management')
-                }).catch((error) => {
-                    setLoading(false);
-                    toast.error(error.response.data.detail);
-
-                }).finally(() => {
-                    actions.setSubmitting(false)
-                })
-            }
-        } catch (error) {
+        if (newTeamMember.length === 0) {
+            const errorMessage = t('PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER');
+            toast.error(errorMessage);
             setLoading(false);
-            toast.error(t('SOMETHING WENT WRONG'));
+        } else {
+            try {
+                values.teamMembers = newTeamMember.map((member) => member.id);
+                console.log('values:', values)
+
+                const action = isEdit
+                    ? handleUpdateUser(id, { ...values })
+                    : handleAddUser({ ...values });
+
+                const response = await action;
+
+                toast.success(response.data.message);
+
+                actions.resetForm();
+                navigate('/team-management');
+            } catch (error) {
+                const errorMessage = error.response?.data?.detail;
+                toast.error(errorMessage);
+            } finally {
+                setLoading(false);
+                actions.setSubmitting(false);
+            }
         }
     };
 
@@ -180,6 +180,7 @@ export default function TeamManagementAddEdit() {
 
     const recordDelete = (deleteId) => {
         setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
+        // handleDeleteUserFromTeam(userData?.id, deleteId)
         setDeleteShow(false);
     };
 
@@ -192,6 +193,7 @@ export default function TeamManagementAddEdit() {
                     <Card.Body className="d-flex flex-column">
                         <Formik
                             initialValues={initialValues}
+                            enableReinitialize={true}
                             validationSchema={validationSchema}
                             onSubmit={onSubmit}
                         >
@@ -208,8 +210,6 @@ export default function TeamManagementAddEdit() {
                                     onSubmit={handleSubmit}
                                     className="d-flex flex-column h-100"
                                 >
-                                    {/* <pre>{JSON.stringify(values,null,2)}</pre>
-                                    <pre>{JSON.stringify(errors,null,2)}</pre> */}
                                     <Row>
                                         <Col xs={12} className="mb-3">
                                             <div className='status-radio'>
@@ -226,9 +226,11 @@ export default function TeamManagementAddEdit() {
                                                             setFieldValue("entityType", "SEPS");
                                                             setShowEntityOrgId(false);
                                                             getTeamMemberLists("SEPS");
+                                                            setNewTeamMember([]);
                                                         }}
                                                         type="radio"
                                                         label={t('SEPS USER')}
+                                                        disabled={isEdit}
                                                     />
                                                     <Form.Check
                                                         className="me-3 me-lg-4"
@@ -242,9 +244,11 @@ export default function TeamManagementAddEdit() {
                                                             setShowEntityOrgId(true);
                                                             getOrganizationLists("FI");
                                                             getTeamMemberLists("FI");
+                                                            setNewTeamMember([]);
                                                         }}
                                                         type="radio"
                                                         label={t('FI USER')}
+                                                        disabled={isEdit}
                                                     />
                                                 </Stack>
                                             </div>
@@ -316,15 +320,9 @@ export default function TeamManagementAddEdit() {
                                                                 options={entityIdArr}
                                                                 value={values.teamMemberId}
                                                                 onChange={(option) => {
-                                                                    console.log('onChange option', option)
                                                                     setSelectedMemberName(option.target.label);
-                                                                    // setFieldValue(
-                                                                    //     "entityId",
-                                                                    //     option?.target?.value ?? ""
-                                                                    // );
-                                                                    setSelectedMember(option.target); // Store the selected member
+                                                                    setSelectedMember(option.target);
                                                                 }}
-                                                                // name="teamMemberId"
                                                                 className={
                                                                     touched.orgId && errors.teamMemberId
                                                                         ? "is-invalid"
@@ -422,7 +420,7 @@ export default function TeamManagementAddEdit() {
                 modalBodyContent={`${t('ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER')} - ${selectedRow?.name}?`}
                 handleAction={() => recordDelete(deleteId)}
                 buttonName={t('DELETE')}
-                ActionButtonVariant={t('CANCEL')}
+                ActionButtonVariant="danger"
             />
 
         </React.Fragment>

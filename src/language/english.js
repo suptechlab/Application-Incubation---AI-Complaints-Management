@@ -156,7 +156,8 @@ export const englishLang = {
     "SELECT A TEAM MEMBER BEFORE ASSIGNING": "Please select a team member before assigning.",
     "DELETE TEAM MEMBER": "Delete Team Member",
     "ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER": "Are you sure, you want to delete the team member",
-    "DELETE": "Eliminado",
+    "DELETE": "Delete",
+    "PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER": "Please add atleast one team member."
 
 
 
