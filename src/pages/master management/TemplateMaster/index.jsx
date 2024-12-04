@@ -34,7 +34,7 @@ const TemplateMaster = () => {
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
   const [isDownloading, setDownloading] = useState(false)
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
@@ -273,36 +273,33 @@ const TemplateMaster = () => {
 
   return (
     <React.Fragment>
-      {
-        loading ? <Loader isLoading={loading} />
-          :
+      <Loader isLoading={loading} />
+      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
 
-          <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-
-            <PageHeader
-              title={t("TEMPLATE MASTER")}
-              actions={[
-                { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-                { label: "Add New", onClick: toggle, variant: "warning" },
-              ]}
+        <PageHeader
+          title={t("TEMPLATE MASTER")}
+          actions={[
+            { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+            { label: "Add New", onClick: toggle, variant: "warning" },
+          ]}
+        />
+        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+          <Card.Body className="d-flex flex-column">
+            <ListingSearchForm filter={filter} setFilter={setFilter} />
+            <CommonDataTable
+              columns={columns}
+              dataQuery={dataQuery}
+              pagination={pagination}
+              setPagination={setPagination}
+              sorting={sorting}
+              setSorting={setSorting}
             />
-            <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-              <Card.Body className="d-flex flex-column">
-                <ListingSearchForm filter={filter} setFilter={setFilter} />
-                <CommonDataTable
-                  columns={columns}
-                  dataQuery={dataQuery}
-                  pagination={pagination}
-                  setPagination={setPagination}
-                  sorting={sorting}
-                  setSorting={setSorting}
-                />
-              </Card.Body>
-            </Card>
-            <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
-            <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
-          </div>
-      }
+          </Card.Body>
+        </Card>
+        <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
+        <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
+      </div>
+
     </React.Fragment>
   );
 };

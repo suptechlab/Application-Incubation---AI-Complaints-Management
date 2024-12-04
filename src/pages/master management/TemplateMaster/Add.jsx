@@ -126,9 +126,9 @@ const Add = ({ provinces, modal, toggle, dataQuery }) => {
                   name="content"
                   label={t("TEMPLATE_DETAILS")}
                   height="215"
-                  content={values.description}
-                  error={errors?.description}
-                  touched={touched?.description}
+                  content={values.content}
+                  error={errors?.content}
+                  touched={touched?.content}
                   handleBlur={handleBlur}
                   handleChange={(value) => {
                     setFieldValue("content", value === "<p><br></p>" ? "" : value);
