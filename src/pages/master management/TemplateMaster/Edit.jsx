@@ -24,7 +24,7 @@ const Edit = ({ provinces, modal, toggle,rowData,dataQuery }) => {
     { value: "EMAIL", label: t('EMAIL') },
     { value: "NOTIFICATION", label: t('NOTIFICATION') }
   ])
-  const [initialValues, setInitialValues] = useState();
+  const [initialValues, setInitialValues] = useState({});
 
   useEffect(() => {
     if(rowData){

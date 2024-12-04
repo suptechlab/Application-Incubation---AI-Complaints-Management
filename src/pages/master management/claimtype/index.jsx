@@ -30,7 +30,7 @@ const ClaimType = () => {
   const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);

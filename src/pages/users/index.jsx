@@ -261,9 +261,7 @@ export default function UserList() {
 
   return (
     <React.Fragment>
-
-      {loading ? <Loader isLoading={loading} />
-        :
+<Loader isLoading={loading} />
         <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
           {permission.current.addModule ?
             <PageHeader
@@ -285,7 +283,7 @@ export default function UserList() {
             </Card.Body>
           </Card>
         </div>
-      }
+     
       {/* Delete Modal */}
       <GenericModal
         show={deleteShow}
