@@ -4,18 +4,37 @@ import { Button, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import CommonViewData from "../../../components/CommonViewData";
 import CommonDatePicker from "../../../components/commonDatePicker";
-import { validationSchema } from "../../../validations/inquiryType.validation";
+import {slaDateValidation} from "../../../validations/ticketsManagement.validation";
 import moment from "moment/moment";
+import toast from "react-hot-toast";
+import { slaDateExtensionApi } from "../../../services/ticketmanagement.service";
 
 const DateExtensionModal = ({ modal, toggle, ticketData }) => {
-    const [startDate, setStartDate] = useState();
+
     const { t } = useTranslation();
 
     const handleSubmit = async (values, actions) => {
-        console.log('values', values)
-        actions.setSubmitting(false);
+        console.log({ values: values })
+        actions.setSubmitting(true);
+        if (values?.date) {
+            slaDateExtensionApi(ticketData?.id, moment(values?.date).format('yyyy-MM-DD'))
+                .then((response) => {
+                    toast.success(response?.data?.message);
+                })
+                .catch((error) => {
+                    if (error?.response?.data?.errorDescription) {
+                        toast.error(error?.response?.data?.errorDescription);
+                    } else {
+                        toast.error(error?.message);
+                    }
+                })
+                .finally(() => {
+                    actions.setSubmitting(false);
+                });
+        }else{
+            actions.setSubmitting(false);
+        }
     };
-
     return (
         <Modal
             show={modal}
@@ -35,8 +54,11 @@ const DateExtensionModal = ({ modal, toggle, ticketData }) => {
                 initialValues={{
                     date: "",
                 }}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmit}
+                validationSchema={slaDateValidation}
+                onSubmit={(values, actions) => {
+                    console.log("are you calling")
+                    handleSubmit(values, actions)
+                }}
             >
                 {({
                     isSubmitting,
@@ -55,16 +77,17 @@ const DateExtensionModal = ({ modal, toggle, ticketData }) => {
                                 label="Due Date"
                                 value={ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY") : 'N/A'}
                             />
+                            
                             <CommonDatePicker
-                                error={errors?.name}
+                                error={errors?.date}
                                 id="date"
                                 key={"date"}
                                 name="date"
                                 touched={touched?.date}
                                 label="Enter Extended Date"
                                 placeholder="Select"
-                                selected={startDate}
-                                onChange={(date) => setStartDate(date)}
+                                selected={values?.date}
+                                onChange={(date) => setFieldValue("date", date)}
                                 isBackDateBlocked={true}
                             />
                         </Modal.Body>

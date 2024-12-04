@@ -3,7 +3,7 @@ import {  ticketMastersData } from '../services/ticketmanagement.service';
 import { AuthenticationContext } from './authentication.context';
 
 // Create the context
-const MasterDataContext = createContext();
+export const MasterDataContext = createContext({masterData : {}});
 
 // Create a custom hook to use the context (optional but recommended)
 export const useMasterData = () => useContext(MasterDataContext);

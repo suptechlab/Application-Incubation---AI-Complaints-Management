@@ -6,6 +6,11 @@ const validationSchema = Yup.object({
 });
 
 
+export const slaDateValidation =  Yup.object({
+  date: Yup.string()
+    .required("Date is required!"),
+});
+
 
 
 export { validationSchema };
