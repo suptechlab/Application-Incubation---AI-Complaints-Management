@@ -4,7 +4,7 @@ import { Button, Card, Col, Form, Row, Stack, Table } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdDelete } from "react-icons/md";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import GenericModal from "../../../components/GenericModal";
 import Loader from "../../../components/Loader";
@@ -26,12 +26,8 @@ export default function TeamManagementAddEdit() {
         entityId: "",
         entityType: "FI"
     });
-    const [entityIdArr, setEntityIdArr] = useState([
-        { label: "Select", value: "" },
-    ])
-    const [organizationArr, setOrganizationArr] = useState([
-        { label: "Select", value: "" },
-    ])
+    const [entityIdArr, setEntityIdArr] = useState([]);
+    const [organizationArr, setOrganizationArr] = useState([]);
     const [selectedRow, setSelectedRow] = useState();
     const [deleteShow, setDeleteShow] = useState(false);
     const [deleteId, setDeleteId] = useState();
@@ -39,7 +35,6 @@ export default function TeamManagementAddEdit() {
     const [newTeamMember, setNewTeamMember] = useState([]);
     const [userData, setUserData] = useState([]);
     const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
-    const [selectedMemberName, setSelectedMemberName] = useState(null); // To hold the selected member
 
 
 
@@ -66,7 +61,20 @@ export default function TeamManagementAddEdit() {
             name: selectedMember.label, // Name from ReactSelect
         };
 
-        assignUserIntoTeam(userData?.id, selectedMember?.value);
+        if (isEdit) {
+            setLoading(true);
+            try {
+                let payload = {
+                    userIds: [selectedMember?.value]
+                }
+                assignUserIntoTeam(userData?.id, payload);
+                setLoading(false);
+            } catch (error) {
+                const errorMessage = error.response?.data?.detail;
+                toast.error(errorMessage);
+                setLoading(false);
+            }
+        }
 
         setNewTeamMember((prev) => [...prev, newMember]);
     };
@@ -79,7 +87,7 @@ export default function TeamManagementAddEdit() {
                     label: item.name,
                     value: item.id
                 }));
-                setEntityIdArr([{ label: "Select", value: "" }, ...formattedData]);
+                setEntityIdArr([...formattedData]);
                 setLoading(false);
             });
         } catch (error) {
@@ -96,7 +104,7 @@ export default function TeamManagementAddEdit() {
                     label: item.name,
                     value: item.id
                 }));
-                setOrganizationArr([{ label: "Select", value: "" }, ...formattedOrgData]);
+                setOrganizationArr([...formattedOrgData]);
                 setLoading(false);
             });
         } catch (error) {
@@ -108,7 +116,6 @@ export default function TeamManagementAddEdit() {
         setLoading(true);
         try {
             const response = await handleGetUserById(userId);
-            console.log('resp', response)
             setUserData(response.data);
             setInitialValues({
                 teamName: response.data?.teamName ?? "",
@@ -117,7 +124,7 @@ export default function TeamManagementAddEdit() {
                 entityType: response.data?.entityType ?? "",
             });
             setNewTeamMember(response.data?.members);
-            if(response.data?.entityType === 'FI'){
+            if (response.data?.entityType === 'FI') {
                 setShowEntityOrgId(true);
             } else {
                 setShowEntityOrgId(false);
@@ -149,7 +156,6 @@ export default function TeamManagementAddEdit() {
         } else {
             try {
                 values.teamMembers = newTeamMember.map((member) => member.id);
-                console.log('values:', values)
 
                 const action = isEdit
                     ? handleUpdateUser(id, { ...values })
@@ -162,7 +168,7 @@ export default function TeamManagementAddEdit() {
                 actions.resetForm();
                 navigate('/team-management');
             } catch (error) {
-                const errorMessage = error.response?.data?.detail;
+                const errorMessage = error.response?.data?.errorDescription;
                 toast.error(errorMessage);
             } finally {
                 setLoading(false);
@@ -174,13 +180,24 @@ export default function TeamManagementAddEdit() {
     //Handle Delete
     const deleteAction = (rowData) => {
         setSelectedRow(rowData);
-        setDeleteId(rowData.id);
+        setDeleteId(rowData.userId);
         setDeleteShow(true);
     };
 
-    const recordDelete = (deleteId) => {
-        setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
-        // handleDeleteUserFromTeam(userData?.id, deleteId)
+    const recordDelete = async (deleteId) => {
+        setNewTeamMember((prev) => prev.filter((member) => member.userId !== deleteId));
+        if (isEdit) {
+            setLoading(true);
+            try {
+                await handleDeleteUserFromTeam(userData?.id, deleteId);
+                await getTeamMemberLists(userData?.entityType);
+                setLoading(false);
+            } catch (error) {
+                const errorMessage = error.response?.data?.errorDescription;
+                toast.error(errorMessage);
+                setLoading(false);
+            }
+        }
         setDeleteShow(false);
     };
 
@@ -227,6 +244,7 @@ export default function TeamManagementAddEdit() {
                                                             setShowEntityOrgId(false);
                                                             getTeamMemberLists("SEPS");
                                                             setNewTeamMember([]);
+                                                            setFieldValue("teamMemberId", "");
                                                         }}
                                                         type="radio"
                                                         label={t('SEPS USER')}
@@ -245,6 +263,7 @@ export default function TeamManagementAddEdit() {
                                                             getOrganizationLists("FI");
                                                             getTeamMemberLists("FI");
                                                             setNewTeamMember([]);
+                                                            setFieldValue("teamMemberId", "");
                                                         }}
                                                         type="radio"
                                                         label={t('FI USER')}
@@ -312,15 +331,12 @@ export default function TeamManagementAddEdit() {
                                                     <Row className="gx-3">
                                                         <Col xs>
                                                             <ReactSelect
-                                                                getOptionLabel={(option) => option.value}
-                                                                getOptionValue={(option) => option.label}
-
                                                                 label="Member Name"
                                                                 error={errors.teamMemberId}
                                                                 options={entityIdArr}
                                                                 value={values.teamMemberId}
                                                                 onChange={(option) => {
-                                                                    setSelectedMemberName(option.target.label);
+                                                                    setFieldValue("teamMemberId", option?.target?.value ?? "");
                                                                     setSelectedMember(option.target);
                                                                 }}
                                                                 className={
