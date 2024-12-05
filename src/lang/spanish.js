@@ -119,5 +119,6 @@ export const spanishLang = {
   "SUBMIT": "Entregar",
   "CLAIM": "Afirmar",
   "CLAIM_STATUS": "Estado del reclamo",
-  "TOO_LARGE_FILE": "es demasiado grande. El tamaño máximo de archivo es de hasta 5 MB."
+  "TOO_LARGE_FILE": "es demasiado grande. El tamaño máximo de archivo es de hasta 5 MB.",
+  "TOO_MANY_FILES": "No se pueden cargar más de 5 archivos."
 }

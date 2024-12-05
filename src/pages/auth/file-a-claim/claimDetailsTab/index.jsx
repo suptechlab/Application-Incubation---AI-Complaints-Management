@@ -31,10 +31,12 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     //Handle File Change
     const handleFileChange = (event) => {
         const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB in bytes
+        const MAX_FILE_COUNT = 5; // Maximum number of files allowed
 
         if (event.target.files) {
             const selectedFiles = Array.from(event.target.files);
 
+            // Filter files based on size
             const validFiles = selectedFiles.filter((file) => {
                 if (file.size > MAX_FILE_SIZE) {
                     toast.error(`${file.name}` + ' ' + t('TOO_LARGE_FILE'));
@@ -44,7 +46,16 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             });
 
             if (validFiles.length > 0) {
-                setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+                setFiles((prevFiles) => {
+                    const totalFiles = prevFiles.length + validFiles.length;
+
+                    if (totalFiles > MAX_FILE_COUNT) {
+                        toast.error(t('TOO_MANY_FILES'));
+                        return prevFiles;
+                    }
+
+                    return [...prevFiles, ...validFiles];
+                });
             }
         }
     };
@@ -166,7 +177,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                     value={formikProps.values.specificPetition || ""}
                                 />
                             </Col>
-                            {/* <Col xs={12} className="mb-3">
+                            <Col xs={12} className="mb-3">
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                     <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
@@ -196,7 +207,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         </div>
                                     )}
                                 </div>
-                            </Col> */}
+                            </Col>
                             <Col xs={12}>
                                 <FormCheckbox
                                     wrapperClassName="mb-0"

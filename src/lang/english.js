@@ -118,5 +118,6 @@ export const englishLang = {
   "SUBMIT": "Submit",
   "CLAIM": "Claim",
   "CLAIM_STATUS": "Claim Status",
-  "TOO_LARGE_FILE": "is too large. Maximum file size is upto 5 MB."
+  "TOO_LARGE_FILE": "is too large. Maximum file size is upto 5 MB.",
+  "TOO_MANY_FILES": "Not more than 5 files can be uploaded."
 }
