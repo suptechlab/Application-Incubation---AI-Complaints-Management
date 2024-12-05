@@ -78,6 +78,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     const handleClaimDetailsSubmit = async (values, actions) => {
         let combinedData = { ...fileClaimValues, ...values };
         combinedData.checkDuplicate = true;
+        setFileClaimValues((prev) => ({ ...prev, ...values }))
 
         const formData = new FormData();
 
@@ -118,8 +119,28 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
 
     // HANDLE FILE DUPLICATE CLAIM
     const handleFileDuplicateClaim = async () => {
-        let formData = { ...fileClaimValues, checkDuplicate: false }
+        
+        let combinedData = { ...fileClaimValues, checkDuplicate: false };
+        combinedData.checkDuplicate = true;
+
+        const formData = new FormData();
+
+        Object.entries(combinedData).forEach(([key, value]) => {
+            if (key === "files") {
+                
+                value.forEach((file, index) => {
+                    formData.append(`attachments[${index}]`, file);
+                });
+            } else {
+                
+                formData.append(key, value);
+            }
+        });
+
+        // Dispatch the FormData
+        setIsLoading(true);
         const result = await dispatch(fileClaimForm(formData));
+        setIsLoading(false);
         if (fileClaimForm.fulfilled.match(result)) {
             setFileClaimResponse(result?.payload?.data)
             setFileAlertModalShow(false)
