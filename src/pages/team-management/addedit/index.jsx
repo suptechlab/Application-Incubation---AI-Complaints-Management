@@ -177,13 +177,17 @@ export default function TeamManagementAddEdit() {
     //Handle Delete
     const deleteAction = (rowData) => {
         setSelectedRow(rowData);
-        setDeleteId(rowData.userId);
+        if (isEdit) {
+            setDeleteId(rowData.userId);
+        } else {
+            setDeleteId(rowData.id);
+        }
         setDeleteShow(true);
     };
 
     const recordDelete = async (deleteId) => {
-        setNewTeamMember((prev) => prev.filter((member) => member.userId !== deleteId));
         if (isEdit) {
+            setNewTeamMember((prev) => prev.filter((member) => member.userId !== deleteId));
             setLoading(true);
             try {
                 await handleDeleteUserFromTeam(userData?.id, deleteId);
@@ -195,6 +199,7 @@ export default function TeamManagementAddEdit() {
                 setLoading(false);
             }
         }
+        setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
         setDeleteShow(false);
     };
 
