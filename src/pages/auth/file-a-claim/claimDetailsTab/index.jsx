@@ -30,8 +30,8 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     const [claimSubTypes, setClaimSubTypes] = useState([])
     //Handle File Change
     const handleFileChange = (event) => {
-        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB in bytes
-        const MAX_FILE_COUNT = 5; // Maximum number of files allowed
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 5 MB in bytes
+        const MAX_FILE_COUNT = 3; // Maximum number of files allowed
 
         if (event.target.files) {
             const selectedFiles = Array.from(event.target.files);
