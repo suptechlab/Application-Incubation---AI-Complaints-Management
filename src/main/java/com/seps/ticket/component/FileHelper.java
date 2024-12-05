@@ -14,10 +14,14 @@ public class FileHelper {
     public static final String IMAGE_PNG = "image/png";
     public static final String PDF = "application/pdf";
     public static final String TEXT_PLAIN = "text/plain";
+    public static final String DOC = "application/msword"; // Microsoft Word 97-2003 document
+    public static final String DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; // Microsoft Word Open XML document
+    public static final String RTF = "application/rtf"; // Rich Text Format document
+
 
     // Enum for different File Types
     public enum FileType {
-        CLAIM_TICKET_DOCUMENTS("document", null, new String[]{IMAGE_JPEG, IMAGE_JPG, IMAGE_PNG, PDF, TEXT_PLAIN}, 1024 * 5.0); // 5MB
+        CLAIM_TICKET_DOCUMENTS("document", null, new String[]{IMAGE_JPEG, IMAGE_JPG, IMAGE_PNG, PDF, DOC, DOCX, RTF, TEXT_PLAIN}, 1024 * 1.0); // 1MB
         private final String folderPath;
         private final String thumbnailFolderPath;
         private final String[] validMimeTypes;
