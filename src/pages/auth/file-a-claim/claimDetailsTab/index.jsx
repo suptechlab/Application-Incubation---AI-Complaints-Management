@@ -10,6 +10,7 @@ import { fetchClaimSubTypes } from '../../../../redux/slice/masterSlice';
 import { ClaimDetailsFormSchema } from '../../validations';
 import SvgIcons from '../../../../components/SVGIcons';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
     const { t } = useTranslation()
@@ -29,9 +30,22 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     const [claimSubTypes, setClaimSubTypes] = useState([])
     //Handle File Change
     const handleFileChange = (event) => {
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB in bytes
+
         if (event.target.files) {
             const selectedFiles = Array.from(event.target.files);
-            setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+
+            const validFiles = selectedFiles.filter((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    toast.error(`${file.name}` + ' ' + t('TOO_LARGE_FILE'));
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+            }
         }
     };
 
@@ -152,7 +166,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                     value={formikProps.values.specificPetition || ""}
                                 />
                             </Col>
-                            <Col xs={12} className="mb-3">
+                            {/* <Col xs={12} className="mb-3">
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                     <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
@@ -163,7 +177,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         </label>
                                         <input
                                             id="files"
-                                            accept="image/png, image/jpeg, image/jpg"
+                                            accept=".pdf, .docx, .doc, .txt, .rtf"
                                             multiple
                                             className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                             type="file"
@@ -182,7 +196,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         </div>
                                     )}
                                 </div>
-                            </Col>
+                            </Col> */}
                             <Col xs={12}>
                                 <FormCheckbox
                                     wrapperClassName="mb-0"

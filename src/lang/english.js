@@ -117,5 +117,6 @@ export const englishLang = {
   "CANCEL": "Cancel",
   "SUBMIT": "Submit",
   "CLAIM": "Claim",
-  "CLAIM_STATUS": "Claim Status"
+  "CLAIM_STATUS": "Claim Status",
+  "TOO_LARGE_FILE": "is too large. Maximum file size is upto 5 MB."
 }

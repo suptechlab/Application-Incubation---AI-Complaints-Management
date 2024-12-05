@@ -118,5 +118,6 @@ export const spanishLang = {
   "CANCEL": "Cancelar",
   "SUBMIT": "Entregar",
   "CLAIM": "Afirmar",
-  "CLAIM_STATUS": "Estado del reclamo"
+  "CLAIM_STATUS": "Estado del reclamo",
+  "TOO_LARGE_FILE": "es demasiado grande. El tamaño máximo de archivo es de hasta 5 MB."
 }
