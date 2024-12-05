@@ -8,8 +8,6 @@ import com.seps.ticket.service.dto.RequestInfo;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.suptech.service.DocumentService;
-import com.seps.ticket.suptech.service.FileStorageException;
-import com.seps.ticket.suptech.service.InvalidFileTypeException;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
 import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
 import io.swagger.v3.oas.annotations.Operation;
