@@ -119,5 +119,11 @@ export const spanishLang = {
   "SUBMIT": "Entregar",
   "CLAIM": "Afirmar",
   "CLAIM_STATUS": "Estado del reclamo",
-  "TOO_LARGE_FILE": "es demasiado grande. El tamaño máximo de archivo es de hasta 5 MB."
+  "TOO_LARGE_FILE": "es demasiado grande. El tamaño máximo de archivo es de hasta 5 MB.",
+  "SUCCESS_LAUNCH_ICON": "Icono de Lanzamiento de Éxito",
+  "SUCCESS": "¡Éxito!",
+  "CLAIM_HAS_BEEN_FILED": "Se ha presentado la reclamación",
+  "TICKET_NO": "Número de Ticket",
+  "CLAIM_SUCCESS_EMAIL": "Su reclamación se ha presentado con éxito. Los detalles se han enviado a su correo electrónico",
+  "MY_ACCOUNT_AREA": "Mi Área de Cuenta"
 }

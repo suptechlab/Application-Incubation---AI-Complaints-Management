@@ -119,7 +119,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
 
     // HANDLE FILE DUPLICATE CLAIM
     const handleFileDuplicateClaim = async () => {
-        
+        setIsLoading(true);
         let combinedData = { ...fileClaimValues, checkDuplicate: false };
         combinedData.checkDuplicate = true;
 
@@ -138,7 +138,7 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
         });
 
         // Dispatch the FormData
-        setIsLoading(true);
+      
         const result = await dispatch(fileClaimForm(formData));
         setIsLoading(false);
         if (fileClaimForm.fulfilled.match(result)) {

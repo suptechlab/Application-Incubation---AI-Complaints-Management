@@ -118,5 +118,11 @@ export const englishLang = {
   "SUBMIT": "Submit",
   "CLAIM": "Claim",
   "CLAIM_STATUS": "Claim Status",
-  "TOO_LARGE_FILE": "is too large. Maximum file size is upto 5 MB."
+  "TOO_LARGE_FILE": "is too large. Maximum file size is upto 5 MB.",
+  "SUCCESS_LAUNCH_ICON": "Success Launch Icon",
+  "SUCCESS": "Success!",
+  "CLAIM_HAS_BEEN_FILED": "Claim has been filed",
+  "TICKET_NO": "Ticket No.",
+  "CLAIM_SUCCESS_EMAIL": "Your claim has been successfully filed. Details have been sent to your email",
+  "MY_ACCOUNT_AREA": "My Account Area"
 }
