@@ -162,10 +162,7 @@ export default function TeamManagementAddEdit() {
                     : handleAddUser({ ...values });
 
                 const response = await action;
-
                 toast.success(response.data.message);
-
-                actions.resetForm();
                 navigate('/team-management');
             } catch (error) {
                 const errorMessage = error.response?.data?.errorDescription;

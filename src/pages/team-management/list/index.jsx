@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
@@ -17,6 +17,7 @@ import Toggle from "../../../components/Toggle";
 export default function TeamManagementList() {
 
     const location = useLocation();
+    const queryClient = useQueryClient();
     const { t } = useTranslation(); // use the translation hook
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
@@ -228,6 +229,12 @@ export default function TeamManagementList() {
             pageSize: 10,
         });
     }, [filter]);
+
+    useEffect(() => {
+        return () => {
+            queryClient.removeQueries("data");
+        };
+    }, [queryClient]);
 
     return (
         <React.Fragment>
