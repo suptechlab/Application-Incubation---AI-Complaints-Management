@@ -58,13 +58,11 @@ const Edit = ({ provinces, modal, toggle, rowData, dataQuery }) => {
       actions.setSubmitting(false)
     }).catch((error) => {
       // console.log('error', error)
-      toast.error(error?.message);
+      toast.error(error?.response?.data?.errorDescription ?? error?.message);
     }).finally(() => {
       setLoading(false);
     });
   };
-
-  console.log({rowData : rowData})
 
   return (
     <Fragment>
