@@ -52,5 +52,5 @@ public class ClaimTicketActivityLog {
 
     @Type(JsonType.class)
     @Column(name = "attachment_url", columnDefinition = "json")
-    private Map<String, String> attachmentUrl;
+    private Map<String, Object> attachmentUrl;
 }

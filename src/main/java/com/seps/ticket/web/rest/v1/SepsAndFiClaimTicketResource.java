@@ -11,6 +11,7 @@ import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -228,5 +229,14 @@ public class SepsAndFiClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @PostMapping("/{ticketId}/reply-to-customer")
+    public ResponseEntity<Void> replyToCustomer(@PathVariable Long ticketId,
+        @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        // Call service method to handle the reply
+        sepsAndFiClaimTicketService.replyToCustomer(ticketId, claimTicketReplyRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -21,5 +21,5 @@ public class ClaimTicketActivityLogDTO {
     private Map<String, Object> activityDetails;
     private Map<String, String> linkedUsers;
     private Map<String, String> taggedUsers;
-    private Map<String, String> attachmentUrl;
+    private Map<String, Object> attachmentUrl;
 }
