@@ -56,6 +56,7 @@ export const messages = {
     // Team Managment
     teamNameRequired: "Team name is required", // For team name
     descriptionRequired: "Description is required", // For description
+    entityRequired: "Entity name is required."
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -113,5 +114,6 @@ export const messages = {
     // Team managment
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
+    entityRequired: "El nombre de la entidad es obligatorio."
   }
 };
