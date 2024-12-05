@@ -10,6 +10,7 @@ import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -194,6 +195,35 @@ public class SepsAndFiClaimTicketResource {
         sepsAndFiClaimTicketService.closedClaimTicket(ticketId, claimTicketClosedRequest, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.closed.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
+
+    @Operation(
+        summary = "Reject a Claim Ticket",
+        description = "Allows users to reject a claim ticket by providing the necessary details and reason for rejection.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Claim ticket rejected successfully",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ResponseStatus.class)
+                )
+            )
+        }
+    )
+    @PostMapping("/{ticketId}/reject")
+    public ResponseEntity<ResponseStatus> rejectClaimTicket(
+        @PathVariable Long ticketId, @Valid @RequestBody ClaimTicketRejectRequest claimTicketRejectRequest,
+        HttpServletRequest request
+    ) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        sepsAndFiClaimTicketService.rejectClaimTicket(ticketId, claimTicketRejectRequest, requestInfo);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.rejected.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
             System.currentTimeMillis()
         );

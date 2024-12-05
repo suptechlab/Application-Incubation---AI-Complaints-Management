@@ -9,6 +9,7 @@ import com.seps.ticket.repository.TemplateMasterRepository;
 import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
@@ -276,5 +277,39 @@ public class MailService {
         dataVariables.put("assignedDate", ticket.getAssignedAt().toString());
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendRejectedTicketEmail(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest, User currentUser){
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("CLAIM_TICKET_REJECTED_NOTIFY_AGENT");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put("reason", claimTicketRejectRequest.getReason());
+        dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
+        LOG.info("Rejected ticket closed email sent successfully to agent {}", currentUser.getEmail());
+    }
+
+    @Async
+    public void sendRejectedTicketEmailToCustomer(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest, User currentUser){
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("CLAIM_TICKET_REJECTED_NOTIFY_CUSTOMER");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put("reason", claimTicketRejectRequest.getReason());
+        dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
+        LOG.info("Rejected ticket closed email sent successfully to customer {}", currentUser.getEmail());
     }
 }

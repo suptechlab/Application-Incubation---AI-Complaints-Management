@@ -14,6 +14,7 @@ import com.seps.ticket.service.specification.ClaimTicketSpecification;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -953,4 +954,139 @@ public class SepsAndFiClaimTicketService {
         });
     }
 
+    /**
+     * Rejects a claim ticket with the given ID, updates its status to REJECTED,
+     * and performs associated activities such as saving logs, sending audit information,
+     * and notifying relevant users via email.
+     *
+     * @param ticketId the ID of the ticket to reject
+     * @param claimTicketRejectRequest the details of the rejection, including reason and sub-status
+     * @param requestInfo additional request-related information for auditing
+     * @throws CustomException if the ticket is not found or is already closed/rejected
+     */
+    @Transactional
+    public void rejectClaimTicket(Long ticketId, @Valid ClaimTicketRejectRequest claimTicketRejectRequest, RequestInfo requestInfo) {
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if(authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }else{
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT, null, null);
+        }
+        Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
+        ClaimTicketActivityLog activityLog = createRejectedClaimActivityLog(currentUser,ticket,claimTicketRejectRequest);
+
+        ticket.setStatus(ClaimTicketStatusEnum.REJECTED);
+        ticket.setRejectedStatus(claimTicketRejectRequest.getRejectedStatus());
+        ticket.setStatusComment(claimTicketRejectRequest.getReason());
+        ticket.setUpdatedBy(currentUser.getId());
+
+        // Save the updated ticket
+        ClaimTicket savedTicket = claimTicketRepository.save(ticket);
+        claimTicketActivityLogService.saveActivityLog(activityLog);
+
+        //Save ClaimTicketStatusLog table
+        ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+        claimTicketStatusLog.setTicketId(ticket.getId());
+        claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.REJECTED);
+        claimTicketStatusLog.setSubStatus(claimTicketRejectRequest.getRejectedStatus().ordinal());
+        claimTicketStatusLog.setCreatedBy(currentUser.getId());
+        claimTicketStatusLogRepository.save(claimTicketStatusLog);
+
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.ticket.rejected",
+                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(this.getSepsFiClaimTicketById(savedTicket.getId()));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        String requestBody = gson.toJson(claimTicketRejectRequest);
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "rejectClaimTicket", ActionTypeEnum.CLAIM_TICKET_REJECTED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
+            null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+
+        this.sendRejectedTicketEmail(savedTicket,claimTicketRejectRequest);
+    }
+
+    /**
+     * Creates a log entry for a rejected claim ticket, capturing details about the action
+     * and associated metadata such as the user performing the action and the reason for rejection.
+     *
+     * @param currentUser the user performing the rejection
+     * @param ticket the claim ticket being rejected
+     * @param claimTicketRejectRequest the details of the rejection, including reason and sub-status
+     * @return a populated ClaimTicketActivityLog instance
+     */
+    private ClaimTicketActivityLog createRejectedClaimActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest) {
+        ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
+        activityLog.setTicketId(ticket.getId());
+        activityLog.setPerformedBy(currentUser.getId());
+        Map<String, String> activityTitle = new HashMap<>();
+        Map<String, String> linkedUser = new HashMap<>();
+        Map<String, Object> activityDetail = new HashMap<>();
+        Map<String, String> subStatus = new HashMap<>();
+        activityLog.setActivityType(ClaimTicketActivityEnum.REJECTED.name());
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.rejected",
+                new Object[]{"@"+currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
+            activityTitle.put(language.getCode(), messageAudit);
+            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(language.getCode())));
+        });
+        activityDetail.put("subStatus",subStatus);
+        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
+        activityDetail.put("text",claimTicketRejectRequest.getReason());
+        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+
+        activityLog.setActivityTitle(activityTitle);
+        activityLog.setLinkedUsers(linkedUser);
+        activityLog.setActivityDetails(activityDetail);
+        return activityLog;
+    }
+
+    /**
+     * Sends rejection notification emails to relevant stakeholders:
+     * - The customer associated with the ticket
+     * - FI Admin users in the ticket's organization
+     * - The FI Agent assigned to the ticket
+     *
+     * @param ticket the rejected claim ticket
+     * @param claimTicketRejectRequest the details of the rejection, including reason and sub-status
+     */
+    private void sendRejectedTicketEmail(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest) {
+        // Fetch related users
+        User customer = ticket.getUser();
+        List<User> fiAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
+        User fiAgent = ticket.getFiAgent();
+
+        // Send email to the customer
+        mailService.sendRejectedTicketEmailToCustomer(ticket, claimTicketRejectRequest, customer);
+
+        // Send email to FI Admin
+        if (!fiAdmin.isEmpty()) {
+            fiAdmin.forEach(fiAdminUser -> mailService.sendRejectedTicketEmail(ticket, claimTicketRejectRequest, fiAdminUser));
+        }
+
+        // Send email to the FI agent
+        if (fiAgent != null) {
+            mailService.sendRejectedTicketEmail(ticket, claimTicketRejectRequest, fiAgent);
+        }
+
+    }
 }
