@@ -16,6 +16,7 @@
   <include file="config/liquibase/changelog/1732786587414_ticket_activity_logs_schema.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/1733229079167_claim_ticket_status_activity_schema.xml" relativeToChangelogFile="false"/>
   <include file="config/liquibase/changelog/1733312203153_load_email_templates.xml" relativeToChangelogFile="false"/>
+  <include file="config/liquibase/changelog/1733399673804_alter_claim_ticket_schema.xml" relativeToChangelogFile="false"/>
   <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
   <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
   <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->

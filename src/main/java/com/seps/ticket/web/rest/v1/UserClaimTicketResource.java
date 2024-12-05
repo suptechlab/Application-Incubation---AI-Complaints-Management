@@ -9,6 +9,7 @@ import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.SecondInstanceRequest;
 import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -132,6 +133,33 @@ public class UserClaimTicketResource {
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") String documentId) {
         return documentService.downloadDocument(documentId);
+    }
+
+    @Operation(
+        summary = "File a second instance of claim API",
+        description = "Allows a user to file a second instance.",
+        tags = {"File a second instance of claim"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Second instance of claim filed successfully.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ClaimTicketResponseDTO.class))),
+        @ApiResponse(responseCode = "403", description = "Access forbidden"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping("/file-second-instance-claim")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<UserClaimTicketDTO> fileSecondInstanceClaim(@ModelAttribute @Valid SecondInstanceRequest secondInstanceRequest,
+                                                                       HttpServletRequest httpServletRequest) {
+        Long id = secondInstanceRequest.getId();
+        RequestInfo requestInfo = new RequestInfo(httpServletRequest);
+        // File the claim
+        userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
+        // Retrieve the claim ticket
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
+        // Send an email notification
+        mailService.sendSecondInstanceClaimEmail(userClaimTicketDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(userClaimTicketDTO);
     }
 
 }

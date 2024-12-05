@@ -1,6 +1,7 @@
 package com.seps.ticket.repository;
 
 import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.enums.InstanceTypeEnum;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,5 +51,8 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "WHERE organizationId = :organizationId " +
         "AND (:userId IS NULL OR ct.fiAgentId = :userId) " +
         "GROUP BY ct.status")
-    List<ClaimStatusCountProjection> countClaimsByStatusAndTotalFiAgentAndOrganizationId(@Param("userId") Long userId, @Param("organizationId") Long organizationId);
+    List<ClaimStatusCountProjection> countClaimsByStatusAndTotalFiAgentAndOrganizationId(@Param("userId") Long userId,
+                                                                                         @Param("organizationId") Long organizationId);
+
+    Optional<ClaimTicket> findByIdAndUserIdAndInstanceType(Long claimTicketId, Long currentUserId, InstanceTypeEnum instanceTypeEnum);
 }

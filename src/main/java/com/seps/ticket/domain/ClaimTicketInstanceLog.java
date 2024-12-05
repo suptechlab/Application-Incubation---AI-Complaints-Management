@@ -1,5 +1,6 @@
 package com.seps.ticket.domain;
 
+import com.seps.ticket.enums.InstanceTypeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +23,9 @@ public class ClaimTicketInstanceLog {
     @Column(name = "ticket_id", nullable = false)
     private Long ticketId;
 
+    @Enumerated
     @Column(name = "instance_type", nullable = false)
-    private Integer instanceType;
+    private InstanceTypeEnum instanceType;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
