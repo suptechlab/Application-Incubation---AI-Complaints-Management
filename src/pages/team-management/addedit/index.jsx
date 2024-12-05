@@ -198,8 +198,9 @@ export default function TeamManagementAddEdit() {
                 toast.error(errorMessage);
                 setLoading(false);
             }
+        } else {
+            setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
         }
-        setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
         setDeleteShow(false);
     };
 
