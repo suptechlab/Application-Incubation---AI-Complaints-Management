@@ -1,11 +1,14 @@
 import moment from 'moment/moment';
 import React, { useEffect, useState } from 'react';
-import { Col, Modal, Row } from 'react-bootstrap';
+import { Accordion, Col, ListGroup, Modal, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import CommonViewData from "../../../../components/CommonViewData";
 import { getClaimDetails } from '../../../../redux/slice/fileClaimSlice';
 import Loader from '../../../../components/Loader';
+import { MdAttachFile, MdDownload } from 'react-icons/md';
+import AppTooltip from '../../../../components/tooltip';
+import { Link } from 'react-router-dom';
 
 const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
@@ -13,9 +16,10 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
-    const [claimTicketData, csetCaimTicketData] = useState([]);
+    const [claimTicketData, setClaimTicketData] = useState([]);
     const [instanceTypeTranslated, setInstanceTypeTranslated] = useState("");
     const { instance_types } = useSelector((state) => state?.masterSlice);
+    const [attachmentsData, setAttachmentsData] = useState([]);
 
 
     const fetchClaimDetails = async (row) => {
@@ -23,7 +27,14 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         try {
             const result = await dispatch(getClaimDetails(row?.id));
             if (getClaimDetails.fulfilled.match(result)) {
-                csetCaimTicketData(result?.payload?.data);
+                setClaimTicketData(result?.payload?.data);
+                const attachmentsDataList = result?.payload?.data?.claimTicketDocuments?.map((documents) => {
+                    return {
+                        id: documents?.id,
+                        file_name: documents?.originalTitle
+                    }
+                });
+                setAttachmentsData(attachmentsDataList);
                 const matchedInstanceType = instance_types.find(
                     (type) => type.value === result?.payload?.data?.instanceType
                 );
@@ -49,13 +60,11 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     // The color class based on the status
     const getStatusClass = (status) => {
         switch (status) {
-            case 'CLOSED':
+            case 'FIRST_INSTANCE':
                 return 'bg-success bg-opacity-25 text-success';
-            case 'IN_PROGRESS':
+            case 'SECOND_INSTANCE':
                 return 'bg-orange-25 text-orange';
-            case 'new':
-                return 'bg-primary bg-opacity-25 text-primary';
-            case 'REJECTED':
+            case 'COMPLAINT':
                 return 'bg-danger bg-opacity-25 text-danger';
             default:
                 return 'bg-body bg-opacity-25 text-body';
@@ -115,14 +124,14 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 { title: 'Document 3.pdf', dowlnloadUrl: '/' }
             ]
         },
-        {
-            eventKey: '1',
-            header: t('ATTACHMENTS_SENT_BY_ENTITY'),
-            body: [
-                { title: 'Document 1.docx', dowlnloadUrl: '/' },
-                { title: 'Document 2.xlsx', dowlnloadUrl: '/' }
-            ]
-        }
+        // {
+        //     eventKey: '1',
+        //     header: t('ATTACHMENTS_SENT_BY_ENTITY'),
+        //     body: [
+        //         { title: 'Document 1.docx', dowlnloadUrl: '/' },
+        //         { title: 'Document 2.xlsx', dowlnloadUrl: '/' }
+        //     ]
+        // }
     ];
 
     // View Bottom Data
@@ -163,7 +172,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                         {t("CLAIM")} ID: #{claimTicketData?.ticketId}{" "}
                         <span
                             className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass(
-                                claimTicketData?.status
+                                claimTicketData?.instanceType
                             )}`}
                         >
                             {instanceTypeTranslated}
@@ -182,38 +191,38 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
                     {/* Accordion Items */}
                     {/* WILL DO IT LATER */}
-                    {/* <Accordion flush className='custom-accordion'>
-                    {accordionItems.map(item => (
-                        <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
-                            <Accordion.Header>
-                                <span className='text-info me-2'><MdAttachFile size={24} /></span>
-                                {item.header}
-                            </Accordion.Header>
-                            <Accordion.Body className='py-0'>
-                                <ListGroup variant="flush">
-                                    {item?.body?.map((item, index) => (
-                                        <ListGroup.Item
-                                            key={"data_body_view_" + index}
-                                            className="px-1 d-flex gap-2 justify-content-between align-items-start"
-                                        >
-                                            <span className="me-auto py-1">{item.title}</span>
-                                            <AppTooltip title={t("DOWNLOAD")} placement="left">
-                                                <Link
-                                                    to={item.dowlnloadUrl}
-                                                    className="text-decoration-none link-primary"
-                                                    target="_blank"
-                                                    aria-label={t("DOWNLOAD")}
-                                                >
-                                                    <MdDownload size={20} />
-                                                </Link>
-                                            </AppTooltip>
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            </Accordion.Body>
-                        </Accordion.Item>
-                    ))}
-                </Accordion> */}
+                    <Accordion flush className='custom-accordion'>
+                        {accordionItems.map(item => (
+                            <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
+                                <Accordion.Header>
+                                    <span className='text-info me-2'><MdAttachFile size={24} /></span>
+                                    {item.header}
+                                </Accordion.Header>
+                                <Accordion.Body className='py-0'>
+                                    <ListGroup variant="flush">
+                                        {attachmentsData?.map((item, index) => (
+                                            <ListGroup.Item
+                                                key={"data_body_view_" + index}
+                                                className="px-1 d-flex gap-2 justify-content-between align-items-start"
+                                            >
+                                                <span className="me-auto py-1">{item.file_name}</span>
+                                                <AppTooltip title={t("DOWNLOAD")} placement="left">
+                                                    <Link
+                                                        to={item.dowlnloadUrl}
+                                                        className="text-decoration-none link-primary"
+                                                        target="_blank"
+                                                        aria-label={t("DOWNLOAD")}
+                                                    >
+                                                        <MdDownload size={20} />
+                                                    </Link>
+                                                </AppTooltip>
+                                            </ListGroup.Item>
+                                        ))}
+                                    </ListGroup>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        ))}
+                    </Accordion>
 
                     {/* View Bottom Data */}
                     <Row>

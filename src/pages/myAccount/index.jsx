@@ -182,7 +182,7 @@ export default function MyAccount() {
               instanceButton = renderButton("RAISE_COMPLAINT", raisedComplaintClickHandler, 'text-info');
               tooltipTitle = "RAISE_COMPLAINT_TOOLTIP";
               break;
-            case "Complaint":
+            case "COMPLAINT":
               break;
             default:
               break;
@@ -206,7 +206,7 @@ export default function MyAccount() {
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
                   aria-label={t("CHAT")}
-                  disabled={true}
+                  disabled={false}
                 >
                   <MdChatBubbleOutline size={24} />
                   <Badge
@@ -218,7 +218,7 @@ export default function MyAccount() {
                 </Button>
               </AppTooltip>
               {instanceButton && (
-                <Stack direction='horizontal' gap={2} className='d-none'>
+                <Stack direction='horizontal' gap={2}>
                   {instanceButton}
                   <AppTooltip title={t(tooltipTitle)}>
                     <Button

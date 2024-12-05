@@ -125,5 +125,7 @@ export const spanishLang = {
   "CLAIM_HAS_BEEN_FILED": "Se ha presentado la reclamación",
   "TICKET_NO": "Número de Ticket",
   "CLAIM_SUCCESS_EMAIL": "Su reclamación se ha presentado con éxito. Los detalles se han enviado a su correo electrónico",
-  "MY_ACCOUNT_AREA": "Mi Área de Cuenta"
+  "MY_ACCOUNT_AREA": "Mi Área de Cuenta",
+  "ATTACHMENTS": "Adjuntos",
+  "ATTACHMENTS_SENT_BY_ENTITY": "Adjuntos enviados por Entidad"
 }
