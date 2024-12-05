@@ -54,7 +54,6 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
     // GET AGENT DROPDOWN LISTING
     const getAgentDropdownListing = () => {
         agentListingApi().then(response => {
-            console.log({ agent: response })
             if (response?.data && response?.data?.length > 0) {
                 const dropdownData = response?.data.map(item => ({
                     value: item.id,
@@ -84,7 +83,6 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
         }
     }, [clearTableSelection])
 
-    console.log({ selectedAgent: selectedAgent })
 
     return (
         <div className="theme-card-header header-search mb-3">

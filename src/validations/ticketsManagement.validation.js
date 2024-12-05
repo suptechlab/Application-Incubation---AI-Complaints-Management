@@ -5,10 +5,18 @@ const validationSchema = Yup.object({
     .max(1500, "Description cannot exceed 1500 characters."),
 });
 
-
-export const slaDateValidation =  Yup.object({
+// SLA DATE EXTENSION
+export const slaDateValidation = Yup.object({
   date: Yup.string()
     .required("Date is required!"),
+});
+
+// TICKET CLOSE STATUS
+export const ticketCloseValidation = Yup.object({
+  closeSubStatus: Yup.string()
+    .required("Close sub status is required!"),
+  reason: Yup.string()
+  .required("Reason is required!"),
 });
 
 

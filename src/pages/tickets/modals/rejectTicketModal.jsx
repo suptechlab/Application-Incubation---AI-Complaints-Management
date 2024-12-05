@@ -7,10 +7,10 @@ import FormInput from "../../../components/FormInput";
 import ReactSelect from "../../../components/ReactSelect";
 import { validationSchema } from "../../../validations/inquiryType.validation";
 import { MasterDataContext } from "../../../contexts/masters.context";
-import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticketmanagement.service";
+import { convertToLabelValue, ticketCloseStatus, ticketRejectStatus } from "../../../services/ticketmanagement.service";
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
-const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
+const RejectTicketModal = ({ modal, toggle ,ticketId}) => {
     const { t } = useTranslation();
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
@@ -19,9 +19,9 @@ const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
     const [subStatus , setSubStatus] = useState([])
 
     useEffect(()=>{
-        if(masterData?.closedStatus){
-            const closeStatus  = convertToLabelValue(masterData?.closedStatus)
-            setSubStatus(closeStatus)
+        if(masterData?.rejectedStatus){
+            const rejectStatus  = convertToLabelValue(masterData?.rejectedStatus)
+            setSubStatus(rejectStatus)
         }
     },[masterData])
 
@@ -39,9 +39,9 @@ const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
         actions.setSubmitting(true);
         const formData = {
             reason: values?.reason,
-            closeSubStatus: values?.closeSubStatus,
+            rejectedStatus: values?.rejectedStatus,
           };
-          ticketCloseStatus(ticketId, formData)
+          ticketRejectStatus(ticketId, formData)
             .then((response) => {
               toast.success(response?.data?.message);
               toggle()
@@ -71,12 +71,12 @@ const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
             enforceFocus={false}
         >
             <Modal.Header className="pb-3">
-                <Modal.Title as="h4" className="fw-semibold">Ticket Close Status</Modal.Title>
+                <Modal.Title as="h4" className="fw-semibold">Ticket Reject Status</Modal.Title>
             </Modal.Header>
             <Formik
                 initialValues={{
                     reason: "",
-                    closeSubStatus: "",
+                    rejectedStatus: "",
                 }}
                 validationSchema={ticketCloseValidation}
                 onSubmit={handleSubmit}
@@ -109,7 +109,7 @@ const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
                             />
                             <ReactSelect
                                 label="Sub-status"
-                                error={errors.closeSubStatus}
+                                error={errors.rejectedStatus}
                                 options={[
                                         { label: t("SELECT"), value: "" },
                                         ...subStatus.map((group) => ({
@@ -117,17 +117,17 @@ const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
                                             value: group.value,
                                         })),
                                     ]}
-                                value={values.closeSubStatus}
+                                value={values.rejectedStatus}
                                 onChange={(option) => {
                                     setFieldValue(
-                                        "closeSubStatus",
+                                        "rejectedStatus",
                                         option?.target?.value ?? ""
                                     );
                                 }}
-                                name="closeSubStatus"
-                                className={touched.closeSubStatus && errors.closeSubStatus ? "is-invalid" : ""}
+                                name="rejectedStatus"
+                                className={touched.rejectedStatus && errors.rejectedStatus ? "is-invalid" : ""}
                                 onBlur={handleBlur}
-                                touched={touched.closeSubStatus}
+                                touched={touched.rejectedStatus}
                             />
                             {/* <Col xs={12} className="mb-3 pb-1">
                                 <div className="mb-1 fs-14">Attchment</div>
@@ -184,4 +184,4 @@ const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
     );
 };
 
-export default CloseTicketModal;
+export default RejectTicketModal;

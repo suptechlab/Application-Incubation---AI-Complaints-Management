@@ -28,7 +28,10 @@ export const agentListingApi = async () => {
 export const agentTicketToSEPSagent = async (agentId, tickets) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${agentId}/assign-tickets-seps-agent`, tickets);
 }
-
+//ASSIGN / REASSIGN TICKET TO FI AGENT
+export const agentTicketToFIagent = async (agentId, tickets) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${agentId}/assign-tickets-fi-agent`, tickets);
+}
 //CHANGE TICKET PRIORITY
 export const changeTicketPriority = async (ticketId, priority) => {
   return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/priority?priority=${priority}`);
@@ -48,6 +51,17 @@ export const ticketOverviewAPI = async () => {
 //SLA DATE EXTENSION API
 export const slaDateExtensionApi = async (ticketId, slaDate) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/extend-sla?slaDate=${slaDate}`);
+}
+
+//TICKET CLOSE API
+export const ticketCloseStatus = async (ticketId, data) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/closed`,data);
+}
+
+
+//TICKET REJECT API
+export const ticketRejectStatus = async (ticketId, data) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reject`,data);
 }
 
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN

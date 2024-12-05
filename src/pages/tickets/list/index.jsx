@@ -9,7 +9,7 @@ import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import { agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
+import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
 import AttachmentsModal from "../modals/attachmentsModal";
 import TicketsListFilters from "./filters";
 
@@ -24,7 +24,12 @@ export default function TicketsList() {
         pageSize: params.limit ? parseInt(params.limit) : 10,
     });
 
-    const [sorting, setSorting] = React.useState([]);
+    const [sorting, setSorting] = React.useState([
+        {
+            "id": "slaBreachDays",
+            "desc": true
+        }
+    ]);
     const [filter, setFilter] = React.useState({
         search: "",
         subscription: "",
@@ -185,8 +190,8 @@ export default function TicketsList() {
         setAttachmentsModalShow(true)
     }
 
-
-    const columns = React.useMemo(
+    //FI AGENT COLUMNS
+    const fiAgentColumns = React.useMemo(
         () => [
             {
                 id: 'select-col',
@@ -262,6 +267,26 @@ export default function TicketsList() {
                 enableSorting: true,
             },
             {
+                accessorFn: (row) => row?.claimSubType?.name,
+                // accessorFn: (row) => row?.claimType,
+                id: "claimSubType",
+                header: () => "Sub Claim Type",
+                enableSorting: true,
+            },
+            {
+                // accessorFn: (row) => row?.claimFilledBy,
+                accessorFn: (row) => row?.user?.name,
+                id: "claimFilledBy",
+                header: () => "Claim filled by",
+                enableSorting: true,
+            },
+            {
+                accessorFn: (row) => row?.slaBreachDays,
+                id: "slaBreachDays",
+                header: () => "SLA",
+                enableSorting: true,
+            },
+            {
                 accessorFn: (row) => row?.createdAt,
                 id: "createdAt",
                 header: () => "Creation Date",
@@ -269,6 +294,242 @@ export default function TicketsList() {
                 cell: ({ row }) => (
                     row?.original?.createdAt
                 ),
+            },
+            {
+                accessorFn: (row) => row?.priority,
+                id: "priority",
+                header: () => "Priority",
+                size: "100",
+                cell: (rowData) => (
+                    <span
+                        className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
+                    >
+                        {rowData.row.original.priority}
+                    </span>
+                )
+            },
+            {
+                accessorFn: (row) => row?.status,
+                id: "status",
+                header: () => "Status",
+                size: "100",
+                cell: (rowData) => (
+                    <span
+                        className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+                    >
+                        {rowData.row.original.status}
+                    </span>
+                )
+            },
+        ],
+        []
+    );
+    //SEPS COLUMN
+    const sepsColumns = React.useMemo(
+        () => [
+            {
+                id: 'select-col',
+                header: ({ table }) => (
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={table.getIsAllRowsSelected()}
+                        indeterminate={table.getIsSomeRowsSelected()}
+                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                        onChange={(e) => {
+                            table.toggleAllRowsSelected(e.target.checked);
+                            const allSelectedIds = e.target.checked
+                                ? table.getRowModel().rows.map((row) => row.original.id)
+                                : [];
+                            setTicketIdsArr(allSelectedIds);
+                            setClearTableSelection(false)
+                        }}
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={row.getIsSelected()}
+                        disabled={!row.getCanSelect()}
+                        // onChange={row.getToggleSelectedHandler()}
+                        onChange={(e) => {
+                            row.toggleSelected(e.target.checked);
+
+                            if (e.target.checked) {
+                                // Add the ID to the array if the row is selected
+                                setTicketIdsArr((prev) => [...prev, row.original.id]);
+                            } else {
+                                // Remove the ID from the array if the row is deselected
+                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+                            }
+
+                            setClearTableSelection(false)
+                        }}
+                    />
+                ),
+                size: "15",
+                meta: {
+                    thClassName: 'pe-0 fs-6',
+                    tdClassName: 'pe-0 fs-6',
+                },
+            },
+            {
+                accessorFn: (row) => row?.ticketId,
+                id: "ticketId",
+                header: () => "Ticket ID",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    <Stack direction="horizontal" gap={2}>
+                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+                        {/* <AppTooltip title="Attachments">
+                            <Button
+                                variant="link"
+                                className="p-0 border-0 link-dark"
+                                onClick={handleAttachmentsClick}
+                                aria-label="Attachments"
+                            >
+                                <MdAttachFile size={16} />
+                            </Button>
+                        </AppTooltip> */}
+                    </Stack>
+                ),
+            },
+            {
+                accessorFn: (row) => row?.createdAt,
+                id: "createdAt",
+                header: () => "Creation Date",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    row?.original?.createdAt
+                )
+            },
+            {
+                accessorFn: (row) => row?.claimType?.name,
+                // accessorFn: (row) => row?.claimType,
+                id: "claimType",
+                header: () => "Claim Type",
+                enableSorting: true,
+            },
+            {
+                // accessorFn: (row) => row?.claimFilledBy,
+                accessorFn: (row) => row?.user?.name,
+                id: "claimFilledBy",
+                header: () => "Claim filled by",
+                enableSorting: true,
+            },
+            {
+                accessorFn: (row) => row?.slaBreachDays,
+                id: "slaBreachDays",
+                header: () => "SLA",
+                enableSorting: true,
+            },
+            {
+                accessorFn: (row) => row?.status,
+                id: "status",
+                header: () => "Status",
+                size: "100",
+                cell: (rowData) => (
+                    <span
+                        className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+                    >
+                        {rowData.row.original.status}
+                    </span>
+                )
+            },
+        ],
+        []
+    );
+
+    // FI ADMIN
+     const FIAdminColumns = React.useMemo(
+        () => [
+            {
+                id: 'select-col',
+                header: ({ table }) => (
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={table.getIsAllRowsSelected()}
+                        indeterminate={table.getIsSomeRowsSelected()}
+                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+                        onChange={(e) => {
+                            table.toggleAllRowsSelected(e.target.checked);
+                            const allSelectedIds = e.target.checked
+                                ? table.getRowModel().rows.map((row) => row.original.id)
+                                : [];
+                            setTicketIdsArr(allSelectedIds);
+                            setClearTableSelection(false)
+                        }}
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Form.Check
+                        className="form-check-cursor"
+                        checked={row.getIsSelected()}
+                        disabled={!row.getCanSelect()}
+                        // onChange={row.getToggleSelectedHandler()}
+                        onChange={(e) => {
+                            row.toggleSelected(e.target.checked);
+
+                            if (e.target.checked) {
+                                // Add the ID to the array if the row is selected
+                                setTicketIdsArr((prev) => [...prev, row.original.id]);
+                            } else {
+                                // Remove the ID from the array if the row is deselected
+                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+                            }
+
+                            setClearTableSelection(false)
+                        }}
+                    />
+                ),
+                size: "15",
+                meta: {
+                    thClassName: 'pe-0 fs-6',
+                    tdClassName: 'pe-0 fs-6',
+                },
+            },
+            {
+                accessorFn: (row) => row?.ticketId,
+                id: "ticketId",
+                header: () => "Ticket ID",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    <Stack direction="horizontal" gap={2}>
+                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+                        {/* <AppTooltip title="Attachments">
+                            <Button
+                                variant="link"
+                                className="p-0 border-0 link-dark"
+                                onClick={handleAttachmentsClick}
+                                aria-label="Attachments"
+                            >
+                                <MdAttachFile size={16} />
+                            </Button>
+                        </AppTooltip> */}
+                    </Stack>
+                ),
+            },
+            {
+                accessorFn: (row) => row?.createdAt,
+                id: "createdAt",
+                header: () => "Creation Date",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    row?.original?.createdAt
+                )
+            },
+            {
+                accessorFn: (row) => row?.claimType?.name,
+                // accessorFn: (row) => row?.claimType,
+                id: "claimType",
+                header: () => "Claim Type",
+                enableSorting: true,
+            },
+            {
+                // accessorFn: (row) => row?.claimFilledBy,
+                accessorFn: (row) => row?.fiAgent,
+                id: "fiAgent",
+                header: () => "FI Agent",
+                enableSorting: true,
             },
             {
                 // accessorFn: (row) => row?.claimFilledBy,
@@ -313,6 +574,7 @@ export default function TicketsList() {
         []
     );
 
+  
     const handleTicketAssignment = (agentId) => {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
@@ -329,6 +591,20 @@ export default function TicketsList() {
             }).finally(() => {
                 setLoading(false)
             })
+            //ASSIGN TICKET TO FI AGENT
+            // agentTicketToFIagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
+            //     toast.success(t("TICKETS ASSIGNED"));
+            //     setClearTableSelection(true)
+            //     setTicketIdsArr([])
+            // }).catch((error) => {
+            //     if (error?.response?.data?.errorDescription) {
+            //         toast.error(error?.response?.data?.errorDescription);
+            //     } else {
+            //         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+            //     }
+            // }).finally(() => {
+            //     setLoading(false)
+            // })
         }
     }
 
@@ -352,17 +628,17 @@ export default function TicketsList() {
                 <PageHeader
                     title="Tickets"
                     actions={[
-                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning" , disabled: false },
+                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning", disabled: false },
                     ]}
                 />
                 <div className="info-cards mb-3">
-                    <InfoCards/>
+                    <InfoCards />
                 </div>
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
                         <TicketsListFilters filter={filter} setFilter={setFilter} handleTicketAssign={handleTicketAssignment} ticketArr={ticketIdsArr} clearTableSelection={clearTableSelection} />
                         <CommonDataTable
-                            columns={columns}
+                            columns={FIAdminColumns}
                             dataQuery={dataQuery}
                             pagination={pagination}
                             setPagination={setPagination}

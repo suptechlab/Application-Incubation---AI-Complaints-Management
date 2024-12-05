@@ -1,23 +1,38 @@
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Badge, Button, Dropdown, Stack } from 'react-bootstrap';
-import { MdMoreVert, MdSchedule } from "react-icons/md";
-import { Link } from 'react-router-dom';
-import AppTooltip from '../../../../components/tooltip';
-import AddAttachmentsModal from '../../modals/addAttachmentsModal';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import moment from 'moment';
+import { MdSchedule } from "react-icons/md";
+import { Link } from 'react-router-dom';
+import ReactSelect from '../../../../components/ReactSelect';
+import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent } from '../../../../services/ticketmanagement.service';
+import AddAttachmentsModal from '../../modals/addAttachmentsModal';
+import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
+import RejectTicketModal from '../../modals/rejectTicketModal';
 
 const TicketViewHeader = ({ title = "", ticketData }) => {
     const { t } = useTranslation();
+    const [agentList, setAgentListing] = useState([])
     const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);
     const [addAttachmentsModalShow, setAddAttachmentsModalShow] = useState(false);
     const [dateExtensionModalShow, setDateExtensionModalShow] = useState(false);
+    const [selectedAgent, setSelectedAgent] = useState(null)
+    const [closeTicketModalShow, setCloseTicketModalShow] = useState(false)
+    const [rejectTicketModalShow, setRejectTicketModalShow] = useState(false)
 
+    const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
-    const handleSelect = (priority) => {
-        setSelectedStatus(priority);
+    const handleSelect = (status) => {
+        setSelectedStatus(status);
+
+        if (status === "CLOSED") {
+            setCloseTicketModalShow(true)
+        }else if (status === "REJECTED"){
+            setRejectTicketModalShow(true)
+        }
     };
 
     // The color class based on the status
@@ -64,6 +79,59 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
         setDateExtensionModalShow(true)
     }
 
+    const handleTicketAssign = (agentId) => {
+        setLoading(true)
+        // agentTicketToSEPSagent
+        if (agentId && agentId !== '') {
+            agentTicketToSEPSagent(agentId).then(response => {
+                toast.success(t("TICKETS ASSIGNED"));
+
+            }).catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                }
+            }).finally(() => {
+                setLoading(false)
+            })
+
+            // agentTicketToFIagent(agentId).then(response => {
+            //     toast.success(t("TICKETS ASSIGNED"));
+
+            // }).catch((error) => {
+            //     if (error?.response?.data?.errorDescription) {
+            //         toast.error(error?.response?.data?.errorDescription);
+            //     } else {
+            //         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+            //     }
+            // }).finally(() => {
+            //     setLoading(false)
+            // })
+        }
+    }
+
+    // GET AGENT DROPDOWN LISTING
+    const getAgentDropdownListing = () => {
+        agentListingApi().then(response => {
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setAgentListing(dropdownData)
+            }
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        })
+    }
+    useEffect(() => {
+        getAgentDropdownListing()
+    }, [])
     return (
         <React.Fragment>
             <div className="pb-3">
@@ -91,12 +159,33 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                         >
                             {t("BACK")}
                         </Link>
-                        <Button
+                        {/* <Button
                             type="submit"
                             variant='outline-dark'
                         >
                             Assign To
-                        </Button>
+                        </Button> */}
+                        <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                            <ReactSelect
+                                wrapperClassName="mb-0"
+                                class="form-select "
+                                placeholder="Assign/Reassign"
+                                id="floatingSelect"
+                                size="sm"
+                                options={[
+                                    {
+                                        label: "Assign/Reassign",
+                                        value: "",
+                                    },
+                                    ...agentList
+                                ]}
+                                onChange={(e) => {
+                                    handleTicketAssign(e.target.value)
+                                    setSelectedAgent(e.target.value)
+                                }}
+                                value={selectedAgent ?? null}
+                            />
+                        </div>
                         <Button
                             type="submit"
                             variant='warning'
@@ -126,7 +215,7 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                                 ))}
                             </Dropdown.Menu>
                         </Dropdown>
-                        <Dropdown>
+                        {/* <Dropdown>
                             <Dropdown.Toggle
                                 variant="link"
                                 id="ticket-detail-filter"
@@ -144,7 +233,7 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                                     SLA
                                 </Dropdown.Item>
                             </Dropdown.Menu>
-                        </Dropdown>
+                        </Dropdown> */}
                     </Stack>
                 </Stack>
             </div>
@@ -160,6 +249,16 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                 ticketData={ticketData}
                 modal={dateExtensionModalShow}
                 toggle={() => setDateExtensionModalShow(false)}
+            />
+            <CloseTicketModal
+                ticketId={ticketData?.id}
+                modal={closeTicketModalShow}
+                toggle={() => setCloseTicketModalShow(false)}
+            />
+            <RejectTicketModal
+                ticketId={ticketData?.id}
+                modal={rejectTicketModalShow}
+                toggle={() => setRejectTicketModalShow(false)}
             />
         </React.Fragment>
     );

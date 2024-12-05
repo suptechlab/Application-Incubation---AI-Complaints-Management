@@ -14,13 +14,11 @@ import { changeTicketPriority, ticketDetailsApi } from '../../../services/ticket
 import toast from 'react-hot-toast';
 import moment from 'moment/moment';
 import ActivityLogs from './activity-logs';
-import CloseTicketModal from '../modals/closeTicketModal';
 
 const TicketsView = () => {
   const [selectedPriority, setSelectedPriority] = useState('Low');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
-  const [closeTicketModalShow , setCloseTicketModalShow] = useState(false)
   const [loading , setLoading] = useState(false)
 
   const { id } = useParams()
@@ -312,10 +310,7 @@ const TicketsView = () => {
         modal={attachmentsModalShow}
         toggle={() => setAttachmentsModalShow(false)}
       />
-      <CloseTicketModal
-        modal={closeTicketModalShow}
-        toggle={() => setCloseTicketModalShow(false)}
-      />
+     
 
     </React.Fragment>
   )

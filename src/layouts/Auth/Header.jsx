@@ -27,7 +27,7 @@ import {
 import "./header.scss";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
-  const { logout } = useContext(AuthenticationContext);
+  const { logout,userData } = useContext(AuthenticationContext);
 
   const [notifications, setNotifications] = useState([]);
   const imageUrl = JSON.parse(localStorage.getItem("imageUrl"));
@@ -39,6 +39,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     count: 0,
   });
   const navigate = useNavigate();
+
   useEffect(() => {
     fetchNotifications();
   }, []);
@@ -194,9 +195,16 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-200 fs-6 lh-sm">
                 {firstName} 
                 <br />
-                <Badge bg="light-green-custom" className="fs-normal">
+
+                {
+                  userData?.roles?.length > 0 ? 
+                  <Badge bg="light-green-custom" className="fs-normal">
+                     {userData?.roles[0]?.name}
+                </Badge> :   <Badge bg="light-green-custom" className="fs-normal">
                      Administrador
                 </Badge>
+                }
+              
               </span>
               <FaCaretDown size={16} className="ms-1" />
             </Dropdown.Toggle>
