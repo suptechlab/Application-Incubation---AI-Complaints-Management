@@ -139,7 +139,7 @@ export const NavItems = () => {
     },
     {
       id: 6,
-      menuName: t("TICKET WORKFLOW fsd"),
+      menuName: t("TICKET WORKFLOW"),
       title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
@@ -161,7 +161,7 @@ export const NavItems = () => {
           path: "/reports/claim-overview",
           moduleName: ["reports"],
           roleName: "Reports",
-          disabled: true,
+          disabled: false,
         },
         {
           id: 72,
@@ -169,7 +169,7 @@ export const NavItems = () => {
           path: "/reports/sla-compliance",
           moduleName: ["reports"],
           roleName: "Reports",
-          disabled: true,
+          disabled: false,
         },
         {
           id: 73,
