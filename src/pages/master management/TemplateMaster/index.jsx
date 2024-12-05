@@ -239,7 +239,7 @@ const TemplateMaster = () => {
 
         const tempLink = document.createElement('a');
         tempLink.href = blobUrl;
-        tempLink.setAttribute('download', 'cities.xlsx');
+        tempLink.setAttribute('download', 'templates.xlsx');
 
         // Append the link to the document body before clicking it
         document.body.appendChild(tempLink);
