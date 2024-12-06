@@ -21,6 +21,7 @@ import UserList from "../pages/users";
 import SLAComplianceReport from "../pages/sla-reports";
 import ClaimOverviewReport from "../pages/clamOverviewReport";
 import TeamManagementAddEdit from "../pages/team-management/addedit";
+import TicketWorkFlowAddEdit from "../pages/tickets-workflow/addedit";
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
@@ -38,6 +39,7 @@ const AddEditRoleRights = React.lazy(() =>
 const TicketsList = React.lazy(() => import("../pages/tickets/list"));
 const TicketsView = React.lazy(() => import("../pages/tickets/view"));
 const TeamManagementList = React.lazy(() => import("../pages/team-management/list"));
+const TicketWorkFlowList = React.lazy(() => import("../pages/tickets-workflow/list"));
 
 const routes = [
   // {
@@ -288,6 +290,24 @@ const routes = [
   {
     path: "/team-management/edit/:id",
     element: <TeamManagementAddEdit />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/tickets-workflow",
+    element: <TicketWorkFlowList />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/tickets-workflow/add",
+    element: <TicketWorkFlowAddEdit />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/tickets-workflow/edit/:id",
+    element: <TicketWorkFlowAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
   },

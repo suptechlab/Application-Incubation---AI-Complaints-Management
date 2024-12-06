@@ -14,7 +14,7 @@ import AppTooltip from "../../../components/tooltip";
 import { assignUserIntoTeam, getOrganizationList, getTeamMemberList, handleAddUser, handleDeleteUserFromTeam, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
-export default function TeamManagementAddEdit() {
+export default function TicketWorkFlowAddEdit() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
@@ -208,7 +208,7 @@ export default function TeamManagementAddEdit() {
         <React.Fragment>
             <Loader isLoading={loading} />
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-                <PageHeader title={`${isEdit ? t('EDIT TEAM') : t('CREATE NEW TEAM')}  `} />
+                <PageHeader title={`${isEdit ? t('EDIT_TICKET_WORKFLOW') : t('CREATE_NEW_TICKET_WORKFLOW')}  `} />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
                         <Formik
@@ -231,85 +231,20 @@ export default function TeamManagementAddEdit() {
                                     className="d-flex flex-column h-100"
                                 >
                                     <Row>
-                                        <Col xs={12} className="mb-3">
-                                            <div className='status-radio'>
-                                                <div className='mb-1 fs-14'>{t('USER TYPE')}</div>
-                                                <Stack direction="horizontal" gap={3} className="flex-wrap">
-                                                    <Form.Check
-                                                        className="me-3 me-lg-4"
-                                                        id="entityType"
-                                                        name="entityType"
-                                                        value="SEPS"
-                                                        checked={values.entityType === 'SEPS'}
-                                                        onBlur={handleBlur}
-                                                        onChange={() => {
-                                                            setFieldValue("entityType", "SEPS");
-                                                            setShowEntityOrgId(false);
-                                                            getTeamMemberLists("SEPS");
-                                                            setNewTeamMember([]);
-                                                            setFieldValue("teamMemberId", "");
-                                                        }}
-                                                        type="radio"
-                                                        label={t('SEPS USER')}
-                                                        disabled={isEdit}
-                                                    />
-                                                    <Form.Check
-                                                        className="me-3 me-lg-4"
-                                                        id="entityTypeFi"
-                                                        name="entityType"
-                                                        value="FI"
-                                                        checked={values.entityType === 'FI'}
-                                                        onBlur={handleBlur}
-                                                        onChange={() => {
-                                                            setFieldValue("entityType", "FI");
-                                                            setShowEntityOrgId(true);
-                                                            getOrganizationLists("FI");
-                                                            getTeamMemberLists("FI");
-                                                            setNewTeamMember([]);
-                                                            setFieldValue("teamMemberId", "");
-                                                        }}
-                                                        type="radio"
-                                                        label={t('FI USER')}
-                                                        disabled={isEdit}
-                                                    />
-                                                </Stack>
-                                            </div>
-                                        </Col>
-                                        {
-                                            showEntityOrgId ?
-                                                <Col sm={6} lg={4}>
-                                                    <ReactSelect
-                                                        label={t('ENTITY NAME')}
-                                                        error={errors.entityId}
-                                                        options={organizationArr}
-                                                        value={values.entityId || ""}
-                                                        onChange={(option) => {
-                                                            setFieldValue(
-                                                                "entityId",
-                                                                option?.target?.value.toString() ?? ""
-                                                            );
-                                                        }}
-                                                        name="entityId"
-                                                        onBlur={handleBlur}
-                                                        touched={touched.entityId}
-                                                    />
-                                                </Col>
-                                                : ''
-                                        }
                                         <Col sm={6} lg={4}>
                                             <FormInput
-                                                id="teamName"
-                                                label={t('TEAM NAME')}
-                                                name="teamName"
+                                                label={t('WORKFLOW_NAME') + '*'}
+                                                name="workflowName"
                                                 type="text"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                error={errors.teamName}
-                                                touched={touched.teamName}
-                                                value={values.teamName || ""}
+                                                error={errors.workflowName}
+                                                touched={touched.workflowName}
+                                                value={values.workflowName || ""}
                                             />
                                         </Col>
                                     </Row>
+
                                     <Row>
                                         <Col lg={8}>
                                             <FormInput
@@ -327,7 +262,8 @@ export default function TeamManagementAddEdit() {
                                             />
                                         </Col>
 
-                                        <Col xs={12}>
+
+                                        {/* <Col xs={12}>
                                             <h5 className="fw-semibold mb-1 border-bottom mb-3 py-2">{t('ASSIGN TEAM MEMBERS')}</h5>
                                             <Row>
                                                 <Col lg={8}>
@@ -400,8 +336,12 @@ export default function TeamManagementAddEdit() {
                                                     </Row>
                                                 </Col>
                                             </Row>
-                                        </Col>
+                                        </Col> */}
                                     </Row>
+                                    <div className="border-top mx-n3">
+                                        
+                                    </div>
+
 
                                     <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
                                         <Stack

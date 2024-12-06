@@ -146,6 +146,9 @@ export const englishLang = {
     "TEMPLATE_DETAILS": "Template Details*",
     "ASSOCIATION": "Association",
     // Team managment
+    "TEAM MANAGEMENT": "Team Management",
+    "CREATE NEW TEAM": "Create New Team",
+    "EDIT TEAM": "Edit Team",
     "ENTITY NAME": "Entity Name",
     "TEAM NAME": "Team Name",
     "ASSIGN TEAM MEMBERS": "Assign Team Members",
@@ -157,7 +160,23 @@ export const englishLang = {
     "DELETE TEAM MEMBER": "Delete Team Member",
     "ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER": "Are you sure, you want to delete the team member",
     "DELETE": "Delete",
-    "PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER": "Please add atleast one team member."
+    "PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER": "Please add atleast one team member.",
+    //Tickets Workflow
+    "TICKETS_WORKFLOW": "Ticket Workflow",
+    "WORKFLOW": "Workflow",
+    "WORKFLOW_NAME": "Workflow Name",
+    "EVENTS": "Events",
+    "EVENT_SELECTION": "Event Selection",
+    "SELECT_ACTION": "Select Action",
+    "CONDITIONS": "Conditions",
+    "CONDITION_MESSAGE": "Conditions are set of which check for specific scenarios.",
+    "ADD_MORE": "Add More",
+    "ADD_OR_CONDITION": "Add OR Condition",
+    "ACTIONS": "Actions",
+    "ACTION_MSG": "Actions help you automate tickets.",
+    "SAVE_WORKFLOW": "Save Workflow",
+    "CREATE_NEW_TICKET_WORKFLOW": "Create New Ticket Workflow",
+    "EDIT_TICKET_WORKFLOW": "Edit Ticket Workflow"
 
 
 
