@@ -49,6 +49,9 @@ public class UserClaimTicketDTO {
     private UserDTO updatedByUser;
     private Instant updatedAt;
     private List<UserClaimTicketDocumentDTO> claimTicketDocuments; // Added this line to include documents in DTO
+    private String secondInstanceComment;
+    private Instant secondInstanceFiledAt;
+
     // Getters and Setters
 
     @Data

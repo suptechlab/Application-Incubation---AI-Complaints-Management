@@ -153,5 +153,10 @@ public class ClaimTicket {
     @JoinColumn(name = "seps_agent_id")
     private User sepsAgent;
 
+    @Column(name = "second_instance_filed_at")
+    private Instant secondInstanceFiledAt;
+
+    @Column(name = "second_instance_comment")
+    private String secondInstanceComment;
 
 }

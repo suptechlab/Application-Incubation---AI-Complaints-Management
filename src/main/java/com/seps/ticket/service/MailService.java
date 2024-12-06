@@ -55,6 +55,16 @@ public class MailService {
 
     private static final String STATUS = "status";
 
+    private static final String PREVIOUS_INSTANCE = "previousInstance";
+
+    private static final String PREVIOUS_STATUS = "previousStatus";
+
+    private static final String NEW_INSTANCE = "newInstance";
+
+    private static final String NEW_STATUS = "newStatus";
+
+    private static final String INSTANCE_COMMENT = "instanceComment";
+
     private final JHipsterProperties jHipsterProperties;
 
     private final JavaMailSender javaMailSender;
@@ -179,7 +189,7 @@ public class MailService {
         TemplateMaster template = templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
             .orElse(null);
 
-        if(template != null) {
+        if (template != null) {
             // Prepare dynamic content
             String subject = replacePlaceholders(template.getSubject(), mailDTO.getDataVariables());
             String content = replacePlaceholders(template.getContent(), mailDTO.getDataVariables());
@@ -189,7 +199,7 @@ public class MailService {
 
             // Send email
             this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
-        }else {
+        } else {
             LOG.debug("Template with key '{}' not found or inactive. Using default content.", mailDTO.getTemplateKey());
         }
     }
@@ -216,7 +226,7 @@ public class MailService {
     }
 
     @Async
-    public void sendClosedTicketEmail(ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest, User currentUser){
+    public void sendClosedTicketEmail(ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest, User currentUser) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTo(currentUser.getEmail());
         mailDTO.setLocale(currentUser.getLangKey());
@@ -225,15 +235,15 @@ public class MailService {
         dataVariables.put(USERNAME, currentUser.getFirstName());
         dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
         dataVariables.put("reason", claimTicketClosedRequest.getReason());
-        dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
 
         LOG.info("Claim ticket closed email sent successfully to {}", currentUser.getEmail());
     }
 
-   @Async
-    public void sendPriorityChangeEmail(ClaimTicket ticket, ClaimTicketPriorityEnum newPriority, User currentUser, String updatedBy){
+    @Async
+    public void sendPriorityChangeEmail(ClaimTicket ticket, ClaimTicketPriorityEnum newPriority, User currentUser, String updatedBy) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTo(currentUser.getEmail());
         mailDTO.setLocale(currentUser.getLangKey());
@@ -241,15 +251,15 @@ public class MailService {
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
         dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
-        dataVariables.put("ticketPriority", enumUtil.getLocalizedEnumValue(newPriority,Locale.forLanguageTag(currentUser.getLangKey())));
+        dataVariables.put("ticketPriority", enumUtil.getLocalizedEnumValue(newPriority, Locale.forLanguageTag(currentUser.getLangKey())));
         dataVariables.put("updatedBy", updatedBy);
-        dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(ticket.getStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(ticket.getStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
     }
 
     @Async
-    public void sendToAgentTicketAssignmentEmail(ClaimTicket ticket, User currentUser){
+    public void sendToAgentTicketAssignmentEmail(ClaimTicket ticket, User currentUser) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTo(currentUser.getEmail());
         mailDTO.setLocale(currentUser.getLangKey());
@@ -265,7 +275,7 @@ public class MailService {
     }
 
     @Async
-    public void sendToCustomerTicketAssignmentEmail(ClaimTicket ticket, User currentUser, String agentName){
+    public void sendToCustomerTicketAssignmentEmail(ClaimTicket ticket, User currentUser, String agentName) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTo(currentUser.getEmail());
         mailDTO.setLocale(currentUser.getLangKey());
@@ -280,7 +290,7 @@ public class MailService {
     }
 
     @Async
-    public void sendRejectedTicketEmail(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest, User currentUser){
+    public void sendRejectedTicketEmail(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest, User currentUser) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTo(currentUser.getEmail());
         mailDTO.setLocale(currentUser.getLangKey());
@@ -289,7 +299,7 @@ public class MailService {
         dataVariables.put(USERNAME, currentUser.getFirstName());
         dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
         dataVariables.put("reason", claimTicketRejectRequest.getReason());
-        dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
 
@@ -297,7 +307,7 @@ public class MailService {
     }
 
     @Async
-    public void sendRejectedTicketEmailToCustomer(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest, User currentUser){
+    public void sendRejectedTicketEmailToCustomer(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest, User currentUser) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTo(currentUser.getEmail());
         mailDTO.setLocale(currentUser.getLangKey());
@@ -306,10 +316,39 @@ public class MailService {
         dataVariables.put(USERNAME, currentUser.getFirstName());
         dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
         dataVariables.put("reason", claimTicketRejectRequest.getReason());
-        dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(currentUser.getLangKey())));
+        dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
 
         LOG.info("Rejected ticket closed email sent successfully to customer {}", currentUser.getEmail());
+    }
+
+    @Async
+    public void sendSecondInstanceClaimEmail(UserClaimTicketDTO prevUserClaimTicketDTO, UserClaimTicketDTO userClaimTicketDTO) {
+        if (StringUtils.isBlank(userClaimTicketDTO.getUser().getEmail())) {
+            LOG.error("User email is missing or invalid. Cannot send claim ticket instance email.");
+            return;
+        }
+        LOG.debug("Preparing claim ticket instance creation email for user '{}'", userClaimTicketDTO.getUser().getName());
+        try {
+            MailDTO mailDTO = new MailDTO();
+            mailDTO.setLocale(userClaimTicketDTO.getUser().getLangKey());
+            mailDTO.setTo(userClaimTicketDTO.getUser().getEmail());
+            mailDTO.setTemplateKey("CLAIM_TICKET_INSTANCE");
+            Map<String, String> dataVariables = new HashMap<>();
+            dataVariables.put(USERNAME, userClaimTicketDTO.getUser().getName());
+            dataVariables.put(TICKET_NUMBER, userClaimTicketDTO.getTicketId().toString());
+            dataVariables.put(PREVIOUS_INSTANCE, enumUtil.getLocalizedEnumValue(prevUserClaimTicketDTO.getInstanceType(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(PREVIOUS_STATUS, enumUtil.getLocalizedEnumValue(prevUserClaimTicketDTO.getStatus(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(NEW_INSTANCE, enumUtil.getLocalizedEnumValue(userClaimTicketDTO.getInstanceType(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(NEW_STATUS, enumUtil.getLocalizedEnumValue(userClaimTicketDTO.getStatus(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(INSTANCE_COMMENT, userClaimTicketDTO.getSecondInstanceComment());
+            dataVariables.put(URL, userBaseUrl + "/my-account/" + userClaimTicketDTO.getTicketId().toString());
+            mailDTO.setDataVariables(dataVariables);
+            this.sendDynamicContentEmail(mailDTO);
+            LOG.info("Claim ticket instance email sent successfully to {}", userClaimTicketDTO.getUser().getEmail());
+        } catch (Exception e) {
+            LOG.error("Failed to send claim ticket instance email to {}: {}", userClaimTicketDTO.getUser().getEmail(), e.getMessage());
+        }
     }
 }

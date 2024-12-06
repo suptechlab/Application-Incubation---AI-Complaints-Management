@@ -5,10 +5,12 @@ import com.seps.ticket.service.UserClaimTicketService;
 import com.seps.ticket.service.UserService;
 import com.seps.ticket.service.dto.ClaimStatusCountResponseDTO;
 import com.seps.ticket.service.dto.RequestInfo;
+import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.SecondInstanceRequest;
 import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -39,14 +43,15 @@ public class UserClaimTicketResource {
 
     private final UserClaimTicketService userClaimTicketService;
     private final MailService mailService;
-    private final UserService userService;
     private final DocumentService documentService;
+    private final MessageSource messageSource;
 
-    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, UserService userService, DocumentService documentService) {
+    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService,
+                                   MessageSource messageSource) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
-        this.userService = userService;
         this.documentService = documentService;
+        this.messageSource = messageSource;
     }
 
     @Operation(
@@ -132,6 +137,39 @@ public class UserClaimTicketResource {
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") String documentId) {
         return documentService.downloadDocument(documentId);
+    }
+
+    @Operation(
+        summary = "File a second instance of claim API",
+        description = "Allows a user to file a second instance.",
+        tags = {"File a second instance of claim"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Second instance of claim filed successfully.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ClaimTicketResponseDTO.class))),
+        @ApiResponse(responseCode = "403", description = "Access forbidden"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping("/file-second-instance-claim")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<ResponseStatus> fileSecondInstanceClaim(@ModelAttribute @Valid SecondInstanceRequest secondInstanceRequest,
+                                                                  HttpServletRequest httpServletRequest) {
+        Long id = secondInstanceRequest.getId();
+        RequestInfo requestInfo = new RequestInfo(httpServletRequest);
+        UserClaimTicketDTO prevUserClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
+        // File the claim
+        userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
+        // Retrieve the claim ticket
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
+        // Send an email notification
+        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO,userClaimTicketDTO);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("second.instance.filed.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
     }
 
 }

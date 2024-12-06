@@ -55,6 +55,7 @@ public class ClaimTicketRequest {
     private String specificPetition;
     // Getters and Setters
     private Boolean checkDuplicate = true;
+
     @MultipleFilesCondition(
         name = FileHelper.FileType.CLAIM_TICKET_DOCUMENTS,
         message = "{claim.ticket.validation.files.invalid.types}" // Message from the language file
