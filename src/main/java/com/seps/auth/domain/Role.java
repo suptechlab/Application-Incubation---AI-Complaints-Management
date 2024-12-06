@@ -49,6 +49,9 @@ public class Role implements Serializable {
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
 
+    @Column(name= "role_slug")
+    private String roleSlug;
+
     @ManyToMany
     @JoinTable(
         name = "role_permissions",

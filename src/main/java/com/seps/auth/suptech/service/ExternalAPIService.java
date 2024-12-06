@@ -1,6 +1,7 @@
 package com.seps.auth.suptech.service;
 
 import com.seps.auth.service.dto.ConsultationRequest;
+import com.seps.auth.service.dto.MailDTO;
 import com.seps.auth.suptech.service.dto.PersonInfoDTO;
 
 public interface ExternalAPIService {
@@ -8,4 +9,6 @@ public interface ExternalAPIService {
     PersonInfoDTO getPersonInfo(String identificacion);
 
     Boolean validateIndividualPerson(ConsultationRequest request);
+
+    Boolean sendEmailViaApi(MailDTO mailDTO, String subject, String renderedContent);
 }
