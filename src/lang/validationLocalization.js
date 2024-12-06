@@ -32,7 +32,10 @@ export const messages = {
     agreeDeclarationsRequired: 'Please agree to all declarations and conditions to proceed',
     attachmentsLabel: 'Attachments',
     firstInstanceTicketRequired: 'First instance complaint ticket is required.',
-    commentsRequired: 'Comments are required.'
+    commentsRequired: 'Comments are required.',
+    firstInstanceTicketRequired: '',
+    precedentsMaxLength: 'Precedents must not exceed 1024 characters.',
+    specificPetitionMaxLength: 'Specific Petition must not exceed 1024 characters.'
   },
   es: {
     agreePrivacy: 'Debes aceptar la política de privacidad',
@@ -67,6 +70,9 @@ export const messages = {
     agreeDeclarationsRequired: 'Por favor, acepte todas las declaraciones y condiciones para continuar',
     attachmentsLabel: 'Adjuntos',
     firstInstanceTicketRequired: 'Se requiere ticket de denuncia de primera instancia.',
-    commentsRequired: 'Se requieren comentarios.'
+    commentsRequired: 'Se requieren comentarios.',
+    secondInstanceTicketRequired: 'Se requiere ticket de reclamo de 2da instancia.',
+    precedentsMaxLength: 'Los precedentes no deben exceder los 1024 caracteres.',
+    specificPetitionMaxLength: 'La petición específica no debe exceder los 1024 caracteres.'
   },
 };

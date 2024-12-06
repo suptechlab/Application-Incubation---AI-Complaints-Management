@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
 import FormCheckbox from '../../../../components/formCheckbox';
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import SvgIcons from '../../../../components/SVGIcons';
-import { InstanceFormSchema } from '../../validations';
+import { SecondInstanceFormSchema } from '../../validations';
+import toast from 'react-hot-toast';
 
 const InstanceModal = ({ handleShow, handleClose }) => {
-    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
+    const [files, setFiles] = useState([]);
     const { t } = useTranslation()
 
     // Initial Values
@@ -22,11 +22,32 @@ const InstanceModal = ({ handleShow, handleClose }) => {
 
     //Handle File Change
     const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            setFileName(file.name);
-        } else {
-            setFileName("Fi_Users_data.xlsx");
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB in bytes
+        const MAX_FILE_COUNT = 3; // Maximum number of files allowed
+
+        if (event.target.files) {
+            const selectedFiles = Array.from(event.target.files);
+
+            const validFiles = selectedFiles.filter((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    toast.error(`${file.name}` + ' ' + t('TOO_LARGE_FILE'));
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                setFiles((prevFiles) => {
+                    const totalFiles = prevFiles.length + validFiles.length;
+
+                    if (totalFiles > MAX_FILE_COUNT) {
+                        toast.error(t('TOO_MANY_FILES'));
+                        return prevFiles;
+                    }
+
+                    return [...prevFiles, ...validFiles];
+                });
+            }
         }
     };
 
@@ -36,10 +57,15 @@ const InstanceModal = ({ handleShow, handleClose }) => {
         actions.resetForm();
     };
 
+    const handleCloseModal = () => {
+        handleClose();
+        setFiles([]);
+    }
+
     return (
         <Modal
             show={handleShow}
-            onHide={handleClose}
+            onHide={() => handleCloseModal()}
             backdrop="static"
             keyboard={false}
             centered={true}
@@ -55,7 +81,7 @@ const InstanceModal = ({ handleShow, handleClose }) => {
             </Modal.Header>
             <CommonFormikComponent
                 initialValues={initialValues}
-                validationSchema={InstanceFormSchema}
+                validationSchema={SecondInstanceFormSchema}
                 onSubmit={handleSubmit}
             >
                 {(formikProps) => (
@@ -106,7 +132,8 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                                             </label>
                                             <input
                                                 id="files"
-                                                accept="image/png, image/jpeg, image/jpg"
+                                                accept=".pdf, .docx, .doc, .txt, .rtf"
+                                                multiple
                                                 className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                                 type="file"
                                                 onChange={handleFileChange}
@@ -114,15 +141,15 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                                         </div>
                                         <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
                                     </div>
-                                    {fileName && (
-                                        <div className='pt-1'>
-                                            <Link
-                                                target="_blank"
-                                                to="/"
-                                                className="text-decoration-none small mw-100 text-break"
-                                            >
-                                                {fileName}
-                                            </Link>
+                                    {files.length > 0 && (
+                                        <div>
+                                            <ul>
+                                                {files.map((file, index) => (
+                                                    <li key={index} className="d-flex align-items-center">
+                                                        <span className="me-2">{file.name}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </div>
                                     )}
                                 </Col>
@@ -146,7 +173,7 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                             <Button
                                 type="button"
                                 variant="secondary"
-                                onClick={handleClose}
+                                onClick={() => handleCloseModal()}
                                 className="custom-min-width-100"
                             >
                                 {t("CANCEL")}

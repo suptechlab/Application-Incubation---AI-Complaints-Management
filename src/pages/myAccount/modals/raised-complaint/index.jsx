@@ -1,31 +1,56 @@
 import React, { useState } from 'react';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
 import FormCheckbox from '../../../../components/formCheckbox';
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import SvgIcons from '../../../../components/SVGIcons';
+import { RaiseComplaintSchema } from '../../validations';
+import toast from 'react-hot-toast';
 
 const RaisedComplaintModal = ({ handleShow, handleClose }) => {
-    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
-    const { t } = useTranslation()
+
+    const { t } = useTranslation();
+    const [files, setFiles] = useState([]);
 
     // Initial Values
     const initialValues = {
         instanceTicket: '',
         comments: '',
         agreeDeclarations: false,
+        precedents: '',
+        specificPetition: ''
     };
 
     //Handle File Change
     const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            setFileName(file.name);
-        } else {
-            setFileName("Fi_Users_data.xlsx");
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB in bytes
+        const MAX_FILE_COUNT = 3; // Maximum number of files allowed
+
+        if (event.target.files) {
+            const selectedFiles = Array.from(event.target.files);
+
+            const validFiles = selectedFiles.filter((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    toast.error(`${file.name}` + ' ' + t('TOO_LARGE_FILE'));
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                setFiles((prevFiles) => {
+                    const totalFiles = prevFiles.length + validFiles.length;
+
+                    if (totalFiles > MAX_FILE_COUNT) {
+                        toast.error(t('TOO_MANY_FILES'));
+                        return prevFiles;
+                    }
+
+                    return [...prevFiles, ...validFiles];
+                });
+            }
         }
     };
 
@@ -49,11 +74,12 @@ const RaisedComplaintModal = ({ handleShow, handleClose }) => {
         >
             <Modal.Header closeButton className="pb-2">
                 <Modal.Title as="h4" className="fw-bold">
-                Raise a Complaint
+                    {t('RAISE_A_COMPLAINT')}
                 </Modal.Title>
             </Modal.Header>
             <CommonFormikComponent
                 initialValues={initialValues}
+                validationSchema={RaiseComplaintSchema}
                 onSubmit={handleSubmit}
             >
                 {(formikProps) => (
@@ -62,7 +88,7 @@ const RaisedComplaintModal = ({ handleShow, handleClose }) => {
                             <Row className="gx-4">
                                 <Col lg={6}>
                                     <ReactSelect
-                                        label={t("2nd Instance Claim Ticket")}
+                                        label={t("SECOND_INSTANCE_CLAIM_TICKET") + '*'}
                                         error={formikProps.errors.instanceTicket}
                                         options={[
                                             { label: t("SELECT"), value: "" }
@@ -80,7 +106,7 @@ const RaisedComplaintModal = ({ handleShow, handleClose }) => {
                                 <Col xs={12}>
                                     <FormInputBox
                                         id="precedents"
-                                        label={t("Precedents*")}
+                                        label={t("PRECEDENTS") + '*'}
                                         name="precedents"
                                         type="text"
                                         as="textarea"
@@ -95,7 +121,7 @@ const RaisedComplaintModal = ({ handleShow, handleClose }) => {
                                 <Col xs={12}>
                                     <FormInputBox
                                         id="specificPetition"
-                                        label={t("Specific Petition*")}
+                                        label={t("SPECIFIC_PETITION") + '*'}
                                         name="specificPetition"
                                         type="text"
                                         as="textarea"
@@ -115,27 +141,28 @@ const RaisedComplaintModal = ({ handleShow, handleClose }) => {
                                                 className="btn btn-secondary"
                                             >
                                                 <span className='me-2'>{SvgIcons.uploadIcon}</span>
-                                                <span className='align-middle'>{t("Upload Optional Attachments")}</span>
+                                                <span className='align-middle'>{t("UPLOAD_OPTIONAL_ATTACHMENTS")}</span>
                                             </label>
                                             <input
                                                 id="files"
-                                                accept="image/png, image/jpeg, image/jpg"
+                                                accept=".pdf, .docx, .doc, .txt, .rtf"
+                                                multiple
                                                 className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                                 type="file"
                                                 onChange={handleFileChange}
                                             />
                                         </div>
-                                        <span className='custom-font-size-12 fw-medium'>Multiple attachment can be uploaded.</span>
+                                        <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
                                     </div>
-                                    {fileName && (
-                                        <div className='pt-1'>
-                                            <Link
-                                                target="_blank"
-                                                to="/"
-                                                className="text-decoration-none small mw-100 text-break"
-                                            >
-                                                {fileName}
-                                            </Link>
+                                    {files.length > 0 && (
+                                        <div>
+                                            <ul>
+                                                {files.map((file, index) => (
+                                                    <li key={index} className="d-flex align-items-center">
+                                                        <span className="me-2">{file.name}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </div>
                                     )}
                                 </Col>

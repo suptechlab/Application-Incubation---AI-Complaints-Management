@@ -127,5 +127,7 @@ export const spanishLang = {
   "CLAIM_SUCCESS_EMAIL": "Su reclamación se ha presentado con éxito. Los detalles se han enviado a su correo electrónico",
   "MY_ACCOUNT_AREA": "Mi Área de Cuenta",
   "ATTACHMENTS": "Adjuntos",
-  "ATTACHMENTS_SENT_BY_ENTITY": "Adjuntos enviados por Entidad"
+  "ATTACHMENTS_SENT_BY_ENTITY": "Adjuntos enviados por Entidad",
+  "SECOND_INSTANCE_CLAIM_TICKET": "Boleto de Reclamación de 2da Instancia",
+  "RAISE_A_COMPLAINT": "Presentar una queja"
 }

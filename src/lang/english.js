@@ -126,5 +126,7 @@ export const englishLang = {
   "CLAIM_SUCCESS_EMAIL": "Your claim has been successfully filed. Details have been sent to your email",
   "MY_ACCOUNT_AREA": "My Account Area",
   "ATTACHMENTS": "Attachments",
-  "ATTACHMENTS_SENT_BY_ENTITY": "Attachments send by Entity"
+  "ATTACHMENTS_SENT_BY_ENTITY": "Attachments send by Entity",
+  "SECOND_INSTANCE_CLAIM_TICKET": "2nd Instance Claim Ticket",
+  "RAISE_A_COMPLAINT": "Raise a Complaint"
 }

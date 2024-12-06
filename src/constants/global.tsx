@@ -25,3 +25,6 @@ export const SUCCESS_STATUS_ERROR = 201;
 export const API_CUSTOM_MESSAGE = {
     SOMETHING_WRONG: "Something went wrong!"
 }
+export const MAX_FILE_SIZE = 1 * 1024 * 1024;
+export const MAX_FILE_COUNT = 3;
+export const ALLOWED_FILES = ".pdf, .docx, .doc, .txt, .rtf";
