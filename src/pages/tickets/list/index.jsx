@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card, Form, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -12,10 +12,18 @@ import PageHeader from "../../../components/PageHeader";
 import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
 import AttachmentsModal from "../modals/attachmentsModal";
 import TicketsListFilters from "./filters";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 export default function TicketsList() {
     const location = useLocation();
     const navigate = useNavigate();
+
+    const { userData } = useContext(AuthenticationContext);
+
+    const { authorities = [], roles = [] } = userData || {};
+
+    const [currentUser, setCurrentUser] = useState([])
+
 
     const { t } = useTranslation()
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -27,7 +35,7 @@ export default function TicketsList() {
     const [sorting, setSorting] = React.useState([
         {
             "id": "slaBreachDays",
-            "desc": true
+            "asc": true
         }
     ]);
     const [filter, setFilter] = React.useState({
@@ -41,6 +49,24 @@ export default function TicketsList() {
     const [ticketIdsArr, setTicketIdsArr] = useState([]);
 
     const [clearTableSelection, setClearTableSelection] = useState(false)
+
+    useEffect(() => {
+        if (roles?.length > 0) {
+
+            const roleMap = {
+                'Fi Admin': 'FI_ADMIN',
+                'Fi Agent': 'FI_AGENT',
+                'SEPS Admin': 'SEPS_ADMIN',
+                'SEPS Agent': 'SEPS_AGENT',
+            };
+
+            const roleName = roles[0]?.name;
+
+            setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
+
+
+        }
+    }, [authorities])
 
 
     const dataQuery = useQuery({
@@ -94,55 +120,6 @@ export default function TicketsList() {
         retry: 0, //Disable retry on failure
     });
 
-    const sampleData = [
-        {
-            ticketId: "TCK-1001",
-            createdAt: "2024-11-20",
-            claimType: "Health Insurance",
-            claimFilledBy: "John Doe",
-            slaBreachDays: "5 Days",
-            priority: "Low",
-            status: "Closed",
-        },
-        {
-            ticketId: "TCK-1002",
-            createdAt: "2024-11-21",
-            claimType: "Auto Insurance",
-            claimFilledBy: "Jane Smith",
-            slaBreachDays: "3 Days",
-            priority: "Medium",
-            status: "In Progress",
-        },
-        {
-            ticketId: "TCK-1003",
-            createdAt: "2024-11-22",
-            claimType: "Travel Insurance",
-            claimFilledBy: "Robert Brown",
-            slaBreachDays: "7 Days",
-            priority: "High",
-            status: "Rejected",
-        },
-        {
-            ticketId: "TCK-1004",
-            createdAt: "2024-11-23",
-            claimType: "Property Insurance",
-            claimFilledBy: "Emily Davis",
-            slaBreachDays: "2 Days",
-            priority: "NIL",
-            status: "New",
-        },
-        {
-            ticketId: "TCK-1005",
-            createdAt: "2024-11-24",
-            claimType: "Life Insurance",
-            claimFilledBy: "Michael Wilson",
-            slaBreachDays: "10 Days",
-            priority: "NIL",
-            status: "Closed",
-        },
-    ];
-
-
     //handle last page deletion item
     useEffect(() => {
         if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
@@ -191,7 +168,7 @@ export default function TicketsList() {
     }
 
     //FI AGENT COLUMNS
-    const fiAgentColumns = React.useMemo(
+    const FIAgentColumns = React.useMemo(
         () => [
             {
                 id: 'select-col',
@@ -260,19 +237,22 @@ export default function TicketsList() {
                 ),
             },
             {
+                accessorFn: (row) => row?.createdAt,
+                id: "createdAt",
+                header: () => "Creation Date",
+                enableSorting: true,
+                cell: ({ row }) => (
+                    row?.original?.createdAt
+                ),
+            },
+            {
                 accessorFn: (row) => row?.claimType?.name,
                 // accessorFn: (row) => row?.claimType,
                 id: "claimType",
                 header: () => "Claim Type",
                 enableSorting: true,
             },
-            {
-                accessorFn: (row) => row?.claimSubType?.name,
-                // accessorFn: (row) => row?.claimType,
-                id: "claimSubType",
-                header: () => "Sub Claim Type",
-                enableSorting: true,
-            },
+
             {
                 // accessorFn: (row) => row?.claimFilledBy,
                 accessorFn: (row) => row?.user?.name,
@@ -285,28 +265,6 @@ export default function TicketsList() {
                 id: "slaBreachDays",
                 header: () => "SLA",
                 enableSorting: true,
-            },
-            {
-                accessorFn: (row) => row?.createdAt,
-                id: "createdAt",
-                header: () => "Creation Date",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    row?.original?.createdAt
-                ),
-            },
-            {
-                accessorFn: (row) => row?.priority,
-                id: "priority",
-                header: () => "Priority",
-                size: "100",
-                cell: (rowData) => (
-                    <span
-                        className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
-                    >
-                        {rowData.row.original.priority}
-                    </span>
-                )
             },
             {
                 accessorFn: (row) => row?.status,
@@ -325,7 +283,7 @@ export default function TicketsList() {
         []
     );
     //SEPS COLUMN
-    const sepsColumns = React.useMemo(
+    const SEPSColumns = React.useMemo(
         () => [
             {
                 id: 'select-col',
@@ -440,7 +398,7 @@ export default function TicketsList() {
     );
 
     // FI ADMIN
-     const FIAdminColumns = React.useMemo(
+    const FIAdminColumns = React.useMemo(
         () => [
             {
                 id: 'select-col',
@@ -529,14 +487,11 @@ export default function TicketsList() {
                 accessorFn: (row) => row?.fiAgent,
                 id: "fiAgent",
                 header: () => "FI Agent",
-                enableSorting: true,
-            },
-            {
-                // accessorFn: (row) => row?.claimFilledBy,
-                accessorFn: (row) => row?.user?.name,
-                id: "claimFilledBy",
-                header: () => "Claim filled by",
-                enableSorting: true,
+                enableSorting: false,
+                cell: ({ row }) => (
+                    // console.log({row :  row})
+                   <span>{ row?.original?.fiAgent?.name}</span>
+                )
             },
             {
                 accessorFn: (row) => row?.slaBreachDays,
@@ -574,37 +529,45 @@ export default function TicketsList() {
         []
     );
 
-  
+
     const handleTicketAssignment = (agentId) => {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
-            agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
-                toast.success(t("TICKETS ASSIGNED"));
-                setClearTableSelection(true)
-                setTicketIdsArr([])
-            }).catch((error) => {
-                if (error?.response?.data?.errorDescription) {
-                    toast.error(error?.response?.data?.errorDescription);
-                } else {
-                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-                }
-            }).finally(() => {
-                setLoading(false)
-            })
-            //ASSIGN TICKET TO FI AGENT
-            // agentTicketToFIagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
-            //     toast.success(t("TICKETS ASSIGNED"));
-            //     setClearTableSelection(true)
-            //     setTicketIdsArr([])
-            // }).catch((error) => {
-            //     if (error?.response?.data?.errorDescription) {
-            //         toast.error(error?.response?.data?.errorDescription);
-            //     } else {
-            //         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-            //     }
-            // }).finally(() => {
-            //     setLoading(false)
-            // })
+
+            if (currentUser === "SEPS_ADMIN") {
+                agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
+                    toast.success(t("TICKETS ASSIGNED"));
+                    setClearTableSelection(true)
+                    setTicketIdsArr([])
+                    dataQuery.refetch()
+                }).catch((error) => {
+                    if (error?.response?.data?.errorDescription) {
+                        toast.error(error?.response?.data?.errorDescription);
+                    } else {
+                        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                    }
+                }).finally(() => {
+                    setLoading(false)
+                })
+            } else if (currentUser === "FI_ADMIN") {
+                //ASSIGN TICKET TO FI AGENT
+                agentTicketToFIagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
+                    toast.success(t("TICKETS ASSIGNED"));
+                    setClearTableSelection(true)
+                    setTicketIdsArr([])
+                    dataQuery.refetch()
+                }).catch((error) => {
+                    if (error?.response?.data?.errorDescription) {
+                        toast.error(error?.response?.data?.errorDescription);
+                    } else {
+                        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                    }
+                }).finally(() => {
+                    setLoading(false)
+                })
+            } else {
+                toast.warning("You are not allowed to assign tickets.")
+            }
         }
     }
 
@@ -619,8 +582,23 @@ export default function TicketsList() {
     const addNewClickHanlder = () => {
         navigate('/tickets/add')
     }
-
-
+    // Define columns based on user role or currentUser state
+    const getColumnsForUser = (currentUser) => {
+        switch (currentUser) {
+            case 'FI_ADMIN':
+                return FIAdminColumns;
+            case 'FI_AGENT':
+                return FIAgentColumns;
+            case 'SEPS_ADMIN':
+                return SEPSColumns;
+            case 'SEPS_AGENT':
+                return SEPSColumns;
+            default:
+                return FIAdminColumns;  // Fallback default columns
+        }
+    };
+    // Inside your component, dynamically decide the columns
+    const columns = getColumnsForUser(currentUser);
     return (
         <React.Fragment>
             <Loader isLoading={loading} />
@@ -636,9 +614,16 @@ export default function TicketsList() {
                 </div>
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <TicketsListFilters filter={filter} setFilter={setFilter} handleTicketAssign={handleTicketAssignment} ticketArr={ticketIdsArr} clearTableSelection={clearTableSelection} />
+                        <TicketsListFilters
+                            filter={filter}
+                            setFilter={setFilter}
+                            handleTicketAssign={handleTicketAssignment}
+                            ticketArr={ticketIdsArr}
+                            clearTableSelection={clearTableSelection}
+                            currentUser={currentUser}
+                        />
                         <CommonDataTable
-                            columns={FIAdminColumns}
+                            columns={columns}
                             dataQuery={dataQuery}
                             pagination={pagination}
                             setPagination={setPagination}

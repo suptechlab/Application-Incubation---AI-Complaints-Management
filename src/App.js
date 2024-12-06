@@ -24,12 +24,16 @@ function App() {
         .catch((error) => {
           console.log(error)
           console.error("Error fetching account details:", error);
-          toast.error("Session expired. Please log in again.");
-          logout();
+        
+          if (error?.response?.status === '401') {
+            toast.error("Session expired. Please log in again.");
+            logout();
+          }
+
         });
     }
-  }, [ ]);
-  
+  }, []);
+
   if (isLoading) {
     return <Loader isLoading={isLoading} />;
   }

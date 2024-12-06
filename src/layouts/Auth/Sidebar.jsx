@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import {
@@ -6,18 +6,51 @@ import {
   MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-import {
-  getPermissionsModuleNameList,
-  isAdminUser,
-} from "../../utils/authorisedmodule";
+
 import { NavItems } from "./NavItems";
 import "./sidebar.scss";
+import { AuthenticationContext } from "../../contexts/authentication.context";
+import { filterNavItemsByModules } from "../../utils/permissionUtils";
 
 const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
+
+  const { logout, userData } = useContext(AuthenticationContext);
+
+  // Default values to handle missing user data
+  const { authorities = [], roles } = userData || {};
+
+  const [isAdmin, setIsAdmin] = useState(null);
+
+  const navItemsArr = NavItems();
+
+  const [navItems, setNavItems] = useState([]);
+
+  useEffect(() => {
+    if (authorities?.length > 0) {
+      const adminStatus = authorities.includes("ROLE_ADMIN");
+      if (adminStatus === true) {
+        setIsAdmin(adminStatus);
+        setNavItems(navItemsArr ?? [])
+      } else {
+        setIsAdmin(false)
+        // FILTER NAV ITEMS HERE
+        // Ensure filterNavItemsByModules is called only when both navItemsArr and roles[0]?.modules are available
+        if (navItemsArr && roles[0]?.modules) {
+          const filteredNavItems = filterNavItemsByModules(navItemsArr, roles[0]?.modules);
+          setNavItems(filteredNavItems ?? []);
+        } else {
+          setNavItems([]); // Fallback to unfiltered navItemsArr
+        }
+      }
+    }
+  }, [authorities])
+
+
+
   const sidebarRef = useRef(null);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null);
 
-  const handleSubmenu = (idx) => { 
+  const handleSubmenu = (idx) => {
     if (isSubMenuOpen === idx) {
       setIsSubMenuOpen(null);
     } else {
@@ -54,32 +87,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
     };
   }, [isActiveSidebar]);
 
-  const permission = useRef({
-    list: [],
-    isAdmin: false,
-  });
 
-  useEffect(() => {
-    isAdminUser()
-      .then((response) => {
-        if (response) {
-          permission.current.isAdmin = true;
-        } else {
-          getPermissionsModuleNameList()
-            .then((response) => {
-              permission.current.list = response;
-            })
-            .catch((error) => {
-              console.error("Error fetching permissions:", error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error get during to fetch User Type", error);
-      });
-  }, []);
-
-  const navItemsArr = NavItems();
 
   return (
     <div
@@ -107,7 +115,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
         <div className="d-flex flex-column w-100 h-100">
           <div className="overflow-x-hidden overflow-y-auto sidebarList">
             <Nav defaultActiveKey="/admin" as="ul" className="flex-column p-2">
-              {navItemsArr.map((elem) => {
+              {navItems?.map((elem) => {
                 const {
                   id,
                   menuName,
@@ -120,20 +128,18 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                 } = elem;
                 return (
                   <Nav.Item as="li" key={id}>
-                    {/* {(permission.current.isAdmin || permission.current.list.includes(roleName)) ? !subMenu && ( */}
                     {!subMenu && (
                       <Nav.Link
                         key={menuName}
                         id={id}
                         as={NavLink}
                         to={path}
-                        className={`align-items-center d-flex px-0 sidebarLink rounded ${
-                          disabled ? "disabled" : ""
-                        }`}
+                        className={`align-items-center d-flex px-0 sidebarLink rounded ${disabled ? "disabled" : ""
+                          }`}
                         onClick={handleNavLinkClick}
                       >
                         <span className="py-1 text-center min-w-44 sidebarIcon">
-                          {menuIcon} 
+                          {menuIcon}
                         </span>
                         <span className="hideInSmallSidebar text-wrap lh-sm">
                           {title}
@@ -141,49 +147,17 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                       </Nav.Link>
                     )}
 
-                    {/* {subMenu && ( */}
-                    {/* {permission.current.isAdmin || permission.current.list.includes(roleName) ? subMenu && ( */}
-                    {/* { Yaha pe dono conditon me se permissoin wali use kr rhe h} */}
-                    
-                    {/* {console.log('roleName 143 - ',roleName)}
-                    {console.log('current list 144 - ',permission.current.list)}
-                    {permission.current.isAdmin || permission.current.list.includes(roleName) ? subMenu && ( 
-                      <Nav.Link
-                        key={menuName}
-                        as={Button}
-                        variant="link"
-                        onClick={() => handleSubmenu(id)}
-                        className={`align-items-center d-flex px-0 sidebarLink rounded w-100 text-white ${
-                          isSubMenuOpen === id ? "active" : ""
-                        } ${disabled ? "disabled" : ""}`}
-                    >
-                          <span className="py-1 text-center min-w-44 sidebarIcon">
-                            {menuIcon}
-                          </span>
-                          <span className="hideInSmallSidebar text-wrap text-start lh-sm">
-                            {title} 164
-                          </span>
-                          <span className="ms-auto sub-menu-arrow">
-                            {isSubMenuOpen === id ? (
-                              <MdOutlineKeyboardArrowDown size={20} />
-                            ) : (
-                              <MdOutlineKeyboardArrowRight size={20} />
-                            )}
-                          </span>
-                    </Nav.Link>
-                   
-                    ) : ''} */}
 
-                    
+
+
                     {subMenu && (
                       <Nav.Link
                         key={menuName}
                         as={Button}
                         variant="link"
                         onClick={() => handleSubmenu(id)}
-                        className={`align-items-center d-flex px-0 sidebarLink rounded w-100 text-white ${
-                          isSubMenuOpen === id ? "active" : ""
-                        } ${disabled ? "disabled" : ""}`}
+                        className={`align-items-center d-flex px-0 sidebarLink rounded w-100 text-white ${isSubMenuOpen === id ? "active" : ""
+                          } ${disabled ? "disabled" : ""}`}
                       >
                         <span className="py-1 text-center min-w-44 sidebarIcon">
                           {menuIcon}
@@ -200,38 +174,28 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                         </span>
                       </Nav.Link>
                     )}
-  
+
                     {isSubMenuOpen === id && subMenu && (
                       <Nav as="ul" className="flex-column p-0">
-                        {/* {console.log('subMenu',subMenu)} */}
-                        {subMenu.map((subItems) => {
-                          // {console.log('permission.current.list 202---', permission.current.list)}
-                          // {console.log('roleName 203---', subItems.roleName)}
+
+                        {subMenu?.map((subItems) => {
+
                           return (
                             <Nav.Item as="li" key={subItems.id}>
-                              {permission.current.isAdmin ||
-                              permission.current.list.includes(
-                                subItems.roleName
-                              ) ? (
-                                <Nav.Link
-                                  key={subItems.menuName}
-                                  as={NavLink}
-                                  to={subItems.path}
-                                  className={`align-items-center d-flex px-0 sidebarLink rounded ${
-                                    subItems.disabled ? "disabled" : ""
+                              <Nav.Link
+                                key={subItems.menuName}
+                                as={NavLink}
+                                to={subItems.path}
+                                className={`align-items-center d-flex px-0 sidebarLink rounded ${subItems.disabled ? "disabled" : ""
                                   }`}
-                                >
-                                  <span className="py-1 text-center min-w-44 sidebarIcon d-none ps-1">
-                                    {subItems.menuIcon}
-                                  </span>
-                                  <span className="hideInSmallSidebar text-wrap lh-sm">
-                                    {/* {subItems.menuName + ' - ' + subItems.roleName}  */}
-                                    {subItems.menuName} 
-                                  </span>
-                                </Nav.Link>
-                              ) : (
-                                ""
-                              )}
+                              >
+                                <span className="py-1 text-center min-w-44 sidebarIcon d-none ps-1">
+                                  {subItems.menuIcon}
+                                </span>
+                                <span className="hideInSmallSidebar text-wrap lh-sm">
+                                  {subItems.menuName}
+                                </span>
+                              </Nav.Link>
                             </Nav.Item>
                           );
                         })}

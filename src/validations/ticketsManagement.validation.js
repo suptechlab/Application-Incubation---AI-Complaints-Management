@@ -1,8 +1,8 @@
 import * as Yup from "yup"
 
 const validationSchema = Yup.object({
-  description: Yup.string()
-    .max(1500, "Description cannot exceed 1500 characters."),
+  message: Yup.string().required("Message is required!")
+    .max(500, "Message cannot exceed 500 characters."),
 });
 
 // SLA DATE EXTENSION

@@ -12,7 +12,7 @@ export const NavItems = () => {
       title: t("DASHBOARD"),
       menuIcon: <MdDashboard size={20} />,
       path: "/dashboard",
-      roleName: "Dashboard",
+      moduleName: "Dashboard",
       disabled: false,
     },
     {
@@ -21,7 +21,7 @@ export const NavItems = () => {
       title: t("User Management"),
       menuIcon: <MdPerson size={20} />,
       path: '#',
-      // roleName: "user",
+      moduleName: "user",
       subMenu: [
         {
           id: 21,
@@ -37,7 +37,7 @@ export const NavItems = () => {
           menuName: t("FI USERS"),
           title: t("FI USERS"),
           path: "/fi-users",
-          roleName: "FI User",
+          moduleName: "FI User",
           permissions: ["FI_USER_CREATE_BY_FI"],
           disabled: false,
         },
@@ -59,6 +59,7 @@ export const NavItems = () => {
       menuIcon: <MdSupervisorAccount size={20} />,
       path: "/team-management",
       roleName: "admin",
+      moduleName:"Teams Manage",
       disabled: false,
     },
     {
@@ -135,6 +136,7 @@ export const NavItems = () => {
       menuIcon: <MdConfirmationNumber size={20} />,
       path: "/tickets",
       roleName: "admin",
+      moduleName : 'Ticket',
       disabled: false,
     },
     {

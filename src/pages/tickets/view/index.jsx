@@ -249,19 +249,19 @@ const TicketsView = () => {
                         src={defaultAvatar}
                         width={36}
                         height={36}
-                        alt="John Smith"
+                        alt={ticketData?.user?.name}
                       />
                     </Col>
                     <Col xs className='small lh-sm'>
-                      <div className='fw-bold'>John Smith</div>
+                      <div className='fw-bold'>{ticketData?.user?.name}th</div>
                       <Stack direction='horizontal' gap={2} className='text-secondary'>
                         <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                        <span>07-14-24 | 10:00 am </span>
+                        <span> {moment().format("DD-MM-YYYY | hh:mm:a") } </span>
                       </Stack>
                     </Col>
                   </Row>
                 </Card.Header>
-                <TicketTabsSection />
+                <TicketTabsSection ticketId={ticketData?.id}/>
               </Card>
               <ActivityLogs setLoading = {setLoading} ticketId ={id}/>
 

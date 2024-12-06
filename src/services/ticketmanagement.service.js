@@ -64,6 +64,16 @@ export const ticketRejectStatus = async (ticketId, data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reject`,data);
 }
 
+//TICKET REPLY TO CUSTOMER API
+export const ticketReplyToCustomer = async (ticketId, data) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-customer`,data);
+}
+
+//TICKET REPLY INTERNAL API
+export const ticketReplyInternal = async (ticketId, data) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-internal`,data);
+}
+
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN
 export const convertToLabelValue = (obj) => {
   return Object.entries(obj).map(([key, value]) => ({
