@@ -141,7 +141,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setI
           <Row>
             <Col lg={2}>
               <ReactSelect
-                label={t("COUNTRY_CODE") + '*'}
+                label={t("COUNTRY_CODE")}
                 error={formikProps.errors.countryCode}
                 options={formattedCountryCodes ?? []}
                 value={formikProps.values.countryCode}
