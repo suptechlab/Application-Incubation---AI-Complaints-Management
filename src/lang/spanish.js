@@ -111,7 +111,7 @@ export const spanishLang = {
   "SEPS_HELPDESK": "Helpdesk SEPS",
   "UPLOAD_OPTIONAL_ATTACHMENTS": "Cargar archivos adjuntos opcionales",
   "RAISE_A_SECOND_INSTANCE_CLAIM": "Presentar un reclamo en segunda instancia",
-  "FIRST_INSTANCE_COMPLAINT_TICKET": "Boleto de Denuncia de 1ra Instancia*",
+  "FIRST_INSTANCE_COMPLAINT_TICKET": "Boleto de Denuncia de 1ra Instancia",
   "COMMENTS": "Comentarios*",
   "ATTACH_NEW_EVIDENCE": "Adjunte la nueva evidencia",
   "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Se pueden cargar varios archivos adjuntos.",

@@ -4,18 +4,24 @@ import { useTranslation } from 'react-i18next';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
 import FormCheckbox from '../../../../components/formCheckbox';
 import FormInputBox from '../../../../components/FormInput';
-import ReactSelect from '../../../../components/ReactSelect';
 import SvgIcons from '../../../../components/SVGIcons';
 import { SecondInstanceFormSchema } from '../../validations';
 import toast from 'react-hot-toast';
+import { fileClaimSecondInstanceForm } from '../../../../redux/slice/fileClaimSlice';
+import { useDispatch } from 'react-redux';
+import Loader from '../../../../components/Loader';
 
-const InstanceModal = ({ handleShow, handleClose }) => {
+const InstanceModal = ({ handleShow, selectedRow, handleClose  }) => {
+
+    const [loading, setLoading] = useState(false)
     const [files, setFiles] = useState([]);
-    const { t } = useTranslation()
+    const { t } = useTranslation();
+    const dispatch = useDispatch()
+
 
     // Initial Values
     const initialValues = {
-        instanceTicket: '',
+        instanceTicket: selectedRow ? selectedRow?.ticketId : '',
         comments: '',
         agreeDeclarations: false,
     };
@@ -44,7 +50,6 @@ const InstanceModal = ({ handleShow, handleClose }) => {
                         toast.error(t('TOO_MANY_FILES'));
                         return prevFiles;
                     }
-
                     return [...prevFiles, ...validFiles];
                 });
             }
@@ -52,9 +57,29 @@ const InstanceModal = ({ handleShow, handleClose }) => {
     };
 
     // Handle Submit Handler
-    const handleSubmit = (values, actions) => {
-        actions.setSubmitting(false);
-        actions.resetForm();
+    const handleSubmit = async (values, actions) => {
+        const appendFilesToFormData = (formData, files) => {
+            files.forEach((file, index) => {
+                formData.append(`attachments[${index}]`, file);
+            });
+        };
+        const formData = new FormData();
+        formData.append('id', selectedRow?.id);
+        formData.append('comment', values.comments);
+        appendFilesToFormData(formData, files);
+        setLoading(true);
+        const result = await dispatch(fileClaimSecondInstanceForm(formData));
+        if (fileClaimSecondInstanceForm.fulfilled.match(result)) {
+            toast.success(t('CLAIM_SUCCESS'));
+            setLoading(false);
+            handleCloseModal();
+            actions.setSubmitting(false);
+        } else {
+            console.error("Verification error:", result.error?.message);
+            toast.error(result.error?.message);
+            actions.setSubmitting(false);
+            setLoading(false);
+        }
     };
 
     const handleCloseModal = () => {
@@ -63,133 +88,135 @@ const InstanceModal = ({ handleShow, handleClose }) => {
     }
 
     return (
-        <Modal
-            show={handleShow}
-            onHide={() => handleCloseModal()}
-            backdrop="static"
-            keyboard={false}
-            centered={true}
-            scrollable={true}
-            size="lg"
-            className="theme-modal"
-            enforceFocus={false}
-        >
-            <Modal.Header closeButton className="pb-2">
-                <Modal.Title as="h4" className="fw-bold">
-                    {t('RAISE_A_SECOND_INSTANCE_CLAIM')}
-                </Modal.Title>
-            </Modal.Header>
-            <CommonFormikComponent
-                initialValues={initialValues}
-                validationSchema={SecondInstanceFormSchema}
-                onSubmit={handleSubmit}
+        <React.Fragment>
+            <Loader isLoading={loading} />
+            <Modal
+                show={handleShow}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+                centered={true}
+                scrollable={true}
+                size="lg"
+                className="theme-modal"
+                enforceFocus={false}
             >
-                {(formikProps) => (
-                    <React.Fragment>
-                        <Modal.Body className="text-break small pt-3">
-                            <Row className="gx-4">
-                                <Col lg={6}>
-                                    <ReactSelect
-                                        label={t("FIRST_INSTANCE_COMPLAINT_TICKET")}
-                                        error={formikProps.errors.instanceTicket}
-                                        options={[
-                                            { label: t("SELECT"), value: "" }
-                                        ]}
-                                        value={formikProps.values.instanceTicket}
-                                        onChange={(option) => {
-                                            formikProps.setFieldValue("instanceTicket", option?.target?.value ?? "");
-                                        }}
-                                        name="instanceTicket"
-                                        className={formikProps.touched.instanceTicket && formikProps.errors.instanceTicket ? "is-invalid" : ""}
-                                        onBlur={formikProps.handleBlur}
-                                        touched={formikProps.touched.instanceTicket}
-                                    />
-                                </Col>
-                                <Col xs={12}>
-                                    <FormInputBox
-                                        id="comments"
-                                        label={t("COMMENTS")}
-                                        name="comments"
-                                        type="text"
-                                        as="textarea"
-                                        rows="3"
-                                        error={formikProps.errors.comments}
-                                        onBlur={formikProps.handleBlur}
-                                        onChange={formikProps.handleChange}
-                                        touched={formikProps.touched.comments}
-                                        value={formikProps.values.comments || ""}
-                                    />
-                                </Col>
-                                <Col xs={12} className="mb-3">
-                                    <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
-                                        <div className="overflow-hidden position-relative z-1 flex-shrink-0">
-                                            <label
-                                                htmlFor="files"
-                                                className="btn btn-secondary"
-                                            >
-                                                <span className='me-2'>{SvgIcons.uploadIcon}</span>
-                                                <span className='align-middle'>{t("ATTACH_NEW_EVIDENCE")}</span>
-                                            </label>
-                                            <input
-                                                id="files"
-                                                accept=".pdf, .docx, .doc, .txt, .rtf"
-                                                multiple
-                                                className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                                                type="file"
-                                                onChange={handleFileChange}
-                                            />
+                <Modal.Header closeButton className="pb-2">
+                    <Modal.Title as="h4" className="fw-bold">
+                        {t('RAISE_A_SECOND_INSTANCE_CLAIM')}
+                    </Modal.Title>
+                </Modal.Header>
+                <CommonFormikComponent
+                    initialValues={initialValues}
+                    validationSchema={SecondInstanceFormSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {(formikProps) => (
+                        <React.Fragment>
+                            <Modal.Body className="text-break small pt-3">
+                                <Row className="gx-4">
+                                    <Col lg={6}>
+                                        <FormInputBox
+                                            id="instanceTicket"
+                                            label={t("FIRST_INSTANCE_COMPLAINT_TICKET")}
+                                            name="instanceTicket"
+                                            type="text"
+                                            rows="3"
+                                            error={formikProps.errors.instanceTicket}
+                                            onBlur={formikProps.handleBlur}
+                                            onChange={formikProps.handleChange}
+                                            touched={formikProps.touched.instanceTicket}
+                                            value={formikProps.values.instanceTicket || ""}
+                                            readOnly={true}
+                                        />
+                                    </Col>
+                                    <Col xs={12}>
+                                        <FormInputBox
+                                            id="comments"
+                                            label={t("COMMENTS")}
+                                            name="comments"
+                                            type="text"
+                                            as="textarea"
+                                            rows="3"
+                                            error={formikProps.errors.comments}
+                                            onBlur={formikProps.handleBlur}
+                                            onChange={formikProps.handleChange}
+                                            touched={formikProps.touched.comments}
+                                            value={formikProps.values.comments || ""}
+                                        />
+                                    </Col>
+                                    <Col xs={12} className="mb-3">
+                                        <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
+                                            <div className="overflow-hidden position-relative z-1 flex-shrink-0">
+                                                <label
+                                                    htmlFor="files"
+                                                    className="btn btn-secondary"
+                                                >
+                                                    <span className='me-2'>{SvgIcons.uploadIcon}</span>
+                                                    <span className='align-middle'>{t("ATTACH_NEW_EVIDENCE")}</span>
+                                                </label>
+                                                <input
+                                                    id="files"
+                                                    accept=".pdf, .docx, .doc, .txt, .rtf"
+                                                    multiple
+                                                    className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                                    type="file"
+                                                    onChange={handleFileChange}
+                                                />
+                                            </div>
+                                            <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
                                         </div>
-                                        <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
-                                    </div>
-                                    {files.length > 0 && (
-                                        <div>
-                                            <ul>
-                                                {files.map((file, index) => (
-                                                    <li key={index} className="d-flex align-items-center">
-                                                        <span className="me-2">{file.name}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </Col>
-                                <Col xs={12}>
-                                    <FormCheckbox
-                                        wrapperClassName="mb-0"
-                                        className='fs-6 fw-medium'
-                                        id="agreeDeclarations"
-                                        checked={formikProps.values.agreeDeclarations}
-                                        onBlur={formikProps.handleBlur}
-                                        onChange={formikProps.handleChange}
-                                        touched={formikProps.touched.agreeDeclarations}
-                                        error={formikProps.errors.agreeDeclarations}
-                                        type="checkbox"
-                                        label={t("AGREE_DECLARATIONS")}
-                                    />
-                                </Col>
-                            </Row>
-                        </Modal.Body>
-                        <Modal.Footer className="border-top">
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={() => handleCloseModal()}
-                                className="custom-min-width-100"
-                            >
-                                {t("CANCEL")}
-                            </Button>
-                            <Button
-                                type="submit"
-                                variant="warning"
-                                className="custom-min-width-100"
-                            >
-                                {t("SUBMIT")}
-                            </Button>
-                        </Modal.Footer>
-                    </React.Fragment>
-                )}
-            </CommonFormikComponent>
-        </Modal>
+                                        {files.length > 0 && (
+                                            <div>
+                                                <ul>
+                                                    {files.map((file, index) => (
+                                                        <li key={index} className="d-flex align-items-center">
+                                                            <span className="me-2">{file.name}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </Col>
+                                    <Col xs={12}>
+                                        <FormCheckbox
+                                            wrapperClassName="mb-0"
+                                            className='fs-6 fw-medium'
+                                            id="agreeDeclarations"
+                                            checked={formikProps.values.agreeDeclarations}
+                                            onBlur={formikProps.handleBlur}
+                                            onChange={formikProps.handleChange}
+                                            touched={formikProps.touched.agreeDeclarations}
+                                            error={formikProps.errors.agreeDeclarations}
+                                            type="checkbox"
+                                            label={t("AGREE_DECLARATIONS")}
+                                        />
+                                    </Col>
+                                </Row>
+                            </Modal.Body>
+                            <Modal.Footer className="border-top">
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={handleClose}
+                                    className="custom-min-width-100"
+                                >
+                                    {t("CANCEL")}
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    variant="warning"
+                                    className="custom-min-width-100"
+                                >
+                                    {t("SUBMIT")}
+                                </Button>
+                            </Modal.Footer>
+                        </React.Fragment>
+                    )}
+                </CommonFormikComponent>
+            </Modal>
+        </React.Fragment>
+
     )
 }
 

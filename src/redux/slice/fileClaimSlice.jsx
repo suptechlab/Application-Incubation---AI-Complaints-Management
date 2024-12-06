@@ -131,4 +131,21 @@ const fileClaimSlice = createSlice({
   },
 });
 
+// SUBMIT FILE CLAIM SECOND INSTANCE FORM
+export const fileClaimSecondInstanceForm = createAsyncThunk(
+  'fileClaimSecondInstanceForm',
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await ticketsApi.post(`${EndPoint.FILE_CLAIM_SECOND_INSTANCE}`, data);
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to file second instance claim!');
+      }
+      console.log('response', response)
+      return response; // RETURN RESPONSE
+    } catch (error) {
+      
+    }
+  }
+);
+
 export default fileClaimSlice.reducer;

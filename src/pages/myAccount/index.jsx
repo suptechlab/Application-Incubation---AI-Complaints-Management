@@ -62,14 +62,21 @@ export default function MyAccount() {
     setTicketModal(false);
   };
 
+  const handleCloseInstanceModal = () => {
+    setSelectedRow(null);
+    setInstanceModalShow(false);
+  };
 
 
-  const instanceClickHandler = () => {
-    setInstanceModalShow(true)
+
+  const instanceClickHandler = (row) => {
+    setSelectedRow(row);
+    setInstanceModalShow(true);
   }
 
-  const raisedComplaintClickHandler = () => {
-    setRaisedComplaintModalShow(true)
+  const raisedComplaintClickHandler = (row) => {
+    setSelectedRow(row);
+    setRaisedComplaintModalShow(true);
   }
   // The color class based on the status
   const getStatusClass = (status) => {
@@ -101,7 +108,7 @@ export default function MyAccount() {
         header: t("ENTITY_NAME"),
         enableSorting: false,
         cell: (rowData) => (
-          <span>{rowData.row.original.organization?.nemonicoTipoOrganizacion}</span>
+          <span>{rowData.row.original.organization?.razonSocial}</span>
         )
       },
       { accessorFn: (row) => row.claimType.name, id: 'claimType.name', header: t("CLAIM_TYPE"), enableSorting: false },
@@ -160,10 +167,10 @@ export default function MyAccount() {
         header: t("ACTIONS"),
         enableSorting: false,
         cell: (info) => {
-          const renderButton = (label, onClickHandler, textColorClass) => (
+          const renderButton = (label, onClickHandler) => (
             <Button
               variant="link"
-              className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none ${textColorClass}`}
+              className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none text-info`}
               aria-label={label}
               onClick={onClickHandler}
             >
@@ -175,11 +182,11 @@ export default function MyAccount() {
           let tooltipTitle = '';
           switch (info.row.original.instanceType) {
             case "FIRST_INSTANCE":
-              instanceButton = renderButton("FILE_SECOND_INSTANCE", instanceClickHandler, 'text-body text-opacity-50');
+              instanceButton = renderButton("FILE_SECOND_INSTANCE", instanceClickHandler(info.row.original));
               tooltipTitle = "FILE_SECOND_INSTANCE_TOOLTIP";
               break;
             case "SECOND_INSTANCE":
-              instanceButton = renderButton("RAISE_COMPLAINT", raisedComplaintClickHandler, 'text-info');
+              instanceButton = renderButton("RAISE_COMPLAINT", raisedComplaintClickHandler(info.row.original));
               tooltipTitle = "RAISE_COMPLAINT_TOOLTIP";
               break;
             case "COMPLAINT":
@@ -206,7 +213,7 @@ export default function MyAccount() {
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
                   aria-label={t("CHAT")}
-                  disabled={false}
+                  disabled={true}
                 >
                   <MdChatBubbleOutline size={24} />
                   <Badge
@@ -351,7 +358,8 @@ export default function MyAccount() {
       {/* Instance MODAL */}
       <InstanceModal
         handleShow={instanceModalShow}
-        handleClose={() => setInstanceModalShow(false)}
+        selectedRow={selectedRow}
+        handleClose={handleCloseInstanceModal}
       />
 
       {/* Raised Complaint MODAL */}

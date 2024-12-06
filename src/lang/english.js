@@ -110,7 +110,7 @@ export const englishLang = {
   "SEPS_HELPDESK": "SEPS Helpdesk",
   "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments",
   "RAISE_A_SECOND_INSTANCE_CLAIM": "Raise a 2nd Instance Claim",
-  "FIRST_INSTANCE_COMPLAINT_TICKET": "1st Instance Complaint Ticket*",
+  "FIRST_INSTANCE_COMPLAINT_TICKET": "1st Instance Complaint Ticket",
   "COMMENTS": "Comments*",
   "ATTACH_NEW_EVIDENCE": "Attach the new evidence",
   "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Multiple attachment can be uploaded.",
