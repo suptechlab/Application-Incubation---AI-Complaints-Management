@@ -55,6 +55,16 @@ public class MailService {
 
     private static final String STATUS = "status";
 
+    private static final String PREVIOUS_INSTANCE = "previousInstance";
+
+    private static final String PREVIOUS_STATUS = "previousStatus";
+
+    private static final String NEW_INSTANCE = "newInstance";
+
+    private static final String NEW_STATUS = "newStatus";
+
+    private static final String INSTANCE_COMMENT = "instanceComment";
+
     private final JHipsterProperties jHipsterProperties;
 
     private final JavaMailSender javaMailSender;
@@ -314,7 +324,31 @@ public class MailService {
     }
 
     @Async
-    public void sendSecondInstanceClaimEmail(UserClaimTicketDTO userClaimTicketDTO) {
-
+    public void sendSecondInstanceClaimEmail(UserClaimTicketDTO prevUserClaimTicketDTO, UserClaimTicketDTO userClaimTicketDTO) {
+        if (StringUtils.isBlank(userClaimTicketDTO.getUser().getEmail())) {
+            LOG.error("User email is missing or invalid. Cannot send claim ticket instance email.");
+            return;
+        }
+        LOG.debug("Preparing claim ticket instance creation email for user '{}'", userClaimTicketDTO.getUser().getName());
+        try {
+            MailDTO mailDTO = new MailDTO();
+            mailDTO.setLocale(userClaimTicketDTO.getUser().getLangKey());
+            mailDTO.setTo(userClaimTicketDTO.getUser().getEmail());
+            mailDTO.setTemplateKey("CLAIM_TICKET_INSTANCE");
+            Map<String, String> dataVariables = new HashMap<>();
+            dataVariables.put(USERNAME, userClaimTicketDTO.getUser().getName());
+            dataVariables.put(TICKET_NUMBER, userClaimTicketDTO.getTicketId().toString());
+            dataVariables.put(PREVIOUS_INSTANCE, enumUtil.getLocalizedEnumValue(prevUserClaimTicketDTO.getInstanceType(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(PREVIOUS_STATUS, enumUtil.getLocalizedEnumValue(prevUserClaimTicketDTO.getStatus(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(NEW_INSTANCE, enumUtil.getLocalizedEnumValue(userClaimTicketDTO.getInstanceType(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(NEW_STATUS, enumUtil.getLocalizedEnumValue(userClaimTicketDTO.getStatus(), Locale.forLanguageTag(userClaimTicketDTO.getUser().getLangKey())));
+            dataVariables.put(INSTANCE_COMMENT, userClaimTicketDTO.getSecondInstanceComment());
+            dataVariables.put(URL, userBaseUrl + "/my-account/" + userClaimTicketDTO.getTicketId().toString());
+            mailDTO.setDataVariables(dataVariables);
+            this.sendDynamicContentEmail(mailDTO);
+            LOG.info("Claim ticket instance email sent successfully to {}", userClaimTicketDTO.getUser().getEmail());
+        } catch (Exception e) {
+            LOG.error("Failed to send claim ticket instance email to {}: {}", userClaimTicketDTO.getUser().getEmail(), e.getMessage());
+        }
     }
 }

@@ -27,6 +27,8 @@ public class UserClaimTicketDocumentDTO {
 
     // Optionally, you can include the claimTicket or uploadedByUser as full objects if needed
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UserDTO implements Serializable {
         private Long id;
         private String name;
@@ -37,6 +39,8 @@ public class UserClaimTicketDocumentDTO {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ClaimTicketDTO implements Serializable {
         private Long id;
         private Long ticketId;

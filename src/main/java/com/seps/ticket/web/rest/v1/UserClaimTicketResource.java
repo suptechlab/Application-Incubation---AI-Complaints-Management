@@ -5,6 +5,7 @@ import com.seps.ticket.service.UserClaimTicketService;
 import com.seps.ticket.service.UserService;
 import com.seps.ticket.service.dto.ClaimStatusCountResponseDTO;
 import com.seps.ticket.service.dto.RequestInfo;
+import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.suptech.service.DocumentService;
@@ -20,6 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -40,14 +43,15 @@ public class UserClaimTicketResource {
 
     private final UserClaimTicketService userClaimTicketService;
     private final MailService mailService;
-    private final UserService userService;
     private final DocumentService documentService;
+    private final MessageSource messageSource;
 
-    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, UserService userService, DocumentService documentService) {
+    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService,
+                                   MessageSource messageSource) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
-        this.userService = userService;
         this.documentService = documentService;
+        this.messageSource = messageSource;
     }
 
     @Operation(
@@ -149,17 +153,23 @@ public class UserClaimTicketResource {
     })
     @PostMapping("/file-second-instance-claim")
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<UserClaimTicketDTO> fileSecondInstanceClaim(@ModelAttribute @Valid SecondInstanceRequest secondInstanceRequest,
-                                                                       HttpServletRequest httpServletRequest) {
+    public ResponseEntity<ResponseStatus> fileSecondInstanceClaim(@ModelAttribute @Valid SecondInstanceRequest secondInstanceRequest,
+                                                                  HttpServletRequest httpServletRequest) {
         Long id = secondInstanceRequest.getId();
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
+        UserClaimTicketDTO prevUserClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // File the claim
         userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
         // Retrieve the claim ticket
         UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // Send an email notification
-        mailService.sendSecondInstanceClaimEmail(userClaimTicketDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(userClaimTicketDTO);
+        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO,userClaimTicketDTO);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("second.instance.filed.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
     }
 
 }

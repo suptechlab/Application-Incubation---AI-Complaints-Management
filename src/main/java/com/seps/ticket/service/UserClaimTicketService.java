@@ -35,6 +35,7 @@ import org.zalando.problem.Status;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
 
@@ -540,18 +541,27 @@ public class UserClaimTicketService {
         claimTicketInstanceLog.setCreatedBy(currentUserId);
         claimTicketInstanceLogRepository.save(claimTicketInstanceLog);
 
-        // Retrieve existing documents (if any) and add new documents
-        List<ClaimTicketDocument> existingDocuments = claimTicket.getClaimTicketDocuments();
-        if (existingDocuments.isEmpty()) {
-            existingDocuments = new ArrayList<>();  // Initialize if no existing documents
-        }
-        existingDocuments.addAll(claimTicketDocuments);  // Add the new documents
         // Set the updated list of documents back to the claim ticket
-        claimTicket.setClaimTicketDocuments(existingDocuments);
+        List<ClaimTicketDocument> userClaimTicketDocumentList = claimTicketDocumentRepository.findAllByClaimTicketIdAndInternal(id, false);
+        List<ClaimTicketDocument> claimTicketDocumentList = claimTicketDocumentRepository.findAllByClaimTicketId(id);
+        // Convert user claim ticket documents to UserClaimTicketDTO
+        List<UserClaimTicketDocumentDTO> userClaimTicketDTOList = userClaimTicketDocumentList.stream()
+            .map(this::convertToUserClaimTicketDocumentDTO)
+            .collect(Collectors.toList());
+        // Convert claim ticket documents to ClaimTicketDTO
+        List<ClaimTicketDocumentDTO> claimTicketDTOList = claimTicketDocumentList.stream()
+            .map(this::convertToClaimTicketDocumentDTO)
+            .collect(Collectors.toList());
+
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketMapper.toUserClaimTicketDTO(claimTicket);
+        ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+
+        userClaimTicketDTO.setClaimTicketDocuments(userClaimTicketDTOList);
+        claimTicketDTO.setClaimTicketDocuments(claimTicketDTOList);
 
         //New Data
-        activityData.put(Constants.NEW_DATA, convertEntityToMap(userClaimTicketMapper.toUserClaimTicketDTO(claimTicket)));
-        auditData.put(Constants.NEW_DATA, claimTicketMapper.toDTO(claimTicket));
+        activityData.put(Constants.NEW_DATA, convertEntityToMap(userClaimTicketDTO));
+        auditData.put(Constants.NEW_DATA, claimTicketDTO);
 
         // Perform additional logging and auditing actions
         logActivityAndAuditOfSecondInstance(claimTicket, activityData, auditData, secondInstanceRequest, requestInfo, currentUser);
@@ -614,4 +624,92 @@ public class UserClaimTicketService {
         secondInstanceRequestForJson.setAttachments(attachments);
         return secondInstanceRequestForJson;
     }
+
+    // Conversion method for UserClaimTicketDocumentDTO
+    private UserClaimTicketDocumentDTO convertToUserClaimTicketDocumentDTO(ClaimTicketDocument document) {
+        UserClaimTicketDocumentDTO dto = new UserClaimTicketDocumentDTO();
+        dto.setId(document.getId());
+        dto.setClaimTicketId(document.getClaimTicketId());
+        dto.setOriginalTitle(document.getOriginalTitle());
+        dto.setSource(document.getSource());
+        dto.setInstanceType(document.getInstanceType());
+        dto.setUploadedBy(document.getUploadedBy());
+        dto.setUploadedAt(document.getUploadedAt());
+        // Populate the ClaimTicketDTO
+        if (document.getClaimTicket() != null) {
+            dto.setClaimTicket(new UserClaimTicketDocumentDTO.ClaimTicketDTO(
+                document.getClaimTicket().getId(),
+                document.getClaimTicket().getTicketId()
+            ));
+        }
+        // Populate the UploadedByUser (if available)
+        if (document.getUploadedByUser() != null) {
+            Set<String> authorities = document.getUploadedByUser().getAuthorities() != null
+                ? document.getUploadedByUser().getAuthorities().stream()
+                .map(Authority::getName) // Ensure Authority has a getName() method
+                .collect(Collectors.toSet())
+                : null;
+
+            dto.setUploadedByUser(new UserClaimTicketDocumentDTO.UserDTO(
+                document.getUploadedByUser().getId(),
+                document.getUploadedByUser().getFirstName(),
+                document.getUploadedByUser().getEmail(),
+                document.getUploadedByUser().getLangKey(),
+                document.getUploadedByUser().getStatus(),
+                authorities
+            ));
+        }
+        return dto;
+    }
+
+
+    private ClaimTicketDocumentDTO convertToClaimTicketDocumentDTO(ClaimTicketDocument document) {
+        ClaimTicketDocumentDTO dto = new ClaimTicketDocumentDTO();
+        dto.setId(document.getId());
+        dto.setClaimTicketId(document.getClaimTicketId());
+        dto.setExternalDocumentId(document.getExternalDocumentId());
+        dto.setTitle(document.getTitle());
+        dto.setOriginalTitle(document.getOriginalTitle());
+        dto.setSource(document.getSource());
+        dto.setInstanceType(document.getInstanceType());
+        dto.setInternal(document.getInternal());
+        dto.setUploadedBy(document.getUploadedBy());
+        dto.setUploadedAt(document.getUploadedAt());
+        // Populate the ClaimTicketDTO
+        if (document.getClaimTicket() != null) {
+            dto.setClaimTicket(new ClaimTicketDocumentDTO.ClaimTicketDTO(
+                document.getClaimTicket().getId(),
+                document.getClaimTicket().getTicketId()
+            ));
+        }
+        // Populate the UploadedByUser
+        if (document.getUploadedByUser() != null) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(document.getUploadedByUser().getId());
+            userDTO.setLogin(document.getUploadedByUser().getLogin());
+            userDTO.setName(document.getUploadedByUser().getFirstName());
+            userDTO.setEmail(document.getUploadedByUser().getEmail());
+            userDTO.setImageUrl(document.getUploadedByUser().getImageUrl());
+            userDTO.setActivated(document.getUploadedByUser().isActivated());
+            userDTO.setLangKey(document.getUploadedByUser().getLangKey());
+            userDTO.setCountryCode(document.getUploadedByUser().getCountryCode());
+            userDTO.setPhoneNumber(document.getUploadedByUser().getPhoneNumber());
+            userDTO.setStatus(document.getUploadedByUser().getStatus());
+            userDTO.setIdentificacion(document.getUploadedByUser().getIdentificacion());
+            userDTO.setGender(document.getUploadedByUser().getGender());
+            userDTO.setFingerprintVerified(document.getUploadedByUser().isFingerprintVerified());
+            userDTO.setFingerprintVerifiedAt(document.getUploadedByUser().getFingerprintVerifiedAt());
+            // Convert authorities to a set of names
+            if (document.getUploadedByUser().getAuthorities() != null) {
+                userDTO.setAuthorities(
+                    document.getUploadedByUser().getAuthorities().stream()
+                        .map(Authority::getName) // Ensure Authority has a getName() method
+                        .collect(Collectors.toSet())
+                );
+            }
+            dto.setUploadedByUser(userDTO);
+        }
+        return dto;
+    }
+
 }

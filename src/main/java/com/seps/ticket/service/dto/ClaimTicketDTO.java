@@ -51,4 +51,6 @@ public class ClaimTicketDTO {
     private List<ClaimTicketDocumentDTO> claimTicketDocuments; // Added this line to include documents in DTO
     private Long sepsAgentId;
     private UserDTO sepsAgent;
+    private String secondInstanceComment;
+    private Instant secondInstanceFiledAt;
 }
