@@ -231,6 +231,21 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok(responseStatus);
     }
 
+    // Swagger documentation for reply-to-customer endpoint
+    @Operation(
+        summary = "Reply to Customer",
+        description = "Allows a user to reply to a customer's ticket, optionally attaching files."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully replied to the customer's ticket.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResponseStatus.class)
+            )
+        )
+    })
     @PostMapping("/{ticketId}/reply-to-customer")
     public ResponseEntity<ResponseStatus> replyToCustomer(@PathVariable Long ticketId,
         @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
@@ -238,6 +253,33 @@ public class SepsAndFiClaimTicketResource {
         sepsAndFiClaimTicketService.replyToCustomer(ticketId, claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.replied.to.customer.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
+
+    @Operation(
+        summary = "Reply to Internal",
+        description = "Allows a user to reply to internal ticket discussions, optionally attaching files."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully replied to the internal discussion.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResponseStatus.class)
+            )
+        )
+    })
+    @PostMapping("/{ticketId}/reply-to-internal")
+    public ResponseEntity<ResponseStatus> replyToInternal(@PathVariable Long ticketId,
+                                                          @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        // Call service method to handle the reply
+        sepsAndFiClaimTicketService.replyToInternal(ticketId, claimTicketReplyRequest);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.replied.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
             System.currentTimeMillis()
         );
