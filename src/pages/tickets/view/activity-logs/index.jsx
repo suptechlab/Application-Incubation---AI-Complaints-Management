@@ -6,7 +6,8 @@ import defaultAvatar from "../../../../assets/images/default-avatar.jpg";
 import { ticketActivityLogs } from "../../../../services/ticketmanagement.service";
 import toast from "react-hot-toast";
 import moment from "moment";
-const ActivityLogs = ({ setLoading, ticketId }) => {
+import { isHTML } from "../../../../utils/commonutils";
+const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
 
   const [ticketActivity, setTicketActivity] = useState([])
 
@@ -34,15 +35,21 @@ const ActivityLogs = ({ setLoading, ticketId }) => {
     ticketActivityLogs(ticketId, params).then(response => {
       if (response?.data) {
         const logData = response?.data?.map((activity, index) => {
-          console.log({ Transformed: replaceLinkedUserPlaceholders(activity.activityTitle, activity.linkedUsers) })
+          const text = activity?.activityDetails?.text || ""; // Safely extract text
+          const containsHTML = isHTML(text);
+
           return {
-            id: activity?.ticketId,
+            id: index,
             // name: activity?.activityDetails?.performBy?.name ? getPerformerName(activity?.activityDetails?.performBy?.name, activity?.activityType) : "",
             action: replaceLinkedUserPlaceholders(activity.activityTitle, activity.linkedUsers),
             date: moment(activity?.performedAt).format("DD-MM-YYYY | hh:mm:a"),
-            message: <>{activity?.activityDetails?.text}</>,
-            avatar: activity?.user?.imageUrl ??  defaultAvatar,
-            variant: '',
+            message: <> {containsHTML ? (
+              <p className="text-justify" dangerouslySetInnerHTML={{ __html: text }} />
+            ) : (
+              <p className="text-justify">{text}</p>
+            )}</>,
+            avatar: activity?.user?.imageUrl ?? defaultAvatar,
+            variant: activity?.activityType ?? '',
           }
         })
         setTicketActivity(logData)
@@ -59,11 +66,10 @@ const ActivityLogs = ({ setLoading, ticketId }) => {
     })
   }
 
-  console.log(ticketActivity)
 
   useEffect(() => {
     getTicketActivityLogs()
-  }, [ticketId])
+  }, [ticketId, isGetActivityLogs])
 
 
   //Chat Reply Data
@@ -120,7 +126,7 @@ const ActivityLogs = ({ setLoading, ticketId }) => {
     switch (status) {
       case 'RESOLVED':
         return 'bg-custom-pink p-2 rounded';
-      case 'IN_PROGRESS':
+      case 'INTERNAL_NOTE':
         return 'bg-custom-yellow p-2 rounded';
       case 'NEW':
         return 'bg-custom-primary p-2 rounded';
@@ -139,7 +145,7 @@ const ActivityLogs = ({ setLoading, ticketId }) => {
               <Col xs="auto">
                 <Image
                   className="object-fit-cover rounded-circle"
-                  src={ reply.avatar}
+                  src={reply.avatar}
                   width={36}
                   height={36}
                   alt={reply?.name}

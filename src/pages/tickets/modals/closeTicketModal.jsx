@@ -10,7 +10,7 @@ import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticketmanagement.service";
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
-const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
+const CloseTicketModal = ({ modal, toggle ,ticketId,setSelectedStatus},) => {
     const { t } = useTranslation();
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
@@ -43,6 +43,7 @@ const CloseTicketModal = ({ modal, toggle ,ticketId}) => {
           };
           ticketCloseStatus(ticketId, formData)
             .then((response) => {
+                setSelectedStatus('CLOSED');
               toast.success(response?.data?.message);
               toggle()
             })

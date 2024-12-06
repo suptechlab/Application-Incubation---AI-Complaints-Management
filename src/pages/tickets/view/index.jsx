@@ -14,23 +14,50 @@ import { changeTicketPriority, ticketDetailsApi } from '../../../services/ticket
 import toast from 'react-hot-toast';
 import moment from 'moment/moment';
 import ActivityLogs from './activity-logs';
+import { useContext } from 'react';
+import { AuthenticationContext } from '../../../contexts/authentication.context';
+import { MasterDataContext } from '../../../contexts/masters.context';
 
 const TicketsView = () => {
-  const [selectedPriority, setSelectedPriority] = useState('Low');
+
+  const { userData } = useContext(AuthenticationContext);
+
+  const { masterData } = useContext(MasterDataContext);
+
+  const { authorities = [], roles = [] } = userData || {};
+
+  const [currentUser, setCurrentUser] = useState([])
+
+  const [isGetActivityLogs , setIsGetAcitivityLogs] = useState(true)
+
+  const [selectedPriority, setSelectedPriority] = useState('LOW');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
-  const [loading , setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const { id } = useParams()
 
   const [ticketData, setTicketData] = useState({})
 
+  useEffect(() => {
+    if (roles?.length > 0) {
+      const roleMap = {
+        'Fi Admin': 'FI_ADMIN',
+        'Fi Agent': 'FI_AGENT',
+        'SEPS Admin': 'SEPS_ADMIN',
+        'SEPS Agent': 'SEPS_AGENT',
+      };
+      const roleName = roles[0]?.name;
+      setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
+    }
+  }, [authorities])
+
+
   // Function to handle dropdown item selection
   const handleSelect = (priority) => {
-    
     setLoading(true)
     if (priority && priority !== '') {
-      changeTicketPriority(id,priority).then(response => {
+      changeTicketPriority(id, priority).then(response => {
         setSelectedPriority(priority);
       }).catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -38,7 +65,7 @@ const TicketsView = () => {
         } else {
           toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
         }
-      }).finally(()=>{
+      }).finally(() => {
         setLoading(false)
       })
     }
@@ -58,7 +85,7 @@ const TicketsView = () => {
       } else {
         toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
       }
-    }).finally(()=>{
+    }).finally(() => {
       setLoading(false)
     })
   }
@@ -114,28 +141,34 @@ const TicketsView = () => {
       value: (<Stack direction='horizontal' gap={1}>
         {/* <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> */}
         {/* Dropdown FILTER */}
-        <Dropdown>
-          <Dropdown.Toggle
-            variant="link"
-            id="filter-dropdown"
-            className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
-          >
-            <AppTooltip title="Change Priority" placement="top">
-              <span><span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> <MdArrowDropDown size={14} /></span>
-            </AppTooltip>
-          </Dropdown.Toggle>
-          <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
-            {priorityOptions?.map((priority) => (
-              <Dropdown.Item
-                key={priority}
-                className={`small ${selectedPriority === priority ? 'active' : ''}`}
-                onClick={() => handleSelect(priority)}
+
+        {
+          currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" ?
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="link"
+                id="filter-dropdown"
+                className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
               >
-                {priority}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
+                <AppTooltip title="Change Priority" placement="top">
+                  <span><span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> <MdArrowDropDown size={14} /></span>
+                </AppTooltip>
+              </Dropdown.Toggle>
+              <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
+                {priorityOptions?.map((priority) => (
+                  <Dropdown.Item
+                    key={priority}
+                    className={`small ${selectedPriority === priority ? 'active' : ''}`}
+                    onClick={() => handleSelect(priority)}
+                  >
+                    {priority}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown> :
+            <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span>
+        }
+
       </Stack>),
       colProps: { sm: 6 }
     },
@@ -210,6 +243,7 @@ const TicketsView = () => {
         <TicketViewHeader
           title={"#" + ticketData?.ticketId}
           ticketData={ticketData}
+          currentUser={currentUser}
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -225,23 +259,27 @@ const TicketsView = () => {
                   </Row>
                 </Card.Body>
               </Card>
-              <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
-                <Card.Body className='mh-100'>
-                  <h5 className='custom-font-size-18 fw-semibold mb-3'>2nd Instance Claim details</h5>
-                  <Row>
-                    {viewBottomData?.map((item, index) => (
-                      <Col key={"data_view_" + index} {...item.colProps}>
-                        <CommonViewData label={item.label} value={item.value} />
-                      </Col>
-                    ))}
-                  </Row>
-                </Card.Body>
-              </Card>
+              {
+                ticketData?.instanceType === 'SECOND_INSTANCE' &&
+                <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                  <Card.Body className='mh-100'>
+                    <h5 className='custom-font-size-18 fw-semibold mb-3'>2nd Instance Claim details</h5>
+                    <Row>
+                      {viewBottomData?.map((item, index) => (
+                        <Col key={"data_view_" + index} {...item.colProps}>
+                          <CommonViewData label={item.label} value={item.value} />
+                        </Col>
+                      ))}
+                    </Row>
+                  </Card.Body>
+                </Card>
+              }
+
             </Col>
             <Col lg={6} className='mh-100 d-flex flex-column'>
               <Card className="border-0 shadow">
                 <Card.Header className='bg-body border-0 py-3'>
-                {/* REPLY SECTION */}
+                  {/* REPLY SECTION */}
                   <Row className='g-2'>
                     <Col xs="auto">
                       <Image
@@ -256,14 +294,14 @@ const TicketsView = () => {
                       <div className='fw-bold'>{ticketData?.user?.name}th</div>
                       <Stack direction='horizontal' gap={2} className='text-secondary'>
                         <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                        <span> {moment().format("DD-MM-YYYY | hh:mm:a") } </span>
+                        <span> {moment().format("DD-MM-YYYY | hh:mm:a")} </span>
                       </Stack>
                     </Col>
                   </Row>
                 </Card.Header>
-                <TicketTabsSection ticketId={ticketData?.id}/>
+                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs}/>
               </Card>
-              <ActivityLogs setLoading = {setLoading} ticketId ={id}/>
+              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs}/>
 
               {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
@@ -303,6 +341,7 @@ const TicketsView = () => {
         modal={userInfoModalShow}
         userData={ticketData}
         toggle={() => setUserInfoModalShow(false)}
+        masterData={masterData}
       />
 
       {/* Attachments Modals */}
@@ -310,7 +349,7 @@ const TicketsView = () => {
         modal={attachmentsModalShow}
         toggle={() => setAttachmentsModalShow(false)}
       />
-     
+
 
     </React.Fragment>
   )

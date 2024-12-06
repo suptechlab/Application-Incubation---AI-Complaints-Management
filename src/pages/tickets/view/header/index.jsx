@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Badge, Button, Dropdown, Stack } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { MdSchedule } from "react-icons/md";
+import { MdMoreVert, MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import ReactSelect from '../../../../components/ReactSelect';
 import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent } from '../../../../services/ticketmanagement.service';
@@ -12,9 +12,17 @@ import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
+import { calculateDaysDifference } from '../../../../utils/commonutils';
+import { MasterDataContext } from '../../../../contexts/masters.context';
+import { useContext } from 'react';
+import AppTooltip from '../../../../components/tooltip';
 
-const TicketViewHeader = ({ title = "", ticketData }) => {
+const TicketViewHeader = ({ title = "", ticketData, currentUser }) => {
+
     const { t } = useTranslation();
+
+    const { masterData } = useContext(MasterDataContext)
+
     const [agentList, setAgentListing] = useState([])
     const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);
     const [addAttachmentsModalShow, setAddAttachmentsModalShow] = useState(false);
@@ -26,17 +34,19 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
     const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
     const handleSelect = (status) => {
-        setSelectedStatus(status);
+        // setSelectedStatus(status);
 
         if (status === "CLOSED") {
             setCloseTicketModalShow(true)
-        }else if (status === "REJECTED"){
+        } else if (status === "REJECTED") {
             setRejectTicketModalShow(true)
         }
     };
 
     // The color class based on the status
-    const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
+    // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
+
+    const statusOptions = [{label :'CLOSE' , value : 'CLOSE'}, {label : 'REJECT',value :'REJECT'}];
     const getStatusClass = (status) => {
         switch (status) {
             case 'CLOSED':
@@ -63,16 +73,7 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
         setAddAttachmentsModalShow(true)
     }
     // Custom function to display "remaining" for future dates
-    const timeRemaining = (date) => {
-        const now = moment();
-        const targetDate = moment(date);
 
-        if (targetDate.isAfter(now)) {
-            return `${targetDate.toNow(true)} remaining`; // 'true' omits 'in'/'ago'
-        } else {
-            return `${targetDate.fromNow()}`; // Uses default format for past dates
-        }
-    };
 
     // Handle Date Extension Click
     const handleDateExtensionClick = () => {
@@ -83,6 +84,7 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
         setLoading(true)
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
+            if (currentUser === "SEPS_ADMIN") { }
             agentTicketToSEPSagent(agentId).then(response => {
                 toast.success(t("TICKETS ASSIGNED"));
 
@@ -95,19 +97,21 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
             }).finally(() => {
                 setLoading(false)
             })
+        } else if (currentUser === "FI_ADMIN") {
+            agentTicketToFIagent(agentId).then(response => {
+                toast.success(t("TICKETS ASSIGNED"));
 
-            // agentTicketToFIagent(agentId).then(response => {
-            //     toast.success(t("TICKETS ASSIGNED"));
-
-            // }).catch((error) => {
-            //     if (error?.response?.data?.errorDescription) {
-            //         toast.error(error?.response?.data?.errorDescription);
-            //     } else {
-            //         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-            //     }
-            // }).finally(() => {
-            //     setLoading(false)
-            // })
+            }).catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                }
+            }).finally(() => {
+                setLoading(false)
+            })
+        } else {
+            toast.warning("You are not allowed to assign tickets.")
         }
     }
 
@@ -132,6 +136,8 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
     useEffect(() => {
         getAgentDropdownListing()
     }, [])
+
+
     return (
         <React.Fragment>
             <div className="pb-3">
@@ -142,13 +148,18 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                 >
                     <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
                         {title}
-                        {ticketData?.slaBreachDate && <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                            <MdSchedule size={16} />
-                            <span className='custom-font-size-13 fw-normal'>{timeRemaining(ticketData?.slaBreachDate)}</span>
-                        </Badge>}
+                        {ticketData?.slaBreachDate &&
+                            calculateDaysDifference(ticketData?.slaBreachDate) > 2 ?
+                            <Badge bg='custom-info' className='bg-opacity-10 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                <MdSchedule size={16} />
+                                <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + " Days remaining"}</span>
+                            </Badge> : <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                <MdSchedule size={16} />
+                                <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + " Days remaining"}</span>
+                            </Badge>}
 
                         <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                            <span className='custom-font-size-13'>Second Instance</span>
+                            <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
                         </Badge>
                     </h1>
 
@@ -200,17 +211,17 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
                                 variant="info"
                                 className={`bg-opacity-25 custom-min-width-130 border-0 ${getStatusClass(selectedStatus)}`}
                             >
-                                <span className='me-2'>{selectedStatus}</span>
+                                <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>
                                 {statusOptions?.map((status) => (
                                     <Dropdown.Item
-                                        key={status}
+                                        key={status?.value}
                                         className={`small ${selectedStatus === status ? 'active' : ''}`}
-                                        onClick={() => handleSelect(status)}
+                                        onClick={() => handleSelect(status?.value)}
                                     >
-                                        {status}
+                                        {status?.label}
                                     </Dropdown.Item>
                                 ))}
                             </Dropdown.Menu>
@@ -253,11 +264,13 @@ const TicketViewHeader = ({ title = "", ticketData }) => {
             <CloseTicketModal
                 ticketId={ticketData?.id}
                 modal={closeTicketModalShow}
+                setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
             />
             <RejectTicketModal
                 ticketId={ticketData?.id}
                 modal={rejectTicketModalShow}
+                setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
             />
         </React.Fragment>

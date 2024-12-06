@@ -3,7 +3,7 @@ import { Nav, Stack, Tab } from 'react-bootstrap';
 import { MdOutlineNote, MdOutlineNoteAdd, MdOutlineReply } from 'react-icons/md';
 import ReplyTab from './reply-tab';
 
-const TicketTabsSection = ({ticketId}) => {
+const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs}) => {
     const [activeTab, setActiveTab] = useState('replies');
 
     //Handle Dropdown Select
@@ -21,7 +21,7 @@ const TicketTabsSection = ({ticketId}) => {
             id: 'replies',
             name: 'Replies',
             tabIcon: <MdOutlineReply size={14} />,
-            Component: <ReplyTab ticketId={ticketId}/>,
+            Component: <ReplyTab ticketId={ticketId} setIsGetAcitivityLogs={setIsGetAcitivityLogs}/>,
             disabled: false,
         },
         // {

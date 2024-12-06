@@ -4,7 +4,7 @@ import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from "../../../components/CommonViewData";
 import Loader from "../../../components/Loader";
 
-const UserInfoModal = ({ userData, modal, toggle }) => {
+const UserInfoModal = ({ userData, modal, toggle,masterData }) => {
 
     // PHONE NO AND NATIONAL ID IS PENDING IN THIS
     // Info Modal Data
@@ -21,7 +21,7 @@ const UserInfoModal = ({ userData, modal, toggle }) => {
         },
         {
             label: "Phone",
-            value: "+593 XX XXX XXXX",
+            value: userData?.user?.countryCode + " " + userData?.user?.phoneNumber,
             colProps: { sm: 6, lg: 4 }
         },
         {
@@ -36,12 +36,12 @@ const UserInfoModal = ({ userData, modal, toggle }) => {
         },
         {
             label: "Priority care group",
-            value: userData?.priorityCareGroup,
+            value: masterData?.priorityCareGroup[userData?.priorityCareGroup],
             colProps: { sm: 6, lg: 4 }
         },
         {
             label: "Customer Type",
-            value: userData?.customerType,
+            value: masterData?.customerType[userData?.customerType],
             colProps: { xs: 12 }
         },
     ];

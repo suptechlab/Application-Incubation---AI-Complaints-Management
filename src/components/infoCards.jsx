@@ -5,25 +5,9 @@ import toast from 'react-hot-toast';
 import { MdAttachFile, MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 
 
-const InfoCards = ({ rowClassName = 'g-3 g-lg-4' }) => {
+const InfoCards = ({claimStatsData , rowClassName = 'g-3 g-lg-4' }) => {
 
 
-  const [claimStatsData, setClaimsStatsData] = useState([])
-
-  // Info Cards Data
-
-  // GET CLAIM TYPE DROPDOWN LIST
-  const getClaimTypeStatsData = () => {
-    ticketOverviewAPI().then(response => {
-      setClaimsStatsData(response?.data)
-    }).catch((error) => {
-      if (error?.response?.data?.errorDescription) {
-        toast.error(error?.response?.data?.errorDescription);
-      } else {
-        toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
-      }
-    })
-  }
   const cardsData = [
     {
       bgColor: 'bg-primary',
@@ -56,9 +40,6 @@ const InfoCards = ({ rowClassName = 'g-3 g-lg-4' }) => {
   ];
 
 
-  useEffect(() => {
-    getClaimTypeStatsData()
-  }, [])
 
 
   return (

@@ -10,20 +10,20 @@ import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus, ticketRejectStatus } from "../../../services/ticketmanagement.service";
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
-const RejectTicketModal = ({ modal, toggle ,ticketId}) => {
+const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus }) => {
     const { t } = useTranslation();
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
-    const {masterData} = useContext(MasterDataContext)
+    const { masterData } = useContext(MasterDataContext)
 
-    const [subStatus , setSubStatus] = useState([])
+    const [subStatus, setSubStatus] = useState([])
 
-    useEffect(()=>{
-        if(masterData?.rejectedStatus){
-            const rejectStatus  = convertToLabelValue(masterData?.rejectedStatus)
+    useEffect(() => {
+        if (masterData?.rejectedStatus) {
+            const rejectStatus = convertToLabelValue(masterData?.rejectedStatus)
             setSubStatus(rejectStatus)
         }
-    },[masterData])
+    }, [masterData])
 
     //Handle File Change
     const handleFileChange = (event) => {
@@ -40,21 +40,22 @@ const RejectTicketModal = ({ modal, toggle ,ticketId}) => {
         const formData = {
             reason: values?.reason,
             rejectedStatus: values?.rejectedStatus,
-          };
-          ticketRejectStatus(ticketId, formData)
+        };
+        ticketRejectStatus(ticketId, formData)
             .then((response) => {
-              toast.success(response?.data?.message);
-              toggle()
+                setSelectedStatus('REJECTED');
+                toast.success(response?.data?.message);
+                toggle()
             })
             .catch((error) => {
-              if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription);
-              } else {
-                toast.error(error?.message);
-              }
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
             })
             .finally(() => {
-              actions.setSubmitting(false);
+                actions.setSubmitting(false);
             });
     };
 
@@ -111,12 +112,12 @@ const RejectTicketModal = ({ modal, toggle ,ticketId}) => {
                                 label="Sub-status"
                                 error={errors.rejectedStatus}
                                 options={[
-                                        { label: t("SELECT"), value: "" },
-                                        ...subStatus.map((group) => ({
-                                            label: group.label,
-                                            value: group.value,
-                                        })),
-                                    ]}
+                                    { label: t("SELECT"), value: "" },
+                                    ...subStatus.map((group) => ({
+                                        label: group.label,
+                                        value: group.value,
+                                    })),
+                                ]}
                                 value={values.rejectedStatus}
                                 onChange={(option) => {
                                     setFieldValue(

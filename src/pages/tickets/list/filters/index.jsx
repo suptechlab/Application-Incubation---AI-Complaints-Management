@@ -129,7 +129,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                                 }}
                                 value={selectedAgent ?? null}
                             />
-                        </div> : currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT'  ? <Button
+                        </div> : currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT' ? <Button
                             type="button"
                             variant="warning"
                             onClick={returnToAdminClick}
@@ -139,65 +139,73 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         </Button> : ''
                 }
 
-                {/* <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder="Claim Type"
-                        id="floatingSelect"
-                        size="sm"
-                        options={[
-                            {
-                                label: "Claim Type",
-                                value: "",
-                            },
-                            ...claimTypes
-                        ]}
-                        onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                claimTypeId: e.target.value,
-                            });
-                        }}
-                        value={filter?.claimTypeId}
-                    />
-                </div> */}
+                {
+                    currentUser === "FI_AGENT" &&
+                    <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                        <ReactSelect
+                            wrapperClassName="mb-0"
+                            class="form-select "
+                            placeholder="Claim Type"
+                            id="floatingSelect"
+                            size="sm"
+                            options={[
+                                {
+                                    label: "Claim Type",
+                                    value: "",
+                                },
+                                ...claimTypes
+                            ]}
+                            onChange={(e) => {
+                                setFilter({
+                                    ...filter,
+                                    claimTypeId: e.target.value,
+                                });
+                            }}
+                            value={filter?.claimTypeId}
+                        />
+                    </div>
+                }
 
-                <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder={t("PRIORITY")}
-                        id="floatingSelect"
-                        size="sm"
-                        options={[
-                            {
-                                label: t("PRIORITY"),
-                                value: "",
-                                class: "label-class",
-                            },
-                            {
-                                label: t("LOW"),
-                                value: "LOW",
-                            },
-                            {
-                                label: t("MEDIUM"),
-                                value: "MEDIUM",
-                            },
-                            {
-                                label: t("HIGH"),
-                                value: "HIGH",
-                            }
-                        ]}
-                        onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                claimTicketPriority: e.target.value,
-                            });
-                        }}
-                        value={filter?.claimTicketPriority}
-                    />
-                </div>
+                {
+                    currentUser !== "FI_AGENT" &&
+                    <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                        <ReactSelect
+                            wrapperClassName="mb-0"
+                            class="form-select "
+                            placeholder={t("PRIORITY")}
+                            id="floatingSelect"
+                            size="sm"
+                            options={[
+                                {
+                                    label: t("PRIORITY"),
+                                    value: "",
+                                    class: "label-class",
+                                },
+                                {
+                                    label: t("LOW"),
+                                    value: "LOW",
+                                },
+                                {
+                                    label: t("MEDIUM"),
+                                    value: "MEDIUM",
+                                },
+                                {
+                                    label: t("HIGH"),
+                                    value: "HIGH",
+                                }
+                            ]}
+                            onChange={(e) => {
+                                setFilter({
+                                    ...filter,
+                                    claimTicketPriority: e.target.value,
+                                });
+                            }}
+                            value={filter?.claimTicketPriority}
+                        />
+                    </div>
+                }
+
+
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect
                         wrapperClassName="mb-0"

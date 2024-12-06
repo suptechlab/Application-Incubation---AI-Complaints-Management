@@ -9,10 +9,12 @@ import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
+import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTicketList, ticketOverviewAPI } from "../../../services/ticketmanagement.service";
 import AttachmentsModal from "../modals/attachmentsModal";
 import TicketsListFilters from "./filters";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
+import { calculateDaysDifference } from "../../../utils/commonutils";
+import moment from "moment/moment";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -49,6 +51,9 @@ export default function TicketsList() {
     const [ticketIdsArr, setTicketIdsArr] = useState([]);
 
     const [clearTableSelection, setClearTableSelection] = useState(false)
+
+    const [claimStatsData, setClaimsStatsData] = useState([])
+
 
     useEffect(() => {
         if (roles?.length > 0) {
@@ -223,6 +228,10 @@ export default function TicketsList() {
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+                        {/* {
+                            <MdAttachFile size={16} />
+                        } */}
+
                         {/* <AppTooltip title="Attachments">
                             <Button
                                 variant="link"
@@ -242,7 +251,7 @@ export default function TicketsList() {
                 header: () => "Creation Date",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    row?.original?.createdAt
+                    row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
                 ),
             },
             {
@@ -261,10 +270,13 @@ export default function TicketsList() {
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row?.slaBreachDays,
-                id: "slaBreachDays",
+                accessorFn: (row) => row?.slaBreachDate,
+                id: "slaBreachDate",
                 header: () => "SLA",
                 enableSorting: true,
+                cell: ({ row }) => (
+                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+                )
             },
             {
                 accessorFn: (row) => row?.status,
@@ -357,7 +369,7 @@ export default function TicketsList() {
                 header: () => "Creation Date",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    row?.original?.createdAt
+                    row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
                 )
             },
             {
@@ -375,10 +387,13 @@ export default function TicketsList() {
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row?.slaBreachDays,
-                id: "slaBreachDays",
+                accessorFn: (row) => row?.slaBreachDate,
+                id: "slaBreachDate",
                 header: () => "SLA",
                 enableSorting: true,
+                cell: ({ row }) => (
+                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+                )
             },
             {
                 accessorFn: (row) => row?.status,
@@ -472,7 +487,7 @@ export default function TicketsList() {
                 header: () => "Creation Date",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    row?.original?.createdAt
+                     row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
                 )
             },
             {
@@ -490,14 +505,17 @@ export default function TicketsList() {
                 enableSorting: false,
                 cell: ({ row }) => (
                     // console.log({row :  row})
-                   <span>{ row?.original?.fiAgent?.name}</span>
+                    <span>{row?.original?.fiAgent?.name}</span>
                 )
             },
             {
-                accessorFn: (row) => row?.slaBreachDays,
-                id: "slaBreachDays",
+                accessorFn: (row) => row?.slaBreachDate,
+                id: "slaBreachDate",
                 header: () => "SLA",
                 enableSorting: true,
+                cell: ({ row }) => (
+                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+                )
             },
             {
                 accessorFn: (row) => row?.priority,
@@ -529,7 +547,6 @@ export default function TicketsList() {
         []
     );
 
-
     const handleTicketAssignment = (agentId) => {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
@@ -540,6 +557,7 @@ export default function TicketsList() {
                     setClearTableSelection(true)
                     setTicketIdsArr([])
                     dataQuery.refetch()
+                    getClaimTypeStatsData()
                 }).catch((error) => {
                     if (error?.response?.data?.errorDescription) {
                         toast.error(error?.response?.data?.errorDescription);
@@ -556,6 +574,7 @@ export default function TicketsList() {
                     setClearTableSelection(true)
                     setTicketIdsArr([])
                     dataQuery.refetch()
+                    getClaimTypeStatsData()
                 }).catch((error) => {
                     if (error?.response?.data?.errorDescription) {
                         toast.error(error?.response?.data?.errorDescription);
@@ -599,6 +618,27 @@ export default function TicketsList() {
     };
     // Inside your component, dynamically decide the columns
     const columns = getColumnsForUser(currentUser);
+
+
+    // Info Cards Data
+
+    // GET CLAIM TYPE DROPDOWN LIST
+    const getClaimTypeStatsData = () => {
+        ticketOverviewAPI().then(response => {
+            setClaimsStatsData(response?.data)
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        })
+    }
+
+    useEffect(() => {
+        getClaimTypeStatsData()
+    }, [])
+
     return (
         <React.Fragment>
             <Loader isLoading={loading} />
@@ -610,7 +650,7 @@ export default function TicketsList() {
                     ]}
                 />
                 <div className="info-cards mb-3">
-                    <InfoCards />
+                    <InfoCards claimStatsData={claimStatsData} />
                 </div>
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">

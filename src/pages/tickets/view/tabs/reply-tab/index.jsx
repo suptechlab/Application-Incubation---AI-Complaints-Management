@@ -10,8 +10,10 @@ import {
     ticketReplyToCustomer,
     ticketReplyInternal,
 } from "../../../../../services/ticketmanagement.service";
+import toast from "react-hot-toast";
+import { validateFile } from "../../../../../utils/commonutils";
 
-const ReplyTab = ({ ticketId }) => {
+const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
     const [sendReplyModalShow, setSendReplyModalShow] = useState(false);
     const [loading, setLoading] = useState(false);
     const [submitAction, setSubmitAction] = useState(""); // Track which button is clicked
@@ -34,10 +36,12 @@ const ReplyTab = ({ ticketId }) => {
 
         apiCall
             .then((response) => {
-                console.log("Response:", response);
                 if (submitAction === "customer") {
                     setSendReplyModalShow(false); // Close modal after success
                 }
+                actions.resetForm()
+                setIsGetAcitivityLogs((prev)=> !prev)
+                toast.success(response?.data?.message)
             })
             .catch((error) => {
                 console.error("Error:", error);
@@ -118,7 +122,13 @@ const ReplyTab = ({ ticketId }) => {
                                     type="file"
                                     onChange={(event) => {
                                         const file = event.currentTarget.files[0];
-                                        setFieldValue("attachment", file); // Update Formik's state with the file
+                                        const isValidated = validateFile(file)
+                                        if (isValidated=== true) {
+                                            setFieldValue("attachment", file);
+                                        }else{
+                                            toast.error(isValidated)
+                                        }
+                                        // Update Formik's state with the file
                                     }}
                                 />
                             </div>
@@ -134,10 +144,10 @@ const ReplyTab = ({ ticketId }) => {
                                     onClick={() => {
                                         if (values.message === '') {
                                             // Set an error for the message field
-                                            setFieldError("message","message is required")
-                                            setFieldTouched("message",true)
+                                            setFieldError("message", "message is required")
+                                            setFieldTouched("message", true)
                                             // Optionally, mark the field as touched
-                                           
+
                                         } else {
                                             setSubmitAction("customer");
                                             setSendReplyModalShow(true); // Show modal first
