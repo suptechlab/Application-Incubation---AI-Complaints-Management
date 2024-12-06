@@ -35,8 +35,7 @@ const Add = ({ provinces, modal, toggle, dataQuery }) => {
       dataQuery.refetch()
     }).catch((error) => {
       setLoading(false);
-      console.log('error', error)
-      toast.error(error);
+      toast.error(error?.response?.data?.errorDescription ?? error?.description);
     });
   };
 

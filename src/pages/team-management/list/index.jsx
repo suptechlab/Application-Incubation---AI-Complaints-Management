@@ -1,22 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
-import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
-import GenericModal from "../../../components/GenericModal";
 import ListingSearchForm from "../../../components/ListingSearchForm";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import { handleDeleteUser, handleGetTableData } from "../../../services/teamManagment.service";
+import { handleGetTableData, handleStatusChangeState } from "../../../services/teamManagment.service";
+import toast from "react-hot-toast";
+import Toggle from "../../../components/Toggle";
 
 export default function TeamManagementList() {
 
     const location = useLocation();
+    const queryClient = useQueryClient();
     const { t } = useTranslation(); // use the translation hook
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
@@ -33,9 +34,6 @@ export default function TeamManagementList() {
     });
 
     const [loading, setLoading] = useState(false);
-    const [selectedRow, setSelectedRow] = useState();
-    const [deleteShow, setDeleteShow] = useState(false);
-    const [deleteId, setDeleteId] = useState();
 
     // Permissoin work
     const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
@@ -108,6 +106,11 @@ export default function TeamManagementList() {
                 setLoading(false);
             }
         },
+        staleTime: 0, // Data is always stale, so it refetches
+        cacheTime: 0, // Cache expires immediately
+        refetchOnWindowFocus: false, // Disable refetching on window focus
+        refetchOnMount: false, // Prevent refetching on component remount
+        retry: 0, //Disable retry on failure
     });
 
     //handle last page deletion item
@@ -120,105 +123,102 @@ export default function TeamManagementList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
-    //Handle Delete
-    const deleteAction = (rowData) => {
-        setSelectedRow(rowData);
-        setDeleteId(rowData.id);
-        setDeleteShow(true);
-    };
-
-    const recordDelete = async (deleteId) => {
-        setLoading(true);
-        try {
-            await handleDeleteUser(deleteId);
-            toast.success("Your data has been deleted successfully");
-            dataQuery.refetch();
-            setDeleteShow(false);
-        } catch (error) {
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const changeStatus = async (id, currentStatus) => {
+    //     setLoading(true)
+    //     let toggleStatus = currentStatus === true ? false : true;
+    //     handleStatusChangeState(id, toggleStatus).then(response => {
+    //         toast.success(t("STATUS UPDATED"));
+    //         dataQuery.refetch();
+    //     }).catch((error) => {
+    //         if (error?.response?.data?.errorDescription) {
+    //             toast.error(error?.response?.data?.errorDescription);
+    //         } else {
+    //             toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+    //         }
+    //     }).finally(() => {
+    //         setLoading(false)
+    //     })
+    // };
 
     const columns = React.useMemo(
         () => [
             {
                 accessorFn: (row) => row.teamName,
                 id: "teamName",
-                header: () => t('Team Name'),
+                header: () => t('TEAM NAME'),
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row.entityType ?? "N/A",
-                id: "entityType",
-                header: () => t('ENTITY NAME'),
-                enableSorting: false,
+                accessorFn: (row) => row.description,
+                id: "description",
+                header: () => t('DESCRIPTION'),
+                enableSorting: true,
             },
             {
-                accessorFn: (row) => row.createdByEmail,
-                id: "createdByEmail",
+                accessorFn: (row) => row.entityType ?? t('N/A'),
+                id: "entityType",
                 header: () => t('ASSOCIATION'),
-                enableSorting: false,
+                enableSorting: true,
             },
-            // Conditionally add the "actions" column
-            ...(permission.current.editModule
-                ? [
-                    {
-                        id: "actions",
-                        isAction: true,
-                        cell: (rowData) => (
-                            <div className="pointer">
-                                <DataGridActions
-                                    controlId="team-management"
-                                    rowData={rowData}
-                                    customButtons={[
-                                        {
-                                            name: "edit",
-                                            enabled: true,
-                                            type: "link",
-                                            title: "Edit",
-                                            icon: <MdEdit size={18} />,
-                                        },
-                                    ]}
-                                />
-                            </div>
-                        ),
-                        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-                        enableSorting: false,
-                        size: "80",
-                    },
-                ]
-                : []),
             // {
-            //     id: "actions",
+            //     id: "status",
             //     isAction: true,
-            //     cell: (rowData) => (
-            //         <DataGridActions
-            //             controlId="team-management"
-            //             rowData={rowData}
-            //             customButtons={[
-            //                 {
-            //                     name: "edit",
-            //                     enabled: true,
-            //                     type: "link",
-            //                     title: "Edit",
-            //                     icon: <MdEdit size={18} />,
-            //                 },
-            //                 {
-            //                     name: "delete",
-            //                     enabled: true,
-            //                     type: "button",
-            //                     title: "Delete",
-            //                     icon: <MdDelete size={18} />,
-            //                     handler: () => deleteAction(rowData.row.original),
-            //                 },
-            //             ]}
-            //         />
-            //     ),
-            //     header: () => <div className="text-center">{t('ACTIONS')}</div>,
+            //     cell: (info) => {
+
+            //         if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
+            //             return (
+            //                 //   permission.current.statusModule ?
+            //                 <Toggle
+            //                     id={`status-${info?.row?.original?.id}`}
+            //                     key={"status"}
+            //                     name="status"
+            //                     value={info?.row?.original?.status === true}
+            //                     checked={info?.row?.original?.status === true}
+            //                     onChange={() =>
+            //                         changeStatus(
+            //                             info?.row?.original?.id,
+            //                             info?.row?.original?.status
+            //                         )
+            //                     }
+            //                     tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+            //                 />
+            //                 //   : ''
+            //             );
+            //         } else {
+            //             return <span>{info?.row?.original?.status} </span>
+            //         }
+            //     },
+            //     header: () => t("STATUS"),
             //     enableSorting: false,
             //     size: "80",
             // },
+            // Conditionally add the "actions" column
+            // ...(permission.current.editModule
+            //     ? [
+            {
+                id: "actions",
+                isAction: true,
+                cell: (rowData) => (
+                    <div className="pointer">
+                        <DataGridActions
+                            controlId="team-management"
+                            rowData={rowData}
+                            customButtons={[
+                                {
+                                    name: "edit",
+                                    enabled: true,
+                                    type: "link",
+                                    title: "Edit",
+                                    icon: <MdEdit size={18} />,
+                                },
+                            ]}
+                        />
+                    </div>
+                ),
+                header: () => <div className="text-center">{t("ACTIONS")}</div>,
+                enableSorting: false,
+                size: "80",
+            },
         ],
         []
     );
@@ -229,6 +229,12 @@ export default function TeamManagementList() {
             pageSize: 10,
         });
     }, [filter]);
+
+    useEffect(() => {
+        return () => {
+            queryClient.removeQueries("data");
+        };
+    }, [queryClient]);
 
     return (
         <React.Fragment>
@@ -252,17 +258,6 @@ export default function TeamManagementList() {
                     </Card.Body>
                 </Card>
             </div>
-
-            {/* Delete Modal */}
-            <GenericModal
-                show={deleteShow}
-                handleClose={() => setDeleteShow(false)}
-                modalHeaderTitle={`Delete Team Member`}
-                modalBodyContent={`Are you sure, you want to delete the team member - ${selectedRow?.name}?`}
-                handleAction={() => recordDelete(deleteId)}
-                buttonName="Delete"
-                ActionButtonVariant="danger"
-            />
         </React.Fragment>
     );
 }

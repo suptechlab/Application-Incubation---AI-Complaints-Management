@@ -38,15 +38,14 @@ const TemplateMaster = () => {
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [modal, setModal] = useState(false);
-  const [editModal, setEditModal] = useState({ id: "", open: false });
+  const [editModal, setEditModal] = useState({ row: {}, open: false });
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
   });
 
   const toggle = () => setModal(!modal);
-
-  const editToggle = () => setEditModal({ id: "", open: !editModal?.open });
+  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
   const permission = useRef({
     addModule: false,
@@ -86,7 +85,7 @@ const TemplateMaster = () => {
       });
   }, []);
 
-  const editCityMaster = async (rowData) => {
+  const editTemplateMaster = async (rowData) => {
     setEditModal({ row: rowData, open: !editModal?.open });
   };
 
@@ -207,7 +206,7 @@ const TemplateMaster = () => {
                   type: "button",
                   title: "Edit",
                   icon: <MdEdit size={18} />,
-                  handler: () => editCityMaster(rowData?.row?.original),
+                  handler: () => editTemplateMaster(rowData?.row?.original),
                 },
               ]}
             /> : ''
@@ -240,7 +239,7 @@ const TemplateMaster = () => {
 
         const tempLink = document.createElement('a');
         tempLink.href = blobUrl;
-        tempLink.setAttribute('download', 'cities.xlsx');
+        tempLink.setAttribute('download', 'templates.xlsx');
 
         // Append the link to the document body before clicking it
         document.body.appendChild(tempLink);

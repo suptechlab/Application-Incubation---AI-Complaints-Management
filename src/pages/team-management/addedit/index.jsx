@@ -1,58 +1,45 @@
 import { Formik, Form as FormikForm } from "formik";
-import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row, Stack, Table } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdDelete } from "react-icons/md";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import GenericModal from "../../../components/GenericModal";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import ReactSelect from "../../../components/ReactSelect";
 import AppTooltip from "../../../components/tooltip";
-import { assignUserIntoTeam, handleDeleteUserFromTeam, getOrganizationList, getTeamMemberList, handleAddUser, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
+import { assignUserIntoTeam, getOrganizationList, getTeamMemberList, handleAddUser, handleDeleteUserFromTeam, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
-export default function TeamManagementEdit() {
-    const [loading, setLoading] = useState(true);
+export default function TeamManagementAddEdit() {
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
     const isEdit = !!id;
-    const [userData, setUserData] = useState([]);
     const { t } = useTranslation();
     const [initialValues, setInitialValues] = useState({
         teamName: "",
         description: "",
         entityId: "",
-        entityType: "FI", //Default value to ensure the radio is selected initially
+        entityType: "FI"
     });
-    const [entityIdArr, setEntityIdArr] = useState([
-        { label: "Select", value: "" },
-    ])
-    const [organizationArr, setOrganizationArr] = useState([
-        { label: "Select", value: "" },
-    ])
-
-    const location = useLocation();
-    const params = qs.parse(location.search, { ignoreQueryPrefix: true });
+    const [entityIdArr, setEntityIdArr] = useState([]);
+    const [organizationArr, setOrganizationArr] = useState([]);
     const [selectedRow, setSelectedRow] = useState();
     const [deleteShow, setDeleteShow] = useState(false);
     const [deleteId, setDeleteId] = useState();
-    const [userType, setUserType] = useState('FI'); // SEPS or FI
-    const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show 
-    const [assignedData, setAssignedData] = useState([]);
+    const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show
     const [newTeamMember, setNewTeamMember] = useState([]);
+    const [userData, setUserData] = useState([]);
     const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
-    const [selectedMemberName, setSelectedMemberName] = useState(null); // To hold the selected member
-    const [membersArr, setMembersArr] = useState([]);
+
 
 
     //  Handle Assign Button Click
     const handleAssign = () => {
-        setLoading(true);
-        console.log('selectedMember',selectedMember)
         if (!selectedMember || Object.keys(selectedMember).length === 0 || selectedMember.value == '') {
             setLoading(false);
             toast.error(t('SELECT A TEAM MEMBER BEFORE ASSIGNING'));
@@ -74,151 +61,147 @@ export default function TeamManagementEdit() {
             name: selectedMember.label, // Name from ReactSelect
         };
 
-        setNewTeamMember((prev) => [...prev, newMember]); // Add to the list
-        //setSelectedMember(null); // Clear selection    
-        setMembersArr((prevNumbers) => [...prevNumbers, selectedMember.value]);
-        console.log('membersArr',membersArr)
-        console.log('newTeamMember',selectedMember.value)
-        let assignMemberArr = [];
-        assignMemberArr.push(selectedMember.value)
-        console.log('assignMemberArr',assignMemberArr)
-        
-        const data = {
-            // userIds: membersArr
-            userIds: assignMemberArr
-        }
-        // calling api to assign member into team
-        assignUserIntoTeam(userData.id,data).then((response) => {
-            getDataById()
-        })
-        .catch((error) => {
-            
-        })    
-        .finally(() => {
-            // Reset loading state regardless of success or failure
-            setDeleteShow(false);
-            setLoading(false);
-        });
-        setLoading(false);
-
-        
-    };
-    
-    useEffect(() => {
-        setLoading(true);
         if (isEdit) {
-            getDataById()
-        } else {
+            setLoading(true);
+            try {
+                let payload = {
+                    userIds: [selectedMember?.value]
+                }
+                assignUserIntoTeam(userData?.id, payload);
+                setLoading(false);
+            } catch (error) {
+                const errorMessage = error.response?.data?.detail;
+                toast.error(errorMessage);
+                setLoading(false);
+            }
         }
 
-    }, [id, isEdit]);
-    
+        setNewTeamMember((prev) => [...prev, newMember]);
+    };
 
-    // Get Assign members list
-    useEffect(() => {
-        getTeamMemberList(userType).then((response) => {
-            const formattedData = response.data.map((item) => ({
-                label: item.name,
-                value: item.id
-            }));
-            setEntityIdArr([{ label: "Select", value: "" }, ...formattedData]);
-            // setEntityIdArr([formattedData]);
-            setLoading(false);
-        });
-
-        getOrganizationList(userType).then((response) => {
-            const formattedOrgData = response.data.map((item) => ({
-                label: item.name,
-                value: item.id
-            }));
-            setOrganizationArr([{ label: "Select", value: "" }, ...formattedOrgData]);
-            setLoading(false);
-        });
-
-        // setOrganizationArr
-    }, [userType]);
-
-    // Get form data by id 
-    const getDataById = () => {
+    const getTeamMemberLists = async (type) => {
         setLoading(true);
-        handleGetUserById(id).then((response) => {
+        try {
+            await getTeamMemberList(type).then((response) => {
+                const formattedData = response.data.map((item) => ({
+                    label: item.name,
+                    value: item.id
+                }));
+                setEntityIdArr([...formattedData]);
+                setLoading(false);
+            });
+        } catch (error) {
+            setLoading(false);
+        }
+
+    }
+
+    const getOrganizationLists = async (type) => {
+        setLoading(true);
+        try {
+            await getOrganizationList(type).then((response) => {
+                const formattedOrgData = response.data.map((item) => ({
+                    label: item.name,
+                    value: item.id
+                }));
+                setOrganizationArr([...formattedOrgData]);
+                setLoading(false);
+            });
+        } catch (error) {
+            setLoading(false);
+        }
+    }
+
+    const getUserDetails = async (userId) => {
+        setLoading(true);
+        try {
+            const response = await handleGetUserById(userId);
             setUserData(response.data);
             setInitialValues({
-                teamName: response.data?.teamName ? response.data?.teamName : "",
-                description: response.data?.description ? response.data?.description : "",
+                teamName: response.data?.teamName ?? "",
+                description: response.data?.description ?? "",
                 entityId: response.data?.entityId ?? "",
                 entityType: response.data?.entityType ?? "",
             });
-            setNewTeamMember(response.data?.members)
+            setNewTeamMember(response.data?.members);
+            if (response.data?.entityType === 'FI') {
+                setShowEntityOrgId(true);
+            } else {
+                setShowEntityOrgId(false);
+            }
+            await getTeamMemberLists(response.data?.entityType);
+            await getOrganizationLists(response.data?.entityType);
             setLoading(false);
-        });
-        setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
     }
+
+    useEffect(() => {
+        if (isEdit && id) {
+            getUserDetails(id);
+        } else {
+            getTeamMemberLists("FI");
+            getOrganizationLists("FI");
+        }
+    }, [id, isEdit]);
 
     const onSubmit = async (values, actions) => {
         setLoading(true);
-        const teamMembersIdArr = newTeamMember.map(member => member.id);
-        values.teamMembers = teamMembersIdArr // add into teamMembers
-        try {
-            if (isEdit) {
-                // values.entityId.toString();
-                await handleUpdateUser(id, { ...values }).then((response) => {
-                    toast.success(response.data.message)
-                    actions.resetForm()
-                    navigate('/team-management')
-                }).catch((error) => {
-                    setLoading(false);
-                    toast.error(error.response.data.detail);
 
-                }).finally(() => {
-                    actions.setSubmitting(false)
-                })
-            }
-            else {
-
-                await handleAddUser({ ...values }).then((response) => {
-                    toast.success(response.data.message)
-                    actions.resetForm()
-                    navigate('/team-management')
-                }).catch((error) => {
-                    setLoading(false);
-                    toast.error(error.response.data.detail);
-
-                }).finally(() => {
-                    actions.setSubmitting(false)
-                })
-            }
-        } catch (error) {
+        if (newTeamMember.length === 0) {
+            const errorMessage = t('PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER');
+            toast.error(errorMessage);
             setLoading(false);
-            toast.error(t('SOMETHING WENT WRONG'));
+        } else {
+            try {
+                values.teamMembers = newTeamMember.map((member) => member.id);
+
+                const action = isEdit
+                    ? handleUpdateUser(id, { ...values })
+                    : handleAddUser({ ...values });
+
+                const response = await action;
+                toast.success(response.data.message);
+                navigate('/team-management');
+            } catch (error) {
+                const errorMessage = error.response?.data?.errorDescription;
+                toast.error(errorMessage);
+            } finally {
+                setLoading(false);
+                actions.setSubmitting(false);
+            }
         }
     };
 
     //Handle Delete
     const deleteAction = (rowData) => {
         setSelectedRow(rowData);
-        setDeleteId(rowData.id);
+        if (isEdit) {
+            setDeleteId(rowData.userId);
+        } else {
+            setDeleteId(rowData.id);
+        }
         setDeleteShow(true);
     };
 
-    // Delete API calling 
-    const recordDelete = (deleteId) => {
-        setLoading(true);
-        setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
-        handleDeleteUserFromTeam(userData.id,deleteId).then((response) => {
-            getDataById()
-        })
-        .catch((error) => {
-            
-        })    
-        .finally(() => {
-            // Reset loading state regardless of success or failure
-            setDeleteShow(false);
-            setLoading(false);
-        });
+    const recordDelete = async (deleteId) => {
+        if (isEdit) {
+            setNewTeamMember((prev) => prev.filter((member) => member.userId !== deleteId));
+            setLoading(true);
+            try {
+                await handleDeleteUserFromTeam(userData?.id, deleteId);
+                await getTeamMemberLists(userData?.entityType);
+                setLoading(false);
+            } catch (error) {
+                const errorMessage = error.response?.data?.errorDescription;
+                toast.error(errorMessage);
+                setLoading(false);
+            }
+        } else {
+            setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
+        }
         setDeleteShow(false);
-        setLoading(false);
-
     };
 
     return (
@@ -230,6 +213,7 @@ export default function TeamManagementEdit() {
                     <Card.Body className="d-flex flex-column">
                         <Formik
                             initialValues={initialValues}
+                            enableReinitialize={true}
                             validationSchema={validationSchema}
                             onSubmit={onSubmit}
                         >
@@ -246,7 +230,6 @@ export default function TeamManagementEdit() {
                                     onSubmit={handleSubmit}
                                     className="d-flex flex-column h-100"
                                 >
-                                    
                                     <Row>
                                         <Col xs={12} className="mb-3">
                                             <div className='status-radio'>
@@ -257,30 +240,37 @@ export default function TeamManagementEdit() {
                                                         id="entityType"
                                                         name="entityType"
                                                         value="SEPS"
-                                                        checked={userData.entityType == 'SEPS'}
-                                                        // checked={values.entityType === 'SEPS'}
+                                                        checked={values.entityType === 'SEPS'}
                                                         onBlur={handleBlur}
                                                         onChange={() => {
                                                             setFieldValue("entityType", "SEPS");
                                                             setShowEntityOrgId(false);
+                                                            getTeamMemberLists("SEPS");
+                                                            setNewTeamMember([]);
+                                                            setFieldValue("teamMemberId", "");
                                                         }}
                                                         type="radio"
                                                         label={t('SEPS USER')}
+                                                        disabled={isEdit}
                                                     />
                                                     <Form.Check
                                                         className="me-3 me-lg-4"
                                                         id="entityTypeFi"
                                                         name="entityType"
                                                         value="FI"
-                                                        checked={userData.entityType == 'FI'}
-                                                        // checked={values.entityType === 'FI'}
+                                                        checked={values.entityType === 'FI'}
                                                         onBlur={handleBlur}
                                                         onChange={() => {
                                                             setFieldValue("entityType", "FI");
                                                             setShowEntityOrgId(true);
+                                                            getOrganizationLists("FI");
+                                                            getTeamMemberLists("FI");
+                                                            setNewTeamMember([]);
+                                                            setFieldValue("teamMemberId", "");
                                                         }}
                                                         type="radio"
                                                         label={t('FI USER')}
+                                                        disabled={isEdit}
                                                     />
                                                 </Stack>
                                             </div>
@@ -289,12 +279,10 @@ export default function TeamManagementEdit() {
                                             showEntityOrgId ?
                                                 <Col sm={6} lg={4}>
                                                     <ReactSelect
-                                                        // label={t('ENTITY NAME')}
-                                                        label="Pawan organizationArr"
+                                                        label={t('ENTITY NAME')}
                                                         error={errors.entityId}
                                                         options={organizationArr}
-                                                        value={userData.entityId}
-                                                        // value={values.entityId}
+                                                        value={values.entityId || ""}
                                                         onChange={(option) => {
                                                             setFieldValue(
                                                                 "entityId",
@@ -302,14 +290,8 @@ export default function TeamManagementEdit() {
                                                             );
                                                         }}
                                                         name="entityId"
-                                                        className={
-                                                            touched.entityId && errors.entityId
-                                                                ? "is-invalid"
-                                                                : ""
-                                                        }
                                                         onBlur={handleBlur}
                                                         touched={touched.entityId}
-
                                                     />
                                                 </Col>
                                                 : ''
@@ -324,7 +306,7 @@ export default function TeamManagementEdit() {
                                                 onChange={handleChange}
                                                 error={errors.teamName}
                                                 touched={touched.teamName}
-                                                value={userData.teamName || ""}
+                                                value={values.teamName || ""}
                                             />
                                         </Col>
                                     </Row>
@@ -341,10 +323,10 @@ export default function TeamManagementEdit() {
                                                 onChange={handleChange}
                                                 error={errors.description}
                                                 touched={touched.description}
-                                                value={userData.description || ""}
+                                                value={values.description || ""}
                                             />
                                         </Col>
-                                       
+
                                         <Col xs={12}>
                                             <h5 className="fw-semibold mb-1 border-bottom mb-3 py-2">{t('ASSIGN TEAM MEMBERS')}</h5>
                                             <Row>
@@ -352,23 +334,14 @@ export default function TeamManagementEdit() {
                                                     <Row className="gx-3">
                                                         <Col xs>
                                                             <ReactSelect
-                                                                getOptionLabel={(option) => option.value}
-                                                                getOptionValue={(option) => option.label}
-
                                                                 label="Member Name"
                                                                 error={errors.teamMemberId}
                                                                 options={entityIdArr}
                                                                 value={values.teamMemberId}
                                                                 onChange={(option) => {
-                                                                    console.log('onChange option', option)
-                                                                    setSelectedMemberName(option.target.label);
-                                                                    // setFieldValue(
-                                                                    //     "entityId",
-                                                                    //     option?.target?.value ?? ""
-                                                                    // );
-                                                                    setSelectedMember(option.target); // Store the selected member
+                                                                    setFieldValue("teamMemberId", option?.target?.value ?? "");
+                                                                    setSelectedMember(option.target);
                                                                 }}
-                                                                // name="teamMemberId"
                                                                 className={
                                                                     touched.orgId && errors.teamMemberId
                                                                         ? "is-invalid"
@@ -463,10 +436,10 @@ export default function TeamManagementEdit() {
                 show={deleteShow}
                 handleClose={() => setDeleteShow(false)}
                 modalHeaderTitle={t('DELETE TEAM MEMBER')}
-                modalBodyContent={`${t('ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER')} - ${deleteId} - ${selectedRow?.name}?`}
-                handleAction={() => recordDelete(deleteId || selectedRow?.userId)}
+                modalBodyContent={`${t('ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER')} - ${selectedRow?.name}?`}
+                handleAction={() => recordDelete(deleteId)}
                 buttonName={t('DELETE')}
-                ActionButtonVariant={t('CANCEL')}
+                ActionButtonVariant="danger"
             />
 
         </React.Fragment>

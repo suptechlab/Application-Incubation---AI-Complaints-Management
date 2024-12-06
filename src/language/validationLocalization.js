@@ -68,6 +68,7 @@ export const messages = {
     // Team Managment
     teamNameRequired: "Team name is required", // For team name
     descriptionRequired: "Description is required", // For description
+    entityRequired: "Entity name is required."
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -136,6 +137,7 @@ export const messages = {
     precedentsRequired: "Se requieren precedentes.",
     invalidSpecialPetition: "La petición especial no debe exceder los 1024 caracteres.",
     specialPetitionRequired: "Se requiere una petición especial.",
-    agreeDeclarations: "Por favor acepte todas las declaraciones y condiciones para continuar."
+    agreeDeclarations: "Por favor acepte todas las declaraciones y condiciones para continuar.",
+    entityRequired: "El nombre de la entidad es obligatorio."
   }
 };

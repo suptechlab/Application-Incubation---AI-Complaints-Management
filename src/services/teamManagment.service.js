@@ -44,7 +44,7 @@ export const handleDeleteUser = async (id) => {
 
 export const handleStatusChangeState = async (id, status) => {
     // return await instance.put(`/api/${API_VERSION}/seps-users/${id}/status?active=${status}`, {});
-    return await adminApi.patch(`/${API_VERSION}/teams/${id}/${status}`, {});
+    return await adminApi.patch(`/${API_VERSION}/teams/${id}/status?status=${status}`);
 }
 
 

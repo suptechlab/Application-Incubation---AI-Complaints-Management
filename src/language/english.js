@@ -24,6 +24,8 @@ export const englishLang = {
     "CREATE CLAIM TYPE": "Create Claim Type",
     "CREATE CLAIM SUB TYPE": "Create Claim Sub Type",
     "EDIT CLAIM SUB TYPE": "Edit Claim Sub Type",
+    "CREATE CLAIM SUB TYPE": "Create Claim Sub Type",
+    "EDIT CLAIM SUB TYPE": "Edit Claim Sub Type",
     "EDIT CLAIM TYPE": "Edit claim type",
     "NAME OF CLAIM SUB TYPE": "Name of Claim Sub Type",
     "SLA BREACH": "SLA Breach",
@@ -144,12 +146,13 @@ export const englishLang = {
     "TEMPLATE TYPE*" : "Template Type*",
     "TEMPLATE_DETAILS": "Template Details*",
     "ASSOCIATION": "Association",
+    "ASSOCIATION": "Association",
     // Team managment
     "TEAM NAME": "Team Name",
     "ASSIGN TEAM MEMBERS": "Assign Team Members",
     "MEMBER NAME": "Member Name",
     "ASSIGN": "Assign",
-
+    "TEAM MANAGEMENT": "Team Management",
     //Ticket Management
     "CREATE_A_CLAIM": "Create a New Claim",
     "BASIC_INFORMATION": "Basic Information",
@@ -181,5 +184,6 @@ export const englishLang = {
     "SELECT A TEAM MEMBER BEFORE ASSIGNING": "Please select a team member before assigning.",
     "DELETE TEAM MEMBER": "Delete Team Member",
     "ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER": "Are you sure, you want to delete the team member",
-    "DELETE": "Eliminado",
+    "DELETE": "Delete",
+    "PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER": "Please add atleast one team member."
 }
