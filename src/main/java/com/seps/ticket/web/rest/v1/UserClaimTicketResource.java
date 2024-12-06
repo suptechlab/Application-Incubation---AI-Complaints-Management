@@ -10,6 +10,7 @@ import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.ComplaintRequest;
 import com.seps.ticket.web.rest.vm.SecondInstanceRequest;
 import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -163,9 +164,41 @@ public class UserClaimTicketResource {
         // Retrieve the claim ticket
         UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // Send an email notification
-        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO,userClaimTicketDTO);
+        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO, userClaimTicketDTO);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("second.instance.filed.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
+
+    @Operation(
+        summary = "File a complaint",
+        description = "Allows a user to file a complaint related to a claim.",
+        tags = {"File Complaint"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Complaint raised successfully.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ResponseStatus.class))),
+        @ApiResponse(responseCode = "403", description = "Access forbidden"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping("/file-complaint")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<ResponseStatus> fileComplaint(@ModelAttribute @Valid ComplaintRequest complaintRequest,
+                                                        HttpServletRequest httpServletRequest) {
+        Long id = complaintRequest.getId();
+        RequestInfo requestInfo = new RequestInfo(httpServletRequest);
+        // Raise the complaint
+        userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
+        // Retrieve the claim ticket
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
+        // Send an email notification
+        mailService.sendComplaintEmail(userClaimTicketDTO);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("complaint.raised.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
             System.currentTimeMillis()
         );

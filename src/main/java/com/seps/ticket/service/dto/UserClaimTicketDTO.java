@@ -1,6 +1,7 @@
 package com.seps.ticket.service.dto;
 
 import com.seps.ticket.enums.*;
+import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.ToString;
 
@@ -51,6 +52,9 @@ public class UserClaimTicketDTO {
     private List<UserClaimTicketDocumentDTO> claimTicketDocuments; // Added this line to include documents in DTO
     private String secondInstanceComment;
     private Instant secondInstanceFiledAt;
+    private String complaintPrecedents;
+    private String complaintSpecificPetition;
+    private Instant complaintFiledAt;
 
     // Getters and Setters
 

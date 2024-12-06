@@ -351,4 +351,9 @@ public class MailService {
             LOG.error("Failed to send claim ticket instance email to {}: {}", userClaimTicketDTO.getUser().getEmail(), e.getMessage());
         }
     }
+
+    @Async
+    public void sendComplaintEmail(UserClaimTicketDTO userClaimTicketDTO) {
+
+    }
 }

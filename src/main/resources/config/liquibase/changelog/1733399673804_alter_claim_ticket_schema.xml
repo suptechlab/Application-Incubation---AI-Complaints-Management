@@ -18,4 +18,22 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet id="1733488973073" author="matellio">
+    <addColumn tableName="claim_ticket">
+      <column name="complaint_precedents" type="text"
+              remarks="precedents added while filing a complaint">
+        <constraints nullable="true"/>
+      </column>
+      <column name="complaint_specific_petition" type="text"
+              remarks="complaint specific petition added while filing a complaint">
+        <constraints nullable="true"/>
+      </column>
+      <column name="complaint_filed_at" type="timestamp"
+              remarks="Complaint filed timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

@@ -577,6 +577,15 @@ public class UserClaimTicketService {
         return allowedStatusList.contains(claimTicketStatus);
     }
 
+    // Helper method to validate allowed statuses
+    private boolean isValidForComplaint(ClaimTicketStatusEnum claimTicketStatus) {
+        List<ClaimTicketStatusEnum> allowedStatusList = Arrays.asList(
+            ClaimTicketStatusEnum.CLOSED
+        );
+        return allowedStatusList.contains(claimTicketStatus);
+    }
+
+
     /**
      * Logs the activity and audit messages for the filed second instance.
      */
@@ -710,6 +719,146 @@ public class UserClaimTicketService {
             dto.setUploadedByUser(userDTO);
         }
         return dto;
+    }
+
+    public void fileComplaint(ComplaintRequest complaintRequest, RequestInfo requestInfo) {
+        // Extract claim ticket ID from the request
+        Long id = complaintRequest.getId();
+        // Retrieve the current logged-in user
+        User currentUser = userService.getCurrentUser();
+        Long currentUserId = currentUser.getId();
+        // Fetch the claim ticket owned by the user, or throw an exception if not found
+        ClaimTicket claimTicket = claimTicketRepository.findByIdAndUserIdAndInstanceType(id, currentUserId, InstanceTypeEnum.SECOND_INSTANCE)
+            .orElseThrow(() -> new CustomException(
+                Status.BAD_REQUEST,
+                SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{id.toString()},
+                null
+            ));
+        // Validate claim ticket status
+        ClaimTicketStatusEnum claimTicketStatus = claimTicket.getStatus();
+        String statusPlain = enumUtil.getLocalizedEnumValue(claimTicketStatus, LocaleContextHolder.getLocale());
+        if (!isValidForComplaint(claimTicketStatus)) {
+            throw new CustomException(
+                Status.BAD_REQUEST,
+                SepsStatusCode.COMPLAINT_INVALID_CLAIM_TICKET_STATUS,
+                new String[]{statusPlain},
+                null
+            );
+        }
+
+        ClaimTicket oldClaimTicket = claimTicketRepository.findById(id)
+            .orElseThrow(() -> new CustomException(
+                Status.BAD_REQUEST,
+                SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{id.toString()},
+                null
+            ));
+
+        Map<String, Object> activityData = new HashMap<>();
+        Map<String, Object> auditData = new HashMap<>();
+        //Old Data
+        activityData.put(Constants.OLD_DATA, convertEntityToMap(userClaimTicketMapper.toUserClaimTicketDTO(oldClaimTicket)));
+        auditData.put(Constants.OLD_DATA, claimTicketMapper.toDTO(oldClaimTicket));
+        // Business logic for filing the second instance claim
+        claimTicket.setInstanceType(InstanceTypeEnum.COMPLAINT);
+        claimTicket.setStatus(ClaimTicketStatusEnum.NEW);
+        claimTicket.setSlaBreachDate(null);
+        claimTicket.setResolvedOn(null);
+        claimTicket.setComplaintPrecedents(complaintRequest.getPrecedents());
+        claimTicket.setComplaintSpecificPetition(complaintRequest.getSpecificPetition());
+        claimTicket.setComplaintFiledAt(Instant.now());
+        claimTicket.setUpdatedByUser(currentUser);
+        // Save the updated claim ticket to the database
+        claimTicketRepository.save(claimTicket);
+        // Handle and save file attachments related to this claim
+        DocumentSourceEnum source = DocumentSourceEnum.RAISED_COMPLAINT;
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(complaintRequest.getAttachments(),
+            claimTicket, currentUser, source);
+        // Save the documents if any were uploaded
+        if (!claimTicketDocuments.isEmpty()) {
+            claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+        }
+        // Log claim ticket status change
+        ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+        claimTicketStatusLog.setTicketId(id);
+        claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.NEW);
+        claimTicketStatusLog.setCreatedBy(currentUserId);
+        claimTicketStatusLogRepository.save(claimTicketStatusLog);
+
+        // Log claim ticket instance change
+        ClaimTicketInstanceLog claimTicketInstanceLog = new ClaimTicketInstanceLog();
+        claimTicketInstanceLog.setTicketId(id);
+        claimTicketInstanceLog.setInstanceType(InstanceTypeEnum.SECOND_INSTANCE);
+        claimTicketInstanceLog.setCreatedBy(currentUserId);
+        claimTicketInstanceLogRepository.save(claimTicketInstanceLog);
+
+        // Set the updated list of documents back to the claim ticket
+        List<ClaimTicketDocument> userClaimTicketDocumentList = claimTicketDocumentRepository.findAllByClaimTicketIdAndInternal(id, false);
+        List<ClaimTicketDocument> claimTicketDocumentList = claimTicketDocumentRepository.findAllByClaimTicketId(id);
+        // Convert user claim ticket documents to UserClaimTicketDTO
+        List<UserClaimTicketDocumentDTO> userClaimTicketDTOList = userClaimTicketDocumentList.stream()
+            .map(this::convertToUserClaimTicketDocumentDTO)
+            .collect(Collectors.toList());
+        // Convert claim ticket documents to ClaimTicketDTO
+        List<ClaimTicketDocumentDTO> claimTicketDTOList = claimTicketDocumentList.stream()
+            .map(this::convertToClaimTicketDocumentDTO)
+            .collect(Collectors.toList());
+
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketMapper.toUserClaimTicketDTO(claimTicket);
+        ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+        userClaimTicketDTO.setClaimTicketDocuments(userClaimTicketDTOList);
+        claimTicketDTO.setClaimTicketDocuments(claimTicketDTOList);
+        //New Data
+        activityData.put(Constants.NEW_DATA, convertEntityToMap(userClaimTicketDTO));
+        auditData.put(Constants.NEW_DATA, claimTicketDTO);
+        // Perform additional logging and auditing actions
+        logActivityAndAuditOfComplaint(claimTicket, activityData, auditData, complaintRequest, requestInfo, currentUser);
+        LOG.info("Complaint filed for claim ticket {} by user {}", id, currentUserId);
+    }
+
+    private void logActivityAndAuditOfComplaint(ClaimTicket claimTicket, Map<String, Object> activityData, Map<String, Object> auditData,
+                                                ComplaintRequest request, RequestInfo requestInfo, User currentUser) {
+        Map<String, String> activityMessageMap = new HashMap<>();
+        Map<String, String> auditMessageMap = new HashMap<>();
+        String plainTicketId = String.valueOf(claimTicket.getTicketId());
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String activityMessage = messageSource.getMessage("activity.log.file.second.instance",
+                new Object[]{plainTicketId}, Locale.forLanguageTag(language.getCode()));
+            activityMessageMap.put(language.getCode(), activityMessage);
+        });
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String auditMessage = messageSource.getMessage("audit.log.claim.ticket.second.instance",
+                new Object[]{currentUser.getEmail(), plainTicketId}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), auditMessage);
+        });
+        // Convert ClaimTicketRequest to ClaimTicketRequestJson using the new method
+        ComplaintRequestForJson complaintRequestForJson = convertToComplaintRequestJson(request);
+        // Convert the SecondInstanceRequest object to JSON string using Gson
+        Gson gson = new Gson();
+        String requestBody = gson.toJson(complaintRequestForJson);  // Convert SecondInstanceRequestForJson to JSON
+        // Activity Log
+        auditLogService.logActivity(currentUser.getId(), currentUser.getId(), requestInfo, "fileComplaint", ActionTypeEnum.CLAIM_TICKET_COMPLAINT.name(), claimTicket.getId(), ClaimTicket.class.getSimpleName(),
+            null, activityMessageMap, activityData, ActivityTypeEnum.ACTIVITY.name(), requestBody);
+        // Audit Log
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "fileComplaint", ActionTypeEnum.CLAIM_TICKET_COMPLAINT.name(), claimTicket.getId(), ClaimTicket.class.getSimpleName(),
+            null, auditMessageMap, auditData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+
+    }
+
+    private ComplaintRequestForJson convertToComplaintRequestJson(ComplaintRequest request) {
+        ComplaintRequestForJson complaintRequestForJson = new ComplaintRequestForJson();
+        complaintRequestForJson.setId(request.getId());
+        complaintRequestForJson.setPrecedents(request.getPrecedents());
+        complaintRequestForJson.setSpecificPetition(request.getSpecificPetition());
+        List<String> attachments = new ArrayList<>();
+        if (complaintRequestForJson.getAttachments() != null) {
+            for (MultipartFile file : request.getAttachments()) {
+                attachments.add(file.getOriginalFilename());  // Add only file name to the list
+            }
+        }
+        complaintRequestForJson.setAttachments(attachments);
+        return complaintRequestForJson;
     }
 
 }
