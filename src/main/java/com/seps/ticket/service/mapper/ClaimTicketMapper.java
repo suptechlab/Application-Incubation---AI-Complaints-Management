@@ -45,6 +45,6 @@ public interface ClaimTicketMapper {
     FIUserDTO toFIUserDTO(User user);
 
     // Map ClaimTicketDocument to ClaimTicketDocumentDTO
-    List<ClaimTicketDocumentDTO> toClaimTicketDocumentDTOs(List<ClaimTicketDocument> claimTicketDocuments);
+    Set<ClaimTicketDocumentDTO> toClaimTicketDocumentDTOs(List<ClaimTicketDocument> claimTicketDocuments);
 
 }

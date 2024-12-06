@@ -232,11 +232,15 @@ public class SepsAndFiClaimTicketResource {
     }
 
     @PostMapping("/{ticketId}/reply-to-customer")
-    public ResponseEntity<Void> replyToCustomer(@PathVariable Long ticketId,
+    public ResponseEntity<ResponseStatus> replyToCustomer(@PathVariable Long ticketId,
         @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
         sepsAndFiClaimTicketService.replyToCustomer(ticketId, claimTicketReplyRequest);
-
-        return ResponseEntity.status(HttpStatus.OK).build();
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.replied.to.customer.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
     }
 }

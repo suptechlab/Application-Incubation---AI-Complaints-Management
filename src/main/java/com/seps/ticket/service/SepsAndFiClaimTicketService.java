@@ -1109,15 +1109,22 @@ public class SepsAndFiClaimTicketService {
     }
 
     /**
-     * Handles replying to a customer for a given claim ticket. This method performs the following actions:
-     * - Validates the ticket existence based on the user's authority and organization.
-     * - Saves any uploaded attachments and links them to the ticket.
-     * - Creates an activity log entry for the reply, including details about the attachments and message content.
-     * - Saves the activity log and updates the ticket's status if applicable.
+     * Handles the process of replying to a customer for a specific claim ticket.
+     * This method performs the following:
+     * <ul>
+     *   <li>Validates the current user's permissions and ensures they are authorized to reply to the ticket.</li>
+     *   <li>Finds the claim ticket based on the provided ticket ID and user's organization, if applicable.</li>
+     *   <li>Handles the upload and storage of any attachments provided in the reply request.</li>
+     *   <li>Logs the reply activity, including details of the reply message and any associated attachments.</li>
+     * </ul>
      *
-     * @param ticketId                 the ID of the claim ticket to reply to
-     * @param claimTicketReplyRequest  the request object containing the reply message and attachments
-     * @throws CustomException if the ticket is not found for the given ID or organization
+     * @param ticketId the ID of the claim ticket to which the reply is being made.
+     * @param claimTicketReplyRequest the request object containing the reply message and any attachments.
+     * @throws CustomException if:
+     * <ul>
+     *   <li>The claim ticket is not found.</li>
+     *   <li>The user is not authorized to reply to the ticket.</li>
+     * </ul>
      */
     @Transactional
     public void replyToCustomer(Long ticketId, @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
@@ -1128,15 +1135,18 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI)) {
-            Long organizationId = currentUser.getOrganization().getId();
-            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
-                    new String[]{ticketId.toString()}, null));
+        if(authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+                Long organizationId = currentUser.getOrganization().getId();
+                ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                    .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                        new String[]{ticketId.toString()}, null));
         }else{
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
+        }
+        if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
         DocumentSourceEnum source = DocumentSourceEnum.CONVERSATION_ON_TICKET;
         // Handle attachments and save documents
@@ -1145,7 +1155,8 @@ public class SepsAndFiClaimTicketService {
         Map<String, Object> attachments = new HashMap<>();
         if (!claimTicketDocuments.isEmpty()) {
             List<ClaimTicketDocument> savedDocuments = claimTicketDocumentRepository.saveAll(claimTicketDocuments);
-            attachments.put("attachments", savedDocuments);
+            Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
+            attachments.put("attachments", attachDocument);
         }
 
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
