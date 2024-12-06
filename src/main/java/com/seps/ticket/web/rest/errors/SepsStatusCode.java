@@ -27,11 +27,12 @@ public enum SepsStatusCode implements StatusType {
     YOU_NOT_AUTHORIZED_TO_PERFORM(40014, "not.authorized.to.perform"),
     INVALID_FILE(40015, "invalid.file"),
     FILE_STORAGE_ERROR(40016, "file.storage.error"),
-    INVALID_SLA_DATE(40017, "invalid.sla.date"),
-    CLAIM_TICKET_NOT_ASSIGNED(40018, "claim.ticket.not.assigned"),
-    INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE(40019, "invalid.instance.type.allow.only.instance"),
-    CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT(40020, "claim.ticket.already.closed.or.reject"),
-    SECOND_INSTANCE_INVALID_CLAIM_TICKET_STATUS(40021, "second.instance.invalid.claim.ticket.status");
+    INVALID_SLA_DATE(40017,"invalid.sla.date"),
+    CLAIM_TICKET_NOT_ASSIGNED(40018,"claim.ticket.not.assigned"),
+    INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE(40019,"invalid.instance.type.allow.only.instance"),
+    CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT(40020,"claim.ticket.already.closed.or.reject"),
+    SECOND_INSTANCE_INVALID_CLAIM_TICKET_STATUS(40021, "second.instance.invalid.claim.ticket.status"),
+    CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY(40022,"claim.ticket.already.closed.or.rejected.you.cannot.reply");
 
     private final int code;
 

@@ -1109,22 +1109,13 @@ public class SepsAndFiClaimTicketService {
     }
 
     /**
-     * Handles the process of replying to a customer for a specific claim ticket.
-     * This method performs the following:
-     * <ul>
-     *   <li>Validates the current user's permissions and ensures they are authorized to reply to the ticket.</li>
-     *   <li>Finds the claim ticket based on the provided ticket ID and user's organization, if applicable.</li>
-     *   <li>Handles the upload and storage of any attachments provided in the reply request.</li>
-     *   <li>Logs the reply activity, including details of the reply message and any associated attachments.</li>
-     * </ul>
+     * Handles the logic for replying to a customer's ticket.
+     * Validates the user's authority and ensures they are authorized to perform the action.
+     * Handles file attachments and logs the activity in the ticket history.
      *
-     * @param ticketId the ID of the claim ticket to which the reply is being made.
-     * @param claimTicketReplyRequest the request object containing the reply message and any attachments.
-     * @throws CustomException if:
-     * <ul>
-     *   <li>The claim ticket is not found.</li>
-     *   <li>The user is not authorized to reply to the ticket.</li>
-     * </ul>
+     * @param ticketId               the ID of the ticket to which the reply is being made
+     * @param claimTicketReplyRequest the reply request containing the message and optional attachments
+     * @throws CustomException if the ticket is not found or the user is not authorized to perform this action
      */
     @Transactional
     public void replyToCustomer(Long ticketId, @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
@@ -1148,6 +1139,23 @@ public class SepsAndFiClaimTicketService {
         if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
+        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
+        }
+        replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.REPLY_CUSTOMER.name());
+
+    }
+
+    /**
+     * Logs an activity related to a ticket, such as a reply to the customer or an internal note.
+     * Handles optional file attachments, saves them, and includes them in the activity log.
+     *
+     * @param claimTicketReplyRequest the reply request containing the message and optional attachments
+     * @param ticket                  the ticket entity to which the activity pertains
+     * @param currentUser             the user performing the activity
+     * @param activityType            the type of activity being logged (e.g., reply to customer, internal note)
+     */
+    private void replyLogActivity(ClaimTicketReplyRequest claimTicketReplyRequest, ClaimTicket ticket, User currentUser, String activityType) {
         DocumentSourceEnum source = DocumentSourceEnum.CONVERSATION_ON_TICKET;
         // Handle attachments and save documents
         List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(claimTicketReplyRequest.getAttachments(), ticket, currentUser, source);
@@ -1165,25 +1173,25 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> activityTitle = new HashMap<>();
         Map<String, String> linkedUser = new HashMap<>();
         Map<String, Object> activityDetail = new HashMap<>();
-        activityLog.setActivityType(ClaimTicketActivityEnum.REPLY_CUSTOMER.name());
+        activityLog.setActivityType(activityType);
         if (!claimTicketDocuments.isEmpty()) {
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
-                String messageAudit = messageSource.getMessage("ticket.activity.log.replied.to.customer.with.attachment",
+                String messageAudit = messageSource.getMessage("ticket.activity.log.replied.with.attachment",
                     new Object[]{"@" + currentUser.getId(), "@" + ticket.getUserId()}, Locale.forLanguageTag(language.getCode()));
                 activityTitle.put(language.getCode(), messageAudit);
             });
         }else{
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
-                String messageAudit = messageSource.getMessage("ticket.activity.log.replied.to.customer",
+                String messageAudit = messageSource.getMessage("ticket.activity.log.replied",
                     new Object[]{"@" + currentUser.getId(), "@" + ticket.getUserId()}, Locale.forLanguageTag(language.getCode()));
                 activityTitle.put(language.getCode(), messageAudit);
             });
         }
         activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
-        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
-        activityDetail.put("text",claimTicketReplyRequest.getMessage());
-        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
-        linkedUser.put(ticket.getUserId().toString(),ticket.getUser().getFirstName());
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        activityDetail.put("text", claimTicketReplyRequest.getMessage());
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
+        linkedUser.put(ticket.getUserId().toString(), ticket.getUser().getFirstName());
 
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
@@ -1234,5 +1242,42 @@ public class SepsAndFiClaimTicketService {
             }
         }
         return claimTicketDocuments;
+    }
+
+    /**
+     * Handles the logic for replying to an internal discussion on a ticket.
+     * Validates the user's authority and ensures they are authorized to perform the action.
+     * Logs the activity in the ticket history.
+     *
+     * @param ticketId               the ID of the ticket to which the internal reply is being made
+     * @param claimTicketReplyRequest the reply request containing the message and optional attachments
+     * @throws CustomException if the ticket is not found or the user is not authorized to perform this action
+     */
+    @Transactional
+    public void replyToInternal(Long ticketId, @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if(authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }else{
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+        }
+        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
+        }
+        replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE.name());
     }
 }
