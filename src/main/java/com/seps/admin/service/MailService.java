@@ -4,6 +4,7 @@ import com.seps.admin.domain.TemplateMaster;
 import com.seps.admin.domain.User;
 import com.seps.admin.repository.TemplateMasterRepository;
 import com.seps.admin.service.dto.MailDTO;
+import com.seps.admin.suptech.service.ExternalAPIService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -55,13 +56,16 @@ public class MailService {
 
     private final TemplateMasterRepository templateMasterRepository;
 
+    private final ExternalAPIService externalAPIService;
+
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
         MessageSource messageSource,
         SpringTemplateEngine templateEngine,
         UserService userService,
-        TemplateMasterRepository templateMasterRepository
+        TemplateMasterRepository templateMasterRepository,
+        ExternalAPIService externalAPIService
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
@@ -69,6 +73,7 @@ public class MailService {
         this.templateEngine = templateEngine;
         this.userService = userService;
         this.templateMasterRepository = templateMasterRepository;
+        this.externalAPIService = externalAPIService;
     }
 
     @Async
@@ -203,7 +208,11 @@ public class MailService {
             String renderedContent = renderEmailTemplate(subject, content, Locale.forLanguageTag(mailDTO.getLocale()));
 
             // Send email
-            this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
+            Boolean isSent = externalAPIService.sendEmailViaApi(mailDTO, subject, renderedContent);
+            if(Boolean.FALSE.equals(isSent)) {
+                LOG.debug("External API Not working trying to test email service now...");
+                this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
+            }
         }else {
             LOG.debug("Template with key '{}' not found or inactive. Using default content.", mailDTO.getTemplateKey());
         }
