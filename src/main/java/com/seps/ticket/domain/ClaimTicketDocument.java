@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -51,6 +52,7 @@ public class ClaimTicketDocument {
     @Column(name = "uploaded_at", nullable = false, updatable = false)
     private Instant uploadedAt;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "claim_ticket_id", referencedColumnName = "id")  // Foreign key reference
     private ClaimTicket claimTicket;  // Link to the ClaimTicket entity

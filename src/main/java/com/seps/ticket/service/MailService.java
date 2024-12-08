@@ -8,6 +8,7 @@ import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.repository.TemplateMasterRepository;
 import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
+import com.seps.ticket.suptech.service.ExternalAPIService;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import jakarta.mail.MessagingException;
@@ -77,6 +78,8 @@ public class MailService {
 
     private final EnumUtil enumUtil;
 
+    private final ExternalAPIService externalAPIService;
+
     @Value("${website.user-base-url:test}")
     private String userBaseUrl;
 
@@ -86,7 +89,8 @@ public class MailService {
         MessageSource messageSource,
         SpringTemplateEngine templateEngine,
         TemplateMasterRepository templateMasterRepository,
-        EnumUtil enumUtil
+        EnumUtil enumUtil,
+        ExternalAPIService externalAPIService
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
@@ -94,6 +98,7 @@ public class MailService {
         this.templateEngine = templateEngine;
         this.templateMasterRepository = templateMasterRepository;
         this.enumUtil = enumUtil;
+        this.externalAPIService = externalAPIService;
     }
 
     @Async
@@ -198,7 +203,11 @@ public class MailService {
             String renderedContent = renderEmailTemplate(subject, content, Locale.forLanguageTag(mailDTO.getLocale()));
 
             // Send email
-            this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
+            Boolean isSent = externalAPIService.sendEmailViaApi(mailDTO, subject, renderedContent);
+            if(Boolean.FALSE.equals(isSent)) {
+                LOG.debug("External API Not working trying to test email service now...");
+                this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
+            }
         } else {
             LOG.debug("Template with key '{}' not found or inactive. Using default content.", mailDTO.getTemplateKey());
         }

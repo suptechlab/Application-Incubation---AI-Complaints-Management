@@ -13,7 +13,7 @@ public class MailDTO {
     private String to;
     private Map<String, String> dataVariables;
     private List<Attachment> attachments;
-
+    private String cc;
 
     public record Attachment(String filename, java.io.File file) {
 
