@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row, Stack, Table } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdDelete } from "react-icons/md";
+import { MdAddCircle, MdClose, MdDelete } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import GenericModal from "../../../components/GenericModal";
@@ -261,87 +261,229 @@ export default function TicketWorkFlowAddEdit() {
                                                 value={values.description || ""}
                                             />
                                         </Col>
-
-
-                                        {/* <Col xs={12}>
-                                            <h5 className="fw-semibold mb-1 border-bottom mb-3 py-2">{t('ASSIGN TEAM MEMBERS')}</h5>
-                                            <Row>
-                                                <Col lg={8}>
-                                                    <Row className="gx-3">
-                                                        <Col xs>
-                                                            <ReactSelect
-                                                                label="Member Name"
-                                                                error={errors.teamMemberId}
-                                                                options={entityIdArr}
-                                                                value={values.teamMemberId}
-                                                                onChange={(option) => {
-                                                                    setFieldValue("teamMemberId", option?.target?.value ?? "");
-                                                                    setSelectedMember(option.target);
-                                                                }}
-                                                                className={
-                                                                    touched.orgId && errors.teamMemberId
-                                                                        ? "is-invalid"
-                                                                        : ""
-                                                                }
-                                                                onBlur={handleBlur}
-                                                                touched={touched.teamMemberId}
-                                                            />
-                                                        </Col>
-                                                        <Col xs="auto" className="mb-3 pb-1 pt-4">
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline-dark"
-                                                                className="custom-min-width-85 mt-1 custom-height-42"
-                                                                onClick={handleAssign} // Assign data on click
-                                                            >
-                                                                {t('ASSIGN')}
-                                                            </Button>
-                                                        </Col>
-
-                                                        {newTeamMember?.length > 0 &&
-                                                            <Col xs={12} className="mb-3 pb-1">
-                                                                <div className="d-flex flex-column h-100 small table-cover-main">
-                                                                    <Table striped bordered hover responsive className="mb-0">
-                                                                        <thead className="fs-15">
-                                                                            <tr>
-                                                                                <th scope="col" className="text-nowrap">
-                                                                                    Team Members
-                                                                                </th>
-                                                                                <th scope="col" className="custom-width-85 text-nowrap text-center">{t('ACTIONS')}</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            {newTeamMember.map((member) => (
-                                                                                <tr key={member.id}>
-                                                                                    <td className="text-nowrap">{member.name}</td>
-                                                                                    <td className="custom-width-85 text-nowrap text-center">
-                                                                                        <AppTooltip title="Delete" placement="top">
-                                                                                            <Button
-                                                                                                className={`custom-width-26 custom-height-26 d-inline-flex align-items-center justify-content-center p-1 lh-1 fs-5 theme-delete-btn link-dark`}
-                                                                                                variant="link"
-                                                                                                onClick={() => deleteAction(member)}
-                                                                                                aria-label="Delete"
-                                                                                            >
-                                                                                                <MdDelete size={18} />
-                                                                                            </Button>
-                                                                                        </AppTooltip>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            ))}
-                                                                        </tbody>
-                                                                    </Table>
-                                                                </div>
-                                                            </Col>
-                                                        }
-                                                    </Row>
-                                                </Col>
-                                            </Row>
-                                        </Col> */}
                                     </Row>
-                                    <div className="border-top mx-n3">
-                                        
+
+                                    <div className="border-top mt-2 mx-n3 px-3">
+                                        <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
+                                            <h5 className="fw-semibold mb-0 me-auto">Events</h5>
+                                            <Button variant="link" className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center">
+                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> Add More
+                                            </Button>
+                                        </Stack>
+                                        <div className="position-relative custom-padding-right-66">
+                                            <Row className="gx-4">
+                                                <Col sm={6} lg={4}>
+                                                    <ReactSelect
+                                                        label={t('EVENT_SELECTION')}
+                                                        wrapperClassName={'mb-3'}
+                                                        error={errors.entityId}
+                                                        options={organizationArr}
+                                                        value={values.entityId || ""}
+                                                        onChange={(option) => {
+                                                            setFieldValue(
+                                                                "entityId",
+                                                                option?.target?.value.toString() ?? ""
+                                                            );
+                                                        }}
+                                                        name="entityId"
+                                                        onBlur={handleBlur}
+                                                        touched={touched.entityId}
+                                                    />
+                                                </Col>
+                                                <Col sm={6} lg={4}>
+                                                    <ReactSelect
+                                                        label={t('SELECT_ACTION')}
+                                                        wrapperClassName={'mb-3'}
+                                                        error={errors.entityId}
+                                                        options={organizationArr}
+                                                        value={values.entityId || ""}
+                                                        onChange={(option) => {
+                                                            setFieldValue(
+                                                                "entityId",
+                                                                option?.target?.value.toString() ?? ""
+                                                            );
+                                                        }}
+                                                        name="entityId"
+                                                        onBlur={handleBlur}
+                                                        touched={touched.entityId}
+                                                    />
+                                                </Col>
+                                                <Col xs='auto' className="pt-1 custom-margin-right--66 pe-0">
+                                                    <Button variant="link" aria-label="Remove" className="p-1 rounded custom-width-42 custom-height-42 d-flex align-items-center justify-content-center link-danger bg-danger-subtle mt-4">
+                                                        <MdClose size={24} />
+                                                    </Button>
+                                                </Col>
+
+                                            </Row>
+                                        </div>
+
                                     </div>
 
+                                    <div className="border-top mt-2 mx-n3 px-3">
+                                        <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
+                                            <div className="me-auto">
+                                                <h5 className="fw-semibold mb-0">Conditions</h5>
+                                                <p className="mb-0 text-muted">Conditions are sets of rules which check for specific scenarios.</p>
+                                            </div>
+
+                                            <Button variant="link" className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center">
+                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> Add OR Conditons
+                                            </Button>
+                                        </Stack>
+
+                                        <div className="repeater-row">
+                                            <div className="position-relative custom-padding-right-66">
+                                                <Row className="gx-4">
+                                                    <Col sm={6} lg={4}>
+                                                        <ReactSelect
+                                                            // label={t('EVENT_SELECTION')}
+                                                            wrapperClassName={'mb-0'}
+                                                            error={errors.entityId}
+                                                            options={organizationArr}
+                                                            value={values.entityId || ""}
+                                                            onChange={(option) => {
+                                                                setFieldValue(
+                                                                    "entityId",
+                                                                    option?.target?.value.toString() ?? ""
+                                                                );
+                                                            }}
+                                                            name="entityId"
+                                                            onBlur={handleBlur}
+                                                            touched={touched.entityId}
+                                                        />
+                                                    </Col>
+                                                    <Col sm={6} lg={4}>
+                                                        <ReactSelect
+                                                            // label={t('SELECT_ACTION')}
+                                                            wrapperClassName={'mb-0'}
+                                                            error={errors.entityId}
+                                                            options={organizationArr}
+                                                            value={values.entityId || ""}
+                                                            onChange={(option) => {
+                                                                setFieldValue(
+                                                                    "entityId",
+                                                                    option?.target?.value.toString() ?? ""
+                                                                );
+                                                            }}
+                                                            name="entityId"
+                                                            onBlur={handleBlur}
+                                                            touched={touched.entityId}
+                                                        />
+                                                    </Col>
+
+                                                    <Col sm={6} lg={4}>
+                                                        <ReactSelect
+                                                            // label={t('SELECT_ACTION')}
+                                                            wrapperClassName={'mb-0'}
+                                                            error={errors.entityId}
+                                                            options={organizationArr}
+                                                            value={values.entityId || ""}
+                                                            onChange={(option) => {
+                                                                setFieldValue(
+                                                                    "entityId",
+                                                                    option?.target?.value.toString() ?? ""
+                                                                );
+                                                            }}
+                                                            name="entityId"
+                                                            onBlur={handleBlur}
+                                                            touched={touched.entityId}
+                                                        />
+                                                    </Col>
+
+                                                    <Col xs='auto' className="custom-margin-right--66 pe-0">
+                                                        <Button variant="link" aria-label="Remove" className="p-1 rounded custom-width-42 custom-height-42 d-flex align-items-center justify-content-center link-danger bg-danger-subtle">
+                                                            <MdClose size={24} />
+                                                        </Button>
+                                                    </Col>
+
+                                                </Row>
+                                            </div>
+                                            <div className="border-top my-4 position-relative">
+                                                <span className="bg-body fw-semibold position-absolute px-2 small start-50 top-50 translate-middle">OR</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="border-top my-2 mx-n3 px-3">
+                                        <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
+                                            <div className="me-auto">
+                                                <h5 className="fw-semibold mb-0">Actions</h5>
+                                                <p className="mb-0 text-muted">Actions help you automate tickets.</p>
+                                            </div>
+
+                                            <Button variant="link" className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center">
+                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> Add More
+                                            </Button>
+                                        </Stack>
+
+                                        <div className="repeater-row">
+                                            <div className="position-relative custom-padding-right-66">
+                                                <Row className="gx-4">
+                                                    <Col sm={6} lg={4}>
+                                                        <ReactSelect
+                                                            wrapperClassName={'mb-3'}
+                                                            error={errors.entityId}
+                                                            options={organizationArr}
+                                                            value={values.entityId || ""}
+                                                            onChange={(option) => {
+                                                                setFieldValue(
+                                                                    "entityId",
+                                                                    option?.target?.value.toString() ?? ""
+                                                                );
+                                                            }}
+                                                            name="entityId"
+                                                            onBlur={handleBlur}
+                                                            touched={touched.entityId}
+                                                        />
+                                                    </Col>
+                                                    <Col sm={6} lg={4}>
+                                                        <ReactSelect
+                                                            wrapperClassName={'mb-3'}
+                                                            error={errors.entityId}
+                                                            options={organizationArr}
+                                                            value={values.entityId || ""}
+                                                            onChange={(option) => {
+                                                                setFieldValue(
+                                                                    "entityId",
+                                                                    option?.target?.value.toString() ?? ""
+                                                                );
+                                                            }}
+                                                            name="entityId"
+                                                            onBlur={handleBlur}
+                                                            touched={touched.entityId}
+                                                        />
+                                                    </Col>
+
+                                                    <Col sm={6} lg={4}>
+                                                        <ReactSelect
+                                                            wrapperClassName={'mb-3'}
+                                                            error={errors.entityId}
+                                                            options={organizationArr}
+                                                            value={values.entityId || ""}
+                                                            onChange={(option) => {
+                                                                setFieldValue(
+                                                                    "entityId",
+                                                                    option?.target?.value.toString() ?? ""
+                                                                );
+                                                            }}
+                                                            name="entityId"
+                                                            onBlur={handleBlur}
+                                                            touched={touched.entityId}
+                                                        />
+                                                    </Col>
+
+                                                    <Col xs='auto' className="custom-margin-right--66 pe-0">
+                                                        <Button variant="link" aria-label="Remove" className="p-1 rounded custom-width-42 custom-height-42 d-flex align-items-center justify-content-center link-danger bg-danger-subtle">
+                                                            <MdClose size={24} />
+                                                        </Button>
+                                                    </Col>
+
+                                                </Row>
+                                            </div>
+                                        </div>
+
+                                    </div>
 
                                     <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
                                         <Stack
