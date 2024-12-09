@@ -82,7 +82,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         },
         {
             label: t('ENTITY_NAME'),
-            value: claimTicketData?.organization?.nemonicoTipoOrganizacion ?? t('N/A'),
+            value: claimTicketData?.organization?.razonSocial ?? t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
         {
