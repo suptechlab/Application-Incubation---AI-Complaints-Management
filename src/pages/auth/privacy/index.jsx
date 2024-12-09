@@ -45,9 +45,12 @@ const PrivacyModal = ({ handleClose, handleFormSubmit }) => {
           <React.Fragment>
             <Modal.Body className="text-break d-flex flex-column small p-0">
               <div className='chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-4'>
-                <div className='chatbot-body-inner flex-grow-1 overflow-auto mx-n4 px-4'>
-                  <PrivacyData />
+                <div className="flex-grow-1 overflow-y-auto overflow-x-hidden">
+                  <div className='chatbot-body-inner mx-n4 px-4'>
+                    <PrivacyData />
+                  </div>
                 </div>
+
                 <div className='pt-2'>
                   <FormCheckbox
                     wrapperClassName="mb-0"
@@ -79,7 +82,7 @@ const PrivacyModal = ({ handleClose, handleFormSubmit }) => {
                   type="submit"
                   variant="warning"
                   className="custom-min-width-100"
-                  disabled={formikProps?.isSubmitting ??  false}
+                  disabled={formikProps?.isSubmitting ?? false}
                 >
                   {/* <Spinner size="sm" animation="border" role="output" className="align-middle me-1">
                     <span className="visually-hidden">{t('LOADING')}...</span>
