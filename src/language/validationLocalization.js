@@ -56,7 +56,7 @@ export const messages = {
     // Team Managment
     teamNameRequired: "Team name is required", // For team name
     descriptionRequired: "Description is required", // For description
-    entityRequired: "Entity name is required."
+    entityRequired: "Entity name is required.",
     //create claim
     genderRequired: "Gender is required.",
     cantonRequired: "Canton of Residence is required.",
@@ -127,7 +127,7 @@ export const messages = {
     // Team managment
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
-    entityRequired: "El nombre de la entidad es obligatorio."
+    entityRequired: "El nombre de la entidad es obligatorio.",
     //create claim
     genderRequired: "Se requiere género.",
     cantonRequired: "Se requiere Cantón de Residencia.",
