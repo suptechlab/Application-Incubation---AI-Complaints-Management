@@ -12,5 +12,6 @@ public enum ClaimTicketActivityEnum {
     REPLY_CUSTOMER,
     DATE_EXTENDED,
     CLOSED,
-    REJECTED
+    REJECTED,
+    CUSTOMER_REPLY
 }

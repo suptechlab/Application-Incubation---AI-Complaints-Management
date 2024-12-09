@@ -6,6 +6,7 @@ import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
+import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
@@ -62,13 +63,15 @@ public class UserClaimTicketService {
     private final ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository;
     private static final boolean IS_INTERNAL_DOCUMENT = false;
     private final EnumUtil enumUtil;
+    private final ClaimTicketActivityLogService claimTicketActivityLogService;
 
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
                                   OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository,
                                   ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository,
                                   UserService userService, UserClaimTicketMapper userClaimTicketMapper,
                                   AuditLogService auditLogService, Gson gson, MessageSource messageSource,
-                                  ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, EnumUtil enumUtil) {
+                                  ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, EnumUtil enumUtil,
+                                  ClaimTicketActivityLogService claimTicketActivityLogService) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -86,6 +89,7 @@ public class UserClaimTicketService {
         this.claimTicketStatusLogRepository = claimTicketStatusLogRepository;
         this.claimTicketInstanceLogRepository = claimTicketInstanceLogRepository;
         this.enumUtil = enumUtil;
+        this.claimTicketActivityLogService = claimTicketActivityLogService;
     }
 
 
@@ -711,5 +715,91 @@ public class UserClaimTicketService {
         }
         return dto;
     }
+
+    /**
+     * Handles the reply action on a claim ticket by the customer.
+     *
+     * @param ticketId the ID of the claim ticket being replied to
+     * @param claimTicketReplyRequest the reply request containing the reply message and optional attachments
+     * @throws CustomException if the ticket is not found, the user is not authorized,
+     *                         or the ticket is already closed or rejected
+     */
+    @Transactional
+    public void replyOnTicket(Long ticketId, @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if(authority.contains(AuthoritiesConstants.USER)) {
+            ticket = claimTicketRepository.findByIdAndUserId(ticketId, currentUser.getId())
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }else{
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+        }
+
+        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
+        }
+        replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.CUSTOMER_REPLY.name());
+
+    }
+
+    /**
+     * Logs an activity related to a reply action on a claim ticket.
+     *
+     * @param claimTicketReplyRequest the reply request containing the reply message and optional attachments
+     * @param ticket the claim ticket being replied to
+     * @param currentUser the user performing the reply action
+     * @param activityType the type of activity being logged (e.g., "CUSTOMER_REPLY")
+     */
+    private void replyLogActivity(ClaimTicketReplyRequest claimTicketReplyRequest, ClaimTicket ticket, User currentUser, String activityType) {
+        DocumentSourceEnum source = DocumentSourceEnum.CONVERSATION_ON_TICKET;
+        // Handle attachments and save documents
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(claimTicketReplyRequest.getAttachments(), ticket, currentUser, source);
+        // Save documents if any were uploaded
+        Map<String, Object> attachments = new HashMap<>();
+        if (!claimTicketDocuments.isEmpty()) {
+            List<ClaimTicketDocument> savedDocuments = claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+            Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
+            attachments.put("attachments", attachDocument);
+        }
+
+        ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
+        activityLog.setTicketId(ticket.getId());
+        activityLog.setPerformedBy(currentUser.getId());
+        Map<String, String> activityTitle = new HashMap<>();
+        Map<String, String> linkedUser = new HashMap<>();
+        Map<String, Object> activityDetail = new HashMap<>();
+        activityLog.setActivityType(activityType);
+        if (!claimTicketDocuments.isEmpty()) {
+            Arrays.stream(LanguageEnum.values()).forEach(language -> {
+                String messageAudit = messageSource.getMessage("ticket.activity.log.customer.replied.with.attachment",
+                    new Object[]{"@" + currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
+                activityTitle.put(language.getCode(), messageAudit);
+            });
+        }else{
+            Arrays.stream(LanguageEnum.values()).forEach(language -> {
+                String messageAudit = messageSource.getMessage("ticket.activity.log.customer.replied",
+                    new Object[]{"@" + currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
+                activityTitle.put(language.getCode(), messageAudit);
+            });
+        }
+        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        activityDetail.put("text", claimTicketReplyRequest.getMessage());
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
+        linkedUser.put(ticket.getUserId().toString(), ticket.getUser().getFirstName());
+
+        activityLog.setActivityTitle(activityTitle);
+        activityLog.setLinkedUsers(linkedUser);
+        activityLog.setActivityDetails(activityDetail);
+        activityLog.setAttachmentUrl(attachments);
+        claimTicketActivityLogService.saveActivityLog(activityLog);
+    }
+
 
 }

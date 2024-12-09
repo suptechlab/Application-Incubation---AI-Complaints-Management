@@ -9,4 +9,6 @@ public interface ClaimTicketActivityLogService {
     void saveActivityLog(ClaimTicketActivityLog activityLog);
 
     Page<ClaimTicketActivityLogDTO> getAllActivities(Long ticketId, Pageable pageable);
+
+    Page<ClaimTicketActivityLogDTO> getAllConversation(Long ticketId, Pageable pageable);
 }

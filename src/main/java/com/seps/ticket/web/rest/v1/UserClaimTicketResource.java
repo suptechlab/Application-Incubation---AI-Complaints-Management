@@ -1,14 +1,13 @@
 package com.seps.ticket.web.rest.v1;
 
+import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.MailService;
 import com.seps.ticket.service.UserClaimTicketService;
 import com.seps.ticket.service.UserService;
-import com.seps.ticket.service.dto.ClaimStatusCountResponseDTO;
-import com.seps.ticket.service.dto.RequestInfo;
+import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
-import com.seps.ticket.service.dto.UserClaimTicketDTO;
-import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.suptech.service.DocumentService;
+import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
 import com.seps.ticket.web.rest.vm.SecondInstanceRequest;
 import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
@@ -45,13 +44,15 @@ public class UserClaimTicketResource {
     private final MailService mailService;
     private final DocumentService documentService;
     private final MessageSource messageSource;
+    private final ClaimTicketActivityLogService claimTicketActivityLogService;
 
     public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService,
-                                   MessageSource messageSource) {
+                                   MessageSource messageSource, ClaimTicketActivityLogService claimTicketActivityLogService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.documentService = documentService;
         this.messageSource = messageSource;
+        this.claimTicketActivityLogService = claimTicketActivityLogService;
     }
 
     @Operation(
@@ -170,6 +171,53 @@ public class UserClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @Operation(
+        summary = "Reply to a claim ticket",
+        description = "Allows a customer to reply to a claim ticket with a message and optional attachments."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Reply posted successfully.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ResponseStatus.class))),
+        @ApiResponse(responseCode = "400", description = "Bad request or invalid ticket status"),
+        @ApiResponse(responseCode = "403", description = "Access forbidden"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping("/{id}/reply-on-ticket")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<ResponseStatus> replyCustomerOnTicket(@PathVariable Long id,
+                                                          @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        // Call service method to handle the reply
+        userClaimTicketService.replyOnTicket(id, claimTicketReplyRequest);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.replied.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
+
+
+    @Operation(
+        summary = "Get list of conversations for a claim ticket",
+        description = "Retrieves a paginated list of activity logs for the specified claim ticket."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Conversations retrieved successfully.",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ClaimTicketActivityLogDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Bad request or invalid ticket ID"),
+        @ApiResponse(responseCode = "404", description = "Claim ticket not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/{id}/conversations-list")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<List<ClaimTicketActivityLogDTO>> claimTicketsConversationList(@PathVariable Long id, Pageable pageable) {
+        Page<ClaimTicketActivityLogDTO> page = claimTicketActivityLogService.getAllConversation(id, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
 }
