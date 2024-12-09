@@ -140,7 +140,7 @@ export default function MyAccount() {
             (type) => type.value === rowData.row.original.instanceType
           );
           const displayLabel = matchedInstanceType ? matchedInstanceType.label : rowData.row.original.instanceType;
-        
+
           return (
             <span className={rowData.row.original.instanceType === 'COMPLAINT' ? 'text-danger' : ''}>
               {displayLabel}
@@ -167,33 +167,32 @@ export default function MyAccount() {
         header: t("ACTIONS"),
         enableSorting: false,
         cell: (info) => {
-          const renderButton = (label, onClickHandler) => (
+          const renderButton = ({ label, onClickHandler, variant = "link", className = "", ariaLabel }) => (
             <Button
-              variant="link"
-              className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none text-info`}
-              aria-label={label}
+              variant={variant}
+              className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none text-info ${className}`}
+              aria-label={ariaLabel || label}
               onClick={onClickHandler}
             >
               {t(label)}
             </Button>
           );
 
-          let instanceButton = null;
           let tooltipTitle = '';
-          switch (info.row.original.instanceType) {
-            case "FIRST_INSTANCE":
-              instanceButton = renderButton("FILE_SECOND_INSTANCE", instanceClickHandler(info.row.original));
-              tooltipTitle = "FILE_SECOND_INSTANCE_TOOLTIP";
-              break;
-            case "SECOND_INSTANCE":
-              instanceButton = renderButton("RAISE_COMPLAINT", raisedComplaintClickHandler(info.row.original));
-              tooltipTitle = "RAISE_COMPLAINT_TOOLTIP";
-              break;
-            case "COMPLAINT":
-              break;
-            default:
-              break;
-          }
+          const instanceButton = (info.row.original.instanceType === "FIRST_INSTANCE") &&
+            ((info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED"))
+            ? renderButton({
+              label: "FILE_SECOND_INSTANCE",
+              onClickHandler: () => instanceClickHandler(info.row.original),
+              ariaLabel: t("FILE_SECOND_INSTANCE")
+            })
+            : info.row.original.instanceType === "SECOND_INSTANCE"
+              ? renderButton({
+                label: "RAISE_COMPLAINT",
+                onClickHandler: () => raisedComplaintClickHandler(info.row.original),
+                ariaLabel: t("RAISE_COMPLAINT")
+              })
+              : null;
 
           return (
             <Stack direction='horizontal' gap={3}>
