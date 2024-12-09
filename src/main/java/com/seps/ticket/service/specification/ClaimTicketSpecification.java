@@ -1,11 +1,10 @@
 package com.seps.ticket.service.specification;
 
 import com.seps.ticket.domain.ClaimTicket;
-import com.seps.ticket.enums.ClaimTicketPriorityEnum;
-import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
-import jakarta.persistence.criteria.Predicate;
+import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 import org.zalando.problem.Status;
@@ -54,77 +53,108 @@ public class ClaimTicketSpecification {
         };
     }
 
-    public static Specification<ClaimTicket> bySepsFiFilter(String search, Long organizationId, ClaimTicketStatusEnum claimTicketStatus, ClaimTicketPriorityEnum claimTicketPriority, String startDate, String endDate, Long fiAgentId, Long claimTypeId, Long sepsAgentId) {
+    public static Specification<ClaimTicket> bySepsFiFilter(ClaimTicketFilterRequest filterRequest, Long fiAgentId, Long sepsAgentId) {
         return (root, query, criteriaBuilder) -> {
-            // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
 
-            // Filter by search (ticketId)
-            if (StringUtils.hasText(search)) {
+            // Add filters based on the available criteria
+            addSearchFilter(filterRequest, root, criteriaBuilder, predicates);
+            addOrganizationFilter(filterRequest, root, criteriaBuilder, predicates);
+            addStatusFilter(filterRequest, root, criteriaBuilder, predicates);
+            addPriorityFilter(filterRequest, root, criteriaBuilder, predicates);
+            addAgentFilter(fiAgentId, root, criteriaBuilder, predicates);
+            addClaimTypeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addSepsAgentFilter(sepsAgentId, root, criteriaBuilder, predicates);
+            addDateRangeFilter(filterRequest, root, criteriaBuilder, predicates);
 
-                predicates.add(criteriaBuilder.like(
-                    criteriaBuilder.function("CONCAT", String.class, criteriaBuilder.literal("#"), root.get("ticketId")), "%" + search + "%"
-                ));
-
-            }
-
-            // Filter by organizationId (if provided)
-            if (organizationId != null) {
-                predicates.add(
-                    criteriaBuilder.equal(root.get("organizationId"), organizationId)
-                );
-            }
-
-            // Filter by claimTicketStatusEnum (if provided)
-            if(claimTicketStatus !=null){
-                predicates.add(
-                    criteriaBuilder.equal(root.get("status"), claimTicketStatus)
-                );
-            }
-
-            // Filter by claimTicketPriorityEnum (if provided)
-            if(claimTicketPriority !=null){
-                predicates.add(
-                    criteriaBuilder.equal(root.get("priority"), claimTicketPriority)
-                );
-            }
-
-            //Filter by agentId (if provided)
-            if(fiAgentId !=null){
-                predicates.add(
-                    criteriaBuilder.equal(root.get("fiAgentId"), fiAgentId)
-                );
-            }
-            //Filter by claimTypeId (if provided)
-            if(claimTypeId != null){
-                predicates.add(
-                    criteriaBuilder.equal(root.get("claimTypeId"), claimTypeId)
-                );
-            }
-
-            if(sepsAgentId != null){
-                predicates.add(
-                    criteriaBuilder.equal(root.get("sepsAgentId"), sepsAgentId)
-                );
-            }
-            // Parse and apply the date range filter only if both startDate and endDate are provided
-            if (StringUtils.hasText(startDate) && StringUtils.hasText(endDate)) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-                try {
-                    Instant startInstant = LocalDate.parse(startDate, formatter).atStartOfDay().toInstant(ZoneOffset.UTC);
-                    Instant endInstant = LocalDate.parse(endDate, formatter).atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
-
-                    // Add the date range filter
-                    predicates.add(criteriaBuilder.between(root.get("createdAt"), startInstant, endInstant));
-                } catch (DateTimeParseException e) {
-                    // Handle parsing error if necessary
-                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_DATE_FORMAT, null, null);
-                }
-            }
-
-            // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    private static void addSearchFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (StringUtils.hasText(filterRequest.getSearch())) {
+
+            // Filter by ticketId with the "#" symbol
+            Predicate ticketIdPredicate = criteriaBuilder.like(
+                criteriaBuilder.function("CONCAT", String.class, criteriaBuilder.literal("#"), root.get("ticketId")), "%" + filterRequest.getSearch() + "%"
+            );
+
+            // Concatenate firstName and lastName, then filter by the concatenated value
+            Join<Object, Object> user = root.join("user", JoinType.INNER);
+            Predicate userNamePredicate = criteriaBuilder.like(
+                criteriaBuilder.lower(
+                    criteriaBuilder.concat(
+                        criteriaBuilder.concat(user.get("firstName"), criteriaBuilder.literal(" ")),
+                        user.get("lastName")
+                    )
+                ),
+                "%" + filterRequest.getSearch().toLowerCase() + "%"
+            );
+
+            // Add both predicates as OR conditions
+            predicates.add(criteriaBuilder.or(ticketIdPredicate, userNamePredicate));
+        }
+    }
+
+    private static void addOrganizationFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getOrganizationId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("organizationId"), filterRequest.getOrganizationId()));
+        }
+    }
+
+    private static void addStatusFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getClaimTicketStatus() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("status"), filterRequest.getClaimTicketStatus()));
+        }
+    }
+
+    private static void addPriorityFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getClaimTicketPriority() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("priority"), filterRequest.getClaimTicketPriority()));
+        }
+    }
+
+    private static void addAgentFilter(Long fiAgentId, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (fiAgentId != null) {
+            predicates.add(criteriaBuilder.equal(root.get("fiAgentId"), fiAgentId));
+        }
+    }
+
+    private static void addClaimTypeFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getClaimTypeId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("claimTypeId"), filterRequest.getClaimTypeId()));
+        }
+    }
+
+    private static void addSepsAgentFilter(Long sepsAgentId, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (sepsAgentId != null) {
+            predicates.add(criteriaBuilder.equal(root.get("sepsAgentId"), sepsAgentId));
+        }
+    }
+
+    private static void addDateRangeFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (StringUtils.hasText(filterRequest.getStartDate()) && StringUtils.hasText(filterRequest.getEndDate())) {
+            try {
+                Instant startInstant = parseDateToInstant(filterRequest.getStartDate());
+                Instant endInstant = parseDateToInstant(filterRequest.getEndDate(), true);
+                predicates.add(criteriaBuilder.between(root.get("createdAt"), startInstant, endInstant));
+            } catch (DateTimeParseException e) {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_DATE_FORMAT, null, null);
+            }
+        }
+    }
+
+    private static Instant parseDateToInstant(String dateString) {
+        return parseDateToInstant(dateString, false);
+    }
+
+    private static Instant parseDateToInstant(String dateString, boolean endOfDay) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(dateString, formatter);
+        if (endOfDay) {
+            return date.atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
+        }
+        return date.atStartOfDay().toInstant(ZoneOffset.UTC);
+    }
+
 }

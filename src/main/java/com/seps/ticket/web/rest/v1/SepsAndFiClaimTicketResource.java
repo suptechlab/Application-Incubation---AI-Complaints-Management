@@ -2,7 +2,6 @@ package com.seps.ticket.web.rest.v1;
 
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
-import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
 import com.seps.ticket.service.dto.*;
@@ -11,6 +10,7 @@ import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,15 +61,9 @@ public class SepsAndFiClaimTicketResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ClaimTicketDTO.class)))
     @GetMapping
-    public ResponseEntity<List<ClaimTicketDTO>> listSepsFiClaimTickets(Pageable pageable,
-                                                                           @RequestParam(required = false) String search,
-                                                                           @RequestParam(required = false) ClaimTicketStatusEnum claimTicketStatus,
-                                                                           @RequestParam(required = false) ClaimTicketPriorityEnum claimTicketPriority,
-                                                                           @RequestParam(required = false) String startDate,
-                                                                           @RequestParam(required = false) String endDate,
-                                                                           @RequestParam(required = false) Long organizationId,
-                                                                           @RequestParam(required = false) Long claimTypeId) {
-        Page<ClaimTicketDTO> page = sepsAndFiClaimTicketService.listSepsAndFiClaimTickets(pageable, search, claimTicketStatus, claimTicketPriority, startDate, endDate, organizationId, claimTypeId);
+    public ResponseEntity<List<ClaimTicketListDTO>> listSepsFiClaimTickets(Pageable pageable,
+                                                                           @ModelAttribute ClaimTicketFilterRequest filterRequest) {
+        Page<ClaimTicketListDTO> page = sepsAndFiClaimTicketService.listSepsAndFiClaimTickets(pageable, filterRequest);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

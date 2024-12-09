@@ -17,12 +17,12 @@ import com.seps.ticket.suptech.service.InvalidFileTypeException;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cglib.core.Local;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -113,27 +113,35 @@ public class SepsAndFiClaimTicketService {
     }
 
     /**
-     * Retrieves a paginated list of claim tickets based on various filters and user roles.
+     * Retrieves a paginated list of claim tickets based on the provided filter criteria.
      *
-     * @param pageable              the pagination and sorting information.
-     * @param search                the search keyword for filtering claim tickets.
-     * @param claimTicketStatus     the status of the claim tickets to filter (e.g., OPEN, CLOSED).
-     * @param claimTicketPriority   the priority of the claim tickets to filter (e.g., HIGH, MEDIUM, LOW).
-     * @param startDate             the start date for filtering claim tickets (in YYYY-MM-DD format).
-     * @param endDate               the end date for filtering claim tickets (in YYYY-MM-DD format).
-     * @param organizationId        the ID of the organization to filter claim tickets by.
-     * @param claimTypeId           the ID of the claim type to filter claim tickets by.
-     * @return a {@link Page} containing a list of {@link ClaimTicketDTO} objects that match the filter criteria.
+     * @param pageable       the pagination and sorting information.
+     * @param filterRequest  the filter criteria for the claim tickets, which includes optional
+     *                       parameters like search, claim ticket status, priority, date range,
+     *                       organization ID, and claim type ID. If {@code null}, a default filter
+     *                       request will be initialized.
+     * @return a {@link Page} of {@link ClaimTicketListDTO} containing the filtered claim tickets.
      *
-     * @throws IllegalArgumentException if the current user does not have the required permissions or if
-     *                                  invalid data is provided.
+     * @throws CustomException if the current user lacks appropriate permissions to view claim tickets.
      *
-     * @see UserService#getCurrentUser()
-     * @see ClaimTicketRepository#findAll(org.springframework.data.jpa.domain.Specification, Pageable)
-     * @see ClaimTicketMapper#toDTO(ClaimTicket)
+     * This method performs the following operations:
+     * <ul>
+     *   <li>Initializes a default filter request if none is provided.</li>
+     *   <li>Identifies the current user's roles and authorities to apply appropriate filtering logic.</li>
+     *   <li>Automatically filters claim tickets based on the current user's organization if they
+     *       belong to the FI group.</li>
+     *   <li>Applies additional filtering for FI agents or SEPS agents based on the user's role and ID.</li>
+     *   <li>Uses a specification to dynamically build the query for fetching claim tickets from
+     *       the repository.</li>
+     * </ul>
      */
+
     @Transactional
-    public Page<ClaimTicketDTO> listSepsAndFiClaimTickets(Pageable pageable, String search, ClaimTicketStatusEnum claimTicketStatus, ClaimTicketPriorityEnum claimTicketPriority, String startDate, String endDate, Long organizationId, Long claimTypeId) {
+    public Page<ClaimTicketListDTO> listSepsAndFiClaimTickets(Pageable pageable, ClaimTicketFilterRequest filterRequest) {
+        // If no filterRequest is provided, initialize a default object
+        if (filterRequest == null) {
+            filterRequest = new ClaimTicketFilterRequest();
+        }
         User currentUser = userService.getCurrentUser();
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
@@ -141,7 +149,7 @@ public class SepsAndFiClaimTicketService {
         Long fiAgentId = null;
         Long sepsAgentId = null;
         if(authority.contains(AuthoritiesConstants.FI)){
-            organizationId = currentUser.getOrganization().getId();
+            filterRequest.setOrganizationId(currentUser.getOrganization().getId());
             if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT)){
                 fiAgentId = currentUser.getId();
             }
@@ -151,8 +159,8 @@ public class SepsAndFiClaimTicketService {
             }
         }
 
-        return claimTicketRepository.findAll(ClaimTicketSpecification.bySepsFiFilter(search, organizationId, claimTicketStatus, claimTicketPriority, startDate, endDate, fiAgentId, claimTypeId, sepsAgentId), pageable)
-            .map(claimTicketMapper::toDTO);
+        return claimTicketRepository.findAll(ClaimTicketSpecification.bySepsFiFilter(filterRequest, fiAgentId, sepsAgentId), pageable)
+            .map(claimTicketMapper::toListDTO);
     }
 
     /**

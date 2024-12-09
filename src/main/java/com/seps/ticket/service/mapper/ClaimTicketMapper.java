@@ -47,4 +47,11 @@ public interface ClaimTicketMapper {
     // Map ClaimTicketDocument to ClaimTicketDocumentDTO
     Set<ClaimTicketDocumentDTO> toClaimTicketDocumentDTOs(List<ClaimTicketDocument> claimTicketDocuments);
 
+    @Mapping(source = "user", target = "user")
+    @Mapping(source = "fiAgent", target = "fiAgent")
+    @Mapping(source = "sepsAgent", target = "sepsAgent")
+    @Mapping(source = "createdByUser", target = "createdByUser")
+    @Mapping(source = "updatedByUser", target = "updatedByUser")
+    @Mapping(expression = "java(claimTicket.getClaimTicketDocuments() != null && !claimTicket.getClaimTicketDocuments().isEmpty())", target = "haveClaimTicketDocuments")
+    ClaimTicketListDTO toListDTO(ClaimTicket claimTicket);
 }
