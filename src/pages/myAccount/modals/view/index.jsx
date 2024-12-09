@@ -1,6 +1,6 @@
 import moment from 'moment/moment';
 import React, { useEffect, useState } from 'react';
-import { Accordion, Col, ListGroup, Modal, Row } from 'react-bootstrap';
+import { Accordion, Button, Col, ListGroup, Modal, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import CommonViewData from "../../../../components/CommonViewData";
@@ -8,12 +8,11 @@ import { getClaimDetails } from '../../../../redux/slice/fileClaimSlice';
 import Loader from '../../../../components/Loader';
 import { MdAttachFile, MdDownload } from 'react-icons/md';
 import AppTooltip from '../../../../components/tooltip';
-import { Link } from 'react-router-dom';
+import { downloadDocument } from '../../../../redux/slice/fileClaimSlice';
 
 const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
     const { t } = useTranslation();
-
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [claimTicketData, setClaimTicketData] = useState([]);
@@ -50,6 +49,17 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             setLoading(false);
         }
     };
+
+    const downloadAttachment = async (id) => {
+        setLoading(true);
+        const result = await dispatch(downloadDocument(id));
+        if (downloadDocument.fulfilled.match(result)) {
+            console.log('result', result)
+            setLoading(false);
+        } else {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         if (selectedRow?.id) {
@@ -207,14 +217,13 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                                             >
                                                 <span className="me-auto py-1">{item.file_name}</span>
                                                 <AppTooltip title={t("DOWNLOAD")} placement="left">
-                                                    <Link
-                                                        to={item.dowlnloadUrl}
-                                                        className="text-decoration-none link-primary"
-                                                        target="_blank"
+                                                    <Button
+                                                        className="text-decoration-none"
                                                         aria-label={t("DOWNLOAD")}
+                                                        onClick = {() => downloadAttachment(item.id)}
                                                     >
                                                         <MdDownload size={20} />
-                                                    </Link>
+                                                    </Button>
                                                 </AppTooltip>
                                             </ListGroup.Item>
                                         ))}

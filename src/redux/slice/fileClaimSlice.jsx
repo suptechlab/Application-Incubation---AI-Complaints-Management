@@ -140,6 +140,21 @@ export const fileClaimSecondInstanceForm = createAsyncThunk(
       if (response.status !== 200) {
         return rejectWithValue('Failed to file second instance claim!');
       }
+      return response; // RETURN RESPONSE
+    } catch (error) {
+      
+    }
+  }
+);
+
+export const downloadDocument = createAsyncThunk(
+  'downloadDocument',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await ticketsApi.get(`${EndPoint.DOWNLOAD_DOCUMENT}/${id}`);
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to download!');
+      }
       console.log('response', response)
       return response; // RETURN RESPONSE
     } catch (error) {

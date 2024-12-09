@@ -16,7 +16,7 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose  }) => {
     const [loading, setLoading] = useState(false)
     const [files, setFiles] = useState([]);
     const { t } = useTranslation();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
 
     // Initial Values
