@@ -1,5 +1,6 @@
 package com.seps.ticket.web.rest.v1;
 
+import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.MailService;
 import com.seps.ticket.service.UserClaimTicketService;
@@ -191,6 +192,7 @@ public class UserClaimTicketResource {
                                                           @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
         userClaimTicketService.replyOnTicket(id, claimTicketReplyRequest);
+        userClaimTicketService.sendCustomerReplyEmail(id,claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.replied.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),

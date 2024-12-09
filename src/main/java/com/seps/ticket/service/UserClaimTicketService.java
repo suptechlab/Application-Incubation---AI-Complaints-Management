@@ -64,6 +64,7 @@ public class UserClaimTicketService {
     private static final boolean IS_INTERNAL_DOCUMENT = false;
     private final EnumUtil enumUtil;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
+    private final MailService mailService;
 
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
                                   OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository,
@@ -71,7 +72,7 @@ public class UserClaimTicketService {
                                   UserService userService, UserClaimTicketMapper userClaimTicketMapper,
                                   AuditLogService auditLogService, Gson gson, MessageSource messageSource,
                                   ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, EnumUtil enumUtil,
-                                  ClaimTicketActivityLogService claimTicketActivityLogService) {
+                                  ClaimTicketActivityLogService claimTicketActivityLogService, MailService mailService) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -90,6 +91,7 @@ public class UserClaimTicketService {
         this.claimTicketInstanceLogRepository = claimTicketInstanceLogRepository;
         this.enumUtil = enumUtil;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
+        this.mailService = mailService;
     }
 
 
@@ -801,5 +803,30 @@ public class UserClaimTicketService {
         claimTicketActivityLogService.saveActivityLog(activityLog);
     }
 
+    @Transactional
+    public void sendCustomerReplyEmail(Long ticketId, ClaimTicketReplyRequest claimTicketRejectRequest) {
+        // Fetch related users
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId).orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+            new String[]{ticketId.toString()}, null));
 
+        List<User> fiAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
+        User fiAgent = ticket.getFiAgent();
+
+        Map<String, String> ticketDetail = new HashMap<>();
+        ticketDetail.put("ticketNumber",ticket.getTicketId().toString());
+        ticketDetail.put("customerName",ticket.getUser().getFirstName());
+
+        // Send email to FI Admin
+        if (!fiAdmin.isEmpty()) {
+            fiAdmin.forEach(fiAdminUser -> mailService.sendCustomerReplyEmail(ticketDetail, claimTicketRejectRequest, fiAdminUser));
+        }
+
+        if(ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE) && fiAgent != null) {
+            mailService.sendCustomerReplyEmail(ticketDetail, claimTicketRejectRequest, fiAgent);
+        }
+
+        if(ticket.getInstanceType().equals(InstanceTypeEnum.SECOND_INSTANCE) && ticket.getSepsAgent()!=null){
+            mailService.sendCustomerReplyEmail(ticketDetail, claimTicketRejectRequest, ticket.getSepsAgent());
+        }
+    }
 }

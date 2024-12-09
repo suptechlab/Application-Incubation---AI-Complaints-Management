@@ -22,6 +22,7 @@ import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cglib.core.Local;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -512,7 +513,8 @@ public class SepsAndFiClaimTicketService {
         if (
             (authority.contains(AuthoritiesConstants.FI) && !currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) ||
                 (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) ||
-                (!authority.contains(AuthoritiesConstants.ADMIN))
+                (!authority.contains(AuthoritiesConstants.ADMIN) &&
+                    !(authority.contains(AuthoritiesConstants.FI) || authority.contains(AuthoritiesConstants.SEPS)))
         ) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
@@ -1205,6 +1207,7 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityDetails(activityDetail);
         activityLog.setAttachmentUrl(attachments);
         claimTicketActivityLogService.saveActivityLog(activityLog);
+        this.sendReplyEmail(ticket, claimTicketReplyRequest, activityType, currentUser);
     }
 
     private List<ClaimTicketDocument> uploadFileAttachments(List<MultipartFile> attachments, ClaimTicket newClaimTicket, User currentUser, DocumentSourceEnum source) {
@@ -1286,5 +1289,22 @@ public class SepsAndFiClaimTicketService {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE.name());
+    }
+
+    private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser) {
+        Map<String, String> ticketDetail = new HashMap<>();
+        ticketDetail.put("ticketNumber",ticket.getTicketId().toString());
+        ticketDetail.put("senderName",currentUser.getFirstName());
+        ticketDetail.put("messageContent",currentUser.getFirstName());
+        ticketDetail.put("id", ticket.getId().toString());
+        if(activityType.equals(ClaimTicketActivityEnum.REPLY_CUSTOMER.name())){
+            mailService.sendReplyToCustomerEmail(ticketDetail, claimTicketRejectRequest, ticket.getUser());
+        }
+//        if(activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE.name())){
+//            ticketDetail.put("customerName",ticket.getUser().getFirstName());
+//            ticketDetail.put("status", enumUtil.getLocalizedEnumValue(ticket.getStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
+//
+//            mailService.sendReplyToInternalEmail(ticketDetail, claimTicketRejectRequest, currentUser);
+//        }
     }
 }

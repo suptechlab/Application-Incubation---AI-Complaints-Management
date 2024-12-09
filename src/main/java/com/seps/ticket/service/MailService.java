@@ -6,11 +6,14 @@ import com.seps.ticket.domain.TemplateMaster;
 import com.seps.ticket.domain.User;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.repository.TemplateMasterRepository;
+import com.seps.ticket.service.dto.ClaimTicketDTO;
+import com.seps.ticket.service.dto.FIUserDTO;
 import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
 import com.seps.ticket.suptech.service.ExternalAPIService;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +26,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
@@ -65,6 +69,8 @@ public class MailService {
     private static final String NEW_STATUS = "newStatus";
 
     private static final String INSTANCE_COMMENT = "instanceComment";
+
+    private static final String SENDER_NAME ="senderName";
 
     private final JHipsterProperties jHipsterProperties;
 
@@ -359,5 +365,65 @@ public class MailService {
         } catch (Exception e) {
             LOG.error("Failed to send claim ticket instance email to {}: {}", userClaimTicketDTO.getUser().getEmail(), e.getMessage());
         }
+    }
+
+    @Async
+    public void sendCustomerReplyEmail(Map<String, String> ticketDetail, ClaimTicketReplyRequest claimTicketRejectRequest, User agentUser) {
+        MailDTO mailDTO = new MailDTO();
+        String attachments = messageSource.getMessage("claim.ticket.attachment.no", null, Locale.forLanguageTag(agentUser.getLangKey()));
+        if (!CollectionUtils.isEmpty(claimTicketRejectRequest.getAttachments())) {
+            attachments = messageSource.getMessage("claim.ticket.attachment.yes", null, Locale.forLanguageTag(agentUser.getLangKey()));
+        }
+        mailDTO.setTo(agentUser.getEmail());
+        mailDTO.setLocale(agentUser.getLangKey());
+        mailDTO.setTemplateKey("CUSTOMER_REPLY_ON_TICKET_CONVERSATION");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, agentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticketDetail.get(TICKET_NUMBER));
+        dataVariables.put("customerName", ticketDetail.get("customerName"));
+        dataVariables.put("messageContent", claimTicketRejectRequest.getMessage());
+        dataVariables.put("attachmentDetails", attachments);
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
+        LOG.info("Customer reply on ticket and email sent successfully to agent or admin {}", agentUser.getEmail());
+    }
+
+    @Async
+    public void sendReplyToCustomerEmail(Map<String, String> ticketDetail, ClaimTicketReplyRequest claimTicketRejectRequest, User currentUser) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("REPLY_TO_CUSTOMER_ON_TICKET_CONVERSATION");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticketDetail.get(TICKET_NUMBER));
+        dataVariables.put(SENDER_NAME, ticketDetail.get(SENDER_NAME));
+        dataVariables.put("messageContent", claimTicketRejectRequest.getMessage());
+        dataVariables.put("ticketUrl", userBaseUrl + "/my-account/");
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
+        LOG.info("Reply to Customer on ticket and email sent successfully to customer {}", currentUser.getEmail());
+    }
+
+    @Async
+    public void sendReplyToInternalEmail(Map<String, String> ticketDetail, ClaimTicketReplyRequest claimTicketRejectRequest, User currentUser) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("REPLY_TO_INTERNAL_ON_TICKET_CONVERSATION");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticketDetail.get(TICKET_NUMBER));
+        dataVariables.put(SENDER_NAME, ticketDetail.get(SENDER_NAME));
+        dataVariables.put("customerName", ticketDetail.get("customerName"));
+        dataVariables.put(STATUS, ticketDetail.get(STATUS));
+        dataVariables.put("messageContent", claimTicketRejectRequest.getMessage());
+        dataVariables.put("ticketUrl", jHipsterProperties.getMail().getBaseUrl() + "/ticket/view/" + ticketDetail.get("id"));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
+        LOG.info("Reply to team on ticket and email sent successfully to team {}", currentUser.getEmail());
     }
 }
