@@ -350,7 +350,7 @@ export default function TicketWorkFlowAddEdit() {
                                             className="justify-content-end flex-wrap"
                                         >
                                             <Link
-                                                to={"/team-management"}
+                                                to={"/tickets-workflow"}
                                                 className="btn btn-outline-dark custom-min-width-85"
                                             >
                                                 {t('CANCEL')}
