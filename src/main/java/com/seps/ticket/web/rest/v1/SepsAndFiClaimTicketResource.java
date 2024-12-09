@@ -7,6 +7,7 @@ import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
+import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
@@ -45,12 +46,14 @@ public class SepsAndFiClaimTicketResource {
     private final SepsAndFiClaimTicketService sepsAndFiClaimTicketService;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
     private final MessageSource messageSource;
+    private final DocumentService documentService;
 
     public SepsAndFiClaimTicketResource(SepsAndFiClaimTicketService sepsAndFiClaimTicketService, ClaimTicketActivityLogService claimTicketActivityLogService,
-                                        MessageSource messageSource) {
+                                        MessageSource messageSource, DocumentService documentService) {
         this.sepsAndFiClaimTicketService =  sepsAndFiClaimTicketService;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
+        this.documentService = documentService;
     }
 
     @Operation(summary = "List all Claim Ticket", description = "Retrieve a paginated list of all claim tickets")
@@ -284,5 +287,10 @@ public class SepsAndFiClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") String documentId) {
+        return documentService.downloadDocument(documentId);
     }
 }

@@ -277,6 +277,13 @@ public class SepsAndFiClaimTicketService {
             if (tickets.isEmpty()) {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NO_TICKET_FOUND_WITH_PROVIDED_IDS, new String[]{assignTicketRequestDTO.toString()}, null);
             }
+            // Validate that all tickets are of the FIRST_INSTANCE type
+            boolean allSecondInstance = tickets.stream()
+                .allMatch(ticket -> ticket.getInstanceType() == InstanceTypeEnum.FIRST_INSTANCE);
+
+            if (!allSecondInstance) {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE, new String[]{enumUtil.getLocalizedEnumValue(InstanceTypeEnum.FIRST_INSTANCE, LocaleContextHolder.getLocale())}, null);
+            }
             List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
             List<ClaimTicketAssignLog> assignLogsList= new ArrayList<>();
             List<ClaimTicketStatusLog> claimTicketStatusLogList= new ArrayList<>();
