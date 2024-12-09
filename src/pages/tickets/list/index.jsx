@@ -15,6 +15,7 @@ import TicketsListFilters from "./filters";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
 import { calculateDaysDifference } from "../../../utils/commonutils";
 import moment from "moment/moment";
+import { MdAttachFile } from "react-icons/md";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -36,7 +37,7 @@ export default function TicketsList() {
 
     const [sorting, setSorting] = React.useState([
         {
-            "id": "slaBreachDays",
+            "id": "slaBreachDate",
             "asc": true
         }
     ]);
@@ -172,9 +173,384 @@ export default function TicketsList() {
         setAttachmentsModalShow(true)
     }
 
-    //FI AGENT COLUMNS
-    const FIAgentColumns = React.useMemo(
-        () => [
+    // //FI AGENT COLUMNS
+    // const FIAgentColumns = React.useMemo(
+    //     () => [
+    //         {
+    //             id: 'select-col',
+    //             header: ({ table }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={table.getIsAllRowsSelected()}
+    //                     indeterminate={table.getIsSomeRowsSelected()}
+    //                     // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+    //                     onChange={(e) => {
+    //                         table.toggleAllRowsSelected(e.target.checked);
+    //                         const allSelectedIds = e.target.checked
+    //                             ? table.getRowModel().rows.map((row) => row.original.id)
+    //                             : [];
+    //                         setTicketIdsArr(allSelectedIds);
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             cell: ({ row }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={row.getIsSelected()}
+    //                     disabled={!row.getCanSelect()}
+    //                     // onChange={row.getToggleSelectedHandler()}
+    //                     onChange={(e) => {
+    //                         row.toggleSelected(e.target.checked);
+
+    //                         if (e.target.checked) {
+    //                             // Add the ID to the array if the row is selected
+    //                             setTicketIdsArr((prev) => [...prev, row.original.id]);
+    //                         } else {
+    //                             // Remove the ID from the array if the row is deselected
+    //                             setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+    //                         }
+
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             size: "15",
+    //             meta: {
+    //                 thClassName: 'pe-0 fs-6',
+    //                 tdClassName: 'pe-0 fs-6',
+    //             },
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.ticketId,
+    //             id: "ticketId",
+    //             header: () => "Ticket ID",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <Stack direction="horizontal" gap={2}>
+    //                     <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+    //                     {/* {
+    //                         <MdAttachFile size={16} />
+    //                     } */}
+
+    //                     {/* <AppTooltip title="Attachments">
+    //                         <Button
+    //                             variant="link"
+    //                             className="p-0 border-0 link-dark"
+    //                             onClick={handleAttachmentsClick}
+    //                             aria-label="Attachments"
+    //                         >
+    //                             <MdAttachFile size={16} />
+    //                         </Button>
+    //                     </AppTooltip> */}
+    //                 </Stack>
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.createdAt,
+    //             id: "createdAt",
+    //             header: () => "Creation Date",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.claimType?.name,
+    //             // accessorFn: (row) => row?.claimType,
+    //             id: "claimType",
+    //             header: () => "Claim Type",
+    //             enableSorting: true,
+    //         },
+
+    //         {
+    //             // accessorFn: (row) => row?.claimFilledBy,
+    //             accessorFn: (row) => row?.user?.name,
+    //             id: "claimFilledBy",
+    //             header: () => "Claim filled by",
+    //             enableSorting: true,
+    //         },
+    // {
+    //     accessorFn: (row) => row?.slaBreachDate,
+    //     id: "slaBreachDate",
+    //     header: () => "SLA",
+    //     enableSorting: true,
+    //     cell: ({ row }) => (
+    //         <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+    //     )
+    // },
+    //         {
+    //             accessorFn: (row) => row?.status,
+    //             id: "status",
+    //             header: () => "Status",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+    //                 >
+    //                     {rowData.row.original.status}
+    //                 </span>
+    //             )
+    //         },
+    //     ],
+    //     []
+    // );
+    // //SEPS COLUMN
+    // const SEPSColumns = React.useMemo(
+    //     () => [
+    //         {
+    //             id: 'select-col',
+    //             header: ({ table }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={table.getIsAllRowsSelected()}
+    //                     indeterminate={table.getIsSomeRowsSelected()}
+    //                     // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+    //                     onChange={(e) => {
+    //                         table.toggleAllRowsSelected(e.target.checked);
+    //                         const allSelectedIds = e.target.checked
+    //                             ? table.getRowModel().rows.map((row) => row.original.id)
+    //                             : [];
+    //                         setTicketIdsArr(allSelectedIds);
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             cell: ({ row }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={row.getIsSelected()}
+    //                     disabled={!row.getCanSelect()}
+    //                     // onChange={row.getToggleSelectedHandler()}
+    //                     onChange={(e) => {
+    //                         row.toggleSelected(e.target.checked);
+
+    //                         if (e.target.checked) {
+    //                             // Add the ID to the array if the row is selected
+    //                             setTicketIdsArr((prev) => [...prev, row.original.id]);
+    //                         } else {
+    //                             // Remove the ID from the array if the row is deselected
+    //                             setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+    //                         }
+
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             size: "15",
+    //             meta: {
+    //                 thClassName: 'pe-0 fs-6',
+    //                 tdClassName: 'pe-0 fs-6',
+    //             },
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.ticketId,
+    //             id: "ticketId",
+    //             header: () => "Ticket ID",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <Stack direction="horizontal" gap={2}>
+    //                     <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+    //                     {/* <AppTooltip title="Attachments">
+    //                         <Button
+    //                             variant="link"
+    //                             className="p-0 border-0 link-dark"
+    //                             onClick={handleAttachmentsClick}
+    //                             aria-label="Attachments"
+    //                         >
+    //                             <MdAttachFile size={16} />
+    //                         </Button>
+    //                     </AppTooltip> */}
+    //                 </Stack>
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.createdAt,
+    //             id: "createdAt",
+    //             header: () => "Creation Date",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.claimType?.name,
+    //             // accessorFn: (row) => row?.claimType,
+    //             id: "claimType",
+    //             header: () => "Claim Type",
+    //             enableSorting: true,
+    //         },
+    //         {
+    //             // accessorFn: (row) => row?.claimFilledBy,
+    //             accessorFn: (row) => row?.user?.name,
+    //             id: "claimFilledBy",
+    //             header: () => "Claim filled by",
+    //             enableSorting: true,
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.slaBreachDate,
+    //             id: "slaBreachDate",
+    //             header: () => "SLA",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.status,
+    //             id: "status",
+    //             header: () => "Status",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+    //                 >
+    //                     {rowData.row.original.status}
+    //                 </span>
+    //             )
+    //         },
+    //     ],
+    //     []
+    // );
+
+    // // FI ADMIN
+    // const FIAdminColumns = React.useMemo(
+    //     () => [
+    //         {
+    //             id: 'select-col',
+    //             header: ({ table }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={table.getIsAllRowsSelected()}
+    //                     indeterminate={table.getIsSomeRowsSelected()}
+    //                     // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+    //                     onChange={(e) => {
+    //                         table.toggleAllRowsSelected(e.target.checked);
+    //                         const allSelectedIds = e.target.checked
+    //                             ? table.getRowModel().rows.map((row) => row.original.id)
+    //                             : [];
+    //                         setTicketIdsArr(allSelectedIds);
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             cell: ({ row }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={row.getIsSelected()}
+    //                     disabled={!row.getCanSelect()}
+    //                     // onChange={row.getToggleSelectedHandler()}
+    //                     onChange={(e) => {
+    //                         row.toggleSelected(e.target.checked);
+
+    //                         if (e.target.checked) {
+    //                             // Add the ID to the array if the row is selected
+    //                             setTicketIdsArr((prev) => [...prev, row.original.id]);
+    //                         } else {
+    //                             // Remove the ID from the array if the row is deselected
+    //                             setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+    //                         }
+
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             size: "15",
+    //             meta: {
+    //                 thClassName: 'pe-0 fs-6',
+    //                 tdClassName: 'pe-0 fs-6',
+    //             },
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.ticketId,
+    //             id: "ticketId",
+    //             header: () => "Ticket ID",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <Stack direction="horizontal" gap={2}>
+    //                     <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+    //                     {/* <AppTooltip title="Attachments">
+    //                         <Button
+    //                             variant="link"
+    //                             className="p-0 border-0 link-dark"
+    //                             onClick={handleAttachmentsClick}
+    //                             aria-label="Attachments"
+    //                         >
+    //                             <MdAttachFile size={16} />
+    //                         </Button>
+    //                     </AppTooltip> */}
+    //                 </Stack>
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.createdAt,
+    //             id: "createdAt",
+    //             header: () => "Creation Date",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.claimType?.name,
+    //             // accessorFn: (row) => row?.claimType,
+    //             id: "claimType",
+    //             header: () => "Claim Type",
+    //             enableSorting: true,
+    //         },
+    //         {
+    //             // accessorFn: (row) => row?.claimFilledBy,
+    //             accessorFn: (row) => row?.fiAgent,
+    //             id: "fiAgent",
+    //             header: () => "FI Agent",
+    //             enableSorting: false,
+    //             cell: ({ row }) => (
+    //                 // console.log({row :  row})
+    //                 <span>{row?.original?.fiAgent?.name}</span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.slaBreachDate,
+    //             id: "slaBreachDate",
+    //             header: () => "SLA",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.priority,
+    //             id: "priority",
+    //             header: () => "Priority",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
+    //                 >
+    //                     {rowData.row.original.priority}
+    //                 </span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.status,
+    //             id: "status",
+    //             header: () => "Status",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+    //                 >
+    //                     {rowData.row.original.status}
+    //                 </span>
+    //             )
+    //         },
+    //     ],
+    //     []
+    // );
+
+    const getFilteredColumns = (columnsArray) => {
+        // All available column definitions
+        const allColumns = [
             {
                 id: 'select-col',
                 header: ({ table }) => (
@@ -182,37 +558,48 @@ export default function TicketsList() {
                         className="form-check-cursor"
                         checked={table.getIsAllRowsSelected()}
                         indeterminate={table.getIsSomeRowsSelected()}
-                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
                         onChange={(e) => {
                             table.toggleAllRowsSelected(e.target.checked);
+
+                            // Filter rows based on status and only include rows that are not "CLOSED" or "REJECTED"
                             const allSelectedIds = e.target.checked
-                                ? table.getRowModel().rows.map((row) => row.original.id)
+                                ? table.getRowModel().rows
+                                    .filter((row) => row.original.status !== "CLOSED" && row.original.status !== "REJECTED")
+                                    .map((row) => row.original.id)
                                 : [];
+
                             setTicketIdsArr(allSelectedIds);
-                            setClearTableSelection(false)
+                            setClearTableSelection(false);
                         }}
+
+                    // onChange={(e) => {
+                    //     table.toggleAllRowsSelected(e.target.checked);
+                    //     const allSelectedIds = e.target.checked
+                    //         ? table.getRowModel().rows.map((row) => row.original.id)
+                    //         : [];
+                    //     setTicketIdsArr(allSelectedIds);
+                    //     setClearTableSelection(false);
+                    // }}
                     />
                 ),
                 cell: ({ row }) => (
-                    <Form.Check
-                        className="form-check-cursor"
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        // onChange={row.getToggleSelectedHandler()}
-                        onChange={(e) => {
-                            row.toggleSelected(e.target.checked);
+                    (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") ? (
+                        <Form.Check
+                            className="form-check-cursor"
+                            checked={row.getIsSelected()}
+                            disabled={!row.getCanSelect()}
+                            onChange={(e) => {
+                                row.toggleSelected(e.target.checked);
 
-                            if (e.target.checked) {
-                                // Add the ID to the array if the row is selected
-                                setTicketIdsArr((prev) => [...prev, row.original.id]);
-                            } else {
-                                // Remove the ID from the array if the row is deselected
-                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
-                            }
-
-                            setClearTableSelection(false)
-                        }}
-                    />
+                                if (e.target.checked) {
+                                    setTicketIdsArr((prev) => [...prev, row.original.id]);
+                                } else {
+                                    setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+                                }
+                                setClearTableSelection(false);
+                            }}
+                        />
+                    ) : ''
                 ),
                 size: "15",
                 meta: {
@@ -223,50 +610,55 @@ export default function TicketsList() {
             {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => "Ticket ID",
+                header: () => t("TICKET_ID"),
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
-                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
-                        {/* {
-                            <MdAttachFile size={16} />
-                        } */}
+                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
+                            {"#" + row?.original?.ticketId}
+                        </Link>
+                        {
+                            row?.original?.claimTicketDocuments && row?.original?.claimTicketDocuments?.length > 0 ?
+                                <MdAttachFile size={16} /> : ""
+                        }
+
+
+
 
                         {/* <AppTooltip title="Attachments">
-                            <Button
-                                variant="link"
-                                className="p-0 border-0 link-dark"
-                                onClick={handleAttachmentsClick}
-                                aria-label="Attachments"
-                            >
-                                <MdAttachFile size={16} />
-                            </Button>
-                        </AppTooltip> */}
+                           <Button
+                               variant="link"
+                               className="p-0 border-0 link-dark"
+                               onClick={handleAttachmentsClick}
+                               aria-label="Attachments"
+                           >
+                               <MdAttachFile size={16} />
+                           </Button>                   
+                           </AppTooltip> */}
                     </Stack>
                 ),
             },
             {
                 accessorFn: (row) => row?.createdAt,
                 id: "createdAt",
-                header: () => "Creation Date",
+                header: () => t("CREATION_DATE"),
                 enableSorting: true,
                 cell: ({ row }) => (
-                    row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
+                    row?.original?.createdAt
+                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a")
+                        : ''
                 ),
             },
             {
                 accessorFn: (row) => row?.claimType?.name,
-                // accessorFn: (row) => row?.claimType,
                 id: "claimType",
-                header: () => "Claim Type",
+                header: () => t("CLAIM TYPE"),
                 enableSorting: true,
             },
-
             {
-                // accessorFn: (row) => row?.claimFilledBy,
                 accessorFn: (row) => row?.user?.name,
                 id: "claimFilledBy",
-                header: () => "Claim filled by",
+                header: () => t("CLAIM_FILLED_BY"),
                 enableSorting: true,
             },
             {
@@ -275,252 +667,13 @@ export default function TicketsList() {
                 header: () => "SLA",
                 enableSorting: true,
                 cell: ({ row }) => (
-                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
-                )
-            },
-            {
-                accessorFn: (row) => row?.status,
-                id: "status",
-                header: () => "Status",
-                size: "100",
-                cell: (rowData) => (
-                    <span
-                        className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
-                    >
-                        {rowData.row.original.status}
-                    </span>
-                )
-            },
-        ],
-        []
-    );
-    //SEPS COLUMN
-    const SEPSColumns = React.useMemo(
-        () => [
-            {
-                id: 'select-col',
-                header: ({ table }) => (
-                    <Form.Check
-                        className="form-check-cursor"
-                        checked={table.getIsAllRowsSelected()}
-                        indeterminate={table.getIsSomeRowsSelected()}
-                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
-                        onChange={(e) => {
-                            table.toggleAllRowsSelected(e.target.checked);
-                            const allSelectedIds = e.target.checked
-                                ? table.getRowModel().rows.map((row) => row.original.id)
-                                : [];
-                            setTicketIdsArr(allSelectedIds);
-                            setClearTableSelection(false)
-                        }}
-                    />
-                ),
-                cell: ({ row }) => (
-                    <Form.Check
-                        className="form-check-cursor"
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        // onChange={row.getToggleSelectedHandler()}
-                        onChange={(e) => {
-                            row.toggleSelected(e.target.checked);
-
-                            if (e.target.checked) {
-                                // Add the ID to the array if the row is selected
-                                setTicketIdsArr((prev) => [...prev, row.original.id]);
-                            } else {
-                                // Remove the ID from the array if the row is deselected
-                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
-                            }
-
-                            setClearTableSelection(false)
-                        }}
-                    />
-                ),
-                size: "15",
-                meta: {
-                    thClassName: 'pe-0 fs-6',
-                    tdClassName: 'pe-0 fs-6',
-                },
-            },
-            {
-                accessorFn: (row) => row?.ticketId,
-                id: "ticketId",
-                header: () => "Ticket ID",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <Stack direction="horizontal" gap={2}>
-                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
-                        {/* <AppTooltip title="Attachments">
-                            <Button
-                                variant="link"
-                                className="p-0 border-0 link-dark"
-                                onClick={handleAttachmentsClick}
-                                aria-label="Attachments"
-                            >
-                                <MdAttachFile size={16} />
-                            </Button>
-                        </AppTooltip> */}
-                    </Stack>
-                ),
-            },
-            {
-                accessorFn: (row) => row?.createdAt,
-                id: "createdAt",
-                header: () => "Creation Date",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
-                )
-            },
-            {
-                accessorFn: (row) => row?.claimType?.name,
-                // accessorFn: (row) => row?.claimType,
-                id: "claimType",
-                header: () => "Claim Type",
-                enableSorting: true,
-            },
-            {
-                // accessorFn: (row) => row?.claimFilledBy,
-                accessorFn: (row) => row?.user?.name,
-                id: "claimFilledBy",
-                header: () => "Claim filled by",
-                enableSorting: true,
-            },
-            {
-                accessorFn: (row) => row?.slaBreachDate,
-                id: "slaBreachDate",
-                header: () => "SLA",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
-                )
-            },
-            {
-                accessorFn: (row) => row?.status,
-                id: "status",
-                header: () => "Status",
-                size: "100",
-                cell: (rowData) => (
-                    <span
-                        className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
-                    >
-                        {rowData.row.original.status}
-                    </span>
-                )
-            },
-        ],
-        []
-    );
-
-    // FI ADMIN
-    const FIAdminColumns = React.useMemo(
-        () => [
-            {
-                id: 'select-col',
-                header: ({ table }) => (
-                    <Form.Check
-                        className="form-check-cursor"
-                        checked={table.getIsAllRowsSelected()}
-                        indeterminate={table.getIsSomeRowsSelected()}
-                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
-                        onChange={(e) => {
-                            table.toggleAllRowsSelected(e.target.checked);
-                            const allSelectedIds = e.target.checked
-                                ? table.getRowModel().rows.map((row) => row.original.id)
-                                : [];
-                            setTicketIdsArr(allSelectedIds);
-                            setClearTableSelection(false)
-                        }}
-                    />
-                ),
-                cell: ({ row }) => (
-                    <Form.Check
-                        className="form-check-cursor"
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        // onChange={row.getToggleSelectedHandler()}
-                        onChange={(e) => {
-                            row.toggleSelected(e.target.checked);
-
-                            if (e.target.checked) {
-                                // Add the ID to the array if the row is selected
-                                setTicketIdsArr((prev) => [...prev, row.original.id]);
-                            } else {
-                                // Remove the ID from the array if the row is deselected
-                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
-                            }
-
-                            setClearTableSelection(false)
-                        }}
-                    />
-                ),
-                size: "15",
-                meta: {
-                    thClassName: 'pe-0 fs-6',
-                    tdClassName: 'pe-0 fs-6',
-                },
-            },
-            {
-                accessorFn: (row) => row?.ticketId,
-                id: "ticketId",
-                header: () => "Ticket ID",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <Stack direction="horizontal" gap={2}>
-                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
-                        {/* <AppTooltip title="Attachments">
-                            <Button
-                                variant="link"
-                                className="p-0 border-0 link-dark"
-                                onClick={handleAttachmentsClick}
-                                aria-label="Attachments"
-                            >
-                                <MdAttachFile size={16} />
-                            </Button>
-                        </AppTooltip> */}
-                    </Stack>
-                ),
-            },
-            {
-                accessorFn: (row) => row?.createdAt,
-                id: "createdAt",
-                header: () => "Creation Date",
-                enableSorting: true,
-                cell: ({ row }) => (
-                     row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
-                )
-            },
-            {
-                accessorFn: (row) => row?.claimType?.name,
-                // accessorFn: (row) => row?.claimType,
-                id: "claimType",
-                header: () => "Claim Type",
-                enableSorting: true,
-            },
-            {
-                // accessorFn: (row) => row?.claimFilledBy,
-                accessorFn: (row) => row?.fiAgent,
-                id: "fiAgent",
-                header: () => "FI Agent",
-                enableSorting: false,
-                cell: ({ row }) => (
-                    // console.log({row :  row})
-                    <span>{row?.original?.fiAgent?.name}</span>
-                )
-            },
-            {
-                accessorFn: (row) => row?.slaBreachDate,
-                id: "slaBreachDate",
-                header: () => "SLA",
-                enableSorting: true,
-                cell: ({ row }) => (
-                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
                 )
             },
             {
                 accessorFn: (row) => row?.priority,
                 id: "priority",
-                header: () => "Priority",
+                header: () => t("PRIORITY"),
                 size: "100",
                 cell: (rowData) => (
                     <span
@@ -528,12 +681,21 @@ export default function TicketsList() {
                     >
                         {rowData.row.original.priority}
                     </span>
-                )
+                ),
+            },
+            {
+                accessorFn: (row) => row?.fiAgent,
+                id: "fiAgent",
+                header: () => t("FI_AGENT"),
+                enableSorting: false,
+                cell: ({ row }) => (
+                    <span>{row?.original?.fiAgent?.name}</span>
+                ),
             },
             {
                 accessorFn: (row) => row?.status,
                 id: "status",
-                header: () => "Status",
+                header: () => t("STATUS"),
                 size: "100",
                 cell: (rowData) => (
                     <span
@@ -541,11 +703,14 @@ export default function TicketsList() {
                     >
                         {rowData.row.original.status}
                     </span>
-                )
+                ),
             },
-        ],
-        []
-    );
+        ];
+
+        // Filter and reorder the columns based on the input array
+        return columnsArray.map((colId) => allColumns.find((col) => col.id === colId)).filter(Boolean);
+    };
+
 
     const handleTicketAssignment = (agentId) => {
         // agentTicketToSEPSagent
@@ -602,20 +767,46 @@ export default function TicketsList() {
         navigate('/tickets/add')
     }
     // Define columns based on user role or currentUser state
+    // const getColumnsForUser = (currentUser) => {
+    //     switch (currentUser) {
+    //         case 'FI_ADMIN':
+    //             return FIAdminColumns;
+    //         case 'FI_AGENT':
+    //             return FIAgentColumns;
+    //         case 'SEPS_ADMIN':
+    //             return SEPSColumns;
+    //         case 'SEPS_AGENT':
+    //             return SEPSColumns;
+    //         default:
+    //             return FIAdminColumns;  // Fallback default columns
+    //     }
+    // };
+
     const getColumnsForUser = (currentUser) => {
+        let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
+
         switch (currentUser) {
             case 'FI_ADMIN':
-                return FIAdminColumns;
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
+                break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
-                return FIAgentColumns;
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "status"];
+                break;
             case 'SEPS_ADMIN':
-                return SEPSColumns;
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "priority", "status"];
+                break;
             case 'SEPS_AGENT':
-                return SEPSColumns;
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "status"];
+                break;
             default:
-                return FIAdminColumns;  // Fallback default columns
+                // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
+                break;
         }
+
+        return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns
     };
+
     // Inside your component, dynamically decide the columns
     const columns = getColumnsForUser(currentUser);
 
@@ -644,9 +835,9 @@ export default function TicketsList() {
             <Loader isLoading={loading} />
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
                 <PageHeader
-                    title="Tickets"
+                    title={t('TICKETS')}
                     actions={[
-                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning", disabled: false },
+                        { label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: false },
                     ]}
                 />
                 <div className="info-cards mb-3">

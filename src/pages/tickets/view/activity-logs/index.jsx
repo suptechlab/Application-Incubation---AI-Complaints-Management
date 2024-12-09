@@ -3,13 +3,18 @@ import { Card, Col, Image, ListGroup, Row, Stack } from "react-bootstrap";
 import { MdCalendarToday } from "react-icons/md";
 import { Link } from "react-router-dom";
 import defaultAvatar from "../../../../assets/images/default-avatar.jpg";
-import { ticketActivityLogs } from "../../../../services/ticketmanagement.service";
+import { downloadTicketsAttachment, ticketActivityLogs } from "../../../../services/ticketmanagement.service";
 import toast from "react-hot-toast";
 import moment from "moment";
-import { isHTML } from "../../../../utils/commonutils";
+import { downloadFile, getIconForFile,  isHTML } from "../../../../utils/commonutils";
+import { useTranslation } from "react-i18next";
 const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
 
   const [ticketActivity, setTicketActivity] = useState([])
+
+  const [isDownloading , setDownloading] = useState(false)
+
+  const {t} = useTranslation()
 
   function replaceLinkedUserPlaceholders(activityTitle, linkedUsers) {
     const parts = activityTitle.split(/(@\d+)/g); // Split on @<id>
@@ -38,6 +43,10 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
           const text = activity?.activityDetails?.text || ""; // Safely extract text
           const containsHTML = isHTML(text);
 
+
+          const attachments = activity?.attachmentUrl?.attachments?.length ? activity.attachmentUrl.attachments : [];
+
+
           return {
             id: index,
             // name: activity?.activityDetails?.performBy?.name ? getPerformerName(activity?.activityDetails?.performBy?.name, activity?.activityType) : "",
@@ -50,6 +59,7 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
             )}</>,
             avatar: activity?.user?.imageUrl ?? defaultAvatar,
             variant: activity?.activityType ?? '',
+            attachments: attachments && attachments?.length > 0 ? attachments : []
           }
         })
         setTicketActivity(logData)
@@ -136,6 +146,42 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
         return '';
     }
   };
+
+   // HANDLE ATTACHMENT DOWNLOAD
+   const handleAttachmentDownload = (attachmentData) => {
+
+    setDownloading(true)
+    toast.loading(t("DOWNLOAD_IN_PROGRESS"), { id: "downloading", isLoading: isDownloading ?? false })
+    downloadTicketsAttachment(attachmentData?.externalDocumentId).then(response => {
+        if (response) {
+            downloadFile(response, attachmentData, attachmentData?.originalTitle)
+                .then(() => {
+                    toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" })
+                })
+                .catch((error) => {
+                    // Handle any error that occurred during the download
+                    toast.error(error?.message ?? t("DOWNLOAD_ERROR") , { id: "downloading" });
+                }).finally(()=>{
+                    setDownloading(false)
+                });
+        } else {
+            toast.dismiss("downloading");
+            throw new Error(t("EMPTY RESPONSE"));
+        }
+    }).catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+            toast.error(error?.response?.data?.errorDescription ,  { id: "downloading" });
+        } else {
+            toast.error(error?.message ?? t("DOWNLOAD ERROR") , { id: "downloading" });
+        }
+        toast.dismiss("downloading");
+    }).finally(() => {
+        // Ensure the loading toast is dismissed
+        // toast.dismiss("downloading");
+        setDownloading(false)
+    });
+}
+
   return <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
     <Card.Body className='py-0'>
       <ListGroup variant="flush">
@@ -158,6 +204,26 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
                   <span>{reply.date}</span>
                 </Stack>
                 <p className={`mt-2 mb-0 bg-opacity-25 ${getReplyStatusClass(reply.variant)}`}>{reply.message}</p>
+                {reply?.attachments && reply?.attachments?.length > 0 && (
+                  <Stack
+                    direction="horizontal"
+                    gap={3}
+                    className="flex-wrap mt-2"
+                  >
+                    {reply?.attachments?.map((actionItem,index) => {
+                      const { originalTitle } = actionItem;
+                      return (
+                        <button
+                          key={index + 1}
+                          onClick={()=>handleAttachmentDownload(actionItem)}
+                          className='btn fw-semibold text-decoration-none link-primary'
+                        >
+                          <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
+                        </button>
+                      )
+                    })}
+                  </Stack>
+                )}
               </Col>
             </Row>
           </ListGroup.Item>

@@ -48,7 +48,7 @@ const DateExtensionModal = ({ modal, toggle, ticketData }) => {
             enforceFocus={false}
         >
             <Modal.Header className="pb-3">
-                <Modal.Title as="h4" className="fw-semibold">Date Extension</Modal.Title>
+                <Modal.Title as="h4" className="fw-semibold">{t("DATE_EXTENSION")}</Modal.Title>
             </Modal.Header>
             <Formik
                 initialValues={{
@@ -56,7 +56,6 @@ const DateExtensionModal = ({ modal, toggle, ticketData }) => {
                 }}
                 validationSchema={slaDateValidation}
                 onSubmit={(values, actions) => {
-                    console.log("are you calling")
                     handleSubmit(values, actions)
                 }}
             >
@@ -74,7 +73,7 @@ const DateExtensionModal = ({ modal, toggle, ticketData }) => {
                     <Form>
                         <Modal.Body className="text-break py-0">
                             <CommonViewData
-                                label="Due Date"
+                                label={t("DUE_DATE")}
                                 value={ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY") : 'N/A'}
                             />
                             
@@ -85,7 +84,7 @@ const DateExtensionModal = ({ modal, toggle, ticketData }) => {
                                 name="date"
                                 touched={touched?.date}
                                 label="Enter Extended Date"
-                                placeholder="Select"
+                                placeholder={t("SELECT")}
                                 selected={values?.date}
                                 onChange={(date) => setFieldValue("date", date)}
                                 isBackDateBlocked={true}

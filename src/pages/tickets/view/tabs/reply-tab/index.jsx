@@ -12,8 +12,12 @@ import {
 } from "../../../../../services/ticketmanagement.service";
 import toast from "react-hot-toast";
 import { validateFile } from "../../../../../utils/commonutils";
+import { useTranslation } from "react-i18next";
 
-const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
+const ReplyTab = ({ ticketId, setIsGetAcitivityLogs }) => {
+
+    const { t } = useTranslation()
+
     const [sendReplyModalShow, setSendReplyModalShow] = useState(false);
     const [loading, setLoading] = useState(false);
     const [submitAction, setSubmitAction] = useState(""); // Track which button is clicked
@@ -40,7 +44,7 @@ const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
                     setSendReplyModalShow(false); // Close modal after success
                 }
                 actions.resetForm()
-                setIsGetAcitivityLogs((prev)=> !prev)
+                setIsGetAcitivityLogs((prev) => !prev)
                 toast.success(response?.data?.message)
             })
             .catch((error) => {
@@ -112,7 +116,7 @@ const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
                                     <span className="align-text-bottom">
                                         <MdAttachFile size={16} />
                                     </span>{" "}
-                                    Add attachment
+                                    {t("ADD_ATTACHMENT")}
                                 </label>
                                 <input
                                     id="attachment"
@@ -123,9 +127,9 @@ const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
                                     onChange={(event) => {
                                         const file = event.currentTarget.files[0];
                                         const isValidated = validateFile(file)
-                                        if (isValidated=== true) {
+                                        if (isValidated === true) {
                                             setFieldValue("attachment", file);
-                                        }else{
+                                        } else {
                                             toast.error(isValidated)
                                         }
                                         // Update Formik's state with the file
@@ -144,10 +148,8 @@ const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
                                     onClick={() => {
                                         if (values.message === '') {
                                             // Set an error for the message field
-                                            setFieldError("message", "message is required")
-                                            setFieldTouched("message", true)
-                                            // Optionally, mark the field as touched
-
+                                            setFieldError("message", t("MESSAGE_REQUIRED"));
+                                            setFieldTouched("message", true);
                                         } else {
                                             setSubmitAction("customer");
                                             setSendReplyModalShow(true); // Show modal first
@@ -156,9 +158,10 @@ const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
                                     disabled={loading}
                                 >
                                     {loading && submitAction === "customer"
-                                        ? "Sending..."
-                                        : "Reply to Customer"}
+                                        ? t("SENDING")
+                                        : t("REPLY_TO_CUSTOMER")}
                                 </Button>
+
                                 <Button
                                     type="submit"
                                     size="sm"
@@ -167,25 +170,25 @@ const ReplyTab = ({ ticketId,setIsGetAcitivityLogs }) => {
                                     disabled={loading}
                                 >
                                     {loading && submitAction === "internal"
-                                        ? "Processing..."
-                                        : "Reply Internally"}
+                                        ? t("PROCESSING")
+                                        : t("REPLY_INTERNALLY")}
                                 </Button>
+
                             </Stack>
                         </Stack>
                     </Card.Footer>
-
                     {/* Send Reply Modal */}
                     <GenericModal
                         show={sendReplyModalShow}
                         handleClose={() => setSendReplyModalShow(false)}
-                        modalHeaderTitle={`Send Reply`}
-                        modalBodyContent={`Are you sure you want to send this reply to customer?`}
+                        modalHeaderTitle={t("SEND_REPLY")}
+                        modalBodyContent={t("CONFIRM_SEND_REPLY")}
                         handleAction={() => {
                             setSendReplyModalShow(false);
                             submitForm(); // Submit the form after confirmation
                         }}
-                        cancelButtonName="No"
-                        buttonName="Yes"
+                        cancelButtonName={t("No")}
+                        buttonName={t("YES")}
                     />
                 </Form>
             )}

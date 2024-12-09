@@ -1,4 +1,18 @@
 import moment from "moment/moment";
+import { MdPictureAsPdf } from "react-icons/md";
+import { FiImage ,FiFileText} from "react-icons/fi";
+import { FaRegFile,FaFileWord,FaFileAlt } from "react-icons/fa";
+
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "application/pdf",
+  "text/plain",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/rtf",
+];
 
 // TIME REMAINING
 export const timeRemaining = (date) => {
@@ -28,16 +42,7 @@ export const calculateDaysDifference = (date) => {
 export const validateFile = (file) => {
 
 
-  const ALLOWED_MIME_TYPES = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "application/pdf",
-    "text/plain",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/rtf",
-  ];
+ 
   const MAX_FILE_SIZE_MB = 1;
 
   if (!file) {
@@ -66,4 +71,60 @@ export const isHTML = (data) => {
   // Regex to check for HTML tags, attributes, or entities
   const htmlRegex = /<([a-z]+)([^<]*)>(.*?)<\/\1>|<([a-z]+)([^<]*)\/>/i;
   return htmlRegex.test(data.trim());
+};
+
+// DOWNLOAD FUNCTION
+
+export function downloadFile(response, attachmentData,fileName) {
+  return new Promise((resolve, reject) => {
+      try {
+          // Create the Blob object based on response data
+          const blob = new Blob([response?.data], { type: response.headers['content-type'] });
+          const blobUrl = window.URL.createObjectURL(blob);
+
+          // Create a temporary link element
+          const tempLink = document.createElement('a');
+          tempLink.href = blobUrl;
+          tempLink.setAttribute('download', fileName || attachmentData?.originalTitle || 'download');
+
+          // Append the link to the document body
+          document.body.appendChild(tempLink);
+
+          // Trigger the download by clicking the link
+          tempLink.click();
+
+          // Clean up by revoking the Blob URL and removing the link
+          window.URL.revokeObjectURL(blobUrl);
+          document.body.removeChild(tempLink);
+
+          // Success: Resolve the promise and display success message
+          // toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" });
+          resolve();
+      } catch (error) {
+          // Handle any errors during the download process
+          console.error("Error downloading the file:", error);
+          reject(error);
+      }
+  });
+}
+
+const EXTENSION_ICON_MAP = {
+  "jpeg": <FiImage size={24} />,
+  "jpg": <FiImage size={24}/>,
+  "png": <FiImage size={24}/>,
+  "pdf": <MdPictureAsPdf size={24}/>,
+  "txt": <FiFileText size={24}/>,
+  "doc": <FaFileWord size={24}/>,
+  "docx": <FaFileWord size={24}/>,
+  "rtf": <FaFileAlt size={24}/>,
+};
+
+const getFileExtension = (originalTitle) => {
+  if (!originalTitle) return null;
+  const parts = originalTitle.split('.');
+  return parts.length > 1 ? parts.pop().toLowerCase() : null;
+};
+export const getIconForFile = (originalTitle) => {
+  const extension = getFileExtension(originalTitle);
+  return extension && EXTENSION_ICON_MAP[extension] ? EXTENSION_ICON_MAP[extension] : <FaRegFile size={24}/>;
 };

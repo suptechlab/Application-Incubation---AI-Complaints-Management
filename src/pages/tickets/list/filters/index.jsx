@@ -112,12 +112,12 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             <ReactSelect
                                 wrapperClassName="mb-0"
                                 class="form-select "
-                                placeholder="Assign/Reassign"
+                                placeholder={t("ASSIGN_REASSIGN")}
                                 id="floatingSelect"
                                 size="sm"
                                 options={[
                                     {
-                                        label: "Assign/Reassign",
+                                        label: t("ASSIGN_REASSIGN"),
                                         value: "",
                                     },
                                     ...agentList
@@ -135,7 +135,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             onClick={returnToAdminClick}
                             className="flex-grow-1 flex-sm-grow-0"
                         >
-                            Return to Admin
+                            {t("RETURN_TO_ADMIN")}
                         </Button> : ''
                 }
 
@@ -145,12 +145,12 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         <ReactSelect
                             wrapperClassName="mb-0"
                             class="form-select "
-                            placeholder="Claim Type"
+                            placeholder={t("CLAIM_TYPE")}
                             id="floatingSelect"
                             size="sm"
                             options={[
                                 {
-                                    label: "Claim Type",
+                                    label: t("CLAIM_TYPE"),
                                     value: "",
                                 },
                                 ...claimTypes
@@ -204,7 +204,6 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         />
                     </div>
                 }
-
 
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect
@@ -263,7 +262,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             startDate={filter?.startDate ?? null}
                             endDate={filter?.endDate}
                             selectsRange={true}
-                            placeholder="Select Date Range"
+                            placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
                         />
                     </div>
@@ -275,22 +274,23 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             id="filter-dropdown"
                             className="link-dark p-1 ms-n1 hide-dropdown-arrow"
                         >
-                            <AppTooltip title="Filters" placement="top">
+                            <AppTooltip title={t("FILTERS")} placement="top">
                                 <span><MdOutlineFilterAlt size={20} /></span>
                             </AppTooltip>
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
                             <Dropdown.Item className="small" as={Link} onClick={filterByClaimFill}>
-                                Claim Filled By
+                                {t("CLAIM_FILLED_BY")}
                             </Dropdown.Item>
                             <Dropdown.Item className="small" as={Link} onClick={filterBySla}>
-                                SLA
+                                {t("SLA")}
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Stack>
             </Stack>
         </div>
+
     );
 };
 

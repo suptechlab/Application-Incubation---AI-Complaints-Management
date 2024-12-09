@@ -41,38 +41,35 @@ export const changeTicketPriority = async (ticketId, priority) => {
 export const ticketActivityLogs = async (ticketId, params) => {
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/activity-logs`, { params });
 }
-
-
 //CHANGE TICKET PRIORITY
 export const ticketOverviewAPI = async () => {
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/count-by-status`);
 }
-
 //SLA DATE EXTENSION API
 export const slaDateExtensionApi = async (ticketId, slaDate) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/extend-sla?slaDate=${slaDate}`);
 }
-
 //TICKET CLOSE API
 export const ticketCloseStatus = async (ticketId, data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/closed`,data);
 }
-
-
 //TICKET REJECT API
 export const ticketRejectStatus = async (ticketId, data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reject`,data);
 }
-
 //TICKET REPLY TO CUSTOMER API
 export const ticketReplyToCustomer = async (ticketId, data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-customer`,data);
 }
-
 //TICKET REPLY INTERNAL API
 export const ticketReplyInternal = async (ticketId, data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-internal`,data);
 }
+//TICKET ATTACHMENT DOWNLOAD API
+export const downloadTicketsAttachment = async (attachmentId) => {
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/download/${attachmentId}`,{ responseType: 'arraybuffer' });
+}
+
 
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN
 export const convertToLabelValue = (obj) => {

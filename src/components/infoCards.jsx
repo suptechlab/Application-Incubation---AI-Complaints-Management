@@ -1,43 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Col, Row, Stack } from 'react-bootstrap';
-import { ticketOverviewAPI } from '../services/ticketmanagement.service';
-import toast from 'react-hot-toast';
-import { MdAttachFile, MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
+import { useTranslation } from 'react-i18next';
+import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 
 
 const InfoCards = ({claimStatsData , rowClassName = 'g-3 g-lg-4' }) => {
-
-
+  const {t} = useTranslation()
   const cardsData = [
     {
       bgColor: 'bg-primary',
       Icon: <MdConfirmationNumber size={24} />,
-      title: 'New Tickets',
-      value:claimStatsData?.countsByStatus?.NEW,
+      title: t('NEW_TICKETS'), 
+      value: claimStatsData?.countsByStatus?.NEW,
       colProps: { sm: 6, lg: 3 }
     },
     {
       bgColor: 'bg-orange',
       Icon: <MdHourglassEmpty size={24} />,
-      title: 'Tickets in Progress',
-      value:claimStatsData?.countsByStatus?.IN_PROGRESS,
+      title: t('TICKETS_IN_PROGRESS'), 
+      value: claimStatsData?.countsByStatus?.IN_PROGRESS,
       colProps: { sm: 6, lg: 3 }
     },
     {
       bgColor: 'bg-danger',
       Icon: <MdPending size={24} />,
-      title: 'Rejected Tickets',
-      value:claimStatsData?.countsByStatus?.REJECTED,
+      title: t('REJECTED_TICKETS'), // Direct translation key
+      value: claimStatsData?.countsByStatus?.REJECTED,
       colProps: { sm: 6, lg: 3 }
     },
     {
       bgColor: 'bg-success',
       Icon: <MdTaskAlt size={24} />,
-      title: 'Closed Tickets',
-     value:claimStatsData?.countsByStatus?.CLOSED,
+      title: t('CLOSED_TICKETS'), // Direct translation key
+      value: claimStatsData?.countsByStatus?.CLOSED,
       colProps: { sm: 6, lg: 3 }
     },
   ];
+  
 
 
 

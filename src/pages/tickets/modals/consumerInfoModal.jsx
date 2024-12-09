@@ -5,7 +5,7 @@ import CommonViewData from "../../../components/CommonViewData";
 import Loader from "../../../components/Loader";
 import { useTranslation } from "react-i18next";
 
-const UserInfoModal = ({ userData, modal, toggle,masterData }) => {
+const ConsumerInfoModal = ({ userData, modal, toggle,masterData }) => {
 
     const {t} = useTranslation()
 
@@ -19,12 +19,12 @@ const UserInfoModal = ({ userData, modal, toggle,masterData }) => {
         },
         {
           label: t("EMAIL"),
-          value: userData?.createdByUser?.email,
+          value: userData?.user?.email,
           colProps: { sm: 6, lg: 4 },
         },
         {
           label: t("PHONE"),
-          value: userData?.createdByUser?.countryCode + " " + userData?.createdByUser?.phoneNumber,
+          value: userData?.user?.countryCode + " " + userData?.user?.phoneNumber,
           colProps: { sm: 6, lg: 4 },
         },
         {
@@ -73,7 +73,7 @@ const UserInfoModal = ({ userData, modal, toggle,masterData }) => {
                                 height={36}
                                 alt="John Smith"
                             />
-                            <span className="text-truncate">{userData?.createdByUser?.name ?? ''}</span>
+                            <span className="text-truncate">{userData?.user?.name ?? ''}</span>
                         </Stack>
                     </Modal.Title>
                 </Modal.Header>
@@ -95,4 +95,4 @@ const UserInfoModal = ({ userData, modal, toggle,masterData }) => {
     );
 };
 
-export default UserInfoModal;
+export default ConsumerInfoModal;

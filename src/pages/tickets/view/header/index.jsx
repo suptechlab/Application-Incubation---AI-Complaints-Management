@@ -1,23 +1,20 @@
-import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Badge, Button, Dropdown, Stack } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { MdMoreVert, MdSchedule } from "react-icons/md";
+import { MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import ReactSelect from '../../../../components/ReactSelect';
+import { MasterDataContext } from '../../../../contexts/masters.context';
 import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent } from '../../../../services/ticketmanagement.service';
+import { calculateDaysDifference } from '../../../../utils/commonutils';
 import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
-import { calculateDaysDifference } from '../../../../utils/commonutils';
-import { MasterDataContext } from '../../../../contexts/masters.context';
-import { useContext } from 'react';
-import AppTooltip from '../../../../components/tooltip';
 
-const TicketViewHeader = ({ title = "", ticketData, currentUser }) => {
+const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivityLogs }) => {
 
     const { t } = useTranslation();
 
@@ -34,11 +31,12 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser }) => {
     const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
     const handleSelect = (status) => {
+
         // setSelectedStatus(status);
 
-        if (status === "CLOSED") {
+        if (status === "CLOSE") {
             setCloseTicketModalShow(true)
-        } else if (status === "REJECTED") {
+        } else if (status === "REJECT") {
             setRejectTicketModalShow(true)
         }
     };
@@ -46,7 +44,7 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser }) => {
     // The color class based on the status
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
-    const statusOptions = [{label :'CLOSE' , value : 'CLOSE'}, {label : 'REJECT',value :'REJECT'}];
+    const statusOptions = [{ label: t('CLOSE'), value: 'CLOSE' }, { label: t('REJECT'), value: 'REJECT' }];
     const getStatusClass = (status) => {
         switch (status) {
             case 'CLOSED':
@@ -157,12 +155,17 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser }) => {
                                 <MdSchedule size={16} />
                                 <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + " Days remaining"}</span>
                             </Badge>}
-
-                        <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                            <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
-                        </Badge>
+                        {
+                            ticketData?.instanceType === "FIRST_INSTANCE" ?
+                                <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                </Badge>
+                                :
+                                <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                </Badge>
+                        }
                     </h1>
-
                     <Stack direction="horizontal" gap={2} className='flex-wrap'>
                         <Link
                             to={"/tickets"}
@@ -176,56 +179,78 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser }) => {
                         >
                             Assign To
                         </Button> */}
-                        <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
-                            <ReactSelect
-                                wrapperClassName="mb-0"
-                                class="form-select "
-                                placeholder="Assign/Reassign"
-                                id="floatingSelect"
-                                size="sm"
-                                options={[
-                                    {
-                                        label: "Assign/Reassign",
-                                        value: "",
-                                    },
-                                    ...agentList
-                                ]}
-                                onChange={(e) => {
-                                    handleTicketAssign(e.target.value)
-                                    setSelectedAgent(e.target.value)
-                                }}
-                                value={selectedAgent ?? null}
-                            />
-                        </div>
-                        <Button
-                            type="submit"
-                            variant='warning'
-                            onClick={handleDateExtensionClick}
-                        >
-                            Date Extension
-                        </Button>
-                        <Dropdown>
 
-                            <Dropdown.Toggle
-                                id="ticket-detail-status"
-                                variant="info"
-                                className={`bg-opacity-25 custom-min-width-130 border-0 ${getStatusClass(selectedStatus)}`}
-                            >
-                                <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
-                            </Dropdown.Toggle>
+                        {
+                            ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECT" &&
+                            <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                                <ReactSelect
+                                    wrapperClassName="mb-0"
+                                    class="form-select "
+                                    placeholder={t("ASSIGN_REASSIGN")}
+                                    id="floatingSelect"
+                                    // size="sm"
+                                    options={[
+                                        {
+                                            label: t("ASSIGN_REASSIGN"),
+                                            value: "",
+                                        },
+                                        ...agentList
+                                    ]}
+                                    onChange={(e) => {
+                                        handleTicketAssign(e.target.value)
+                                        setSelectedAgent(e.target.value)
+                                    }}
+                                    value={selectedAgent ?? null}
+                                />
+                            </div>
+                        }
 
-                            <Dropdown.Menu>
-                                {statusOptions?.map((status) => (
-                                    <Dropdown.Item
-                                        key={status?.value}
-                                        className={`small ${selectedStatus === status ? 'active' : ''}`}
-                                        onClick={() => handleSelect(status?.value)}
+                        {
+
+                            currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN" ?
+                                <Button
+                                    type="submit"
+                                    variant='warning'
+                                    onClick={handleDateExtensionClick}
+                                >
+                                    {t("DATE_EXTENSION")}
+                                </Button> : ""
+                        }
+
+                        {
+                            selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED" ?
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        id="ticket-detail-status"
+                                        variant="info"
+                                        className={`bg-opacity-25 custom-min-width-130 border-0 ${getStatusClass(selectedStatus)}`}
                                     >
-                                        {status?.label}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
+                                        <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        {statusOptions?.map((status) => (
+                                            <Dropdown.Item
+                                                key={status?.value}
+                                                className={`small ${selectedStatus === status ? 'active' : ''}`}
+                                                onClick={() => handleSelect(status?.value)}
+                                            >
+                                                {status?.label}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown> :
+
+                                <Button
+                                    variant="info"
+                                    className={`bg-opacity-25 custom-min-width-130 border-0 ${getStatusClass(selectedStatus)}`}
+                                    disabled={true}
+                                >
+                                    <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
+                                </Button>
+
+                        }
+
                         {/* <Dropdown>
                             <Dropdown.Toggle
                                 variant="link"
@@ -266,12 +291,14 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser }) => {
                 modal={closeTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
+                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
             />
             <RejectTicketModal
                 ticketId={ticketData?.id}
                 modal={rejectTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
+                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
             />
         </React.Fragment>
     );

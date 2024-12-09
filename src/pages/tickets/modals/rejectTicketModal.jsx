@@ -10,7 +10,7 @@ import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus, ticketRejectStatus } from "../../../services/ticketmanagement.service";
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
-const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus }) => {
+const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGetAcitivityLogs }) => {
     const { t } = useTranslation();
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
@@ -44,6 +44,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus }) => {
         ticketRejectStatus(ticketId, formData)
             .then((response) => {
                 setSelectedStatus('REJECTED');
+                setIsGetAcitivityLogs((prev)=> !prev)
                 toast.success(response?.data?.message);
                 toggle()
             })

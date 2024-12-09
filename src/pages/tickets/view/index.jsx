@@ -17,6 +17,8 @@ import ActivityLogs from './activity-logs';
 import { useContext } from 'react';
 import { AuthenticationContext } from '../../../contexts/authentication.context';
 import { MasterDataContext } from '../../../contexts/masters.context';
+import { useTranslation } from 'react-i18next';
+import ConsumerInfoModal from '../modals/consumerInfoModal';
 
 const TicketsView = () => {
 
@@ -24,20 +26,35 @@ const TicketsView = () => {
 
   const { masterData } = useContext(MasterDataContext);
 
+  const { t } = useTranslation()
+
   const { authorities = [], roles = [] } = userData || {};
 
   const [currentUser, setCurrentUser] = useState([])
 
-  const [isGetActivityLogs , setIsGetAcitivityLogs] = useState(true)
+  const [isGetActivityLogs, setIsGetAcitivityLogs] = useState(true)
 
   const [selectedPriority, setSelectedPriority] = useState('LOW');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
+  const [consumerInfoModalShow, setConsumerInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
+
   const [loading, setLoading] = useState(false)
 
   const { id } = useParams()
 
   const [ticketData, setTicketData] = useState({})
+
+  const [currentDate, setCurrentDate] = useState(moment().format("DD-MM-YYYY | hh:mm:a"));
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentDate(moment().format("DD-MM-YYYY | hh:mm:a"));
+    }, 60000); // Update every 60,000ms (1 minute)
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array means this effect runs only once
 
   useEffect(() => {
     if (roles?.length > 0) {
@@ -50,15 +67,19 @@ const TicketsView = () => {
       const roleName = roles[0]?.name;
       setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
     }
+    else {
+      setCurrentUser("ADMIN")
+    }
   }, [authorities])
 
 
   // Function to handle dropdown item selection
-  const handleSelect = (priority) => {
+  const handlePriorityChange = (priority) => {
     setLoading(true)
     if (priority && priority !== '') {
       changeTicketPriority(id, priority).then(response => {
         setSelectedPriority(priority);
+        setIsGetAcitivityLogs((prev) => !prev)
       }).catch((error) => {
         if (error?.response?.data?.errorDescription) {
           toast.error(error?.response?.data?.errorDescription);
@@ -115,42 +136,45 @@ const TicketsView = () => {
     setUserInfoModalShow(true)
   }
 
+
+  // Handle File a Claim Button
+  const handleConsumerInfoClick = () => {
+    setConsumerInfoModalShow(true)
+  }
+
   // Handle Attachments Button
   const handleAttachmentsClick = () => {
     setAttachmentsModalShow(true)
   }
-  // View Top Data
+  // VIEW TOP DATA
   const viewTopData = [
     {
-      label: "Created on",
+      label: t("CREATED_ON"),
       value: ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
-      label: "Due Date",
+      label: t("DUE_DATE"),
       value: ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY") : 'N/A',
       colProps: { sm: 6 }
     },
     {
-      label: "Claim filed by",
+      label: t("CLAIM_FILED_BY"),
       value: <Link onClick={handleUserInfoClick} className='text-decoration-none'>{ticketData?.createdByUser?.name}</Link>,
       colProps: { sm: 6 }
     },
     {
-      label: "Priority",
+      label: t("PRIORITY"),
       value: (<Stack direction='horizontal' gap={1}>
-        {/* <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> */}
-        {/* Dropdown FILTER */}
-
         {
-          currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" ?
+          currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN" ?
             <Dropdown>
               <Dropdown.Toggle
                 variant="link"
                 id="filter-dropdown"
                 className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
               >
-                <AppTooltip title="Change Priority" placement="top">
+                <AppTooltip title={t("CHANGE_PRIORITY")} placement="top">
                   <span><span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> <MdArrowDropDown size={14} /></span>
                 </AppTooltip>
               </Dropdown.Toggle>
@@ -159,7 +183,7 @@ const TicketsView = () => {
                   <Dropdown.Item
                     key={priority}
                     className={`small ${selectedPriority === priority ? 'active' : ''}`}
-                    onClick={() => handleSelect(priority)}
+                    onClick={() => handlePriorityChange(priority)}
                   >
                     {priority}
                   </Dropdown.Item>
@@ -168,74 +192,95 @@ const TicketsView = () => {
             </Dropdown> :
             <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span>
         }
-
       </Stack>),
       colProps: { sm: 6 }
     },
     {
-      label: "Claim Type",
+      label: t("CLAIM_TYPE"),
       value: ticketData?.claimType?.name,
       colProps: { sm: 6 }
     },
     {
-      label: "Claim Sub Type",
+      label: t("CLAIM_SUB_TYPE"),
       value: ticketData?.claimSubType?.name,
       colProps: { sm: 6 }
     },
     {
-      label: "Agent",
+      label: t("AGENT"),
       value: ticketData?.fiAgent?.name ?? "N/A",
       colProps: { sm: 6 }
     },
     {
-      label: "Team",
+      label: t("TEAM"),
       value: ticketData?.team ?? "N/A",
       colProps: { sm: 6 }
     },
+    ...(ticketData?.createdByUser?.id !== ticketData?.user?.id
+      ? [
+        {
+          label: t("CONSUMER_INFO"),
+          value: <Link onClick={handleConsumerInfoClick} className='text-decoration-none'>{ticketData?.user?.name}</Link>,
+          colProps: { sm: 6 },
+        },
+      ]
+      : []),
     // {
-    //   value: (<Stack direction='horizontal' gap={1}>
-    //     <span><MdAttachFile size={16} /></span>
-    //     <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
-    //   </Stack>),
-    //   colProps: { xs: 12, className: "pb-4" }
+    //   label: t("CONSUMER_INFO"),
+    //   value: <Link onClick={handleConsumerInfoClick} className='text-decoration-none'>{ticketData?.user?.name}</Link>,
+    //   colProps: { sm: 6 }
     // },
+    // ...(ticketData?.claimTicketDocuments !== ticketData?.claimTicketDocuments?.length > 0
+    //   ? [{
+    //     value: (<Stack direction='horizontal' gap={1}>
+    //       <span><MdAttachFile size={16} /></span>
+    //       <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
+    //     </Stack>),
+    //     colProps: { sm: 6 }
+    //   }] :[]),
     {
-      label: "Precedents",
+      value: (<Stack direction='horizontal' gap={1}>
+        <span><MdAttachFile size={16} /></span>
+        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
+      </Stack>),
+      colProps: { sm: 6 }
+    },
+    {
+      label: t("PRECEDENTS"),
       value: ticketData?.precedents,
       colProps: { xs: 12, className: "py-2" }
     },
     {
-      label: "Specific Petition",
+      label: t("SPECIFIC_PETITION"),
       value: ticketData?.specificPetition ?? 'N/A',
       colProps: { xs: 12 }
     },
   ];
-
-  // View Bottom Data
+  // VIEW BOTTOM DATA
   const viewBottomData = [
     {
-      label: "Created on",
-      value: `07-10-24 | 03:33 pm`,
+      label: t("CREATED_ON"),
+      value:  ticketData?.secondInstanceFiledAt ? moment(ticketData?.secondInstanceFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
-      label: "Agent",
-      value: `John Duo`,
+      label: t("AGENT"),
+      value: ticketData?.sepsAgent ?? 'N/A',
       colProps: { sm: 6 }
     },
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
+        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
       </Stack>),
       colProps: { xs: 12, className: "pb-3" }
     },
     {
-      label: "Comments",
-      value: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus ante quis massa bibendum fringilla.`,
+      label: t("COMMENT"),
+      value: ticketData?.secondInstanceComment ?? 'N/A',
       colProps: { xs: 12 }
     },
-  ]
+  ];
+
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
@@ -244,6 +289,7 @@ const TicketsView = () => {
           title={"#" + ticketData?.ticketId}
           ticketData={ticketData}
           currentUser={currentUser}
+          setIsGetAcitivityLogs={setIsGetAcitivityLogs}
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -263,7 +309,7 @@ const TicketsView = () => {
                 ticketData?.instanceType === 'SECOND_INSTANCE' &&
                 <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                   <Card.Body className='mh-100'>
-                    <h5 className='custom-font-size-18 fw-semibold mb-3'>2nd Instance Claim details</h5>
+                    <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5>
                     <Row>
                       {viewBottomData?.map((item, index) => (
                         <Col key={"data_view_" + index} {...item.colProps}>
@@ -274,7 +320,6 @@ const TicketsView = () => {
                   </Card.Body>
                 </Card>
               }
-
             </Col>
             <Col lg={6} className='mh-100 d-flex flex-column'>
               <Card className="border-0 shadow">
@@ -294,15 +339,14 @@ const TicketsView = () => {
                       <div className='fw-bold'>{ticketData?.user?.name}th</div>
                       <Stack direction='horizontal' gap={2} className='text-secondary'>
                         <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                        <span> {moment().format("DD-MM-YYYY | hh:mm:a")} </span>
+                        <span> {currentDate} </span>
                       </Stack>
                     </Col>
                   </Row>
                 </Card.Header>
-                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs}/>
+                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} />
               </Card>
-              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs}/>
-
+              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} />
               {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
                   <ListGroup variant="flush">
@@ -343,14 +387,18 @@ const TicketsView = () => {
         toggle={() => setUserInfoModalShow(false)}
         masterData={masterData}
       />
-
+      <ConsumerInfoModal
+        modal={consumerInfoModalShow}
+        userData={ticketData}
+        toggle={() => setConsumerInfoModalShow(false)}
+        masterData={masterData}
+      />
       {/* Attachments Modals */}
       <AttachmentsModal
         modal={attachmentsModalShow}
         toggle={() => setAttachmentsModalShow(false)}
+        ticketData={ticketData}
       />
-
-
     </React.Fragment>
   )
 }
