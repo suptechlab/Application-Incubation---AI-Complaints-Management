@@ -246,7 +246,7 @@ export default function TeamManagementList() {
                 />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <ListingSearchForm filter={filter} setFilter={setFilter} />
+                        <ListingSearchForm filter={filter} setFilter={setFilter} hideFilter={true}/>
                         <CommonDataTable
                             columns={columns}
                             dataQuery={dataQuery}
