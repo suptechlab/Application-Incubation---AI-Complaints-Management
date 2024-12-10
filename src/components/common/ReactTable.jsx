@@ -26,7 +26,7 @@ export default function ReactTable({
   const defaultData = React.useMemo(() => [], []);
 
   // Assuming dataQuery contains headers in its response
-  const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 0;
+  const totalRecords = dataQuery?.data?.payload?.headers?.["x-total-count"] ?? 0;
 
 
   const { data } = dataQuery;
@@ -34,7 +34,7 @@ export default function ReactTable({
   // console.log('32 table',dataQuery?.data)
   const table = useReactTable({
     // data: dataQuery.data?.data?.data ?? defaultData,
-    data: data?.payload ?? defaultData,
+    data: data?.payload?.data ?? defaultData,
     columns,
     defaultColumn: {
       size: '200px',
