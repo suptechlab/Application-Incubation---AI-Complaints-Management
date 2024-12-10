@@ -33,7 +33,7 @@ export const fileClaimList = createAsyncThunk(
         return rejectWithValue('Failed to get claim list!');
       }
 
-      return response?.data; // RETURN RESPONSE
+      return response; // RETURN RESPONSE
     } catch (error) {
       return rejectWithValue(error.message || 'Something went wrong');
     }

@@ -60,20 +60,22 @@ const LoginModal = ({ handleSignUpClick, handleLoginSucccesSubmit }) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body className="text-break d-flex flex-column small pt-0">
-                <Row className="pb-2 gy-4">
-                    <Col lg>
-                        <SetupAccountSection handleSignUpClick={handleSignUpClick} />
-                    </Col>
-                    <Col lg="auto" aria-hidden={true}>
-                        <div className="border-black border-dashed border-end d-lg-block d-none h-100 opacity-100" />
-                        <div className="border-black border-dashed border-top d-lg-none opacity-100 w-100" />
-                    </Col>
-                    <Col lg>
-                        {isloginFormSubmitted ?
-                            <OtpFormSection otpToken={otpToken} handleFormSubmit={handleLoginSucccesSubmit} /> :
-                            <LoginFormSection handleFormSubmit={handleLoginFormSubmit} />}
-                    </Col>
-                </Row>
+                <div>
+                    <Row className="pb-2 gy-4">
+                        <Col lg>
+                            <SetupAccountSection handleSignUpClick={handleSignUpClick} />
+                        </Col>
+                        <Col lg="auto" aria-hidden={true}>
+                            <div className="border-black border-dashed border-end d-lg-block d-none h-100 opacity-100" />
+                            <div className="border-black border-dashed border-top d-lg-none opacity-100 w-100" />
+                        </Col>
+                        <Col lg>
+                            {isloginFormSubmitted ?
+                                <OtpFormSection otpToken={otpToken} handleFormSubmit={handleLoginSucccesSubmit} /> :
+                                <LoginFormSection handleFormSubmit={handleLoginFormSubmit} />}
+                        </Col>
+                    </Row>
+                </div>
             </Modal.Body>
         </React.Fragment>
     );
