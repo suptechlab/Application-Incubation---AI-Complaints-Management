@@ -195,6 +195,9 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                             onChange={handleFileChange}
                                         />
                                     </div>
+                                    <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
+                                </div>
+                                <div className='mt-2'>
                                     {files.length > 0 && (
                                         <div>
                                             <ul>
@@ -244,8 +247,9 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                     </Modal.Footer>
                 </React.Fragment>
 
-            )}
-        </CommonFormikComponent>
+            )
+            }
+        </CommonFormikComponent >
     )
 }
 
