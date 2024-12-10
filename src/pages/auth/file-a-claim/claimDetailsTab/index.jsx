@@ -188,7 +188,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         </label>
                                         <input
                                             id="files"
-                                            accept=".pdf, .docx, .doc, .txt, .rtf"
+                                            accept=".pdf, .docx, .doc, .txt, .rtf, image/jpeg, image/jpg"
                                             multiple
                                             className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                             type="file"
