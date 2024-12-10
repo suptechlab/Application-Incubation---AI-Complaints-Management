@@ -128,5 +128,6 @@ export const englishLang = {
   "ATTACHMENTS": "Attachments",
   "ATTACHMENTS_SENT_BY_ENTITY": "Attachments send by Entity",
   "SECOND_INSTANCE_CLAIM_TICKET": "2nd Instance Claim Ticket",
-  "RAISE_A_COMPLAINT": "Raise a Complaint"
+  "RAISE_A_COMPLAINT": "Raise a Complaint",
+  "SECOND_CLAIM_SUCCESS": "2nd Instance Claimed Successfully"
 }

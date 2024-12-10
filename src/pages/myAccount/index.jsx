@@ -173,6 +173,7 @@ export default function MyAccount() {
               className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none text-info ${className}`}
               aria-label={ariaLabel || label}
               onClick={onClickHandler}
+              disabled={info.row.original.instanceType === "SECOND_INSTANCE"}
             >
               {t(label)}
             </Button>

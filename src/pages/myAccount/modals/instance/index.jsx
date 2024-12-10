@@ -70,7 +70,7 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose  }) => {
         setLoading(true);
         const result = await dispatch(fileClaimSecondInstanceForm(formData));
         if (fileClaimSecondInstanceForm.fulfilled.match(result)) {
-            toast.success(t('CLAIM_SUCCESS'));
+            toast.success(t('SECOND_CLAIM_SUCCESS'));
             setLoading(false);
             handleCloseModal();
             actions.setSubmitting(false);

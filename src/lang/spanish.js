@@ -129,5 +129,6 @@ export const spanishLang = {
   "ATTACHMENTS": "Adjuntos",
   "ATTACHMENTS_SENT_BY_ENTITY": "Adjuntos enviados por Entidad",
   "SECOND_INSTANCE_CLAIM_TICKET": "Boleto de Reclamación de 2da Instancia",
-  "RAISE_A_COMPLAINT": "Presentar una queja"
+  "RAISE_A_COMPLAINT": "Presentar una queja",
+  "SECOND_CLAIM_SUCCESS": "Segunda instancia reclamada con éxito"
 }
