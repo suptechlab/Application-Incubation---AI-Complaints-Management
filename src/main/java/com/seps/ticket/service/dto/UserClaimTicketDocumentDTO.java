@@ -18,6 +18,7 @@ public class UserClaimTicketDocumentDTO {
     private Long id; // Unique identifier
     private Long claimTicketId; // ID of the associated claim ticket
     private ClaimTicketDTO claimTicket;
+    private String externalDocumentId; // External reference for the document
     private String originalTitle; // Title of the document
     private DocumentSourceEnum source; // Source of the document (enum)
     private InstanceTypeEnum instanceType; // Instance type for the document (enum)

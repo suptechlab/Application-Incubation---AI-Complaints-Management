@@ -287,4 +287,31 @@ public class SepsAndFiClaimTicketResource {
     public ResponseEntity<byte[]> downloadDocument(@PathVariable("id") String documentId) {
         return documentService.downloadDocument(documentId);
     }
+
+    @Operation(
+        summary = "Add Internal Note",
+        description = "Allows a user to add internal note ticket discussions, optionally attaching files."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully added internal note.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResponseStatus.class)
+            )
+        )
+    })
+    @PostMapping("/{ticketId}/add-internal-note")
+    public ResponseEntity<ResponseStatus> replyToInternalNote(@PathVariable Long ticketId,
+                                                          @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        // Call service method to handle the reply
+        sepsAndFiClaimTicketService.replyToInternalNote(ticketId, claimTicketReplyRequest);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.internal.note.added.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
 }

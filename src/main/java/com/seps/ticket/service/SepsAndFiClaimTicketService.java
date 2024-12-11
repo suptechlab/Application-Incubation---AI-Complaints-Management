@@ -1191,15 +1191,23 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> linkedUser = new HashMap<>();
         Map<String, Object> activityDetail = new HashMap<>();
         activityLog.setActivityType(activityType);
+        String msgOne = "ticket.activity.log.replied.with.attachment";
+        String msgTwo = "ticket.activity.log.replied";
+        if(activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name())){
+            msgOne = "ticket.activity.log.internal.note.added.with.attachment";
+            msgTwo = "ticket.activity.log.internal.note.added";
+        }
         if (!claimTicketDocuments.isEmpty()) {
+            final String messageOne = msgOne;
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
-                String messageAudit = messageSource.getMessage("ticket.activity.log.replied.with.attachment",
+                String messageAudit = messageSource.getMessage(messageOne,
                     new Object[]{"@" + currentUser.getId(), "@" + ticket.getUserId()}, Locale.forLanguageTag(language.getCode()));
                 activityTitle.put(language.getCode(), messageAudit);
             });
         }else{
+            final String messageTwo = msgTwo;
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
-                String messageAudit = messageSource.getMessage("ticket.activity.log.replied",
+                String messageAudit = messageSource.getMessage(messageTwo,
                     new Object[]{"@" + currentUser.getId(), "@" + ticket.getUserId()}, Locale.forLanguageTag(language.getCode()));
                 activityTitle.put(language.getCode(), messageAudit);
             });
@@ -1314,5 +1322,33 @@ public class SepsAndFiClaimTicketService {
 //
 //            mailService.sendReplyToInternalEmail(ticketDetail, claimTicketRejectRequest, currentUser);
 //        }
+    }
+
+    @Transactional
+    public void replyToInternalNote(Long ticketId, @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if(authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }else{
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+        }
+        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
+        }
+        replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name());
     }
 }
