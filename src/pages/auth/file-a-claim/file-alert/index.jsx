@@ -2,10 +2,12 @@ import React from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import SvgIcons from '../../../../components/SVGIcons'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormBack ,fileClaimData}) => {
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { t } = useTranslation();
 
     
     return (
@@ -22,17 +24,17 @@ const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormB
             <Modal.Body className="text-break text-center">
                 <div className='py-sm-4 px-sm-2'>
                     <div className='mb-3' aria-label='Success Launch Icon'>{SvgIcons.alertIcon}</div>
-                    <h2 className='fw-bold'>Alert!</h2>
-                    <h6 className='fw-semibold'>It looks like a duplicate entry and will be rejected by the authority.</h6>
-                    <div className='custom-font-size-18 fw-semibold text-danger mb-2'>Duplicate Claim ID. {fileClaimData?.duplicateTicketId}</div>
-                    <p className='lh-sm small mb-3 py-1'>Are you sure you want to file this claim?</p>
+                    <h2 className='fw-bold'>{t('ALERT!')}</h2>
+                    <h6 className='fw-semibold'>{t('AUTHORITY_REJECTION')}</h6>
+                    <div className='custom-font-size-18 fw-semibold text-danger mb-2'>{t('DUPLICATE_CLAIM_ID')} {fileClaimData?.duplicateTicketId}</div>
+                    <p className='lh-sm small mb-3 py-1'>{t('FILE_CLAIM_SURITY')}</p>
                     <Button
                         type="button"
                         variant="warning"
                         className="px-5"
                         onClick={handleFormSubmit}
                     >
-                        Yes, File my Claim
+                        {t('YES_FILE_CLAIM')}
                     </Button>
                     <Button
                         type="button"
@@ -40,7 +42,7 @@ const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormB
                         onClick={()=>{handleClose() ; navigate('/my-account')}}
                         className='mt-3 text-black p-0 border-0 text-decoration-none fw-medium custom-font-size-12'
                     >
-                        No, let me verify existing Claim
+                        {t('NO_FILE_MY_CLAIM')}
                     </Button>
                 </div>
             </Modal.Body>

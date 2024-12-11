@@ -130,5 +130,12 @@ export const englishLang = {
   "ATTACHMENTS_SENT_BY_ENTITY": "Attachments send by Entity",
   "SECOND_INSTANCE_CLAIM_TICKET": "2nd Instance Claim Ticket",
   "RAISE_A_COMPLAINT": "Raise a Complaint",
-  "SECOND_CLAIM_SUCCESS": "2nd Instance Claimed Successfully"
+  "SECOND_CLAIM_SUCCESS": "2nd Instance Claimed Successfully",
+  //Alert Modal
+  "ALERT!": "Alert!",
+  "AUTHORITY_REJECTION": "It looks like a duplicate entry and will be rejected by the authority.",
+  "DUPLICATE_CLAIM_ID": "Duplicate Claim ID.",
+  "FILE_CLAIM_SURITY": "Are you sure you want to file this claim?",
+  "YES_FILE_CLAIM": "Yes, File my Claim",
+  "NO_FILE_MY_CLAIM": " No, let me verify existing Claim"
 }

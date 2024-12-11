@@ -131,5 +131,12 @@ export const spanishLang = {
   "ATTACHMENTS_SENT_BY_ENTITY": "Adjuntos enviados por Entidad",
   "SECOND_INSTANCE_CLAIM_TICKET": "Boleto de Reclamación de 2da Instancia",
   "RAISE_A_COMPLAINT": "Presentar una queja",
-  "SECOND_CLAIM_SUCCESS": "Segunda instancia reclamada con éxito"
+  "SECOND_CLAIM_SUCCESS": "Segunda instancia reclamada con éxito",
+  //Alert Modal
+  "ALERT!": "¡Alerta!",
+  "AUTHORITY_REJECTION": "Parece una entrada duplicada y será rechazada por la autoridad.",
+  "DUPLICATE_CLAIM_ID": "ID de reclamo duplicado.",
+  "FILE_CLAIM_SURITY": "¿Está seguro de que desea presentar este reclamo?",
+  "YES_FILE_CLAIM": "Sí, presentar mi reclamo",
+  "NO_FILE_MY_CLAIM": " No, déjame verificar el reclamo existente"
 }
