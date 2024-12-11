@@ -3,49 +3,52 @@ import { Col, Image, Modal, Row, Stack } from "react-bootstrap";
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from "../../../components/CommonViewData";
 import Loader from "../../../components/Loader";
+import { useTranslation } from "react-i18next";
 
-const UserInfoModal = ({ userData, modal, toggle }) => {
+const UserInfoModal = ({ userData, modal, toggle,masterData }) => {
+
+    const {t} = useTranslation()
 
     // PHONE NO AND NATIONAL ID IS PENDING IN THIS
     // Info Modal Data
     const InfoModalData = [
         {
-            label: "National ID",
-            value: "235647874",
-            colProps: { sm: 6, lg: 4 }
+          label: t("NATIONAL_ID"),
+          value: userData?.ticketId ?? '',
+          colProps: { sm: 6, lg: 4 },
         },
         {
-            label: "Email",
-            value: userData?.createdByUser?.email,
-            colProps: { sm: 6, lg: 4 }
+          label: t("EMAIL"),
+          value: userData?.createdByUser?.email,
+          colProps: { sm: 6, lg: 4 },
         },
         {
-            label: "Phone",
-            value: "+593 XX XXX XXXX",
-            colProps: { sm: 6, lg: 4 }
+          label: t("PHONE"),
+          value: userData?.createdByUser?.countryCode + " " + userData?.createdByUser?.phoneNumber,
+          colProps: { sm: 6, lg: 4 },
         },
         {
-            label: "Province of residence",
-            value: userData?.province?.name,
-            colProps: { sm: 6, lg: 4 }
+          label: t("PROVINCE_OF_RESIDENCE"),
+          value: userData?.province?.name,
+          colProps: { sm: 6, lg: 4 },
         },
         {
-            label: "Canton of residence",
-            value: userData?.city?.name,
-            colProps: { sm: 6, lg: 4 }
+          label: t("CANTON_OF_RESIDENCE"),
+          value: userData?.city?.name,
+          colProps: { sm: 6, lg: 4 },
         },
         {
-            label: "Priority care group",
-            value: userData?.priorityCareGroup,
-            colProps: { sm: 6, lg: 4 }
+          label: t("PRIORITY_CARE_GROUP"),
+          value: masterData?.priorityCareGroup[userData?.priorityCareGroup],
+          colProps: { sm: 6, lg: 4 },
         },
         {
-            label: "Customer Type",
-            value: userData?.customerType,
-            colProps: { xs: 12 }
+          label: t("CUSTOMER_TYPE"),
+          value: masterData?.customerType[userData?.customerType],
+          colProps: { xs: 12 },
         },
-    ];
-
+      ];
+      
     return (
         <React.Fragment>
             <Loader isLoading={false} />
@@ -70,7 +73,7 @@ const UserInfoModal = ({ userData, modal, toggle }) => {
                                 height={36}
                                 alt="John Smith"
                             />
-                            <span className="text-truncate">Veronica Andres</span>
+                            <span className="text-truncate">{userData?.createdByUser?.name ?? ''}</span>
                         </Stack>
                     </Modal.Title>
                 </Modal.Header>

@@ -86,6 +86,7 @@ $theme-header-height: 4rem;
 $custom-bg-light-green: #28A745;
 $custom-bg-light-blue: #1B7ACE;
 $custom-bg-orange: #DE9800;
+$custom-gray: #D9D9D9;
 
 // Generate custom classes for width, min-width, height, min-height
 @mixin custom-class($property, $value) {
@@ -111,6 +112,10 @@ $custom-colors: (
   warning: #FF7438,
   yellow: #F6C300,
   pink: #A256F3,
+  orange: #E7652D,
+  green: #009E0B,
+  red: #DA220B,
+  gray: #DFDFDF,
 );
 
 // Mixin to generate CSS variables and background/text color classes
@@ -118,6 +123,10 @@ $custom-colors: (
   @each $name, $color in $colors {
     // Convert the hex color to RGB
     $rgb: red($color), green($color), blue($color);
+
+    :root {
+      --bs-border-opacity: 1;
+    }
 
     // Background color class
     .bg-custom-#{$name} {
@@ -128,6 +137,12 @@ $custom-colors: (
     .text-custom-#{$name} {
       color: $color !important;
     }
+
+    // Background color class
+    .border-custom-#{$name} {
+      border-color: rgba($rgb, var(--bs-border-opacity)) !important;
+    }
+
   }
 }
 

@@ -12,7 +12,7 @@ export const NavItems = () => {
       title: t("DASHBOARD"),
       menuIcon: <MdDashboard size={20} />,
       path: "/dashboard",
-      roleName: "Dashboard",
+      moduleName: "Dashboard",
       disabled: false,
     },
     {
@@ -21,7 +21,7 @@ export const NavItems = () => {
       title: t("User Management"),
       menuIcon: <MdPerson size={20} />,
       path: '#',
-      // roleName: "user",
+      moduleName: "user",
       subMenu: [
         {
           id: 21,
@@ -37,7 +37,7 @@ export const NavItems = () => {
           menuName: t("FI USERS"),
           title: t("FI USERS"),
           path: "/fi-users",
-          roleName: "FI User",
+          moduleName: "FI User",
           permissions: ["FI_USER_CREATE_BY_FI"],
           disabled: false,
         },
@@ -59,6 +59,7 @@ export const NavItems = () => {
       menuIcon: <MdSupervisorAccount size={20} />,
       path: "/team-management",
       roleName: "admin",
+      moduleName:"Teams Manage",
       disabled: false,
     },
     {
@@ -135,11 +136,12 @@ export const NavItems = () => {
       menuIcon: <MdConfirmationNumber size={20} />,
       path: "/tickets",
       roleName: "admin",
-      disabled: true,
+      moduleName : 'Ticket',
+      disabled: false,
     },
     {
       id: 6,
-      menuName: t("TICKET WORKFLOW fsd"),
+      menuName: t("TICKET WORKFLOW"),
       title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
@@ -161,7 +163,7 @@ export const NavItems = () => {
           path: "/reports/claim-overview",
           moduleName: ["reports"],
           roleName: "Reports",
-          disabled: true,
+          disabled: false,
         },
         {
           id: 72,
@@ -169,7 +171,7 @@ export const NavItems = () => {
           path: "/reports/sla-compliance",
           moduleName: ["reports"],
           roleName: "Reports",
-          disabled: true,
+          disabled: false,
         },
         {
           id: 73,

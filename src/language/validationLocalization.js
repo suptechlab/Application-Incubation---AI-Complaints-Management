@@ -56,7 +56,20 @@ export const messages = {
     // Team Managment
     teamNameRequired: "Team name is required", // For team name
     descriptionRequired: "Description is required", // For description
-    entityRequired: "Entity name is required."
+    entityRequired: "Entity name is required.",
+    //create claim
+    genderRequired: "Gender is required.",
+    cantonRequired: "Canton of Residence is required.",
+    priorityCareRequired: "Priority Care Group is required.",
+    customterTypeRequired: "Customer Type is required.",
+    entityNameRequired: "Entity Name is required.",
+    claimSubTypeRequired: "Claim Sub Type is required.",
+    invalidPrecedents: "Precedents must not exceed 1024 characters.",
+    precedentsRequired: "Precedents is required.",
+    invalidSpecialPetition: "Special Petition must not exceed 1024 characters.",
+    specialPetitionRequired: "Special Petition is required.",
+    agreeDeclarations: "Please agree to all declarations and conditions to proceed."
+
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -114,6 +127,19 @@ export const messages = {
     // Team managment
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
-    entityRequired: "El nombre de la entidad es obligatorio."
+    entityRequired: "El nombre de la entidad es obligatorio.",
+    roleIdRequired: "El rol es obligatorio.", // Add this
+    //create claim
+    genderRequired: "Se requiere género.",
+    cantonRequired: "Se requiere Cantón de Residencia.",
+    priorityCareRequired: "Se requiere grupo de atención prioritaria.",
+    customterTypeRequired: "Se requiere tipo de cliente.",
+    entityNameRequired: "El nombre de la entidad es obligatorio.",
+    claimSubTypeRequired: "Se requiere el subtipo de reclamo.",
+    invalidPrecedents: "Los precedentes no deben exceder los 1024 caracteres.",
+    precedentsRequired: "Se requieren precedentes.",
+    invalidSpecialPetition: "La petición especial no debe exceder los 1024 caracteres.",
+    specialPetitionRequired: "Se requiere una petición especial.",
+    agreeDeclarations: "Por favor acepte todas las declaraciones y condiciones para continuar."
   }
 };

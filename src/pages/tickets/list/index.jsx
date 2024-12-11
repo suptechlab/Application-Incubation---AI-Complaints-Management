@@ -1,24 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useState } from "react";
-import { Button, Card, Form, Stack } from "react-bootstrap";
-import { MdAttachFile, MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
+import React, { useContext, useEffect, useState } from "react";
+import { Card, Form, Stack } from "react-bootstrap";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import InfoCards from "../../../components/infoCards";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import { handleGetUsers } from "../../../services/user.service";
-import TicketsListFilters from "./filters";
-import { agentTicketToSEPSagent, handleGetTicketList } from "../../../services/ticketmanagement.service";
-import AppTooltip from "../../../components/tooltip";
+import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTicketList, ticketOverviewAPI } from "../../../services/ticketmanagement.service";
 import AttachmentsModal from "../modals/attachmentsModal";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import TicketsListFilters from "./filters";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
+import { calculateDaysDifference } from "../../../utils/commonutils";
+import moment from "moment/moment";
+import { MdAttachFile } from "react-icons/md";
 
 export default function TicketsList() {
     const location = useLocation();
     const navigate = useNavigate();
+
+    const { userData } = useContext(AuthenticationContext);
+
+    const { authorities = [], roles = [] } = userData || {};
+
+    const [currentUser, setCurrentUser] = useState([])
+
 
     const { t } = useTranslation()
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -27,7 +35,12 @@ export default function TicketsList() {
         pageSize: params.limit ? parseInt(params.limit) : 10,
     });
 
-    const [sorting, setSorting] = React.useState([]);
+    const [sorting, setSorting] = React.useState([
+        {
+            "id": "slaBreachDate",
+            "asc": true
+        }
+    ]);
     const [filter, setFilter] = React.useState({
         search: "",
         subscription: "",
@@ -38,7 +51,28 @@ export default function TicketsList() {
     const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
     const [ticketIdsArr, setTicketIdsArr] = useState([]);
 
-    const [clearTableSelection ,setClearTableSelection] = useState(false)
+    const [clearTableSelection, setClearTableSelection] = useState(false)
+
+    const [claimStatsData, setClaimsStatsData] = useState([])
+
+
+    useEffect(() => {
+        if (roles?.length > 0) {
+
+            const roleMap = {
+                'Fi Admin': 'FI_ADMIN',
+                'Fi Agent': 'FI_AGENT',
+                'SEPS Admin': 'SEPS_ADMIN',
+                'SEPS Agent': 'SEPS_AGENT',
+            };
+
+            const roleName = roles[0]?.name;
+
+            setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
+
+
+        }
+    }, [authorities])
 
 
     const dataQuery = useQuery({
@@ -92,55 +126,6 @@ export default function TicketsList() {
         retry: 0, //Disable retry on failure
     });
 
-    const sampleData = [
-        {
-            ticketId: "TCK-1001",
-            createdAt: "2024-11-20",
-            claimType: "Health Insurance",
-            claimFilledBy: "John Doe",
-            slaBreachDays: "5 Days",
-            priority: "Low",
-            status: "Closed",
-        },
-        {
-            ticketId: "TCK-1002",
-            createdAt: "2024-11-21",
-            claimType: "Auto Insurance",
-            claimFilledBy: "Jane Smith",
-            slaBreachDays: "3 Days",
-            priority: "Medium",
-            status: "In Progress",
-        },
-        {
-            ticketId: "TCK-1003",
-            createdAt: "2024-11-22",
-            claimType: "Travel Insurance",
-            claimFilledBy: "Robert Brown",
-            slaBreachDays: "7 Days",
-            priority: "High",
-            status: "Rejected",
-        },
-        {
-            ticketId: "TCK-1004",
-            createdAt: "2024-11-23",
-            claimType: "Property Insurance",
-            claimFilledBy: "Emily Davis",
-            slaBreachDays: "2 Days",
-            priority: "NIL",
-            status: "New",
-        },
-        {
-            ticketId: "TCK-1005",
-            createdAt: "2024-11-24",
-            claimType: "Life Insurance",
-            claimFilledBy: "Michael Wilson",
-            slaBreachDays: "10 Days",
-            priority: "NIL",
-            status: "Closed",
-        },
-    ];
-
-
     //handle last page deletion item
     useEffect(() => {
         if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
@@ -154,11 +139,11 @@ export default function TicketsList() {
     // The color class based on the status
     const getPriorityClass = (priority) => {
         switch (priority) {
-            case 'Low':
+            case 'LOW':
                 return 'text-success';
-            case 'Medium':
+            case 'MEDIUM':
                 return 'text-custom-warning';
-            case 'High':
+            case 'HIGH':
                 return 'text-custom-danger';
             default:
                 return 'text-body';
@@ -168,13 +153,15 @@ export default function TicketsList() {
     // The color class based on the status
     const getStatusClass = (status) => {
         switch (status) {
-            case 'Closed':
+            case 'CLOSED':
                 return 'bg-success text-success';
-            case 'In Progress':
+            case 'IN_PROGRESS':
                 return 'bg-custom-info text-custom-info';
-            case 'New':
+            case 'NEW':
                 return 'bg-custom-primary text-custom-primary';
-            case 'Rejected':
+            case 'ASSIGNED':
+                return 'bg-custom-warning text-custom-warning';
+            case 'REJECTED':
                 return 'bg-custom-danger text-custom-danger';
             default:
                 return 'bg-body text-body';
@@ -186,9 +173,384 @@ export default function TicketsList() {
         setAttachmentsModalShow(true)
     }
 
+    // //FI AGENT COLUMNS
+    // const FIAgentColumns = React.useMemo(
+    //     () => [
+    //         {
+    //             id: 'select-col',
+    //             header: ({ table }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={table.getIsAllRowsSelected()}
+    //                     indeterminate={table.getIsSomeRowsSelected()}
+    //                     // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+    //                     onChange={(e) => {
+    //                         table.toggleAllRowsSelected(e.target.checked);
+    //                         const allSelectedIds = e.target.checked
+    //                             ? table.getRowModel().rows.map((row) => row.original.id)
+    //                             : [];
+    //                         setTicketIdsArr(allSelectedIds);
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             cell: ({ row }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={row.getIsSelected()}
+    //                     disabled={!row.getCanSelect()}
+    //                     // onChange={row.getToggleSelectedHandler()}
+    //                     onChange={(e) => {
+    //                         row.toggleSelected(e.target.checked);
 
-    const columns = React.useMemo(
-        () => [
+    //                         if (e.target.checked) {
+    //                             // Add the ID to the array if the row is selected
+    //                             setTicketIdsArr((prev) => [...prev, row.original.id]);
+    //                         } else {
+    //                             // Remove the ID from the array if the row is deselected
+    //                             setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+    //                         }
+
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             size: "15",
+    //             meta: {
+    //                 thClassName: 'pe-0 fs-6',
+    //                 tdClassName: 'pe-0 fs-6',
+    //             },
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.ticketId,
+    //             id: "ticketId",
+    //             header: () => "Ticket ID",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <Stack direction="horizontal" gap={2}>
+    //                     <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+    //                     {/* {
+    //                         <MdAttachFile size={16} />
+    //                     } */}
+
+    //                     {/* <AppTooltip title="Attachments">
+    //                         <Button
+    //                             variant="link"
+    //                             className="p-0 border-0 link-dark"
+    //                             onClick={handleAttachmentsClick}
+    //                             aria-label="Attachments"
+    //                         >
+    //                             <MdAttachFile size={16} />
+    //                         </Button>
+    //                     </AppTooltip> */}
+    //                 </Stack>
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.createdAt,
+    //             id: "createdAt",
+    //             header: () => "Creation Date",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.claimType?.name,
+    //             // accessorFn: (row) => row?.claimType,
+    //             id: "claimType",
+    //             header: () => "Claim Type",
+    //             enableSorting: true,
+    //         },
+
+    //         {
+    //             // accessorFn: (row) => row?.claimFilledBy,
+    //             accessorFn: (row) => row?.user?.name,
+    //             id: "claimFilledBy",
+    //             header: () => "Claim filled by",
+    //             enableSorting: true,
+    //         },
+    // {
+    //     accessorFn: (row) => row?.slaBreachDate,
+    //     id: "slaBreachDate",
+    //     header: () => "SLA",
+    //     enableSorting: true,
+    //     cell: ({ row }) => (
+    //         <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+    //     )
+    // },
+    //         {
+    //             accessorFn: (row) => row?.status,
+    //             id: "status",
+    //             header: () => "Status",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+    //                 >
+    //                     {rowData.row.original.status}
+    //                 </span>
+    //             )
+    //         },
+    //     ],
+    //     []
+    // );
+    // //SEPS COLUMN
+    // const SEPSColumns = React.useMemo(
+    //     () => [
+    //         {
+    //             id: 'select-col',
+    //             header: ({ table }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={table.getIsAllRowsSelected()}
+    //                     indeterminate={table.getIsSomeRowsSelected()}
+    //                     // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+    //                     onChange={(e) => {
+    //                         table.toggleAllRowsSelected(e.target.checked);
+    //                         const allSelectedIds = e.target.checked
+    //                             ? table.getRowModel().rows.map((row) => row.original.id)
+    //                             : [];
+    //                         setTicketIdsArr(allSelectedIds);
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             cell: ({ row }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={row.getIsSelected()}
+    //                     disabled={!row.getCanSelect()}
+    //                     // onChange={row.getToggleSelectedHandler()}
+    //                     onChange={(e) => {
+    //                         row.toggleSelected(e.target.checked);
+
+    //                         if (e.target.checked) {
+    //                             // Add the ID to the array if the row is selected
+    //                             setTicketIdsArr((prev) => [...prev, row.original.id]);
+    //                         } else {
+    //                             // Remove the ID from the array if the row is deselected
+    //                             setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+    //                         }
+
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             size: "15",
+    //             meta: {
+    //                 thClassName: 'pe-0 fs-6',
+    //                 tdClassName: 'pe-0 fs-6',
+    //             },
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.ticketId,
+    //             id: "ticketId",
+    //             header: () => "Ticket ID",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <Stack direction="horizontal" gap={2}>
+    //                     <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+    //                     {/* <AppTooltip title="Attachments">
+    //                         <Button
+    //                             variant="link"
+    //                             className="p-0 border-0 link-dark"
+    //                             onClick={handleAttachmentsClick}
+    //                             aria-label="Attachments"
+    //                         >
+    //                             <MdAttachFile size={16} />
+    //                         </Button>
+    //                     </AppTooltip> */}
+    //                 </Stack>
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.createdAt,
+    //             id: "createdAt",
+    //             header: () => "Creation Date",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.claimType?.name,
+    //             // accessorFn: (row) => row?.claimType,
+    //             id: "claimType",
+    //             header: () => "Claim Type",
+    //             enableSorting: true,
+    //         },
+    //         {
+    //             // accessorFn: (row) => row?.claimFilledBy,
+    //             accessorFn: (row) => row?.user?.name,
+    //             id: "claimFilledBy",
+    //             header: () => "Claim filled by",
+    //             enableSorting: true,
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.slaBreachDate,
+    //             id: "slaBreachDate",
+    //             header: () => "SLA",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.status,
+    //             id: "status",
+    //             header: () => "Status",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+    //                 >
+    //                     {rowData.row.original.status}
+    //                 </span>
+    //             )
+    //         },
+    //     ],
+    //     []
+    // );
+
+    // // FI ADMIN
+    // const FIAdminColumns = React.useMemo(
+    //     () => [
+    //         {
+    //             id: 'select-col',
+    //             header: ({ table }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={table.getIsAllRowsSelected()}
+    //                     indeterminate={table.getIsSomeRowsSelected()}
+    //                     // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
+    //                     onChange={(e) => {
+    //                         table.toggleAllRowsSelected(e.target.checked);
+    //                         const allSelectedIds = e.target.checked
+    //                             ? table.getRowModel().rows.map((row) => row.original.id)
+    //                             : [];
+    //                         setTicketIdsArr(allSelectedIds);
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             cell: ({ row }) => (
+    //                 <Form.Check
+    //                     className="form-check-cursor"
+    //                     checked={row.getIsSelected()}
+    //                     disabled={!row.getCanSelect()}
+    //                     // onChange={row.getToggleSelectedHandler()}
+    //                     onChange={(e) => {
+    //                         row.toggleSelected(e.target.checked);
+
+    //                         if (e.target.checked) {
+    //                             // Add the ID to the array if the row is selected
+    //                             setTicketIdsArr((prev) => [...prev, row.original.id]);
+    //                         } else {
+    //                             // Remove the ID from the array if the row is deselected
+    //                             setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+    //                         }
+
+    //                         setClearTableSelection(false)
+    //                     }}
+    //                 />
+    //             ),
+    //             size: "15",
+    //             meta: {
+    //                 thClassName: 'pe-0 fs-6',
+    //                 tdClassName: 'pe-0 fs-6',
+    //             },
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.ticketId,
+    //             id: "ticketId",
+    //             header: () => "Ticket ID",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <Stack direction="horizontal" gap={2}>
+    //                     <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+    //                     {/* <AppTooltip title="Attachments">
+    //                         <Button
+    //                             variant="link"
+    //                             className="p-0 border-0 link-dark"
+    //                             onClick={handleAttachmentsClick}
+    //                             aria-label="Attachments"
+    //                         >
+    //                             <MdAttachFile size={16} />
+    //                         </Button>
+    //                     </AppTooltip> */}
+    //                 </Stack>
+    //             ),
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.createdAt,
+    //             id: "createdAt",
+    //             header: () => "Creation Date",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 row?.original?.createdAt ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a") : ''
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.claimType?.name,
+    //             // accessorFn: (row) => row?.claimType,
+    //             id: "claimType",
+    //             header: () => "Claim Type",
+    //             enableSorting: true,
+    //         },
+    //         {
+    //             // accessorFn: (row) => row?.claimFilledBy,
+    //             accessorFn: (row) => row?.fiAgent,
+    //             id: "fiAgent",
+    //             header: () => "FI Agent",
+    //             enableSorting: false,
+    //             cell: ({ row }) => (
+    //                 // console.log({row :  row})
+    //                 <span>{row?.original?.fiAgent?.name}</span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.slaBreachDate,
+    //             id: "slaBreachDate",
+    //             header: () => "SLA",
+    //             enableSorting: true,
+    //             cell: ({ row }) => (
+    //                 <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + 'Days' : 'N/A'}</span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.priority,
+    //             id: "priority",
+    //             header: () => "Priority",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
+    //                 >
+    //                     {rowData.row.original.priority}
+    //                 </span>
+    //             )
+    //         },
+    //         {
+    //             accessorFn: (row) => row?.status,
+    //             id: "status",
+    //             header: () => "Status",
+    //             size: "100",
+    //             cell: (rowData) => (
+    //                 <span
+    //                     className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+    //                 >
+    //                     {rowData.row.original.status}
+    //                 </span>
+    //             )
+    //         },
+    //     ],
+    //     []
+    // );
+
+    const getFilteredColumns = (columnsArray) => {
+        // All available column definitions
+        const allColumns = [
             {
                 id: 'select-col',
                 header: ({ table }) => (
@@ -196,38 +558,48 @@ export default function TicketsList() {
                         className="form-check-cursor"
                         checked={table.getIsAllRowsSelected()}
                         indeterminate={table.getIsSomeRowsSelected()}
-                        // onChange={table.getToggleAllRowsSelectedHandler()} //or getToggleAllPageRowsSelectedHandler
                         onChange={(e) => {
                             table.toggleAllRowsSelected(e.target.checked);
+
+                            // Filter rows based on status and only include rows that are not "CLOSED" or "REJECTED"
                             const allSelectedIds = e.target.checked
-                                ? table.getRowModel().rows.map((row) => row.original.id)
+                                ? table.getRowModel().rows
+                                    .filter((row) => row.original.status !== "CLOSED" && row.original.status !== "REJECTED")
+                                    .map((row) => row.original.id)
                                 : [];
+
                             setTicketIdsArr(allSelectedIds);
-                            setClearTableSelection(false)
+                            setClearTableSelection(false);
                         }}
+
+                    // onChange={(e) => {
+                    //     table.toggleAllRowsSelected(e.target.checked);
+                    //     const allSelectedIds = e.target.checked
+                    //         ? table.getRowModel().rows.map((row) => row.original.id)
+                    //         : [];
+                    //     setTicketIdsArr(allSelectedIds);
+                    //     setClearTableSelection(false);
+                    // }}
                     />
                 ),
                 cell: ({ row }) => (
-                    <Form.Check
-                        className="form-check-cursor"
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        // onChange={row.getToggleSelectedHandler()}
-                        onChange={(e) => {
-                            row.toggleSelected(e.target.checked);
+                    (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") ? (
+                        <Form.Check
+                            className="form-check-cursor"
+                            checked={row.getIsSelected()}
+                            disabled={!row.getCanSelect()}
+                            onChange={(e) => {
+                                row.toggleSelected(e.target.checked);
 
-                            if (e.target.checked) {
-                                // Add the ID to the array if the row is selected
-                                setTicketIdsArr((prev) => [...prev, row.original.id]);
-                            } else {
-                                // Remove the ID from the array if the row is deselected
-                                setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
-                            }
-
-                            setClearTableSelection(false)
-                            //     console.log({some : currentSelectedIds})
-                        }}
-                    />
+                                if (e.target.checked) {
+                                    setTicketIdsArr((prev) => [...prev, row.original.id]);
+                                } else {
+                                    setTicketIdsArr((prev) => prev.filter((id) => id !== row.original.id));
+                                }
+                                setClearTableSelection(false);
+                            }}
+                        />
+                    ) : ''
                 ),
                 size: "15",
                 meta: {
@@ -238,57 +610,70 @@ export default function TicketsList() {
             {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => "Ticket ID",
+                header: () => t("TICKET_ID"),
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
-                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
+                            {"#" + row?.original?.ticketId}
+                        </Link>
+                        {
+                            row?.original?.claimTicketDocuments && row?.original?.claimTicketDocuments?.length > 0 ?
+                                <MdAttachFile size={16} /> : ""
+                        }
+
+
+
+
                         {/* <AppTooltip title="Attachments">
-                            <Button
-                                variant="link"
-                                className="p-0 border-0 link-dark"
-                                onClick={handleAttachmentsClick}
-                                aria-label="Attachments"
-                            >
-                                <MdAttachFile size={16} />
-                            </Button>
-                        </AppTooltip> */}
+                           <Button
+                               variant="link"
+                               className="p-0 border-0 link-dark"
+                               onClick={handleAttachmentsClick}
+                               aria-label="Attachments"
+                           >
+                               <MdAttachFile size={16} />
+                           </Button>                   
+                           </AppTooltip> */}
                     </Stack>
                 ),
             },
             {
-                accessorFn: (row) => row?.claimType?.name,
-                // accessorFn: (row) => row?.claimType,
-                id: "claimType",
-                header: () => "Claim Type",
-                enableSorting: true,
-            },
-            {
                 accessorFn: (row) => row?.createdAt,
                 id: "createdAt",
-                header: () => "Creation Date",
+                header: () => t("CREATION_DATE"),
                 enableSorting: true,
                 cell: ({ row }) => (
                     row?.original?.createdAt
+                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a")
+                        : ''
                 ),
             },
             {
-                // accessorFn: (row) => row?.claimFilledBy,
-                accessorFn: (row) => row?.user?.name,
-                id: "claimFilledBy",
-                header: () => "Claim filled by",
+                accessorFn: (row) => row?.claimType?.name,
+                id: "claimType",
+                header: () => t("CLAIM TYPE"),
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row?.slaBreachDays,
-                id: "slaBreachDays",
+                accessorFn: (row) => row?.user?.name,
+                id: "claimFilledBy",
+                header: () => t("CLAIM_FILLED_BY"),
+                enableSorting: true,
+            },
+            {
+                accessorFn: (row) => row?.slaBreachDate,
+                id: "slaBreachDate",
                 header: () => "SLA",
                 enableSorting: true,
+                cell: ({ row }) => (
+                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
+                )
             },
             {
                 accessorFn: (row) => row?.priority,
                 id: "priority",
-                header: () => "Priority",
+                header: () => t("PRIORITY"),
                 size: "100",
                 cell: (rowData) => (
                     <span
@@ -296,12 +681,21 @@ export default function TicketsList() {
                     >
                         {rowData.row.original.priority}
                     </span>
-                )
+                ),
+            },
+            {
+                accessorFn: (row) => row?.fiAgent,
+                id: "fiAgent",
+                header: () => t("FI_AGENT"),
+                enableSorting: false,
+                cell: ({ row }) => (
+                    <span>{row?.original?.fiAgent?.name}</span>
+                ),
             },
             {
                 accessorFn: (row) => row?.status,
                 id: "status",
-                header: () => "Status",
+                header: () => t("STATUS"),
                 size: "100",
                 cell: (rowData) => (
                     <span
@@ -309,28 +703,55 @@ export default function TicketsList() {
                     >
                         {rowData.row.original.status}
                     </span>
-                )
+                ),
             },
-        ],
-        []
-    );
+        ];
+
+        // Filter and reorder the columns based on the input array
+        return columnsArray.map((colId) => allColumns.find((col) => col.id === colId)).filter(Boolean);
+    };
+
 
     const handleTicketAssignment = (agentId) => {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
-            agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
-                toast.success(t("TICKETS ASSIGNED"));
-                setClearTableSelection(true)
-                setTicketIdsArr([])
-            }).catch((error) => {
-                if (error?.response?.data?.errorDescription) {
-                    toast.error(error?.response?.data?.errorDescription);
-                } else {
-                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-                }
-            }).finally(() => {
-                setLoading(false)
-            })
+
+            if (currentUser === "SEPS_ADMIN") {
+                agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
+                    toast.success(t("TICKETS ASSIGNED"));
+                    setClearTableSelection(true)
+                    setTicketIdsArr([])
+                    dataQuery.refetch()
+                    getClaimTypeStatsData()
+                }).catch((error) => {
+                    if (error?.response?.data?.errorDescription) {
+                        toast.error(error?.response?.data?.errorDescription);
+                    } else {
+                        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                    }
+                }).finally(() => {
+                    setLoading(false)
+                })
+            } else if (currentUser === "FI_ADMIN") {
+                //ASSIGN TICKET TO FI AGENT
+                agentTicketToFIagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
+                    toast.success(t("TICKETS ASSIGNED"));
+                    setClearTableSelection(true)
+                    setTicketIdsArr([])
+                    dataQuery.refetch()
+                    getClaimTypeStatsData()
+                }).catch((error) => {
+                    if (error?.response?.data?.errorDescription) {
+                        toast.error(error?.response?.data?.errorDescription);
+                    } else {
+                        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                    }
+                }).finally(() => {
+                    setLoading(false)
+                })
+            } else {
+                toast.warning("You are not allowed to assign tickets.")
+            }
         }
     }
 
@@ -343,58 +764,94 @@ export default function TicketsList() {
 
     //Add New Click Hanlder
     const addNewClickHanlder = () => {
-        // navigate tickets/view/1
-        // navigate('/tickets/view/1')
+        navigate('/tickets/add')
     }
+    // Define columns based on user role or currentUser state
+    // const getColumnsForUser = (currentUser) => {
+    //     switch (currentUser) {
+    //         case 'FI_ADMIN':
+    //             return FIAdminColumns;
+    //         case 'FI_AGENT':
+    //             return FIAgentColumns;
+    //         case 'SEPS_ADMIN':
+    //             return SEPSColumns;
+    //         case 'SEPS_AGENT':
+    //             return SEPSColumns;
+    //         default:
+    //             return FIAdminColumns;  // Fallback default columns
+    //     }
+    // };
+
+    const getColumnsForUser = (currentUser) => {
+        let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
+
+        switch (currentUser) {
+            case 'FI_ADMIN':
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
+                break; // Use `break` to avoid executing further cases
+            case 'FI_AGENT':
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "priority" ,"status"];
+                break;
+            case 'SEPS_ADMIN':
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "priority", "status"];
+                break;
+            case 'SEPS_AGENT':
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate","priority", "status"];
+                break;
+            default:
+                // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
+                break;
+        }
+        return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns
+    };
+
+    // Inside your component, dynamically decide the columns
+    const columns = getColumnsForUser(currentUser);
+
 
     // Info Cards Data
-    const cardsData = [
-        {
-            bgColor: 'bg-primary',
-            Icon: <MdConfirmationNumber size={24} />,
-            title: 'New Tickets',
-            value: 5,
-            colProps: { sm: 6, lg: 3 }
-        },
-        {
-            bgColor: 'bg-orange',
-            Icon: <MdHourglassEmpty size={24} />,
-            title: 'Tickets in Progress',
-            value: 2,
-            colProps: { sm: 6, lg: 3 }
-        },
-        {
-            bgColor: 'bg-danger',
-            Icon: <MdPending size={24} />,
-            title: 'Rejected Tickets',
-            value: 1,
-            colProps: { sm: 6, lg: 3 }
-        },
-        {
-            bgColor: 'bg-success',
-            Icon: <MdTaskAlt size={24} />,
-            title: 'Closed Tickets',
-            value: 2,
-            colProps: { sm: 6, lg: 3 }
-        },
-    ];
+
+    // GET CLAIM TYPE DROPDOWN LIST
+    const getClaimTypeStatsData = () => {
+        ticketOverviewAPI().then(response => {
+            setClaimsStatsData(response?.data)
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        })
+    }
+
+    useEffect(() => {
+        getClaimTypeStatsData()
+    }, [])
 
     return (
         <React.Fragment>
             <Loader isLoading={loading} />
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
                 <PageHeader
-                    title="Tickets"
+                    title={t('TICKETS')}
                     actions={[
-                        { label: "Add New Claim", onClick: addNewClickHanlder, variant: "warning", disabled: true },
+                        { label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: false },
                     ]}
                 />
                 <div className="info-cards mb-3">
-                    <InfoCards cardsData={cardsData} />
+                    <InfoCards claimStatsData={claimStatsData} />
                 </div>
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <TicketsListFilters filter={filter} setFilter={setFilter} handleTicketAssign={handleTicketAssignment} ticketArr={ticketIdsArr} clearTableSelection={clearTableSelection} />
+                        <TicketsListFilters
+                            filter={filter}
+                            setFilter={setFilter}
+                            handleTicketAssign={handleTicketAssignment}
+                            ticketArr={ticketIdsArr}
+                            clearTableSelection={clearTableSelection}
+                            currentUser={currentUser}
+                        />
                         <CommonDataTable
                             columns={columns}
                             dataQuery={dataQuery}

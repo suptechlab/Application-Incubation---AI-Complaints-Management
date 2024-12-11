@@ -12,7 +12,8 @@ import { claimTypesDropdownList } from "../../../../services/claimSubType.servic
 import toast from "react-hot-toast";
 import { agentListingApi } from "../../../../services/ticketmanagement.service";
 
-const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign,ticketArr,clearTableSelection    }) => {
+const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection, currentUser }) => {
+
     const { t } = useTranslation();
     const [claimTypes, setClaimTypes] = useState([])
     const [agentList, setAgentListing] = useState([])
@@ -31,7 +32,6 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
             });
         }
     };
-
     // GET CLAIM TYPE DROPDOWN LIST
     const getClaimTypeDropdownList = () => {
         claimTypesDropdownList().then(response => {
@@ -50,11 +50,9 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
             }
         })
     }
-
     // GET AGENT DROPDOWN LISTING
     const getAgentDropdownListing = () => {
         agentListingApi().then(response => {
-            console.log({ agent: response })
             if (response?.data && response?.data?.length > 0) {
                 const dropdownData = response?.data.map(item => ({
                     value: item.id,
@@ -70,22 +68,16 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
             }
         })
     }
-
     useEffect(() => {
         getClaimTypeDropdownList()
         getAgentDropdownListing()
     }, [])
+    useEffect(() => {
 
-
-    useEffect(()=>{
-
-        if(clearTableSelection === true){
+        if (clearTableSelection === true) {
             setSelectedAgent('')
         }
-    },[clearTableSelection])
-
-    console.log({selectedAgent : selectedAgent})
-
+    }, [clearTableSelection])
     return (
         <div className="theme-card-header header-search mb-3">
             <Stack direction="horizontal" gap={2} className="flex-wrap gap-md-3">
@@ -114,94 +106,105 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         value={filter.search}
                     />
                 </div>
-                {/* <Button
-                    type="button"
-                    variant="warning"
-                    onClick={returnToAdminClick}
-                    className="flex-grow-1 flex-sm-grow-0"
-                >
-                    Return to Admin
-                </Button> */}
-                {/* <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder="Claim Type"
-                        id="floatingSelect"
-                        size="sm"
-                        options={[
-                            {
-                                label: "Claim Type",
-                                value: "",
-                            },
-                            ...claimTypes
-                        ]}
-                        onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                claimTypeId: e.target.value,
-                            });
-                        }}
-                        value={filter?.claimTypeId}
-                    />
-                </div> */}
-                <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder="Assign/Reassign"
-                        id="floatingSelect"
-                        size="sm"
-                        options={[
-                            {
-                                label: "Assign/Reassign",
-                                value: "",
-                            },
-                            ...agentList
-                        ]}
-                        disabled={ticketArr?.length > 0 ? false : true }
-                        onChange={(e) => {
-                            handleTicketAssign(e.target.value)
-                            setSelectedAgent(e.target.value)
-                        }}
-                        value={selectedAgent ?? null}
-                    />
-                </div>
-                <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder={t("PRIORITY")}
-                        id="floatingSelect"
-                        size="sm"
-                        options={[
-                            {
-                                label: t("PRIORITY"),
-                                value: "",
-                                class: "label-class",
-                            },
-                            {
-                                label: t("LOW"),
-                                value: "LOW",
-                            },
-                            {
-                                label: t("MEDIUM"),
-                                value: "MEDIUM",
-                            },
-                            {
-                                label: t("HIGH"),
-                                value: "HIGH",
-                            }
-                        ]}
-                        onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                claimTicketPriority: e.target.value,
-                            });
-                        }}
-                        value={filter?.claimTicketPriority}
-                    />
-                </div>
+                {
+                    currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN' ?
+                        <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                            <ReactSelect
+                                wrapperClassName="mb-0"
+                                class="form-select "
+                                placeholder={t("ASSIGN_REASSIGN")}
+                                id="floatingSelect"
+                                size="sm"
+                                options={[
+                                    {
+                                        label: t("ASSIGN_REASSIGN"),
+                                        value: "",
+                                    },
+                                    ...agentList
+                                ]}
+                                disabled={ticketArr?.length > 0 ? false : true}
+                                onChange={(e) => {
+                                    handleTicketAssign(e.target.value)
+                                    setSelectedAgent(e.target.value)
+                                }}
+                                value={selectedAgent ?? null}
+                            />
+                        </div> : currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT' ? <Button
+                            type="button"
+                            variant="warning"
+                            onClick={returnToAdminClick}
+                            className="flex-grow-1 flex-sm-grow-0"
+                        >
+                            {t("RETURN_TO_ADMIN")}
+                        </Button> : ''
+                }
+
+                {
+                    currentUser === "FI_AGENT" &&
+                    <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                        <ReactSelect
+                            wrapperClassName="mb-0"
+                            class="form-select "
+                            placeholder={t("CLAIM_TYPE")}
+                            id="floatingSelect"
+                            size="sm"
+                            options={[
+                                {
+                                    label: t("CLAIM_TYPE"),
+                                    value: "",
+                                },
+                                ...claimTypes
+                            ]}
+                            onChange={(e) => {
+                                setFilter({
+                                    ...filter,
+                                    claimTypeId: e.target.value,
+                                });
+                            }}
+                            value={filter?.claimTypeId}
+                        />
+                    </div>
+                }
+
+                {
+                    currentUser !== "FI_AGENT" &&
+                    <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                        <ReactSelect
+                            wrapperClassName="mb-0"
+                            class="form-select "
+                            placeholder={t("PRIORITY")}
+                            id="floatingSelect"
+                            size="sm"
+                            options={[
+                                {
+                                    label: t("PRIORITY"),
+                                    value: "",
+                                    class: "label-class",
+                                },
+                                {
+                                    label: t("LOW"),
+                                    value: "LOW",
+                                },
+                                {
+                                    label: t("MEDIUM"),
+                                    value: "MEDIUM",
+                                },
+                                {
+                                    label: t("HIGH"),
+                                    value: "HIGH",
+                                }
+                            ]}
+                            onChange={(e) => {
+                                setFilter({
+                                    ...filter,
+                                    claimTicketPriority: e.target.value,
+                                });
+                            }}
+                            value={filter?.claimTicketPriority}
+                        />
+                    </div>
+                }
+
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect
                         wrapperClassName="mb-0"
@@ -259,7 +262,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             startDate={filter?.startDate ?? null}
                             endDate={filter?.endDate}
                             selectsRange={true}
-                            placeholder="Select Date Range"
+                            placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
                         />
                     </div>
@@ -271,22 +274,23 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             id="filter-dropdown"
                             className="link-dark p-1 ms-n1 hide-dropdown-arrow"
                         >
-                            <AppTooltip title="Filters" placement="top">
+                            <AppTooltip title={t("FILTERS")} placement="top">
                                 <span><MdOutlineFilterAlt size={20} /></span>
                             </AppTooltip>
                         </Dropdown.Toggle>
                         <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
                             <Dropdown.Item className="small" as={Link} onClick={filterByClaimFill}>
-                                Claim Filled By
+                                {t("CLAIM_FILLED_BY")}
                             </Dropdown.Item>
                             <Dropdown.Item className="small" as={Link} onClick={filterBySla}>
-                                SLA
+                                {t("SLA")}
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Stack>
             </Stack>
         </div>
+
     );
 };
 

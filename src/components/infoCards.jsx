@@ -1,32 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Col, Row, Stack } from 'react-bootstrap';
-
-const InfoCards = ({ cardsData }) => {
-
-
-  const [claimStatsData, setClaimsStatsData] = useState([])
+import { useTranslation } from 'react-i18next';
+import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
 
 
-  // GET CLAIM TYPE DROPDOWN LIST
-  const getClaimTypeStatsData = () => {
-    // claimTypesDropdownList().then(response => {
-    //   setClaimTypes(response?.data)
-    // }).catch((error) => {
-    //   if (error?.response?.data?.errorDescription) {
-    //     toast.error(error?.response?.data?.errorDescription);
-    //   } else {
-    //     toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
-    //   }
-    // })
-  }
+const InfoCards = ({claimStatsData , rowClassName = 'g-3 g-lg-4' }) => {
+  const {t} = useTranslation()
+  const cardsData = [
+    {
+      bgColor: 'bg-primary',
+      Icon: <MdConfirmationNumber size={24} />,
+      title: t('NEW_TICKETS'), 
+      value: claimStatsData?.countsByStatus?.NEW,
+      colProps: { sm: 6, lg: 3 }
+    },
+    {
+      bgColor: 'bg-orange',
+      Icon: <MdHourglassEmpty size={24} />,
+      title: t('TICKETS_IN_PROGRESS'), 
+      value: claimStatsData?.countsByStatus?.IN_PROGRESS,
+      colProps: { sm: 6, lg: 3 }
+    },
+    {
+      bgColor: 'bg-danger',
+      Icon: <MdPending size={24} />,
+      title: t('REJECTED_TICKETS'), // Direct translation key
+      value: claimStatsData?.countsByStatus?.REJECTED,
+      colProps: { sm: 6, lg: 3 }
+    },
+    {
+      bgColor: 'bg-success',
+      Icon: <MdTaskAlt size={24} />,
+      title: t('CLOSED_TICKETS'), // Direct translation key
+      value: claimStatsData?.countsByStatus?.CLOSED,
+      colProps: { sm: 6, lg: 3 }
+    },
+  ];
+  
 
-  useEffect(() => {
-    getClaimTypeStatsData()
-  }, [])
+
 
 
   return (
-    <Row className='g-3 g-lg-4'>
+    <Row className={rowClassName}>
       {cardsData.map((card, index) => (
         <Col key={index} {...card.colProps}>
           <Stack

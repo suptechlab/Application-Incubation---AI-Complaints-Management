@@ -37,3 +37,7 @@ export const downloadClaimSubTypes = async (params) => {
 export const claimTypesDropdownList = async () => {
   return await adminApi.get(`/${API_VERSION}/claim-types/dropdown-list`);
 }
+// CLAIM SUB TYPE DROPDOWN LIST
+// export const claimTypesDropdownList = async () => {
+//   return await adminApi.get(`/${API_VERSION}/claim-types/dropdown-list`);
+// }
