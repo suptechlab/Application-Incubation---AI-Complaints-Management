@@ -240,5 +240,6 @@ export const spanishLang = {
     "CONSUMER_INFO": "Información del Consumidor",
     "ENTER_EXTENDED_DATE": "Ingrese Fecha Extendida",
     "DAYS_REMAINING": "Días restantes",
-    "DAYS": "Días"
+    "DAYS": "Días",
+     "ALL_PRIORITY":"Toda prioridad"
 }

@@ -177,7 +177,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             size="sm"
                             options={[
                                 {
-                                    label: t("PRIORITY"),
+                                    label: t("ALL PRIORITY"),
                                     value: "",
                                     class: "label-class",
                                 },

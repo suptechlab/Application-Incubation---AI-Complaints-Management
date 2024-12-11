@@ -243,5 +243,6 @@ export const englishLang = {
     "CONSUMER_INFO": "Consumer Info",
     "ENTER_EXTENDED_DATE": "Enter Extended Date",
     "DAYS REMAINING":"Days remaining",
-    "DAYS" :"Days"
+    "DAYS" :"Days",
+    "ALL_PRIORITY":"All Priority"
 }

@@ -21,6 +21,7 @@ import UserList from "../pages/users";
 import SLAComplianceReport from "../pages/sla-reports";
 import ClaimOverviewReport from "../pages/clamOverviewReport";
 import CreateClaim from "../pages/tickets/create-claim";
+import TeamManagementAddEdit from "../pages/team-management/addedit";
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));

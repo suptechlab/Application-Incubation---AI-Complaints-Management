@@ -163,7 +163,7 @@ export const NavItems = () => {
           path: "/reports/claim-overview",
           moduleName: ["reports"],
           roleName: "Reports",
-          disabled: false,
+          disabled: true,
         },
         {
           id: 72,
@@ -171,7 +171,7 @@ export const NavItems = () => {
           path: "/reports/sla-compliance",
           moduleName: ["reports"],
           roleName: "Reports",
-          disabled: false,
+          disabled: true,
         },
         {
           id: 73,
