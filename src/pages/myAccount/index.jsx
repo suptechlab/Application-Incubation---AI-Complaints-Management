@@ -174,14 +174,17 @@ export default function MyAccount() {
               className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none text-info ${className}`}
               aria-label={ariaLabel || label}
               onClick={onClickHandler}
-              disabled={info.row.original.instanceType === "SECOND_INSTANCE" || (info.row.original.status !== "CLOSED" || info.row.original.status !== "REJECTED")}
+              disabled={
+                info.row.original.instanceType === "SECOND_INSTANCE" ||
+                (info.row.original.status !== "CLOSED" && info.row.original.status !== "REJECTED")
+              }
             >
               {t(label)}
             </Button>
           );
 
           let tooltipTitle = '';
-          const instanceButton = (info.row.original.instanceType === "FIRST_INSTANCE") 
+          const instanceButton = (info.row.original.instanceType === "FIRST_INSTANCE")
             ? renderButton({
               label: "FILE_SECOND_INSTANCE",
               onClickHandler: () => instanceClickHandler(info.row.original),
@@ -228,13 +231,13 @@ export default function MyAccount() {
                 <Stack direction='horizontal' gap={2}>
                   {instanceButton}
                   {/* <AppTooltip title={t(tooltipTitle)}> */}
-                    <Button
-                      variant="link"
-                      className='p-0 border-0 lh-sm position-relative text-body'
-                      aria-label={t(tooltipTitle)}
-                    >
-                      {/* <MdOutlineInfo size={24} /> */}
-                    </Button>
+                  <Button
+                    variant="link"
+                    className='p-0 border-0 lh-sm position-relative text-body'
+                    aria-label={t(tooltipTitle)}
+                  >
+                    {/* <MdOutlineInfo size={24} /> */}
+                  </Button>
                   {/* </AppTooltip> */}
                 </Stack>
               )}
