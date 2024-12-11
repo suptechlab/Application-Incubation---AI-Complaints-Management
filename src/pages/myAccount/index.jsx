@@ -215,7 +215,7 @@ export default function MyAccount() {
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
                   aria-label={t("CHAT")}
-                  disabled={false}
+                  disabled={true}
                 >
                   <MdChatBubbleOutline size={24} />
                   {/* <Badge
