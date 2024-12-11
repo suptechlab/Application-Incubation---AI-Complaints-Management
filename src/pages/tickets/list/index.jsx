@@ -790,20 +790,19 @@ export default function TicketsList() {
                 selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
                 break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "status"];
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "priority" ,"status"];
                 break;
             case 'SEPS_ADMIN':
                 selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "priority", "status"];
                 break;
             case 'SEPS_AGENT':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "status"];
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate","priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
                 selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
                 break;
         }
-
         return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns
     };
 

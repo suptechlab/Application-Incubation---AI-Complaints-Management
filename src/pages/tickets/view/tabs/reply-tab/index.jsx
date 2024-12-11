@@ -121,7 +121,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs }) => {
                                 <input
                                     id="attachment"
                                     name="attachment"
-                                    accept="image/png, image/jpeg, image/jpg"
+                                    accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
                                     className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                     type="file"
                                     onChange={(event) => {
