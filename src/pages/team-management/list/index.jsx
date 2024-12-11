@@ -123,22 +123,22 @@ export default function TeamManagementList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
-    // const changeStatus = async (id, currentStatus) => {
-    //     setLoading(true)
-    //     let toggleStatus = currentStatus === true ? false : true;
-    //     handleStatusChangeState(id, toggleStatus).then(response => {
-    //         toast.success(t("STATUS UPDATED"));
-    //         dataQuery.refetch();
-    //     }).catch((error) => {
-    //         if (error?.response?.data?.errorDescription) {
-    //             toast.error(error?.response?.data?.errorDescription);
-    //         } else {
-    //             toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-    //         }
-    //     }).finally(() => {
-    //         setLoading(false)
-    //     })
-    // };
+    const changeStatus = async (id, currentStatus) => {
+        setLoading(true)
+        let toggleStatus = currentStatus === true ? false : true;
+        handleStatusChangeState(id, toggleStatus).then(response => {
+            toast.success(t("STATUS UPDATED"));
+            dataQuery.refetch();
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+            }
+        }).finally(() => {
+            setLoading(false)
+        })
+    };
 
     const columns = React.useMemo(
         () => [
@@ -160,38 +160,38 @@ export default function TeamManagementList() {
                 header: () => t('ASSOCIATION'),
                 enableSorting: true,
             },
-            // {
-            //     id: "status",
-            //     isAction: true,
-            //     cell: (info) => {
+            {
+                id: "status",
+                isAction: true,
+                cell: (info) => {
 
-            //         if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
-            //             return (
-            //                 //   permission.current.statusModule ?
-            //                 <Toggle
-            //                     id={`status-${info?.row?.original?.id}`}
-            //                     key={"status"}
-            //                     name="status"
-            //                     value={info?.row?.original?.status === true}
-            //                     checked={info?.row?.original?.status === true}
-            //                     onChange={() =>
-            //                         changeStatus(
-            //                             info?.row?.original?.id,
-            //                             info?.row?.original?.status
-            //                         )
-            //                     }
-            //                     tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
-            //                 />
-            //                 //   : ''
-            //             );
-            //         } else {
-            //             return <span>{info?.row?.original?.status} </span>
-            //         }
-            //     },
-            //     header: () => t("STATUS"),
-            //     enableSorting: false,
-            //     size: "80",
-            // },
+                    if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
+                        return (
+                            //   permission.current.statusModule ?
+                            <Toggle
+                                id={`status-${info?.row?.original?.id}`}
+                                key={"status"}
+                                name="status"
+                                value={info?.row?.original?.status === true}
+                                checked={info?.row?.original?.status === true}
+                                onChange={() =>
+                                    changeStatus(
+                                        info?.row?.original?.id,
+                                        info?.row?.original?.status
+                                    )
+                                }
+                                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+                            />
+                            //   : ''
+                        );
+                    } else {
+                        return <span>{info?.row?.original?.status} </span>
+                    }
+                },
+                header: () => t("STATUS"),
+                enableSorting: false,
+                size: "80",
+            },
             // Conditionally add the "actions" column
             // ...(permission.current.editModule
             //     ? [
