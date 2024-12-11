@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import { Col, Row, Tab } from "react-bootstrap";
+import { Tab } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../components/Loader";
-import StepsProgress from "../../../components/stepProgress/stepProgress";
 import BasicInfoTab from "./basicInfoTab";
 import ClaimDetailsTab from "./claimDetailsTab";
 import FileAlertModal from "./file-alert";
 import FileSuccesModal from "./file-success";
-import OtherInfoTab from "./otherInfoTab";
 import PageHeader from "./header";
+import OtherInfoTab from "./otherInfoTab";
 
 export default function CreateClaim() {
 
@@ -63,9 +62,7 @@ export default function CreateClaim() {
     const handleClaimDetailsSubmit = async (values, actions) => {
 
         let formData = { ...fileClaimValues, ...values }
-
         formData.checkDuplicate = true
-
         setFileClaimValues((prev) => ({ ...prev, ...values }))
 
         // const result = await dispatch(fileClaimForm(formData));
@@ -87,7 +84,7 @@ export default function CreateClaim() {
 
     // HANDLE FILE DUPLICATE CLAIM
     const handleFileDuplicateClaim = async () => {
-        let formData = { ...fileClaimValues, checkDuplicate: false }
+        // let formData = { ...fileClaimValues, checkDuplicate: false }
         // const result = await dispatch(fileClaimForm(formData));
         // if (fileClaimForm.fulfilled.match(result)) {
         //     setFileClaimResponse(result?.payload?.data)
@@ -99,15 +96,15 @@ export default function CreateClaim() {
         // }
     }
     // Handle File Alert Click
-    const handleFileAlertClick = () => {
-        setFileAlertModalShow(false)
-        setFileSuccesModalShow(true)
-    };
+    // const handleFileAlertClick = () => {
+    //     setFileAlertModalShow(false)
+    //     setFileSuccesModalShow(true)
+    // };
     // Handle File Succes Click
     const handleFileSuccesClick = () => {
-        setFileSuccesModalShow(false)
-        setActiveTab(0)
-        navigate('/my-account')
+        setFileSuccesModalShow(false);
+        setActiveTab(0);
+        navigate('/tickets');
     };
     //Steps Data
     const stepData = [
@@ -143,7 +140,7 @@ export default function CreateClaim() {
         },
         {
             eventKey: 1,
-            content: <OtherInfoTab backButtonClickHandler={backButtonOtherInfoClickHandler} handleFormSubmit={handleOtherInfoSubmit} />,
+            content: <OtherInfoTab backButtonClickHandler={backButtonOtherInfoClickHandler} handleFormSubmit={handleOtherInfoSubmit} setIsLoading={setIsLoading} />,
         },
         {
             eventKey: 2,

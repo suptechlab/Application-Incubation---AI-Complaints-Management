@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Modal } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
 import SvgIcons from '../../../../components/SVGIcons'
-import { Link, useNavigate } from 'react-router-dom'
 
 const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormBack, fileClaimData }) => {
 

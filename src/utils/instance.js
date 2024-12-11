@@ -18,7 +18,7 @@ const createAxiosInstance = (baseURL) => {
     instance.interceptors.request.use(
         (config) => {
             const token = getLocalStorage('access_token');
-            const userLanguage = 'es';
+            const userLanguage = 'en';
 
             // Set Accept-Language header
             config.headers["Accept-Language"] = userLanguage ?? "en";
@@ -51,7 +51,7 @@ const createAxiosInstance = (baseURL) => {
         (error) => {
             console.log(error?.response)
             if (error.response?.status === 401) {
-                toast.error('No autorizado');
+                toast.error(error.response?.message ?? 'No autorizado');
                 // Force redirect to the login page
                 // const dashboardURL = `${process.env.REACT_APP_BASE_URL}/dashboard`;
                 // window.location.href = dashboardURL;

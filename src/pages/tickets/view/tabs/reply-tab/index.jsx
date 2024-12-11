@@ -1,141 +1,199 @@
 import { Form, Formik } from "formik";
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button, Card, Stack } from "react-bootstrap";
 import { MdAttachFile } from "react-icons/md";
 import { Link } from "react-router-dom";
-import SunEditorReact from '../../../../../components/SuneditorReact';
-import { validationSchema } from '../../../../../validations/ticketsManagement.validation';
-import GenericModal from '../../../../../components/GenericModal';
+import SunEditorReact from "../../../../../components/SuneditorReact";
+import { validationSchema } from "../../../../../validations/ticketsManagement.validation";
+import GenericModal from "../../../../../components/GenericModal";
+import {
+    ticketReplyToCustomer,
+    ticketReplyInternal,
+} from "../../../../../services/ticketmanagement.service";
+import toast from "react-hot-toast";
+import { validateFile } from "../../../../../utils/commonutils";
+import { useTranslation } from "react-i18next";
 
-const ReplyTab = () => {
-    const [fileName, setFileName] = useState("");
+const ReplyTab = ({ ticketId, setIsGetAcitivityLogs }) => {
+
+    const { t } = useTranslation()
+
     const [sendReplyModalShow, setSendReplyModalShow] = useState(false);
-
-    //Handle File Change
-    const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            setFileName(file.name);
-        } else {
-            setFileName("Fi_Users_data.xlsx");
-        }
-    };
+    const [loading, setLoading] = useState(false);
+    const [submitAction, setSubmitAction] = useState(""); // Track which button is clicked
 
     // Handle Submit
     const handleSubmit = (values, actions) => {
-        actions.setSubmitting(false);
-        console.log("values::", values);
+        setLoading(true);
+
+        // Prepare form data for API submission
+        const formData = new FormData();
+        formData.append("message", values.message);
+        if (values.attachment) {
+            formData.append("attachments[0]", values.attachment);
+        }
+
+        const apiCall =
+            submitAction === "customer"
+                ? ticketReplyToCustomer(ticketId, formData)
+                : ticketReplyInternal(ticketId, formData);
+
+        apiCall
+            .then((response) => {
+                if (submitAction === "customer") {
+                    setSendReplyModalShow(false); // Close modal after success
+                }
+                actions.resetForm()
+                setIsGetAcitivityLogs((prev) => !prev)
+                toast.success(response?.data?.message)
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            })
+            .finally(() => {
+                setLoading(false);
+                actions.setSubmitting(false); // Reset Formik's submitting state
+            });
     };
 
-    // Handle Send Reply Click
-    const handleSendReplyClick = () => {
-        setSendReplyModalShow(true)
-    }
-
-    // Handle Send Reply Action
-    const handleSendReplyAction = () => {
-        console.log("handleSendReplyClick: Yes");
-    }
     return (
-        <React.Fragment>
-            <Formik
-                initialValues={{
-                    description: "",
-                }}
-                onSubmit={handleSubmit}
-                validationSchema={validationSchema}
-            >
-                {({
-                    handleChange,
-                    handleBlur,
-                    values,
-                    setFieldValue,
-                    setFieldError,
-                    touched,
-                    isValid,
-                    errors,
-                }) => (
-                    <Form>
-                        <SunEditorReact
-                            wrapperClassName="mb-0 editor-for-tab-view overflow-hidden"
-                            id="description"
-                            name="description"
-                            height="100"
-                            content={values.description}
-                            error={errors?.description}
-                            touched={touched?.description}
-                            handleBlur={handleBlur}
-                            handleChange={(value) => {
-                                if (value === "<p><br></p>") {
-                                    setFieldValue("description", "");
-                                } else {
-                                    setFieldValue("description", value);
-                                }
-                            }}
-                        />
-                        {fileName && (
-                            <div className='px-3 py-1'>
-                                <Link
-                                    target="_blank"
-                                    to="/fi-users/import"
-                                    className="text-decoration-none small mw-100 text-break"
+        <Formik
+            initialValues={{
+                message: "",
+                attachment: null,
+            }}
+            onSubmit={handleSubmit}
+            validationSchema={validationSchema}
+        >
+            {({
+                handleChange,
+                handleBlur,
+                values,
+                setFieldError,
+                setFieldValue,
+                submitForm, // Access Formik's submitForm method
+                touched,
+                isValid,
+                setFieldTouched,
+                errors,
+            }) => (
+                <Form>
+                    <SunEditorReact
+                        wrapperClassName="mb-0 editor-for-tab-view overflow-hidden"
+                        id="message"
+                        name="message"
+                        height="100"
+                        content={values.message}
+                        error={errors?.message}
+                        touched={touched?.message}
+                        handleBlur={handleBlur}
+                        handleChange={(value) => {
+                            if (value === "<p><br></p>") {
+                                setFieldValue("message", "");
+                            } else {
+                                setFieldValue("message", value);
+                            }
+                        }}
+                    />
+                    {values.attachment && (
+                        <div className="px-3 py-1">
+                            <Link
+                                target="_blank"
+                                to="#"
+                                className="text-decoration-none small mw-100 text-break"
+                            >
+                                {values.attachment.name}
+                            </Link>
+                        </div>
+                    )}
+                    <Card.Footer className="bg-body py-3">
+                        <Stack direction="horizontal" gap={2} className="flex-wrap">
+                            <div className="overflow-hidden position-relative z-1 flex-shrink-0 me-auto">
+                                <label
+                                    htmlFor="attachment"
+                                    className="small link-info align-middle cursor-pointer"
                                 >
-                                    {fileName}
-                                </Link>
+                                    <span className="align-text-bottom">
+                                        <MdAttachFile size={16} />
+                                    </span>{" "}
+                                    {t("ADD_ATTACHMENT")}
+                                </label>
+                                <input
+                                    id="attachment"
+                                    name="attachment"
+                                    accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                    className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                    type="file"
+                                    onChange={(event) => {
+                                        const file = event.currentTarget.files[0];
+                                        const isValidated = validateFile(file)
+                                        if (isValidated === true) {
+                                            setFieldValue("attachment", file);
+                                        } else {
+                                            toast.error(isValidated)
+                                        }
+                                        // Update Formik's state with the file
+                                    }}
+                                />
                             </div>
-                        )}
-                        <Card.Footer className='bg-body py-3'>
-                            <Stack direction='horizontal' gap={2} className='flex-wrap'>
-                                <div className="overflow-hidden position-relative z-1 flex-shrink-0 me-auto">
-                                    <label
-                                        htmlFor="files"
-                                        className="small link-info align-middle cursor-pointer"
-                                    >
-                                        <span className='align-text-bottom'><MdAttachFile size={16} /></span> Add attachment
-                                    </label>
-                                    <input
-                                        id="files"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                                        type="file"
-                                        onChange={handleFileChange}
-                                    />
-                                </div>
-                                <Stack direction='horizontal' gap={2} className='flex-wrap justify-content-between justify-content-sm-end flex-fill'>
-                                    <Button
-                                        type='button'
-                                        size="sm"
-                                        variant='outline-dark'
-                                        onClick={handleSendReplyClick}
-                                    >
-                                        Reply to Customer
-                                    </Button>
-                                    <Button
-                                        type='submit'
-                                        size="sm"
-                                        variant='warning'
-                                    >
-                                        Reply Internally
-                                    </Button>
-                                </Stack>
+                            <Stack
+                                direction="horizontal"
+                                gap={2}
+                                className="flex-wrap justify-content-between justify-content-sm-end flex-fill"
+                            >
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline-dark"
+                                    onClick={() => {
+                                        if (values.message === '') {
+                                            // Set an error for the message field
+                                            setFieldError("message", t("MESSAGE_REQUIRED"));
+                                            setFieldTouched("message", true);
+                                        } else {
+                                            setSubmitAction("customer");
+                                            setSendReplyModalShow(true); // Show modal first
+                                        }
+                                    }}
+                                    disabled={loading}
+                                >
+                                    {loading && submitAction === "customer"
+                                        ? t("SENDING")
+                                        : t("REPLY_TO_CUSTOMER")}
+                                </Button>
+
+                                <Button
+                                    type="submit"
+                                    size="sm"
+                                    variant="warning"
+                                    onClick={() => setSubmitAction("internal")}
+                                    disabled={loading}
+                                >
+                                    {loading && submitAction === "internal"
+                                        ? t("PROCESSING")
+                                        : t("REPLY_INTERNALLY")}
+                                </Button>
+
                             </Stack>
-                        </Card.Footer>
-                    </Form>
-                )}
-            </Formik>
+                        </Stack>
+                    </Card.Footer>
+                    {/* Send Reply Modal */}
+                    <GenericModal
+                        show={sendReplyModalShow}
+                        handleClose={() => setSendReplyModalShow(false)}
+                        modalHeaderTitle={t("SEND_REPLY")}
+                        modalBodyContent={t("CONFIRM_SEND_REPLY")}
+                        handleAction={() => {
+                            setSendReplyModalShow(false);
+                            submitForm(); // Submit the form after confirmation
+                        }}
+                        cancelButtonName={t("No")}
+                        buttonName={t("YES")}
+                    />
+                </Form>
+            )}
+        </Formik>
+    );
+};
 
-            {/* Send Reply Modal */}
-            <GenericModal
-                show={sendReplyModalShow}
-                handleClose={() => setSendReplyModalShow(false)}
-                modalHeaderTitle={`Send Reply`}
-                modalBodyContent={`Are you sure you want to send this reply to customer?`}
-                handleAction={handleSendReplyAction}
-                cancelButtonName="No"
-                buttonName="Yes"
-            />
-        </React.Fragment>
-    )
-}
-
-export default ReplyTab
+export default ReplyTab;

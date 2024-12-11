@@ -1,43 +1,140 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
-import { Badge, Dropdown, Stack } from 'react-bootstrap';
-import { MdMoreVert, MdSchedule } from "react-icons/md";
-import { Link } from 'react-router-dom';
-import AppTooltip from '../../../../components/tooltip';
-import AddAttachmentsModal from '../../modals/addAttachmentsModal';
+import React, { useContext, useEffect, useState } from 'react';
+import { Badge, Button, Dropdown, Stack } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { MdSchedule } from "react-icons/md";
+import { Link } from 'react-router-dom';
+import ReactSelect from '../../../../components/ReactSelect';
+import { MasterDataContext } from '../../../../contexts/masters.context';
+import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent } from '../../../../services/ticketmanagement.service';
+import { calculateDaysDifference } from '../../../../utils/commonutils';
+import AddAttachmentsModal from '../../modals/addAttachmentsModal';
+import CloseTicketModal from '../../modals/closeTicketModal';
+import DateExtensionModal from '../../modals/dateExtensionModal';
+import RejectTicketModal from '../../modals/rejectTicketModal';
 
-const TicketViewHeader = ({ title = "" }) => {
+const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivityLogs }) => {
+
     const { t } = useTranslation();
-    const [selectedStatus, setSelectedStatus] = useState('In Progress');
-    const [addAttachmentsModalShow, setAddAttachmentsModalShow] = useState(false);
 
+    const { masterData } = useContext(MasterDataContext)
+
+    const [agentList, setAgentListing] = useState([])
+    const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);
+    const [addAttachmentsModalShow, setAddAttachmentsModalShow] = useState(false);
+    const [dateExtensionModalShow, setDateExtensionModalShow] = useState(false);
+    const [selectedAgent, setSelectedAgent] = useState(null)
+    const [closeTicketModalShow, setCloseTicketModalShow] = useState(false)
+    const [rejectTicketModalShow, setRejectTicketModalShow] = useState(false)
+
+    const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
-    const handleSelect = (priority) => {
-        setSelectedStatus(priority);
+    const handleSelect = (status) => {
+
+        // setSelectedStatus(status);
+
+        if (status === "CLOSE") {
+            setCloseTicketModalShow(true)
+        } else if (status === "REJECT") {
+            setRejectTicketModalShow(true)
+        }
     };
 
     // The color class based on the status
-    const statusOptions = ['Closed', 'In Progress', 'New', 'Rejected'];
+    // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
+
+    const statusOptions = [{ label: t('CLOSE'), value: 'CLOSE' }, { label: t('REJECT'), value: 'REJECT' }];
     const getStatusClass = (status) => {
         switch (status) {
-            case 'Closed':
+            case 'CLOSED':
                 return 'bg-success';
-            case 'In Progress':
+            case 'IN_PROGRESS':
                 return 'bg-info';
-            case 'New':
+            case 'NEW':
                 return 'bg-primary';
-            case 'Rejected':
+            case 'REJECTED':
                 return 'bg-danger';
+            case 'ASSIGNED':
+                return 'bg-warning';
             default:
                 return 'bg-body';
         }
     };
 
+    useEffect(() => {
+        setSelectedStatus(ticketData?.status)
+    }, [ticketData?.status])
+
     // Handle Add Attachments Click
     const handleAddAttachmentsClick = () => {
         setAddAttachmentsModalShow(true)
     }
+    // Custom function to display "remaining" for future dates
+
+
+    // Handle Date Extension Click
+    const handleDateExtensionClick = () => {
+        setDateExtensionModalShow(true)
+    }
+
+    const handleTicketAssign = (agentId) => {
+        setLoading(true)
+        // agentTicketToSEPSagent
+        if (agentId && agentId !== '') {
+            if (currentUser === "SEPS_ADMIN") { }
+            agentTicketToSEPSagent(agentId).then(response => {
+                toast.success(t("TICKETS ASSIGNED"));
+
+            }).catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                }
+            }).finally(() => {
+                setLoading(false)
+            })
+        } else if (currentUser === "FI_ADMIN") {
+            agentTicketToFIagent(agentId).then(response => {
+                toast.success(t("TICKETS ASSIGNED"));
+
+            }).catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                }
+            }).finally(() => {
+                setLoading(false)
+            })
+        } else {
+            toast.warning("You are not allowed to assign tickets.")
+        }
+    }
+
+    // GET AGENT DROPDOWN LISTING
+    const getAgentDropdownListing = () => {
+        agentListingApi().then(response => {
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setAgentListing(dropdownData)
+            }
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        })
+    }
+    useEffect(() => {
+        getAgentDropdownListing()
+    }, [])
+
 
     return (
         <React.Fragment>
@@ -47,43 +144,114 @@ const TicketViewHeader = ({ title = "" }) => {
                     gap={2}
                     className="flex-wrap custom-min-height-38"
                 >
-                    <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-1">
+                    <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
                         {title}
-                        <Badge bg='danger-subtle' className='text-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                            <MdSchedule size={16} />
-                            <span className='custom-font-size-13 fw-normal'>10 Days Remaning</span>
-                        </Badge>
+                        {ticketData?.slaBreachDate &&
+                            calculateDaysDifference(ticketData?.slaBreachDate) > 2 ?
+                            <Badge bg='custom-info' className='bg-opacity-10 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                <MdSchedule size={16} />
+                                <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + " Days remaining"}</span>
+                            </Badge> : <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                <MdSchedule size={16} />
+                                <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + " Days remaining"}</span>
+                            </Badge>}
+                        {
+                            ticketData?.instanceType === "FIRST_INSTANCE" ?
+                                <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                </Badge>
+                                :
+                                <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                </Badge>
+                        }
                     </h1>
-
-                    <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
+                    <Stack direction="horizontal" gap={2} className='flex-wrap'>
                         <Link
                             to={"/tickets"}
                             className="btn btn-outline-dark custom-min-width-85"
                         >
                             {t("BACK")}
                         </Link>
-                        <Dropdown>
-                            <Dropdown.Toggle
-                                id="ticket-detail-status"
-                                variant="info"
-                                className={`bg-opacity-25 custom-min-width-130 border-0 ${getStatusClass(selectedStatus)}`}
-                            >
-                                <span className='me-2'>{selectedStatus}</span>
-                            </Dropdown.Toggle>
+                        {/* <Button
+                            type="submit"
+                            variant='outline-dark'
+                        >
+                            Assign To
+                        </Button> */}
 
-                            <Dropdown.Menu>
-                                {statusOptions?.map((status) => (
-                                    <Dropdown.Item
-                                        key={status}
-                                        className={`small ${selectedStatus === status ? 'active' : ''}`}
-                                        onClick={() => handleSelect(status)}
+                        {
+                            ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECT" &&
+                            <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
+                                <ReactSelect
+                                    wrapperClassName="mb-0"
+                                    class="form-select "
+                                    placeholder={t("ASSIGN_REASSIGN")}
+                                    id="floatingSelect"
+                                    // size="sm"
+                                    options={[
+                                        {
+                                            label: t("ASSIGN_REASSIGN"),
+                                            value: "",
+                                        },
+                                        ...agentList
+                                    ]}
+                                    onChange={(e) => {
+                                        handleTicketAssign(e.target.value)
+                                        setSelectedAgent(e.target.value)
+                                    }}
+                                    value={selectedAgent ?? null}
+                                />
+                            </div>
+                        }
+
+                        {
+
+                            currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN" ?
+                                <Button
+                                    type="submit"
+                                    variant='warning'
+                                    onClick={handleDateExtensionClick}
+                                >
+                                    {t("DATE_EXTENSION")}
+                                </Button> : ""
+                        }
+
+                        {
+                            selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED" ?
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        id="ticket-detail-status"
+                                        variant="info"
+                                        className={`bg-opacity-25 custom-min-width-130 border-0 ${getStatusClass(selectedStatus)}`}
                                     >
-                                        {status}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <Dropdown>
+                                        <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        {statusOptions?.map((status) => (
+                                            <Dropdown.Item
+                                                key={status?.value}
+                                                className={`small ${selectedStatus === status ? 'active' : ''}`}
+                                                onClick={() => handleSelect(status?.value)}
+                                            >
+                                                {status?.label}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown> :
+
+                                <Button
+                                    variant="info"
+                                    className={`bg-opacity-25 custom-min-width-130 border-0 ${getStatusClass(selectedStatus)}`}
+                                    disabled={true}
+                                >
+                                    <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
+                                </Button>
+
+                        }
+
+                        {/* <Dropdown>
                             <Dropdown.Toggle
                                 variant="link"
                                 id="ticket-detail-filter"
@@ -101,7 +269,7 @@ const TicketViewHeader = ({ title = "" }) => {
                                     SLA
                                 </Dropdown.Item>
                             </Dropdown.Menu>
-                        </Dropdown>
+                        </Dropdown> */}
                     </Stack>
                 </Stack>
             </div>
@@ -110,6 +278,27 @@ const TicketViewHeader = ({ title = "" }) => {
             <AddAttachmentsModal
                 modal={addAttachmentsModalShow}
                 toggle={() => setAddAttachmentsModalShow(false)}
+            />
+
+            {/* Date Extension Modals */}
+            <DateExtensionModal
+                ticketData={ticketData}
+                modal={dateExtensionModalShow}
+                toggle={() => setDateExtensionModalShow(false)}
+            />
+            <CloseTicketModal
+                ticketId={ticketData?.id}
+                modal={closeTicketModalShow}
+                setSelectedStatus={setSelectedStatus}
+                toggle={() => setCloseTicketModalShow(false)}
+                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+            />
+            <RejectTicketModal
+                ticketId={ticketData?.id}
+                modal={rejectTicketModalShow}
+                setSelectedStatus={setSelectedStatus}
+                toggle={() => setRejectTicketModalShow(false)}
+                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
             />
         </React.Fragment>
     );

@@ -32,9 +32,10 @@ export const BasicInfoFormSchema = yup.object({
     .string()
     .required(msg.provinceRequired),
 
+
   cityId: yup
     .string()
-    .required(msg.cantonRequired)
+    // .required(msg.cantonRequired)
 });
 
 export const OtherInfoFormSchema = yup.object({

@@ -8,7 +8,7 @@ import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
-import ListingSearchForm from "../../components/ListingSearchForm";
+import ListingSearchForm from "./ListingSearchForm";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
@@ -32,12 +32,7 @@ const SLAComplianceReport = () => {
   });
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState({ row: {}, open: false })
-  const [sorting, setSorting] = useState([
-    {
-      "id": "name",
-      "desc": true
-    }
-  ]);
+  const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
   });
@@ -78,72 +73,52 @@ const SLAComplianceReport = () => {
     setEditModal({ row: row, open: !editModal?.open })
   };
 
+  // Dummy Data for SLAComplianceReport
+const dummyData = {
+  data: {
+    totalPages: 5,
+    totalItems: 50,
+    data: Array.from({ length: 10 }, (_, index) => ({
+      ticketId: `TICK-${index + 1}`,
+      name: `Claim Type ${index + 1}`,
+      claimSubType: { name: `Sub Type ${index + 1}` },
+      createdAt: new Date().toISOString(),
+      slaDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+      slaBreachDays: index % 3 === 0 ? index : 0, // Breach days for every 3rd item
+      status: index % 2 === 0 ? "Active" : "Inactive", // Alternating status
+    })),
+  },
+};
+
   // DATA QUERY
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: async () => {
-      // Set loading state to true before the request starts
       setLoading(true);
-
+  
       try {
+        // Simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
+  
         const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-        Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
-
-        // Make the API request based on sorting
-        let response;
-        // if (sorting.length === 0) {
-        //   response = await handleGetClaimTypes({
-        //     page: pagination.pageIndex,
-        //     size: pagination.pageSize,
-        //     ...filterObj,
-        //   });
-        // } else {
-        //   response = await handleGetClaimTypes({
-        //     page: pagination.pageIndex,
-        //     size: pagination.pageSize,
-        //     sort: sorting
-        //       .map(
-        //         (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
-        //       )
-        //       .join(","),
-        //     ...filterObj,
-        //   });
-        // }
-
-        // Return the API response data
-        return response?.payload;
+        Object.keys(filterObj).forEach((key) => filterObj[key] === "" && delete filterObj[key]);
+  
+        // Use dummy data instead of API call
+        return dummyData.data;
       } catch (error) {
         console.error("Error fetching data", error);
-        // Optionally, handle errors here
       } finally {
-        // Set loading state to false when the request finishes (whether successful or not)
         setLoading(false);
       }
     },
-    staleTime: 0, // Data is always stale, so it refetches
-    cacheTime: 0, // Cache expires immediately
-    refetchOnWindowFocus: false, // Disable refetching on window focus
-    refetchOnMount: false, // Prevent refetching on component remount
-    retry: 0, //Disable retry on failure
+    staleTime: 0,
+    cacheTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 0,
   });
+  
 
-  // STATUS UPDATE FUNCTION
-  const changeStatus = async (id, currentStatus) => {
-    setLoading(true)
-    // await handleEditDistricts(id, { status: !currentStatus });
-    // changeClaimTypeStatus(id, !currentStatus).then(response => {
-    //   toast.success(t("STATUS UPDATED"));
-    //   dataQuery.refetch();
-    // }).catch((error) => {
-    //   if (error?.response?.data?.errorDescription) {
-    //     toast.error(error?.response?.data?.errorDescription);
-    //   } else {
-    //     toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-    //   }
-    // }).finally(() => {
-    //   setLoading(false)
-    // })
-  };
 
   // DOWNLOAD CLAIM TYPES LIST
   const handleDownload = () => {
@@ -201,57 +176,46 @@ const SLAComplianceReport = () => {
   const columns = React.useMemo(
     () => [
       {
+        accessorFn: (row) => row?.ticketId,
+        id: "ticketId",
+        header: () => t("TICKET_ID"),
+        enableSorting: true
+      },
+      {
         accessorFn: (row) => row?.name,
         id: "name",
         header: () => t("CLAIM TYPE"),
         enableSorting: true
       },
       {
-        accessorFn: (row) => row?.description != null ? row?.description : '-',
-        id: "description",
-        header: () => t("DESCRIPTION"),
+        accessorFn: (row) => row?.claimSubType?.name,
+        id: "claimSubType",
+        header: () => t("CLAIM SUB TYPE"),
         enableSorting: true,
       },
       {
-        cell: (info) => {
-          return (
-            <Toggle
-              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            />
-          )
-        },
-        id: "status",
-        header: () => t("STATUS"),
-        size: '80'
+        accessorFn: (row) => row?.createdAt,
+        id: "createdAt",
+        header: () => t("CREATION DATE"),
+        enableSorting: true,
       },
       {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          <DataGridActions
-            controlId="province-master"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permission.current.editModule,
-                type: "button",
-                title: t("EDIT"),
-                icon: <MdEdit size={18} />,
-                handler: () => editClaimType(rowData?.row?.original),
-              },
-            ]}
-          />
-        ),
-        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-        enableSorting: false,
-        size: '80',
+        accessorFn: (row) => row?.slaDueDate,
+        id: "slaDueDate",
+        header: () => t("SLA DUE DATE"),
+        enableSorting: true,
+      },
+      {
+        accessorFn: (row) => row?.slaBreachDays,
+        id: "slaBreachDays",
+        header: () => t("SLA BREACH DAYS"),
+        enableSorting: true,
+      },
+      {
+        accessorFn: (row) => row?.status,
+        id: "status",
+        header: () => t("STATUS"),
+        enableSorting: true,
       },
     ],
     []
@@ -275,10 +239,10 @@ const SLAComplianceReport = () => {
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
     <PageHeader
-      title={t("CLAIM TYPE")}
+      title={t("SLA COMPLIANCE REPORT")}
       actions={[
         { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
-        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
+        // { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
     />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
@@ -294,7 +258,7 @@ const SLAComplianceReport = () => {
         />
       </Card.Body>
     </Card>
-  
+
   </div>
 };
 

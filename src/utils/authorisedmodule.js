@@ -2,7 +2,7 @@ import { getLocalStorage } from './storage';
 
 const isAccessible = async(moduleName, childModuleName)=>{
     const userType = getLocalStorage("user_type");
-    console.log("User Type:::", moduleName,  childModuleName);
+    // console.log("User Type:::", moduleName,  childModuleName);
     if (userType==="ROLE_USER") {
         const userRoles = getLocalStorage("user_roles");
         console.log("User Roles:::", userRoles);

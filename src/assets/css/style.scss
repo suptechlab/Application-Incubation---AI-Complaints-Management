@@ -11,6 +11,8 @@
 @include custom-class('padding-bottom', 2);
 @include custom-class('padding-right', 66);
 @include custom-class('margin-right', -66);
+@include custom-class('height', 10);
+@include custom-class('width', 10);
 @include custom-class('height', 26);
 @include custom-class('width', 26);
 @include custom-class('height', 32);
@@ -40,12 +42,14 @@
 @include custom-class('max-width', 150);
 @include custom-class('width', 160);
 @include custom-class('min-width', 160);
+@include custom-class('min-width', 180);
 @include custom-class('width', 190);
 @include custom-class('width', 200);
 @include custom-class('max-width', 200);
 @include custom-class('min-height', 200);
-@include custom-class('min-width', 240);
 @include custom-class('min-width', 210);
+@include custom-class('width', 218);
+@include custom-class('min-width', 240);
 @include custom-class('width', 250);
 @include custom-class('max-width', 320);
 @include generate-color-classes($custom-colors);
@@ -316,4 +320,3 @@ input:-webkit-autofill:active {
     margin-top: 5px;
     font-size: 14px;
 }
-

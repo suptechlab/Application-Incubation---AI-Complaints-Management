@@ -8,7 +8,6 @@ export const messages = {
     countryCodeRequired: 'Mobile code is required',
     countryCodeInvalid: 'Invalid mobile code',
     rucRequired: "Entity's Tax ID (RUC) is required",
-    roleIdRequired: 'Role Id is required',
     nameMax: 'Claim type name cannot exceed 250 characters',
     nameInvalid: 'Name can only contain letters, spaces, and valid Spanish characters.',
     descriptionMax: 'Description cannot exceed 512 characters',
@@ -68,7 +67,7 @@ export const messages = {
     precedentsRequired: "Precedents is required.",
     invalidSpecialPetition: "Special Petition must not exceed 1024 characters.",
     specialPetitionRequired: "Special Petition is required.",
-    agreeDeclarations: "Please agree to all declarations and conditions to proceed."
+    agreeDeclarations: "Please agree to all declarations and conditions to proceed.",
 
   },
   es: {
@@ -128,6 +127,7 @@ export const messages = {
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
     entityRequired: "El nombre de la entidad es obligatorio.",
+    roleIdRequired: "El rol es obligatorio.", // Add this
     //create claim
     genderRequired: "Se requiere género.",
     cantonRequired: "Se requiere Cantón de Residencia.",
@@ -139,6 +139,7 @@ export const messages = {
     precedentsRequired: "Se requieren precedentes.",
     invalidSpecialPetition: "La petición especial no debe exceder los 1024 caracteres.",
     specialPetitionRequired: "Se requiere una petición especial.",
-    agreeDeclarations: "Por favor acepte todas las declaraciones y condiciones para continuar."
+    agreeDeclarations: "Por favor acepte todas las declaraciones y condiciones para continuar.",
+    entityRequired: "El nombre de la entidad es obligatorio."
   }
 };
