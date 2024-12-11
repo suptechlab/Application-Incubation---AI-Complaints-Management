@@ -60,6 +60,7 @@ public class UserClaimTicketService {
     private final ClaimTicketDocumentRepository claimTicketDocumentRepository;
     private final ClaimTicketStatusLogRepository claimTicketStatusLogRepository;
     private final ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository;
+    private final ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository;
     private static final boolean IS_INTERNAL_DOCUMENT = false;
     private final EnumUtil enumUtil;
 
@@ -68,7 +69,7 @@ public class UserClaimTicketService {
                                   ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository,
                                   UserService userService, UserClaimTicketMapper userClaimTicketMapper,
                                   AuditLogService auditLogService, Gson gson, MessageSource messageSource,
-                                  ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, EnumUtil enumUtil) {
+                                  ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -85,6 +86,7 @@ public class UserClaimTicketService {
         this.claimTicketDocumentRepository = claimTicketDocumentRepository;
         this.claimTicketStatusLogRepository = claimTicketStatusLogRepository;
         this.claimTicketInstanceLogRepository = claimTicketInstanceLogRepository;
+        this.claimTicketPriorityLogRepository = claimTicketPriorityLogRepository;
         this.enumUtil = enumUtil;
     }
 
@@ -137,6 +139,28 @@ public class UserClaimTicketService {
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
+
+        // Log claim ticket status
+        ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+        claimTicketStatusLog.setTicketId(newClaimTicket.getId());
+        claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.NEW);
+        claimTicketStatusLog.setCreatedBy(currentUserId);
+        claimTicketStatusLogRepository.save(claimTicketStatusLog);
+
+        // Log claim ticket instance
+        ClaimTicketInstanceLog claimTicketInstanceLog = new ClaimTicketInstanceLog();
+        claimTicketInstanceLog.setTicketId(newClaimTicket.getId());
+        claimTicketInstanceLog.setInstanceType(InstanceTypeEnum.FIRST_INSTANCE);
+        claimTicketInstanceLog.setCreatedBy(currentUserId);
+        claimTicketInstanceLogRepository.save(claimTicketInstanceLog);
+
+        //Log claim ticket priority
+        ClaimTicketPriorityLog claimTicketPriorityLog = new ClaimTicketPriorityLog();
+        claimTicketPriorityLog.setTicketId(newClaimTicket.getId());
+        claimTicketPriorityLog.setCreatedBy(currentUser.getId());
+        claimTicketPriorityLog.setPriority(ClaimTicketPriorityEnum.MEDIUM);
+        claimTicketPriorityLogRepository.save(claimTicketPriorityLog);
+
         // Populate response
         responseDTO.setNewTicketId(newClaimTicket.getTicketId());
         responseDTO.setNewId(newClaimTicket.getId());
@@ -504,7 +528,7 @@ public class UserClaimTicketService {
         Map<String, Object> auditData = new HashMap<>();
         //Old Data
         activityData.put(Constants.OLD_DATA, convertEntityToMap(userClaimTicketMapper.toUserClaimTicketDTO(oldClaimTicket)));
-        auditData.put(Constants.OLD_DATA, claimTicketMapper.toDTO(oldClaimTicket));
+        auditData.put(Constants.OLD_DATA, convertEntityToMap(claimTicketMapper.toDTO(oldClaimTicket)));
 
         // Business logic for filing the second instance claim
         claimTicket.setInstanceType(InstanceTypeEnum.SECOND_INSTANCE);
@@ -513,6 +537,7 @@ public class UserClaimTicketService {
         claimTicket.setResolvedOn(null);
         claimTicket.setSecondInstanceFiledAt(Instant.now());
         claimTicket.setSecondInstanceComment(secondInstanceRequest.getComment());
+        claimTicket.setUpdatedAt(Instant.now());
         claimTicket.setUpdatedByUser(currentUser);
         // Save the updated claim ticket to the database
         claimTicketRepository.save(claimTicket);
@@ -561,7 +586,7 @@ public class UserClaimTicketService {
 
         //New Data
         activityData.put(Constants.NEW_DATA, convertEntityToMap(userClaimTicketDTO));
-        auditData.put(Constants.NEW_DATA, claimTicketDTO);
+        auditData.put(Constants.NEW_DATA, convertEntityToMap(claimTicketDTO));
 
         // Perform additional logging and auditing actions
         logActivityAndAuditOfSecondInstance(claimTicket, activityData, auditData, secondInstanceRequest, requestInfo, currentUser);
@@ -721,6 +746,7 @@ public class UserClaimTicketService {
         return dto;
     }
 
+    @Transactional
     public void fileComplaint(ComplaintRequest complaintRequest, RequestInfo requestInfo) {
         // Extract claim ticket ID from the request
         Long id = complaintRequest.getId();
@@ -759,7 +785,7 @@ public class UserClaimTicketService {
         Map<String, Object> auditData = new HashMap<>();
         //Old Data
         activityData.put(Constants.OLD_DATA, convertEntityToMap(userClaimTicketMapper.toUserClaimTicketDTO(oldClaimTicket)));
-        auditData.put(Constants.OLD_DATA, claimTicketMapper.toDTO(oldClaimTicket));
+        auditData.put(Constants.OLD_DATA, convertEntityToMap(claimTicketMapper.toDTO(oldClaimTicket)));
         // Business logic for filing the second instance claim
         claimTicket.setInstanceType(InstanceTypeEnum.COMPLAINT);
         claimTicket.setStatus(ClaimTicketStatusEnum.NEW);
@@ -768,6 +794,7 @@ public class UserClaimTicketService {
         claimTicket.setComplaintPrecedents(complaintRequest.getPrecedents());
         claimTicket.setComplaintSpecificPetition(complaintRequest.getSpecificPetition());
         claimTicket.setComplaintFiledAt(Instant.now());
+        claimTicket.setUpdatedAt(Instant.now());
         claimTicket.setUpdatedByUser(currentUser);
         // Save the updated claim ticket to the database
         claimTicketRepository.save(claimTicket);
@@ -789,7 +816,7 @@ public class UserClaimTicketService {
         // Log claim ticket instance change
         ClaimTicketInstanceLog claimTicketInstanceLog = new ClaimTicketInstanceLog();
         claimTicketInstanceLog.setTicketId(id);
-        claimTicketInstanceLog.setInstanceType(InstanceTypeEnum.SECOND_INSTANCE);
+        claimTicketInstanceLog.setInstanceType(InstanceTypeEnum.COMPLAINT);
         claimTicketInstanceLog.setCreatedBy(currentUserId);
         claimTicketInstanceLogRepository.save(claimTicketInstanceLog);
 
@@ -811,7 +838,7 @@ public class UserClaimTicketService {
         claimTicketDTO.setClaimTicketDocuments(claimTicketDTOList);
         //New Data
         activityData.put(Constants.NEW_DATA, convertEntityToMap(userClaimTicketDTO));
-        auditData.put(Constants.NEW_DATA, claimTicketDTO);
+        auditData.put(Constants.NEW_DATA, convertEntityToMap(claimTicketDTO));
         // Perform additional logging and auditing actions
         logActivityAndAuditOfComplaint(claimTicket, activityData, auditData, complaintRequest, requestInfo, currentUser);
         LOG.info("Complaint filed for claim ticket {} by user {}", id, currentUserId);
@@ -823,12 +850,12 @@ public class UserClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         String plainTicketId = String.valueOf(claimTicket.getTicketId());
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
-            String activityMessage = messageSource.getMessage("activity.log.file.second.instance",
+            String activityMessage = messageSource.getMessage("activity.log.raised.complaint",
                 new Object[]{plainTicketId}, Locale.forLanguageTag(language.getCode()));
             activityMessageMap.put(language.getCode(), activityMessage);
         });
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
-            String auditMessage = messageSource.getMessage("audit.log.claim.ticket.second.instance",
+            String auditMessage = messageSource.getMessage("audit.log.claim.ticket.file.complaint",
                 new Object[]{currentUser.getEmail(), plainTicketId}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), auditMessage);
         });
