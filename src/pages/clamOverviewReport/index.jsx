@@ -1,11 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
 import React, { useEffect, useRef, useState } from "react";
-import { Card } from "react-bootstrap";
+import { Card, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import ListingSearchForm from "../../components/ListingSearchForm";
@@ -13,6 +13,7 @@ import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
+import ListFilters from "./ListFilters";
 
 const ClaimOverviewReport = () => {
 
@@ -46,6 +47,95 @@ const ClaimOverviewReport = () => {
 
 
   const permission = useRef({ addModule: false, editModule: false, deleteModule: false });
+
+  const columns = React.useMemo(
+    () => [
+
+      {
+        accessorFn: (row) => row?.ticketId,
+        id: "ticketId",
+        header: () => "Ticket ID",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <Stack direction="horizontal" gap={2}>
+            <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+            {/* <AppTooltip title="Attachments">
+                        <Button
+                            variant="link"
+                            className="p-0 border-0 link-dark"
+                            onClick={handleAttachmentsClick}
+                            aria-label="Attachments"
+                        >
+                            <MdAttachFile size={16} />
+                        </Button>
+                    </AppTooltip> */}
+          </Stack>
+        ),
+      },
+      {
+        // accessorFn: (row) => row?.claimFilledBy,
+        accessorFn: (row) => row?.user?.name,
+        id: "claimFilledBy",
+        header: () => "Claim filled by",
+        enableSorting: true,
+      },
+      {
+        accessorFn: (row) => row?.claimType?.name,
+        // accessorFn: (row) => row?.claimType,
+        id: "claimType",
+        header: () => "Claim Type",
+        enableSorting: true,
+      },
+      {
+        accessorFn: (row) => row?.fiAgent,
+        id: "fiAgent",
+        header: () => "FI Agent",
+        enableSorting: true,
+      },
+      {
+        accessorFn: (row) => row?.slaBreachDays,
+        id: "slaBreachDays",
+        header: () => "SLA",
+        enableSorting: true,
+      },
+      {
+        accessorFn: (row) => row?.createdAt,
+        id: "createdAt",
+        header: () => "Creation Date",
+        enableSorting: true,
+        cell: ({ row }) => (
+          row?.original?.createdAt
+        )
+      },
+      {
+        accessorFn: (row) => row?.priority,
+        id: "priority",
+        header: () => "Priority",
+        size: "100",
+        cell: (rowData) => (
+            <span
+                className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
+            >
+                {rowData.row.original.priority}
+            </span>
+        )
+    },
+      {
+        accessorFn: (row) => row?.status,
+        id: "status",
+        header: () => "Status",
+        size: "100",
+        cell: (rowData) => (
+          <span
+            className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+          >
+            {rowData.row.original.status}
+          </span>
+        )
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     isAdminUser().then(response => {
@@ -198,64 +288,34 @@ const ClaimOverviewReport = () => {
     }
   }, [dataQuery.data?.data?.totalPages]);
 
-  const columns = React.useMemo(
-    () => [
-      {
-        accessorFn: (row) => row?.name,
-        id: "name",
-        header: () => t("CLAIM TYPE"),
-        enableSorting: true
-      },
-      {
-        accessorFn: (row) => row?.description != null ? row?.description : '-',
-        id: "description",
-        header: () => t("DESCRIPTION"),
-        enableSorting: true,
-      },
-      {
-        cell: (info) => {
-          return (
-            <Toggle
-              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            />
-          )
-        },
-        id: "status",
-        header: () => t("STATUS"),
-        size: '80'
-      },
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          <DataGridActions
-            controlId="province-master"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permission.current.editModule,
-                type: "button",
-                title: t("EDIT"),
-                icon: <MdEdit size={18} />,
-                handler: () => editClaimType(rowData?.row?.original),
-              },
-            ]}
-          />
-        ),
-        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-        enableSorting: false,
-        size: '80',
-      },
-    ],
-    []
-  );
+  // The color class based on the status
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'Closed':
+        return 'bg-success text-success';
+      case 'In Progress':
+        return 'bg-custom-info text-custom-info';
+      case 'New':
+        return 'bg-custom-primary text-custom-primary';
+      case 'Rejected':
+        return 'bg-custom-danger text-custom-danger';
+      default:
+        return 'bg-body text-body';
+    }
+  };
+// The color class based on the status
+const getPriorityClass = (priority) => {
+  switch (priority) {
+      case 'LOW':
+          return 'text-success';
+      case 'MEDIUM':
+          return 'text-custom-warning';
+      case 'HIGH':
+          return 'text-custom-danger';
+      default:
+          return 'text-body';
+  }
+};
 
   useEffect(() => {
     setPagination({
@@ -275,26 +335,27 @@ const ClaimOverviewReport = () => {
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
     <PageHeader
-      title={t("CLAIM TYPE")}
+      title={t("CLAIM OVERVIEW REPORT")}
       actions={[
         { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
-        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
     />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-      <Card.Body className="d-flex flex-column">
-        <ListingSearchForm filter={filter} setFilter={setFilter} />
-        <CommonDataTable
-          columns={columns}
-          dataQuery={dataQuery}
-          pagination={pagination}
-          setPagination={setPagination}
-          sorting={sorting}
-          setSorting={setSorting}
-        />
-      </Card.Body>
+      <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+        <Card.Body className="d-flex flex-column">
+          <ListFilters filter={filter} setFilter={setFilter} />
+          <CommonDataTable
+            columns={columns}
+            dataQuery={dataQuery}
+            pagination={pagination}
+            setPagination={setPagination}
+            sorting={sorting}
+            setSorting={setSorting}
+          />
+        </Card.Body>
+      </Card>
     </Card>
-  
+
   </div>
 };
 

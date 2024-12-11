@@ -27,65 +27,27 @@ import {
 import "./header.scss";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
-  const { logout } = useContext(AuthenticationContext);
+  const { logout,userData } = useContext(AuthenticationContext);
+
 
   const [notifications, setNotifications] = useState([]);
-  const imageUrl = JSON.parse(localStorage.getItem("imageUrl"));
-  const firstName = JSON.parse(localStorage.getItem("firstName"));
-  const lastName = JSON.parse(localStorage.getItem("lastName"));
-  // const companyTitle = JSON.parse(localStorage.getItem("companyTitle"));
-  const companyTitle = "";
-  const [notificationsCount, setNotificationsCount] = useState({
-    count: 0,
-  });
-  const navigate = useNavigate();
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  const fetchNotifications = async () => {
-    // try {
-    //     fetchNotificationCount();
-    //     const response = await handleGetNotifications();
-    //     if (response.status === 200) {
-    //         setNotifications(response.data.data);
-    //     }
-    // } catch (error) {
-    //     console.error("Failed to fetch notifications", error);
-    // }
-  };
-
-  const fetchNotificationCount = async () => {
-    try {
-      const response = await handleCountNotifications();
-      if (response.status === 200) {
-        setNotificationsCount({
-          count: response.data.data.count,
-        });
-      }
-    } catch (error) {
-      console.error("Failed to fetch notifications count", error);
-    }
-  };
-
-  const markAllAsRead = async () => {
-    try {
-      await handleMarkAllNotifications();
-      fetchNotifications();
-    } catch (error) {
-      console.error("Failed to mark all notifications as read", error);
-    }
-  };
-
-  const deleteNotification = async (id) => {
-    try {
-      console.log("Delete called...", id);
-      // await handleDeleteNotification(id);
-      // fetchNotifications();
-    } catch (error) {
-      console.error("Failed to delete notification", error);
-    }
-  };
+  const [notificationsCount, setNotificationsCount] = useState({ count: 0 });
+  
+  // Default values to handle missing user data
+  const { imageUrl = '', firstName = ''} = userData || {};
+  
+  // const [isAdmin, setIsAdmin] = useState(false);
+  
+  // useEffect(() => {
+  //   if (authorities?.length > 0) {
+  //     const adminStatus = authorities.includes("ROLE_ADMIN");
+  //     if (adminStatus !== isAdmin) {
+  //       setIsAdmin(adminStatus);
+  //     }else{
+  //       // FILTER NAV ITEMS HERE
+  //     }
+  //   }
+  // }, [authorities])
 
   return (
     <Navbar
@@ -143,7 +105,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 <li className="fs-14 text-center px-3 py-1">
                   {notificationsCount.count > 0 ? (
                     <Link
-                      onClick={markAllAsRead}
+                      // onClick={markAllAsRead}
                       className="text-decoration-none"
                     >
                       Mark As Read
@@ -166,7 +128,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                         <div>
                           <FaTrash
                             className="text-primary ms-2 "
-                            onClick={() => deleteNotification(notification.id)}
+                            // onClick={() => deleteNotification(notification.id)}
                           />
                         </div>
                       </div>
@@ -194,9 +156,16 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-200 fs-6 lh-sm">
                 {firstName} 
                 <br />
-                <Badge bg="light-green-custom" className="fs-normal">
+
+                {
+                  userData?.roles?.length > 0 ? 
+                  <Badge bg="light-green-custom" className="fs-normal">
+                     {userData?.roles[0]?.name}
+                </Badge> :   <Badge bg="light-green-custom" className="fs-normal">
                      Administrador
                 </Badge>
+                }
+              
               </span>
               <FaCaretDown size={16} className="ms-1" />
             </Dropdown.Toggle>

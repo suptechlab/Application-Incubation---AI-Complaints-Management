@@ -52,6 +52,10 @@ export const messages = {
     templateContentMax1500: "Template details cannot exceed 8500 characters.",
     templateContentRequired: "Template details is required.",
     roleIdRequired: "Role is required.", // Add this
+    // Team Managment
+    teamNameRequired: "Team name is required", // For team name
+    descriptionRequired: "Description is required", // For description
+    entityRequired: "Entity name is required.",
     //create claim
     genderRequired: "Gender is required.",
     cantonRequired: "Canton of Residence is required.",
@@ -126,6 +130,8 @@ export const messages = {
     // Team managment
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
+    entityRequired: "El nombre de la entidad es obligatorio.",
+    roleIdRequired: "El rol es obligatorio.", // Add this
     //create claim
     genderRequired: "Se requiere género.",
     cantonRequired: "Se requiere Cantón de Residencia.",

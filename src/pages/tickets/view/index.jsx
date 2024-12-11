@@ -10,26 +10,91 @@ import AttachmentsModal from '../modals/attachmentsModal';
 import UserInfoModal from '../modals/userInfoModal';
 import TicketViewHeader from './header';
 import TicketTabsSection from './tabs';
-import { ticketDetailsApi } from '../../../services/ticketmanagement.service';
+import { changeTicketPriority, ticketDetailsApi } from '../../../services/ticketmanagement.service';
 import toast from 'react-hot-toast';
 import moment from 'moment/moment';
+import ActivityLogs from './activity-logs';
+import { useContext } from 'react';
+import { AuthenticationContext } from '../../../contexts/authentication.context';
+import { MasterDataContext } from '../../../contexts/masters.context';
+import { useTranslation } from 'react-i18next';
+import ConsumerInfoModal from '../modals/consumerInfoModal';
 
 const TicketsView = () => {
-  const [selectedPriority, setSelectedPriority] = useState('Low');
+
+  const { userData } = useContext(AuthenticationContext);
+
+  const { masterData } = useContext(MasterDataContext);
+
+  const { t } = useTranslation()
+
+  const { authorities = [], roles = [] } = userData || {};
+
+  const [currentUser, setCurrentUser] = useState([])
+
+  const [isGetActivityLogs, setIsGetAcitivityLogs] = useState(true)
+
+  const [selectedPriority, setSelectedPriority] = useState('LOW');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
+  const [consumerInfoModalShow, setConsumerInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
 
-  const {id} = useParams()
+  const [loading, setLoading] = useState(false)
+
+  const { id } = useParams()
 
   const [ticketData, setTicketData] = useState({})
 
+  const [currentDate, setCurrentDate] = useState(moment().format("DD-MM-YYYY | hh:mm:a"));
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentDate(moment().format("DD-MM-YYYY | hh:mm:a"));
+    }, 60000); // Update every 60,000ms (1 minute)
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array means this effect runs only once
+
+  useEffect(() => {
+    if (roles?.length > 0) {
+      const roleMap = {
+        'Fi Admin': 'FI_ADMIN',
+        'Fi Agent': 'FI_AGENT',
+        'SEPS Admin': 'SEPS_ADMIN',
+        'SEPS Agent': 'SEPS_AGENT',
+      };
+      const roleName = roles[0]?.name;
+      setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
+    }
+    else {
+      setCurrentUser("ADMIN")
+    }
+  }, [authorities])
+
+
   // Function to handle dropdown item selection
-  const handleSelect = (priority) => {
-    setSelectedPriority(priority);
+  const handlePriorityChange = (priority) => {
+    setLoading(true)
+    if (priority && priority !== '') {
+      changeTicketPriority(id, priority).then(response => {
+        setSelectedPriority(priority);
+        setIsGetAcitivityLogs((prev) => !prev)
+      }).catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
+        }
+      }).finally(() => {
+        setLoading(false)
+      })
+    }
   };
 
   // GET TICKET DETAILS
   const getTicketDetails = () => {
+    setLoading(true)
     ticketDetailsApi(id).then(response => {
       if (response?.data) {
         setTicketData(response?.data)
@@ -41,9 +106,10 @@ const TicketsView = () => {
       } else {
         toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
       }
+    }).finally(() => {
+      setLoading(false)
     })
   }
-
   useEffect(() => {
     getTicketDetails()
   }, [id])
@@ -70,194 +136,160 @@ const TicketsView = () => {
     setUserInfoModalShow(true)
   }
 
+
+  // Handle File a Claim Button
+  const handleConsumerInfoClick = () => {
+    setConsumerInfoModalShow(true)
+  }
+
   // Handle Attachments Button
   const handleAttachmentsClick = () => {
     setAttachmentsModalShow(true)
   }
-
-  // View Top Data
+  // VIEW TOP DATA
   const viewTopData = [
     {
-      label: "Created on",
-      value:    ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
+      label: t("CREATED_ON"),
+      value: ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
-      label: "Due Date",
-      value:  ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY | hh:mm:a") : 'N/A',
+      label: t("DUE_DATE"),
+      value: ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY") : 'N/A',
       colProps: { sm: 6 }
     },
     {
-      label: "Claim filed by",
+      label: t("CLAIM_FILED_BY"),
       value: <Link onClick={handleUserInfoClick} className='text-decoration-none'>{ticketData?.createdByUser?.name}</Link>,
       colProps: { sm: 6 }
     },
     {
-      label: "Priority",
+      label: t("PRIORITY"),
       value: (<Stack direction='horizontal' gap={1}>
-        <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span>
-        {/* Dropdown FILTER */}
-        <Dropdown>
-          <Dropdown.Toggle
-            variant="link"
-            id="filter-dropdown"
-            className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1"
-          >
-            <AppTooltip title="Change Priority" placement="top">
-              <span><MdArrowDropDown size={14} /></span>
-            </AppTooltip>
-          </Dropdown.Toggle>
-          <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
-            {priorityOptions?.map((priority) => (
-              <Dropdown.Item
-                key={priority}
-                className={`small ${selectedPriority === priority ? 'active' : ''}`}
-                onClick={() => handleSelect(priority)}
+        {
+          currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN" ?
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="link"
+                id="filter-dropdown"
+                className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
               >
-                {priority}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
+                <AppTooltip title={t("CHANGE_PRIORITY")} placement="top">
+                  <span><span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> <MdArrowDropDown size={14} /></span>
+                </AppTooltip>
+              </Dropdown.Toggle>
+              <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
+                {priorityOptions?.map((priority) => (
+                  <Dropdown.Item
+                    key={priority}
+                    className={`small ${selectedPriority === priority ? 'active' : ''}`}
+                    onClick={() => handlePriorityChange(priority)}
+                  >
+                    {priority}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown> :
+            <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span>
+        }
       </Stack>),
       colProps: { sm: 6 }
     },
     {
-      label: "Claim Type",
+      label: t("CLAIM_TYPE"),
       value: ticketData?.claimType?.name,
       colProps: { sm: 6 }
     },
     {
-      label: "Claim Sub Type",
+      label: t("CLAIM_SUB_TYPE"),
       value: ticketData?.claimSubType?.name,
       colProps: { sm: 6 }
     },
     {
-      label: "Agent",
-      value: ticketData?.fiAgent ?? "N/A",
+      label: t("AGENT"),
+      value: ticketData?.fiAgent?.name ?? "N/A",
       colProps: { sm: 6 }
     },
     {
-      label: "Team",
+      label: t("TEAM"),
       value: ticketData?.team ?? "N/A",
       colProps: { sm: 6 }
     },
+    ...(ticketData?.createdByUser?.id !== ticketData?.user?.id
+      ? [
+        {
+          label: t("CONSUMER_INFO"),
+          value: <Link onClick={handleConsumerInfoClick} className='text-decoration-none'>{ticketData?.user?.name}</Link>,
+          colProps: { sm: 6 },
+        },
+      ]
+      : []),
     // {
-    //   value: (<Stack direction='horizontal' gap={1}>
-    //     <span><MdAttachFile size={16} /></span>
-    //     <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
-    //   </Stack>),
-    //   colProps: { xs: 12, className: "pb-4" }
+    //   label: t("CONSUMER_INFO"),
+    //   value: <Link onClick={handleConsumerInfoClick} className='text-decoration-none'>{ticketData?.user?.name}</Link>,
+    //   colProps: { sm: 6 }
     // },
+    // ...(ticketData?.claimTicketDocuments !== ticketData?.claimTicketDocuments?.length > 0
+    //   ? [{
+    //     value: (<Stack direction='horizontal' gap={1}>
+    //       <span><MdAttachFile size={16} /></span>
+    //       <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
+    //     </Stack>),
+    //     colProps: { sm: 6 }
+    //   }] :[]),
     {
-      label: "Precedents",
-      value:ticketData?.precedents,
+      value: (<Stack direction='horizontal' gap={1}>
+        <span><MdAttachFile size={16} /></span>
+        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
+      </Stack>),
+      colProps: { sm: 6 }
+    },
+    {
+      label: t("PRECEDENTS"),
+      value: ticketData?.precedents,
       colProps: { xs: 12, className: "py-2" }
     },
     {
-      label: "Specific Petition",
+      label: t("SPECIFIC_PETITION"),
       value: ticketData?.specificPetition ?? 'N/A',
       colProps: { xs: 12 }
     },
   ];
-
-  // View Bottom Data
+  // VIEW BOTTOM DATA
   const viewBottomData = [
     {
-      label: "Created on",
-      value: `07-10-24 | 03:33 pm`,
+      label: t("CREATED_ON"),
+      value:  ticketData?.secondInstanceFiledAt ? moment(ticketData?.secondInstanceFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
-      label: "Agent",
-      value: `John Duo`,
+      label: t("AGENT"),
+      value: ticketData?.sepsAgent ?? 'N/A',
       colProps: { sm: 6 }
     },
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>Attachments</Link>
+        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
       </Stack>),
       colProps: { xs: 12, className: "pb-3" }
     },
     {
-      label: "Comments",
-      value: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam luctus ante quis massa bibendum fringilla.`,
+      label: t("COMMENT"),
+      value: ticketData?.secondInstanceComment ?? 'N/A',
       colProps: { xs: 12 }
-    },
-  ]
-
-  //Chat Reply Data
-  const chatReplyData = [
-    {
-      id: 1,
-      name: "John Smith",
-      action: <>added Internal Note</>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 2,
-      name: "John Smith",
-      action: <>replied & tagged <Link to="/" className='text-decoration-none fw-bold'>Kyle</Link></>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Thanks i will update <Link to="/" className='text-decoration-none'>@Kyle</Link> about the same.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 3,
-      name: "Carlos P",
-      action: <>replied</>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 4,
-      name: "Carlos P",
-      action: <>added Resolution Note and mark it Resolved</>,
-      date: "14-07-24 | 9:11 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer.</>,
-      avatar: defaultAvatar,
-      variant: 'Resolved',
-    },
-    {
-      id: 5,
-      name: "Mic Johns",
-      action: <>added Internal Note</>,
-      date: "14-07-24 | 9:10 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.</>,
-      avatar: defaultAvatar,
-      variant: 'In Progress',
     },
   ];
 
-  // The color class based on the status
-  const getReplyStatusClass = (status) => {
-    switch (status) {
-        case 'Resolved':
-            return 'bg-custom-pink p-2 rounded';
-        case 'In Progress':
-            return 'bg-custom-yellow p-2 rounded';
-        case 'New':
-            return 'bg-custom-primary p-2 rounded';
-        case 'Rejected':
-            return 'bg-custom-danger p-2 rounded';
-        default:
-            return '';
-    }
-};
-
   return (
     <React.Fragment>
-      <Loader isLoading={false} />
+      <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <TicketViewHeader
-          title={"#"+ticketData?.ticketId}
+          title={"#" + ticketData?.ticketId}
+          ticketData={ticketData}
+          currentUser={currentUser}
+          setIsGetAcitivityLogs={setIsGetAcitivityLogs}
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -273,22 +305,26 @@ const TicketsView = () => {
                   </Row>
                 </Card.Body>
               </Card>
-              <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
-                <Card.Body className='mh-100'>
-                  <h5 className='custom-font-size-18 fw-semibold mb-3'>2nd Instance Claim details</h5>
-                  <Row>
-                    {viewBottomData?.map((item, index) => (
-                      <Col key={"data_view_" + index} {...item.colProps}>
-                        <CommonViewData label={item.label} value={item.value} />
-                      </Col>
-                    ))}
-                  </Row>
-                </Card.Body>
-              </Card>
+              {
+                ticketData?.instanceType === 'SECOND_INSTANCE' &&
+                <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                  <Card.Body className='mh-100'>
+                    <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5>
+                    <Row>
+                      {viewBottomData?.map((item, index) => (
+                        <Col key={"data_view_" + index} {...item.colProps}>
+                          <CommonViewData label={item.label} value={item.value} />
+                        </Col>
+                      ))}
+                    </Row>
+                  </Card.Body>
+                </Card>
+              }
             </Col>
             <Col lg={6} className='mh-100 d-flex flex-column'>
               <Card className="border-0 shadow">
                 <Card.Header className='bg-body border-0 py-3'>
+                  {/* REPLY SECTION */}
                   <Row className='g-2'>
                     <Col xs="auto">
                       <Image
@@ -296,21 +332,22 @@ const TicketsView = () => {
                         src={defaultAvatar}
                         width={36}
                         height={36}
-                        alt="John Smith"
+                        alt={ticketData?.user?.name}
                       />
                     </Col>
                     <Col xs className='small lh-sm'>
-                      <div className='fw-bold'>John Smith</div>
+                      <div className='fw-bold'>{ticketData?.user?.name}th</div>
                       <Stack direction='horizontal' gap={2} className='text-secondary'>
                         <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                        <span>07-14-24 | 10:00 am </span>
+                        <span> {currentDate} </span>
                       </Stack>
                     </Col>
                   </Row>
                 </Card.Header>
-                <TicketTabsSection />
+                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} />
               </Card>
-              <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} />
+              {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
                   <ListGroup variant="flush">
                     {chatReplyData.map((reply) => (
@@ -338,25 +375,30 @@ const TicketsView = () => {
                     ))}
                   </ListGroup>
                 </Card.Body>
-              </Card>
+              </Card> */}
             </Col>
           </Row>
         </div>
       </div>
-
       {/* User Info Modals */}
       <UserInfoModal
         modal={userInfoModalShow}
-        userData = {ticketData}
+        userData={ticketData}
         toggle={() => setUserInfoModalShow(false)}
+        masterData={masterData}
       />
-
+      <ConsumerInfoModal
+        modal={consumerInfoModalShow}
+        userData={ticketData}
+        toggle={() => setConsumerInfoModalShow(false)}
+        masterData={masterData}
+      />
       {/* Attachments Modals */}
       <AttachmentsModal
         modal={attachmentsModalShow}
         toggle={() => setAttachmentsModalShow(false)}
+        ticketData={ticketData}
       />
-
     </React.Fragment>
   )
 }
