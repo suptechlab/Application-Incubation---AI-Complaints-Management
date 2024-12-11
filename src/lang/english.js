@@ -138,5 +138,7 @@ export const englishLang = {
   "FILE_CLAIM_SURITY": "Are you sure you want to file this claim?",
   "YES_FILE_CLAIM": "Yes, File my Claim",
   "NO_FILE_MY_CLAIM": " No, let me verify existing Claim",
-  "REMOVE": "Remove"
+  "REMOVE": "Remove",
+  "NO_CHAT_AVAILABLE":"No chat available",
+  "ASK_OR_REPLY...":"Ask or reply..."
 }

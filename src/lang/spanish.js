@@ -139,5 +139,7 @@ export const spanishLang = {
   "FILE_CLAIM_SURITY": "¿Está seguro de que desea presentar este reclamo?",
   "YES_FILE_CLAIM": "Sí, presentar mi reclamo",
   "NO_FILE_MY_CLAIM": " No, déjame verificar el reclamo existente",
-  "REMOVE": "Eliminar"
+  "REMOVE": "Eliminar",
+  "NO_CHAT_AVAILABLE": "No hay chat disponible",
+  "ASK_OR_REPLY": "Preguntar o responder"
 }

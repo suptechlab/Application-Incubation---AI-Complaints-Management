@@ -54,11 +54,11 @@ export default function MyAccount() {
 
 
   const handleCloseModal = () => {
-    setSelectedRow(null);
+    setSelectedRow({});
     setShowViewModal(false);
   };
   const handleCloseTicketModal = () => {
-    setSelectedRow(null);
+    setSelectedRow({});
     setTicketModal(false);
   };
 
@@ -85,19 +85,18 @@ export default function MyAccount() {
       case 'CLOSED':
         return 'bg-success bg-opacity-25 text-success';
       case 'IN_PROGRESS':
-        return 'bg-orange-25 text-orange';
+        return 'bg-info-25 text-info';
       case 'NEW':
         return 'bg-primary bg-opacity-25 text-primary';
       case 'REJECTED':
         return 'bg-danger bg-opacity-25 text-danger';
-      case 'PENDING':
-        return 'bg-danger bg-opacity-25 text-danger';
       case 'ASSIGNED':
-        return 'bg-danger bg-opacity-25 text-danger';
+        return 'bg-orange-25 text-orange';
       default:
         return 'bg-body bg-opacity-25 text-body';
     }
   };
+
 
   // TABLE COLUMNS
   const columns = React.useMemo(
@@ -119,7 +118,7 @@ export default function MyAccount() {
         id: "createdAt",
         header: t("CREATED_ON"),
         enableSorting: false,
-        cell: (rowData) => moment(rowData.row.original.createdAt).format("YYYY-MM-DD HH:mm"),
+        cell: (rowData) => moment(rowData.row.original.createdAt).format("YYYY-MM-DD | HH:mm"),
       },
       {
         accessorFn: (row) => row.resolvedOn,
@@ -128,7 +127,7 @@ export default function MyAccount() {
         enableSorting: false,
         cell: (rowData) =>
           rowData?.row?.original?.resolvedOn
-            ? moment(rowData?.row?.original?.resolvedOn).format("YYYY-MM-DD HH:mm")
+            ? moment(rowData?.row?.original?.resolvedOn).format("YYYY-MM-DD | HH:mm")
             : t("N/A"),
       },
       {
@@ -216,15 +215,15 @@ export default function MyAccount() {
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
                   aria-label={t("CHAT")}
-                  disabled={true}
+                  disabled={false}
                 >
                   <MdChatBubbleOutline size={24} />
-                  <Badge
+                  {/* <Badge
                     bg="danger"
                     className="border border-white custom-font-size-12 fw-semibold ms-n1 p-1 position-absolute rounded-pill start-100 top-0 translate-middle custom-min-width-22"
                   >
                     2 <span className="visually-hidden">{t("UNREAD_CHAT")}</span>
-                  </Badge>
+                  </Badge> */}
                 </Button>
               </AppTooltip>
               {instanceButton && (
@@ -248,7 +247,6 @@ export default function MyAccount() {
     ],
     []
   );
-
   // Data query for fetching paginated and sorted data
   // DATA QUERY
   const dataQuery = useQuery({

@@ -44,7 +44,7 @@ export const getClaimDetails = createAsyncThunk(
   'getClaimDetails',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await ticketsApi.get(`${EndPoint.CLAIM_TICKETS}/${id}`, );
+      const response = await ticketsApi.get(`${EndPoint.CLAIM_TICKETS}/${id}`,);
 
       if (response.status !== 200) {
         return rejectWithValue('Failed to get claim list!');
@@ -73,6 +73,44 @@ export const fileClaimStats = createAsyncThunk(
     }
   }
 );
+/// CLAIM CHAT DATA API
+export const replyOnTicket = createAsyncThunk(
+  'replyOnTicket',
+  async ({ ticketId, data }, { rejectWithValue }) => {
+    try {
+
+      const response = await ticketsApi.post(`${EndPoint.TICKET_CHAT}/${ticketId}/reply-on-ticket`, data);
+
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to reply!');
+      }
+
+      return response?.data; // RETURN RESPONSE
+    } catch (error) {
+      return rejectWithValue(error.message || 'Something went wrong');
+    }
+  }
+);
+
+export const ticketConversationList = createAsyncThunk(
+  'ticketConversationList',
+  async (ticketId, { rejectWithValue }) => {
+    try {
+
+      const response = await ticketsApi.get(`${EndPoint.TICKET_CHAT}/${ticketId}/conversations-list`);
+
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to get data!');
+      }
+
+      return response?.data; // RETURN RESPONSE
+    } catch (error) {
+      return rejectWithValue(error.message || 'Something went wrong');
+    }
+  }
+);
+
+
 // Slice to manage dropdown data
 const fileClaimSlice = createSlice({
   name: "fileClaim",
@@ -104,8 +142,8 @@ const fileClaimSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Something went wrong";
       })
-       // CLAIM DETAILS
-       .addCase(getClaimDetails.pending, (state) => {
+      // CLAIM DETAILS
+      .addCase(getClaimDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -127,7 +165,44 @@ const fileClaimSlice = createSlice({
       .addCase(fileClaimStats.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Something went wrong";
+      })
+      // REPLY ON TICKET
+      .addCase(replyOnTicket.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(replyOnTicket.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(replyOnTicket.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
+      })
+      // TICKET CONVERSATION LIST API
+      .addCase(ticketConversationList.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(ticketConversationList.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(ticketConversationList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
+      })
+      // ATTACHMENT DOWNLOAD
+      .addCase(downloadDocument.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(downloadDocument.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(downloadDocument.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
       });
+    ;
   },
 });
 
@@ -142,23 +217,23 @@ export const fileClaimSecondInstanceForm = createAsyncThunk(
       }
       return response; // RETURN RESPONSE
     } catch (error) {
-      
+
     }
   }
 );
-
+// DOWNLOAD DOCUMENT
 export const downloadDocument = createAsyncThunk(
   'downloadDocument',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await ticketsApi.get(`${EndPoint.DOWNLOAD_DOCUMENT}/${id}`);
+      const response = await ticketsApi.get(`${EndPoint.DOWNLOAD_DOCUMENT}/${id}`,{ responseType: 'arraybuffer' });
       if (response.status !== 200) {
         return rejectWithValue('Failed to download!');
       }
       console.log('response', response)
       return response; // RETURN RESPONSE
     } catch (error) {
-      
+
     }
   }
 );
