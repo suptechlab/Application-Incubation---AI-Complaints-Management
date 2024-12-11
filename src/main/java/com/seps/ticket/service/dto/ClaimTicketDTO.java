@@ -53,4 +53,8 @@ public class ClaimTicketDTO {
     private UserDTO sepsAgent;
     private String secondInstanceComment;
     private Instant secondInstanceFiledAt;
+    private String complaintPrecedents;
+    private String complaintSpecificPetition;
+    private Instant complaintFiledAt;
+
 }

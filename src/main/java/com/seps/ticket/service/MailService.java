@@ -70,7 +70,7 @@ public class MailService {
 
     private static final String INSTANCE_COMMENT = "instanceComment";
 
-    private static final String SENDER_NAME ="senderName";
+    private static final String SENDER_NAME = "senderName";
 
     private final JHipsterProperties jHipsterProperties;
 
@@ -210,7 +210,7 @@ public class MailService {
 
             // Send email
             Boolean isSent = externalAPIService.sendEmailViaApi(mailDTO, subject, renderedContent);
-            if(Boolean.FALSE.equals(isSent)) {
+            if (Boolean.FALSE.equals(isSent)) {
                 LOG.debug("External API Not working trying to test email service now...");
                 this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
             }
@@ -425,5 +425,9 @@ public class MailService {
         this.sendDynamicContentEmail(mailDTO);
 
         LOG.info("Reply to team on ticket and email sent successfully to team {}", currentUser.getEmail());
+    }
+
+    public void sendComplaintEmail(UserClaimTicketDTO userClaimTicketDTO) {
+
     }
 }

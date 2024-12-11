@@ -10,6 +10,7 @@ import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.ComplaintRequest;
 import com.seps.ticket.web.rest.vm.SecondInstanceRequest;
 import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -165,7 +166,7 @@ public class UserClaimTicketResource {
         // Retrieve the claim ticket
         UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // Send an email notification
-        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO,userClaimTicketDTO);
+        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO, userClaimTicketDTO);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("second.instance.filed.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -173,6 +174,7 @@ public class UserClaimTicketResource {
         );
         return ResponseEntity.ok(responseStatus);
     }
+
 
     @Operation(
         summary = "Reply to a claim ticket",
@@ -185,14 +187,17 @@ public class UserClaimTicketResource {
         @ApiResponse(responseCode = "400", description = "Bad request or invalid ticket status"),
         @ApiResponse(responseCode = "403", description = "Access forbidden"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
+
     })
+
     @PostMapping("/{id}/reply-on-ticket")
     @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<ResponseStatus> replyCustomerOnTicket(@PathVariable Long id,
-                                                          @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+                                                                @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+
         // Call service method to handle the reply
         userClaimTicketService.replyOnTicket(id, claimTicketReplyRequest);
-        userClaimTicketService.sendCustomerReplyEmail(id,claimTicketReplyRequest);
+        userClaimTicketService.sendCustomerReplyEmail(id, claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.replied.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -213,6 +218,7 @@ public class UserClaimTicketResource {
         @ApiResponse(responseCode = "400", description = "Bad request or invalid ticket ID"),
         @ApiResponse(responseCode = "404", description = "Claim ticket not found"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
+
     })
     @GetMapping("/{id}/conversations-list")
     @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -220,6 +226,26 @@ public class UserClaimTicketResource {
         Page<ClaimTicketActivityLogDTO> page = claimTicketActivityLogService.getAllConversation(id, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+
     }
 
+    @PostMapping("/file-complaint")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<ResponseStatus> fileComplaint(@ModelAttribute @Valid ComplaintRequest complaintRequest,
+                                                        HttpServletRequest httpServletRequest) {
+        Long id = complaintRequest.getId();
+        RequestInfo requestInfo = new RequestInfo(httpServletRequest);
+        // Raise the complaint
+        userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
+        // Retrieve the claim ticket
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
+        // Send an email notification
+        mailService.sendComplaintEmail(userClaimTicketDTO);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("complaint.raised.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
 }

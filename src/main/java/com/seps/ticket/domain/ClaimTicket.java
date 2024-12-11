@@ -159,4 +159,14 @@ public class ClaimTicket {
     @Column(name = "second_instance_comment")
     private String secondInstanceComment;
 
+    @Column(name = "complaint_precedents")
+    private String complaintPrecedents;
+
+    @Column(name = "complaint_specific_petition")
+    private String complaintSpecificPetition;
+
+    @Column(name = "complaint_filed_at")
+    private Instant complaintFiledAt;
+
+
 }

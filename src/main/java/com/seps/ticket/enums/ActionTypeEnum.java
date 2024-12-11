@@ -7,7 +7,8 @@ public enum ActionTypeEnum {
     CLAIM_TICKET_CLOSED("Claim Ticket Closed"),
     CLAIM_TICKET_PRIORITY_CHANGE("Claim Ticket Priority Changed"),
     CLAIM_TICKET_REJECTED("Claim Ticket Rejected"),
-    CLAIM_TICKET_SECOND_INSTANCE("Claim Ticket Second Instance");
+    CLAIM_TICKET_SECOND_INSTANCE("Claim Ticket Second Instance"),
+    CLAIM_TICKET_COMPLAINT("Claim Ticket Complaint");
 
     private final String description;
 
