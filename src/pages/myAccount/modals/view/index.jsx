@@ -235,7 +235,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                     </Row>
                     {/* Accordion Items */}
                     {/* WILL DO IT LATER */}
-                    <Accordion flush className='custom-accordion'>
+                    {/* <Accordion flush className='custom-accordion'>
                         {accordionItems.map(item => (
                             <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
                                 <Accordion.Header>
@@ -265,7 +265,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                                 </Accordion.Body>
                             </Accordion.Item>
                         ))}
-                    </Accordion>
+                    </Accordion> */}
 
                     {/* View Bottom Data */}
                     <Row>
