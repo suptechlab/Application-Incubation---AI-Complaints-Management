@@ -13,12 +13,14 @@ import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
+import { AuthenticationContext } from '../../../../contexts/authentication.context';
 
-const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivityLogs,getTicketData }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTicketData }) => {
 
     const { t } = useTranslation();
 
     const { masterData } = useContext(MasterDataContext)
+    const {currentUser } = useContext(AuthenticationContext);
 
     const [agentList, setAgentListing] = useState([])
     const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);

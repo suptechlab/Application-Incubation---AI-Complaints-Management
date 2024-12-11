@@ -21,11 +21,8 @@ export default function TicketsList() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { userData } = useContext(AuthenticationContext);
+    const { currentUser } = useContext(AuthenticationContext);
 
-    const { authorities = [], roles = [] } = userData || {};
-
-    const [currentUser, setCurrentUser] = useState([])
 
 
     const { t } = useTranslation()
@@ -56,30 +53,11 @@ export default function TicketsList() {
     const [claimStatsData, setClaimsStatsData] = useState([])
 
 
-    useEffect(() => {
-        if (roles?.length > 0) {
-            const roleMap = {
-                'Fi Admin': 'FI_ADMIN',
-                'Fi Agent': 'FI_AGENT',
-                'SEPS Admin': 'SEPS_ADMIN',
-                'SEPS Agent': 'SEPS_AGENT',
-            };
-
-            const roleName = roles[0]?.name;
-            setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
-        } else {
-            setCurrentUser('ADMIN');
-        }
-    }, [authorities])
-
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
             // Set loading state to true before the request starts
-
-            // return { data: sampleData, page: 1, size: 10 }
-
             setLoading(true);
 
             try {
@@ -546,7 +524,6 @@ export default function TicketsList() {
     //     []
     // );
 
-    console.log({ ticketIds: ticketIdsArr })
     const getFilteredColumns = (columnsArray) => {
         // All available column definitions
         const allColumns = [
@@ -858,7 +835,6 @@ export default function TicketsList() {
                             handleTicketAssign={handleTicketAssignment}
                             ticketArr={ticketIdsArr}
                             clearTableSelection={clearTableSelection}
-                            currentUser={currentUser}
                         />
                         <CommonDataTable
                             columns={columns}

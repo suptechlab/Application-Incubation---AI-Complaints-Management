@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Dropdown, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { MdOutlineFilterAlt } from "react-icons/md";
@@ -11,13 +11,17 @@ import AppTooltip from "../../../../components/tooltip";
 import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
 import toast from "react-hot-toast";
 import { agentListingApi } from "../../../../services/ticketmanagement.service";
+import { AuthenticationContext } from "../../../../contexts/authentication.context";
 
-const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection, currentUser }) => {
+const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection }) => {
+
+    const { currentUser } = useContext(AuthenticationContext);
 
     const { t } = useTranslation();
     const [claimTypes, setClaimTypes] = useState([])
     const [agentList, setAgentListing] = useState([])
     const [selectedAgent, setSelectedAgent] = useState(null)
+  
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
 
