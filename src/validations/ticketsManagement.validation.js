@@ -19,6 +19,13 @@ export const ticketCloseValidation = Yup.object({
   .required("Reason is required!"),
 });
 
+// TICKET REJECT STATUS
+export const ticketRejectValidation = Yup.object({
+  rejectedStatus: Yup.string()
+    .required("Reject sub status is required!"),
+  reason: Yup.string()
+  .required("Reason is required!"),
+});
 
 
 export { validationSchema };

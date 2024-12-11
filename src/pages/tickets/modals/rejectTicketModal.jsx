@@ -5,10 +5,9 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import ReactSelect from "../../../components/ReactSelect";
-import { validationSchema } from "../../../validations/inquiryType.validation";
 import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus, ticketRejectStatus } from "../../../services/ticketmanagement.service";
-import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
+import { ticketRejectValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
 const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGetAcitivityLogs }) => {
     const { t } = useTranslation();
@@ -17,7 +16,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
     const { masterData } = useContext(MasterDataContext)
 
     const [subStatus, setSubStatus] = useState([])
-
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
         if (masterData?.rejectedStatus) {
             const rejectStatus = convertToLabelValue(masterData?.rejectedStatus)
@@ -36,7 +35,8 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
     };
 
     const handleSubmit = async (values, actions) => {
-        actions.setSubmitting(true);
+        // actions.setSubmitting(true);
+        setLoading(true)
         const formData = {
             reason: values?.reason,
             rejectedStatus: values?.rejectedStatus,
@@ -56,6 +56,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                 }
             })
             .finally(() => {
+                setLoading(false)
                 actions.setSubmitting(false);
             });
     };
@@ -80,7 +81,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                     reason: "",
                     rejectedStatus: "",
                 }}
-                validationSchema={ticketCloseValidation}
+                validationSchema={ticketRejectValidation}
                 onSubmit={handleSubmit}
             >
                 {({
@@ -174,7 +175,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                                 type="submit"
                                 variant="warning"
                                 className="custom-min-width-85"
-                                disabled={isSubmitting ?? false}
+                                disabled={loading ?? false}
                             >
                                 {t("SUBMIT")}
                             </Button>

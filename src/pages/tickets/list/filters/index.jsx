@@ -129,15 +129,17 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                                 }}
                                 value={selectedAgent ?? null}
                             />
-                        </div> : currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT' ? <Button
+                        </div> : ''
+                }
+                
+                {/* currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT' ? <Button
                             type="button"
                             variant="warning"
                             onClick={returnToAdminClick}
                             className="flex-grow-1 flex-sm-grow-0"
                         >
                             {t("RETURN_TO_ADMIN")}
-                        </Button> : ''
-                }
+                        </Button> : */}
 
                 {
                     currentUser === "FI_AGENT" &&
@@ -268,7 +270,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                     </div>
 
                     {/* Dropdown FILTER */}
-                    <Dropdown>
+                    {/* <Dropdown>
                         <Dropdown.Toggle
                             variant="link"
                             id="filter-dropdown"
@@ -286,7 +288,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                                 {t("SLA")}
                             </Dropdown.Item>
                         </Dropdown.Menu>
-                    </Dropdown>
+                    </Dropdown> */}
                 </Stack>
             </Stack>
         </div>

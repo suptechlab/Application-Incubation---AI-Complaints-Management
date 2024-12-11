@@ -4,7 +4,7 @@ import { MdOutlineNote, MdOutlineNoteAdd, MdOutlineReply } from 'react-icons/md'
 import ReplyTab from './reply-tab';
 import { useTranslation } from 'react-i18next';
 
-const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs}) => {
+const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs,ticketData, getTicketData}) => {
     const {t} = useTranslation()
     const [activeTab, setActiveTab] = useState('replies');
 
@@ -23,7 +23,7 @@ const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs}) => {
             id: 'replies',
             name: t('REPLIES'),
             tabIcon: <MdOutlineReply size={14} />,
-            Component: <ReplyTab ticketId={ticketId} setIsGetAcitivityLogs={setIsGetAcitivityLogs}/>,
+            Component: <ReplyTab ticketId={ticketId} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketData}/>,
             disabled: false,
         },
         // {
