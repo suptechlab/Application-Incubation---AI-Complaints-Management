@@ -65,6 +65,7 @@ export default function MyAccount() {
   const handleCloseInstanceModal = () => {
     setSelectedRow(null);
     setInstanceModalShow(false);
+    dataQuery.refetch();
   };
 
 
@@ -227,15 +228,15 @@ export default function MyAccount() {
               {instanceButton && (
                 <Stack direction='horizontal' gap={2}>
                   {instanceButton}
-                  <AppTooltip title={t(tooltipTitle)}>
+                  {/* <AppTooltip title={t(tooltipTitle)}> */}
                     <Button
                       variant="link"
                       className='p-0 border-0 lh-sm position-relative text-body'
                       aria-label={t(tooltipTitle)}
                     >
-                      <MdOutlineInfo size={24} />
+                      {/* <MdOutlineInfo size={24} /> */}
                     </Button>
-                  </AppTooltip>
+                  {/* </AppTooltip> */}
                 </Stack>
               )}
             </Stack>
