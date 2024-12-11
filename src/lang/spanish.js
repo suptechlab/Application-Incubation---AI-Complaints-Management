@@ -138,5 +138,6 @@ export const spanishLang = {
   "DUPLICATE_CLAIM_ID": "ID de reclamo duplicado.",
   "FILE_CLAIM_SURITY": "¿Está seguro de que desea presentar este reclamo?",
   "YES_FILE_CLAIM": "Sí, presentar mi reclamo",
-  "NO_FILE_MY_CLAIM": " No, déjame verificar el reclamo existente"
+  "NO_FILE_MY_CLAIM": " No, déjame verificar el reclamo existente",
+  "REMOVE": "Eliminar"
 }

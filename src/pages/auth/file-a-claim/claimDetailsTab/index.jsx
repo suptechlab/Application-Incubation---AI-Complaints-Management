@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Col, Modal, Row, Stack } from 'react-bootstrap';
+import { Badge, Button, Col, Modal, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import CommonFormikComponent from '../../../../components/CommonFormikComponent';
@@ -11,6 +11,8 @@ import { ClaimDetailsFormSchema } from '../../validations';
 import SvgIcons from '../../../../components/SVGIcons';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { MdClose } from 'react-icons/md';
+import AppTooltip from '../../../../components/tooltip';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
     const { t } = useTranslation()
@@ -58,6 +60,10 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                 });
             }
         }
+    };
+
+    const removeFile = (indexToRemove) => {
+        setFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
     };
 
     // Handle Submit Handler
@@ -197,19 +203,26 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                     </div>
                                     <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
                                 </div>
-                                <div className='mt-2'>
-                                    {files.length > 0 && (
-                                        <div>
-                                            <ul>
-                                                {files.map((file, index) => (
-                                                    <li key={index} className="d-flex align-items-center">
-                                                        <span className="me-2">{file.name}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </div>
+
+                                {files.length > 0 && (
+                                    <Stack direction='horizontal' gap={2} className="mt-2">
+                                        {files.map((file, index) => (
+                                            <Badge key={index} className="d-inline-flex align-items-center gap-2 text-info px-3" pill bg='secondary-subtle'>
+                                                <span>{file.name}</span>
+                                                <AppTooltip title={t('REMOVE')}>
+                                                    <Button
+                                                        variant="link"
+                                                        className='p-0 border-0 lh-sm'
+                                                        onClick={() => removeFile(index)}
+                                                    >
+                                                        <MdClose size={16} />
+                                                    </Button>
+                                                </AppTooltip>
+                                            </Badge>
+                                        ))}
+                                    </Stack>
+                                )}
+
                             </Col>
                             <Col xs={12}>
                                 <FormCheckbox

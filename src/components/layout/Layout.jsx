@@ -5,7 +5,7 @@ import Header from "./Header";
 
 const Layout = ({layout}) => {
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100 vh-100">
       <Header layout={layout} />
       <div className="d-flex flex-column flex-grow-1 overflow-auto">
         <Outlet />
