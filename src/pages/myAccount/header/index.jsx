@@ -24,7 +24,7 @@ const PageHeader = ({ title = "", filter, setFilter }) => {
                     {title}
                 </h1>
 
-                {/* <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
+                <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
                     <div className="custom-width-140 flex-grow-1 flex-md-grow-0">
                         <CustomDateRangePicker
                             wrapperClassName="mb-0"
@@ -36,7 +36,7 @@ const PageHeader = ({ title = "", filter, setFilter }) => {
 
                         />
                     </div>
-                </Stack> */}
+                </Stack>
             </Stack>
         </div>
     );

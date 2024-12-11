@@ -9,11 +9,12 @@ import SvgIcons from '../../../../components/SVGIcons';
 import AppTooltip from '../../../../components/tooltip';
 import { useTranslation } from 'react-i18next';
 import { ChatSchema } from '../../validations';
-import { replyOnTicket, ticketConversationList } from '../../../../redux/slice/fileClaimSlice';
+import { downloadDocument, replyOnTicket, ticketConversationList } from '../../../../redux/slice/fileClaimSlice';
 import { useDispatch } from 'react-redux';
 import moment from 'moment/moment';
 import { FiImage, FiFileText } from "react-icons/fi";
 import { FaRegFile, FaFileWord, FaFileAlt } from "react-icons/fa";
+import { downloadFile, isHTML } from '../../../../constants/utils';
 
 const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
 
@@ -51,7 +52,7 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
         let replyData = { message: values?.message, attachments: values?.attachments };
         const formData = new FormData();
         Object.entries(replyData).forEach(([key, value]) => {
-            if (key === "attachments") {
+            if (key === "attachments" && value !== null) {
                 formData.append(`attachments[0]`, values?.attachments);
             } else if (value !== null && value !== undefined) {
                 formData.append(key, value);
@@ -119,30 +120,26 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
 
 
     const getConversationData = async () => {
+        setIsLoading(true);
         const result = await dispatch(ticketConversationList(selectedRow?.id));
         setIsLoading(false);
         if (ticketConversationList.fulfilled.match(result)) {
-            console.log(result)
-            //     {
-            //         id: 3,
-            //         message: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy tex.`,
-            //         userMode: false,
-            //         userName: "Agent John",
-            //         dateTime: "07-11-24 | 04:35 pm",
-            //         attachments: [],
-            //     }
-            // ]
-
-            const chatActivities = result?.payload?.map((chat, index) => (
-                {
+            const chatActivities = result?.payload?.map((chat, index) => {
+                const text = chat?.activityDetails?.text || ""; // Safely extract text
+                const containsHTML = isHTML(text);
+               return {
                     id: chat?.id,
-                    message: chat?.activityDetails?.text,
+                    message: <> {containsHTML ? (
+                        <p className="" dangerouslySetInnerHTML={{ __html: text }} />
+                      ) : (
+                        <p className="">{text}</p>
+                      )}</>,
                     userMode: chat?.activityType === "CUSTOMER_REPLY" ? true : false,
                     userName: chat?.performBy?.name,
                     dateTime: chat?.performedAt ? moment(chat?.performedAt).format('DD-MM-YY | hh:mm:ss') : '',
                     attachments: chat?.attachmentUrl?.attachments && chat?.attachmentUrl?.attachments?.length > 0 ? chat?.attachmentUrl?.attachments : []
                 }
-            ))
+            })
             setChatData(chatActivities ?? [])
         } else {
             console.error('Verification error:', result);
@@ -179,10 +176,25 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
         }
     }, [selectedRow])
 
-    const handleAttachmentDownload = () => {
+    // ATTACHMENT DOWNLOAD
+    const handleAttachmentDownload = async(id,attachmentData) => {
         // WRITE HERE FUNCTION FOR ATTACHMENT DOWNLOAD
-    }
+        setIsLoading(true);
+        const result = await dispatch(downloadDocument(id));
+        if (downloadDocument.fulfilled.match(result)) {
+            downloadFile(result?.payload,attachmentData?.originalTitle).then(()=>{
+               
+            }).catch((error)=>{
 
+            }).finally(()=>{
+                setIsLoading(false)
+            })
+            
+        } else {
+            setIsLoading(false);
+        }
+    }
+   
     return (
         <Modal
             show={handleShow}
@@ -257,11 +269,11 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                                                 className="flex-wrap mt-2"
                                                             >
                                                                 {attachments?.map((actionItem) => {
-                                                                    const { id, originalTitle } = actionItem;
+                                                                    const { id,externalDocumentId, originalTitle } = actionItem;
                                                                     return (
                                                                         <button
                                                                             key={id}
-                                                                            onClick={() => handleAttachmentDownload(actionItem)}
+                                                                            onClick={() => handleAttachmentDownload(externalDocumentId , actionItem)}
                                                                             className='btn fw-semibold text-decoration-none link-primary'
                                                                         >
                                                                             <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
@@ -278,17 +290,19 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                     </div>
                                 )
                             })}
-                            {
+                            {/* {
                                 chatData && chatData?.length > 0 &&
                                 <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
                                     <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
                                 </Stack>
-                            }
+                            } */}
+                           
                             {
-                                chatData && chatData?.length === 0 &&
+                                chatData && chatData?.length === 0 && isLoading === false &&
                                 <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
-                                    <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>No chat available</span>
-                                </Stack>
+                                    <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>{t("NO_CHAT_AVAILABLE")}</span>
+                                </Stack> 
+                               
                             }
                             <div ref={messagesEndRef} />
                         </Modal.Body>
@@ -323,7 +337,7 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                     wrapperClassName='mb-0 flex-fill'
                                     inputClassName="border-0 shadow-none px-1 py-3"
                                     id="message"
-                                    placeholder="Ask or reply..."
+                                    placeholder={t("ASK_OR_REPLY...")}
                                     name="message"
                                     error={formikProps.errors.message}
                                     onBlur={formikProps.handleBlur}

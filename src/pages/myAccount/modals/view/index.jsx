@@ -9,6 +9,7 @@ import Loader from '../../../../components/Loader';
 import { MdAttachFile, MdDownload } from 'react-icons/md';
 import AppTooltip from '../../../../components/tooltip';
 import { downloadDocument } from '../../../../redux/slice/fileClaimSlice';
+import { downloadFile } from '../../../../constants/utils';
 
 const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
@@ -30,7 +31,8 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 const attachmentsDataList = result?.payload?.data?.claimTicketDocuments?.map((documents) => {
                     return {
                         id: documents?.id,
-                        file_name: documents?.originalTitle
+                        file_name: documents?.originalTitle,
+                        externalDocumentId: documents?.externalDocumentId
                     }
                 });
                 setAttachmentsData(attachmentsDataList);
@@ -50,12 +52,17 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         }
     };
 
-    const downloadAttachment = async (id) => {
+    const downloadAttachment = async (id,attachmentData) => {
         setLoading(true);
         const result = await dispatch(downloadDocument(id));
         if (downloadDocument.fulfilled.match(result)) {
-            console.log('result', result)
-            setLoading(false);
+            downloadFile(result?.payload,attachmentData?.file_name).then(() => {
+
+            }).catch((error) => {
+
+            }).finally(() => {
+                setLoading(false)
+            })
         } else {
             setLoading(false);
         }
@@ -226,14 +233,9 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                             </Col>
                         ))}
                     </Row>
-
-                    {
-                        console.log({ selectedRow })
-                    }
-
                     {/* Accordion Items */}
                     {/* WILL DO IT LATER */}
-                    {/* <Accordion flush className='custom-accordion'>
+                    <Accordion flush className='custom-accordion'>
                         {accordionItems.map(item => (
                             <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
                                 <Accordion.Header>
@@ -252,7 +254,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                                                     <Button
                                                         className="text-decoration-none"
                                                         aria-label={t("DOWNLOAD")}
-                                                        onClick = {() => downloadAttachment(item.id)}
+                                                        onClick={() => downloadAttachment(item?.externalDocumentId,item)}
                                                     >
                                                         <MdDownload size={20} />
                                                     </Button>
@@ -263,7 +265,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                                 </Accordion.Body>
                             </Accordion.Item>
                         ))}
-                    </Accordion> */}
+                    </Accordion>
 
                     {/* View Bottom Data */}
                     <Row>
