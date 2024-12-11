@@ -1,16 +1,22 @@
-import { Formik } from "formik";
-import React, { useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button, Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { OtherInfoFormSchema } from '../../../../validations/createClaim.validation';
-import CommonFormikComponent from "../../../../components/CommonFormikComponent";
+import { useMasterData } from '../../../../contexts/masters.context';
+import { convertToLabelValue } from '../../../../services/ticketmanagement.service';
+import { getOrganizationList } from '../../../../services/teamManagment.service';
 
-const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
+const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
 
 
-    const [selectedRuc, setSelectedRuc] = useState('')
+    // const [selectedRuc, setSelectedRuc] = useState('');
+    const { masterData } = useMasterData();
+    const [pcGroupList, setPcGroupList] = useState([]);
+    const [customerTypeList, setCustomerTypeList] = useState([]);
+    const [entityList, setEntityList] = useState([]);
 
     const { t } = useTranslation()
 
@@ -21,6 +27,32 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
         organizationId: '',
         entitysTaxID: '',
     };
+
+    const getEntitynameList = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await getOrganizationList();
+
+            const entityNameList = response?.data?.map((data) => {
+                return {
+                    label: data?.name,
+                    value: data?.id
+                }
+            })
+            setEntityList(entityNameList);
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+        }
+    }, [setEntityList, setIsLoading])
+
+    useEffect(() => {
+        getEntitynameList();
+        if (masterData) {
+            setPcGroupList(convertToLabelValue(masterData.priorityCareGroup || {}));
+            setCustomerTypeList(convertToLabelValue(masterData.customerType || {}));
+        }
+    }, [masterData, getEntitynameList])
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
@@ -43,13 +75,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         <ReactSelect
                                             label={t("PRIORITY_CARE_GROUP")}
                                             error={formikProps.errors.priorityCareGroup}
-                                            options={[
-                                                // { label: t("SELECT"), value: "" },
-                                                // ...priority_care_group.map((group) => ({
-                                                //     label: group.label,
-                                                //     value: group.value, 
-                                                // })),
-                                            ]}
+                                            options={pcGroupList}
                                             value={formikProps.values.priorityCareGroup}
                                             onChange={(option) => {
                                                 formikProps.setFieldValue(
@@ -72,13 +98,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         <ReactSelect
                                             label={t("CUSTOMER_TYPE")}
                                             error={formikProps.errors.customerType}
-                                            options={[
-                                                // { label: t("SELECT"), value: "" },
-                                                // ...customer_types.map((group) => ({
-                                                //     label: group.label,
-                                                //     value: group.value,
-                                                // })),
-                                            ]}
+                                            options={customerTypeList}
                                             value={formikProps.values.customerType}
                                             onChange={(option) => {
                                                 formikProps.setFieldValue(
@@ -101,13 +121,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                         <ReactSelect
                                             label={t("ENTITY_NAME")}
                                             error={formikProps.errors.organizationId}
-                                            options={[
-                                                // { label: t("SELECT"), value: "" },
-                                                // ...organizational_units.map((group) => ({
-                                                //     label: group.label, 
-                                                //     value: group.value,
-                                                // })),
-                                            ]}
+                                            options={entityList}
                                             value={formikProps.values.organizationId}
                                             onChange={(option) => {
                                                 // const selectedUnit = organizational_units.find(
@@ -140,7 +154,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                             onBlur={formikProps.handleBlur}
                                             onChange={formikProps.handleChange}
                                             touched={formikProps.touched.entitysTaxID}
-                                            value={selectedRuc || ""}
+                                            value={""}
                                             readOnly={true}
                                         />
                                     </Col>

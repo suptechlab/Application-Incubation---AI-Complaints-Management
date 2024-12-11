@@ -9,6 +9,8 @@
 @include custom-class('font-size', 30);
 @include custom-class('padding-top', 2);
 @include custom-class('padding-bottom', 2);
+@include custom-class('padding-right', 66);
+@include custom-class('margin-right', -66);
 @include custom-class('height', 10);
 @include custom-class('width', 10);
 @include custom-class('height', 26);
@@ -26,6 +28,7 @@
 @include custom-class('height', 60);
 @include custom-class('width', 60);
 @include custom-class('min-width', 65);
+@include custom-class('width', 66);
 @include custom-class('min-width', 75);
 @include custom-class('width', 85);
 @include custom-class('min-width', 85);

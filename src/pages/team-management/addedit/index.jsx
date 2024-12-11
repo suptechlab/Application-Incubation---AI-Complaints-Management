@@ -208,7 +208,7 @@ export default function TeamManagementAddEdit() {
         <React.Fragment>
             <Loader isLoading={loading} />
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-                <PageHeader title={`${isEdit ? t('Edit Team') : t('Create New Team')}  `} />
+                <PageHeader title={`${isEdit ? t('EDIT TEAM') : t('CREATE NEW TEAM')}  `} />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
                         <Formik

@@ -1,5 +1,4 @@
-import { Formik } from "formik";
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button, Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import FormInputBox from '../../../../components/FormInput';
@@ -8,11 +7,14 @@ import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.vali
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormCheckbox from "../../../../components/formCheckbox";
 import { Link } from "react-router-dom";
+import { claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
-    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
-    const { t } = useTranslation()
+    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
+    const { t } = useTranslation();
+    const [claimTypes, setClaimTypes] = useState([]);
+    const [claimSubTypes, setClaimSubTypes] = useState([]);
 
 
 
@@ -26,7 +28,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         agreeDeclarations: false,
     };
 
-    const [claimSubTypes, setClaimSubTypes] = useState([])
     //Handle File Change
     const handleFileChange = (event) => {
         const file = event.currentTarget.files[0];
@@ -42,17 +43,41 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         handleFormSubmit(values, actions);
     };
 
-    const getClaimSubTypes = async (claimTypeId) => {
-        setIsLoading(true)
-        // const response = await dispatch(fetchClaimSubTypes(claimTypeId))
-        // if (fetchClaimSubTypes.fulfilled.match(response)) {
-        //     setClaimSubTypes(response?.payload)
-        //     setIsLoading(false)
-        // } else {
-        //     setIsLoading(false)
-        //     console.error('Sub types error:', response.error.message);
-        // }
-    }
+    const getClaimTypes = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await claimTypesDropdownList();
+
+            const claimFormatTypesList = response?.data?.map((data) => {
+                return {
+                    label: data?.name,
+                    value: data?.id
+                }
+            })
+            setClaimTypes(claimFormatTypesList);
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+        }
+    }, [setClaimTypes, setIsLoading])
+
+    const getClaimSubTypes = useCallback(async (claimId) => {
+        setIsLoading(true);
+        try {
+            const response = await getClaimSubTypeById(claimId);
+            const claimSubTypeFormatList = response?.data
+                ? [{ label: response.data.name, value: response.data.id }]
+                : [];
+            setClaimSubTypes(claimSubTypeFormatList);
+            setIsLoading(false);
+        } catch (error) {
+            setIsLoading(false);
+        }
+    }, [setClaimSubTypes, setIsLoading])
+
+    useEffect(() => {
+        getClaimTypes();
+    }, [getClaimTypes])
 
     return (
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
@@ -71,18 +96,16 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         <ReactSelect
                                             label={t("CLAIM_TYPE")}
                                             error={formikProps.errors.claimTypeId}
-                                            options={[
-                                                // { label: t("SELECT"), value: "" },
-                                                // ...claim_types.map((group) => ({
-                                                //     label: group.label,
-                                                //     value: group.value,
-                                                // })),
-                                            ]}
+                                            options={claimTypes}
                                             value={formikProps.values.claimTypeId}
                                             onChange={(option) => {
                                                 formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
-                                                formikProps.setFieldValue("claimSubtype", "");
-                                                getClaimSubTypes(option?.target?.value);
+                                                formikProps.setFieldValue("claimSubTypeId", "");
+                                                if (option?.target?.value && option?.target?.value !== "") {
+                                                    if (option?.target?.value !== formikProps?.values?.claimTypeId) {
+                                                        getClaimSubTypes(option?.target?.value);
+                                                    }
+                                                }
                                             }}
                                             name="claimTypeId"
                                             className={formikProps.touched.claimTypeId && formikProps.errors.claimTypeId ? "is-invalid" : ""}
@@ -94,13 +117,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         <ReactSelect
                                             label={t("CLAIM_SUBTYPE")}
                                             error={formikProps.errors.claimSubTypeId}
-                                            options={[
-                                                { label: t("SELECT"), value: "" },
-                                                ...claimSubTypes.map((group) => ({
-                                                    label: group.label,
-                                                    value: group.value,
-                                                })),
-                                            ]}
+                                            options={claimSubTypes}
                                             value={formikProps.values.claimSubTypeId}
                                             onChange={(option) => {
                                                 formikProps.setFieldValue("claimSubTypeId", option?.target?.value ?? "");
@@ -158,7 +175,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
-                                            <span className="opacity-75">Multiple attachment can be uploaded.</span>                                            
+                                            <span className="opacity-75">Multiple attachment can be uploaded.</span>
                                         </div>
                                         {fileName && (
                                             <div className="pt-1">

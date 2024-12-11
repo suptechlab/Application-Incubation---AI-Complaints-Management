@@ -54,8 +54,8 @@ export const NavItems = () => {
     },
     {
       id: 3,
-      menuName: t("Team Management"),
-      title: t("Team Management"),
+      menuName: t("TEAM MANAGEMENT"),
+      title: t("TEAM MANAGEMENT"),
       menuIcon: <MdSupervisorAccount size={20} />,
       path: "/team-management",
       roleName: "admin",
