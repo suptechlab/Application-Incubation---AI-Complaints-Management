@@ -140,5 +140,6 @@ export const englishLang = {
   "NO_FILE_MY_CLAIM": " No, let me verify existing Claim",
   "REMOVE": "Remove",
   "NO_CHAT_AVAILABLE":"No chat available",
-  "ASK_OR_REPLY...":"Ask or reply..."
+  "ASK_OR_REPLY...":"Ask or reply...",
+  "DOWNLOAD": "Download"
 }

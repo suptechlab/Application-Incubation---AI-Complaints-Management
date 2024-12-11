@@ -52,11 +52,11 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         }
     };
 
-    const downloadAttachment = async (id,attachmentData) => {
+    const downloadAttachment = async (id, attachmentData) => {
         setLoading(true);
         const result = await dispatch(downloadDocument(id));
         if (downloadDocument.fulfilled.match(result)) {
-            downloadFile(result?.payload,attachmentData?.file_name).then(() => {
+            downloadFile(result?.payload, attachmentData?.file_name).then(() => {
 
             }).catch((error) => {
 
@@ -235,7 +235,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                     </Row>
                     {/* Accordion Items */}
                     {/* WILL DO IT LATER */}
-                    {/* <Accordion flush className='custom-accordion'>
+                    <Accordion flush className='custom-accordion'>
                         {accordionItems.map(item => (
                             <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
                                 <Accordion.Header>
@@ -252,9 +252,10 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                                                 <span className="me-auto py-1">{item.file_name}</span>
                                                 <AppTooltip title={t("DOWNLOAD")} placement="left">
                                                     <Button
+                                                        variant='link'
                                                         className="text-decoration-none"
                                                         aria-label={t("DOWNLOAD")}
-                                                        onClick={() => downloadAttachment(item?.externalDocumentId,item)}
+                                                        onClick={() => downloadAttachment(item?.externalDocumentId, item)}
                                                     >
                                                         <MdDownload size={20} />
                                                     </Button>
@@ -265,7 +266,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                                 </Accordion.Body>
                             </Accordion.Item>
                         ))}
-                    </Accordion> */}
+                    </Accordion>
 
                     {/* View Bottom Data */}
                     <Row>
