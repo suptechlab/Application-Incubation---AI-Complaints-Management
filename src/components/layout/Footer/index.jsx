@@ -128,7 +128,7 @@ const Footer = ({ layout }) => {
                 ))}
               </Nav>
             }
-            <div className={layout !== 'full' && "pt-2"}>
+            <div className={layout !== 'full' ? "pt-2" : ""}>
               {layout !== 'full' &&
                 <p className="mb-1">
                   Dirección: Av. Amazonas N32-87 y La Granja |

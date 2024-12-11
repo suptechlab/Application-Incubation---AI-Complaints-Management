@@ -27,7 +27,8 @@ const EndPoint = {
   CLAIM_TICKETS : `/${version}/user/claim-tickets`,
   CLAIM_STATS:`/${version}/user/claim-tickets/count-by-status`,
   FILE_CLAIM_SECOND_INSTANCE: `/${version}/user/claim-tickets/file-second-instance-claim`,
-  DOWNLOAD_DOCUMENT: `/${version}/user/claim-tickets/download`
+  DOWNLOAD_DOCUMENT: `/${version}/user/claim-tickets/download`,
+  TICKET_CHAT:`/${version}/user/claim-tickets`,
 };
 
 export default EndPoint;
