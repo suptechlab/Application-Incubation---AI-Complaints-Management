@@ -35,6 +35,24 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                         externalDocumentId: documents?.externalDocumentId
                     }
                 });
+                const roleUserDocuments = result?.payload?.data?.claimTicketDocuments
+                    .filter((doc) => doc.uploadedByUser.authorities.includes("ROLE_USER"))
+                    .map(({ id, externalDocumentId, originalTitle }) => ({
+                        id,
+                        externalDocumentId,
+                        originalTitle,
+                    }));
+
+                const roleFiUserDocuments = result?.payload?.data?.claimTicketDocuments
+                    .filter((doc) => doc.uploadedByUser.authorities.includes("ROLE_FI_USER"))
+                    .map(({ id, externalDocumentId, originalTitle }) => ({
+                        id,
+                        externalDocumentId,
+                        originalTitle,
+                    }));
+
+                console.log("ROLE_USER Documents:", roleUserDocuments);
+                console.log("ROLE_FI_USER Documents:", roleFiUserDocuments);
                 setAttachmentsData(attachmentsDataList);
                 const matchedInstanceType = instance_types.find(
                     (type) => type.value === result?.payload?.data?.instanceType
@@ -169,14 +187,14 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 { title: 'Document 3.pdf', dowlnloadUrl: '/' }
             ]
         },
-        // {
-        //     eventKey: '1',
-        //     header: t('ATTACHMENTS_SENT_BY_ENTITY'),
-        //     body: [
-        //         { title: 'Document 1.docx', dowlnloadUrl: '/' },
-        //         { title: 'Document 2.xlsx', dowlnloadUrl: '/' }
-        //     ]
-        // }
+        {
+            eventKey: '1',
+            header: t('ATTACHMENTS_SENT_BY_ENTITY'),
+            body: [
+                { title: 'Document 1.docx', dowlnloadUrl: '/' },
+                { title: 'Document 2.xlsx', dowlnloadUrl: '/' }
+            ]
+        }
     ];
 
     // View Bottom Data
