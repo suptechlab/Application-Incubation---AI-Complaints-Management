@@ -24,6 +24,8 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
     const [isLoading, setIsLoading] = useState(false)
     const { t } = useTranslation()
 
+    //Dummy Chat 
+    const [chatData, setChatData] = useState([])
     // Initial Values
     const initialValues = {
         message: '',
@@ -75,8 +77,6 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
         }
     };
 
-    //Dummy Chat 
-    const [chatData, setChatData] = useState([])
     // [
     //     {
     //         id: 1,
@@ -174,10 +174,12 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
     useEffect(() => {
         if (selectedRow?.id) {
             getConversationData()
+        }else{
+            setChatData([])
         }
     }, [selectedRow])
 
-    const handleAttachmentDownload = ()=>{
+    const handleAttachmentDownload = () => {
         // WRITE HERE FUNCTION FOR ATTACHMENT DOWNLOAD
     }
 
@@ -276,14 +278,18 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                     </div>
                                 )
                             })}
-
                             {
                                 chatData && chatData?.length > 0 &&
                                 <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
                                     <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
                                 </Stack>
                             }
-
+                            {
+                                chatData && chatData?.length === 0 &&
+                                <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
+                                    <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>No chat available</span>
+                                </Stack>
+                            }
                             <div ref={messagesEndRef} />
                         </Modal.Body>
                         <Modal.Footer className="border-top py-0 flex-column">

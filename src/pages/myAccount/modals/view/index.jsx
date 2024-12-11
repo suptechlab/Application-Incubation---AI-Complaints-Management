@@ -13,7 +13,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
-    const [claimTicketData, csetCaimTicketData] = useState([]);
+    const [claimTicketData, setClaimTicketData] = useState([]);
     const [instanceTypeTranslated, setInstanceTypeTranslated] = useState("");
     const { instance_types } = useSelector((state) => state?.masterSlice);
 
@@ -23,7 +23,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         try {
             const result = await dispatch(getClaimDetails(row?.id));
             if (getClaimDetails.fulfilled.match(result)) {
-                csetCaimTicketData(result?.payload?.data);
+                setClaimTicketData(result?.payload?.data);
                 const matchedInstanceType = instance_types.find(
                     (type) => type.value === result?.payload?.data?.instanceType
                 );
@@ -43,6 +43,8 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     useEffect(() => {
         if (selectedRow?.id) {
             fetchClaimDetails(selectedRow);
+        }else{
+            setClaimTicketData([])
         }
     }, [selectedRow]);
 
@@ -52,16 +54,36 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             case 'CLOSED':
                 return 'bg-success bg-opacity-25 text-success';
             case 'IN_PROGRESS':
-                return 'bg-orange-25 text-orange';
-            case 'new':
+                return 'bg-info-25 text-info';
+            case 'NEW':
                 return 'bg-primary bg-opacity-25 text-primary';
             case 'REJECTED':
                 return 'bg-danger bg-opacity-25 text-danger';
+            case 'ASSIGNED':
+                return 'bg-orange-25 text-orange';
             default:
                 return 'bg-body bg-opacity-25 text-body';
         }
     };
 
+    // GET STATUS TEXT CLASS
+
+    const getStatusTextClass = (status) => {
+        switch (status) {
+            case 'CLOSED':
+                return 'text-success';
+            case 'IN_PROGRESS':
+                return 'text-info';
+            case 'NEW':
+                return 'text-primary';
+            case 'REJECTED':
+                return 'text-danger';
+            case 'ASSIGNED':
+                return 'text-orange';
+            default:
+                return 'text-body';
+        }
+    };
     // View Top Data
     const viewTopData = [
         {
@@ -96,7 +118,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         {
             label: t('CLAIM_STATUS'),
             value: (
-                <span className="text-success fw-semibold">
+                <span className={`${getStatusTextClass(claimTicketData?.status)} fw-semibold`}>
                     {claimTicketData?.status ?? t('N/A')}
                 </span>
             ),
@@ -179,6 +201,10 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                             </Col>
                         ))}
                     </Row>
+
+                    {
+                        console.log({selectedRow})
+                    }
 
                     {/* Accordion Items */}
                     {/* WILL DO IT LATER */}
