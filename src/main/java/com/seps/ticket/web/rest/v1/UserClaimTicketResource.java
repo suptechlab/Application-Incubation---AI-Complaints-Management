@@ -1,10 +1,8 @@
 package com.seps.ticket.web.rest.v1;
 
-import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.MailService;
 import com.seps.ticket.service.UserClaimTicketService;
-import com.seps.ticket.service.UserService;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.suptech.service.DocumentService;
@@ -34,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
-import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "User Claim Ticket Management", description = "APIs for Users to manage their Claim Tickets")

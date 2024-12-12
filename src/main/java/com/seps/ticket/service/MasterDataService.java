@@ -1,10 +1,14 @@
 package com.seps.ticket.service;
 
 import com.seps.ticket.component.EnumUtil;
+import com.seps.ticket.domain.Authority;
+import com.seps.ticket.domain.User;
 import com.seps.ticket.enums.*;
+import com.seps.ticket.security.AuthoritiesConstants;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -17,13 +21,16 @@ public class MasterDataService {
 
     private final EnumUtil enumUtil;
 
+    private final UserService userService;
+
     /**
      * Constructor for {@link MasterDataService}.
      *
      * @param enumUtil The utility component for enum localization.
      */
-    public MasterDataService(EnumUtil enumUtil) {
+    public MasterDataService(EnumUtil enumUtil, UserService userService) {
         this.enumUtil = enumUtil;
+        this.userService = userService;
     }
 
     /**
@@ -31,10 +38,18 @@ public class MasterDataService {
      *
      * @param locale The {@link Locale} used for localizing the enum descriptions.
      * @return A map containing the localized master data, where the key is the enum name
-     *         (e.g., "customerType", "priorityCareGroup") and the value is a map of enum entries
-     *         with their localized descriptions.
+     * (e.g., "customerType", "priorityCareGroup") and the value is a map of enum entries
+     * with their localized descriptions.
      */
     public Map<String, Object> getMasterData(Locale locale) {
+
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        // Check if the user is FI-Admin
+        boolean isFiAdmin = authority.contains(AuthoritiesConstants.FI);
+
         Map<String, Object> masterData = new HashMap<>();
 
         // Adding localized data for Customer Type enum
@@ -57,7 +72,56 @@ public class MasterDataService {
 
         // Adding localized data for Rejected Status enum
         masterData.put("rejectedStatus", enumUtil.enumToLocalizedMap(RejectedStatusEnum.class, locale));
+        // Adding localized data for Ticket Workflow Status enum
+        masterData.put("ticketWorkflowEvent", enumUtil.enumToLocalizedMap(TicketWorkflowEventEnum.class, locale));
+
+        // Adding filtered localized data for specific enums
+
+        // CreateActionEnum
+        masterData.put("createAction", enumUtil.createFilteredEnumMap(
+            CreateActionEnum.values(),
+            locale,
+            isFiAdmin ? new CreateActionEnum[]{CreateActionEnum.MAIL_TO_SEPS_TEAM, CreateActionEnum.MAIL_TO_SEPS_AGENT} : new CreateActionEnum[]{}
+        ));
+
+        // TicketStatusActionEnum
+        masterData.put("ticketStatusAction", enumUtil.createFilteredEnumMap(
+            TicketStatusActionEnum.values(),
+            locale,
+            isFiAdmin ? new TicketStatusActionEnum[]{TicketStatusActionEnum.MAIL_TO_SEPS_TEAM, TicketStatusActionEnum.MAIL_TO_SEPS_AGENT} : new TicketStatusActionEnum[]{}
+        ));
+
+        // TicketPriorityActionEnum
+        masterData.put("ticketPriorityAction", enumUtil.createFilteredEnumMap(
+            TicketPriorityActionEnum.values(),
+            locale,
+            isFiAdmin ? new TicketPriorityActionEnum[]{TicketPriorityActionEnum.MAIL_TO_SEPS_TEAM, TicketPriorityActionEnum.MAIL_TO_SEPS_AGENT} : new TicketPriorityActionEnum[]{}
+        ));
+
+        // SLADaysReminderActionEnum
+        masterData.put("slaDaysReminderAction", enumUtil.createFilteredEnumMap(
+            SLADaysReminderActionEnum.values(),
+            locale,
+            isFiAdmin ? new SLADaysReminderActionEnum[]{SLADaysReminderActionEnum.MAIL_TO_SEPS_TEAM, SLADaysReminderActionEnum.MAIL_TO_SEPS_AGENT} : new SLADaysReminderActionEnum[]{}
+        ));
+
+
+        // SLABreachActionEnum
+        masterData.put("slaBreachAction", enumUtil.createFilteredEnumMap(
+            SLABreachActionEnum.values(),
+            locale,
+            isFiAdmin ? new SLABreachActionEnum[]{SLABreachActionEnum.MAIL_TO_SEPS_TEAM, SLABreachActionEnum.MAIL_TO_SEPS_AGENT} : new SLABreachActionEnum[]{}
+        ));
+
+        // TicketDateExtensionActionEnum
+        masterData.put("ticketDateExtensionAction", enumUtil.createFilteredEnumMap(
+            TicketDateExtensionActionEnum.values(),
+            locale,
+            isFiAdmin ? new TicketDateExtensionActionEnum[]{TicketDateExtensionActionEnum.MAIL_TO_SEPS_TEAM, TicketDateExtensionActionEnum.MAIL_TO_SEPS_AGENT} : new TicketDateExtensionActionEnum[]{}
+        ));
 
         return masterData;
     }
+
+
 }
