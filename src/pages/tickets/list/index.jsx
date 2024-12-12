@@ -58,7 +58,6 @@ export default function TicketsList() {
 
     useEffect(() => {
         if (roles?.length > 0) {
-
             const roleMap = {
                 'Fi Admin': 'FI_ADMIN',
                 'Fi Agent': 'FI_AGENT',
@@ -67,10 +66,9 @@ export default function TicketsList() {
             };
 
             const roleName = roles[0]?.name;
-
             setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
-
-
+        } else {
+            setCurrentUser('ADMIN');
         }
     }, [authorities])
 
@@ -548,6 +546,7 @@ export default function TicketsList() {
     //     []
     // );
 
+    console.log({ ticketIds: ticketIdsArr })
     const getFilteredColumns = (columnsArray) => {
         // All available column definitions
         const allColumns = [
@@ -564,7 +563,8 @@ export default function TicketsList() {
                             // Filter rows based on status and only include rows that are not "CLOSED" or "REJECTED"
                             const allSelectedIds = e.target.checked
                                 ? table.getRowModel().rows
-                                    .filter((row) => row.original.status !== "CLOSED" && row.original.status !== "REJECTED")
+                                    .filter((row) => (currentUser === "SEPS_ADMIN" && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") ||
+                                        (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_ADMIN"))
                                     .map((row) => row.original.id)
                                 : [];
 
@@ -583,7 +583,12 @@ export default function TicketsList() {
                     />
                 ),
                 cell: ({ row }) => (
-                    (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") ? (
+
+                    (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && (
+                        (currentUser === "SEPS_ADMIN" && row?.original?.instanceType === 'SECOND_INSTANCE') ||
+                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE') ||
+                        (currentUser !== "SEPS_ADMIN" && currentUser !== "FI_ADMIN")
+                    )) ? (
                         <Form.Check
                             className="form-check-cursor"
                             checked={row.getIsSelected()}
@@ -599,7 +604,7 @@ export default function TicketsList() {
                                 setClearTableSelection(false);
                             }}
                         />
-                    ) : ''
+                    ) : null
                 ),
                 size: "15",
                 meta: {
@@ -657,8 +662,8 @@ export default function TicketsList() {
             },
             {
                 accessorFn: (row) => row?.user?.name,
-                id: "claimFilledBy",
-                header: () => t("CLAIM_FILLED_BY"),
+                id: "claimFiledBy",
+                header: () => t("CLAIM_FILED_BY"),
                 enableSorting: true,
             },
             {
@@ -669,6 +674,12 @@ export default function TicketsList() {
                 cell: ({ row }) => (
                     <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
                 )
+            },
+            {
+                accessorFn: (row) => row?.instanceType,
+                id: "instanceType",
+                header: () => t("INSTANCE_TYPE"),
+                enableSorting: false,
             },
             {
                 accessorFn: (row) => row?.priority,
@@ -710,8 +721,6 @@ export default function TicketsList() {
         // Filter and reorder the columns based on the input array
         return columnsArray.map((colId) => allColumns.find((col) => col.id === colId)).filter(Boolean);
     };
-
-
     const handleTicketAssignment = (agentId) => {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
@@ -754,7 +763,6 @@ export default function TicketsList() {
             }
         }
     }
-
     useEffect(() => {
         setPagination({
             pageIndex: 0,
@@ -787,20 +795,20 @@ export default function TicketsList() {
 
         switch (currentUser) {
             case 'FI_ADMIN':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "priority" ,"status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_ADMIN':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate", "priority", "status"];
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_AGENT':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFilledBy", "slaBreachDate","priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "priority", "status"];
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
         return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns

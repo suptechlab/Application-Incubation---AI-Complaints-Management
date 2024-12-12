@@ -10,20 +10,23 @@ import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticketmanagement.service";
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
-const CloseTicketModal = ({ modal, toggle ,ticketId,setSelectedStatus,setIsGetAcitivityLogs}) => {
+const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs }) => {
+
     const { t } = useTranslation();
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
-    const {masterData} = useContext(MasterDataContext)
+    const { masterData } = useContext(MasterDataContext)
 
-    const [subStatus , setSubStatus] = useState([])
+    const [subStatus, setSubStatus] = useState([])
 
-    useEffect(()=>{
-        if(masterData?.closedStatus){
-            const closeStatus  = convertToLabelValue(masterData?.closedStatus)
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (masterData?.closedStatus) {
+            const closeStatus = convertToLabelValue(masterData?.closedStatus)
             setSubStatus(closeStatus)
         }
-    },[masterData])
+    }, [masterData])
 
     //Handle File Change
     const handleFileChange = (event) => {
@@ -36,27 +39,28 @@ const CloseTicketModal = ({ modal, toggle ,ticketId,setSelectedStatus,setIsGetAc
     };
 
     const handleSubmit = async (values, actions) => {
-        actions.setSubmitting(true);
+        setLoading(true);
         const formData = {
             reason: values?.reason,
             closeSubStatus: values?.closeSubStatus,
-          };
-          ticketCloseStatus(ticketId, formData)
+        };
+        ticketCloseStatus(ticketId, formData)
             .then((response) => {
                 setSelectedStatus('CLOSED');
-                setIsGetAcitivityLogs((prev)=> !prev)
-              toast.success(response?.data?.message);
-              toggle()
+                setIsGetAcitivityLogs((prev) => !prev)
+                toast.success(response?.data?.message);
+                toggle()
             })
             .catch((error) => {
-              if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription);
-              } else {
-                toast.error(error?.message);
-              }
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
             })
             .finally(() => {
-              actions.setSubmitting(false);
+                setLoading(false)
+                actions.setSubmitting(false);
             });
     };
 
@@ -95,6 +99,9 @@ const CloseTicketModal = ({ modal, toggle ,ticketId,setSelectedStatus,setIsGetAc
                     errors,
                 }) => (
                     <Form>
+                        {
+                            console.log({ isSubmitting: isSubmitting })
+                        }
                         <Modal.Body className="text-break py-0">
                             <FormInput
                                 label="Comments"
@@ -113,12 +120,12 @@ const CloseTicketModal = ({ modal, toggle ,ticketId,setSelectedStatus,setIsGetAc
                                 label="Sub-status"
                                 error={errors.closeSubStatus}
                                 options={[
-                                        { label: t("SELECT"), value: "" },
-                                        ...subStatus.map((group) => ({
-                                            label: group.label,
-                                            value: group.value,
-                                        })),
-                                    ]}
+                                    { label: t("SELECT"), value: "" },
+                                    ...subStatus.map((group) => ({
+                                        label: group.label,
+                                        value: group.value,
+                                    })),
+                                ]}
                                 value={values.closeSubStatus}
                                 onChange={(option) => {
                                     setFieldValue(
@@ -174,7 +181,7 @@ const CloseTicketModal = ({ modal, toggle ,ticketId,setSelectedStatus,setIsGetAc
                                 type="submit"
                                 variant="warning"
                                 className="custom-min-width-85"
-                                disabled={isSubmitting ?? false}
+                                disabled={loading ?? false}
                             >
                                 {t("SUBMIT")}
                             </Button>

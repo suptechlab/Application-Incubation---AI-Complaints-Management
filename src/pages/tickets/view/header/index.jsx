@@ -14,7 +14,7 @@ import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 
-const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivityLogs }) => {
+const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivityLogs,getTicketData }) => {
 
     const { t } = useTranslation();
 
@@ -71,48 +71,46 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
         setAddAttachmentsModalShow(true)
     }
     // Custom function to display "remaining" for future dates
-
-
     // Handle Date Extension Click
     const handleDateExtensionClick = () => {
         setDateExtensionModalShow(true)
     }
-
     const handleTicketAssign = (agentId) => {
         setLoading(true)
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
-            if (currentUser === "SEPS_ADMIN") { }
-            agentTicketToSEPSagent(agentId).then(response => {
-                toast.success(t("TICKETS ASSIGNED"));
+            if (currentUser === "SEPS_ADMIN") {
+                agentTicketToSEPSagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
+                    toast.success(t("TICKETS ASSIGNED"));
+                    setSelectedAgent(null)
+                }).catch((error) => {
+                    if (error?.response?.data?.errorDescription) {
+                        toast.error(error?.response?.data?.errorDescription);
+                    } else {
+                        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                    }
+                }).finally(() => {
+                    setLoading(false)
+                })
+            } else if (currentUser === "FI_ADMIN") {
+                agentTicketToFIagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
+                    toast.success(t("TICKETS ASSIGNED"));
+                    setSelectedAgent(null)
+                }).catch((error) => {
+                    if (error?.response?.data?.errorDescription) {
+                        toast.error(error?.response?.data?.errorDescription);
+                    } else {
+                        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+                    }
+                }).finally(() => {
+                    setLoading(false)
+                })
+            }
 
-            }).catch((error) => {
-                if (error?.response?.data?.errorDescription) {
-                    toast.error(error?.response?.data?.errorDescription);
-                } else {
-                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-                }
-            }).finally(() => {
-                setLoading(false)
-            })
-        } else if (currentUser === "FI_ADMIN") {
-            agentTicketToFIagent(agentId).then(response => {
-                toast.success(t("TICKETS ASSIGNED"));
-
-            }).catch((error) => {
-                if (error?.response?.data?.errorDescription) {
-                    toast.error(error?.response?.data?.errorDescription);
-                } else {
-                    toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-                }
-            }).finally(() => {
-                setLoading(false)
-            })
         } else {
             toast.warning("You are not allowed to assign tickets.")
         }
     }
-
     // GET AGENT DROPDOWN LISTING
     const getAgentDropdownListing = () => {
         agentListingApi().then(response => {
@@ -134,8 +132,6 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
     useEffect(() => {
         getAgentDropdownListing()
     }, [])
-
-
     return (
         <React.Fragment>
             <div className="pb-3">
@@ -179,9 +175,9 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
                         >
                             Assign To
                         </Button> */}
-
                         {
-                            ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECT" &&
+                            (currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN') &&
+                            (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED") &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
                                     wrapperClassName="mb-0"
@@ -204,10 +200,9 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
                                 />
                             </div>
                         }
-
                         {
-
-                            currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN" ?
+                            ((currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN") &&
+                                (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
                                 <Button
                                     type="submit"
                                     variant='warning'
@@ -248,9 +243,7 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
                                 >
                                     <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
                                 </Button>
-
                         }
-
                         {/* <Dropdown>
                             <Dropdown.Toggle
                                 variant="link"
@@ -285,6 +278,7 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
                 ticketData={ticketData}
                 modal={dateExtensionModalShow}
                 toggle={() => setDateExtensionModalShow(false)}
+                getTicketData={getTicketData}
             />
             <CloseTicketModal
                 ticketId={ticketData?.id}

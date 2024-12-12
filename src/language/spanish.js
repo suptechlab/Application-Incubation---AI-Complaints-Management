@@ -190,7 +190,7 @@ export const spanishLang = {
 
     "TICKET_ID": "ID del Ticket",
     "CREATION_DATE": "Fecha de Creación",
-    "CLAIM_FILLED_BY": "Reclamado por",
+    "CLAIM_FILED_BY": "Reclamo presentado por",
     "PRIORITY": "Prioridad",
     "FI_AGENT": "Agente FI",
     "NEW_TICKETS": "Nuevos Tickets",
@@ -242,5 +242,6 @@ export const spanishLang = {
     "ENTER_EXTENDED_DATE": "Ingrese Fecha Extendida",
     "DAYS_REMAINING": "Días restantes",
     "DAYS": "Días",
-     "ALL_PRIORITY":"Toda prioridad"
+    "ALL_PRIORITY": "Toda prioridad",
+    "INSTANCE_TYPE": "Tipo de instancia"
 }

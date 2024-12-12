@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { validateFile } from "../../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
 
-const ReplyTab = ({ ticketId, setIsGetAcitivityLogs }) => {
+const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData ,getTicketData}) => {
 
     const { t } = useTranslation()
 
@@ -44,6 +44,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs }) => {
                     setSendReplyModalShow(false); // Close modal after success
                 }
                 actions.resetForm()
+                getTicketData()
                 setIsGetAcitivityLogs((prev) => !prev)
                 toast.success(response?.data?.message)
             })
@@ -136,45 +137,88 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs }) => {
                                     }}
                                 />
                             </div>
-                            <Stack
-                                direction="horizontal"
-                                gap={2}
-                                className="flex-wrap justify-content-between justify-content-sm-end flex-fill"
-                            >
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="outline-dark"
-                                    onClick={() => {
-                                        if (values.message === '') {
-                                            // Set an error for the message field
-                                            setFieldError("message", t("MESSAGE_REQUIRED"));
-                                            setFieldTouched("message", true);
-                                        } else {
-                                            setSubmitAction("customer");
-                                            setSendReplyModalShow(true); // Show modal first
-                                        }
-                                    }}
-                                    disabled={loading}
-                                >
-                                    {loading && submitAction === "customer"
-                                        ? t("SENDING")
-                                        : t("REPLY_TO_CUSTOMER")}
-                                </Button>
 
-                                <Button
-                                    type="submit"
-                                    size="sm"
-                                    variant="warning"
-                                    onClick={() => setSubmitAction("internal")}
-                                    disabled={loading}
-                                >
-                                    {loading && submitAction === "internal"
-                                        ? t("PROCESSING")
-                                        : t("REPLY_INTERNALLY")}
-                                </Button>
+                            {
+                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED") ?
 
-                            </Stack>
+                                    <Stack
+                                        direction="horizontal"
+                                        gap={2}
+                                        className="flex-wrap justify-content-between justify-content-sm-end flex-fill"
+                                    >
+
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="outline-dark"
+                                            onClick={() => {
+                                                if (values.message === '') {
+                                                    // Set an error for the message field
+                                                    setFieldError("message", t("MESSAGE_REQUIRED"));
+                                                    setFieldTouched("message", true);
+                                                } else {
+                                                    setSubmitAction("customer");
+                                                    setSendReplyModalShow(true); // Show modal first
+                                                }
+                                            }}
+                                            disabled={loading}
+                                        >
+                                            {loading && submitAction === "customer"
+                                                ? t("SENDING")
+                                                : t("REPLY_TO_CUSTOMER")}
+                                        </Button>
+
+                                        <Button
+                                            type="submit"
+                                            size="sm"
+                                            variant="warning"
+                                            onClick={() => setSubmitAction("internal")}
+                                            disabled={loading}
+                                        >
+                                            {loading && submitAction === "internal"
+                                                ? t("PROCESSING")
+                                                : t("REPLY_INTERNALLY")}
+                                        </Button>
+
+                                    </Stack> :
+                                    <div>
+                                        <Stack
+                                            direction="horizontal"
+                                            gap={2}
+                                            className="flex-wrap justify-content-between justify-content-sm-end flex-fill"
+                                        >
+
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline-dark"
+                                                onClick={() => {
+                                                    if (values.message === '') {
+                                                        // Set an error for the message field
+                                                        setFieldError("message", t("MESSAGE_REQUIRED"));
+                                                        setFieldTouched("message", true);
+                                                    } else {
+                                                        setSubmitAction("customer");
+                                                        setSendReplyModalShow(true); // Show modal first
+                                                    }
+                                                }}
+                                                disabled={true}
+                                            >
+                                                {t("REPLY_TO_CUSTOMER")}
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                size="sm"
+                                                variant="warning"
+                                                onClick={() => setSubmitAction("internal")}
+                                                disabled={true}
+                                            >
+                                                {t("REPLY_INTERNALLY")}
+                                            </Button>
+                                        </Stack>
+                                    </div>
+                            }
+
                         </Stack>
                     </Card.Footer>
                     {/* Send Reply Modal */}

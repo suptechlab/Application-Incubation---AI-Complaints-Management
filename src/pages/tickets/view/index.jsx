@@ -115,7 +115,7 @@ const TicketsView = () => {
   }, [id])
 
   // The color class based on the priority level
-  const priorityOptions = ['LOW', 'MEDIUM', 'HIGH', 'NIL'];
+  const priorityOptions = ['LOW', 'MEDIUM', 'HIGH'];
   const getPriorityClass = (priority) => {
     switch (priority) {
       case 'LOW':
@@ -124,8 +124,8 @@ const TicketsView = () => {
         return 'text-orange';
       case 'HIGH':
         return 'text-danger';
-      case 'NIL':
-        return 'text-muted';
+      // case 'NIL':
+      //   return 'text-muted';
       default:
         return 'text-body';
     }
@@ -167,7 +167,7 @@ const TicketsView = () => {
       label: t("PRIORITY"),
       value: (<Stack direction='horizontal' gap={1}>
         {
-          currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN" ?
+          ((currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN") && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) ?
             <Dropdown>
               <Dropdown.Toggle
                 variant="link"
@@ -259,12 +259,12 @@ const TicketsView = () => {
   const viewBottomData = [
     {
       label: t("CREATED_ON"),
-      value:  ticketData?.secondInstanceFiledAt ? moment(ticketData?.secondInstanceFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
+      value: ticketData?.secondInstanceFiledAt ? moment(ticketData?.secondInstanceFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
       colProps: { sm: 6 }
     },
     {
       label: t("AGENT"),
-      value: ticketData?.sepsAgent ?? 'N/A',
+      value: ticketData?.sepsAgent?.name ?? 'N/A',
       colProps: { sm: 6 }
     },
     {
@@ -290,6 +290,7 @@ const TicketsView = () => {
           ticketData={ticketData}
           currentUser={currentUser}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+          getTicketData = {getTicketDetails}
         />
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -322,30 +323,30 @@ const TicketsView = () => {
               }
             </Col>
             <Col lg={6} className='mh-100 d-flex flex-column'>
-              <Card className="border-0 shadow">
-                <Card.Header className='bg-body border-0 py-3'>
-                  {/* REPLY SECTION */}
-                  <Row className='g-2'>
-                    <Col xs="auto">
-                      <Image
-                        className="object-fit-cover rounded-circle"
-                        src={defaultAvatar}
-                        width={36}
-                        height={36}
-                        alt={ticketData?.user?.name}
-                      />
-                    </Col>
-                    <Col xs className='small lh-sm'>
-                      <div className='fw-bold'>{ticketData?.user?.name}th</div>
-                      <Stack direction='horizontal' gap={2} className='text-secondary'>
-                        <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                        <span> {currentDate} </span>
-                      </Stack>
-                    </Col>
-                  </Row>
-                </Card.Header>
-                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} />
-              </Card>
+                <Card className="border-0 shadow">
+                  <Card.Header className='bg-body border-0 py-3'>
+                    {/* REPLY SECTION */}
+                    <Row className='g-2'>
+                      <Col xs="auto">
+                        <Image
+                          className="object-fit-cover rounded-circle"
+                          src={defaultAvatar}
+                          width={36}
+                          height={36}
+                          alt={ticketData?.user?.name}
+                        />
+                      </Col>
+                      <Col xs className='small lh-sm'>
+                        <div className='fw-bold'>{ticketData?.user?.name}th</div>
+                        <Stack direction='horizontal' gap={2} className='text-secondary'>
+                          <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                          <span> {currentDate} </span>
+                        </Stack>
+                      </Col>
+                    </Row>
+                  </Card.Header>
+                  <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData}  getTicketData={getTicketDetails}/>
+                </Card>
               <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} />
               {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
