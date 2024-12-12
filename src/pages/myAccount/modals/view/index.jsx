@@ -19,7 +19,9 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     const [claimTicketData, setClaimTicketData] = useState([]);
     const [instanceTypeTranslated, setInstanceTypeTranslated] = useState("");
     const { instance_types } = useSelector((state) => state?.masterSlice);
-    const [attachmentsData, setAttachmentsData] = useState([]);
+    const [roleUserDocuments, setRoleUserDocuments] = useState([]);
+    const [roleFiUserDocuments, setRoleFiUserDocuments] = useState([]);
+    const [roleSepsUserDocuments, setRoleSepsUserDocuments] = useState([]);
 
 
     const fetchClaimDetails = async (row) => {
@@ -35,25 +37,32 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                         externalDocumentId: documents?.externalDocumentId
                     }
                 });
-                const roleUserDocuments = result?.payload?.data?.claimTicketDocuments
+                const roleUserAttachments = result?.payload?.data?.claimTicketDocuments
                     .filter((doc) => doc.uploadedByUser.authorities.includes("ROLE_USER"))
                     .map(({ id, externalDocumentId, originalTitle }) => ({
-                        id,
-                        externalDocumentId,
-                        originalTitle,
+                        id: id,
+                        file_name: originalTitle,
+                        externalDocumentId: externalDocumentId,
                     }));
 
-                const roleFiUserDocuments = result?.payload?.data?.claimTicketDocuments
+                const roleFiUserAttachments = result?.payload?.data?.claimTicketDocuments
                     .filter((doc) => doc.uploadedByUser.authorities.includes("ROLE_FI_USER"))
                     .map(({ id, externalDocumentId, originalTitle }) => ({
-                        id,
-                        externalDocumentId,
-                        originalTitle,
+                        id: id,
+                        file_name: originalTitle,
+                        externalDocumentId: externalDocumentId,
                     }));
 
-                console.log("ROLE_USER Documents:", roleUserDocuments);
-                console.log("ROLE_FI_USER Documents:", roleFiUserDocuments);
-                setAttachmentsData(attachmentsDataList);
+                const roleSepsUserAttachments = result?.payload?.data?.claimTicketDocuments
+                    .filter((doc) => doc.uploadedByUser.authorities.includes("ROLE_SEPS_USER"))
+                    .map(({ id, externalDocumentId, originalTitle }) => ({
+                        id: id,
+                        file_name: originalTitle,
+                        externalDocumentId: externalDocumentId,
+                    }));
+                setRoleUserDocuments(roleUserAttachments);
+                setRoleFiUserDocuments(roleFiUserAttachments);
+                setRoleSepsUserDocuments(roleSepsUserAttachments);
                 const matchedInstanceType = instance_types.find(
                     (type) => type.value === result?.payload?.data?.instanceType
                 );
@@ -181,33 +190,42 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
         {
             eventKey: '0',
             header: t('ATTACHMENTS'),
-            body: [
-                { title: 'Document 1.docx', dowlnloadUrl: '/' },
-                { title: 'Document 2.xlsx', dowlnloadUrl: '/' },
-                { title: 'Document 3.pdf', dowlnloadUrl: '/' }
-            ]
+            body: roleUserDocuments,
+            condition: true,
         },
         {
             eventKey: '1',
             header: t('ATTACHMENTS_SENT_BY_ENTITY'),
-            body: [
-                { title: 'Document 1.docx', dowlnloadUrl: '/' },
-                { title: 'Document 2.xlsx', dowlnloadUrl: '/' }
-            ]
-        }
+            body: roleFiUserDocuments,
+            condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE' && claimTicketData?.instanceType !== 'COMPLAINT',
+        },
+        {
+            eventKey: '2',
+            header: t('ATTACHMENTS_SENT_BY_SEPS'),
+            body: roleSepsUserDocuments,
+            condition: claimTicketData?.instanceType === 'SECOND_INSTANCE' || claimTicketData?.instanceType === 'COMPLAINT',
+        },
     ];
 
     // View Bottom Data
     const viewBottomData = [
         {
             label: t('PRECEDENTS'),
-            value: claimTicketData?.precedents ?? t('N/A'),
-            colProps: { xs: 12 }
+            value: claimTicketData?.instanceType === 'FIRST_INSTANCE' ? (claimTicketData?.precedents ?? t('N/A')) : (claimTicketData?.complaintPrecedents ?? t('N/A')),
+            colProps: { xs: 12 },
+            condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE'
         },
         {
             label: t('SPECIFIC_PETITION'),
-            value: claimTicketData?.specificPetition ?? t('N/A'),
-            colProps: { xs: 12 }
+            value: claimTicketData?.instanceType === 'FIRST_INSTANCE' ? (claimTicketData?.specificPetition ?? t('N/A')) : (claimTicketData?.complaintSpecificPetition ?? t('N/A')),
+            colProps: { xs: 12 },
+            condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE'
+        },
+        {
+            label: t('COMMENTS'),
+            value: claimTicketData?.secondInstanceComment ?? t('N/A'),
+            colProps: { xs: 12 },
+            condition: claimTicketData?.instanceType === 'SECOND_INSTANCE'
         },
         // {
         //     label: t("ENTITY_RESPONSE"),
@@ -252,47 +270,56 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                         ))}
                     </Row>
                     {/* Accordion Items */}
-                    {/* WILL DO IT LATER */}
-                    <Accordion flush className='custom-accordion'>
-                        {accordionItems.map(item => (
-                            <Accordion.Item eventKey={item.eventKey} className='mb-4' key={item.eventKey}>
-                                <Accordion.Header>
-                                    <span className='text-info me-2'><MdAttachFile size={24} /></span>
-                                    {item.header}
-                                </Accordion.Header>
-                                <Accordion.Body className='py-0'>
-                                    <ListGroup variant="flush">
-                                        {attachmentsData?.map((item, index) => (
-                                            <ListGroup.Item
-                                                key={"data_body_view_" + index}
-                                                className="px-1 d-flex gap-2 justify-content-between align-items-start"
-                                            >
-                                                <span className="me-auto py-1">{item.file_name}</span>
-                                                <AppTooltip title={t("DOWNLOAD")} placement="left">
-                                                    <Button
-                                                        variant='link'
-                                                        className="text-decoration-none"
-                                                        aria-label={t("DOWNLOAD")}
-                                                        onClick={() => downloadAttachment(item?.externalDocumentId, item)}
+                    <Accordion flush className="custom-accordion">
+                        {accordionItems
+                            .filter(item => item.condition) // Only include items where condition is true
+                            .map(item => (
+                                <Accordion.Item eventKey={item.eventKey} className="mb-4" key={item.eventKey}>
+                                    <Accordion.Header>
+                                        <span className="text-info me-2"><MdAttachFile size={24} /></span>
+                                        {item.header}
+                                    </Accordion.Header>
+                                    <Accordion.Body className="py-0">
+                                        <ListGroup variant="flush">
+                                            {item.body?.length > 0 ? (
+                                                item.body.map((doc, index) => (
+                                                    <ListGroup.Item
+                                                        key={"data_body_view_" + index}
+                                                        className="px-1 d-flex gap-2 justify-content-between align-items-start"
                                                     >
-                                                        <MdDownload size={20} />
-                                                    </Button>
-                                                </AppTooltip>
-                                            </ListGroup.Item>
-                                        ))}
-                                    </ListGroup>
-                                </Accordion.Body>
-                            </Accordion.Item>
-                        ))}
+                                                        <span className="me-auto py-1">{doc.file_name}</span>
+                                                        <AppTooltip title={t("DOWNLOAD")} placement="left">
+                                                            <Button
+                                                                variant="link"
+                                                                className="text-decoration-none"
+                                                                aria-label={t("DOWNLOAD")}
+                                                                onClick={() => downloadAttachment(doc?.externalDocumentId, doc)}
+                                                            >
+                                                                <MdDownload size={20} />
+                                                            </Button>
+                                                        </AppTooltip>
+                                                    </ListGroup.Item>
+                                                ))
+                                            ) : (
+                                                <ListGroup.Item className="px-1 text-muted">
+                                                    {t("NO_ATTACHMENTS_AVAILABLE")}
+                                                </ListGroup.Item>
+                                            )}
+                                        </ListGroup>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            ))}
                     </Accordion>
 
                     {/* View Bottom Data */}
                     <Row>
-                        {viewBottomData?.map((item, index) => (
-                            <Col key={"data_view_bottom_" + index} {...item.colProps}>
-                                <CommonViewData label={item.label} value={item.value} />
-                            </Col>
-                        ))}
+                        {viewBottomData
+                            .filter(item => item.condition)
+                            .map((item, index) => (
+                                <Col key={"data_view_bottom_" + index} {...item.colProps}>
+                                    <CommonViewData label={item.label} value={item.value} />
+                                </Col>
+                            ))}
                     </Row>
                 </Modal.Body>
             </Modal>

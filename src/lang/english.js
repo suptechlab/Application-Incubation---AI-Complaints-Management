@@ -111,7 +111,6 @@ export const englishLang = {
   "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments",
   "RAISE_A_SECOND_INSTANCE_CLAIM": "Raise a 2nd Instance Claim",
   "FIRST_INSTANCE_COMPLAINT_TICKET": "1st Instance Complaint Ticket",
-  "COMMENTS": "Comments*",
   "ATTACH_NEW_EVIDENCE": "Attach the new evidence",
   "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Multiple attachment can be uploaded.",
   "CANCEL": "Cancel",
@@ -131,6 +130,9 @@ export const englishLang = {
   "SECOND_INSTANCE_CLAIM_TICKET": "2nd Instance Claim Ticket",
   "RAISE_A_COMPLAINT": "Raise a Complaint",
   "SECOND_CLAIM_SUCCESS": "2nd Instance Claimed Successfully",
+  "ATTACHMENTS_SENT_BY_SEPS": "Attachments send by SEPS",
+  "NO_ATTACHMENTS_AVAILABLE": "No attachments available.",
+  "COMMENTS": "Comments",
   //Alert Modal
   "ALERT!": "Alert!",
   "AUTHORITY_REJECTION": "It looks like a duplicate entry and will be rejected by the authority.",

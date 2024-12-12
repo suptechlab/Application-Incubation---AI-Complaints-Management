@@ -112,7 +112,7 @@ export const spanishLang = {
   "UPLOAD_OPTIONAL_ATTACHMENTS": "Cargar archivos adjuntos opcionales",
   "RAISE_A_SECOND_INSTANCE_CLAIM": "Presentar un reclamo en segunda instancia",
   "FIRST_INSTANCE_COMPLAINT_TICKET": "Boleto de Denuncia de 1ra Instancia",
-  "COMMENTS": "Comentarios*",
+  "COMMENTS": "Comentarios",
   "ATTACH_NEW_EVIDENCE": "Adjunte la nueva evidencia",
   "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Se pueden cargar varios archivos adjuntos.",
   "CANCEL": "Cancelar",
@@ -132,6 +132,8 @@ export const spanishLang = {
   "SECOND_INSTANCE_CLAIM_TICKET": "Boleto de Reclamación de 2da Instancia",
   "RAISE_A_COMPLAINT": "Presentar una queja",
   "SECOND_CLAIM_SUCCESS": "Segunda instancia reclamada con éxito",
+  "ATTACHMENTS_SENT_BY_SEPS": "Adjuntos enviados por SEPS",
+  "NO_ATTACHMENTS_AVAILABLE": "No hay archivos adjuntos disponibles.",
   //Alert Modal
   "ALERT!": "¡Alerta!",
   "AUTHORITY_REJECTION": "Parece una entrada duplicada y será rechazada por la autoridad.",
