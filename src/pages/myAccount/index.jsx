@@ -69,6 +69,13 @@ export default function MyAccount() {
   };
 
 
+  const handleCloseComplaintModal = () => {
+    setSelectedRow(null);
+    setRaisedComplaintModalShow(false);
+    dataQuery.refetch();
+  };
+
+
 
   const instanceClickHandler = (row) => {
     setSelectedRow(row);
@@ -167,16 +174,13 @@ export default function MyAccount() {
         header: t("ACTIONS"),
         enableSorting: false,
         cell: (info) => {
-          const renderButton = ({ label, onClickHandler, variant = "link", className = "", ariaLabel }) => (
+          const renderButton = ({ label, onClickHandler, variant = "link", className = "", ariaLabel, disabled = false }) => (
             <Button
               variant={variant}
               className={`p-0 border-0 lh-sm position-relative text-nowrap fw-medium text-decoration-none text-info ${className}`}
               aria-label={ariaLabel || label}
               onClick={onClickHandler}
-              disabled={
-                info.row.original.instanceType === "SECOND_INSTANCE" ||
-                (info.row.original.status !== "CLOSED" && info.row.original.status !== "REJECTED")
-              }
+              disabled={disabled}
             >
               {t(label)}
             </Button>
@@ -187,13 +191,15 @@ export default function MyAccount() {
             ? renderButton({
               label: "FILE_SECOND_INSTANCE",
               onClickHandler: () => instanceClickHandler(info.row.original),
-              ariaLabel: t("FILE_SECOND_INSTANCE")
+              ariaLabel: t("FILE_SECOND_INSTANCE"),
+              disabled: !(info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED")
             })
             : info.row.original.instanceType === "SECOND_INSTANCE"
               ? renderButton({
                 label: "RAISE_COMPLAINT",
                 onClickHandler: () => raisedComplaintClickHandler(info.row.original),
-                ariaLabel: t("RAISE_COMPLAINT")
+                ariaLabel: t("RAISE_COMPLAINT"),
+                disabled: !(info.row.original.status === "CLOSED")
               })
               : null;
 
@@ -366,7 +372,8 @@ export default function MyAccount() {
       {/* Raised Complaint MODAL */}
       <RaisedComplaintModal
         handleShow={raisedComplaintModalShow}
-        handleClose={() => setRaisedComplaintModalShow(false)}
+        selectedRow={selectedRow}
+        handleClose={handleCloseComplaintModal}
       />
 
     </React.Fragment>

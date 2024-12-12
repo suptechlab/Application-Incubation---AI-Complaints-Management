@@ -237,5 +237,20 @@ export const downloadDocument = createAsyncThunk(
     }
   }
 );
+// SUBMIT FILE CLAIM SECOND INSTANCE FORM
+export const fileRaiseComplaintForm = createAsyncThunk(
+  'fileRaiseComplaintForm',
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await ticketsApi.post(`${EndPoint.FILE_COMPLAINT}`, data);
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to file complaint!');
+      }
+      return response; // RETURN RESPONSE
+    } catch (error) {
+
+    }
+  }
+);
 
 export default fileClaimSlice.reducer;

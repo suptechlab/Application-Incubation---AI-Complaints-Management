@@ -145,5 +145,6 @@ export const spanishLang = {
   "NO_CHAT_AVAILABLE": "No hay chat disponible",
   "ASK_OR_REPLY": "Preguntar o responder",
   "DOWNLOAD": "Descargar"
-
+,
+  "COMPLAINT_RAISED_SUCCES": "Queja planteada con éxito"
 }

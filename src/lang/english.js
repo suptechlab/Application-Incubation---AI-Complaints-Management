@@ -143,5 +143,6 @@ export const englishLang = {
   "REMOVE": "Remove",
   "NO_CHAT_AVAILABLE":"No chat available",
   "ASK_OR_REPLY...":"Ask or reply...",
-  "DOWNLOAD": "Download"
+  "DOWNLOAD": "Download",
+  "COMPLAINT_RAISED_SUCCES": "Complaint raised successfully"
 }

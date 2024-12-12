@@ -33,10 +33,6 @@ export const RaiseComplaintSchema = yup.object({
         .string()
         .required(msg.secondInstanceTicketRequired),
 
-    comments: yup
-        .string()
-        .required(msg.commentsRequired),
-
     precedents: yup
         .string()
         .required(msg.precedentsRequired)
