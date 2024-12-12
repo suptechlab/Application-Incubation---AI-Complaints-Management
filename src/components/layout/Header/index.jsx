@@ -13,13 +13,15 @@ import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import Logo from "../../../assets/images/logo.svg";
 import "./header.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { setLogout } from "../../../redux/slice/authSlice";
+import { setLogout, verifyLoginOTP } from "../../../redux/slice/authSlice";
 import { useTranslation } from "react-i18next";
 import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
 import ProfileModal from "../../../pages/profile";
+import OnlyLoginModal from "../../../pages/auth/user-direct-login";
 
 const Header = ({ layout }) => {
   const [profileModalShow, setProfileModalShow] = useState(false);
+  const [loginModalShow, setLoginModalShow] = useState(false);
 
   const { isLoggedIn, user } = useSelector((state) => state?.authSlice)
 
@@ -53,8 +55,29 @@ const Header = ({ layout }) => {
     navigate('/')
   }
 
+  const handleLoginClick = () => {
+    setLoginModalShow(true);
+  }
+
+  const handleSuccessButtonClick = async (values, actions) => {
+    // verifyLoginOTP
+    const result = await dispatch(verifyLoginOTP(values));
+    if (verifyLoginOTP.fulfilled.match(result)) {
+      navigate('/my-account');
+      handleCloseModal();
+      actions.setSubmitting(false)
+    } else {
+      console.error('VERIFY OTP ERROR:', result.error.message);
+      actions.setSubmitting(false)
+    }
+  }
+
   const handleProfileClick = () => {
     setProfileModalShow(true)
+  }
+
+  const handleCloseModal = () => {
+    setLoginModalShow(false);
   }
 
   return (
@@ -94,6 +117,16 @@ const Header = ({ layout }) => {
             </Offcanvas.Body>
           </Navbar.Offcanvas>
 
+          <div className="p-2">
+            <Button
+              variant="warning"
+              className={`${isLoggedIn ? 'd-none' : 'custom-min-width-100 ms-auto mt-2'}`}
+              onClick={handleLoginClick}
+            >
+              {t('LOGIN')}
+            </Button>
+          </div>
+
           <Dropdown className={`${!isLoggedIn ? 'd-none' : ''} ms-md-4`}>
             <Dropdown.Toggle
               variant="link"
@@ -108,12 +141,12 @@ const Header = ({ layout }) => {
                 alt={"Alex Boston"}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-150 fs-6 lh-sm fw-semibold">
-              {user?.name}
+                {user?.name}
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="shadow border-0 mt-3">
               <Dropdown.Header className="fw-semibold d-md-none">
-              {user?.name ?? ''} 
+                {user?.name ?? ''}
               </Dropdown.Header>
               <Dropdown.Item as={Button} onClick={handleProfileClick} disabled>
                 {t("PROFILE")}
@@ -135,11 +168,19 @@ const Header = ({ layout }) => {
           />
         </Container>
       </Navbar>
-      
+
       {/* Profile Modal */}
       <ProfileModal
         handleShow={profileModalShow}
         handleClose={() => setProfileModalShow(false)}
+      />
+
+      {/* Login Modal */}
+      <OnlyLoginModal
+        handleShow={loginModalShow}
+        handleClose={handleCloseModal}
+        handleLoginSucccesSubmit={handleSuccessButtonClick}
+        isFromDirectLogin={true}
       />
     </header>
   );

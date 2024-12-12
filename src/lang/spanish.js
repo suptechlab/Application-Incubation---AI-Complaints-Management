@@ -144,7 +144,7 @@ export const spanishLang = {
   "REMOVE": "Eliminar",
   "NO_CHAT_AVAILABLE": "No hay chat disponible",
   "ASK_OR_REPLY": "Preguntar o responder",
-  "DOWNLOAD": "Descargar"
-,
-  "COMPLAINT_RAISED_SUCCES": "Queja planteada con éxito"
+  "DOWNLOAD": "Descargar",
+  "COMPLAINT_RAISED_SUCCES": "Queja planteada con éxito",
+  "LOGIN": "Acceso",
 }

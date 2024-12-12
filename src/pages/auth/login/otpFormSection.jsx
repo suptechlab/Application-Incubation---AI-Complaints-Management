@@ -9,12 +9,12 @@ import { resendLoginOTPonEmail } from "../../../redux/slice/authSlice";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
+const OtpFormSection = ({ otpToken, handleFormSubmit, isFromDirectLogin }) => {
     const [optSendStatus, setOptSendStatus] = useState(false);
     const [isResendDisabled, setIsResendDisabled] = useState(false);
     const [timer, setTimer] = useState(0);
 
-    const {t} = useTranslation()
+    const { t } = useTranslation()
 
     const dispatch = useDispatch()
 
@@ -54,6 +54,7 @@ const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
     };
 
     useEffect(() => {
+        console.log('isDirect', isFromDirectLogin)
         let countdown;
         if (timer > 0) {
             countdown = setInterval(() => {
@@ -75,7 +76,11 @@ const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
         >
             {(formikProps) => (
                 <React.Fragment>
-                    <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
+                    {!isFromDirectLogin && (
+                        <>
+                            <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
+                        </>
+                    )}
                     <div className="fw-semibold mb-2">{t('VERIFY_EMAIL_LABEL')}</div>
                     <p>{t('OTP_SENT_INSTRUCTION')}</p>
                     <FormOtpInputBox
@@ -96,7 +101,7 @@ const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
                             type="button"
                             variant="link"
                             className="fw-semibold text-decoration-none p-0 border-0"
-                            onClick={()=>{handleResend(); formikProps.setFieldValue("otpCode", "");}}
+                            onClick={() => { handleResend(); formikProps.setFieldValue("otpCode", ""); }}
                             disabled={isResendDisabled || timer > 0}
                         >
                             {timer > 0 ? `${t('RESEND_OTP_TIMER')} ${timer}s` : <>
