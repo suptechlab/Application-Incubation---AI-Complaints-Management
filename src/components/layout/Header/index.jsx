@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
 import ProfileModal from "../../../pages/profile";
 import OnlyLoginModal from "../../../pages/auth/user-direct-login";
+import { MdAccountBox, MdAccountCircle, MdKey, MdLogout } from "react-icons/md";
 
 const Header = ({ layout }) => {
   const [profileModalShow, setProfileModalShow] = useState(false);
@@ -113,19 +114,19 @@ const Header = ({ layout }) => {
                     {link.label}
                   </Nav.Link>
                 ))}
+                {!isLoggedIn &&
+                  <Button
+                    type="button"
+                    className="py-2 custom-min-width-90"
+                    variant="warning"
+                    onClick={handleLoginClick}
+                  >
+                    {t('LOGIN')}
+                  </Button>
+                }
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
-
-          <div className="p-2">
-            <Button
-              variant="warning"
-              className={`${isLoggedIn ? 'd-none' : 'custom-min-width-100 ms-auto mt-2'}`}
-              onClick={handleLoginClick}
-            >
-              {t('LOGIN')}
-            </Button>
-          </div>
 
           <Dropdown className={`${!isLoggedIn ? 'd-none' : ''} ms-md-4`}>
             <Dropdown.Toggle
@@ -148,17 +149,29 @@ const Header = ({ layout }) => {
               <Dropdown.Header className="fw-semibold d-md-none">
                 {user?.name ?? ''}
               </Dropdown.Header>
-              <Dropdown.Item as={Button} onClick={handleProfileClick} disabled>
-                {t("PROFILE")}
+              <Dropdown.Item as={Button} onClick={handleProfileClick} disabled className="fs-6">
+                <span className="me-2">
+                  <MdAccountBox size={18} />
+                </span>
+                <span className="align-middle">{t("PROFILE")}</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/my-account">
-                {t("MY_ACCOUNT")}
+                <span className="me-2">
+                  <MdAccountCircle size={18} />
+                </span>
+                <span className="align-middle">{t("MY_ACCOUNT")}</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password" disabled>
-                {t("CHANGE_PASSWORD")}
+                <span className="me-2">
+                  <MdKey size={18} />
+                </span>
+                <span className="align-middle">{t("CHANGE_PASSWORD")}</span>
               </Dropdown.Item>
-              <Dropdown.Item as={Button} onClick={handleLogout}>
-                {t("LOGOUT")}
+              <Dropdown.Item as={Button} onClick={handleLogout} className="fs-6">
+                <span className="me-2">
+                  <MdLogout size={18} />
+                </span>
+                <span className="align-middle">{t("LOGOUT")}</span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

@@ -34,9 +34,7 @@ const LoginFormSection = ({ handleFormSubmit, isFromDirectLogin }) => {
             {(formikProps) => (
                 <React.Fragment>
                     {!isFromDirectLogin && (
-                        <>
-                            <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
-                        </>
+                        <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
                     )}
                     <p>{t('LOGIN_INSTRUCTION')}</p>
                     <FormInputBox

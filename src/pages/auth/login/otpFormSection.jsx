@@ -77,9 +77,7 @@ const OtpFormSection = ({ otpToken, handleFormSubmit, isFromDirectLogin }) => {
             {(formikProps) => (
                 <React.Fragment>
                     {!isFromDirectLogin && (
-                        <>
-                            <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
-                        </>
+                        <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
                     )}
                     <div className="fw-semibold mb-2">{t('VERIFY_EMAIL_LABEL')}</div>
                     <p>{t('OTP_SENT_INSTRUCTION')}</p>
