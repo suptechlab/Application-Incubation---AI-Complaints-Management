@@ -33,7 +33,7 @@ const PageHeader = ({ title = "", filter, setFilter }) => {
                             onChange={handleDateChange}
                             dateFormat="yyyy"
                             showYearPicker
-
+                            isClearable={false}
                         />
                     </div>
                 </Stack>
