@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @TicketWorkFlowCondition
-public class TicketWorkflowDTO {
+public class ClaimTicketWorkFlowDTO {
 
     private Long id;
 
@@ -47,20 +47,28 @@ public class TicketWorkflowDTO {
     @Valid
     private List<CreateAction> createActions;
 
+    @Valid
     private List<TicketStatusCondition> ticketStatusConditions;
 
+    @Valid
     private List<TicketStatusAction> ticketStatusActions;
 
+    @Valid
     private List<TicketPriorityCondition> ticketPriorityConditions;
 
+    @Valid
     private List<TicketPriorityAction> ticketPriorityActions;
 
+    @Valid
     private List<SLADaysReminderCondition> slaDaysReminderConditions;
 
+    @Valid
     private List<SLADaysReminderAction> slaDaysReminderActions;
 
     private List<SLABreachAction> slaBreachActions;
 
     private List<TicketDateExtensionAction> ticketDateExtensionActions;
+
+    private Boolean status;
 
 }

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1734087879590" author="matellio">
+    <createTable tableName="claim_ticket_work_flow">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <!-- Entity or financial institution associated with the claim -->
+      <column name="organization_id" type="bigint" remarks="Entity or financial institution related to ticket workflow">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Instance Type -->
+      <column name="instance_type" type="int" remarks="Instance type of ticket (e.g., first,second,claim etc)">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Title -->
+      <column name="title" type="varchar(255)" remarks="Title of the ticket workflow">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Description-->
+      <column name="description" type="text" remarks="Description of the ticket workflow">
+        <constraints nullable="false"/>
+      </column>
+      <column name="event" type="int"
+              remarks="Event of the ticket workflow (e.g. created,status change,sla breach etc)">
+        <constraints nullable="false"/>
+      </column>
+      <!--Status-->
+      <column name="status" type="boolean" remarks="Status of the ticket workflow">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Conditions-->
+      <column name="conditions" type="jsonb" remarks="Conditions of the ticket workflow">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Actions-->
+      <column name="actions" type="jsonb" remarks="Actions of the ticket workflow">
+        <constraints nullable="false"/>
+      </column>
+      <!-- User who created the workflow -->
+      <column name="created_by" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Timestamp when the work flow was created -->
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <!-- User who last updated the workflow -->
+      <column name="updated_by" type="bigint">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the workflow was last updated -->
+      <column name="updated_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <!-- Foreign Key constraint for organization_id linking to the organization table -->
+    <addForeignKeyConstraint baseColumnNames="organization_id"
+                             baseTableName="claim_ticket_work_flow"
+                             constraintName="fk_claim_ticket_work_flow_organization_id"
+                             referencedColumnNames="id"
+                             referencedTableName="organization"/>
+
+    <!-- Foreign Key constraint for created_by linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="created_by"
+                             baseTableName="claim_ticket_work_flow"
+                             constraintName="fk_claim_ticket_work_flow_created_by"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+    <!-- Foreign Key constraint for updated_by linking to the jhi_user table -->
+    <addForeignKeyConstraint baseColumnNames="updated_by"
+                             baseTableName="claim_ticket_work_flow"
+                             constraintName="fk_claim_ticket_work_flow_updated_by"
+                             referencedColumnNames="id"
+                             referencedTableName="jhi_user"/>
+
+  </changeSet>
+  <changeSet id="1734096634244" author="matellio">
+    <dropNotNullConstraint tableName="claim_ticket_work_flow" columnName="conditions"/>
+  </changeSet>
+</databaseChangeLog>

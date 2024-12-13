@@ -33,7 +33,8 @@ public enum SepsStatusCode implements StatusType {
     CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT(40020, "claim.ticket.already.closed.or.reject"),
     SECOND_INSTANCE_INVALID_CLAIM_TICKET_STATUS(40021, "second.instance.invalid.claim.ticket.status"),
     CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY(40022, "claim.ticket.already.closed.or.rejected.you.cannot.reply"),
-    COMPLAINT_INVALID_CLAIM_TICKET_STATUS(40023, "complaint.invalid.claim.ticket.status");
+    COMPLAINT_INVALID_CLAIM_TICKET_STATUS(40023, "complaint.invalid.claim.ticket.status"),
+    CLAIM_TICKET_WORKFLOW_NOT_FOUND(20030, "claim.ticket.workflow.not.found");
 
     private final int code;
 
