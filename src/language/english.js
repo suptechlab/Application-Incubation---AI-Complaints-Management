@@ -202,7 +202,7 @@ export const englishLang = {
     "FINISH": "Finish",
     "ADD_NEW_CLAIM": "Add New Claim",
     "INFO_CARDS": "Information Cards",
-
+    "DAYS_REMAINING": "Days remaining",
     "TICKET_ID": "Ticket ID",
     "CREATION_DATE": "Creation Date",
     "CLAIM_FILED_BY": "Claim filed by",

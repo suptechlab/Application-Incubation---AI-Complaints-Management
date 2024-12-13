@@ -187,7 +187,7 @@ export const spanishLang = {
     "FINISH": "Finalizar",
     "ADD_NEW_CLAIM": "Agregar Nueva Reclamación",
     "INFO_CARDS": "Tarjetas Informativas",
-
+    "DAYS_REMAINING": "Días restantes",
     "TICKET_ID": "ID del Ticket",
     "CREATION_DATE": "Fecha de Creación",
     "CLAIM_FILED_BY": "Reclamo presentado por",
