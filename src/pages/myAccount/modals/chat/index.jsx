@@ -40,7 +40,6 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
             setFileName(file.name);
             setFieldsValue("attachments", file)
         } else {
-            setFileName("Fi_Users_data.xlsx");
             setFieldsValue("attachments", null)
         }
     };
@@ -72,7 +71,8 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                 message: values.message,
                 userMode: true,
             }
-            setChatData([...chatData, upateUserData])
+            setChatData([...chatData, upateUserData]);
+            await getConversationData();
         } else {
             console.error('Verification error:', result);
         }
@@ -169,6 +169,7 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
         return extension && EXTENSION_ICON_MAP[extension] ? EXTENSION_ICON_MAP[extension] : <FaRegFile size={24} />;
     };
     useEffect(() => {
+        setFileName('');
         if (selectedRow?.id) {
             getConversationData()
         }else{
