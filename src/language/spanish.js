@@ -35,7 +35,7 @@ export const spanishLang = {
     "CREATE INQUIRY TYPE": "Crear Tipo de Consulta",
     "EDIT INQUIRY TYPE": "Editar Tipo de Consulta",
     "TEAM MANAGEMENT": "Gestión de Equipo",
-    "TICKETS": "Tickets",
+    "TICKETS": "Entradas",
     "TICKET WORKFLOW": "Flujo de Trabajo de Tickets",
     "USERS": "Usuarios",
     "USERS LIST": "Lista de Usuarios",
