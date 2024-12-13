@@ -79,4 +79,15 @@
     </sql>
 
   </changeSet>
+  <changeSet id="1734036832370" author="matellio">
+    <loadData
+      file="config/liquibase/data/modules3.csv"
+      separator=","
+      tableName="modules"/>
+
+    <loadData
+      file="config/liquibase/data/permissions3.csv"
+      separator=","
+      tableName="permissions"/>
+  </changeSet>
 </databaseChangeLog>

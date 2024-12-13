@@ -38,7 +38,7 @@ public class ClaimTypeResource {
     }
 
     @PostMapping
-    @PermissionCheck({"CLAIM_TYPE_CREATE"})
+    @PermissionCheck({"CLAIM_TYPE_CREATE","CLAIM_TYPE_CREATE_FI"})
     public ResponseEntity<ResponseStatus> addClaimType(@RequestBody ClaimTypeDTO claimTypeDTO, HttpServletRequest request) throws URISyntaxException {
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = claimTypeService.addClaimType(claimTypeDTO, requestInfo);
@@ -52,7 +52,7 @@ public class ClaimTypeResource {
     }
 
     @PutMapping("/{id}")
-    @PermissionCheck({"CLAIM_TYPE_UPDATE"})
+    @PermissionCheck({"CLAIM_TYPE_UPDATE","CLAIM_TYPE_UPDATE_FI"})
     public ResponseEntity<ResponseStatus> updateClaimType(@PathVariable Long id, @RequestBody ClaimTypeDTO claimTypeDTO, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         claimTypeService.updateClaimType(id, claimTypeDTO, requestInfo);
@@ -65,13 +65,13 @@ public class ClaimTypeResource {
     }
 
     @GetMapping("/{id}")
-    @PermissionCheck({"CLAIM_TYPE_UPDATE"})
+    @PermissionCheck({"CLAIM_TYPE_UPDATE","CLAIM_TYPE_UPDATE_FI"})
     public ResponseEntity<ClaimTypeDTO> getClaimTypeById(@PathVariable Long id) {
         return ResponseEntity.ok(claimTypeService.getClaimTypeById(id));
     }
 
     @GetMapping
-    @PermissionCheck({"CLAIM_TYPE_CREATE","CLAIM_TYPE_UPDATE","CLAIM_TYPE_STATUS_CHANGE"})
+    @PermissionCheck({"CLAIM_TYPE_CREATE","CLAIM_TYPE_UPDATE","CLAIM_TYPE_STATUS_CHANGE", "CLAIM_TYPE_CREATE_FI","CLAIM_TYPE_UPDATE_FI","CLAIM_TYPE_STATUS_CHANGE_FI"})
     public ResponseEntity<List<ClaimTypeDTO>> listClaimTypes(Pageable pageable, @RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) {
         Page<ClaimTypeDTO> page = claimTypeService.listClaimTypes(pageable, search, status);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -79,7 +79,7 @@ public class ClaimTypeResource {
     }
 
     @PatchMapping("/{id}/status")
-    @PermissionCheck({"CLAIM_TYPE_STATUS_CHANGE"})
+    @PermissionCheck({"CLAIM_TYPE_STATUS_CHANGE","CLAIM_TYPE_STATUS_CHANGE_FI"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         claimTypeService.changeStatus(id, status, requestInfo);
@@ -87,7 +87,7 @@ public class ClaimTypeResource {
     }
 
     @GetMapping("/download")
-    @PermissionCheck({"CLAIM_TYPE_CREATE","CLAIM_TYPE_UPDATE","CLAIM_TYPE_STATUS_CHANGE"})
+    @PermissionCheck({"CLAIM_TYPE_CREATE","CLAIM_TYPE_UPDATE","CLAIM_TYPE_STATUS_CHANGE", "CLAIM_TYPE_CREATE_FI","CLAIM_TYPE_UPDATE_FI","CLAIM_TYPE_STATUS_CHANGE_FI"})
     public ResponseEntity<byte[]> listClaimTypesDownload(@RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) throws IOException {
         ByteArrayInputStream in = claimTypeService.listClaimTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();

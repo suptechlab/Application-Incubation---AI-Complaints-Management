@@ -1,0 +1,5 @@
+id,name,name_es,description,description_es,user_type,sort_order
+19,Claim Type Master,Tipo de reclamo maestro,Manage Claim Type Master,Administrar el tipo de reclamo maestro,FI_USER,19
+20,Claim Sub Type Master,Subtipo de reclamo maestro,Manage Claim Sub Type Master,Administrar el subtipo de reclamo maestro,FI_USER,20
+21,Ticket Workflow,Flujo de trabajo de tickets,Manage Ticket Workflow by SEPS,Administrar flujo de trabajo de tickets por SEPS,FI_USER,21
+22,Template Master,Plantilla maestra,Manage Template Master,Administrar el maestro de plantilla,FI_USER,22

@@ -42,7 +42,8 @@ public enum SepsStatusCode implements StatusType {
     TEAM_NOT_FOUND(20043,"team.not.found"),
     NO_MEMBERS_TO_ASSIGN(20044,"no.member.to.assign"),
     MEMBER_NOT_FOUND_IN_TEAM(20045,"member.not.found.in.team"),
-    UNAUTHORIZED_ACCESS(200046,"unauthorized.access");
+    UNAUTHORIZED_ACCESS(200046,"unauthorized.access"),
+    TEMPLATE_ALREADY_EXISTS(200047,"template.email.already.exist");
 
     private final int code;
 

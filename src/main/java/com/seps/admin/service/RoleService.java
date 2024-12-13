@@ -338,7 +338,7 @@ public class RoleService {
             });
     }
 
-
+    @Transactional
     public Set<Permission> getUserPermissions(Long userId, String permissionName) {
         return userRepository.findById(userId)
             .map(user -> user.getRoles().stream()

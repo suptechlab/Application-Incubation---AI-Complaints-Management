@@ -1,5 +1,6 @@
 package com.seps.admin.domain;
 
+import com.seps.admin.enums.EmailUserTypeEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -57,4 +58,16 @@ public class TemplateMaster {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "is_general")
+    private Boolean isGeneral;
+
+    @Column(name = "organization_id")
+    private Long organizationId;
+
+    @Column(name = "user_type")
+    private EmailUserTypeEnum userType;
+
+    @Column(name = "is_static")
+    private Boolean isStatic;
 }

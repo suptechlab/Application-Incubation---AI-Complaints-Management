@@ -2,6 +2,7 @@ package com.seps.admin.service.mapper;
 
 import com.seps.admin.domain.ClaimSubTypeEntity;
 import com.seps.admin.service.dto.ClaimSubTypeDTO;
+import com.seps.admin.service.dto.DropdownListDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,5 +13,7 @@ public interface ClaimSubTypeMapper {
     ClaimSubTypeDTO toDTO(ClaimSubTypeEntity entity);
 
     ClaimSubTypeEntity toEntity(ClaimSubTypeDTO dto);
+
+    DropdownListDTO toDropDownDTO(ClaimSubTypeEntity claimSubTypeEntity);
 }
 

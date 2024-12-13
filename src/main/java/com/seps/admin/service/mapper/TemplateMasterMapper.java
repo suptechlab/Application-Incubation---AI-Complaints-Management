@@ -1,7 +1,9 @@
 package com.seps.admin.service.mapper;
 
+import com.seps.admin.domain.InquiryTypeEntity;
 import com.seps.admin.domain.TemplateMaster;
 import com.seps.admin.enums.TemplateTypeEnum;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.TemplateMasterDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -62,5 +64,8 @@ public interface TemplateMasterMapper {
         // Combine slug and unique suffix for templateKey
         return slug + "_" + uniqueSuffix;
     }
+
+    @Mapping(source = "templateName", target = "name")
+    DropdownListDTO toDropDownDTO(TemplateMaster templateMaster);
 }
 
