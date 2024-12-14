@@ -32,9 +32,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service for sending emails asynchronously.
@@ -86,6 +85,8 @@ public class MailService {
 
     private final ExternalAPIService externalAPIService;
 
+    private final TemplateVariableMappingService templateVariableMappingService;
+
     @Value("${website.user-base-url:test}")
     private String userBaseUrl;
 
@@ -96,7 +97,8 @@ public class MailService {
         SpringTemplateEngine templateEngine,
         TemplateMasterRepository templateMasterRepository,
         EnumUtil enumUtil,
-        ExternalAPIService externalAPIService
+        ExternalAPIService externalAPIService,
+        TemplateVariableMappingService templateVariableMappingService
     ) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
@@ -105,6 +107,7 @@ public class MailService {
         this.templateMasterRepository = templateMasterRepository;
         this.enumUtil = enumUtil;
         this.externalAPIService = externalAPIService;
+        this.templateVariableMappingService = templateVariableMappingService;
     }
 
     @Async
@@ -197,13 +200,17 @@ public class MailService {
     }
 
     public void sendDynamicContentEmail(MailDTO mailDTO) {
-        TemplateMaster template = templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
+        TemplateMaster template = mailDTO.getIsStatic() ? templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
+            .orElse(null) : templateMasterRepository.findByIdAndStatus(mailDTO.getTemplateId(), true)
             .orElse(null);
 
         if (template != null) {
+            // Extract supported variables from the template
+            Set<String> supportedVariables = parseSupportedVariables(template.getSupportedVariables());
+
             // Prepare dynamic content
-            String subject = replacePlaceholders(template.getSubject(), mailDTO.getDataVariables());
-            String content = replacePlaceholders(template.getContent(), mailDTO.getDataVariables());
+            String subject = replacePlaceholders(template.getSubject(), mailDTO.getDataVariables(), supportedVariables);
+            String content = replacePlaceholders(template.getContent(), mailDTO.getDataVariables(), supportedVariables);
 
             // Render HTML template with Thymeleaf
             String renderedContent = renderEmailTemplate(subject, content, Locale.forLanguageTag(mailDTO.getLocale()));
@@ -219,13 +226,25 @@ public class MailService {
         }
     }
 
-    private String replacePlaceholders(String template, Map<String, String> variables) {
+    private String replacePlaceholders(String template, Map<String, String> variables, Set<String> supportedVariables) {
         if (template == null || variables == null) return template;
+
+        // Filter variables to include only supported ones
+        variables.keySet().retainAll(supportedVariables);
 
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
         }
         return template;
+    }
+
+    private Set<String> parseSupportedVariables(String supportedVariables) {
+        if (supportedVariables == null || supportedVariables.isEmpty()) return Collections.emptySet();
+
+        // supportedVariables is stored as a comma-separated string in the DB
+        return Arrays.stream(supportedVariables.split(","))
+            .map(String::trim)
+            .collect(Collectors.toSet());
     }
 
     private String renderEmailTemplate(String subject, String content, Locale locale) {

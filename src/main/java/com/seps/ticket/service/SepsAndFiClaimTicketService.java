@@ -70,6 +70,7 @@ public class SepsAndFiClaimTicketService {
     private final DocumentService documentService;
     private final ClaimTicketDocumentRepository claimTicketDocumentRepository;
     private static final boolean IS_INTERNAL_DOCUMENT = false;
+    private final TemplateVariableMappingService templateVariableMappingService;
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -95,7 +96,8 @@ public class SepsAndFiClaimTicketService {
                                        MessageSource messageSource, EnumUtil enumUtil, Gson gson, AuditLogService auditLogService,
                                        ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                        ClaimTicketStatusLogRepository claimTicketStatusLogRepository, MailService mailService, DocumentService documentService,
-                                       ClaimTicketDocumentRepository claimTicketDocumentRepository) {
+                                       ClaimTicketDocumentRepository claimTicketDocumentRepository,
+                                       TemplateVariableMappingService templateVariableMappingService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
@@ -110,6 +112,7 @@ public class SepsAndFiClaimTicketService {
         this.mailService = mailService;
         this.documentService = documentService;
         this.claimTicketDocumentRepository = claimTicketDocumentRepository;
+        this.templateVariableMappingService = templateVariableMappingService;
     }
 
     /**
@@ -1350,5 +1353,13 @@ public class SepsAndFiClaimTicketService {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name());
+    }
+
+    @Transactional
+    public Map<String, String> getSepsFiClaimTicketByIdTest(Long id) {
+        ClaimTicketDTO claimTicket = this.getSepsFiClaimTicketById((id));
+        User user = userService.getCurrentUser();
+        return templateVariableMappingService.mapVariables(claimTicket, user);
+
     }
 }

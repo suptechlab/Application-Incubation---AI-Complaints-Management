@@ -1,0 +1,105 @@
+package com.seps.ticket.service;
+
+import com.seps.ticket.component.DateUtil;
+import com.seps.ticket.component.EnumUtil;
+import com.seps.ticket.domain.ClaimTicketInstanceLog;
+import com.seps.ticket.domain.ClaimTicketPriorityLog;
+import com.seps.ticket.domain.ClaimTicketStatusLog;
+import com.seps.ticket.domain.User;
+import com.seps.ticket.enums.ClaimTicketPriorityEnum;
+import com.seps.ticket.enums.ClaimTicketStatusEnum;
+import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.repository.ClaimTicketInstanceLogRepository;
+import com.seps.ticket.repository.ClaimTicketPriorityLogRepository;
+import com.seps.ticket.repository.ClaimTicketStatusLogRepository;
+import com.seps.ticket.service.dto.ClaimTicketDTO;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import tech.jhipster.config.JHipsterProperties;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+@Service
+public class TemplateVariableMappingService {
+
+    private final EnumUtil enumUtil;
+    private final JHipsterProperties jHipsterProperties;
+    private final ClaimTicketInstanceLogRepository instanceLogRepository;
+    private final ClaimTicketPriorityLogRepository priorityLogRepository;
+    private final ClaimTicketStatusLogRepository statusLogRepository;
+
+    @Value("${website.user-base-url:test}")
+    private String userBaseUrl;
+
+
+    public TemplateVariableMappingService(EnumUtil enumUtil, JHipsterProperties jHipsterProperties, ClaimTicketInstanceLogRepository instanceLogRepository, ClaimTicketPriorityLogRepository priorityLogRepository, ClaimTicketStatusLogRepository statusLogRepository) {
+        this.enumUtil = enumUtil;
+        this.jHipsterProperties = jHipsterProperties;
+        this.instanceLogRepository = instanceLogRepository;
+        this.priorityLogRepository = priorityLogRepository;
+        this.statusLogRepository = statusLogRepository;
+    }
+
+    public Map<String, String> mapVariables(ClaimTicketDTO claimTicketDTO, User sendToUser) {
+        Map<String, String> variableMap = new HashMap<>();
+
+        // Add mappings based on provided ClaimTicketDTO and User
+        variableMap.put("username", sendToUser.getFirstName());
+        variableMap.put("ticketNumber", String.valueOf(claimTicketDTO.getTicketId()));
+        variableMap.put("assignedUser", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getName() : "Unassigned");
+
+        // Localized enum values
+        Locale userLocale = Locale.forLanguageTag(sendToUser.getLangKey());
+        variableMap.put("status", enumUtil.getLocalizedEnumValue(claimTicketDTO.getStatus(), userLocale));
+        variableMap.put("closedStatus", enumUtil.getLocalizedEnumValue(claimTicketDTO.getClosedStatus(), userLocale));
+        variableMap.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketDTO.getRejectedStatus(), userLocale));
+        variableMap.put("priority", enumUtil.getLocalizedEnumValue(claimTicketDTO.getPriority(), userLocale));
+        variableMap.put("instanceType", enumUtil.getLocalizedEnumValue(claimTicketDTO.getInstanceType(), userLocale));
+
+        // Claim details
+        variableMap.put("instanceComment", claimTicketDTO.getSecondInstanceComment() != null ? claimTicketDTO.getSecondInstanceComment() : "");
+        variableMap.put("claimType", claimTicketDTO.getClaimType() != null ? claimTicketDTO.getClaimType().getName() : "");
+        variableMap.put("claimSubType", claimTicketDTO.getClaimSubType() != null ? claimTicketDTO.getClaimSubType().getName() : "");
+        variableMap.put("razonSocial", claimTicketDTO.getOrganization() != null ? claimTicketDTO.getOrganization().getRazonSocial() : "");
+        variableMap.put("ruc", claimTicketDTO.getOrganization() != null ? claimTicketDTO.getOrganization().getRuc() : "");
+        variableMap.put("reason", claimTicketDTO.getStatusComment() != null ? claimTicketDTO.getStatusComment() : "");
+
+        // Customer information
+        variableMap.put("customerName", claimTicketDTO.getUser() != null ? claimTicketDTO.getUser().getName() : "");
+        variableMap.put("customerEmail", claimTicketDTO.getUser() != null ? claimTicketDTO.getUser().getEmail() : "");
+
+        // Dates
+        variableMap.put("assignedDate", DateUtil.formatDate(claimTicketDTO.getAssignedAt(), sendToUser.getLangKey()));
+        variableMap.put("createdDate", DateUtil.formatDate(claimTicketDTO.getCreatedAt(), sendToUser.getLangKey()));
+        variableMap.put("secondInstanceFiledDate", DateUtil.formatDate(claimTicketDTO.getSecondInstanceFiledAt(), sendToUser.getLangKey()));
+        variableMap.put("complaintFiledDate", DateUtil.formatDate(claimTicketDTO.getComplaintFiledAt(), sendToUser.getLangKey()));
+
+        // Agent names
+        variableMap.put("fiAgentName", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getName() : "N/A");
+        variableMap.put("sepsAgentName", claimTicketDTO.getSepsAgent() != null ? claimTicketDTO.getSepsAgent().getName() : "N/A");
+
+        // URLs
+        variableMap.put("userTicketUrl", this.userBaseUrl + "/my-account/" + claimTicketDTO.getTicketId());
+        variableMap.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/ticket/view/" + claimTicketDTO.getId());
+
+        // Audit details
+        variableMap.put("createdBy", claimTicketDTO.getCreatedByUser() != null ? claimTicketDTO.getCreatedByUser().getName() : "System");
+        variableMap.put("updatedBy", claimTicketDTO.getUpdatedByUser() != null ? claimTicketDTO.getUpdatedByUser().getName() : "System");
+
+        // Additional placeholders (can be customized)
+        InstanceTypeEnum previousInstance = instanceLogRepository.findFirstByTicketIdOrderByCreatedAtDesc(claimTicketDTO.getId()).map(ClaimTicketInstanceLog::getInstanceType).orElse(null);
+        variableMap.put("previousInstance", enumUtil.getLocalizedEnumValue(previousInstance, userLocale));
+
+        ClaimTicketStatusEnum previousStatus = statusLogRepository.findFirstByTicketIdOrderByCreatedAtDesc(claimTicketDTO.getId()).map(ClaimTicketStatusLog::getStatus).orElse(null);
+        variableMap.put("previousStatus", enumUtil.getLocalizedEnumValue(previousStatus, userLocale));
+
+        ClaimTicketPriorityEnum previousPriority = priorityLogRepository.findFirstByTicketIdOrderByCreatedAtDesc(claimTicketDTO.getId()).map(ClaimTicketPriorityLog::getPriority).orElse(null);
+        variableMap.put("previousPriority", enumUtil.getLocalizedEnumValue(previousPriority, userLocale)); // Placeholder
+
+
+        return variableMap;
+    }
+
+}

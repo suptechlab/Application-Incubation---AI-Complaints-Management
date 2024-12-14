@@ -37,6 +37,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "SEPS and FI Claim Ticket Management", description = "APIs for SEPS and FI to manage their Claim Tickets")
 @RestController
@@ -313,5 +314,10 @@ public class SepsAndFiClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @GetMapping("/{id}/test")
+    public ResponseEntity<Map<String, String>> getSepsFiClaimTicketByIdTest(@PathVariable Long id) {
+        return ResponseEntity.ok(sepsAndFiClaimTicketService.getSepsFiClaimTicketByIdTest(id));
     }
 }

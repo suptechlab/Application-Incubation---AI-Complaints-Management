@@ -13,4 +13,6 @@ import java.util.Optional;
  */
 public interface TemplateMasterRepository extends JpaRepository<TemplateMaster, Long>, JpaSpecificationExecutor<TemplateMaster> {
     Optional<TemplateMaster> findByTemplateKeyIgnoreCaseAndStatus(String templateKey, boolean status);
+
+    Optional<TemplateMaster> findByIdAndStatus(Long id, boolean status);
 }
