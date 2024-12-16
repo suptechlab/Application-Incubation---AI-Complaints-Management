@@ -185,7 +185,7 @@ public class SepsAndFiClaimTicketResource {
     )
     @PostMapping("/{ticketId}/closed")
     public ResponseEntity<ResponseStatus> closeClaimTicket(
-        @PathVariable Long ticketId, @Valid @RequestBody ClaimTicketClosedRequest claimTicketClosedRequest,
+        @PathVariable Long ticketId, @ModelAttribute @Valid ClaimTicketClosedRequest claimTicketClosedRequest,
         HttpServletRequest request
     ) {
         RequestInfo requestInfo = new RequestInfo(request);

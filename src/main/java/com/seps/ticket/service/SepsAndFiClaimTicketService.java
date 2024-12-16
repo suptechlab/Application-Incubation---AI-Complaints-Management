@@ -832,6 +832,7 @@ public class SepsAndFiClaimTicketService {
         ticket.setStatus(ClaimTicketStatusEnum.CLOSED);
         ticket.setClosedStatus(claimTicketClosedRequest.getCloseSubStatus());
         ticket.setStatusComment(claimTicketClosedRequest.getReason());
+        ticket.setResolvedOn(Instant.now());
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -876,6 +877,16 @@ public class SepsAndFiClaimTicketService {
      * @return the created {@link ClaimTicketActivityLog} object containing the details of the ticket closure.
      */
     private ClaimTicketActivityLog createClosedClaimActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest) {
+        DocumentSourceEnum source = DocumentSourceEnum.CLOSED_OR_REJECT_TICKET;
+        // Handle attachments and save documents
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(claimTicketClosedRequest.getAttachments(), ticket, currentUser, source);
+        // Save documents if any were uploaded
+        Map<String, Object> attachments = new HashMap<>();
+        if (!claimTicketDocuments.isEmpty()) {
+            List<ClaimTicketDocument> savedDocuments = claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+            Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
+            attachments.put("attachments", attachDocument);
+        }
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
@@ -899,6 +910,7 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
         activityLog.setActivityDetails(activityDetail);
+        activityLog.setAttachmentUrl(attachments);
         return activityLog;
     }
 
@@ -1069,6 +1081,16 @@ public class SepsAndFiClaimTicketService {
      * @return a populated ClaimTicketActivityLog instance
      */
     private ClaimTicketActivityLog createRejectedClaimActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest) {
+        DocumentSourceEnum source = DocumentSourceEnum.CLOSED_OR_REJECT_TICKET;
+        // Handle attachments and save documents
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(claimTicketRejectRequest.getAttachments(), ticket, currentUser, source);
+        // Save documents if any were uploaded
+        Map<String, Object> attachments = new HashMap<>();
+        if (!claimTicketDocuments.isEmpty()) {
+            List<ClaimTicketDocument> savedDocuments = claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+            Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
+            attachments.put("attachments", attachDocument);
+        }
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
@@ -1092,6 +1114,7 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
         activityLog.setActivityDetails(activityDetail);
+        activityLog.setAttachmentUrl(attachments);
         return activityLog;
     }
 
