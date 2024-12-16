@@ -14,6 +14,7 @@ public enum SepsStatusCode implements StatusType {
     USER_ACCOUNT_STATUS_PENDING(10029, "user.account.status.pending"),
     USER_ACCOUNT_STATUS_BLOCKED(10030, "user.account.status.blocked"),
     USER_ACCOUNT_STATUS_DELETED(10031, "user.account.status.deleted"),
+    SOMETHING_GOES_WRONG(10032, "something.goes.wrong"),
     CLAIM_TYPE_NOT_FOUND(20015, "claim.type.not.found"),
     CLAIM_SUB_TYPE_NOT_FOUND(20017, "claim.sub.type.not.found"),
     PROVINCE_NOT_FOUND(20019, "province.not.found"),

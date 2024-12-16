@@ -4,6 +4,7 @@ import com.seps.ticket.constraint.validation.TicketWorkFlowCondition;
 import com.seps.ticket.enums.InstanceTypeEnum;
 import com.seps.ticket.enums.TicketWorkflowEventEnum;
 import com.seps.ticket.service.dto.OrganizationDTO;
+import com.seps.ticket.service.dto.UserDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -70,5 +72,18 @@ public class ClaimTicketWorkFlowDTO {
     private List<TicketDateExtensionAction> ticketDateExtensionActions;
 
     private Boolean status;
+
+    private Long createdBy;
+
+    private UserDTO createdByUser;
+
+    private Instant createdAt;
+
+    private Long updatedBy;
+
+    private UserDTO updatedByUser;
+
+    private Instant updatedAt;
+
 
 }
