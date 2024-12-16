@@ -215,7 +215,7 @@ public class SepsAndFiClaimTicketResource {
     )
     @PostMapping("/{ticketId}/reject")
     public ResponseEntity<ResponseStatus> rejectClaimTicket(
-        @PathVariable Long ticketId, @Valid @RequestBody ClaimTicketRejectRequest claimTicketRejectRequest,
+        @PathVariable Long ticketId, @ModelAttribute @Valid ClaimTicketRejectRequest claimTicketRejectRequest,
         HttpServletRequest request
     ) {
         RequestInfo requestInfo = new RequestInfo(request);
