@@ -14,7 +14,7 @@ import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 
-const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivityLogs,getTicketData }) => {
+const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
 
@@ -142,15 +142,15 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
                 >
                     <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
                         {title}
-                        {ticketData?.slaBreachDate &&
+                        {ticketData?.slaBreachDate && (
                             calculateDaysDifference(ticketData?.slaBreachDate) > 2 ?
-                            <Badge bg='custom-info' className='bg-opacity-10 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                <MdSchedule size={16} />
-                                <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + " Days remaining"}</span>
-                            </Badge> : <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                <MdSchedule size={16} />
-                                <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + " Days remaining"}</span>
-                            </Badge>}
+                                <Badge bg='custom-info' className='bg-opacity-10 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <MdSchedule size={16} />
+                                    <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + ' ' + t('DAYS_REMAINING')}</span>
+                                </Badge> : <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <MdSchedule size={16} />
+                                    <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + ' ' + t('DAYS_REMAINING')}</span>
+                                </Badge>)}
                         {
                             ticketData?.instanceType === "FIRST_INSTANCE" ?
                                 <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
