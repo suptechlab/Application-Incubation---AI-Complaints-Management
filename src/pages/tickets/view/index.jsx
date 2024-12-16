@@ -317,7 +317,7 @@ const TicketsView = () => {
                         />
                       </Col>
                       <Col xs className='small lh-sm'>
-                        <div className='fw-bold'>{ticketData?.user?.name}th</div>
+                        <div className='fw-bold'>{ticketData?.user?.name}</div>
                         <Stack direction='horizontal' gap={2} className='text-secondary'>
                           <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
                           <span> {currentDate} </span>

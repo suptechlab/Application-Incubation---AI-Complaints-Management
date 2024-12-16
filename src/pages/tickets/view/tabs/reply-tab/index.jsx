@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { validateFile } from "../../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
 
-const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData ,getTicketData}) => {
+const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, currentTab }) => {
 
     const { t } = useTranslation()
 
@@ -56,6 +56,9 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData ,getTicketData})
                 actions.setSubmitting(false); // Reset Formik's submitting state
             });
     };
+
+    const isTicketNotClosedOrRejected = ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED";
+
 
     return (
         <Formik
@@ -138,9 +141,9 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData ,getTicketData})
                                 />
                             </div>
 
-                            {
-                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED") ?
 
+                            {
+                                currentTab === "REPLY" ?
                                     <Stack
                                         direction="horizontal"
                                         gap={2}
@@ -161,7 +164,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData ,getTicketData})
                                                     setSendReplyModalShow(true); // Show modal first
                                                 }
                                             }}
-                                            disabled={loading}
+                                            disabled={loading || !isTicketNotClosedOrRejected}
                                         >
                                             {loading && submitAction === "customer"
                                                 ? t("SENDING")
@@ -173,16 +176,35 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData ,getTicketData})
                                             size="sm"
                                             variant="warning"
                                             onClick={() => setSubmitAction("internal")}
-                                            disabled={loading}
+                                            disabled={loading || !isTicketNotClosedOrRejected}
                                         >
                                             {loading && submitAction === "internal"
                                                 ? t("PROCESSING")
                                                 : t("REPLY_INTERNALLY")}
                                         </Button>
 
-                                    </Stack> :
-                                    <div>
-                                        <Stack
+                                    </Stack>
+                                    : <Stack>
+                                        <Button
+                                            type="submit"
+                                            size="sm"
+                                            variant="warning"
+                                            onClick={() => setSubmitAction("internal")}
+                                            disabled={loading || !isTicketNotClosedOrRejected}
+                                        >
+                                            {loading && submitAction === "internal"
+                                                ? t("PROCESSING")
+                                                : t("REPLY_INTERNALLY")}
+                                        </Button>
+                                    </Stack>
+                            }
+
+
+
+
+
+
+                            {/* <Stack
                                             direction="horizontal"
                                             gap={2}
                                             className="flex-wrap justify-content-between justify-content-sm-end flex-fill"
@@ -215,9 +237,9 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData ,getTicketData})
                                             >
                                                 {t("REPLY_INTERNALLY")}
                                             </Button>
-                                        </Stack>
-                                    </div>
-                            }
+                                        </Stack> */}
+
+
 
                         </Stack>
                     </Card.Footer>
