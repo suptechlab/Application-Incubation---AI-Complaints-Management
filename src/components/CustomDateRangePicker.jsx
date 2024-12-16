@@ -10,7 +10,7 @@ const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, selectsR
     <div className={wrapperClassName || ''}>
       {label ? <div className='mb-1 fs-14'>{label}</div> : ""}
       <DatePicker
-        isClearable
+        isClearable={false}
         showIcon
         toggleCalendarOnIconClick
         placeholderText={placeholder}
