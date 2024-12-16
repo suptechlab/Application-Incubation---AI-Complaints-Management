@@ -228,6 +228,9 @@ public class MailService {
     }
 
     private String renderEmailTemplate(String subject, String content, Locale locale) {
+        if (locale == null) {
+            locale = Locale.forLanguageTag("es"); // Default fallback locale
+        }
         Context context = new Context(locale);
         context.setVariable("subject", subject);
         context.setVariable("content", content);

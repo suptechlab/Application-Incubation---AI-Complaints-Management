@@ -86,7 +86,7 @@ public class SEPSUserResource {
         } else {
             RequestInfo requestInfo = new RequestInfo(request);
             User newUser = userService.addSEPSUser(dto, requestInfo);
-            //mailService.sendSepsUserCreationEmail(newUser);
+            mailService.sendSepsUserCreationEmail(newUser);
             ResponseStatus responseStatus = new ResponseStatus(
                 messageSource.getMessage("seps.user.created.successfully", null, LocaleContextHolder.getLocale()),
                 HttpStatus.CREATED.value(),
