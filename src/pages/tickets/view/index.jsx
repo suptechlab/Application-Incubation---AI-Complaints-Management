@@ -34,6 +34,7 @@ const TicketsView = () => {
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
   const [consumerInfoModalShow, setConsumerInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
+  const [currentInstance , setCurrentInstance] = useState('')
 
   const [loading, setLoading] = useState(false)
 
@@ -117,14 +118,14 @@ const TicketsView = () => {
     setUserInfoModalShow(true)
   }
 
-
   // Handle File a Claim Button
   const handleConsumerInfoClick = () => {
     setConsumerInfoModalShow(true)
   }
 
   // Handle Attachments Button
-  const handleAttachmentsClick = () => {
+  const handleAttachmentsClick = (instance_type) => {
+    setCurrentInstance(instance_type)
     setAttachmentsModalShow(true)
   }
   // VIEW TOP DATA
@@ -177,7 +178,7 @@ const TicketsView = () => {
       colProps: { sm: 6 }
     },
     {
-      label: t("CLAIM_TYPE"),
+      label: t("CLAIM TYPE"),
       value: ticketData?.claimType?.name,
       colProps: { sm: 6 }
     },
@@ -221,7 +222,7 @@ const TicketsView = () => {
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
+        <button onClick={()=>handleAttachmentsClick("FIRST_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
       </Stack>),
       colProps: { sm: 6 }
     },
@@ -237,7 +238,7 @@ const TicketsView = () => {
     },
   ];
   // VIEW BOTTOM DATA
-  const viewBottomData = [
+  const viewSecondInstanceData = [
     {
       label: t("CREATED_ON"),
       value: ticketData?.secondInstanceFiledAt ? moment(ticketData?.secondInstanceFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
@@ -251,13 +252,38 @@ const TicketsView = () => {
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
+        <button onClick={()=>handleAttachmentsClick("SECOND_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
       </Stack>),
-      colProps: { xs: 12, className: "pb-3" }
+      colProps: { xs: 12}
     },
     {
       label: t("COMMENT"),
       value: ticketData?.secondInstanceComment ?? 'N/A',
+      colProps: { xs: 12 }
+    },
+  ];
+
+  const viewComplaintData = [
+    {
+      label: t("CREATED_ON"),
+      value: ticketData?.complaintFiledAt ? moment(ticketData?.complaintFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
+      colProps: { sm: 6 }
+    },
+    // {
+    //   label: t("AGENT"),
+    //   value: ticketData?.sepsAgent?.name ?? 'N/A',
+    //   colProps: { sm: 6 }
+    // },
+    {
+      value: (<Stack direction='horizontal' gap={1}>
+        <span><MdAttachFile size={16} /></span>
+        <button onClick={()=>handleAttachmentsClick("COMPLAINT")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
+      </Stack>),
+      colProps: { xs: 12}
+    },
+    {
+      label: t("PRECEDENTS"),
+      value: ticketData?.complaintPrecedents ?? 'N/A',
       colProps: { xs: 12 }
     },
   ];
@@ -286,13 +312,30 @@ const TicketsView = () => {
                   </Row>
                 </Card.Body>
               </Card>
+              {/* SECOND INSTANCE DETAILS */}
               {
                 ticketData?.instanceType === 'SECOND_INSTANCE' &&
                 <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                   <Card.Body className='mh-100'>
                     <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5>
                     <Row>
-                      {viewBottomData?.map((item, index) => (
+                      {viewSecondInstanceData?.map((item, index) => (
+                        <Col key={"data_view_" + index} {...item.colProps}>
+                          <CommonViewData label={item.label} value={item.value} />
+                        </Col>
+                      ))}
+                    </Row>
+                  </Card.Body>
+                </Card>
+              }
+              {/* COMPLAINT DETAILS */}
+              {
+                ticketData?.instanceType === 'COMPLAINT' &&
+                <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                  <Card.Body className='mh-100'>
+                    <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("COMPLAINT")}</h5>
+                    <Row>
+                      {viewComplaintData?.map((item, index) => (
                         <Col key={"data_view_" + index} {...item.colProps}>
                           <CommonViewData label={item.label} value={item.value} />
                         </Col>
@@ -378,6 +421,7 @@ const TicketsView = () => {
       <AttachmentsModal
         modal={attachmentsModalShow}
         toggle={() => setAttachmentsModalShow(false)}
+        currentInstance={currentInstance}
         ticketData={ticketData}
       />
     </React.Fragment>

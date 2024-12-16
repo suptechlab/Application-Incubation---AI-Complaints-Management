@@ -111,7 +111,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                     />
                 </div>
                 {
-                    currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN' ?
+                    currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN' || currentUser === 'SUPER_ADMIN' ?
                         <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                             <ReactSelect
                                 wrapperClassName="mb-0"

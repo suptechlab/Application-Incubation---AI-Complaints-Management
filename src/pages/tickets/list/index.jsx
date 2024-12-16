@@ -16,6 +16,7 @@ import { AuthenticationContext } from "../../../contexts/authentication.context"
 import { calculateDaysDifference } from "../../../utils/commonutils";
 import moment from "moment/moment";
 import { MdAttachFile } from "react-icons/md";
+import { MasterDataContext } from "../../../contexts/masters.context";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -23,7 +24,9 @@ export default function TicketsList() {
 
     const { currentUser } = useContext(AuthenticationContext);
 
+    const { masterData } = useContext(MasterDataContext);
 
+    console.log(masterData)
 
     const { t } = useTranslation()
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -524,6 +527,7 @@ export default function TicketsList() {
     //     []
     // );
 
+console.log({currentUser : currentUser})
     const getFilteredColumns = (columnsArray) => {
         // All available column definitions
         const allColumns = [
@@ -540,8 +544,10 @@ export default function TicketsList() {
                             // Filter rows based on status and only include rows that are not "CLOSED" or "REJECTED"
                             const allSelectedIds = e.target.checked
                                 ? table.getRowModel().rows
-                                    .filter((row) => (currentUser === "SEPS_ADMIN" && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") ||
-                                        (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_ADMIN"))
+                                    .filter((row) => (
+                                        (currentUser === "SEPS_ADMIN" || currentUser==="SUPER_ADMIN")&& row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") 
+                                    ||
+                                        (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_ADMIN" && currentUser !== "SUPER_ADMIN"))
                                     .map((row) => row.original.id)
                                 : [];
 
@@ -562,9 +568,11 @@ export default function TicketsList() {
                 cell: ({ row }) => (
 
                     (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && (
-                        (currentUser === "SEPS_ADMIN" && row?.original?.instanceType === 'SECOND_INSTANCE') ||
-                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE') ||
-                        (currentUser !== "SEPS_ADMIN" && currentUser !== "FI_ADMIN")
+                        ((currentUser === "SEPS_ADMIN"||currentUser === "SUPER_ADMIN" ) && row?.original?.instanceType === 'SECOND_INSTANCE') ||
+                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE') 
+
+                       
+                        // (currentUser !== "SEPS_ADMIN" && currentUser !== "FI_ADMIN")
                     )) ? (
                         <Form.Check
                             className="form-check-cursor"
@@ -657,6 +665,9 @@ export default function TicketsList() {
                 id: "instanceType",
                 header: () => t("INSTANCE_TYPE"),
                 enableSorting: false,
+                cell: ({ row }) => (
+                    <span>{(row?.original?.instanceType && masterData?.instanceType ) && masterData?.instanceType[row?.original?.instanceType]}</span>
+                )
             },
             {
                 accessorFn: (row) => row?.priority,
@@ -702,7 +713,7 @@ export default function TicketsList() {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
 
-            if (currentUser === "SEPS_ADMIN") {
+            if (currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") {
                 agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setClearTableSelection(true)

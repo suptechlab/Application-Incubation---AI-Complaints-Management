@@ -243,5 +243,8 @@ export const spanishLang = {
     "DAYS_REMAINING": "Días restantes",
     "DAYS": "Días",
     "ALL_PRIORITY": "Toda prioridad",
-    "INSTANCE_TYPE": "Tipo de instancia"
+    "INSTANCE_TYPE": "Tipo de instancia",
+    "ADD_INTERNAL_NOTE": "Agregar nota interna",
+    "COMPLAINT":"Queja",
+    "NO_ATTACHMENT":"No hay ningún archivo adjunto incluido."
 }
