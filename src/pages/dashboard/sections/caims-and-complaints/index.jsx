@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import qs from "qs"
 import React, { useEffect, useState } from 'react'
 import { Button, Card, Stack } from 'react-bootstrap'
@@ -12,6 +12,7 @@ import DashboardListFilters from './filters'
 
 const CaimsAndComplaints = () => {
     const location = useLocation();
+    const queryClient = useQueryClient();
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -28,10 +29,58 @@ const CaimsAndComplaints = () => {
     const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
     const [clearTableSelection, setClearTableSelection] = useState(false)
 
+    // const sampleData = [
+    //     {
+    //         ticketId: "TCK-1001",
+    //         claimType: "Health Insurance",
+    //         subClaimType: "Refinancing Request",
+    //         fIEntity: "Entity 1",
+    //         slaBreachDays: "5",
+    //         createdAt: "2024-11-20",
+    //         status: "Closed",
+    //     },
+    //     {
+    //         ticketId: "TCK-1002",
+    //         claimType: "Auto Insurance",
+    //         subClaimType: "Appointment of Managers",
+    //         fIEntity: "Entity 2",
+    //         slaBreachDays: "3",
+    //         createdAt: "2024-11-21",
+    //         status: "In Progress",
+    //     },
+    //     {
+    //         ticketId: "TCK-1003",
+    //         claimType: "Travel Insurance",
+    //         subClaimType: "Novation Request",
+    //         fIEntity: "Entity 3",
+    //         slaBreachDays: "7",
+    //         createdAt: "2024-11-22",
+    //         status: "Rejected",
+    //     },
+    //     {
+    //         ticketId: "TCK-1004",
+    //         claimType: "Property Insurance",
+    //         subClaimType: "Unauthorized Transfers",
+    //         fIEntity: "Entity 4",
+    //         slaBreachDays: "2",
+    //         createdAt: "2024-11-23",
+    //         status: "New",
+    //     },
+    //     {
+    //         ticketId: "TCK-1005",
+    //         claimType: "Life Insurance",
+    //         subClaimType: "Appointment of Managers",
+    //         fIEntity: "Entity 5",
+    //         slaBreachDays: "10",
+    //         createdAt: "2024-11-24",
+    //         status: "Closed",
+    //     },
+    // ];
+
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
-            return { data: sampleData, page: 1, size: 10 }
+            return { data: [], page: 1, size: 10 }
         },
         staleTime: 0,
         cacheTime: 0,
@@ -39,54 +88,10 @@ const CaimsAndComplaints = () => {
         refetchOnMount: false,
         retry: 0,
     });
+   
+    
 
-    const sampleData = [
-        {
-            ticketId: "TCK-1001",
-            claimType: "Health Insurance",
-            subClaimType: "Refinancing Request",
-            fIEntity: "Entity 1",
-            slaBreachDays: "5",
-            createdAt: "2024-11-20",
-            status: "Closed",
-        },
-        {
-            ticketId: "TCK-1002",
-            claimType: "Auto Insurance",
-            subClaimType: "Appointment of Managers",
-            fIEntity: "Entity 2",
-            slaBreachDays: "3",
-            createdAt: "2024-11-21",
-            status: "In Progress",
-        },
-        {
-            ticketId: "TCK-1003",
-            claimType: "Travel Insurance",
-            subClaimType: "Novation Request",
-            fIEntity: "Entity 3",
-            slaBreachDays: "7",
-            createdAt: "2024-11-22",
-            status: "Rejected",
-        },
-        {
-            ticketId: "TCK-1004",
-            claimType: "Property Insurance",
-            subClaimType: "Unauthorized Transfers",
-            fIEntity: "Entity 4",
-            slaBreachDays: "2",
-            createdAt: "2024-11-23",
-            status: "New",
-        },
-        {
-            ticketId: "TCK-1005",
-            claimType: "Life Insurance",
-            subClaimType: "Appointment of Managers",
-            fIEntity: "Entity 5",
-            slaBreachDays: "10",
-            createdAt: "2024-11-24",
-            status: "Closed",
-        },
-    ];
+    
 
 
     //handle last page deletion item
@@ -129,7 +134,7 @@ const CaimsAndComplaints = () => {
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
-                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+                        <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.ticketId}`}>{"#" + row?.original?.ticketId}</Link>
                         <AppTooltip title="Attachments">
                             <Button
                                 variant="link"
@@ -254,7 +259,6 @@ const CaimsAndComplaints = () => {
                         setPagination={setPagination}
                         sorting={sorting}
                         setSorting={setSorting}
-                        clearTableSelection={clearTableSelection}
                     />
                 </Card.Body>
             </Card>
