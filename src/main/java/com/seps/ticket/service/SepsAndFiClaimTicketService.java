@@ -70,6 +70,8 @@ public class SepsAndFiClaimTicketService {
     private final DocumentService documentService;
     private final ClaimTicketDocumentRepository claimTicketDocumentRepository;
     private static final boolean IS_INTERNAL_DOCUMENT = false;
+    private static final String ATTACHMENTS ="attachments";
+    private static final String REASON = "reason";
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -683,7 +685,7 @@ public class SepsAndFiClaimTicketService {
         entityData.put(Constants.NEW_DATA, newData);
         Map<String, String> req = new HashMap<>();
         req.put("newSlaDate", newSlaDate.toString());
-        req.put("reason", reason);
+        req.put(REASON, reason);
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "extendSlaDate", ActionTypeEnum.CLAIM_TICKET_EXTEND_SLA_DATE.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
@@ -832,6 +834,7 @@ public class SepsAndFiClaimTicketService {
         ticket.setStatus(ClaimTicketStatusEnum.CLOSED);
         ticket.setClosedStatus(claimTicketClosedRequest.getCloseSubStatus());
         ticket.setStatusComment(claimTicketClosedRequest.getReason());
+        ticket.setResolvedOn(Instant.now());
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -852,11 +855,22 @@ public class SepsAndFiClaimTicketService {
                 new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(),Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
+        // Convert attachments (MultipartFile to filenames)
+        List<String> attachments = new ArrayList<>();
+        if (claimTicketClosedRequest.getAttachments() != null) {
+            for (MultipartFile file : claimTicketClosedRequest.getAttachments()) {
+                attachments.add(file.getOriginalFilename());  // Add only file name to the list
+            }
+        }
         Map<String, Object> entityData = new HashMap<>();
         Map<String, Object> newData = convertEntityToMap(this.getSepsFiClaimTicketById(savedTicket.getId()));
         entityData.put(Constants.OLD_DATA, oldData);
         entityData.put(Constants.NEW_DATA, newData);
-        String requestBody = gson.toJson(claimTicketClosedRequest);
+        Map<String, Object> req = new HashMap<>();
+        req.put("closeSubStatus", claimTicketClosedRequest.getCloseSubStatus().name());
+        req.put(REASON, claimTicketClosedRequest.getReason());
+        req.put(ATTACHMENTS, attachments);
+        String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "closedClaimTicket", ActionTypeEnum.CLAIM_TICKET_CLOSED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
@@ -876,6 +890,16 @@ public class SepsAndFiClaimTicketService {
      * @return the created {@link ClaimTicketActivityLog} object containing the details of the ticket closure.
      */
     private ClaimTicketActivityLog createClosedClaimActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest) {
+        DocumentSourceEnum source = DocumentSourceEnum.CLOSED_OR_REJECT_TICKET;
+        // Handle attachments and save documents
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(claimTicketClosedRequest.getAttachments(), ticket, currentUser, source);
+        // Save documents if any were uploaded
+        Map<String, Object> attachments = new HashMap<>();
+        if (!claimTicketDocuments.isEmpty()) {
+            List<ClaimTicketDocument> savedDocuments = claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+            Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
+            attachments.put(ATTACHMENTS, attachDocument);
+        }
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
@@ -899,6 +923,7 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
         activityLog.setActivityDetails(activityDetail);
+        activityLog.setAttachmentUrl(attachments);
         return activityLog;
     }
 
@@ -1048,11 +1073,22 @@ public class SepsAndFiClaimTicketService {
                 new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
+        // Convert attachments (MultipartFile to filenames)
+        List<String> attachments = new ArrayList<>();
+        if (claimTicketRejectRequest.getAttachments() != null) {
+            for (MultipartFile file : claimTicketRejectRequest.getAttachments()) {
+                attachments.add(file.getOriginalFilename());  // Add only file name to the list
+            }
+        }
         Map<String, Object> entityData = new HashMap<>();
         Map<String, Object> newData = convertEntityToMap(this.getSepsFiClaimTicketById(savedTicket.getId()));
         entityData.put(Constants.OLD_DATA, oldData);
         entityData.put(Constants.NEW_DATA, newData);
-        String requestBody = gson.toJson(claimTicketRejectRequest);
+        Map<String, Object> req = new HashMap<>();
+        req.put("rejectedStatus", claimTicketRejectRequest.getRejectedStatus().name());
+        req.put(REASON, claimTicketRejectRequest.getReason());
+        req.put(ATTACHMENTS, attachments);
+        String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "rejectClaimTicket", ActionTypeEnum.CLAIM_TICKET_REJECTED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
@@ -1069,6 +1105,16 @@ public class SepsAndFiClaimTicketService {
      * @return a populated ClaimTicketActivityLog instance
      */
     private ClaimTicketActivityLog createRejectedClaimActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest) {
+        DocumentSourceEnum source = DocumentSourceEnum.CLOSED_OR_REJECT_TICKET;
+        // Handle attachments and save documents
+        List<ClaimTicketDocument> claimTicketDocuments = uploadFileAttachments(claimTicketRejectRequest.getAttachments(), ticket, currentUser, source);
+        // Save documents if any were uploaded
+        Map<String, Object> attachments = new HashMap<>();
+        if (!claimTicketDocuments.isEmpty()) {
+            List<ClaimTicketDocument> savedDocuments = claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+            Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
+            attachments.put(ATTACHMENTS, attachDocument);
+        }
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
@@ -1092,6 +1138,7 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
         activityLog.setActivityDetails(activityDetail);
+        activityLog.setAttachmentUrl(attachments);
         return activityLog;
     }
 
@@ -1181,7 +1228,7 @@ public class SepsAndFiClaimTicketService {
         if (!claimTicketDocuments.isEmpty()) {
             List<ClaimTicketDocument> savedDocuments = claimTicketDocumentRepository.saveAll(claimTicketDocuments);
             Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
-            attachments.put("attachments", attachDocument);
+            attachments.put(ATTACHMENTS, attachDocument);
         }
 
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
