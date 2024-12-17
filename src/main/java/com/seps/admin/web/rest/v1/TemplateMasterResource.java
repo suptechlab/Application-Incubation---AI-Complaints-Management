@@ -1,6 +1,7 @@
 package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.aop.permission.PermissionCheck;
+import com.seps.admin.enums.EmailUserTypeEnum;
 import com.seps.admin.enums.TemplateTypeEnum;
 import com.seps.admin.service.TemplateMasterService;
 import com.seps.admin.service.dto.DropdownListDTO;
@@ -152,5 +153,11 @@ public class TemplateMasterResource {
     @GetMapping("/{id}/for-copy")
     public ResponseEntity<TemplateMasterDTO> getTemplateByIdForCopy(@PathVariable Long id) {
         return ResponseEntity.ok(service.getTemplateByIdForCopy(id));
+    }
+
+    @GetMapping("/dropdown-list-for-workflow")
+    public ResponseEntity<List<DropdownListDTO>> listActiveTemplatesForWorkflow(@RequestParam(required = false) EmailUserTypeEnum userType) {
+        List<DropdownListDTO> templatesList = service.listActiveTemplatesForWorkFlow(userType);
+        return ResponseEntity.ok(templatesList);
     }
 }

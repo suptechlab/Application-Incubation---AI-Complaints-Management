@@ -5,10 +5,7 @@ import com.seps.admin.config.Constants;
 import com.seps.admin.domain.Authority;
 import com.seps.admin.domain.TemplateMaster;
 import com.seps.admin.domain.User;
-import com.seps.admin.enums.ActionTypeEnum;
-import com.seps.admin.enums.ActivityTypeEnum;
-import com.seps.admin.enums.LanguageEnum;
-import com.seps.admin.enums.TemplateTypeEnum;
+import com.seps.admin.enums.*;
 import com.seps.admin.repository.TemplateMasterRepository;
 import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.service.dto.DropdownListDTO;
@@ -84,15 +81,15 @@ public class TemplateMasterService {
     public Long createTemplate(@Valid TemplateMasterDTO templateMasterDTO, RequestInfo requestInfo) {
         User currentUser = userService.getCurrentUser();
         TemplateMaster template = templateMasterMapper.mapToEntity(templateMasterDTO);
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        Long organizationId = null;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+        }
         if(templateMasterDTO.getCopyFrom()!=null) {
             TemplateMasterDTO copyTemplate = getTemplateByIdForCopy(templateMasterDTO.getCopyFrom());
-            List<String> authority = currentUser.getAuthorities().stream()
-                .map(Authority::getName)
-                .toList();
-            Long organizationId = null;
-            if (authority.contains(AuthoritiesConstants.FI)) {
-                organizationId = currentUser.getOrganizationId();
-            }
             if (repository.existsByTemplateKeyAndIsGeneralAndOrganizationIdAndUserType(
                 copyTemplate.getTemplateKey(),
                 false,
@@ -104,7 +101,6 @@ public class TemplateMasterService {
                 );
             }
             template.setTemplateKey(copyTemplate.getTemplateKey());
-            template.setOrganizationId(organizationId);
             template.setIsGeneral(false);
             template.setSupportedVariables(copyTemplate.getSupportedVariables());
         }else{
@@ -120,6 +116,7 @@ public class TemplateMasterService {
             }
             template.setIsGeneral(true);
         }
+        template.setOrganizationId(organizationId);
         template.setIsStatic(false);
         template.setUserType(templateMasterDTO.getUserType());
         template.setCreatedBy(currentUser.getId());
@@ -347,5 +344,21 @@ public class TemplateMasterService {
             .map(templateMasterMapper::mapToDTO)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.TEMPLATE_NOT_FOUND,
                 new String[]{id.toString()}, null));
+    }
+
+    public List<DropdownListDTO> listActiveTemplatesForWorkFlow(EmailUserTypeEnum userType) {
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        Long organizationId = null;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+            return repository.findAll(TemplateMasterSpecification.byFilterWorkflowTemplateList(userType,organizationId,true))
+                .stream().map(templateMasterMapper::toDropDownDTO).toList();
+        }else{
+            return repository.findAll(TemplateMasterSpecification.byFilterWorkflowTemplateList(userType,organizationId,false))
+                .stream().map(templateMasterMapper::toDropDownDTO).toList();
+        }
     }
 }
