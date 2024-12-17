@@ -22,15 +22,11 @@ import ConsumerInfoModal from '../modals/consumerInfoModal';
 
 const TicketsView = () => {
 
-  const { userData } = useContext(AuthenticationContext);
+  const {currentUser } = useContext(AuthenticationContext);
 
   const { masterData } = useContext(MasterDataContext);
 
   const { t } = useTranslation()
-
-  const { authorities = [], roles = [] } = userData || {};
-
-  const [currentUser, setCurrentUser] = useState([])
 
   const [isGetActivityLogs, setIsGetAcitivityLogs] = useState(true)
 
@@ -56,21 +52,6 @@ const TicketsView = () => {
     return () => clearInterval(intervalId);
   }, []); // Empty dependency array means this effect runs only once
 
-  useEffect(() => {
-    if (roles?.length > 0) {
-      const roleMap = {
-        'Fi Admin': 'FI_ADMIN',
-        'Fi Agent': 'FI_AGENT',
-        'SEPS Admin': 'SEPS_ADMIN',
-        'SEPS Agent': 'SEPS_AGENT',
-      };
-      const roleName = roles[0]?.name;
-      setCurrentUser(roleMap[roleName] || 'FI_ADMIN');
-    }
-    else {
-      setCurrentUser("ADMIN")
-    }
-  }, [authorities])
 
 
   // Function to handle dropdown item selection
@@ -288,7 +269,6 @@ const TicketsView = () => {
         <TicketViewHeader
           title={"#" + ticketData?.ticketId}
           ticketData={ticketData}
-          currentUser={currentUser}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
           getTicketData = {getTicketDetails}
         />

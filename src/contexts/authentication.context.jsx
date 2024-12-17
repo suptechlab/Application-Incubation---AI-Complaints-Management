@@ -9,6 +9,8 @@ export const AuthenticationContext = createContext({
     isAuthenticated: false,
     isLoading: true,
     userData: {},
+    currentUser: {},
+    permissions: [],
     setUserData: () => { },
 });
 
@@ -17,15 +19,19 @@ export default function AuthenticationProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [userData, setUserData] = useState({})
+    const [currentUser, setCurrentUser] = useState(null)
+    const [permissions, setPermissions] = useState([])
+    const [authorities, setAuthorities] = useState([])
+
     const navigate = useNavigate()
     const location = useLocation()
 
-    useEffect(() => {
-        const localStorageRefreshToken = getLocalStorage("refresh_token")
-        if (!!localStorageRefreshToken) {
-            refreshToken(localStorageRefreshToken)
-        }
-    }, [])
+    // useEffect(() => {
+    //     const localStorageRefreshToken = getLocalStorage("refresh_token")
+    //     if (!!localStorageRefreshToken) {
+    //         refreshToken(localStorageRefreshToken)
+    //     }
+    // }, [])
 
     useEffect(() => {
         if (!!getLocalStorage("access_token")) {
@@ -41,24 +47,12 @@ export default function AuthenticationProvider({ children }) {
         removeLocalStorage("access_token")
         removeLocalStorage("refresh_token")
         setIsAuthenticated(false)
-        // removeLocalStorage("imageUrl")
-        // removeLocalStorage("firstName")
-        // removeLocalStorage("lastName")
-        // removeLocalStorage("companyTitle")
-        // removeLocalStorage("user_type")
-        // removeLocalStorage("email")
-        // removeLocalStorage("password")
-
     }
 
     const login = async (data) => {
         const username = data.username
         return handleLogin(data).then((response) => {
             const otpToken = response?.data?.otpToken;
-            //toast.success(response.data.message);
-            //setLocalStorage("access_token", response.data.tokens.access.token)
-            //setLocalStorage("refresh_token", response.data.tokens.refresh.token)
-            // setIsAuthenticated(true)
             navigate("/otp", { state: { username, otpToken } })
         }).catch((error) => {
             console.log('error 53->', error)
@@ -69,74 +63,13 @@ export default function AuthenticationProvider({ children }) {
     const OtpVerify = async (data) => {
 
         return handleVerifyOtp(data).then((response) => {
-            console.log('otp verify 70', response)
-            //toast.success(response.data.message);
-            console.log('accessToken:', response.data);
             if (response.data.id_token) {
                 setLocalStorage("access_token", response.data.id_token);
                 setLocalStorage("refresh_token", response.data.id_token);
                 setIsAuthenticated(true);
-                // handleGetAccountDetail().then((accountResponse)=>{
-                //     console.log("Account Detail:::", accountResponse);
-                //     setLocalStorage("imageUrl", accountResponse.data?.imageUrl);
-                //     setLocalStorage("firstName", accountResponse.data?.firstName);
-                //     setLocalStorage("lastName", accountResponse.data?.lastName);
-                //     setLocalStorage("companyTitle", '');
-
-                //     const authorities = accountResponse.data?.authorities;
-                //     const role = 'ROLE_ADMIN' //accountResponse.data?.role;
-                //     setLocalStorage("user_type", authorities);
-                //     if(!authorities.includes("ROLE_ADMIN")){
-                //         const roleMap = role.modules.reduce((acc, module) => {
-                //             acc[module.name] = module.permissions.map(permission => permission.name);
-                //             return acc;
-                //         }, {});
-                //         setLocalStorage("user_roles", roleMap);
-                //     }
-                //     navigate("/dashboard");  
-                // }).catch((error) => {
-                //     toast.error('Something went wrong.');
-                //     console.log('errorOTP 98 ',error);
-                // });
-
-                handleGetAccountDetail()
-                    .then((accountResponse) => {
-                        console.log("Account Detail:::", accountResponse);
-                        const { data } = accountResponse;
-                        setUserData(data)
-                        // Set user details in local storage
-                        // setLocalStorage("imageUrl", data?.imageUrl);
-                        // setLocalStorage("firstName", data?.firstName);
-                        // setLocalStorage("lastName", data?.lastName);
-                        // setLocalStorage("role", JSON.stringify(data?.roles));
-                        // setLocalStorage("companyTitle", "");
-
-                        // Set authorities
-                        const authorities = data?.authorities || [];
-                        setLocalStorage("user_type", authorities);
-
-                        // Check for roles and create role map
-                        const roles = data?.roles || [];
-                        if (!authorities.includes("ROLE_ADMIN")) {
-                            const roleMap = roles.reduce((acc, role) => {
-                                const modules = role.modules || [];
-                                modules.forEach((module) => {
-                                    acc[module.name] = module.permissions.map(
-                                        (permission) => permission.name
-                                    );
-                                });
-                                return acc;
-                            }, {});
-                            setLocalStorage("user_roles", roleMap);
-                        }
-
-                        // Navigate to dashboard
-                        navigate("/dashboard");
-                    })
-                    .catch((error) => {
-                        toast.error("Something went wrong.");
-                        console.log("Error in handleGetAccountDetail:", error);
-                    });
+                // GET USER INFO AND SET IT INTO LOCALSTORAGE
+                handleAccountDetails()
+                navigate("/dashboard");
 
             } else {
                 toast.error('Tokens are missing in the response');
@@ -187,6 +120,67 @@ export default function AuthenticationProvider({ children }) {
     useEffect(() => {
     }, [isAuthenticated])
 
+    // GET ACCOUNT DETAILS AND SET IT IN TO STATES
+    const handleAccountDetails = () => {
+        // CALL API FOR GET ACCOUNT DETAILS
+        handleGetAccountDetail()
+            .then((response) => {
+                const { data } = response;
+                setUserData(data)
+                // Set authorities
+                const authorities = data?.authorities || [];
+                setAuthorities(authorities)
+                // Check for roles and create role map
+                const roles = data?.roles || [];
+                if (!authorities.includes("ROLE_ADMIN")) {
+                    // const roleMap = roles.reduce((acc, role) => {
+                    //     const modules = role.modules || [];
+                    //     modules.forEach((module) => {
+                    //         acc[module.name] = module.permissions.map(
+                    //             (permission) => permission.name
+                    //         );
+                    //     });
+                    //     return acc;
+                    // }, {});
+
+                    if (roles?.length > 0) {
+                        const roleMap = {
+                            'fi-admin': 'FI_ADMIN',
+                            'fi-agent': 'FI_AGENT',
+                            'seps-admin': 'SEPS_ADMIN',
+                            'seps-agent': 'SEPS_AGENT',
+                        };
+                        const roleName = roles[0]?.name;
+                        setCurrentUser(roleMap[roleName] || 'SUPER_ADMIN');
+                    } else {
+                        setCurrentUser('SUPER_ADMIN');
+                    }
+                    setPermissions(roles);
+                } else {
+                    setCurrentUser('SUPER_ADMIN')
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+                console.error("Error fetching account details:", error);
+
+                if (error?.response?.status === '401') {
+                    toast.error("Session expired. Please log in again.");
+                    logout();
+                }
+
+            });
+    }
+
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem("access_token");
+
+        if (accessToken) {
+            handleAccountDetails()
+        }
+    }, []);
+
 
     return (
         <AuthenticationContext.Provider value={
@@ -198,7 +192,9 @@ export default function AuthenticationProvider({ children }) {
                 login,
                 OtpVerify,
                 userData,
-                setUserData, // Pass setUserData to the context
+                currentUser,
+                permissions,
+                authorities
             }}>
             {children}
         </AuthenticationContext.Provider>
