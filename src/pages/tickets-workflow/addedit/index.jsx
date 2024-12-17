@@ -31,7 +31,7 @@ export default function TicketWorkFlowAddEdit() {
 
     useEffect(() => {
         console.log('masterData', masterData)
-    }, [id, isEdit]);
+    }, [masterData]);
 
     const onSubmit = async (values, actions) => {
         setLoading(true);
@@ -83,6 +83,7 @@ export default function TicketWorkFlowAddEdit() {
                                     <Row>
                                         <Col sm={6} lg={4}>
                                             <FormInput
+                                                id="workflowName"
                                                 label={t('WORKFLOW_NAME') + '*'}
                                                 name="workflowName"
                                                 type="text"
@@ -115,9 +116,9 @@ export default function TicketWorkFlowAddEdit() {
 
                                     <div className="border-top mt-2 mx-n3 px-3">
                                         <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
-                                            <h5 className="fw-semibold mb-0 me-auto">Events</h5>
+                                            <h5 className="fw-semibold mb-0 me-auto">{t('EVENTS')}</h5>
                                             <Button variant="link" className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center">
-                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> Add More
+                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> {t('ADD_MORE')}
                                             </Button>
                                         </Stack>
                                         <div className="position-relative custom-padding-right-66">
@@ -125,6 +126,7 @@ export default function TicketWorkFlowAddEdit() {
                                                 <Col sm={6} lg={4}>
                                                     <ReactSelect
                                                         label={t('EVENT_SELECTION')}
+                                                        placeholder={t('SELECT')}
                                                         wrapperClassName={'mb-3'}
                                                         error={errors.entityId}
                                                         options={organizationArr}
@@ -143,6 +145,7 @@ export default function TicketWorkFlowAddEdit() {
                                                 <Col sm={6} lg={4}>
                                                     <ReactSelect
                                                         label={t('SELECT_ACTION')}
+                                                        placeholder={t('SELECT')}
                                                         wrapperClassName={'mb-3'}
                                                         error={errors.entityId}
                                                         options={organizationArr}
@@ -172,12 +175,12 @@ export default function TicketWorkFlowAddEdit() {
                                     <div className="border-top mt-2 mx-n3 px-3">
                                         <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
                                             <div className="me-auto">
-                                                <h5 className="fw-semibold mb-0">Conditions</h5>
-                                                <p className="mb-0 text-muted">Conditions are sets of rules which check for specific scenarios.</p>
+                                                <h5 className="fw-semibold mb-0">{t('CONDITIONS')}</h5>
+                                                <p className="mb-0 text-muted">{t('CONDITION_MESSAGE')}</p>
                                             </div>
 
                                             <Button variant="link" className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center">
-                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> Add OR Conditons
+                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> {t('ADD_OR_CONDITION')}
                                             </Button>
                                         </Stack>
 
@@ -186,7 +189,7 @@ export default function TicketWorkFlowAddEdit() {
                                                 <Row className="gx-4">
                                                     <Col sm={6} lg={4}>
                                                         <ReactSelect
-                                                            // label={t('EVENT_SELECTION')}
+                                                            placeholder={t('SELECT')}
                                                             wrapperClassName={'mb-0'}
                                                             error={errors.entityId}
                                                             options={organizationArr}
@@ -204,7 +207,7 @@ export default function TicketWorkFlowAddEdit() {
                                                     </Col>
                                                     <Col sm={6} lg={4}>
                                                         <ReactSelect
-                                                            // label={t('SELECT_ACTION')}
+                                                            placeholder={t('SELECT')}
                                                             wrapperClassName={'mb-0'}
                                                             error={errors.entityId}
                                                             options={organizationArr}
@@ -223,7 +226,7 @@ export default function TicketWorkFlowAddEdit() {
 
                                                     <Col sm={6} lg={4}>
                                                         <ReactSelect
-                                                            // label={t('SELECT_ACTION')}
+                                                            placeholder={t('SELECT')}
                                                             wrapperClassName={'mb-0'}
                                                             error={errors.entityId}
                                                             options={organizationArr}
@@ -249,7 +252,7 @@ export default function TicketWorkFlowAddEdit() {
                                                 </Row>
                                             </div>
                                             <div className="border-top my-4 position-relative">
-                                                <span className="bg-body fw-semibold position-absolute px-2 small start-50 top-50 translate-middle">OR</span>
+                                                <span className="bg-body fw-semibold position-absolute px-2 small start-50 top-50 translate-middle">{t('OR')}</span>
                                             </div>
                                         </div>
 
@@ -258,12 +261,12 @@ export default function TicketWorkFlowAddEdit() {
                                     <div className="border-top my-2 mx-n3 px-3">
                                         <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
                                             <div className="me-auto">
-                                                <h5 className="fw-semibold mb-0">Actions</h5>
-                                                <p className="mb-0 text-muted">Actions help you automate tickets.</p>
+                                                <h5 className="fw-semibold mb-0">{t('ACTIONS')}</h5>
+                                                <p className="mb-0 text-muted">{t('ACTION_MSG')}</p>
                                             </div>
 
                                             <Button variant="link" className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center">
-                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> Add More
+                                                <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> {t('ADD_MORE')}
                                             </Button>
                                         </Stack>
 
@@ -273,6 +276,7 @@ export default function TicketWorkFlowAddEdit() {
                                                     <Col sm={6} lg={4}>
                                                         <ReactSelect
                                                             wrapperClassName={'mb-3'}
+                                                            placeholder={t('SELECT')}
                                                             error={errors.entityId}
                                                             options={organizationArr}
                                                             value={values.entityId || ""}
@@ -290,6 +294,7 @@ export default function TicketWorkFlowAddEdit() {
                                                     <Col sm={6} lg={4}>
                                                         <ReactSelect
                                                             wrapperClassName={'mb-3'}
+                                                            placeholder={t('SELECT')}
                                                             error={errors.entityId}
                                                             options={organizationArr}
                                                             value={values.entityId || ""}
@@ -308,6 +313,7 @@ export default function TicketWorkFlowAddEdit() {
                                                     <Col sm={6} lg={4}>
                                                         <ReactSelect
                                                             wrapperClassName={'mb-3'}
+                                                            placeholder={t('SELECT')}
                                                             error={errors.entityId}
                                                             options={organizationArr}
                                                             value={values.entityId || ""}

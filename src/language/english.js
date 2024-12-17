@@ -255,8 +255,26 @@ export const englishLang = {
     "REPLIES": "Replies",
     "CONSUMER_INFO": "Consumer Info",
     "ENTER_EXTENDED_DATE": "Enter Extended Date",
-    "DAYS REMAINING":"Days remaining",
-    "DAYS" :"Days",
-    "ALL_PRIORITY":"All Priority",
-    "INSTANCE_TYPE":"Instance Type"
+    "DAYS REMAINING": "Days remaining",
+    "DAYS": "Days",
+    "ALL_PRIORITY": "All Priority",
+    "INSTANCE_TYPE": "Instance Type",
+
+    //Tickets Workflow
+    "TICKETS_WORKFLOW": "Ticket Workflow",
+    "WORKFLOW": "Workflow",
+    "WORKFLOW_NAME": "Workflow Name",
+    "EVENTS": "Events",
+    "EVENT_SELECTION": "Event Selection",
+    "SELECT_ACTION": "Select Action",
+    "CONDITIONS": "Conditions",
+    "CONDITION_MESSAGE": "Conditions are set of which check for specific scenarios.",
+    "ADD_MORE": "Add More",
+    "ADD_OR_CONDITION": "Add OR Condition",
+    "ACTIONS": "Actions",
+    "ACTION_MSG": "Actions help you automate tickets.",
+    "SAVE_WORKFLOW": "Save Workflow",
+    "CREATE_NEW_TICKET_WORKFLOW": "Create New Ticket Workflow",
+    "EDIT_TICKET_WORKFLOW": "Edit Ticket Workflow",
+    "OR": "OR"
 }
