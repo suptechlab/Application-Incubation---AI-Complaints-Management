@@ -265,5 +265,6 @@ export const englishLang = {
     "TICKET_CLOSE_STATUS" : "Ticket Close Status",
     "TICKET_REJECT_STATUS" :"Ticket Reject Status",
     "ATTACHMENT" : "Attachment",
-    "BROWSE":"Browse"
+    "BROWSE":"Browse",
+    "REASON":"Reason"
 }

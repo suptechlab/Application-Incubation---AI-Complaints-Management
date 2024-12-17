@@ -81,7 +81,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
             enforceFocus={false}
         >
             <Modal.Header className="pb-3">
-                <Modal.Title as="h4" className="fw-semibold">Ticket Reject Status</Modal.Title>
+                <Modal.Title as="h4" className="fw-semibold">{t("TICKET_REJECT_STATUS")}</Modal.Title>
             </Modal.Header>
             <Formik
                 initialValues={{
@@ -106,7 +106,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                     <Form>
                         <Modal.Body className="text-break py-0">
                             <FormInput
-                                label="Comments"
+                                label={t("REASON")}
                                 id="reason"
                                 name="reason"
                                 type="text"
@@ -141,14 +141,14 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                                 touched={touched.rejectedStatus}
                             />
                             <Col xs={12} className="mb-3 pb-1">
-                                <div className="mb-1 fs-14">Attchment</div>
+                                <div className="mb-1 fs-14">{t("ATTACHMENT")}</div>
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                 <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
                                             htmlFor="attachments"
                                             className="btn btn-outline-dark custom-min-width-85"
                                         >
-                                            Browse
+                                            {t("BROWSE")}
                                         </label>
                                         {/* <input
                                             id="files"

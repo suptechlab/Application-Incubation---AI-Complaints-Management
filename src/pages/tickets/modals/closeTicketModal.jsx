@@ -14,7 +14,7 @@ import { validateFile } from "../../../utils/commonutils";
 const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs }) => {
 
     const { t } = useTranslation();
-    const [fileName, setFileName] = useState("");
+    // const [fileName, setFileName] = useState("");
 
     const { masterData } = useContext(MasterDataContext)
 
@@ -84,7 +84,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
             enforceFocus={false}
         >
             <Modal.Header className="pb-3">
-                <Modal.Title as="h4" className="fw-semibold">Ticket Close Status</Modal.Title>
+                <Modal.Title as="h4" className="fw-semibold">{t("TICKET_CLOSE_STATUS")}</Modal.Title>
             </Modal.Header>
             <Formik
                 initialValues={{
@@ -144,14 +144,14 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                                 touched={touched.closeSubStatus}
                             />
                             <Col xs={12} className="mb-3 pb-1">
-                                <div className="mb-1 fs-14">Attchment</div>
+                                <div className="mb-1 fs-14">{t("ATTACHMENT")}</div>
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                     <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
                                             htmlFor="attachments"
                                             className="btn btn-outline-dark custom-min-width-85"
                                         >
-                                            Browse
+                                            {t("BROWSE")}
                                         </label>
                                         {/* <input
                                             id="files"
