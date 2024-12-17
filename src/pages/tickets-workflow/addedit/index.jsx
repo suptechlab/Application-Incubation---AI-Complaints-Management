@@ -1,17 +1,16 @@
 import { Formik, Form as FormikForm } from "formik";
-import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Form, Row, Stack, Table } from "react-bootstrap";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdAddCircle, MdClose, MdDelete } from "react-icons/md";
+import { MdAddCircle, MdClose } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
-import GenericModal from "../../../components/GenericModal";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import ReactSelect from "../../../components/ReactSelect";
-import AppTooltip from "../../../components/tooltip";
-import { assignUserIntoTeam, getOrganizationList, getTeamMemberList, handleAddUser, handleDeleteUserFromTeam, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
+import { MasterDataContext } from "../../../contexts/masters.context";
+import { handleAddUser, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
 
 export default function TicketWorkFlowAddEdit() {
@@ -26,183 +25,34 @@ export default function TicketWorkFlowAddEdit() {
         entityId: "",
         entityType: "FI"
     });
-    const [entityIdArr, setEntityIdArr] = useState([]);
     const [organizationArr, setOrganizationArr] = useState([]);
-    const [selectedRow, setSelectedRow] = useState();
-    const [deleteShow, setDeleteShow] = useState(false);
-    const [deleteId, setDeleteId] = useState();
-    const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show
-    const [newTeamMember, setNewTeamMember] = useState([]);
-    const [userData, setUserData] = useState([]);
-    const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
+    const { masterData } = useContext(MasterDataContext);
 
-
-
-    //  Handle Assign Button Click
-    const handleAssign = () => {
-        if (!selectedMember || Object.keys(selectedMember).length === 0 || selectedMember.value == '') {
-            setLoading(false);
-            toast.error(t('SELECT A TEAM MEMBER BEFORE ASSIGNING'));
-            return;
-        }
-
-        // Check if the member is already in the list
-        const isDuplicate = newTeamMember.some(
-            (member) => member.id === selectedMember.value
-        );
-
-        if (isDuplicate) {
-            toast.error(t('TEAM MEMBER HAS ALREADY BEEN ASSIGNED'));
-            return;
-        }
-
-        const newMember = {
-            id: selectedMember.value, // ID from ReactSelect
-            name: selectedMember.label, // Name from ReactSelect
-        };
-
-        if (isEdit) {
-            setLoading(true);
-            try {
-                let payload = {
-                    userIds: [selectedMember?.value]
-                }
-                assignUserIntoTeam(userData?.id, payload);
-                setLoading(false);
-            } catch (error) {
-                const errorMessage = error.response?.data?.detail;
-                toast.error(errorMessage);
-                setLoading(false);
-            }
-        }
-
-        setNewTeamMember((prev) => [...prev, newMember]);
-    };
-
-    const getTeamMemberLists = async (type) => {
-        setLoading(true);
-        try {
-            await getTeamMemberList(type).then((response) => {
-                const formattedData = response.data.map((item) => ({
-                    label: item.name,
-                    value: item.id
-                }));
-                setEntityIdArr([...formattedData]);
-                setLoading(false);
-            });
-        } catch (error) {
-            setLoading(false);
-        }
-
-    }
-
-    const getOrganizationLists = async (type) => {
-        setLoading(true);
-        try {
-            await getOrganizationList(type).then((response) => {
-                const formattedOrgData = response.data.map((item) => ({
-                    label: item.name,
-                    value: item.id
-                }));
-                setOrganizationArr([...formattedOrgData]);
-                setLoading(false);
-            });
-        } catch (error) {
-            setLoading(false);
-        }
-    }
-
-    const getUserDetails = async (userId) => {
-        setLoading(true);
-        try {
-            const response = await handleGetUserById(userId);
-            setUserData(response.data);
-            setInitialValues({
-                teamName: response.data?.teamName ?? "",
-                description: response.data?.description ?? "",
-                entityId: response.data?.entityId ?? "",
-                entityType: response.data?.entityType ?? "",
-            });
-            setNewTeamMember(response.data?.members);
-            if (response.data?.entityType === 'FI') {
-                setShowEntityOrgId(true);
-            } else {
-                setShowEntityOrgId(false);
-            }
-            await getTeamMemberLists(response.data?.entityType);
-            await getOrganizationLists(response.data?.entityType);
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-        }
-    }
 
     useEffect(() => {
-        if (isEdit && id) {
-            getUserDetails(id);
-        } else {
-            getTeamMemberLists("FI");
-            getOrganizationLists("FI");
-        }
+        console.log('masterData', masterData)
     }, [id, isEdit]);
 
     const onSubmit = async (values, actions) => {
         setLoading(true);
 
-        if (newTeamMember.length === 0) {
-            const errorMessage = t('PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER');
+        try {
+            const action = isEdit
+                ? handleUpdateUser(id, { ...values })
+                : handleAddUser({ ...values });
+
+            const response = await action;
+            toast.success(response.data.message);
+            navigate('/team-management');
+        } catch (error) {
+            const errorMessage = error.response?.data?.errorDescription;
             toast.error(errorMessage);
+        } finally {
             setLoading(false);
-        } else {
-            try {
-                values.teamMembers = newTeamMember.map((member) => member.id);
-
-                const action = isEdit
-                    ? handleUpdateUser(id, { ...values })
-                    : handleAddUser({ ...values });
-
-                const response = await action;
-                toast.success(response.data.message);
-                navigate('/team-management');
-            } catch (error) {
-                const errorMessage = error.response?.data?.errorDescription;
-                toast.error(errorMessage);
-            } finally {
-                setLoading(false);
-                actions.setSubmitting(false);
-            }
+            actions.setSubmitting(false);
         }
     };
 
-    //Handle Delete
-    const deleteAction = (rowData) => {
-        setSelectedRow(rowData);
-        if (isEdit) {
-            setDeleteId(rowData.userId);
-        } else {
-            setDeleteId(rowData.id);
-        }
-        setDeleteShow(true);
-    };
-
-    const recordDelete = async (deleteId) => {
-        if (isEdit) {
-            setNewTeamMember((prev) => prev.filter((member) => member.userId !== deleteId));
-            setLoading(true);
-            try {
-                await handleDeleteUserFromTeam(userData?.id, deleteId);
-                await getTeamMemberLists(userData?.entityType);
-                setLoading(false);
-            } catch (error) {
-                const errorMessage = error.response?.data?.errorDescription;
-                toast.error(errorMessage);
-                setLoading(false);
-            }
-        } else {
-            setNewTeamMember((prev) => prev.filter((member) => member.id !== deleteId));
-        }
-        setDeleteShow(false);
-    };
 
     return (
         <React.Fragment>
@@ -512,17 +362,6 @@ export default function TicketWorkFlowAddEdit() {
                     </Card.Body>
                 </Card>
             </div>
-
-            {/* Delete Modal */}
-            <GenericModal
-                show={deleteShow}
-                handleClose={() => setDeleteShow(false)}
-                modalHeaderTitle={t('DELETE TEAM MEMBER')}
-                modalBodyContent={`${t('ARE YOU SURE, YOU WANT TO DELETE THE TEAM MEMBER')} - ${selectedRow?.name}?`}
-                handleAction={() => recordDelete(deleteId)}
-                buttonName={t('DELETE')}
-                ActionButtonVariant="danger"
-            />
 
         </React.Fragment>
     );

@@ -146,7 +146,7 @@ export const NavItems = () => {
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
       roleName: "Ticket Workflow",
-      disabled: true,
+      disabled: false,
     },
     {
       id: 7,
