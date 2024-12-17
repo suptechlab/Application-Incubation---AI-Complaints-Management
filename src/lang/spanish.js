@@ -143,7 +143,7 @@ export const spanishLang = {
   "NO_FILE_MY_CLAIM": " No, déjame verificar el reclamo existente",
   "REMOVE": "Eliminar",
   "NO_CHAT_AVAILABLE": "No hay chat disponible",
-  "ASK_OR_REPLY": "Preguntar o responder",
+  "ASK_OR_REPLY...": "Preguntar o responder",
   "DOWNLOAD": "Descargar",
   "COMPLAINT_RAISED_SUCCES": "Queja planteada con éxito",
   "LOGIN": "Acceso",

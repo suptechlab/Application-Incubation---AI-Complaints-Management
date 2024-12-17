@@ -193,18 +193,18 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             body: roleUserDocuments,
             condition: true,
         },
-        {
-            eventKey: '1',
-            header: t('ATTACHMENTS_SENT_BY_ENTITY'),
-            body: roleFiUserDocuments,
-            condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE' && claimTicketData?.instanceType !== 'COMPLAINT',
-        },
-        {
-            eventKey: '2',
-            header: t('ATTACHMENTS_SENT_BY_SEPS'),
-            body: roleSepsUserDocuments,
-            condition: claimTicketData?.instanceType === 'SECOND_INSTANCE' || claimTicketData?.instanceType === 'COMPLAINT',
-        },
+        // {
+        //     eventKey: '1',
+        //     header: t('ATTACHMENTS_SENT_BY_ENTITY'),
+        //     body: roleFiUserDocuments,
+        //     condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE' && claimTicketData?.instanceType !== 'COMPLAINT',
+        // },
+        // {
+        //     eventKey: '2',
+        //     header: t('ATTACHMENTS_SENT_BY_SEPS'),
+        //     body: roleSepsUserDocuments,
+        //     condition: claimTicketData?.instanceType === 'SECOND_INSTANCE' || claimTicketData?.instanceType === 'COMPLAINT',
+        // },
     ];
 
     // View Bottom Data
