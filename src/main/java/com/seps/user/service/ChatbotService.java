@@ -4,8 +4,10 @@ import com.seps.user.domain.ChatbotSession;
 import com.seps.user.repository.ChatbotSessionRepository;
 import com.seps.user.service.dto.ChatbotQueryDTO;
 import com.seps.user.service.dto.RasaResponseDTO;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,8 +27,12 @@ public class ChatbotService {
     private final Logger log = LoggerFactory.getLogger(ChatbotService.class);
 
     private final ChatbotSessionRepository chatbotSessionRepository;
-    private final WebClient webClient;
+    private WebClient webClient;
     private final UserService userService;
+
+    @Value("${website.chatbot-base-url:test}")
+    private String chatBotBaseUrl;
+
     /**
      * Constructor for ChatbotService.
      *
@@ -35,8 +41,12 @@ public class ChatbotService {
     public ChatbotService(ChatbotSessionRepository chatbotSessionRepository, UserService userService) {
         this.chatbotSessionRepository = chatbotSessionRepository;
         this.userService = userService;
+    }
+
+    @PostConstruct
+    public void init() {
         this.webClient = WebClient.builder()
-            .baseUrl("https://select-caiman-intimate.ngrok-free.app")
+            .baseUrl(chatBotBaseUrl)
             .build();
     }
 
