@@ -121,7 +121,6 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     const handleFileDuplicateClaim = async () => {
         setIsLoading(true);
         let combinedData = { ...fileClaimValues, checkDuplicate: false };
-        combinedData.checkDuplicate = true;
 
         const formData = new FormData();
 

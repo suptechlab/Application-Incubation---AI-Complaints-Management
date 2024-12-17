@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, Button, Stack } from 'react-bootstrap';
 import { MdChatBubbleOutline, MdOutlineInfo, MdOutlineVisibility } from 'react-icons/md';
 import DataTable from '../../components/common/DataTable';
@@ -302,6 +302,10 @@ export default function MyAccount() {
     retry: 0, //Disable retry on failure
   });
 
+
+  useEffect(() => {
+    dataQuery.refetch();
+  }, []);
 
   // Handle table pagination changes
   const handlePaginationChange = (newPagination) => {
