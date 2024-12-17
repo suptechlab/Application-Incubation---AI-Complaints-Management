@@ -78,14 +78,14 @@ deployment:
         nginx.ingress.kubernetes.io/rewrite-target: /$2
         nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     hosts:
-      - host: admin-stg-suptech.seps.gob.ec
+      - host: api-stg-suptech.seps.gob.ec
         paths:
           - path: /ticket(/|$)(.*)
             pathType: ImplementationSpecific         
     tls:
       - secretName: seps-cert
         hosts:
-          - admin-stg-suptech.seps.gob.ec
+          - api-stg-suptech.seps.gob.ec
   
   ## Virtual Route        
   virtualRoute:
