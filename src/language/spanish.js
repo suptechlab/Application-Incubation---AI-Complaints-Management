@@ -252,5 +252,22 @@ export const spanishLang = {
     "ATTACHMENT": "Adjunto",
     "BROWSE": "Buscar",
     "REASON": "Razón",
-    "SUB-STATUS": "Subestado"
+    "SUB-STATUS": "Subestado",
+     //Tickets Workflow
+     "TICKETS_WORKFLOW": "Flujo de trabajo de tickets",
+     "WORKFLOW": "Flujo de trabajo",
+     "WORKFLOW_NAME": "Nombre del flujo de trabajo",
+     "EVENTS": "Eventos",
+     "EVENT_SELECTION": "Selección de eventos",
+     "SELECT_ACTION": "Seleccionar acción",
+     "CONDITIONS": "Condiciones",
+     "CONDITION_MESSAGE": "Se establecen condiciones que verifican escenarios específicos.",
+     "ADD_MORE": "Añadir más",
+     "ADD_OR_CONDITION": "Agregar condición O",
+     "ACTIONS": "Acciónes",
+     "ACTION_MSG": "Las acciones le ayudan a automatizar los tickets.",
+     "SAVE_WORKFLOW": "Guardar flujo de trabajo",
+     "CREATE_NEW_TICKET_WORKFLOW": "Crear nuevo flujo de trabajo de tickets",
+     "EDIT_TICKET_WORKFLOW": "Editar flujo de trabajo de tickets",
+     "OR": "O"
 }
