@@ -245,6 +245,11 @@ export const spanishLang = {
     "ALL_PRIORITY": "Toda prioridad",
     "INSTANCE_TYPE": "Tipo de instancia",
     "ADD_INTERNAL_NOTE": "Agregar nota interna",
-    "COMPLAINT":"Queja",
-    "NO_ATTACHMENT":"No hay ningún archivo adjunto incluido."
+    "COMPLAINT": "Queja",
+    "NO_ATTACHMENT": "No hay ningún archivo adjunto incluido.",
+    "TICKET_CLOSE_STATUS": "Estado de cierre del ticket",
+    "TICKET_REJECT_STATUS": "Estado de rechazo del ticket",
+    "ATTACHMENT": "Adjunto",
+    "BROWSE": "Buscar"
+
 }

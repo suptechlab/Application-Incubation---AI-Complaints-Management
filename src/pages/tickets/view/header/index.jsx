@@ -157,7 +157,7 @@ const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference)
                     className="flex-wrap custom-min-height-38"
                 >
                     <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
-                        {title}
+                        {title ?? ""}
                         {isSlaBreachDateValid && (
                             daysDifference > 2
                                 ? renderBadge("custom-info", "custom-info", `${daysDifference} Days remaining`)

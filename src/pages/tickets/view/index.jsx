@@ -291,13 +291,18 @@ const TicketsView = () => {
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
+
+     
+
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <TicketViewHeader
+      {loading!== true &&   <TicketViewHeader
           title={"#" + ticketData?.ticketId}
           ticketData={ticketData}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
           getTicketData = {getTicketDetails}
-        />
+        />}
+
+       
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
             <Col lg={6} className='mh-100 d-flex flex-column'>

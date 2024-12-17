@@ -102,13 +102,13 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                     />
                     {values.attachment && (
                         <div className="px-3 py-1">
-                            <Link
-                                target="_blank"
-                                to="#"
+                            <span
+                                // target="_blank"
+                                // to="#"
                                 className="text-decoration-none small mw-100 text-break"
                             >
                                 {values.attachment.name}
-                            </Link>
+                            </span>
                         </div>
                     )}
                     <Card.Footer className="bg-body py-3">
