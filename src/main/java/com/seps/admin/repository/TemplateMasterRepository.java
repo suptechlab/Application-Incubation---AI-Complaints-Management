@@ -40,4 +40,8 @@ public interface TemplateMasterRepository extends JpaRepository<TemplateMaster, 
     );
 
     Optional<TemplateMaster> findByIdAndOrganizationId(Long id, Long organizationId);
+
+    List<TemplateMaster> findAllByStatusTrueAndOrganizationIdIsNullOrOrganizationId(Long organizationId);
+
+    List<TemplateMaster> findAllByStatusTrueAndOrganizationIdIsNull();
 }
