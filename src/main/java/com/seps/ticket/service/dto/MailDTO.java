@@ -9,11 +9,13 @@ import java.util.Map;
 public class MailDTO {
 
     private String templateKey;
+    private Long templateId;
     private String locale;
     private String to;
     private Map<String, String> dataVariables;
     private List<Attachment> attachments;
     private String cc;
+    private Boolean isStatic = true;
 
     public record Attachment(String filename, java.io.File file) {
 

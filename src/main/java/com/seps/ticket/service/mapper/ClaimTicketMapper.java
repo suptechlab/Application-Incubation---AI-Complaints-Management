@@ -54,4 +54,6 @@ public interface ClaimTicketMapper {
     @Mapping(source = "updatedByUser", target = "updatedByUser")
     @Mapping(expression = "java(claimTicket.getClaimTicketDocuments() != null && !claimTicket.getClaimTicketDocuments().isEmpty())", target = "haveClaimTicketDocuments")
     ClaimTicketListDTO toListDTO(ClaimTicket claimTicket);
+
+
 }

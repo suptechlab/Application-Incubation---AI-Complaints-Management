@@ -72,6 +72,7 @@ public class SepsAndFiClaimTicketService {
     private static final boolean IS_INTERNAL_DOCUMENT = false;
     private static final String ATTACHMENTS ="attachments";
     private static final String REASON = "reason";
+    private final TemplateVariableMappingService templateVariableMappingService;
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -97,7 +98,8 @@ public class SepsAndFiClaimTicketService {
                                        MessageSource messageSource, EnumUtil enumUtil, Gson gson, AuditLogService auditLogService,
                                        ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                        ClaimTicketStatusLogRepository claimTicketStatusLogRepository, MailService mailService, DocumentService documentService,
-                                       ClaimTicketDocumentRepository claimTicketDocumentRepository) {
+                                       ClaimTicketDocumentRepository claimTicketDocumentRepository,
+                                       TemplateVariableMappingService templateVariableMappingService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
@@ -112,6 +114,7 @@ public class SepsAndFiClaimTicketService {
         this.mailService = mailService;
         this.documentService = documentService;
         this.claimTicketDocumentRepository = claimTicketDocumentRepository;
+        this.templateVariableMappingService = templateVariableMappingService;
     }
 
     /**
@@ -685,7 +688,7 @@ public class SepsAndFiClaimTicketService {
         entityData.put(Constants.NEW_DATA, newData);
         Map<String, String> req = new HashMap<>();
         req.put("newSlaDate", newSlaDate.toString());
-        req.put(REASON, reason);
+        req.put("reason", reason);
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "extendSlaDate", ActionTypeEnum.CLAIM_TICKET_EXTEND_SLA_DATE.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
@@ -834,7 +837,6 @@ public class SepsAndFiClaimTicketService {
         ticket.setStatus(ClaimTicketStatusEnum.CLOSED);
         ticket.setClosedStatus(claimTicketClosedRequest.getCloseSubStatus());
         ticket.setStatusComment(claimTicketClosedRequest.getReason());
-        ticket.setResolvedOn(Instant.now());
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -1397,5 +1399,13 @@ public class SepsAndFiClaimTicketService {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name());
+    }
+
+    @Transactional
+    public Map<String, String> getSepsFiClaimTicketByIdTest(Long id) {
+        ClaimTicketDTO claimTicket = this.getSepsFiClaimTicketById((id));
+        User user = userService.getCurrentUser();
+        return templateVariableMappingService.mapVariables(claimTicket, user);
+
     }
 }

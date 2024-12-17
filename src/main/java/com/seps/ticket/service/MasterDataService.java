@@ -120,6 +120,9 @@ public class MasterDataService {
             isFiAdmin ? new TicketDateExtensionActionEnum[]{TicketDateExtensionActionEnum.MAIL_TO_SEPS_TEAM, TicketDateExtensionActionEnum.MAIL_TO_SEPS_AGENT} : new TicketDateExtensionActionEnum[]{}
         ));
 
+        // Adding localized data for EmailUserType enum
+        masterData.put("emailUserType", enumUtil.enumToLocalizedMap(EmailUserTypeEnum.class, locale));
+
         return masterData;
     }
 
