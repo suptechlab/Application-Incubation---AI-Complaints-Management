@@ -57,6 +57,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/validate-identificacion")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/validate-individual-person")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/send-login-otp")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/send-chatbot-login-otp")).permitAll()
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()
                     .requestMatchers(mvc.pattern("/v3/api-docs/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/management/health")).permitAll()

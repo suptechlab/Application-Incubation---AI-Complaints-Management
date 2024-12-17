@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1733147833739" author="matellio">
+
+    <!-- Truncate tables before loading data -->
+    <sql>
+      TRUNCATE TABLE template_master CASCADE;
+    </sql>
+
+    <!-- Reset sequences -->
+    <sql>
+      ALTER SEQUENCE template_master_id_seq RESTART WITH 1;
+    </sql>
+
+    <!-- Load data into tables -->
+    <loadData
+      file="config/liquibase/data/email_template_data.csv"
+      separator=","
+      tableName="template_master">
+      <column name="id" type="numeric"/>
+      <column name="template_key" type="string"/>
+      <column name="template_name" type="string"/>
+      <column name="template_type" type="string"/>
+      <column name="subject" type="string"/>
+      <column name="content" type="string"/>
+      <column name="supported_variables" type="string"/>
+      <column name="status" type="boolean"/>
+      <column name="created_by" type="numeric"/>
+      <column name="created_at" type="timestamp"/>
+      <column name="updated_by" type="numeric"/>
+      <column name="updated_at" type="timestamp"/>
+    </loadData>
+
+    <!-- Update sequences based on current max ID -->
+    <sql>
+      SELECT setval('template_master_id_seq', (SELECT MAX(id) FROM template_master), true);
+
+    </sql>
+  </changeSet>
+</databaseChangeLog>

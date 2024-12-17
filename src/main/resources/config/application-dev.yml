@@ -111,3 +111,10 @@ google:
     secret: ENC(${seps.google.recaptcha.secret})
     verify-url: ENC(${seps.google.recaptcha.verify.url})
 
+website:
+  user-base-url: https://user-suptechdev.seps.gob.ec
+
+external-api:
+  email-base-url: https://serviciosrest.seps.gob.ec
+  email-from: sender@seps.gob.ec
+  email-service-enable: false

@@ -10,6 +10,7 @@ public final class Constants {
 
     public static final String SYSTEM = "system";
     public static final String DEFAULT_LANGUAGE = "es";
+    public static final String MICROSERVICE_NAME = "auth";
 
     private Constants() {}
 }

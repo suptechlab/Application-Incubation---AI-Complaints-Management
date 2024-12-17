@@ -11,9 +11,7 @@ import com.seps.auth.repository.LoginLogRepository;
 import com.seps.auth.service.MailService;
 import com.seps.auth.service.RecaptchaService;
 import com.seps.auth.service.UserService;
-import com.seps.auth.service.dto.LoginOtpDTO;
-import com.seps.auth.service.dto.OtpResponse;
-import com.seps.auth.service.dto.RegisterUserDTO;
+import com.seps.auth.service.dto.*;
 import com.seps.auth.service.dto.ResponseStatus;
 import com.seps.auth.web.rest.errors.CustomException;
 import com.seps.auth.web.rest.errors.SepsStatusCode;
@@ -291,17 +289,21 @@ public class AuthenticateController {
      * @return a {@link ResponseEntity} containing the generated {@link JWTToken} and an HTTP header with the Bearer token.
      */
     @PostMapping("/register")
-    public ResponseEntity<JWTToken> register(@Valid @RequestBody RegisterUserDTO dto) {
-        User user = userService.registerUser(dto);
-        List<GrantedAuthority> authorities = user.getAuthorities().stream()
+    public ResponseEntity<JWTToken> register(@Valid @RequestBody RegisterUserDTO dto,HttpServletRequest request) {
+        String clientIp = request.getRemoteAddr();
+        User newUser = userService.registerUser(dto);
+        List<GrantedAuthority> authorities = newUser.getAuthorities().stream()
             .map(role -> new SimpleGrantedAuthority(role.getName()))
             .collect(Collectors.toList());
         UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(user.getLogin(), null, authorities);
+            new UsernamePasswordAuthenticationToken(newUser.getLogin(), null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = this.createToken(authentication, true);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
+        mailService.sendAccountSetupEmail(newUser);
+        // Log the successful login attempt
+        userService.saveLoginLog(newUser,UserService.SUCCESS, clientIp);
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
@@ -327,6 +329,23 @@ public class AuthenticateController {
             LOG.error("Recaptcha verification failed for send login otp token: {}", dto.getRecaptchaToken());
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
         }
+        User account = userService.getEndUserWithAuthoritiesByEmail(dto.getEmail())
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_ACCOUNT_NOT_EXIST, null, null));
+        userService.validateAccount(account);
+        String login=account.getLogin();
+        // Retrieve user, update OTP, and send via email
+        User user=userService.updateUserOtpInfo(login);
+        mailService.sendLoginOtpEmail(user);
+        // Log the successful login attempt
+        userService.saveLoginLog(user,UserService.INITIATED, clientIp);
+        // Return OTP response
+        return new ResponseEntity<>(new OtpResponse(user.getOtpToken(), user.getOtpTokenExpirationTime()), HttpStatus.OK);
+    }
+
+    @PostMapping("/send-chatbot-login-otp")
+    public ResponseEntity<OtpResponse> sendChatBotLoginOtp(@Valid @RequestBody LoginChatbotOtpDTO dto,HttpServletRequest request){
+        String clientIp = request.getRemoteAddr();
+
         User account = userService.getEndUserWithAuthoritiesByEmail(dto.getEmail())
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_ACCOUNT_NOT_EXIST, null, null));
         userService.validateAccount(account);
