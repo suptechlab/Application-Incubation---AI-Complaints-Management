@@ -149,7 +149,6 @@ export const NavItems = () => {
       disabled: false,
       roleName: "admin",
       moduleName : "Ticket Workflow",
-      disabled: true,
     },
     {
       id: 7,
