@@ -15,12 +15,12 @@ import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTicketData }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
 
     const { masterData } = useContext(MasterDataContext)
-    const {currentUser } = useContext(AuthenticationContext);
+    const { currentUser } = useContext(AuthenticationContext);
 
     const [agentList, setAgentListing] = useState([])
     const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);
@@ -88,7 +88,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTic
         setLoading(true)
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
-            if (currentUser === "SEPS_ADMIN") {
+            if (currentUser === "SEPS_ADMIN" || currentUser === "ADMIN") {
                 agentTicketToSEPSagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setSelectedAgent(null)
@@ -117,7 +117,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTic
             }
 
         } else {
-            toast.warning("You are not allowed to assign tickets.")
+            toast.error("You are not allowed to assign tickets.")
         }
     }
     // GET AGENT DROPDOWN LISTING
@@ -141,6 +141,20 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTic
     useEffect(() => {
         getAgentDropdownListing()
     }, [])
+
+const daysDifference = calculateDaysDifference(ticketData?.slaBreachDate);
+const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference);
+    const renderBadge = (bgColor, textColor, message) => (
+        <Badge
+            bg={bgColor}
+            className={`bg-opacity-10 text-${textColor} py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill`}
+        >
+            <MdSchedule size={16} />
+            <span className="custom-font-size-13 fw-normal">{message}</span>
+        </Badge>
+    );
+
+
     return (
         <React.Fragment>
             <div className="pb-3">
@@ -150,16 +164,12 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTic
                     className="flex-wrap custom-min-height-38"
                 >
                     <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
-                        {title}
-                        {ticketData?.slaBreachDate && (
-                            calculateDaysDifference(ticketData?.slaBreachDate) > 2 ?
-                                <Badge bg='custom-info' className='bg-opacity-10 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                    <MdSchedule size={16} />
-                                    <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + ' ' + t('DAYS_REMAINING')}</span>
-                                </Badge> : <Badge bg='custom-danger' className='bg-opacity-10 text-custom-danger py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                    <MdSchedule size={16} />
-                                    <span className='custom-font-size-13 fw-normal'>{calculateDaysDifference(ticketData?.slaBreachDate) + ' ' + t('DAYS_REMAINING')}</span>
-                                </Badge>)}
+                        {title ?? ""}
+                        {isSlaBreachDateValid && (
+                            daysDifference > 2
+                                ? renderBadge("custom-info", "custom-info", `${daysDifference} Days remaining`)
+                                : renderBadge("custom-danger", "custom-danger", `${daysDifference} Days remaining`)
+                        )}
                         {
                             ticketData?.instanceType === "FIRST_INSTANCE" ?
                                 <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
@@ -185,7 +195,9 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTic
                             Assign To
                         </Button> */}
                         {
-                            (currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN') &&
+                            (currentUser === 'FI_ADMIN' && ticketData?.instanceType === 'FIRST_INSTANCE') || 
+                            ((currentUser === 'SEPS_ADMIN' || currentUser === 'SUPER_ADMIN') && 
+                            ticketData?.instanceType === 'SECOND_INSTANCE')  &&
                             (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED") &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
