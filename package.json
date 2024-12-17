@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://localhost:3001",
+  "homepage": "https://webportal-stg-suptech.seps.gob.ec",
   "dependencies": {
     "@reduxjs/toolkit": "^2.3.0",
     "@tanstack/react-query": "^5.61.0",
