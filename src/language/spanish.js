@@ -250,6 +250,7 @@ export const spanishLang = {
     "TICKET_CLOSE_STATUS": "Estado de cierre del ticket",
     "TICKET_REJECT_STATUS": "Estado de rechazo del ticket",
     "ATTACHMENT": "Adjunto",
-    "BROWSE": "Buscar"
-
+    "BROWSE": "Buscar",
+    "REASON": "Razón",
+    "SUB-STATUS": "Subestado"
 }

@@ -109,7 +109,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                     <Form>
                         <Modal.Body className="text-break py-0">
                             <FormInput
-                                label="Comments"
+                                label={t("COMMENT")}
                                 id="reason"
                                 name="reason"
                                 type="text"
@@ -122,7 +122,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                                 touched={touched?.reason}
                             />
                             <ReactSelect
-                                label="Sub-status"
+                                label={t("SUB-STATUS")}
                                 error={errors.closeSubStatus}
                                 options={[
                                     { label: t("SELECT"), value: "" },

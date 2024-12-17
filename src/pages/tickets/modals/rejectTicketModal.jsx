@@ -119,7 +119,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                                 touched={touched?.reason}
                             />
                             <ReactSelect
-                                label="Sub-status"
+                                label={t("SUB-STATUS")}
                                 error={errors.rejectedStatus}
                                 options={[
                                     { label: t("SELECT"), value: "" },
