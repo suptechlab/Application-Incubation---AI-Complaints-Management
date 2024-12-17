@@ -13,13 +13,16 @@ import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import Logo from "../../../assets/images/logo.svg";
 import "./header.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { setLogout } from "../../../redux/slice/authSlice";
+import { setLogout, verifyLoginOTP } from "../../../redux/slice/authSlice";
 import { useTranslation } from "react-i18next";
 import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
 import ProfileModal from "../../../pages/profile";
+import OnlyLoginModal from "../../../pages/auth/user-direct-login";
+import { MdAccountBox, MdAccountCircle, MdKey, MdLogout } from "react-icons/md";
 
 const Header = ({ layout }) => {
   const [profileModalShow, setProfileModalShow] = useState(false);
+  const [loginModalShow, setLoginModalShow] = useState(false);
 
   const { isLoggedIn, user } = useSelector((state) => state?.authSlice)
 
@@ -53,8 +56,29 @@ const Header = ({ layout }) => {
     navigate('/')
   }
 
+  const handleLoginClick = () => {
+    setLoginModalShow(true);
+  }
+
+  const handleSuccessButtonClick = async (values, actions) => {
+    // verifyLoginOTP
+    const result = await dispatch(verifyLoginOTP(values));
+    if (verifyLoginOTP.fulfilled.match(result)) {
+      navigate('/my-account');
+      handleCloseModal();
+      actions.setSubmitting(false)
+    } else {
+      console.error('VERIFY OTP ERROR:', result.error.message);
+      actions.setSubmitting(false)
+    }
+  }
+
   const handleProfileClick = () => {
     setProfileModalShow(true)
+  }
+
+  const handleCloseModal = () => {
+    setLoginModalShow(false);
   }
 
   return (
@@ -90,6 +114,16 @@ const Header = ({ layout }) => {
                     {link.label}
                   </Nav.Link>
                 ))}
+                {!isLoggedIn &&
+                  <Button
+                    type="button"
+                    className="py-2 custom-min-width-90"
+                    variant="warning"
+                    onClick={handleLoginClick}
+                  >
+                    {t('LOGIN')}
+                  </Button>
+                }
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
@@ -108,24 +142,36 @@ const Header = ({ layout }) => {
                 alt={"Alex Boston"}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-150 fs-6 lh-sm fw-semibold">
-              {user?.name}
+                {user?.name}
               </span>
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="shadow border-0 mt-3">
               <Dropdown.Header className="fw-semibold d-md-none">
-              {user?.name ?? ''} 
+                {user?.name ?? ''}
               </Dropdown.Header>
-              <Dropdown.Item as={Button} onClick={handleProfileClick} disabled>
-                {t("PROFILE")}
+              <Dropdown.Item as={Button} onClick={handleProfileClick} disabled className="fs-6">
+                <span className="me-2">
+                  <MdAccountBox size={18} />
+                </span>
+                <span className="align-middle">{t("PROFILE")}</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/my-account">
-                {t("MY_ACCOUNT")}
+                <span className="me-2">
+                  <MdAccountCircle size={18} />
+                </span>
+                <span className="align-middle">{t("MY_ACCOUNT")}</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password" disabled>
-                {t("CHANGE_PASSWORD")}
+                <span className="me-2">
+                  <MdKey size={18} />
+                </span>
+                <span className="align-middle">{t("CHANGE_PASSWORD")}</span>
               </Dropdown.Item>
-              <Dropdown.Item as={Button} onClick={handleLogout}>
-                {t("LOGOUT")}
+              <Dropdown.Item as={Button} onClick={handleLogout} className="fs-6">
+                <span className="me-2">
+                  <MdLogout size={18} />
+                </span>
+                <span className="align-middle">{t("LOGOUT")}</span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -135,11 +181,19 @@ const Header = ({ layout }) => {
           />
         </Container>
       </Navbar>
-      
+
       {/* Profile Modal */}
       <ProfileModal
         handleShow={profileModalShow}
         handleClose={() => setProfileModalShow(false)}
+      />
+
+      {/* Login Modal */}
+      <OnlyLoginModal
+        handleShow={loginModalShow}
+        handleClose={handleCloseModal}
+        handleLoginSucccesSubmit={handleSuccessButtonClick}
+        isFromDirectLogin={true}
       />
     </header>
   );
