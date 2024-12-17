@@ -1,5 +1,6 @@
 package com.seps.ticket.domain;
 
+import com.seps.ticket.enums.EmailUserTypeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,4 +61,16 @@ public class TemplateMaster {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "is_general")
+    private Boolean isGeneral;
+
+    @Column(name = "organization_id")
+    private Long organizationId;
+
+    @Column(name = "user_type")
+    private EmailUserTypeEnum userType;
+
+    @Column(name = "is_static")
+    private Boolean isStatic;
 }

@@ -58,6 +58,9 @@ public class MasterDataService {
         // Adding localized data for Rejected Status enum
         masterData.put("rejectedStatus", enumUtil.enumToLocalizedMap(RejectedStatusEnum.class, locale));
 
+        // Adding localized data for EmailUserType enum
+        masterData.put("emailUserType", enumUtil.enumToLocalizedMap(EmailUserTypeEnum.class, locale));
+
         return masterData;
     }
 }
