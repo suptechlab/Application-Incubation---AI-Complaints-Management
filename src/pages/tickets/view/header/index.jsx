@@ -39,12 +39,19 @@ const TicketViewHeader = ({ title = "", ticketData, currentUser, setIsGetAcitivi
         } else if (status === "REJECT") {
             setRejectTicketModalShow(true)
         }
+        
+        // else if (status === "IN_PROGRESS"){
+
+        // }
     };
 
     // The color class based on the status
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
     const statusOptions = [{ label: t('CLOSE'), value: 'CLOSE' }, { label: t('REJECT'), value: 'REJECT' }];
+    // if (selectedStatus === 'NEW') {
+    //     statusOptions.push({ label: t('IN_PROGRESS'), value: 'IN_PROGRESS' });
+    //   }
     const getStatusClass = (status) => {
         switch (status) {
             case 'CLOSED':
