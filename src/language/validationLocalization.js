@@ -68,7 +68,7 @@ export const messages = {
     invalidSpecialPetition: "Special Petition must not exceed 1024 characters.",
     specialPetitionRequired: "Special Petition is required.",
     agreeDeclarations: "Please agree to all declarations and conditions to proceed.",
-
+    userTypeRequired :'User Type is required.',
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -127,7 +127,6 @@ export const messages = {
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
     entityRequired: "El nombre de la entidad es obligatorio.",
-    roleIdRequired: "El rol es obligatorio.", // Add this
     //create claim
     genderRequired: "Se requiere género.",
     cantonRequired: "Se requiere Cantón de Residencia.",
@@ -140,6 +139,6 @@ export const messages = {
     invalidSpecialPetition: "La petición especial no debe exceder los 1024 caracteres.",
     specialPetitionRequired: "Se requiere una petición especial.",
     agreeDeclarations: "Por favor acepte todas las declaraciones y condiciones para continuar.",
-    entityRequired: "El nombre de la entidad es obligatorio."
+    userTypeRequired : "Se requiere el tipo de usuario."
   }
 };

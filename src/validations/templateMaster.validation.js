@@ -11,7 +11,8 @@ const validationSchema = Yup.object({
   templateType: Yup.string()
     .max(250, msg.maximum250Characters) // Dynamic message for max 250 characters
     .required(msg.templateTypeRequired), // Dynamic message for required field
-
+  userType: Yup.string()
+    .required(msg.userTypeRequired), // Dynamic message for required field
   subject: Yup.string()
     .max(250, msg.maximum250Characters) // Dynamic message for max 250 characters
     .required(msg.subjectRequired), // Dynamic message for required field

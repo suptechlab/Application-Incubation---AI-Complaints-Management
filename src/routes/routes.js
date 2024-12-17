@@ -23,6 +23,9 @@ import ClaimOverviewReport from "../pages/clamOverviewReport";
 import CreateClaim from "../pages/tickets/create-claim";
 import TeamManagementAddEdit from "../pages/team-management/addedit";
 import TicketWorkFlowAddEdit from "../pages/tickets-workflow/addedit";
+import AddTemplate from "../pages/master management/TemplateMaster/Add/index";
+import EditTemplate from "../pages/master management/TemplateMaster/Edit/index";
+
 
 const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
@@ -106,6 +109,18 @@ const routes = [
   {
     path: "/template-master",
     element: <TemplateMaster />,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/template-master/add",
+    element:<AddTemplate/>,
+    isPrivate: true,
+    layoutType: "Auth",
+  },
+  {
+    path: "/template-master/edit/:id",
+    element: <EditTemplate/>,
     isPrivate: true,
     layoutType: "Auth",
   },

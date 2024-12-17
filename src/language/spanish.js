@@ -240,8 +240,12 @@ export const spanishLang = {
     "REPLIES": "Respuestas",
     "CONSUMER_INFO": "Información del Consumidor",
     "ENTER_EXTENDED_DATE": "Ingrese Fecha Extendida",
-    "DAYS_REMAINING": "Días restantes",
     "DAYS": "Días",
     "ALL_PRIORITY": "Toda prioridad",
-    "INSTANCE_TYPE": "Tipo de instancia"
+    "INSTANCE_TYPE": "Tipo de instancia",
+    "USER_TYPE": "Tipo de usuario",
+    "FI": "FI",
+    "SEPS": "SEPS",
+    "CUSTOMER": "Cliente",
+    "TEMPLATES":"Plantillas",
 }

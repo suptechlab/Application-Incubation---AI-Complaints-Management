@@ -258,5 +258,10 @@ export const englishLang = {
     "DAYS REMAINING":"Days remaining",
     "DAYS" :"Days",
     "ALL_PRIORITY":"All Priority",
-    "INSTANCE_TYPE":"Instance Type"
+    "INSTANCE_TYPE":"Instance Type",
+    "USER_TYPE" : "User Type",
+    "FI" : "FI",
+    "SEPS":"SEPS",
+    "CUSTOMER":"Customer",
+    "TEMPLATES":"Templates"
 }

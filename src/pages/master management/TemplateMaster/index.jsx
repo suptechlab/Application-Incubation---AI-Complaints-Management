@@ -5,7 +5,7 @@ import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
 import ListingSearchForm from "../../../components/ListingSearchForm";
@@ -30,7 +30,8 @@ const TemplateMaster = () => {
   const { t } = useTranslation();
 
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
   const [isDownloading, setDownloading] = useState(false)
   const [pagination, setPagination] = useState({
@@ -86,7 +87,8 @@ const TemplateMaster = () => {
   }, []);
 
   const editTemplateMaster = async (rowData) => {
-    setEditModal({ row: rowData, open: !editModal?.open });
+    navigate(`/template-master/edit/${rowData?.id}`)
+    // setEditModal({ row: rowData, open: !editModal?.open });
   };
 
   const dataQuery = useQuery({
@@ -279,7 +281,7 @@ const TemplateMaster = () => {
           title={t("TEMPLATE MASTER")}
           actions={[
             { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-            { label: "Add New", onClick: toggle, variant: "warning" },
+            { label: "Add New", to:"/template-master/add", variant: "warning" },
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
