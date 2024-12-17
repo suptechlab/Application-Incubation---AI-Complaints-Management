@@ -258,5 +258,14 @@ export const englishLang = {
     "DAYS REMAINING":"Days remaining",
     "DAYS" :"Days",
     "ALL_PRIORITY":"All Priority",
-    "INSTANCE_TYPE":"Instance Type"
+    "INSTANCE_TYPE":"Instance Type",
+    "ADD_INTERNAL_NOTE":"Add Internal Note",
+    "COMPLAINT" : "Complaint",
+    "NO_ATTACHMENT" : "There is no attachment included.",
+    "TICKET_CLOSE_STATUS" : "Ticket Close Status",
+    "TICKET_REJECT_STATUS" :"Ticket Reject Status",
+    "ATTACHMENT" : "Attachment",
+    "BROWSE":"Browse",
+    "REASON":"Reason",
+    "SUB-STATUS":'Sub-Status'
 }

@@ -2,6 +2,9 @@ import moment from "moment/moment";
 import { MdPictureAsPdf } from "react-icons/md";
 import { FiImage ,FiFileText} from "react-icons/fi";
 import { FaRegFile,FaFileWord,FaFileAlt } from "react-icons/fa";
+import { getValidationMessages } from "../services/Validation.service";
+
+const msg = getValidationMessages();
 
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
@@ -39,24 +42,45 @@ export const calculateDaysDifference = (date) => {
 
 // FILE UPLOAD
 
-export const validateFile = (file) => {
+// export const validateFile = (file) => {
 
 
  
+//   const MAX_FILE_SIZE_MB = 1;
+
+//   if (!file) {
+//     return "No file selected.";
+//   }
+
+//   // Validate MIME type
+//   if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+//     return "Invalid file type. Please upload an allowed file.";
+//   }
+
+//   // Validate file size
+//   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+//     return `File size exceeds ${MAX_FILE_SIZE_MB} MB. Please upload a smaller file.`;
+//   }
+
+//   // If all validations pass
+//   return true;
+// };
+
+export const validateFile = (file) => {
   const MAX_FILE_SIZE_MB = 1;
 
   if (!file) {
-    return "No file selected.";
+    return msg.noFileSelected;
   }
 
   // Validate MIME type
   if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-    return "Invalid file type. Please upload an allowed file.";
+    return msg.invalidFileType;
   }
 
   // Validate file size
   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-    return `File size exceeds ${MAX_FILE_SIZE_MB} MB. Please upload a smaller file.`;
+    return msg.fileSizeExceeded.replace("{size}", MAX_FILE_SIZE_MB);
   }
 
   // If all validations pass
