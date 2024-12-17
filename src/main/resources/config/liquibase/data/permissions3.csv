@@ -1,0 +1,21 @@
+id,module_id,name,description,description_es
+57,19,CLAIM_TYPE_CREATE_FI,Create,Crear
+58,19,CLAIM_TYPE_UPDATE_FI,Update,Actualizar
+59,19,CLAIM_TYPE_STATUS_CHANGE_FI,Status Change,Cambio de estado
+60,20,CLAIM_SUB_TYPE_CREATE_FI,Create,Crear
+61,20,CLAIM_SUB_TYPE_UPDATE_FI,Update,Actualizar
+62,20,CLAIM_SUB_TYPE_STATUS_CHANGE_FI,Status Change,Cambio de estado
+63,21,TEMPLATE_CREATE_FI,Create,Crear
+64,21,TEMPLATE_UPDATE_FI,Update,Actualizar
+65,21,TEMPLATE_STATUS_CHANGE_FI,Status Change,Cambio de estado
+66,22,TICKET_WF_CREATED_BY_FI,Create,Crear
+67,22,TICKET_WF_UPDATED_BY_FI,Update,Actualizar
+68,22,TICKET_WF_CHANGE_STATUS_BY_FI,Status Change,Cambio de estado
+69,16,TICKET_CLOSED_FI,Close,Cerrar
+70,16,TICKET_REJECT_FI,Reject,Rechazar
+71,16,TICKET_PRIORITY_CHANGE_FI,Priority Change,Cambio de prioridad
+72,16,TICKET_DOWNLOAD_PDF_FI,Download PDF,Descargar PDF
+73,10,TICKET_CLOSED_SEPS,Close,Cerrar
+74,10,TICKET_REJECT_SEPS,Reject,Rechazar
+75,10,TICKET_PRIORITY_CHANGE_SEPS,Priority Change,Cambio de prioridad
+76,10,TICKET_DOWNLOAD_PDF_SEPS,Download PDF,Descargar PDF

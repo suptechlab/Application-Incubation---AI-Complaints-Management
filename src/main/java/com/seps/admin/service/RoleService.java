@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.zalando.problem.Status;
 
 import java.util.*;
@@ -129,7 +130,9 @@ public class RoleService {
         Map<String, Object> oldData = convertEntityToMap(this.findOne(id));
         Role role = getRole(id);
         // Update role details
-        role.setName(roleDTO.getName());
+        if(!StringUtils.hasText(role.getRoleSlug())) {
+            role.setName(roleDTO.getName());
+        }
         role.setDescription(roleDTO.getDescription());
         role = roleRepository.save(role);
 
@@ -335,7 +338,7 @@ public class RoleService {
             });
     }
 
-
+    @Transactional
     public Set<Permission> getUserPermissions(Long userId, String permissionName) {
         return userRepository.findById(userId)
             .map(user -> user.getRoles().stream()

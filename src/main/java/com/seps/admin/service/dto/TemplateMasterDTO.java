@@ -1,5 +1,6 @@
 package com.seps.admin.service.dto;
 
+import com.seps.admin.enums.EmailUserTypeEnum;
 import com.seps.admin.enums.TemplateTypeEnum;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
@@ -21,4 +22,6 @@ public class TemplateMasterDTO {
     private String content;
     private String supportedVariables;
     private Boolean status;
+    private Long copyFrom;
+    private EmailUserTypeEnum userType;
 }

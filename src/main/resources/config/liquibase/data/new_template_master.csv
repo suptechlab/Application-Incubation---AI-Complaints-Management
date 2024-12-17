@@ -1,0 +1,256 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at,is_general,organization_id,user_type,is_static
+FORGOT_PASSWORD,Reinicio de contraseÃ±a de SEPS-Cambridge,EMAIL,Reinicio de contraseÃ±a de SEPS-Cambridge,"<p>Estimado/a {{username}},</p>
+<p>Se ha solicitado el reinicio de la contraseÃ±a para su cuenta SEPS-Cambridge. Por favor, haga clic en el siguiente enlace para reiniciarla:</p>
+<p><a href=""{{url}}"" target=""_blank"">{{url}}</a></p>","{{username}},{{url}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+YOUR_OTP_CODE,Tu cÃ³digo OTP,EMAIL,Tu cÃ³digo OTP,"<p>Estimado/a {{username}},</p>
+<p>Su contraseÃ±a de un solo uso (OTP) es</p>
+<p><strong>{{otpCode}}</strong></p>
+<p>Utilice esta OTP en los prÃ³ximos {{minutes}} minutos</p>","{{username}},{{otpCode}},{{minutes}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+REGISTER_YOUR_OTP_CODE,Tu cÃ³digo OTP,EMAIL,Tu cÃ³digo OTP,"<p>Estimado/a,</p>
+<p>Su contraseÃ±a de un solo uso (OTP) es</p>
+<p><strong>{{otpCode}}</strong></p>
+<p>Utilice esta OTP en los prÃ³ximos {{minutes}} minutos</p>","{{username}},{{otpCode}},{{minutes}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+ACCOUNT_ACTIVATION,ActivaciÃ³n de gateway,EMAIL,ActivaciÃ³n de gateway,"<p>Estimado/a {{username}},</p><p>Su cuenta en gateway ha sido creada. Por favor, haga clic en el siguiente enlace para activarla:</p><p><a href=""{{url}}"">{{url}}</a></p>","{{username}},{{url}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+WELCOME_TO_TEAM_FOR_ASSIGNED_MEMBER,Bienvenido al equipo,EMAIL,Bienvenido al equipo {{teamName}},"<p>Estimado/a {{username}},</p>
+<p>¡Bienvenido al equipo {{teamName}}! Estamos encantados de contar con usted a bordo.</p>","{{username}},{{teamName}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+NEW_MEMBER_ADDED_TO_TEAM,Nuevo miembro agregado al equipo,EMAIL,Nuevo miembro agregado al equipo {{teamName}},"<p>Estimado/a {{username}},</p>
+<p>Los siguientes nuevos miembros se han agregado a su equipo {{teamName}}:</p>
+<p>{{membersName}}</p>","{{username}},{{teamName}},{{membersName}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+FI_USER_CREATION,Creación de usuarios FI,EMAIL,Creación de usuarios FI,"<p>Estimado/a {{username}},</p>
+<p>Su cuenta de usuario FI ha sido creada bajo la organización {{organizationName}}, haga clic en la siguiente URL para acceder a ella:</p>
+<p><a href=""{{url}}"">{{url}}</a></p>","{{username}},{{organizationName}},{{url}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+SEPS_USER_CREATION,Creación de usuarios SEPS,EMAIL,Creación de usuarios SEPS,"<p>Estimado/a {{username}},</p>
+<p>Su cuenta de usuario SEPS ha sido creada, haga clic en la siguiente URL para acceder a ella:</p>
+<p><a href=""{{url}}"">{{url}}</a></p>","{{username}},{{url}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+CLAIM_TICKET_CREATED,Ticket de reclamo creado,EMAIL,Ticket de reclamo creado,"<p>Estimado {{username}},</p>
+<p>Su ticket con ID #{{ticketNumber}} ha sido creado exitosamente.</p>
+<p>Detalles del reclamo:</p>
+<ul>
+  <li>
+    <strong>Tipo de reclamo:</strong>
+    <span>{{claimType}}</span>
+  </li>
+  <li>
+    <strong>Subtipo de reclamo:</strong>
+    <span>{{claimSubType}}</span>
+  </li>
+  <li>
+    <strong>Nombre de la entidad:</strong>
+    <span>{{razonSocial}}</span>
+  </li>
+  <li>
+    <strong>Identificación Fiscal de la Entidad (RUC):</strong>
+    <span>{{ruc}}</span>
+  </li>
+  <li>
+    <strong>Prioridad:</strong>
+    <span>{{priority}}</span>
+  </li>
+  <li>
+    <strong>Estado:</strong>
+    <span>{{status}}</span>
+  </li>
+</ul>
+<p>
+  <a href=""{{url}}"" target=""_blank"">Ver detalles del reclamo</a>
+</p>","{{username}},{{ticketNumber}},{{claimType}},{{claimSubType}},{{razonSocial}},{{ruc}},{{priority}},{{status}},{{url}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+CLAIM_TICKET_CLOSED,Reclamación de ticket cerrada,EMAIL,Reclamar ticket #{{ticketNumber}} Cerrado,"<p>Estimado {{username}},</p>
+<p>Le informamos que el ticket de reclamo #{{ticketNumber}} ha sido cerrado.</p>
+<ul>
+  <li>
+    <strong>Razón:</strong>
+    <span>{{reason}}</span>
+  </li>  
+  <li>
+    <strong>Estado:</strong>
+    <span>{{status}}</span>
+  </li>
+</ul>
+<p>Gracias por su cooperación.</p>","{{username}},{{ticketNumber}},{{reason}},{{status}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+ASSIGN_TICKET_NOTIFY_CUSTOMER,Enviar correo electrónico al cliente para asignar boleto.,EMAIL,Su ticket de reclamo #{{ticketNumber}} ha sido asignado,"<p>Estimado {{username}},</p>
+<p>Queríamos informarle que su ticket (ID: #{{ticketNumber}}) se ha asignado correctamente a un agente para su resolución. A continuación, se muestran los detalles del ticket:</p>
+<ul>
+  <li>
+    <strong>Reclamar ID de ticket: </strong>
+    <span>#{{ticketNumber}}</span>
+  </li>  
+  <li>
+    <strong>Agente asignado: </strong>
+    <span>{{agentName}}</span>
+  </li>
+  <li>
+    <strong>Fecha asignada: </strong>
+    <span>{{assignedDate}}</span>
+  </li>
+</ul>
+<p>Nuestro agente se pondrá en contacto contigo en breve para solucionar tu problema. Si tienes alguna pregunta, no dudes en ponerte en contacto con nuestro equipo de asistencia.</p>
+<p>Gracias por su paciencia y cooperación.</p>","{{username}},{{ticketNumber}},{{agentName}},{{assignedDate}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,2,FALSE
+ASSIGN_TICKET_NOTIFY_AGENT,Enviar correo electrónico al agente que boleto asignado.,EMAIL,Reclama el ticket #{{ticketNumber}} que te fue asignado,"<p>Estimado {{username}},</p>
+<p>Se le ha asignado un nuevo ticket de reclamación. A continuación se muestran los detalles del ticket:</p>
+<ul>
+  <li>
+    <strong>Reclamar ID de ticket: </strong>
+    <span>#{{ticketNumber}}</span>
+  </li>  
+  <li>
+    <strong>Nombre del cliente: </strong>
+    <span>{{customerName}}</span>
+  </li>
+  <li>
+    <strong>Correo electrónico del cliente: </strong>
+    <span>{{customerEmail}}</span>
+  </li>
+  <li>
+    <strong>Fecha asignada: </strong>
+    <span>{{assignedDate}}</span>
+  </li>
+</ul>
+<p>Revise el ticket lo antes posible y asegúrese de resolverlo a tiempo. Si tiene alguna pregunta, no dude en comunicarse con su administrador.</p>","{{username}},{{ticketNumber}},{{customerName}},{{customerEmail}},{{assignedDate}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,1,FALSE
+CLAIM_TICKET_PRIORITY_CHANGE_AGENT,Enviar correo electrónico al agente cuando cambie la prioridad.,EMAIL,Se modificó la prioridad del ticket de reclamo #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>La prioridad del ticket de reclamación #{{ticketNumber}} ha sido cambiada a <strong>{{ticketPriority}}</strong></p>
+<ul>
+  <li>
+    <strong>Actualizado por: </strong>
+    <span>#{{updatedBy}}</span>
+  </li>  
+  <li>
+    <strong>Prioridad: </strong>
+    <span>{{ticketPriority}}</span>
+  </li>
+  <li>
+    <strong>Estado:</strong>
+    <span>{{status}}</span>
+  </li>
+</ul>
+<p>Por favor revise el ticket lo antes posible.</p>","{{username}}, {{ticketNumber}}, {{ticketPriority}}, {{updatedBy}}, {{status}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,1,FALSE
+CLAIM_TICKET_REJECTED_NOTIFY_AGENT,Enviar correo electrónico al agente que reclama ticket rechazado,EMAIL,Reclamación de ticket rechazada,"<p>Estimado {{username}},</p>
+<p>Lamentamos informarle que el ticket de reclamación con ID <strong>#{{ticketNumber}}</strong> ha sido rechazado.</p>
+<p>Detalles del rechazo:</p>
+<ul>
+  <li>
+    <strong>Razón: </strong>
+    <span>#{{reason}}</span>
+  </li>  
+  <li>
+    <strong>Estado rechazado: </strong>
+    <span>{{rejectedStatus}}</span>
+  </li>
+</ul>
+<p>Revise el ticket y tome las medidas necesarias según los procedimientos de la empresa.</p>
+<p>Si tiene más preguntas, no dude en ponerse en contacto con su administrador.</p>","{{username}},{{ticketNumber}},{{reason}},{{rejectedStatus}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,1,FALSE
+CLAIM_TICKET_REJECTED_NOTIFY_CUSTOMER,Enviar correo electrónico al cliente indicando que el ticket de reclamo fue rechazado,EMAIL,Su ticket de reclamo #{{ticketNumber}} ha sido rechazado,"<p>Estimado {{username}},</p>
+<p>Lamentamos informarle que su ticket de reclamación con ID <strong>#{{ticketNumber}}</strong> ha sido rechazado.</p>
+<p>Detalles del rechazo:</p>
+<ul>
+  <li>
+    <strong>Razón: </strong>
+    <span>#{{reason}}</span>
+  </li>  
+  <li>
+    <strong>Estado rechazado: </strong>
+    <span>{{rejectedStatus}}</span>
+  </li>
+</ul>
+<p>Entendemos que esto puede resultar decepcionante. Si desea hablar sobre el rechazo o necesita más aclaraciones, no dude en ponerse en contacto con nuestro equipo de asistencia.</p>
+<p>Gracias por su comprensión.</p>","{{username}},{{ticketNumber}},{{reason}},{{rejectedStatus}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,2,FALSE
+CLAIM_TICKET_INSTANCE,Segunda instancia de reclamo creada,EMAIL,Segunda instancia de reclamo creada - Ticket #{{ticketNumber}},"<p>Estimado {{username}},</p>
+
+<p>Su reclamo con ID de Ticket #{{ticketNumber}} ha sido actualizado a una nueva instancia.</p>
+
+<p>Detalles de la instancia anterior:</p>
+<ul>
+  <li>
+    <strong>Instancia Anterior:</strong>
+    <span>{{previousInstance}}</span>
+  </li>
+  <li>
+    <strong>Estado Anterior:</strong>
+    <span>{{previousStatus}}</span>
+  </li>
+</ul>
+
+<p>Detalles de la nueva instancia del reclamo:</p>
+<ul>
+  <li>
+    <strong>Instancia Actual:</strong>
+    <span>{{newInstance}}</span>
+  </li>
+  <li>
+    <strong>Estado Actual:</strong>
+    <span>{{newStatus}}</span>
+  </li>
+  <li>
+    <strong>Comentario Adicional:</strong>
+    <span>{{instanceComment}}</span>
+  </li>
+</ul>
+
+<p>
+  <a href=""{{url}}"" target=""_blank"">Ver detalles del reclamo</a>
+</p>
+
+<p>Si tiene preguntas adicionales, no dude en comunicarse con nuestro equipo de soporte.</p>
+
+<p>Atentamente,</p>
+<p>El equipo de soporte</p>
+","{{username}},{{ticketNumber}},{{previousInstance}},{{previousStatus}},{{newInstance}},{{newStatus}},{{instanceComment}},{{url}}",True,1,2024-12-06 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+CUSTOMER_REPLY_ON_TICKET_CONVERSATION,Respuesta del cliente en la conversación del ticket,EMAIL,Respuesta del cliente al ticket #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Esto es para notificarle que el cliente <strong>{{customerName}}</strong> ha respondido al ticket con los siguientes detalles:</p>
+<ul>
+  <li>
+    <strong>Reclamar ID del ticket: </strong>
+    <span>#{{ticketNumber}}</span>
+  </li>  
+  <li>
+    <strong>Nombre del cliente: </strong>
+    <span>{{customerName}}</span>
+  </li>
+  <li>
+    <strong>Mensaje de respuesta: </strong>
+    <span>{{messageContent}}</span>
+  </li>  
+  <li>
+    <strong>Archivos adjuntos: </strong>
+    <span>{{attachmentDetails}}</span>
+  </li>
+</ul>
+<p>Inicie sesión en el sistema para ver la conversación completa y responder si es necesario.</p>","{{username}},{{customerName}},{{messageContent}},{{ticketNumber}},{{attachmentDetails}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+REPLY_TO_CUSTOMER_ON_TICKET_CONVERSATION,Responder al cliente en la conversación del ticket,EMAIL,Actualización sobre su ticket de reclamo #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Queríamos informarle que hubo una actualización con respecto a su ticket (#{{ticketNumber}}). A continuación, encontrará los detalles de la respuesta:</p>
+<ul>
+  <li>
+    <strong>Mensaje de {{senderName}}: </strong>
+    <span>{{messageContent}}</span>
+  </li>
+</ul>
+<p>Si hay archivos adjuntos incluidos, puede verlos en su cuenta o contactarnos para obtener más ayuda.</p>
+<p>Para ver el ticket y responder, inicie sesión en su cuenta utilizando el siguiente enlace:</p>
+<p><a href=""{{ticketUrl}}"">{{ticketUrl}}</a></p>
+<p>Gracias por comunicarse con nosotros. Seguimos comprometidos a resolver su problema lo más rápido posible.</p>","{{username}},{{ticketNumber}},{{senderName}},{{messageContent}},{{ticketUrl}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE
+REPLY_TO_INTERNAL_ON_TICKET_CONVERSATION,Responder a la conversación interna del ticket,EMAIL,Nota interna agregada al ticket de reclamo #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Se ha añadido una nota interna al ticket (#{{ticketNumber}}) de {{senderName}}. A continuación se muestran los detalles:</p>
+<ul>
+  <li>
+    <strong>Mensaje: </strong>
+    <span>{{messageContent}}</span>
+  </li>
+</ul>
+<p>Detalles del reclamo del ticket:</p>
+<ul>
+  <li>
+    <strong>Nombre del cliente: </strong>
+    <span>{{customerName}}</span>
+  </li>
+  <li>
+    <strong>Reclamar ID del ticket: </strong>
+    <span>{{ticketNumber}}</span>
+  </li>
+  <li>
+    <strong>Reclamar estado del ticket: </strong>
+    <span>{{status}}</span>
+  </li>
+</ul>
+<p>Si se incluyen archivos adjuntos, se pueden ver en los detalles del ticket.</p>
+<p>Para revisar el ticket y proporcionar actualizaciones o notas adicionales, visite:</p>
+<p><a href=""{{ticketUrl}}"">{{ticketUrl}}</a></p>
+<p>Asegúrese de que cualquier acción o respuesta posterior se registre de forma adecuada.</p>","{{username}},{{senderName}},{{messageContent}},{{customerName}},{{ticketNumber}},{{status}},{{ticketUrl}}",True,1,2024-12-02 00:00:00.627679,1,NULL,TRUE,NULL,0,TRUE

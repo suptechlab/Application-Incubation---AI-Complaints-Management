@@ -29,7 +29,7 @@ public class TemplateMasterSpecification {
      * @param templateType the type of the template, as defined in {@link TemplateTypeEnum} (optional).
      * @return a {@link Specification} of {@link TemplateMaster} that can be used in query methods.
      */
-    public static Specification<TemplateMaster> byFilter(String search, Boolean status, TemplateTypeEnum templateType) {
+    public static Specification<TemplateMaster> byFilter(String search, Boolean status, TemplateTypeEnum templateType, Long organizationId) {
         return (root, query, criteriaBuilder) -> {
             // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
@@ -57,6 +57,12 @@ public class TemplateMasterSpecification {
                 );
             }
 
+            // Filter by organizationId (if provided)
+            if (organizationId != null) {
+                predicates.add(
+                    criteriaBuilder.equal(root.get("organizationId"), organizationId)
+                );
+            }
             // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

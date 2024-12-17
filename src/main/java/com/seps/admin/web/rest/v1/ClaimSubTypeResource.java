@@ -3,8 +3,14 @@ package com.seps.admin.web.rest.v1;
 import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.service.ClaimSubTypeService;
 import com.seps.admin.service.dto.ClaimSubTypeDTO;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -37,7 +43,7 @@ public class ClaimSubTypeResource {
     }
 
     @PostMapping
-    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE"})
+    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE","CLAIM_SUB_TYPE_CREATE_FI"})
     public ResponseEntity<ResponseStatus> addClaimSubType(@RequestBody ClaimSubTypeDTO claimSubTypeDTO, HttpServletRequest request) throws URISyntaxException {
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = claimSubTypeService.addClaimSubType(claimSubTypeDTO, requestInfo);
@@ -51,7 +57,7 @@ public class ClaimSubTypeResource {
     }
 
     @PutMapping("/{id}")
-    @PermissionCheck({"CLAIM_SUB_TYPE_UPDATE"})
+    @PermissionCheck({"CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_UPDATE_FI"})
     public ResponseEntity<ResponseStatus> updateClaimSubType(@PathVariable Long id, @RequestBody ClaimSubTypeDTO claimSubTypeDTO, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         claimSubTypeService.updateClaimSubType(id, claimSubTypeDTO, requestInfo);
@@ -64,13 +70,13 @@ public class ClaimSubTypeResource {
     }
 
     @GetMapping("/{id}")
-    @PermissionCheck({"CLAIM_SUB_TYPE_UPDATE"})
+    @PermissionCheck({"CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_UPDATE_FI"})
     public ResponseEntity<ClaimSubTypeDTO> getClaimSubTypeById(@PathVariable Long id) {
         return ResponseEntity.ok(claimSubTypeService.getClaimSubTypeById(id));
     }
 
     @GetMapping
-    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE","CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_STATUS_CHANGE"})
+    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE","CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_STATUS_CHANGE","CLAIM_SUB_TYPE_CREATE_FI","CLAIM_SUB_TYPE_UPDATE_FI","CLAIM_SUB_TYPE_STATUS_CHANGE_FI"})
     public ResponseEntity<List<ClaimSubTypeDTO>> listClaimSubTypes(Pageable pageable, @RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) {
         Page<ClaimSubTypeDTO> page = claimSubTypeService.listClaimSubTypes(pageable, search, status);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -78,7 +84,7 @@ public class ClaimSubTypeResource {
     }
 
     @PatchMapping("/{id}/status")
-    @PermissionCheck({"CLAIM_SUB_TYPE_STATUS_CHANGE"})
+    @PermissionCheck({"CLAIM_SUB_TYPE_STATUS_CHANGE","CLAIM_SUB_TYPE_STATUS_CHANGE_FI"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         claimSubTypeService.changeStatus(id, status, requestInfo);
@@ -86,7 +92,7 @@ public class ClaimSubTypeResource {
     }
 
     @GetMapping("/download")
-    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE","CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_STATUS_CHANGE"})
+    @PermissionCheck({"CLAIM_SUB_TYPE_CREATE","CLAIM_SUB_TYPE_UPDATE","CLAIM_SUB_TYPE_STATUS_CHANGE","CLAIM_SUB_TYPE_CREATE_FI","CLAIM_SUB_TYPE_UPDATE_FI","CLAIM_SUB_TYPE_STATUS_CHANGE_FI"})
     public ResponseEntity<byte[]> listClaimSubTypesDownload(@RequestParam(required = false) String search, @RequestParam(required = false) Boolean status) throws IOException {
         ByteArrayInputStream in = claimSubTypeService.listClaimSubTypesDownload(search, status);
         HttpHeaders headers = new HttpHeaders();
@@ -98,6 +104,19 @@ public class ClaimSubTypeResource {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(in.readAllBytes());
         }
+    }
+
+    @Operation(summary = "List Active Claim Sub-Types", description = "Fetches a list of all active claim sub-types based on the claim type ID.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "List of active claim sub-types",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = DropdownListDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Claim Type not found")
+    })
+    @GetMapping("/dropdown-list/{claimTypeId}")
+    public ResponseEntity<List<DropdownListDTO>> listActiveClaimSubTypesByClaimType(@PathVariable Long claimTypeId) {
+        List<DropdownListDTO> claimSubTypes = claimSubTypeService.listActiveClaimSubTypesById(claimTypeId);
+        return ResponseEntity.ok(claimSubTypes);
     }
 }
 

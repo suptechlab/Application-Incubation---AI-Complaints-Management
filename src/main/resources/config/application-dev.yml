@@ -115,3 +115,11 @@ ldap:
   basedn: DC=SEPS,DC=local
   username: CN=suptech,OU=Cambrigde,DC=SEPS,DC=local
   password: Must4n8_2k2G
+
+website:
+  user-base-url: https://user-suptechdev.seps.gob.ec
+
+external-api:
+  email-base-url: https://serviciosrest.seps.gob.ec
+  email-from: sender@seps.gob.ec
+  email-service-enable: false

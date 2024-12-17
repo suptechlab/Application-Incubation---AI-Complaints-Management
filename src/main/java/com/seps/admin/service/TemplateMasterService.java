@@ -2,6 +2,7 @@ package com.seps.admin.service;
 
 import com.google.gson.Gson;
 import com.seps.admin.config.Constants;
+import com.seps.admin.domain.Authority;
 import com.seps.admin.domain.TemplateMaster;
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.ActionTypeEnum;
@@ -9,6 +10,8 @@ import com.seps.admin.enums.ActivityTypeEnum;
 import com.seps.admin.enums.LanguageEnum;
 import com.seps.admin.enums.TemplateTypeEnum;
 import com.seps.admin.repository.TemplateMasterRepository;
+import com.seps.admin.security.AuthoritiesConstants;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.TemplateMasterDTO;
 import com.seps.admin.service.mapper.TemplateMasterMapper;
@@ -79,16 +82,46 @@ public class TemplateMasterService {
      * @return the ID of the newly created template
      */
     public Long createTemplate(@Valid TemplateMasterDTO templateMasterDTO, RequestInfo requestInfo) {
-        if (repository.existsByTemplateNameIgnoreCase(templateMasterDTO.getTemplateName())) {
-            throw new CustomException(
-                    Status.BAD_REQUEST,
-                    SepsStatusCode.DUPLICATE_TEMPLATE,
-                    new String[]{templateMasterDTO.getTemplateName()},
-                    null
-            );
-        }
         User currentUser = userService.getCurrentUser();
         TemplateMaster template = templateMasterMapper.mapToEntity(templateMasterDTO);
+        if(templateMasterDTO.getCopyFrom()!=null) {
+            TemplateMasterDTO copyTemplate = getTemplateByIdForCopy(templateMasterDTO.getCopyFrom());
+            List<String> authority = currentUser.getAuthorities().stream()
+                .map(Authority::getName)
+                .toList();
+            Long organizationId = null;
+            if (authority.contains(AuthoritiesConstants.FI)) {
+                organizationId = currentUser.getOrganizationId();
+            }
+            if (repository.existsByTemplateKeyAndIsGeneralAndOrganizationIdAndUserType(
+                copyTemplate.getTemplateKey(),
+                false,
+                organizationId,
+                templateMasterDTO.getUserType())) {
+                throw new CustomException(
+                    Status.BAD_REQUEST,
+                    SepsStatusCode.TEMPLATE_ALREADY_EXISTS, null, null
+                );
+            }
+            template.setTemplateKey(copyTemplate.getTemplateKey());
+            template.setOrganizationId(organizationId);
+            template.setIsGeneral(false);
+            template.setSupportedVariables(copyTemplate.getSupportedVariables());
+        }else{
+            if (repository.existsByTemplateKeyAndIsGeneralAndOrganizationIdAndUserType(
+                template.getTemplateKey(),
+                false,
+                null,
+                templateMasterDTO.getUserType())) {
+                throw new CustomException(
+                    Status.BAD_REQUEST,
+                    SepsStatusCode.TEMPLATE_ALREADY_EXISTS, null, null
+                );
+            }
+            template.setIsGeneral(true);
+        }
+        template.setIsStatic(false);
+        template.setUserType(templateMasterDTO.getUserType());
         template.setCreatedBy(currentUser.getId());
         TemplateMasterDTO savedTemplateMaster = templateMasterMapper.mapToDTO(repository.save(template));
         Map<String, String> auditMessageMap = new HashMap<>();
@@ -139,23 +172,35 @@ public class TemplateMasterService {
      * @param requestInfo the request information for auditing
      */
     public void updateTemplate(Long id, @Valid TemplateMasterDTO dto, RequestInfo requestInfo) {
-        TemplateMaster entity = repository.findById(id)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.TEMPLATE_NOT_FOUND,
-                        new String[]{id.toString()}, null));
-
-        repository.findByTemplateNameIgnoreCase(dto.getTemplateName())
-                .ifPresent(duplicateTemplate -> {
-                    if (!duplicateTemplate.getId().equals(entity.getId())) {
-                        throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.DUPLICATE_TEMPLATE,
-                                new String[]{dto.getTemplateName()}, null);
-                    }
-                });
         User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        Long organizationId = null;
+        if(authority.contains(AuthoritiesConstants.FI) && currentUser.getOrganizationId() != null){
+            organizationId = currentUser.getOrganizationId();
+        }
+        TemplateMaster entity = repository.findByIdAndOrganizationId(id,organizationId)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.TEMPLATE_NOT_FOUND,
+                new String[]{id.toString()}, null));
+        repository.findByTemplateKeyAndIsGeneralAndOrganizationIdAndUserType(
+            entity.getTemplateKey(),
+            entity.getIsGeneral(),
+            entity.getOrganizationId(),
+            entity.getUserType())
+            .ifPresent(duplicateTemplate -> {
+                if (!duplicateTemplate.getId().equals(entity.getId())) {
+                    throw new CustomException(
+                    Status.BAD_REQUEST,
+                    SepsStatusCode.TEMPLATE_ALREADY_EXISTS, null, null
+                );
+                    }
+            });
+
         Map<String, Object> oldData = convertEntityToMap(this.getTemplateById(entity.getId()));
         entity.setTemplateName(dto.getTemplateName());
         entity.setContent(dto.getContent());
         entity.setUpdatedBy(currentUser.getId());
-        entity.setTemplateType(dto.getTemplateType().name());
 
         TemplateMaster template = repository.save(entity);
 
@@ -187,7 +232,15 @@ public class TemplateMasterService {
      */
     @Transactional(readOnly = true)
     public Page<TemplateMasterDTO> listTemplates(Pageable pageable, String search, Boolean status, TemplateTypeEnum templateType) {
-        return repository.findAll(TemplateMasterSpecification.byFilter(search, status, templateType), pageable)
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        Long organizationId = null;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+        }
+        return repository.findAll(TemplateMasterSpecification.byFilter(search, status, templateType, organizationId), pageable)
                 .map(templateMasterMapper::toDTO);
     }
 
@@ -239,8 +292,15 @@ public class TemplateMasterService {
      */
     @Transactional(readOnly = true)
     public ByteArrayInputStream listTemplatesDownloadExcel(String search, Boolean status, TemplateTypeEnum templateType) throws IOException {
-
-        List<TemplateMaster> dataList = repository.findAll(TemplateMasterSpecification.byFilter(search, status, templateType));
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        Long organizationId = null;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+        }
+        List<TemplateMaster> dataList = repository.findAll(TemplateMasterSpecification.byFilter(search, status, templateType, organizationId));
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Templates");
@@ -275,5 +335,17 @@ public class TemplateMasterService {
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         }
+    }
+
+    public List<DropdownListDTO> listActiveTemplatesForCopy() {
+        return repository.findAllByIsGeneralTrueAndIsStaticFalseAndStatusTrue()
+            .stream().map(templateMasterMapper::toDropDownDTO).toList();
+    }
+
+    public TemplateMasterDTO getTemplateByIdForCopy(Long id) {
+        return repository.findByIdAndIsGeneralTrueAndIsStaticFalseAndStatusTrue(id)
+            .map(templateMasterMapper::mapToDTO)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.TEMPLATE_NOT_FOUND,
+                new String[]{id.toString()}, null));
     }
 }

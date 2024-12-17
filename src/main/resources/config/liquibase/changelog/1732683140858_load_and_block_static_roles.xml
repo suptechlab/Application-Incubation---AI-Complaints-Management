@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1732683530985" author="matellio">
+
+    <!-- Truncate tables before loading data -->
+    <sql>
+      TRUNCATE TABLE user_role CASCADE;
+      TRUNCATE TABLE role_permissions CASCADE;
+      TRUNCATE TABLE roles CASCADE;
+    </sql>
+
+    <!-- Reset sequences -->
+    <sql>
+      ALTER SEQUENCE role_permissions_id_seq RESTART WITH 1;
+      ALTER SEQUENCE roles_id_seq RESTART WITH 1;
+    </sql>
+
+    <update tableName="permissions">
+      <column name="module_id" value="5" />
+      <where>id = 15</where>
+    </update>
+
+    <delete  catalogName="cat" schemaName="public"
+             tableName="permissions">
+      <where>id IN (25, 29, 36, 46)</where>
+    </delete>
+
+    <addColumn tableName="roles">
+      <column name="role_slug" type="varchar(255)" remarks="if role slug is available means title cannot be edit - this is static">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <loadData
+      file="config/liquibase/data/modules2.csv"
+      separator=","
+      tableName="modules"/>
+
+    <loadData
+      file="config/liquibase/data/permissions2.csv"
+      separator=","
+      tableName="permissions"/>
+
+    <!-- Load data into tables -->
+    <loadData
+      file="config/liquibase/data/static_roles.csv"
+      separator=";"
+      tableName="roles">
+      <column name="id" type="numeric"/>
+      <column name="name" type="string"/>
+      <column name="description" type="string"/>
+      <column name="user_type" type="string"/>
+      <column name="created_by" type="numeric"/>
+      <column name="created_at" type="timestamp"/>
+      <column name="updated_at" type="timestamp"/>
+      <column name="status" type="boolean"/>
+      <column name="deleted" type="boolean"/>
+      <column name="role_slug" type="string"/>
+    </loadData>
+
+    <loadData
+      file="config/liquibase/data/static_role_permission.csv"
+      separator=";"
+      tableName="role_permissions">
+      <column name="id" type="numeric"/>
+      <column name="role_id" type="numeric"/>
+      <column name="permission_id" type="numeric"/>
+    </loadData>
+
+    <!-- Update sequences based on current max ID -->
+    <sql>
+      SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles), true);
+      SELECT setval('role_permissions_id_seq', (SELECT MAX(id) FROM role_permissions), true);
+    </sql>
+
+  </changeSet>
+  <changeSet id="1734036832370" author="matellio">
+    <loadData
+      file="config/liquibase/data/modules3.csv"
+      separator=","
+      tableName="modules"/>
+
+    <loadData
+      file="config/liquibase/data/permissions3.csv"
+      separator=","
+      tableName="permissions"/>
+  </changeSet>
+</databaseChangeLog>
