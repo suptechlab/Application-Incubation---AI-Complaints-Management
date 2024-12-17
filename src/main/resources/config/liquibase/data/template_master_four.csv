@@ -1,0 +1,61 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at
+CUSTOMER_REPLY_ON_TICKET_CONVERSATION,Respuesta del cliente en la conversación del ticket,EMAIL,Respuesta del cliente al ticket #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Esto es para notificarle que el cliente <strong>{{customerName}}</strong> ha respondido al ticket con los siguientes detalles:</p>
+<ul>
+  <li>
+    <strong>Reclamar ID del ticket: </strong>
+    <span>#{{ticketNumber}}</span>
+  </li>  
+  <li>
+    <strong>Nombre del cliente: </strong>
+    <span>{{customerName}}</span>
+  </li>
+  <li>
+    <strong>Mensaje de respuesta: </strong>
+    <span>{{messageContent}}</span>
+  </li>  
+  <li>
+    <strong>Archivos adjuntos: </strong>
+    <span>{{attachmentDetails}}</span>
+  </li>
+</ul>
+<p>Inicie sesión en el sistema para ver la conversación completa y responder si es necesario.</p>","{{username}},{{customerName}},{{messageContent}},{{ticketNumber}},{{attachmentDetails}}",True,1,2024-12-02 00:00:00.627679,1,2024-12-02 00:00:00.627679
+REPLY_TO_CUSTOMER_ON_TICKET_CONVERSATION,Responder al cliente en la conversación del ticket,EMAIL,Actualización sobre su ticket de reclamo #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Queríamos informarle que hubo una actualización con respecto a su ticket (#{{ticketNumber}}). A continuación, encontrará los detalles de la respuesta:</p>
+<ul>
+  <li>
+    <strong>Mensaje de {{senderName}}: </strong>
+    <span>{{messageContent}}</span>
+  </li>
+</ul>
+<p>Si hay archivos adjuntos incluidos, puede verlos en su cuenta o contactarnos para obtener más ayuda.</p>
+<p>Para ver el ticket y responder, inicie sesión en su cuenta utilizando el siguiente enlace:</p>
+<p><a href=""{{ticketUrl}}"">{{ticketUrl}}</a></p>
+<p>Gracias por comunicarse con nosotros. Seguimos comprometidos a resolver su problema lo más rápido posible.</p>","{{username}},{{ticketNumber}},{{senderName}},{{messageContent}},{{ticketUrl}}",True,1,2024-12-02 00:00:00.627679,1,2024-12-02 00:00:00.627679
+REPLY_TO_INTERNAL_ON_TICKET_CONVERSATION,Responder a la conversación interna del ticket,EMAIL,Nota interna agregada al ticket de reclamo #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Se ha añadido una nota interna al ticket (#{{ticketNumber}}) de {{senderName}}. A continuación se muestran los detalles:</p>
+<ul>
+  <li>
+    <strong>Mensaje: </strong>
+    <span>{{messageContent}}</span>
+  </li>
+</ul>
+<p>Detalles del reclamo del ticket:</p>
+<ul>
+  <li>
+    <strong>Nombre del cliente: </strong>
+    <span>{{customerName}}</span>
+  </li>
+  <li>
+    <strong>Reclamar ID del ticket: </strong>
+    <span>{{ticketNumber}}</span>
+  </li>
+  <li>
+    <strong>Reclamar estado del ticket: </strong>
+    <span>{{status}}</span>
+  </li>
+</ul>
+<p>Si se incluyen archivos adjuntos, se pueden ver en los detalles del ticket.</p>
+<p>Para revisar el ticket y proporcionar actualizaciones o notas adicionales, visite:</p>
+<p><a href=""{{ticketUrl}}"">{{ticketUrl}}</a></p>
+<p>Asegúrese de que cualquier acción o respuesta posterior se registre de forma adecuada.</p>","{{username}},{{senderName}},{{messageContent}},{{customerName}},{{ticketNumber}},{{status}},{{ticketUrl}}",True,1,2024-12-02 00:00:00.627679,1,2024-12-02 00:00:00.627679

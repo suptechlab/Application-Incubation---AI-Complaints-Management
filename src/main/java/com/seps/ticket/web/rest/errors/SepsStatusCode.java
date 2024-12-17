@@ -18,8 +18,22 @@ public enum SepsStatusCode implements StatusType {
     CLAIM_SUB_TYPE_NOT_FOUND(20017, "claim.sub.type.not.found"),
     PROVINCE_NOT_FOUND(20019, "province.not.found"),
     CITY_NOT_FOUND(20019, "city.not.found"),
+    INVALID_DATE_FORMAT(20024, "invalid.date.format"),
     ORGANIZATION_NOT_FOUND(20030, "organization.not.found"),
-    CLAIM_TICKET_NOT_FOUND(40010, "claim.ticket.not.found");
+    CLAIM_TICKET_NOT_FOUND(40010, "claim.ticket.not.found"),
+    IS_NOT_FI_AGENT(40011, "is.not.fi.agent"),
+    IS_NOT_SEPS_AGENT(40012, "is.not.seps.agent"),
+    NO_TICKET_FOUND_WITH_PROVIDED_IDS(40013, "no.ticket.found.with.provided.ids"),
+    YOU_NOT_AUTHORIZED_TO_PERFORM(40014, "not.authorized.to.perform"),
+    INVALID_FILE(40015, "invalid.file"),
+    FILE_STORAGE_ERROR(40016, "file.storage.error"),
+    INVALID_SLA_DATE(40017, "invalid.sla.date"),
+    CLAIM_TICKET_NOT_ASSIGNED(40018, "claim.ticket.not.assigned"),
+    INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE(40019, "invalid.instance.type.allow.only.instance"),
+    CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT(40020, "claim.ticket.already.closed.or.reject"),
+    SECOND_INSTANCE_INVALID_CLAIM_TICKET_STATUS(40021, "second.instance.invalid.claim.ticket.status"),
+    CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY(40022, "claim.ticket.already.closed.or.rejected.you.cannot.reply"),
+    COMPLAINT_INVALID_CLAIM_TICKET_STATUS(40023, "complaint.invalid.claim.ticket.status");
 
     private final int code;
 

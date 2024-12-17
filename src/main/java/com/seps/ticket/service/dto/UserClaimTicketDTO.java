@@ -7,6 +7,7 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @ToString
@@ -47,6 +48,13 @@ public class UserClaimTicketDTO {
     private Long updatedBy;
     private UserDTO updatedByUser;
     private Instant updatedAt;
+    private List<UserClaimTicketDocumentDTO> claimTicketDocuments; // Added this line to include documents in DTO
+    private String secondInstanceComment;
+    private Instant secondInstanceFiledAt;
+    private String complaintPrecedents;
+    private String complaintSpecificPetition;
+    private Instant complaintFiledAt;
+
     // Getters and Setters
 
     @Data

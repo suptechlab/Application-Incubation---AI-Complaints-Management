@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "claim_ticket")
@@ -140,6 +142,31 @@ public class ClaimTicket {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @OneToMany(mappedBy = "claimTicket", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClaimTicketDocument> claimTicketDocuments = new ArrayList<>();  // List of associated documents
+
+    @Column(name = "seps_agent_id", nullable = false, insertable = false, updatable = false)
+    private Long sepsAgentId;
+
+    @ManyToOne
+    @JoinColumn(name = "seps_agent_id")
+    private User sepsAgent;
+
+    @Column(name = "second_instance_filed_at")
+    private Instant secondInstanceFiledAt;
+
+    @Column(name = "second_instance_comment")
+    private String secondInstanceComment;
+
+    @Column(name = "complaint_precedents")
+    private String complaintPrecedents;
+
+    @Column(name = "complaint_specific_petition")
+    private String complaintSpecificPetition;
+
+    @Column(name = "complaint_filed_at")
+    private Instant complaintFiledAt;
 
 
 }

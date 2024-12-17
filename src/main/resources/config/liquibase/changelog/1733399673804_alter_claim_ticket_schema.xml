@@ -1,0 +1,39 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+  <!-- Create claim_ticket_priority_log -->
+  <changeSet id="1733399673804" author="matellio">
+    <addColumn tableName="claim_ticket">
+      <!-- Column for storing the comment or note for the second instance -->
+      <column name="second_instance_comment" type="text"
+              remarks="Comment or note added while filing second instance of claim">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Column for storing the timestamp when the second instance was filed -->
+      <column name="second_instance_filed_at" type="timestamp"
+              remarks="Second instance filed timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="1733488973073" author="matellio">
+    <addColumn tableName="claim_ticket">
+      <column name="complaint_precedents" type="text"
+              remarks="precedents added while filing a complaint">
+        <constraints nullable="true"/>
+      </column>
+      <column name="complaint_specific_petition" type="text"
+              remarks="complaint specific petition added while filing a complaint">
+        <constraints nullable="true"/>
+      </column>
+      <column name="complaint_filed_at" type="timestamp"
+              remarks="Complaint filed timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+</databaseChangeLog>

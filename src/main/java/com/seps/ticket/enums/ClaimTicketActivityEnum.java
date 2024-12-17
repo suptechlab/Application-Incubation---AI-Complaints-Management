@@ -1,0 +1,18 @@
+package com.seps.ticket.enums;
+
+public enum ClaimTicketActivityEnum {
+    CREATED,
+    ASSIGNED,
+    REASSIGNED,
+    CHANGED_PRIORITY,
+    TAGGED_REPLY,
+    COMMENT,
+    ATTACHMENT,
+    INTERNAL_NOTE,
+    REPLY_CUSTOMER,
+    DATE_EXTENDED,
+    CLOSED,
+    REJECTED,
+    CUSTOMER_REPLY,
+    INTERNAL_NOTE_ADDED
+}

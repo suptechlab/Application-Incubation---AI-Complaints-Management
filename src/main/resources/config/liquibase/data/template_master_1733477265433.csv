@@ -1,0 +1,42 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at
+CLAIM_TICKET_INSTANCE,Segunda instancia de reclamo creada,EMAIL,Segunda instancia de reclamo creada - Ticket #{{ticketNumber}},"<p>Estimado {{username}},</p>
+
+<p>Su reclamo con ID de Ticket #{{ticketNumber}} ha sido actualizado a una nueva instancia.</p>
+
+<p>Detalles de la instancia anterior:</p>
+<ul>
+  <li>
+    <strong>Instancia Anterior:</strong>
+    <span>{{previousInstance}}</span>
+  </li>
+  <li>
+    <strong>Estado Anterior:</strong>
+    <span>{{previousStatus}}</span>
+  </li>
+</ul>
+
+<p>Detalles de la nueva instancia del reclamo:</p>
+<ul>
+  <li>
+    <strong>Instancia Actual:</strong>
+    <span>{{newInstance}}</span>
+  </li>
+  <li>
+    <strong>Estado Actual:</strong>
+    <span>{{newStatus}}</span>
+  </li>
+  <li>
+    <strong>Comentario Adicional:</strong>
+    <span>{{instanceComment}}</span>
+  </li>
+</ul>
+
+<p>
+  <a href=""{{url}}"" target=""_blank"">Ver detalles del reclamo</a>
+</p>
+
+<p>Si tiene preguntas adicionales, no dude en comunicarse con nuestro equipo de soporte.</p>
+
+<p>Atentamente,</p>
+<p>El equipo de soporte</p>
+","{{username}},{{ticketNumber}},{{previousInstance}},{{previousStatus}},{{newInstance}},{{newStatus}},{{instanceComment}},{{url}}",True,1,2024-12-06 00:00:00.627679,1,2024-12-06 00:00:00.627679

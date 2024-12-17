@@ -1,0 +1,31 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at
+CLAIM_TICKET_REJECTED_NOTIFY_AGENT,Enviar correo electrónico al agente que reclama ticket rechazado,EMAIL,Reclamación de ticket rechazada,"<p>Estimado {{username}},</p>
+<p>Lamentamos informarle que el ticket de reclamación con ID <strong>#{{ticketNumber}}</strong> ha sido rechazado.</p>
+<p>Detalles del rechazo:</p>
+<ul>
+  <li>
+    <strong>Razón: </strong>
+    <span>#{{reason}}</span>
+  </li>  
+  <li>
+    <strong>Estado rechazado: </strong>
+    <span>{{rejectedStatus}}</span>
+  </li>
+</ul>
+<p>Revise el ticket y tome las medidas necesarias según los procedimientos de la empresa.</p>
+<p>Si tiene más preguntas, no dude en ponerse en contacto con su administrador.</p>","{{username}},{{ticketNumber}},{{reason}},{{rejectedStatus}}",True,1,2024-12-02 00:00:00.627679,1,2024-12-02 00:00:00.627679
+CLAIM_TICKET_REJECTED_NOTIFY_CUSTOMER,Enviar correo electrónico al cliente indicando que el ticket de reclamo fue rechazado,EMAIL,Su ticket de reclamo #{{ticketNumber}} ha sido rechazado,"<p>Estimado {{username}},</p>
+<p>Lamentamos informarle que su ticket de reclamación con ID <strong>#{{ticketNumber}}</strong> ha sido rechazado.</p>
+<p>Detalles del rechazo:</p>
+<ul>
+  <li>
+    <strong>Razón: </strong>
+    <span>#{{reason}}</span>
+  </li>  
+  <li>
+    <strong>Estado rechazado: </strong>
+    <span>{{rejectedStatus}}</span>
+  </li>
+</ul>
+<p>Entendemos que esto puede resultar decepcionante. Si desea hablar sobre el rechazo o necesita más aclaraciones, no dude en ponerse en contacto con nuestro equipo de asistencia.</p>
+<p>Gracias por su comprensión.</p>","{{username}},{{ticketNumber}},{{reason}},{{rejectedStatus}}",True,1,2024-12-02 00:00:00.627679,1,2024-12-02 00:00:00.627679

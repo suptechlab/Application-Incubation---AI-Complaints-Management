@@ -1,5 +1,8 @@
 package com.seps.ticket.web.rest.vm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.seps.ticket.component.FileHelper;
+import com.seps.ticket.constraint.validation.MultipleFilesCondition;
 import com.seps.ticket.enums.CustomerTypeEnum;
 import com.seps.ticket.enums.PriorityCareGroupEnum;
 import jakarta.validation.constraints.Email;
@@ -8,6 +11,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Data
@@ -48,4 +55,12 @@ public class ClaimTicketRequest {
     private String specificPetition;
     // Getters and Setters
     private Boolean checkDuplicate = true;
+
+    @MultipleFilesCondition(
+        name = FileHelper.FileType.CLAIM_TICKET_DOCUMENTS,
+        message = "{claim.ticket.validation.files.invalid.types}" // Message from the language file
+    )
+    @Size(max = 3, message = "{claim.ticket.validation.files.max.size}") // Message from the language file
+    private List<MultipartFile> attachments = new ArrayList<>();
+
 }
