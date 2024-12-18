@@ -150,7 +150,7 @@ export default function AuthenticationProvider({ children }) {
                             'seps-admin': 'SEPS_ADMIN',
                             'seps-agent': 'SEPS_AGENT',
                         };
-                        const roleName = roles[0]?.name;
+                        const roleName = roles[0]?.roleSlug;
                         setCurrentUser(roleMap[roleName] || 'SUPER_ADMIN');
                     } else {
                         setCurrentUser('SUPER_ADMIN');
