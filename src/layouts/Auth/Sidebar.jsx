@@ -113,7 +113,6 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                   path,
                   subMenu,
                   disabled,
-                  roleName,
                 } = elem;
                 return (
                   <Nav.Item as="li" key={id}>
