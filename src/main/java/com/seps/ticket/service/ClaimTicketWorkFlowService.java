@@ -4,19 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.config.InstantTypeAdapter;
-import com.seps.ticket.domain.Authority;
-import com.seps.ticket.domain.ClaimTicketWorkFlow;
-import com.seps.ticket.domain.Organization;
-import com.seps.ticket.domain.User;
-import com.seps.ticket.enums.ActionTypeEnum;
-import com.seps.ticket.enums.ActivityTypeEnum;
-import com.seps.ticket.enums.LanguageEnum;
-import com.seps.ticket.repository.ClaimTicketWorkFlowRepository;
-import com.seps.ticket.repository.OrganizationRepository;
+import com.seps.ticket.domain.*;
+import com.seps.ticket.enums.*;
+import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.RequestInfo;
+import com.seps.ticket.service.dto.UserDTO;
 import com.seps.ticket.service.dto.workflow.*;
 import com.seps.ticket.service.mapper.ClaimTicketWorkFlowMapper;
+import com.seps.ticket.service.mapper.UserMapper;
 import com.seps.ticket.service.specification.ClaimTicketWorkFlowSpecification;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
@@ -32,11 +28,13 @@ import org.zalando.problem.Status;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
 
 @Service
 public class ClaimTicketWorkFlowService {
+
     private static final Logger LOG = LoggerFactory.getLogger(ClaimTicketWorkFlowService.class);
 
     private final UserService userService;
@@ -46,15 +44,24 @@ public class ClaimTicketWorkFlowService {
     private final MessageSource messageSource;
     private final Gson gson;
     private final AuditLogService auditLogService;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final ClaimTicketWorkflowFailureLogRepository claimTicketWorkflowFailureLogRepository;
+    private final AuthorityRepository authorityRepository;
 
     public ClaimTicketWorkFlowService(UserService userService, ClaimTicketWorkFlowRepository claimTicketWorkFlowRepository,
                                       OrganizationRepository organizationRepository, ClaimTicketWorkFlowMapper claimTicketWorkFlowMapper,
-                                      MessageSource messageSource, AuditLogService auditLogService) {
+                                      MessageSource messageSource, AuditLogService auditLogService, UserRepository userRepository,
+                                      UserMapper userMapper, ClaimTicketWorkflowFailureLogRepository claimTicketWorkflowFailureLogRepository, AuthorityRepository authorityRepository) {
         this.userService = userService;
         this.claimTicketWorkFlowRepository = claimTicketWorkFlowRepository;
         this.organizationRepository = organizationRepository;
         this.claimTicketWorkFlowMapper = claimTicketWorkFlowMapper;
         this.messageSource = messageSource;
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.claimTicketWorkflowFailureLogRepository = claimTicketWorkflowFailureLogRepository;
+        this.authorityRepository = authorityRepository;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -310,5 +317,109 @@ public class ClaimTicketWorkFlowService {
             return organizationId;
         }
         return null;
+    }
+
+    public ClaimTicketWorkFlowDTO findCreateWorkFlow(Long organizationId, InstanceTypeEnum instanceType, Long claimTypeId,
+                                                     Long claimSubTypeId, List<Long> processedWorkflowIds) {
+
+        // Retrieve workflows excluding already processed ones
+        List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
+            findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.CREATED, true)
+            .stream()
+            .filter(workflow -> !processedWorkflowIds.contains(workflow.getId()))
+            .collect(Collectors.toList());
+
+
+        // If the list is not empty, process each workflow
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
+                // Map the entity to a DTO
+                ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+                List<CreateCondition> createConditionList = claimTicketWorkFlowDTO.getCreateConditions();
+                // Check each condition for a match
+                for (CreateCondition createCondition : createConditionList) {
+                    if (claimTypeId.equals(createCondition.getClaimTypeId()) &&
+                        claimSubTypeId.equals(createCondition.getClaimSubTypeId())) {
+                        // Return the DTO if a match is found
+                        return claimTicketWorkFlowDTO;
+                    }
+                }
+            }
+        }
+        // Return null if no match is found
+        return null;
+    }
+
+    public UserDTO validateAssignAction(ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO) {
+        List<CreateAction> createActionList = claimTicketWorkFlowDTO.getCreateActions();
+        Long workflowId = claimTicketWorkFlowDTO.getId();
+        Long organizationId = claimTicketWorkFlowDTO.getOrganizationId();
+        InstanceTypeEnum instanceType = claimTicketWorkFlowDTO.getInstanceType();
+        // Check if actions list is empty
+        if (createActionList.isEmpty()) {
+            logWorkflowFailure(workflowId, "workflow.no.create.actions", null, null);
+            return null;
+        }
+        // Determine required authorities and statuses based on instance type
+        Set<Authority> authorities = getAuthoritiesForInstanceType(instanceType);
+        Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.ACTIVE);
+        // Iterate through actions
+        for (CreateAction createAction : createActionList) {
+            if (isAssignableAction(createAction.getAction())) {
+                Long agentId = createAction.getAgentId();
+                if (agentId == null) {
+                    logWorkflowFailure(workflowId, "workflow.agent.id.null", new Object[]{createAction.getAction()}, null);
+                    continue;
+                }
+                // Check user existence based on instance type
+                return findUserForAction(instanceType, agentId, organizationId, authorities, requiredStatuses, workflowId);
+            }
+        }
+        logWorkflowFailure(workflowId, "workflow.no.valid.actions", null, null);
+        return null;
+    }
+
+    private Set<Authority> getAuthoritiesForInstanceType(InstanceTypeEnum instanceType) {
+        Set<Authority> authorities = new HashSet<>();
+        String authorityKey = instanceType.equals(InstanceTypeEnum.FIRST_INSTANCE)
+            ? AuthoritiesConstants.FI
+            : AuthoritiesConstants.SEPS;
+        authorityRepository.findById(authorityKey).ifPresent(authorities::add);
+        return authorities;
+    }
+
+    private boolean isAssignableAction(CreateActionEnum action) {
+        return action.equals(CreateActionEnum.ASSIGN_TO_TEAM) || action.equals(CreateActionEnum.ASSIGN_TO_AGENT);
+    }
+
+    private UserDTO findUserForAction(InstanceTypeEnum instanceType, Long agentId, Long organizationId, Set<Authority> authorities,
+                                      Set<UserStatusEnum> requiredStatuses, Long workflowId) {
+        return instanceType.equals(InstanceTypeEnum.FIRST_INSTANCE)
+            ? userRepository.findOneByIdAndOrganizationIdAndAuthoritiesInAndStatusIn(agentId, organizationId, authorities, requiredStatuses)
+            .map(userMapper::toDto)
+            .orElseGet(() -> {
+                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
+                return null;
+            })
+            : userRepository.findOneByIdAndAuthoritiesInAndStatusIn(agentId, authorities, requiredStatuses)
+            .map(userMapper::toDto)
+            .orElseGet(() -> {
+                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
+                return null;
+            });
+    }
+
+    private void logWorkflowFailure(Long workflowId, String messageKey, Object[] args, Long agentId) {
+        Map<String, String> reasonMap = Arrays.stream(LanguageEnum.values())
+            .collect(Collectors.toMap(
+                LanguageEnum::getCode,
+                language -> messageSource.getMessage(messageKey, args, Locale.forLanguageTag(language.getCode()))
+            ));
+        ClaimTicketWorkFlowFailureLog failureLog = new ClaimTicketWorkFlowFailureLog();
+        failureLog.setClaimTicketWorkFlowId(workflowId);
+        failureLog.setReason(reasonMap);
+        failureLog.setAgentId(agentId);
+        claimTicketWorkflowFailureLogRepository.save(failureLog);
+        LOG.warn("Workflow failure logged: {}", reasonMap);
     }
 }
