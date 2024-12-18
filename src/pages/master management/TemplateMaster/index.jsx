@@ -300,7 +300,6 @@ const TemplateMaster = () => {
         <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
         <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
       </div>
-
     </React.Fragment>
   );
 };

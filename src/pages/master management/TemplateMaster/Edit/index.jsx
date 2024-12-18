@@ -26,10 +26,16 @@ const EditTemplate = () => {
   ])
 
 
-  const {id} = useParams()
+  const { id } = useParams()
 
 
-  const [initialValues , setInitialValues] = useState({})
+  const [initialValues, setInitialValues] = useState({
+    templateName: "",
+    subject: "",
+    content: "",
+    templateType: "",
+    userType: ""
+  })
 
   useEffect(() => {
 
@@ -38,10 +44,11 @@ const EditTemplate = () => {
       getTemplateMaster(id)
         .then((response) => {
           setInitialValues({
-            templateName: response.data?.templateName ?? "",
+            templateName: response?.data?.templateName ?? "",
             subject: response.data?.subject ?? "",
             content: response.data?.content ?? "",
-            templateType: response.data?.templateType ?? "",
+            templateType: response?.data?.templateType ?? "",
+            userType : response?.data?.userType
           });
           setLoading(false);
         })
@@ -127,6 +134,37 @@ const EditTemplate = () => {
                       touched={touched?.templateName}
                       type="text"
                       value={values?.templateName || ""}
+                    />
+                    <ReactSelect
+                      error={errors?.userType}
+                      options={[
+                        {
+                          value: '',
+                          label: t('SELECT')
+                        },
+                        {
+                          value: 'FI',
+                          label: t('FI')
+                        },
+                        {
+                          value: 'SEPS',
+                          label: t('SEPS')
+                        },
+                        {
+                          value: 'CUSTOMER',
+                          label: t('CUSTOMER')
+                        },
+                      ]}
+                      value={values?.userType}
+                      onChange={(option) => {
+                        setFieldValue("userType", option?.target?.value ?? "");
+                      }}
+                      name="userType"
+                      label={t("USER_TYPE") + "*"}
+                      className={`${touched?.userType && errors?.userType ? "is-invalid" : ""
+                        } mb-3`}
+                      onBlur={handleBlur}
+                      touched={touched?.userType}
                     />
                     <FormInput
                       error={errors?.subject}
