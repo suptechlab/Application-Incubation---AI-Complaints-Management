@@ -1,6 +1,6 @@
 import { Formik, Form as FormikForm } from "formik";
-import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Modal, Row } from "react-bootstrap";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Card, Col, Modal, Row, Stack } from "react-bootstrap";
 import FormInput from "../../../../components/FormInput";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -18,12 +18,16 @@ import {
 } from "../../../../services/templateMaster.service";
 import Loader from "../../../../components/Loader";
 import PageHeader from "../../../../components/PageHeader";
+import { AuthenticationContext } from "../../../../contexts/authentication.context";
 
 const AddTemplate = () => {
 
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  const { currentUser } = useContext(AuthenticationContext);
+
   const [templateTypeOption, setTemplateTypeOption] = useState([
     { value: "EMAIL", label: t('EMAIL') },
     { value: "NOTIFICATION", label: t('NOTIFICATION') }
@@ -94,12 +98,12 @@ const AddTemplate = () => {
           templateId: templateId,
         })
 
-        if(response?.data?.supportedVariables){
+        if (response?.data?.supportedVariables) {
           setVariableList(response?.data?.supportedVariables.split(","))
-        }else{
+        } else {
           setVariableList([])
         }
-        
+
       }
     }).catch((error) => {
       if (error?.response?.data?.errorDescription) {
@@ -107,7 +111,7 @@ const AddTemplate = () => {
       } else {
         toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
       }
-    }).finally(()=>{
+    }).finally(() => {
       setLoading(false)
     })
   }
@@ -164,22 +168,6 @@ const AddTemplate = () => {
                             />
                           </Col>
                           <Col lg={6}>
-                            <FormInput
-                              error={errors.templateName}
-                              id="templateName"
-                              key={"templateName"}
-                              label={t("NAME OF TEMPLATE MASTER")}
-                              name="templateName"
-                              onBlur={handleBlur}
-                              onChange={handleChange}
-                              touched={touched.templateName}
-                              type="text"
-                              value={values.templateName || ""}
-                            />
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col lg={6}>
                             <ReactSelect
                               error={errors?.userType}
                               options={[
@@ -212,29 +200,49 @@ const AddTemplate = () => {
                               touched={touched?.userType}
                             />
                           </Col>
-                          <Col>
-                            <ReactSelect
-                              error={errors?.templateId}
-                              options={[
-                                {
-                                  value: '',
-                                  label: t('SELECT')
-                                },
-                                ...templateDropList,
-                              ]}
-                              value={values?.templateId}
-                              onChange={(option) => {
-                                setFieldValue("templateId", option?.target?.value ?? "");
-                                getCopiedTemplateData(option?.target?.value)
-                              }}
-                              name="templateId"
-                              label={t("TEMPLATES")}
-                              className={`${touched?.templateId && errors?.templateId ? "is-invalid" : ""
-                                } mb-3`}
+                        </Row>
+                        <Row>
+                          <Col lg={12}>
+                            <FormInput
+                              error={errors.templateName}
+                              id="templateName"
+                              key={"templateName"}
+                              label={t("NAME OF TEMPLATE MASTER")}
+                              name="templateName"
                               onBlur={handleBlur}
-                              touched={touched?.templateId}
+                              onChange={handleChange}
+                              touched={touched.templateName}
+                              type="text"
+                              value={values.templateName || ""}
                             />
                           </Col>
+                          {
+                            currentUser === "FI_ADMIN" &&
+                            <Col lg={12}>
+                              <ReactSelect
+                                error={errors?.templateId}
+                                options={[
+                                  {
+                                    value: '',
+                                    label: t('SELECT')
+                                  },
+                                  ...templateDropList,
+                                ]}
+                                value={values?.templateId}
+                                onChange={(option) => {
+                                  setFieldValue("templateId", option?.target?.value ?? "");
+                                  getCopiedTemplateData(option?.target?.value)
+                                }}
+                                name="templateId"
+                                label={t("TEMPLATES")}
+                                className={`${touched?.templateId && errors?.templateId ? "is-invalid" : ""
+                                  } mb-3`}
+                                onBlur={handleBlur}
+                                touched={touched?.templateId}
+                              />
+                            </Col>
+                          }
+
                         </Row>
                         <FormInput
                           error={errors.subject}
@@ -283,7 +291,7 @@ const AddTemplate = () => {
                   )}
                 </Formik>
               </Col>
-             
+
               <Col lg="4">
                 <Card>
                   <Card.Header className="border-0">
@@ -291,13 +299,13 @@ const AddTemplate = () => {
                   </Card.Header>
 
                   <Card.Body>
-                      <ul className="variable-list ps-0">
+                    <ul className="variable-list ps-0">
                       {
-                        variableList?.map((variable , index)=>(
-                          <li key={index+1} className="text-primary mb-2 fs-16"><GoCheckCircleFill size={20} className="me-2"/> {variable}</li>
+                        variableList?.map((variable, index) => (
+                          <li key={index + 1} className="text-primary mb-2 fs-16"><GoCheckCircleFill size={20} className="me-2" /> {variable}</li>
                         ))
                       }
-                      </ul> 
+                    </ul>
                   </Card.Body>
                 </Card>
 

@@ -263,5 +263,6 @@ export const englishLang = {
     "FI" : "FI",
     "SEPS":"SEPS",
     "CUSTOMER":"Customer",
-    "TEMPLATES":"Templates"
+    "TEMPLATES":"Templates",
+    "ALL TEMPLATES":"All Templates"
 }

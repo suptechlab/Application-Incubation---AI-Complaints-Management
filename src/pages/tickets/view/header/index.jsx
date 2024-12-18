@@ -184,9 +184,11 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs,getTic
                         >
                             Assign To
                         </Button> */}
+
+
                         {
-                            (currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN') &&
-                            (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED") &&
+                           ( (currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN') &&
+                            (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
                                     wrapperClassName="mb-0"

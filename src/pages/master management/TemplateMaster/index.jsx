@@ -8,7 +8,7 @@ import { MdEdit } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
-import ListingSearchForm from "../../../components/ListingSearchForm";
+
 import PageHeader from "../../../components/PageHeader";
 import Toggle from "../../../components/Toggle";
 import {
@@ -17,8 +17,7 @@ import {
 } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
-
-
+import ListingSearchForm from "./ListingSearchForm";
 import {
   handleGetTemplateMaster,
   changeTemplateMaster,
@@ -130,7 +129,7 @@ const TemplateMaster = () => {
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
     refetchOnWindowFocus: false, // Disable refetching on window focus
-    refetchOnMount: false, // Prevent refetching on component remount
+    refetchOnMount: true, // Prevent refetching on component remount
     retry: 0, //Disable retry on failure
   });
 
@@ -171,7 +170,11 @@ const TemplateMaster = () => {
         id: "templateType",
         header: () => t("TEMPLATE TYPE"),
       },
-
+      {
+        accessorFn: (row) => row?.userType,
+        id: "userType",
+        header: () => t("USER TYPE"),
+      },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
@@ -276,12 +279,11 @@ const TemplateMaster = () => {
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-
         <PageHeader
           title={t("TEMPLATE MASTER")}
           actions={[
-            { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-            { label: "Add New", to:"/template-master/add", variant: "warning" },
+            { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+            { label: t("ADD NEW"), to: "/template-master/add", variant: "warning" },
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">

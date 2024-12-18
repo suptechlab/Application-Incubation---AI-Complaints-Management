@@ -248,4 +248,5 @@ export const spanishLang = {
     "SEPS": "SEPS",
     "CUSTOMER": "Cliente",
     "TEMPLATES":"Plantillas",
+    "ALL TEMPLATES" : "Todas las plantillas"
 }
