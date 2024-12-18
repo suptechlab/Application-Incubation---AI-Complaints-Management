@@ -14,9 +14,10 @@ import { filterNavItemsByModules } from "../../utils/permissionUtils";
 
 const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
 
-  const { authorities = [] , permissions = [] } = useContext(AuthenticationContext);
+  const { authorities = [] , permissions = [], modules =[] } = useContext(AuthenticationContext);
   const navItemsArr = NavItems();
   const [navItems, setNavItems] = useState([]);
+
   useEffect(() => {
     if (authorities?.length > 0) {
       const adminStatus = authorities.includes("ROLE_ADMIN");
@@ -25,15 +26,16 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
       } else {
         // FILTER NAV ITEMS HERE
         // Ensure filterNavItemsByModules is called only when both navItemsArr and roles[0]?.modules are available
-        if (navItemsArr && permissions && permissions?.length > 0) {
-          const filteredNavItems = filterNavItemsByModules(navItemsArr, permissions[0]?.modules);
+        if (navItemsArr && modules && modules?.length > 0) {
+          const filteredNavItems = filterNavItemsByModules(navItemsArr, modules);
+
           setNavItems(filteredNavItems ?? []);
         } else {
           setNavItems([]); // Fallback to unfiltered navItemsArr
         }
       }
     }
-  }, [authorities])
+  }, [authorities,modules])
 
   const sidebarRef = useRef(null);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null);

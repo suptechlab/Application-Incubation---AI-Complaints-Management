@@ -11,6 +11,7 @@ export const AuthenticationContext = createContext({
     userData: {},
     currentUser: {},
     permissions: [],
+    modules: [],
     setUserData: () => { },
 });
 
@@ -22,6 +23,7 @@ export default function AuthenticationProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null)
     const [permissions, setPermissions] = useState([])
     const [authorities, setAuthorities] = useState([])
+    const [modules, setModules] = useState([])
 
     const navigate = useNavigate()
     const location = useLocation()
@@ -133,16 +135,6 @@ export default function AuthenticationProvider({ children }) {
                 // Check for roles and create role map
                 const roles = data?.roles || [];
                 if (!authorities.includes("ROLE_ADMIN")) {
-                    // const roleMap = roles.reduce((acc, role) => {
-                    //     const modules = role.modules || [];
-                    //     modules.forEach((module) => {
-                    //         acc[module.name] = module.permissions.map(
-                    //             (permission) => permission.name
-                    //         );
-                    //     });
-                    //     return acc;
-                    // }, {});
-
                     if (roles?.length > 0) {
                         const roleMap = {
                             'fi-admin': 'FI_ADMIN',
@@ -152,10 +144,23 @@ export default function AuthenticationProvider({ children }) {
                         };
                         const roleName = roles[0]?.name;
                         setCurrentUser(roleMap[roleName] || 'SUPER_ADMIN');
+
+                        const rolePermissionMap = roles.reduce((acc, role) => {
+                            const modules = role.modules || [];
+                            modules.forEach((module) => {
+                                acc[module.name] = module.permissions.map(
+                                    (permission) => permission.name
+                                );
+                            });
+                            return acc;
+                        }, {});
+                        setModules(roles[0]?.modules);
+                        setPermissions(rolePermissionMap);
                     } else {
                         setCurrentUser('SUPER_ADMIN');
                     }
-                    setPermissions(roles);
+
+
                 } else {
                     setCurrentUser('SUPER_ADMIN')
                 }
@@ -194,7 +199,8 @@ export default function AuthenticationProvider({ children }) {
                 userData,
                 currentUser,
                 permissions,
-                authorities
+                authorities,
+                modules
             }}>
             {children}
         </AuthenticationContext.Provider>
