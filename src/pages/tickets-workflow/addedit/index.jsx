@@ -35,7 +35,13 @@ export default function TicketWorkFlowAddEdit() {
                 conditionCatId: '',
             }
         ],
-        actionId: "",
+        actions: [
+            {
+                actionId: '',
+                actionFilter1: '',
+                actionFilter2: ''
+            }
+        ],
         userType: ""
     });
     const { masterData } = useContext(MasterDataContext);
@@ -139,7 +145,13 @@ export default function TicketWorkFlowAddEdit() {
                         conditionCatId: '',
                     }
                 ],
-                actionId: ""
+                actions: [
+                    {
+                        actionId: '',
+                        actionFilter1: '',
+                        actionFilter2: ''
+                    }
+                ]
             })
         }
     }, [masterData, currentUser]);
@@ -450,82 +462,107 @@ export default function TicketWorkFlowAddEdit() {
                                                     <p className="mb-0 text-muted">{t('ACTION_MSG')}</p>
                                                 </div>
 
-                                                <Button variant="link" className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center">
+                                                <Button
+                                                    variant="link"
+                                                    className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center"
+                                                    onClick={() =>
+                                                        formikProps.setFieldValue("actions", [
+                                                            ...formikProps.values.actions,
+                                                            { actionId: '', actionFilter1: '', actionFilter2: '' },
+                                                        ])}
+                                                >
                                                     <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> {t('ADD_MORE')}
                                                 </Button>
                                             </Stack>
+                                            {formikProps.values.actions.map((action, index) => (
 
-                                            <div className="repeater-row">
-                                                <div className="position-relative custom-padding-right-66">
-                                                    <Row className="gx-4">
-                                                        <Col sm={6} lg={4}>
-                                                            <ReactSelect
-                                                                wrapperClassName={'mb-3'}
-                                                                placeholder={t('SELECT_ACTION')}
-                                                                name="actionId"
-                                                                options={actionsArr}
-                                                                value={formikProps.values.actionId || ""}
-                                                                onChange={(option) => {
-                                                                    formikProps.setFieldValue(
-                                                                        "actionId",
-                                                                        option?.target?.value.toString() ?? ""
-                                                                    );
-                                                                    updateActionCategory1Filter(option?.target?.value)
-                                                                }}
-                                                                onBlur={formikProps.handleBlur}
-                                                                error={formikProps.errors.actionId}
-                                                                touched={formikProps.touched.actionId}
-                                                            />
-                                                        </Col>
-                                                        <Col sm={6} lg={4}>
-                                                            <ReactSelect
-                                                                wrapperClassName={'mb-3'}
-                                                                placeholder={t('SELECT')}
-                                                                name="actionCat1"
-                                                                options={actionCategory1Arr}
-                                                                value={formikProps.values.actionCat1 || ""}
-                                                                onChange={(option) => {
-                                                                    formikProps.setFieldValue(
-                                                                        "actionCat1",
-                                                                        option?.target?.value.toString() ?? ""
-                                                                    );
-                                                                    updateActionCategory2Filter(option?.target?.value)
-                                                                }}
-                                                                onBlur={formikProps.handleBlur}
-                                                                error={formikProps.errors.actionCat1}
-                                                                touched={formikProps.touched.actionCat1}
-                                                            />
-                                                        </Col>
+                                                <div key={index} className="repeater-row">
+                                                    <div className="position-relative custom-padding-right-66">
+                                                        <Row className="gx-4">
+                                                            <Col sm={6} lg={4}>
+                                                                <ReactSelect
+                                                                    wrapperClassName={'mb-3'}
+                                                                    placeholder={t('SELECT_ACTION')}
+                                                                    name={`actions[${index}].actionId`}
+                                                                    options={actionsArr}
+                                                                    onBlur={formikProps.handleBlur}
+                                                                    onChange={(option) =>
+                                                                        formikProps.setFieldValue(
+                                                                            `actions[${index}].actionId`,
+                                                                            option?.target?.value
+                                                                        )
+                                                                    }
+                                                                    value={formikProps.values.actions[index].actionId}
+                                                                    error={formikProps.errors?.actions?.[index]?.actionId}
+                                                                    touched={formikProps.touched?.actions?.[index]?.actionId}
+                                                                />
+                                                            </Col>
+                                                            <Col sm={6} lg={4}>
+                                                                <ReactSelect
+                                                                    wrapperClassName={'mb-3'}
+                                                                    placeholder={t('SELECT')}
+                                                                    name={`actions[${index}].actionFilter1`}
+                                                                    options={actionCategory1Arr}
+                                                                    onBlur={formikProps.handleBlur}
+                                                                    onChange={(option) => {
+                                                                        formikProps.setFieldValue(
+                                                                            `actions[${index}].actionFilter1`,
+                                                                            option?.target?.value
+                                                                        );
+                                                                        updateActionCategory2Filter(option?.target?.value)
+                                                                    }}
+                                                                    value={formikProps.values.actions[index].actionFilter1}
+                                                                    error={formikProps.errors?.actions?.[index]?.actionFilter1}
+                                                                    touched={formikProps.touched?.actions?.[index]?.actionFilter1}
+                                                                />
+                                                            </Col>
 
-                                                        <Col sm={6} lg={4}>
-                                                            <ReactSelect
-                                                                wrapperClassName={'mb-3'}
-                                                                placeholder={t('SELECT')}
-                                                                name="actionCat2"
-                                                                options={actionCategory2Arr}
-                                                                value={formikProps.values.actionCat2 || ""}
-                                                                onChange={(option) => {
-                                                                    formikProps.setFieldValue(
-                                                                        "actionCat2",
-                                                                        option?.target?.value.toString() ?? ""
-                                                                    );
-                                                                }}
-                                                                onBlur={formikProps.handleBlur}
-                                                                error={formikProps.errors.actionCat2}
-                                                                touched={formikProps.touched.actionCat2}
-                                                            />
-                                                        </Col>
+                                                            <Col sm={6} lg={4}>
+                                                                <ReactSelect
+                                                                    wrapperClassName={'mb-3'}
+                                                                    placeholder={t('SELECT')}
+                                                                    name={`actions[${index}].actionFilter2`}
+                                                                    options={actionCategory2Arr}
+                                                                    onBlur={formikProps.handleBlur}
+                                                                    onChange={(option) => {
+                                                                        formikProps.setFieldValue(
+                                                                            `actions[${index}].actionFilter2`,
+                                                                            option?.target?.value
+                                                                        );
+                                                                        updateActionCategory2Filter(option?.target?.value)
+                                                                    }}
+                                                                    value={formikProps.values.actions[index].actionFilter2}
+                                                                    error={formikProps.errors?.actions?.[index]?.actionFilter2}
+                                                                    touched={formikProps.touched?.actions?.[index]?.actionFilter2}
+                                                                />
+                                                            </Col>
 
-                                                        <Col xs='auto' className="custom-margin-right--66 pe-0">
-                                                            <Button variant="link" aria-label="Remove" className="p-1 rounded custom-width-42 custom-height-42 d-flex align-items-center justify-content-center link-danger bg-danger-subtle">
-                                                                <MdClose size={24} />
-                                                            </Button>
-                                                        </Col>
+                                                            {index > 0 && (
+                                                                <Col xs="auto" className="custom-margin-right--66 pe-0">
+                                                                    <Button
+                                                                        variant="link"
+                                                                        aria-label="Remove"
+                                                                        className="p-1 rounded custom-width-42 custom-height-42 d-flex align-items-center justify-content-center link-danger bg-danger-subtle"
+                                                                        onClick={() => {
+                                                                            const updatedActions =
+                                                                                formikProps.values.actions.filter(
+                                                                                    (_, i) => i !== index
+                                                                                );
+                                                                            formikProps.setFieldValue(
+                                                                                "actions",
+                                                                                updatedActions
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <MdClose size={24} />
+                                                                    </Button>
+                                                                </Col>
+                                                            )}
 
-                                                    </Row>
+                                                        </Row>
+                                                    </div>
                                                 </div>
-                                            </div>
-
+                                            ))}
                                         </div>
                                         {/* Action Section Ends*/}
                                     </div>
