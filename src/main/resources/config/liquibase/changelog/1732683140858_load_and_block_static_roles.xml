@@ -90,4 +90,10 @@
       separator=","
       tableName="permissions"/>
   </changeSet>
+  <changeSet id="1734524352476" author="matellio">
+    <loadData
+      file="config/liquibase/data/modules4.csv"
+      separator=","
+      tableName="modules"/>
+  </changeSet>
 </databaseChangeLog>

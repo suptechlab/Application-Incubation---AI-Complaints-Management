@@ -560,4 +560,58 @@ public class TeamService {
         return teamRepository.findAll(TeamSpecification.byFilter(search, status), pageable)
             .map(teamMapper::toTeamListDTO);
     }
+
+    /**
+     * Retrieves a list of active teams for workflow based on the current user's authority
+     * and the provided organization ID.
+     *
+     * <p>If the current user has the FI role, the organization ID is overridden
+     * with the user's organization ID. If no organization ID is provided or determined,
+     * a default value of 0 is used.
+     *
+     * @param organizationId the ID of the organization to filter teams by;
+     *                       can be null, in which case it defaults to 0.
+     * @return a list of {@link DropdownListDTO} objects representing the active teams,
+     *         containing their IDs and names.
+     * @throws IllegalStateException if the current user is not authenticated or has no roles assigned.
+     * @see TeamSpecification#byFilterWorkflow(Long)
+     */
+    public List<DropdownListDTO> listActiveTeamsForWorkFlow(Long organizationId) {
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+        }
+        if(organizationId==null)
+            organizationId = 0L;
+
+        return teamRepository.findAll(TeamSpecification.byFilterWorkflow(organizationId))
+            .stream().map(teamMapper::toDropDownDTO).toList();
+    }
+
+    /**
+     * Retrieves a list of active team members for workflow based on the specified team ID.
+     *
+     * <p>This method fetches all team members associated with the given team ID and maps
+     * them to a list of {@link DropdownListDTO} objects. If a team member's first name is null,
+     * the name will be set to an empty string.
+     *
+     * @param teamId the ID of the team whose members are to be retrieved.
+     * @return a list of {@link DropdownListDTO} objects representing the active team members,
+     *         including their user IDs and names.
+     * @throws IllegalArgumentException if the provided team ID is invalid or does not exist.
+     */
+    public List<DropdownListDTO> listActiveTeamsMembersForWorkFlow(Long teamId) {
+        return teamMemberRepository.findAllByTeamId(teamId)
+            .stream()
+            .map(team -> {
+                DropdownListDTO dropdown = new DropdownListDTO();
+                dropdown.setId(team.getUser().getId());
+                dropdown.setName(team.getUser().getFirstName() != null ? team.getUser().getFirstName() : ""); // Handle null names
+                return dropdown;
+            })
+            .toList();
+    }
 }

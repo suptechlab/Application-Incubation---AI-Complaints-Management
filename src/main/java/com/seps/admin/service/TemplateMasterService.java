@@ -197,6 +197,7 @@ public class TemplateMasterService {
         Map<String, Object> oldData = convertEntityToMap(this.getTemplateById(entity.getId()));
         entity.setTemplateName(dto.getTemplateName());
         entity.setContent(dto.getContent());
+        entity.setSubject(dto.getSubject());
         entity.setUpdatedBy(currentUser.getId());
 
         TemplateMaster template = repository.save(entity);
@@ -346,19 +347,23 @@ public class TemplateMasterService {
                 new String[]{id.toString()}, null));
     }
 
-    public List<DropdownListDTO> listActiveTemplatesForWorkFlow(EmailUserTypeEnum userType) {
+    public List<DropdownListDTO> listActiveTemplatesForWorkFlow(EmailUserTypeEnum userType, Long organizationId) {
         User currentUser = userService.getCurrentUser();
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
-        Long organizationId = null;
         if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganizationId();
             return repository.findAll(TemplateMasterSpecification.byFilterWorkflowTemplateList(userType,organizationId,true))
                 .stream().map(templateMasterMapper::toDropDownDTO).toList();
         }else{
-            return repository.findAll(TemplateMasterSpecification.byFilterWorkflowTemplateList(userType,organizationId,false))
-                .stream().map(templateMasterMapper::toDropDownDTO).toList();
+            if(organizationId != null){
+                return repository.findAll(TemplateMasterSpecification.byFilterWorkflowTemplateList(userType,organizationId,true))
+                    .stream().map(templateMasterMapper::toDropDownDTO).toList();
+            }else {
+                return repository.findAll(TemplateMasterSpecification.byFilterWorkflowTemplateList(userType, organizationId, false))
+                    .stream().map(templateMasterMapper::toDropDownDTO).toList();
+            }
         }
     }
 }

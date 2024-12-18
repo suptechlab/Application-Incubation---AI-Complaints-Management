@@ -101,6 +101,7 @@ public class TemplateMasterSpecification {
             }
 
             predicates.add(criteriaBuilder.equal(root.get("isStatic"), false));
+            predicates.add(criteriaBuilder.equal(root.get("status"), true));
 
             // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

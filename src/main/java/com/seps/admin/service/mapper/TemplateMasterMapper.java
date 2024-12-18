@@ -46,6 +46,7 @@ public interface TemplateMasterMapper {
             .content(entity.getContent())
             .supportedVariables(entity.getSupportedVariables())
             .status(entity.getStatus())
+            .userType(entity.getUserType())
             .build();
     }
 

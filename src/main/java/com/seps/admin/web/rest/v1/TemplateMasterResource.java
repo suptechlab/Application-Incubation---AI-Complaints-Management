@@ -156,8 +156,9 @@ public class TemplateMasterResource {
     }
 
     @GetMapping("/dropdown-list-for-workflow")
-    public ResponseEntity<List<DropdownListDTO>> listActiveTemplatesForWorkflow(@RequestParam(required = false) EmailUserTypeEnum userType) {
-        List<DropdownListDTO> templatesList = service.listActiveTemplatesForWorkFlow(userType);
+    public ResponseEntity<List<DropdownListDTO>> listActiveTemplatesForWorkflow(@RequestParam(required = false) EmailUserTypeEnum userType,
+                                                                                @RequestParam(required = false) Long organizationId) {
+        List<DropdownListDTO> templatesList = service.listActiveTemplatesForWorkFlow(userType, organizationId);
         return ResponseEntity.ok(templatesList);
     }
 }

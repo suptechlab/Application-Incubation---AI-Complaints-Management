@@ -3,6 +3,7 @@ package com.seps.admin.service.mapper;
 import com.seps.admin.domain.Role;
 import com.seps.admin.domain.Team;
 import com.seps.admin.domain.TeamMember;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.TeamDTO;
 import com.seps.admin.service.dto.TeamListDTO;
 import java.util.Collections;
@@ -56,4 +57,7 @@ public interface TeamMapper {
 
     @Mapping(source = "createdByUser.email", target = "createdByEmail")
     TeamListDTO toTeamListDTO(Team team);
+
+    @Mapping(source = "teamName", target = "name")
+    DropdownListDTO toDropDownDTO(Team team);
 }

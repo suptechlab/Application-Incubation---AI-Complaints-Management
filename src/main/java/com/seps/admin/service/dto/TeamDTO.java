@@ -1,6 +1,5 @@
 package com.seps.admin.service.dto;
 
-import com.seps.admin.domain.Role;
 import com.seps.admin.enums.TeamEntityTypeEnum;
 import com.seps.admin.validation.ValidEntityId;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +9,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @ValidEntityId
