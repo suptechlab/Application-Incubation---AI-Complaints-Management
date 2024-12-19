@@ -147,7 +147,7 @@ export const NavItems = () => {
       path: "/tickets-workflow",
       roleName: "admin",
       moduleName : "Ticket Workflow",
-      disabled: false,
+      disabled: true,
     },
     {
       id: 7,
