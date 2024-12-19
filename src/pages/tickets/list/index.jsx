@@ -17,6 +17,7 @@ import { calculateDaysDifference } from "../../../utils/commonutils";
 import moment from "moment/moment";
 import { MdAttachFile } from "react-icons/md";
 import { MasterDataContext } from "../../../contexts/masters.context";
+import AppTooltip from "../../../components/tooltip";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -24,6 +25,7 @@ export default function TicketsList() {
 
 
     const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+    const { masterData } = useContext(MasterDataContext)
     // PERMISSIONS work
 
     const [permissionsState, setPermissionsState] = React.useState({
@@ -194,7 +196,7 @@ export default function TicketsList() {
         setAttachmentsModalShow(true)
     }
 
-   
+
     const getFilteredColumns = (columnsArray) => {
         // All available column definitions
         const allColumns = [
@@ -212,8 +214,8 @@ export default function TicketsList() {
                             const allSelectedIds = e.target.checked
                                 ? table.getRowModel().rows
                                     .filter((row) => (
-                                        (currentUser === "SEPS_ADMIN" || currentUser==="SUPER_ADMIN")&& row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") 
-                                    ||
+                                        (currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED")
+                                        ||
                                         (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_ADMIN" && currentUser !== "SUPER_ADMIN"))
                                     .map((row) => row.original.id)
                                 : [];
@@ -235,10 +237,10 @@ export default function TicketsList() {
                 cell: ({ row }) => (
 
                     (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && (
-                        ((currentUser === "SEPS_ADMIN"||currentUser === "SUPER_ADMIN" ) && row?.original?.instanceType === 'SECOND_INSTANCE') ||
-                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE') 
+                        ((currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE') ||
+                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE')
 
-                       
+
                         // (currentUser !== "SEPS_ADMIN" && currentUser !== "FI_ADMIN")
                     )) ? (
                         <Form.Check
@@ -333,7 +335,7 @@ export default function TicketsList() {
                 header: () => t("INSTANCE_TYPE"),
                 enableSorting: false,
                 cell: ({ row }) => (
-                    <span>{(row?.original?.instanceType && masterData?.instanceType ) && masterData?.instanceType[row?.original?.instanceType]}</span>
+                    <span>{(row?.original?.instanceType && masterData?.instanceType) && masterData?.instanceType[row?.original?.instanceType]}</span>
                 )
             },
             {
@@ -364,11 +366,23 @@ export default function TicketsList() {
                 header: () => t("STATUS"),
                 size: "100",
                 cell: (rowData) => (
-                    <span
+
+                    rowData?.row?.original?.status === 'CLOSED' ? <AppTooltip title={masterData?.closedStatus[rowData?.row?.original?.closedStatus]}>
+                        <span
+                            className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+                        >
+                            {rowData.row.original.status}
+                        </span>
+
+
+                    </AppTooltip> : <span
                         className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
                     >
                         {rowData.row.original.status}
                     </span>
+
+
+
                 ),
             },
         ];
@@ -429,7 +443,7 @@ export default function TicketsList() {
     const addNewClickHanlder = () => {
         navigate('/tickets/add')
     }
-   
+
 
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
