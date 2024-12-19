@@ -39,4 +39,11 @@
     <dropForeignKeyConstraint baseTableName="claim_ticket_work_flow_failure_log"
                               constraintName="fk_claim_ticket_work_flow_failure_log_claim_ticket_work_flow_id"/>
   </changeSet>
+  <changeSet id="1734617791902" author="matellio">
+    <addColumn tableName="claim_ticket_work_flow_failure_log">
+      <column name="template_id" type="bigint" remarks="Template ID">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

@@ -10,6 +10,8 @@ import com.seps.ticket.service.dto.ClaimTicketDTO;
 import com.seps.ticket.service.dto.FIUserDTO;
 import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.UserClaimTicketDTO;
+import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
+import com.seps.ticket.service.dto.workflow.CreateAction;
 import com.seps.ticket.suptech.service.ExternalAPIService;
 import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
@@ -21,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -90,6 +93,14 @@ public class MailService {
     @Value("${website.user-base-url:test}")
     private String userBaseUrl;
 
+    private final UserClaimTicketService userClaimTicketService;
+
+    private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
+
+    private final TemplateMasterService templateMasterService;
+
+    private final UserService userService;
+
     public MailService(
         JHipsterProperties jHipsterProperties,
         JavaMailSender javaMailSender,
@@ -98,8 +109,8 @@ public class MailService {
         TemplateMasterRepository templateMasterRepository,
         EnumUtil enumUtil,
         ExternalAPIService externalAPIService,
-        TemplateVariableMappingService templateVariableMappingService
-    ) {
+        TemplateVariableMappingService templateVariableMappingService, @Lazy UserClaimTicketService userClaimTicketService,
+        ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterService templateMasterService, UserService userService) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
@@ -108,6 +119,10 @@ public class MailService {
         this.enumUtil = enumUtil;
         this.externalAPIService = externalAPIService;
         this.templateVariableMappingService = templateVariableMappingService;
+        this.userClaimTicketService = userClaimTicketService;
+        this.claimTicketWorkFlowService = claimTicketWorkFlowService;
+        this.templateMasterService = templateMasterService;
+        this.userService = userService;
     }
 
     @Async
@@ -448,5 +463,109 @@ public class MailService {
 
     public void sendComplaintEmail(UserClaimTicketDTO userClaimTicketDTO) {
 
+    }
+
+    @Async
+    public void handleWorkflowFileClaimTicket(Long claimTicketId, Long workflowId) {
+        ClaimTicketDTO claimTicketDTO = userClaimTicketService.findClaimTicketById(claimTicketId);
+        if (claimTicketDTO == null) {
+            return;
+        }
+        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowService.findClaimTicketWorkFlowById(workflowId);
+        if (claimTicketWorkFlowDTO == null) {
+            return;
+        }
+        for (CreateAction createAction : claimTicketWorkFlowDTO.getCreateActions()) {
+            Long agentId = createAction.getAgentId();
+            Long templateId = createAction.getTemplateId();
+            TemplateMaster templateMaster = null;
+            if (templateId != null) {
+                templateMaster = templateMasterService.findTemplateById(templateId);
+            }
+            User user = null;
+            switch (createAction.getAction()) {
+                case MAIL_TO_CUSTOMER:
+                    if (templateId == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    if (templateMaster == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.not.found",
+                            new Object[]{templateId}, null, templateId);
+                        continue;
+                    }
+                    if (claimTicketDTO.getUserId() == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.customer.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    user = userService.findUserById(claimTicketDTO.getUserId());
+                    if (user == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.customer.not.found",
+                            new Object[]{claimTicketDTO.getUserId()}, claimTicketDTO.getUserId(), null);
+                        continue;
+                    }
+                    break;
+                case MAIL_TO_FI_TEAM:
+                case MAIL_TO_FI_AGENT:
+                    if (templateId == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    if (templateMaster == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.not.found",
+                            new Object[]{templateId}, null, templateId);
+                        continue;
+                    }
+                    if (agentId == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.agent.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    user = claimTicketWorkFlowService.findFIUserForMailAction(agentId, claimTicketWorkFlowDTO);
+                    if (user == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.user.not.found",
+                            new Object[]{agentId}, agentId, null);
+                        continue;
+                    }
+                    break;
+                case MAIL_TO_SEPS_TEAM:
+                case MAIL_TO_SEPS_AGENT:
+                    if (templateId == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    if (templateMaster == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.not.found", new Object[]{templateId}, null, templateId);
+                        continue;
+                    }
+                    if (agentId == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.agent.id.null", new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    user = claimTicketWorkFlowService.findSEPSUserForMailAction(agentId, claimTicketWorkFlowDTO);
+                    if (user == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId, null);
+                        continue;
+                    }
+                    break;
+                // Add other cases if needed
+                default:
+                    // Handle unsupported actions or log them
+                    break;
+            }
+            if (user != null && templateMaster != null) {
+                MailDTO mailDTO = new MailDTO();
+                mailDTO.setTemplateId(templateId);
+                mailDTO.setTo(user.getEmail());
+                mailDTO.setLocale(user.getLangKey());
+                mailDTO.setIsStatic(false);
+                mailDTO.setDataVariables(templateVariableMappingService.mapVariables(claimTicketDTO, user));
+                sendDynamicContentEmail(mailDTO);
+            }
+        }
     }
 }

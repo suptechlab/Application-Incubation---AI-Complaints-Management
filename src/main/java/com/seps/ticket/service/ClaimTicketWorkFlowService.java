@@ -359,7 +359,7 @@ public class ClaimTicketWorkFlowService {
         InstanceTypeEnum instanceType = claimTicketWorkFlowDTO.getInstanceType();
         // Check if actions list is empty
         if (createActionList.isEmpty()) {
-            logWorkflowFailure(workflowId, "workflow.no.create.actions", null, null);
+            logWorkflowFailure(workflowId, "workflow.no.create.actions", null, null, null);
             return null;
         }
         // Determine required authorities and statuses based on instance type
@@ -370,14 +370,14 @@ public class ClaimTicketWorkFlowService {
             if (isAssignableAction(createAction.getAction())) {
                 Long agentId = createAction.getAgentId();
                 if (agentId == null) {
-                    logWorkflowFailure(workflowId, "workflow.agent.id.null", new Object[]{createAction.getAction()}, null);
+                    logWorkflowFailure(workflowId, "workflow.agent.id.null", new Object[]{createAction.getAction()}, null, null);
                     continue;
                 }
                 // Check user existence based on instance type
                 return findUserForAction(instanceType, agentId, organizationId, authorities, requiredStatuses, workflowId);
             }
         }
-        logWorkflowFailure(workflowId, "workflow.no.valid.actions", null, null);
+        logWorkflowFailure(workflowId, "workflow.no.valid.actions", null, null, null);
         return null;
     }
 
@@ -400,18 +400,18 @@ public class ClaimTicketWorkFlowService {
             ? userRepository.findOneByIdAndOrganizationIdAndAuthoritiesInAndStatusIn(agentId, organizationId, authorities, requiredStatuses)
             .map(userMapper::toDto)
             .orElseGet(() -> {
-                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
+                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId, null);
                 return null;
             })
             : userRepository.findOneByIdAndAuthoritiesInAndStatusIn(agentId, authorities, requiredStatuses)
             .map(userMapper::toDto)
             .orElseGet(() -> {
-                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
+                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId, null);
                 return null;
             });
     }
 
-    private void logWorkflowFailure(Long workflowId, String messageKey, Object[] args, Long agentId) {
+    public void logWorkflowFailure(Long workflowId, String messageKey, Object[] args, Long agentId, Long templateId) {
         Map<String, String> reasonMap = Arrays.stream(LanguageEnum.values())
             .collect(Collectors.toMap(
                 LanguageEnum::getCode,
@@ -421,6 +421,7 @@ public class ClaimTicketWorkFlowService {
         failureLog.setClaimTicketWorkFlowId(workflowId);
         failureLog.setReason(reasonMap);
         failureLog.setAgentId(agentId);
+        failureLog.setTemplateId(templateId);
         claimTicketWorkflowFailureLogRepository.save(failureLog);
         LOG.warn("Workflow failure logged: {}", reasonMap);
     }
@@ -432,10 +433,7 @@ public class ClaimTicketWorkFlowService {
         authorityRepository.findById(AuthoritiesConstants.FI).ifPresent(authorities::add);
         Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.ACTIVE);
         return userRepository.findOneByIdAndOrganizationIdAndAuthoritiesInAndStatusIn(agentId, organizationId, authorities, requiredStatuses)
-            .orElseGet(() -> {
-                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
-                return null;
-            });
+            .orElse(null);
     }
 
     public User findSEPSUserForMailAction(Long agentId, ClaimTicketWorkFlowDTO workFlowDTO) {
@@ -444,10 +442,7 @@ public class ClaimTicketWorkFlowService {
         authorityRepository.findById(AuthoritiesConstants.SEPS).ifPresent(authorities::add);
         Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.ACTIVE);
         return userRepository.findOneByIdAndAuthoritiesInAndStatusIn(agentId, authorities, requiredStatuses)
-            .orElseGet(() -> {
-                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
-                return null;
-            });
+            .orElse(null);
     }
 
     @Transactional(readOnly = true)

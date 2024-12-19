@@ -32,6 +32,9 @@ public class ClaimTicketWorkFlowFailureLog {
     @Column(name = "agent_id")
     private Long agentId;
 
+    @Column(name = "template_id")
+    private Long templateId;
+
     @CreationTimestamp
     @Column(name = "logged_at")
     private LocalDateTime loggedAt;

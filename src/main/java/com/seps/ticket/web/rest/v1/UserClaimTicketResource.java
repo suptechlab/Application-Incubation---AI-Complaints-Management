@@ -1,11 +1,8 @@
 package com.seps.ticket.web.rest.v1;
 
-import com.seps.ticket.domain.User;
 import com.seps.ticket.service.*;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
-import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
-import com.seps.ticket.service.dto.workflow.CreateAction;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
@@ -45,21 +42,16 @@ public class UserClaimTicketResource {
     private final DocumentService documentService;
     private final MessageSource messageSource;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
-    private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
-    private final TemplateVariableMappingService templateVariableMappingService;
-    private final UserService userService;
 
-    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService,
-                                   MessageSource messageSource, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateVariableMappingService templateVariableMappingService, UserService userService) {
+    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService, MessageSource messageSource,
+                                   ClaimTicketActivityLogService claimTicketActivityLogService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.documentService = documentService;
         this.messageSource = messageSource;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
-        this.claimTicketWorkFlowService = claimTicketWorkFlowService;
-        this.templateVariableMappingService = templateVariableMappingService;
-        this.userService = userService;
     }
+
 
     @Operation(
         summary = "File a claim API",
@@ -81,63 +73,13 @@ public class UserClaimTicketResource {
         ClaimTicketResponseDTO claimTicketResponseDTO = userClaimTicketService.fileClaimTicket(claimTicketRequest, requestInfo);
         if (claimTicketResponseDTO.getNewId() != null) {
             if (claimTicketResponseDTO.getClaimTicketWorkFlowId() == null) {
-                handleSimpleFileClaimTicket(claimTicketResponseDTO.getNewId());
+                UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(claimTicketResponseDTO.getNewId());
+                mailService.sendClaimTicketCreationEmail(userClaimTicketDTO);
             } else {
-                handleWorkflowClaimTicket(claimTicketResponseDTO.getNewId(), claimTicketResponseDTO.getClaimTicketWorkFlowId());
+                mailService.handleWorkflowFileClaimTicket(claimTicketResponseDTO.getNewId(), claimTicketResponseDTO.getClaimTicketWorkFlowId());
             }
         }
         return ResponseEntity.status(HttpStatus.OK).body(claimTicketResponseDTO);
-    }
-
-    private void handleSimpleFileClaimTicket(Long newTicketId) {
-        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(newTicketId);
-        mailService.sendClaimTicketCreationEmail(userClaimTicketDTO);
-    }
-
-    private void handleWorkflowClaimTicket(Long claimTicketId, Long workflowId) {
-        ClaimTicketDTO claimTicketDTO = userClaimTicketService.findClaimTicketById(claimTicketId);
-        if (claimTicketDTO == null) {
-            return;
-        }
-        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowService.findClaimTicketWorkFlowById(workflowId);
-        if (claimTicketWorkFlowDTO == null) {
-            return;
-        }
-        if (claimTicketWorkFlowDTO.getCreateActions().isEmpty()) {
-            return;
-        }
-
-        for (CreateAction createAction : claimTicketWorkFlowDTO.getCreateActions()) {
-            Long agentId = createAction.getAgentId();
-            Long templateId = createAction.getTemplateId();
-            User user = null;
-            switch (createAction.getAction()) {
-                case MAIL_TO_CUSTOMER:
-                    user = userService.findUserById(claimTicketDTO.getUserId());
-                    break;
-                case MAIL_TO_FI_TEAM:
-                case MAIL_TO_FI_AGENT:
-                    user = claimTicketWorkFlowService.findFIUserForMailAction(agentId, claimTicketWorkFlowDTO);
-                    break;
-                case MAIL_TO_SEPS_TEAM:
-                case MAIL_TO_SEPS_AGENT:
-                    user = claimTicketWorkFlowService.findSEPSUserForMailAction(agentId, claimTicketWorkFlowDTO);
-                    break;
-                // Add other cases if needed
-                default:
-                    // Handle unsupported actions or log them
-                    break;
-            }
-            if (user != null && templateId != null) {
-                MailDTO mailDTO = new MailDTO();
-                mailDTO.setTemplateId(templateId);
-                mailDTO.setTo(user.getEmail());
-                mailDTO.setLocale(user.getLangKey());
-                mailDTO.setIsStatic(false);
-                mailDTO.setDataVariables(templateVariableMappingService.mapVariables(claimTicketDTO, user));
-                mailService.sendDynamicContentEmail(mailDTO);
-            }
-        }
     }
 
 
