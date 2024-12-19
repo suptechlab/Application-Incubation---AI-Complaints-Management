@@ -17,7 +17,7 @@ const NotAuthorized = () => {
             </p>
             <p className="fs-20 text-secondary">Sorry, you are not authorized to access this page.</p>
             <div>
-              <button className="btn btn-primary fs-16"><IoArrowBack className="ms-2" onClick={() => navigate(-1)} /> Go Back</button>
+              <button className="btn btn-primary fs-16" onClick={() => navigate(-1)}><IoArrowBack className="ms-2"  /> Go Back</button>
             </div>
           </div>
         </div>

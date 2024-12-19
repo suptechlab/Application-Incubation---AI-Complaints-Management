@@ -4,18 +4,14 @@ import CommonDatePicker from "../../components/commonDatePicker";
 import Loader from "../../components/Loader";
 import TotalClaimsSection from "./sections/total-claims";
 import CaimsAndComplaints from "./sections/caims-and-complaints";
-import NotAuthorized from "../not-authorized";
 
 export default function Dashboard() {
   const [startDate, setStartDate] = useState();
-  let loading = false;
-
+  const [loading , setLoading ] = useState(false)
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
-      <NotAuthorized/>
-      {/* <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-       
+      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <div className="pb-3">
           <Stack
             direction="horizontal"
@@ -39,10 +35,9 @@ export default function Dashboard() {
             </div>
           </Stack>
         </div>
-
         <TotalClaimsSection />
         <CaimsAndComplaints />
-      </div> */}
+      </div>
     </React.Fragment>
   );
 }

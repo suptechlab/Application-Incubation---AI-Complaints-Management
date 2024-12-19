@@ -5,21 +5,21 @@ import { AuthenticationContext } from "../contexts/authentication.context";
 import NotAuthorized from "../pages/not-authorized";
 
 const PrivateRoute = ({ element, moduleName ="", route_permissions = [] }) => {
-    const { isAuthenticated, permissions = {} } = useContext(AuthenticationContext);
-
-    console.log(permissions[moduleName])
+    const { currentUser , isAuthenticated, permissions = {},isLoading=true } = useContext(AuthenticationContext);
 
     // Check if the module exists in permissions and if it has any matching permission
     const hasPermission = permissions[moduleName]?.some(permission =>
         route_permissions.includes(permission)
     );
 
+    // Bypass permission check for SUPER_ADMIN
+    const isSuperAdmin = currentUser === "SUPER_ADMIN";
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
 
-    if (!hasPermission) {
+    if (!isSuperAdmin && !hasPermission && !isLoading) {
         return <NotAuthorized />;
     }
 

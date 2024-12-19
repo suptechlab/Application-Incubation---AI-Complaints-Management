@@ -124,6 +124,7 @@ export default function AuthenticationProvider({ children }) {
 
     // GET ACCOUNT DETAILS AND SET IT IN TO STATES
     const handleAccountDetails = () => {
+        setIsLoading(true)
         // CALL API FOR GET ACCOUNT DETAILS
         handleGetAccountDetail()
             .then((response) => {
@@ -174,6 +175,8 @@ export default function AuthenticationProvider({ children }) {
                     logout();
                 }
 
+            }).finally(()=>{
+                setIsLoading(false)
             });
     }
 
