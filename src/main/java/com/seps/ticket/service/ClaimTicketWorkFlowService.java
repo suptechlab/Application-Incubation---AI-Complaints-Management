@@ -8,6 +8,8 @@ import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
+import com.seps.ticket.service.dto.ClaimTicketDTO;
+import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.RequestInfo;
 import com.seps.ticket.service.dto.UserDTO;
 import com.seps.ticket.service.dto.workflow.*;
@@ -455,5 +457,69 @@ public class ClaimTicketWorkFlowService {
         return claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
     }
 
+    public void triggerPriorityWorkflow(ClaimTicketDTO claimTicket){
 
+        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO;
+        // Find the next workflow excluding already processed ones
+        claimTicketWorkFlowDTO = this.findPriorityWorkFlow(claimTicket.getOrganizationId(), claimTicket.getInstanceType(),
+                claimTicket.getPriority());
+
+        if (claimTicketWorkFlowDTO != null) {
+            for (TicketPriorityAction priorityAction : claimTicketWorkFlowDTO.getTicketPriorityActions()) {
+                Long agentId = priorityAction.getAgentId();
+                Long templateId = priorityAction.getTemplateId();
+                User user = null;
+                switch (priorityAction.getAction()) {
+                    case MAIL_TO_CUSTOMER:
+                        user = userService.findUserById(claimTicket.getUserId());
+                        break;
+                    case MAIL_TO_FI_TEAM, MAIL_TO_FI_AGENT:
+                        user = this.findFIUserForMailAction(agentId, claimTicketWorkFlowDTO);
+                        break;
+                    case MAIL_TO_SEPS_TEAM, MAIL_TO_SEPS_AGENT:
+                        user = this.findSEPSUserForMailAction(agentId, claimTicketWorkFlowDTO);
+                        break;
+                    // Add other cases if needed
+                    default:
+                        // Handle unsupported actions or log them
+                        break;
+                }
+                if (user != null && templateId != null) {
+                    MailDTO mailDTO = new MailDTO();
+                    mailDTO.setTemplateId(templateId);
+                    mailDTO.setTo(user.getEmail());
+                    mailDTO.setLocale(user.getLangKey());
+                    mailDTO.setIsStatic(false);
+                    //mailDTO.setDataVariables(templateVariableMappingService.mapVariables(claimTicket, user));
+                    //mailService.sendDynamicContentEmail(mailDTO);
+                }
+            }
+        }
+    }
+
+    public ClaimTicketWorkFlowDTO findPriorityWorkFlow(Long organizationId, InstanceTypeEnum instanceType, ClaimTicketPriorityEnum priority) {
+        // Retrieve workflows
+        List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
+                findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.TICKET_PRIORITY, true)
+                .stream()
+                .toList();
+
+        // If the list is not empty, process each workflow
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
+                // Map the entity to a DTO
+                ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+                List<TicketPriorityCondition> priorityConditionList = claimTicketWorkFlowDTO.getTicketPriorityConditions();
+                // Check each condition for a match
+                for (TicketPriorityCondition priorityCondition : priorityConditionList) {
+                    if (priority.equals(priorityCondition.getPriority())) {
+                        // Return the DTO if a match is found
+                        return claimTicketWorkFlowDTO;
+                    }
+                }
+            }
+        }
+        // Return null if no match is found
+        return null;
+    }
 }

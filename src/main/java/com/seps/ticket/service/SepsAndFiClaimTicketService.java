@@ -1395,7 +1395,7 @@ public class SepsAndFiClaimTicketService {
         User user = userService.getCurrentUser();
 
         MailDTO mailDTO = new MailDTO();
-        mailDTO.setTemplateId(9L);
+        mailDTO.setTemplateId(28L);
         mailDTO.setTo(user.getEmail());
         mailDTO.setLocale(user.getLangKey());
         mailDTO.setIsStatic(false);

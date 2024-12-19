@@ -200,7 +200,7 @@ public class MailService {
     }
 
     public void sendDynamicContentEmail(MailDTO mailDTO) {
-        TemplateMaster template = mailDTO.getIsStatic() ? templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
+        TemplateMaster template = mailDTO.getIsStatic() ? templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatusAndIsGeneralTrue(mailDTO.getTemplateKey(), true)
             .orElse(null) : templateMasterRepository.findByIdAndStatus(mailDTO.getTemplateId(), true)
             .orElse(null);
 

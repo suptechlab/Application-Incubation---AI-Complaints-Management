@@ -62,7 +62,7 @@ public class EnumUtil {
      */
     public <E extends Enum<E> & EnumWithDescription> String getLocalizedEnumValue(E enumValue, Locale locale) {
         if (enumValue == null) {
-            return null;  // or return a default value, e.g., "Unknown"
+            return "N/A";  // or return a default value, e.g., "Unknown"
         }
         return messageSource.getMessage(enumValue.getDescription(), null, locale);
     }
