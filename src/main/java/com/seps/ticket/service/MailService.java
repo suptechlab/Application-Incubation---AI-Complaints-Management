@@ -243,7 +243,7 @@ public class MailService {
 
         // supportedVariables is stored as a comma-separated string in the DB
         return Arrays.stream(supportedVariables.split(","))
-            .map(String::trim)
+            .map(variable -> variable.replace("{{", "").replace("}}", ""))
             .collect(Collectors.toSet());
     }
 
