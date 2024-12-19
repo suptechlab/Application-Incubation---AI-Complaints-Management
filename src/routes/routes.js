@@ -60,54 +60,80 @@ const routes = [
     element: <Dashboard />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Dashboard"
   },
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
-    isPrivate: true,
-    layoutType: "Auth",
-  },
+
   {
     path: "/claim-type",
     element: <ClaimType />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Claim Type Master",
+    permissions: ["CLAIM_TYPE_CREATE",
+      "CLAIM_TYPE_UPDATE",
+      "CLAIM_TYPE_STATUS_CHANGE",
+      "CLAIM_TYPE_CREATE_FI",
+      "CLAIM_TYPE_UPDATE_FI",
+      "CLAIM_TYPE_STATUS_CHANGE_FI"],
   },
   {
     path: "/claim-subtype",
     element: <ClaimSubtype />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Claim Sub Type Master",
+    permissions: ["CLAIM_SUB_TYPE_CREATE",
+      "CLAIM_SUB_TYPE_UPDATE",
+      "CLAIM_SUB_TYPE_STATUS_CHANGE",
+      "CLAIM_SUB_TYPE_CREATE_FI",
+      "CLAIM_SUB_TYPE_UPDATE_FI",
+      "CLAIM_SUB_TYPE_STATUS_CHANGE_FI"
+    ],
   },
   {
     path: "/inquiry-type",
     element: <InquiryType />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Inquiry Type Master",
+    permissions: ["INQUIRY_TYPE_CREATE", "INQUIRY_TYPE_UPDATE", "INQUIRY_TYPE_STATUS_CHANGE"],
   },
   {
     path: "/inquiry-subtype",
     element: <InquirySubtype />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Inquiry Sub Type Master",
+    permissions: ["INQUIRY_SUB_TYPE_CREATE", "INQUIRY_SUB_TYPE_UPDATE", "INQUIRY_SUB_TYPE_STATUS_CHANGE"],
   },
   {
     path: "/province-master",
     element: <ProvinceMaster />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Province Master",
+    permissions: ["PROVINCE_CREATE", "PROVINCE_UPDATE", "PROVINCE_STATUS_CHANGE"],
   },
   {
     path: "/city-master",
     element: <CityMaster />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "City Master",
+    permissions: ["CITY_CREATE", "CITY_UPDATE", "CITY_STATUS_CHANGE"],
   },
   {
     path: "/template-master",
     element: <TemplateMaster />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Template Master",
+    permissions: ["TEMPLATE_CREATE",
+      "TEMPLATE_UPDATE",
+      "TEMPLATE_STATUS_CHANGE",
+      "TEMPLATE_CREATE_FI",
+      "TEMPLATE_UPDATE_FI",
+      "TEMPLATE_STATUS_CHANGE_FI"],
   },
   {
     path: "/login",
@@ -155,6 +181,8 @@ const routes = [
     element: <UserList />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"SEPS User",
+    permissions: ["SEPS_USER_CREATE_BY_SEPS", "SEPS_USER_UPDATE_BY_SEPS", "SEPS_USER_STATUS_CHANGE_BY_SEPS"]
   },
   {
     path: "/states",
@@ -173,12 +201,16 @@ const routes = [
     element: <AddUserPage isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"SEPS User",
+    permissions: ["SEPS_USER_CREATE_BY_SEPS"]
   },
   {
     path: "/users/edit/:id",
     element: <AddUserPage isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"SEPS User",
+    permissions: ["SEPS_USER_UPDATE_BY_SEPS"]
   },
   {
     path: "/states/edit/:id",
@@ -214,24 +246,37 @@ const routes = [
     path: "/fi-users",
     element: <FIUserList />,
     isPrivate: true,
+    module:"FI User",
     layoutType: "Auth",
+    permissions: ["FI_USER_CREATE_BY_SEPS",
+      "FI_UPDATE_CREATE_BY_SEPS",
+      "FI_STATUS_CHANGE_CREATE_BY_SEPS",
+      "FI_USER_CREATE_BY_FI",
+      "FI_UPDATE_CREATE_BY_FI",
+      "FI_STATUS_CHANGE_CREATE_BY_FI"
+    ]
   },
   {
     path: "/fi-users/add",
     element: <FIUserAddEdit isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"FI User",
+    permissions: ["FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI"]
   },
   {
     path: "/fi-users/edit/:id",
     element: <FIUserAddEdit isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"FI User",
+    permissions: ["FI_UPDATE_CREATE_BY_SEPS", "FI_UPDATE_CREATE_BY_FI"]
   },
   {
     path: "/fi-users/import",
     element: <ImportFIUser isEdit={false} />,
     isPrivate: true,
+    module:"FI User",
     layoutType: "Auth",
   },
   {
@@ -239,24 +284,32 @@ const routes = [
     element: <AuditLogs />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"Audit Trails",
+    permissions: ["AUDIT_TRAILS_VIEW"]
   },
   {
     path: "/reports/audit-trail/:id",
     element: <ViewAuditTrail />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"Audit Trails",
+    permissions: ["AUDIT_TRAILS_VIEW"]
   },
   {
     path: "/reports/sla-compliance",
     element: <SLAComplianceReport />,
     isPrivate: true,
     layoutType: "Auth",
+    module : "Reports",
+    permissions: ["SLA_COMPLIANCE"]
   },
   {
     path: "/reports/claim-overview",
     element: <ClaimOverviewReport />,
     isPrivate: true,
     layoutType: "Auth",
+    module : "Reports",
+    permissions: ["CLAIM_OVERVIEW_REPORT"]
   },
   {
     path: "*",
@@ -269,54 +322,112 @@ const routes = [
     element: <TicketsList />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"Ticket",
+    permissions: [
+      "TICKET_CREATED_BY_SEPS",
+      "TICKET_UPDATED_BY_SEPS",
+      "TICKET_CHANGE_STATUS_BY_SEPS",
+      "TICKET_CREATED_BY_FI",
+      "TICKET_UPDATED_BY_FI",
+      "TICKET_CHANGE_STATUS_BY_FI",
+      "TICKET_ASSIGNED_TO_AGENT_FI",
+      "TICKET_ASSIGNED_TO_AGENT_SEPS",
+      "TICKET_CLOSED_FI",
+      "TICKET_REJECT_FI",
+      "TICKET_PRIORITY_CHANGE_FI",
+      "TICKET_DOWNLOAD_PDF_FI",
+      "TICKET_CLOSED_SEPS",
+      "TICKET_REJECT_SEPS",
+      "TICKET_PRIORITY_CHANGE_SEPS",
+      "TICKET_DOWNLOAD_PDF_SEPS"
+    ]
   },
   {
     path: "/tickets/view/:id",
     element: <TicketsView />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"Ticket",
+    permissions: ["TICKET_CHANGE_STATUS_BY_FI",
+      "TICKET_CHANGE_STATUS_BY_SEPS",
+      "TICKET_ASSIGNED_TO_AGENT_FI",
+      "TICKET_ASSIGNED_TO_AGENT_SEPS",
+      "TICKET_CLOSED_FI",
+      "TICKET_REJECT_FI",
+      "TICKET_PRIORITY_CHANGE_FI",
+      "TICKET_DOWNLOAD_PDF_FI",
+      "TICKET_CLOSED_SEPS",
+      "TICKET_REJECT_SEPS",
+      "TICKET_PRIORITY_CHANGE_SEPS",
+      "TICKET_DOWNLOAD_PDF_SEPS"
+    ]
   },
   {
     path: "/tickets/add",
     element: <CreateClaim />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"Ticket",
+    permissions: ["TICKET_CREATED_BY_SEPS", "TICKET_CREATED_BY_FI"]
   },
   {
     path: "/team-management",
     element: <TeamManagementList />,
     isPrivate: true,
     layoutType: "Auth",
+    module:"Teams Manage",
+    permissions: ["TEAMS_CREATE_BY_SEPS",
+      "TEAMS_UPDATED_BY_SEPS",
+      "TEAMS_CHANGE_STATUS_BY_SEPS",
+      "TEAMS_CREATE_BY_FI",
+      "TEAMS_CHANGE_STATUS_BY_FI",
+      "TEAMS_UPDATED_BY_FI"]
   },
   {
     path: "/team-management/add",
     element: <TeamManagementAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
+    module : "Teams Manage",
+    permissions: ["TEAMS_CREATE_BY_SEPS","TEAMS_CREATE_BY_FI"]
   },
   {
     path: "/team-management/edit/:id",
     element: <TeamManagementAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
+    module : "Teams Manage",
+    permissions: ["TEAMS_UPDATED_BY_SEPS", "TEAMS_UPDATED_BY_FI"]
   },
   {
     path: "/tickets-workflow",
     element: <TicketWorkFlowList />,
     isPrivate: true,
     layoutType: "Auth",
+    module : "Ticket Workflow",
+    permissions: ["TICKET_WF_CREATED_BY_SEPS",
+      "TICKET_WF_UPDATED_BY_SEPS",
+      "TICKET_WF_CHANGE_STATUS_BY_SEPS",
+      "TICKET_WF_CREATED_BY_FI",
+      "TICKET_WF_UPDATED_BY_FI",
+      "TICKET_WF_CHANGE_STATUS_BY_FI"
+    ],
   },
   {
     path: "/tickets-workflow/add",
     element: <TicketWorkFlowAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
+    module : "Ticket Workflow",
+    permissions: ["TICKET_WF_CREATED_BY_SEPS", "TICKET_WF_CREATED_BY_FI"]
   },
   {
     path: "/tickets-workflow/edit/:id",
     element: <TicketWorkFlowAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
+    module : "Ticket Workflow",
+    permissions: ["TICKET_WF_UPDATED_BY_SEPS", "TICKET_WF_UPDATED_BY_FI"]
   },
 ];
 

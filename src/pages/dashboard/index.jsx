@@ -7,13 +7,11 @@ import CaimsAndComplaints from "./sections/caims-and-complaints";
 
 export default function Dashboard() {
   const [startDate, setStartDate] = useState();
-  let loading = false;
-
+  const [loading , setLoading ] = useState(false)
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        {/* Header */}
         <div className="pb-3">
           <Stack
             direction="horizontal"
@@ -37,7 +35,6 @@ export default function Dashboard() {
             </div>
           </Stack>
         </div>
-
         <TotalClaimsSection />
         <CaimsAndComplaints />
       </div>

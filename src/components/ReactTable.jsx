@@ -99,7 +99,7 @@ export default function ReactTable({
                   <th
                     key={header.id}
                     colSpan={header.colSpan}
-                    style={{ width: header.getSize() }}
+                    style={{ width: header.getSize() &&  header.getSize() !=='NaN'? header.getSize() : '' }}
                     className={thClassName}
                   >
                     {header.column.getCanSort() ? (
@@ -159,7 +159,7 @@ export default function ReactTable({
                   <td
                     key={cell.id}
                     align={cell.column.columnDef.meta?.align}
-                    style={{ width: cell.column.getSize() }}
+                    style={{ width: cell?.column?.getSize() && cell?.column?.getSize()!=='NaN' ? cell?.column?.getSize() : '' }}
                     className={tdClassName}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
