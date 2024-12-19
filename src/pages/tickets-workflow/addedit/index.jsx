@@ -13,9 +13,10 @@ import ReactSelect from "../../../components/ReactSelect";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
 import { MasterDataContext } from "../../../contexts/masters.context";
 import { claimTypesDropdownList, getClaimSubTypeById } from "../../../services/claimSubType.service";
-import { getOrganizationList, getTeamMemberList } from "../../../services/teamManagment.service";
+import { getOrganizationList } from "../../../services/teamManagment.service";
 import { convertToLabelValue } from "../../../services/ticketmanagement.service";
 import { ticketWorkflowSchema } from "../../../validations/ticketWorkflow.validation";
+import { addTicketWorkflow, editTicketWorkflow, getAgentList, getTeamList, getTeamMemberList, getTemplateList } from "../../../services/ticketWorkflow.service";
 
 export default function TicketWorkFlowAddEdit() {
     const [loading, setLoading] = useState(false);
@@ -47,8 +48,11 @@ export default function TicketWorkFlowAddEdit() {
     const { masterData } = useContext(MasterDataContext);
     const [organizationArr, setOrganizationArr] = useState([]);
     const [instanceTypeArr, setInstanceTypeArr] = useState([]);
+    const [claimTicketStatusArr, setClaimTicketStatusArr] = useState([]);
+    const [claimTicketPriorityArr, setClaimTicketPriorityArr] = useState([]);
     const [eventTypeArr, setEventTypeArr] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState([]);
+    const [selectedOrg, setSelectedOrg] = useState([]);
     const [conditionsArr, setConditionsArr] = useState([]);
     const [conditionsCatArr, setConditionsCatArr] = useState([]);
     const [actionsArr, setActionsArr] = useState([]);
@@ -56,6 +60,7 @@ export default function TicketWorkFlowAddEdit() {
     const [actionCategory2Arr, setActionCategory2Arr] = useState([]);
     const { currentUser } = useContext(AuthenticationContext);
 
+    // All Api Calls 
 
     const getOrganizationLists = async (type) => {
         setLoading(true);
@@ -73,22 +78,59 @@ export default function TicketWorkFlowAddEdit() {
         }
     }
 
-    const getTeamMemberLists = async (type) => {
+    const getTeamLists = async (orgId) => {
         setLoading(true);
         try {
-            await getTeamMemberList(type).then((response) => {
-                console.log('resp', response)
-                const formattedData = response.data.map((item) => ({
-                    label: item.name,
-                    value: item.id
-                }));
-                setActionCategory2Arr(formattedData)
-                setLoading(false);
-            });
+            const response = orgId
+                ? await getTeamList(orgId)
+                : await getTeamList();
+
+            const formattedData = response.data.map((item) => ({
+                label: item.name,
+                value: item.id
+            }));
+
+            setActionCategory1Arr(formattedData);
         } catch (error) {
+            console.error("Error fetching team list:", error);
+        } finally {
             setLoading(false);
         }
-    }
+    };
+
+    const getTeamMemberLists = async (teamId) => {
+        setLoading(true);
+        try {
+            const response = await getTeamMemberList(teamId);
+            console.log('Response:', response);
+            const formattedData = response.data.map((item) => ({
+                label: item.name,
+                value: item.id
+            }));
+            setActionCategory2Arr(formattedData);
+        } catch (error) {
+            console.error("Error fetching team list:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getTemplateLists = async () => {
+        setLoading(true);
+        try {
+            const response = await getTemplateList();
+            console.log('Response:', response);
+            const formattedData = response.data.map((item) => ({
+                label: item.name,
+                value: item.id
+            }));
+            setActionCategory2Arr(formattedData);
+        } catch (error) {
+            console.error("Error fetching team list:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getClaimTypeDropdownList = () => {
         setLoading(true);
@@ -111,6 +153,26 @@ export default function TicketWorkFlowAddEdit() {
         })
     }
 
+    const getAgentLists = async (orgId) => {
+        setLoading(true);
+        try {
+            const response = orgId
+                ? await getAgentList(orgId)
+                : await getAgentList();
+
+            const formattedData = response.data.map((item) => ({
+                label: item.name,
+                value: item.id
+            }));
+
+            setActionCategory1Arr(formattedData);
+        } catch (error) {
+            console.error("Error fetching team list:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const getClaimSubTypes = useCallback(async (claimId) => {
         setLoading(true);
         try {
@@ -130,6 +192,8 @@ export default function TicketWorkFlowAddEdit() {
         if (masterData) {
             setInstanceTypeArr(convertToLabelValue(masterData.instanceType || {}));
             setEventTypeArr(convertToLabelValue(masterData.ticketWorkflowEvent || {}));
+            setClaimTicketStatusArr(convertToLabelValue(masterData.claimTicketStatus || {}));
+            setClaimTicketPriorityArr(convertToLabelValue(masterData.claimTicketPriority || {}));
         }
         if (currentUser) {
             setInitialValues({
@@ -159,33 +223,44 @@ export default function TicketWorkFlowAddEdit() {
     const updateActionCategory1Filter = async (selectedActionCat1) => {
         switch (selectedActionCat1) {
             case 'ASSIGN_TO_TEAM':
-                return setActionCategory1Arr([
-                    { label: 'SEPS User', value: 'SEPS' },
-                    { label: 'Fi User', value: 'FI' },
-                ]);
+                if (selectedOrg) {
+                    return await getTeamLists(selectedOrg);
+                } else {
+                    return getTeamLists();
+                }
+                break;
             case 'ASSIGN_TO_AGENT':
-                return setActionCategory1Arr([]);
+                if (selectedOrg) {
+                    return await getAgentLists(selectedOrg);
+                } else {
+                    return getAgentLists();
+                }
+                break;
             case 'MAIL_TO_CUSTOMER':
-                return setActionCategory1Arr([]);
             case 'MAIL_TO_FI_TEAM':
-                return setActionCategory1Arr([]);
             case 'MAIL_TO_FI_AGENT':
-                return setActionCategory1Arr([]);
             case 'MAIL_TO_SEPS_TEAM':
-                return setActionCategory1Arr([]);
             case 'MAIL_TO_SEPS_AGENT':
                 return setActionCategory1Arr([]);
         }
-    }
+    };
 
-    const updateActionCategory2Filter = async (selectedActionCat2) => {
-        switch (selectedActionCat2) {
-            case 'SEPS':
-                return getTeamMemberLists('SEPS');
-            case 'FI':
-                return getTeamMemberLists('FI');
+    const updateActionCategory2Filter = async (selectedAction, selectedValue) => {
+        switch (selectedAction) {
+            case 'ASSIGN_TO_TEAM':
+                if (selectedValue) {
+                    return getTeamMemberLists(selectedValue);
+                }
+                break;
+            case 'ASSIGN_TO_AGENT':
+            case 'MAIL_TO_CUSTOMER':
+            case 'MAIL_TO_FI_TEAM':
+            case 'MAIL_TO_FI_AGENT':
+            case 'MAIL_TO_SEPS_TEAM':
+            case 'MAIL_TO_SEPS_AGENT':
+                return setActionCategory1Arr([]);
         }
-    }
+    };
 
     const getEventActionsConditions = async (event) => {
         switch (event) {
@@ -195,39 +270,135 @@ export default function TicketWorkFlowAddEdit() {
                     getClaimTypeDropdownList()
                 ];
             case 'SLA_BREACH':
-                return setActionsArr(convertToLabelValue(masterData.slaBreachAction || {}));
+                return [
+                    setActionsArr(convertToLabelValue(masterData.slaBreachAction || {}))
+                ];
             case 'SLA_DAYS_REMINDER':
-                return setActionsArr(convertToLabelValue(masterData.slaDaysReminderAction || {}));
+                return [
+                    setActionsArr(convertToLabelValue(masterData.slaDaysReminderAction || {}))
+                ]
             case 'TICKET_DATE_EXTENSION':
                 return setActionsArr(convertToLabelValue(masterData.ticketDateExtensionAction || {}));
             case 'TICKET_PRIORITY':
-                return setActionsArr(convertToLabelValue(masterData.ticketPriorityAction || {}));
+                return [
+                    setActionsArr(convertToLabelValue(masterData.ticketPriorityAction || {})),
+                    setConditionsArr(claimTicketStatusArr)
+                ]
             case 'TICKET_STATUS':
-                return setActionsArr(convertToLabelValue(masterData.ticketStatusAction || {}));
+                return [
+                    setActionsArr(convertToLabelValue(masterData.ticketStatusAction || {})),
+                    setConditionsArr(claimTicketPriorityArr)
+                ]
             default:
                 return setActionsArr([]);
         }
     }
 
+    const generateDynamicPayload = (selectedEvent, values) => {
+        // Map the event types to their respective condition and action keys and subfield mappings
+        const eventKeyMap = {
+            CREATED: {
+                conditionsKey: "createConditions",
+                actionsKey: "createActions",
+                conditionFields: { conditionId: "claimTypeId", conditionCatId: "claimSubTypeId" },
+                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+            },
+            TICKET_STATUS: {
+                conditionsKey: "ticketStatusConditions",
+                actionsKey: "ticketStatusActions",
+                conditionFields: { conditionId: "status" },
+                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+            },
+            TICKET_PRIORITY: {
+                conditionsKey: "ticketPriorityConditions",
+                actionsKey: "ticketPriorityActions",
+                conditionFields: { conditionId: "priority" },
+                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+            },
+            SLA_DAYS_REMINDER: {
+                conditionsKey: "slaDaysReminderConditions",
+                actionsKey: "slaDaysReminderActions",
+                conditionFields: { conditionId: "noOfDays" },
+                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+            },
+            SLA_BREACH: {
+                actionsKey: "slaBreachActions",
+                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+            },
+            TICKET_DATE_EXTENSION: {
+                actionsKey: "ticketPriorityActions",
+                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+            }
+        };
+
+        // Determine the keys and field mappings based on the selected event
+        const { conditionsKey, actionsKey, conditionFields, actionFields } = eventKeyMap[selectedEvent] || {};
+
+        if (!actionsKey || !actionFields) {
+            throw new Error(`Invalid event type: ${selectedEvent}`);
+        }
+
+        // Map conditions dynamically based on field mappings if they exist
+        let conditions;
+        if (conditionsKey && conditionFields) {
+            conditions = values?.conditions.map((item) => {
+                const transformedCondition = {};
+                Object.keys(conditionFields).forEach((key) => {
+                    transformedCondition[conditionFields[key]] = item[key];
+                });
+                return transformedCondition;
+            });
+        }
+
+        // Map actions dynamically based on field mappings
+        const actions = values?.actions.map((item) => {
+            const transformedAction = {};
+            Object.keys(actionFields).forEach((key) => {
+                transformedAction[actionFields[key]] = item[key];
+            });
+            return transformedAction;
+        });
+
+        // Build the dynamic payload
+        const payload = {
+            ...(conditionsKey ? { [conditionsKey]: conditions } : {}), // Add conditions only if they exist
+            [actionsKey]: actions,
+            organizationId: values.entityId,
+            instanceType: values.instanceTypeId,
+            title: values.workflowName,
+            description: values.description,
+            event: values.eventId
+        };
+
+        return payload;
+    };
+
+
+
+
     const handleSubmit = async (values, actions) => {
-        // setLoading(true);
+        setLoading(true);
+        actions.setSubmitting(true);
 
-        // try {
-        //     const action = isEdit
-        //         ? handleUpdateUser(id, { ...values })
-        //         : handleAddUser({ ...values });
+        const payload = generateDynamicPayload(selectedEvent, values);
 
-        //     const response = await action;
-        //     toast.success(response.data.message);
-        //     navigate('/team-management');
-        // } catch (error) {
-        //     const errorMessage = error.response?.data?.errorDescription;
-        //     toast.error(errorMessage);
-        // } finally {
-        //     setLoading(false);
-        //     actions.setSubmitting(false);
-        // }
-        console.log('submitted')
+        console.log('payload', payload)
+
+        try {
+            const action = isEdit
+                ? editTicketWorkflow(id, { ...payload })
+                : addTicketWorkflow({ ...payload });
+
+            const response = await action;
+            toast.success(response.data.message);
+            navigate('/tickets-workflow/');
+        } catch (error) {
+            const errorMessage = error.response?.data?.errorDescription;
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+            actions.setSubmitting(false);
+        }
     };
 
 
@@ -257,7 +428,8 @@ export default function TicketWorkFlowAddEdit() {
                                                         options={organizationArr}
                                                         value={formikProps.values.entityId}
                                                         onChange={(option) => {
-                                                            formikProps.setFieldValue("entityId", option?.value || "");
+                                                            formikProps.setFieldValue("entityId", option?.target?.value || "");
+                                                            setSelectedOrg(option?.target?.value);
                                                         }}
                                                         name="entityId"
                                                         onBlur={formikProps.handleBlur}
@@ -339,8 +511,14 @@ export default function TicketWorkFlowAddEdit() {
                                                                 formikProps.setFieldValue("conditions", [
                                                                     { conditionId: '', conditionCatId: '' },
                                                                 ])
+                                                                formikProps.setFieldValue("actions", [
+                                                                    { actionId: '', actionFilter1: '', actionFilter2: '' }
+                                                                ])
                                                                 setConditionsArr([]);
                                                                 setConditionsCatArr([]);
+                                                                setActionsArr([]);
+                                                                setActionCategory1Arr([]);
+                                                                setActionCategory2Arr([]);
                                                                 setSelectedEvent(option?.target?.value);
                                                                 getEventActionsConditions(option?.target?.value);
                                                             }}
@@ -356,101 +534,123 @@ export default function TicketWorkFlowAddEdit() {
                                         {/* Event Section Ends*/}
 
                                         {/* Condition Section Starts */}
-                                        <div className="border-top mt-2 mx-n3 px-3">
-                                            <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
-                                                <div className="me-auto">
-                                                    <h5 className="fw-semibold mb-0">{t('CONDITIONS')}</h5>
-                                                    <p className="mb-0 text-muted">{t('CONDITION_MESSAGE')}</p>
-                                                </div>
-
-                                                <Button
-                                                    variant="link"
-                                                    className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center"
-                                                    onClick={() =>
-                                                        formikProps.setFieldValue("conditions", [
-                                                            ...formikProps.values.conditions,
-                                                            { conditionId: '', conditionCatId: '' },
-                                                        ])
-                                                    }
-                                                >
-                                                    <MdAddCircle size={20} aria-hidden={true} className="me-2 text-primary" /> {t('ADD_OR_CONDITION')}
-                                                </Button>
-                                            </Stack>
-
-                                            {formikProps.values.conditions.map((condition, index) => (
-                                                <div key={index} className="repeater-row">
-                                                    <div className="position-relative custom-padding-right-66">
-                                                        <Row className="gx-4">
-                                                            <Col sm={6} lg={4}>
-                                                                <ReactSelect
-                                                                    placeholder={t('SELECT')}
-                                                                    name={`conditions[${index}].conditionId`}
-                                                                    options={conditionsArr}
-                                                                    onBlur={formikProps.handleBlur}
-                                                                    onChange={(option) => {
-                                                                        formikProps.setFieldValue(
-                                                                            `conditions[${index}].conditionId`,
-                                                                            option?.target?.value
-                                                                        )
-                                                                        if (selectedEvent === 'CREATED') {
-                                                                            getClaimSubTypes(option?.target?.value)
-                                                                        }
-                                                                    }
-                                                                    }
-                                                                    value={formikProps.values.conditions[index].conditionId}
-                                                                    error={formikProps.errors?.conditions?.[index]?.conditionId}
-                                                                    touched={formikProps.touched?.conditions?.[index]?.conditionId}
-                                                                />
-                                                            </Col>
-                                                            <Col sm={6} lg={4}>
-                                                                <ReactSelect
-                                                                    placeholder={t('SELECT')}
-                                                                    name={`conditions[${index}].conditionCatId`}
-                                                                    options={conditionsCatArr}
-                                                                    onBlur={formikProps.handleBlur}
-                                                                    onChange={(option) =>
-                                                                        formikProps.setFieldValue(
-                                                                            `conditions[${index}].conditionCatId`,
-                                                                            option?.target?.value
-                                                                        )
-                                                                    }
-                                                                    value={formikProps.values.conditions[index].conditionCatId}
-                                                                    error={formikProps.errors?.conditions?.[index]?.conditionCatId}
-                                                                    touched={formikProps.touched?.conditions?.[index]?.conditionCatId}
-                                                                />
-                                                            </Col>
-                                                            {index > 0 && (
-                                                                <Col xs="auto" className="custom-margin-right--66 pe-0">
-                                                                    <Button
-                                                                        variant="link"
-                                                                        aria-label="Remove"
-                                                                        className="p-1 rounded custom-width-42 custom-height-42 d-flex align-items-center justify-content-center link-danger bg-danger-subtle"
-                                                                        onClick={() => {
-                                                                            const updatedConditions =
-                                                                                formikProps.values.conditions.filter(
-                                                                                    (_, i) => i !== index
-                                                                                );
-                                                                            formikProps.setFieldValue(
-                                                                                "conditions",
-                                                                                updatedConditions
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <MdClose size={24} />
-                                                                    </Button>
-                                                                </Col>
-                                                            )}
-                                                        </Row>
+                                        {selectedEvent !== 'SLA_BREACH' && selectedEvent !== 'TICKET_DATE_EXTENSION' && (
+                                            <div className="border-top mt-2 mx-n3 px-3">
+                                                <Stack direction="horizontal" gap={2} className="mb-3 pb-1 pt-4">
+                                                    <div className="me-auto">
+                                                        <h5 className="fw-semibold mb-0">{t('CONDITIONS')}</h5>
+                                                        <p className="mb-0 text-muted">{t('CONDITION_MESSAGE')}</p>
                                                     </div>
 
-                                                    {index < formikProps.values.conditions.length - 1 && (
-                                                        <div className="border-top my-4 position-relative">
-                                                            <span className="bg-body fw-semibold position-absolute px-2 small start-50 top-50 translate-middle">{t('OR')}</span>
+                                                    <Button
+                                                        variant="link"
+                                                        className="link-dark border-0 text-decoration-none p-0 fw-semibold d-inline-flex align-items-center"
+                                                        onClick={() =>
+                                                            formikProps.setFieldValue('conditions', [
+                                                                ...formikProps.values.conditions,
+                                                                { conditionId: '', conditionCatId: '' },
+                                                            ])
+                                                        }
+                                                    >
+                                                        <MdAddCircle size={20} aria-hidden className="me-2 text-primary" /> {t('ADD_OR_CONDITION')}
+                                                    </Button>
+                                                </Stack>
+
+                                                {formikProps.values.conditions.map((condition, index) => (
+                                                    <div key={index} className="repeater-row">
+                                                        <div className="position-relative custom-padding-right-66">
+                                                            <Row className="gx-4">
+                                                                {selectedEvent !== 'SLA_DAYS_REMINDER' ? (
+                                                                    <Col sm={6} lg={4}>
+                                                                        <ReactSelect
+                                                                            placeholder={t('SELECT')}
+                                                                            name={`conditions[${index}].conditionId`}
+                                                                            options={conditionsArr}
+                                                                            onBlur={formikProps.handleBlur}
+                                                                            onChange={(option) => {
+                                                                                formikProps.setFieldValue(
+                                                                                    `conditions[${index}].conditionId`,
+                                                                                    option?.target?.value
+                                                                                );
+                                                                                if (selectedEvent === 'CREATED') {
+                                                                                    getClaimSubTypes(option?.target?.value);
+                                                                                }
+                                                                            }}
+                                                                            value={conditionsArr.find(
+                                                                                (opt) => opt.value === formikProps.values.conditions[index].conditionId
+                                                                            )}
+                                                                            error={formikProps.errors?.conditions?.[index]?.conditionId}
+                                                                            touched={formikProps.touched?.conditions?.[index]?.conditionId}
+                                                                        />
+                                                                    </Col>
+                                                                ) : (
+                                                                    <Col sm={6} lg={4}>
+                                                                        <FormInput
+                                                                            id={`conditions[${index}].conditionId`}
+                                                                            placeholder="Enter Days"
+                                                                            name={`conditions[${index}].conditionId`}
+                                                                            type="text"
+                                                                            onBlur={formikProps.handleBlur}
+                                                                            onChange={formikProps.handleChange}
+                                                                            value={formikProps.values.conditions[index]?.conditionId || ''}
+                                                                            error={formikProps.errors?.conditions?.[index]?.conditionId}
+                                                                            touched={formikProps.touched?.conditions?.[index]?.conditionId}
+                                                                        />
+                                                                    </Col>
+                                                                )}
+                                                                {selectedEvent === 'CREATED' && (
+                                                                    <Col sm={6} lg={4}>
+                                                                        <ReactSelect
+                                                                            placeholder={t('SELECT')}
+                                                                            name={`conditions[${index}].conditionCatId`}
+                                                                            options={conditionsCatArr}
+                                                                            onBlur={formikProps.handleBlur}
+                                                                            onChange={(option) =>
+                                                                                formikProps.setFieldValue(
+                                                                                    `conditions[${index}].conditionCatId`,
+                                                                                    option?.target?.value
+                                                                                )
+                                                                            }
+                                                                            value={conditionsCatArr.find(
+                                                                                (opt) => opt.value === formikProps.values.conditions[index].conditionCatId
+                                                                            )}
+                                                                            error={formikProps.errors?.conditions?.[index]?.conditionCatId}
+                                                                            touched={formikProps.touched?.conditions?.[index]?.conditionCatId}
+                                                                        />
+                                                                    </Col>
+                                                                )}
+                                                                {index > 0 && (
+                                                                    <Col xs="auto" className="custom-margin-right--66 pe-0">
+                                                                        <Button
+                                                                            variant="link"
+                                                                            aria-label="Remove"
+                                                                            className="p-1 rounded custom-width-42 custom-height-42 d-flex align-items-center justify-content-center link-danger bg-danger-subtle"
+                                                                            onClick={() => {
+                                                                                const updatedConditions = formikProps.values.conditions.filter(
+                                                                                    (_, i) => i !== index
+                                                                                );
+                                                                                formikProps.setFieldValue('conditions', updatedConditions);
+                                                                            }}
+                                                                        >
+                                                                            <MdClose size={24} />
+                                                                        </Button>
+                                                                    </Col>
+                                                                )}
+                                                            </Row>
                                                         </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
+
+                                                        {index < formikProps.values.conditions.length - 1 && (
+                                                            <div className="border-top my-4 position-relative">
+                                                                <span className="bg-body fw-semibold position-absolute px-2 small start-50 top-50 translate-middle">
+                                                                    {t('OR')}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
                                         {/* Condition Section Ends */}
 
 
@@ -486,12 +686,15 @@ export default function TicketWorkFlowAddEdit() {
                                                                     name={`actions[${index}].actionId`}
                                                                     options={actionsArr}
                                                                     onBlur={formikProps.handleBlur}
-                                                                    onChange={(option) =>
+                                                                    onChange={(option) => {
                                                                         formikProps.setFieldValue(
                                                                             `actions[${index}].actionId`,
                                                                             option?.target?.value
                                                                         )
-                                                                    }
+                                                                        setActionCategory1Arr([]);
+                                                                        setActionCategory2Arr([]);
+                                                                        updateActionCategory1Filter(option?.target?.value)
+                                                                    }}
                                                                     value={formikProps.values.actions[index].actionId}
                                                                     error={formikProps.errors?.actions?.[index]?.actionId}
                                                                     touched={formikProps.touched?.actions?.[index]?.actionId}
@@ -509,7 +712,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                             `actions[${index}].actionFilter1`,
                                                                             option?.target?.value
                                                                         );
-                                                                        updateActionCategory2Filter(option?.target?.value)
+                                                                        updateActionCategory2Filter(formikProps.values.actions[index].actionId, option?.target?.value)
                                                                     }}
                                                                     value={formikProps.values.actions[index].actionFilter1}
                                                                     error={formikProps.errors?.actions?.[index]?.actionFilter1}
@@ -529,7 +732,6 @@ export default function TicketWorkFlowAddEdit() {
                                                                             `actions[${index}].actionFilter2`,
                                                                             option?.target?.value
                                                                         );
-                                                                        updateActionCategory2Filter(option?.target?.value)
                                                                     }}
                                                                     value={formikProps.values.actions[index].actionFilter2}
                                                                     error={formikProps.errors?.actions?.[index]?.actionFilter2}

@@ -60,6 +60,10 @@ export const englishLang = {
     "EXPORT TO CSV": "Export To CSV",
     "SUB-CLAIM": "Sub-claim",
     // Authentication
+    "CHANGE_PASSWORD": "Change Password",
+    "LOGOUT": "Logout",
+    "ADMINISTRATOR": "Administrator",
+    "VERIFY_OTP": "Verify Otp",
     "ONE TIME PASSWORD": "One Time Password",
     "WE VE SENT A ONE-TIME PASSWORD (OTP)": "We’ve sent a One-Time Password (OTP) to your email address. Please enter it below to verify.",
     "BACK": "Back",

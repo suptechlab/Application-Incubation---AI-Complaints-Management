@@ -12,7 +12,6 @@ const ticketWorkflowSchema = Yup.object({
             otherwise: (schema) => schema,
         }),
 
-
     instanceTypeId: Yup.string()
         .required(msg.instanceTypeRequired),
 
@@ -27,11 +26,37 @@ const ticketWorkflowSchema = Yup.object({
     eventId: Yup.string()
         .required(msg.eventRequired),
 
-    actionId: Yup.string()
-        .required(msg.actionRequired),
 
-    conditionId: Yup.string()
-        .required(msg.conditionRequired)
+    actions: Yup.array()
+        .of(
+            Yup.object().shape({
+                actionId: Yup.string().required(msg.actionRequired),
+                actionFilter1: Yup.string().required(msg.fieldRequired),
+                actionFilter2: Yup.string().required(msg.fieldRequired),
+            })
+        )
+        .min(1, msg.actionsRequired),
+
+    conditions: Yup.array()
+        .when('eventId', {
+            is: (eventId) => eventId !== 'SLA_BREACH' && eventId !== 'TICKET_DATE_EXTENSION',
+            then: (schema) => schema
+                .of(
+                    Yup.object().shape({
+                        conditionId: Yup.string().required(msg.conditionRequired),
+                        conditionCatId: Yup.string().required(msg.fieldRequired),
+                    })
+                ),
+            otherwise: (schema) => schema
+                .of(
+                    Yup.object().shape({
+                        conditionId: Yup.string(), // Optional
+                        conditionCatId: Yup.string(), // Optional
+                    })
+                ),
+        }),
+
 });
+
 
 export { ticketWorkflowSchema };

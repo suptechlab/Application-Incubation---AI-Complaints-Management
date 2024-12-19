@@ -25,19 +25,21 @@ import {
   handleMarkAllNotifications
 } from "../../services/notification.service";
 import "./header.scss";
+import { useTranslation } from "react-i18next";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
-  const { logout,userData } = useContext(AuthenticationContext);
+  const { logout, userData } = useContext(AuthenticationContext);
+  const { t } = useTranslation();
 
 
   const [notifications, setNotifications] = useState([]);
   const [notificationsCount, setNotificationsCount] = useState({ count: 0 });
-  
+
   // Default values to handle missing user data
-  const { imageUrl = '', firstName = ''} = userData || {};
-  
+  const { imageUrl = '', firstName = '' } = userData || {};
+
   // const [isAdmin, setIsAdmin] = useState(false);
-  
+
   // useEffect(() => {
   //   if (authorities?.length > 0) {
   //     const adminStatus = authorities.includes("ROLE_ADMIN");
@@ -64,9 +66,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
           aria-label="Sidebar Toggle Button"
         >
           <span
-            className={`bg-dark d-inline-block menuTrigger position-relative text-center ${
-              isActiveSidebar ? "active" : ""
-            }`}
+            className={`bg-dark d-inline-block menuTrigger position-relative text-center ${isActiveSidebar ? "active" : ""
+              }`}
           ></span>
         </Button>
         <Link to="/dashboard" className="me-3">
@@ -128,7 +129,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                         <div>
                           <FaTrash
                             className="text-primary ms-2 "
-                            // onClick={() => deleteNotification(notification.id)}
+                          // onClick={() => deleteNotification(notification.id)}
                           />
                         </div>
                       </div>
@@ -139,7 +140,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
             </Dropdown.Menu>
           </Dropdown>
 
-        
+
           <Dropdown className="profileDropdown ms-3 ms-sm-4">
             <Dropdown.Toggle
               variant="link"
@@ -154,18 +155,18 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 alt={firstName}
               />
               <span className="align-middle text-start d-none d-md-inline-block px-2 text-truncate custom-max-width-200 fs-6 lh-sm">
-                {firstName} 
+                {firstName}
                 <br />
 
                 {
-                  userData?.roles?.length > 0 ? 
-                  <Badge bg="light-green-custom" className="fs-normal">
-                     {userData?.roles[0]?.name}
-                </Badge> :   <Badge bg="light-green-custom" className="fs-normal">
-                     Administrador
-                </Badge>
+                  userData?.roles?.length > 0 ?
+                    <Badge bg="light-green-custom" className="fs-normal">
+                      {userData?.roles[0]?.name}
+                    </Badge> : <Badge bg="light-green-custom" className="fs-normal">
+                      {t('ADMINISTRATOR')}
+                    </Badge>
                 }
-              
+
               </span>
               <FaCaretDown size={16} className="ms-1" />
             </Dropdown.Toggle>
@@ -174,19 +175,19 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 <span className="me-2">
                   <MdAccountBox size={18} />
                 </span>
-                <span className="align-middle">Perfil</span>
+                <span className="align-middle">{t('PROFILE')}</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} to="/change-password">
                 <span className="me-2">
                   <MdKey size={18} />
                 </span>
-                <span className="align-middle">Cambiar la contraseña</span>
+                <span className="align-middle">{t('CHANGE_PASSWORD')}</span>
               </Dropdown.Item>
               <Dropdown.Item as={Link} onClick={logout}>
                 <span className="me-2">
                   <MdLogout size={18} />
                 </span>
-                <span className="align-middle">Cerrar sesión</span>
+                <span className="align-middle">{t('LOGOUT')}</span>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

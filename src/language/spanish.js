@@ -77,6 +77,10 @@ export const spanishLang = {
     "STATUS UPDATE ERROR": "Error al Actualizar el Estado",
     "SUB-CLAIM": "Subreclamación",
     // Autenticación
+    "CHANGE_PASSWORD": "Cambiar la contraseña",
+    "LOGOUT": "Cerrar sesión",
+    "ADMINISTRATOR": "Administrador",
+    "VERIFY_OTP": "Verificar OTP",
     "BACK": "Atrás",
     "CITY NAME": "Nombre de la Ciudad",
     "PROVINCE NAME": "Nombre de la Provincia",

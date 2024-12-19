@@ -83,7 +83,8 @@ export const messages = {
     conditionRequired: "Condition is required.",
     actionRequired: "Action is required.",
     instanceTypeRequired: "Instance type is required.",
-    eventRequired: "Event is required."
+    eventRequired: "Event is required.",
+    fieldRequired: "This field is required."
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -165,10 +166,11 @@ export const messages = {
     invalidFileType: "Tipo de archivo no válido. Por favor, suba un archivo permitido.",
     fileSizeExceeded: "El tamaño del archivo supera los {size} MB. Por favor, suba un archivo más pequeño.",
     //Ticket Workflow
-    workFlowNameRequired: "El nombre del flujo de trabajo es obligatorio.",
+    workflowNameRequired: "El nombre del flujo de trabajo es obligatorio.",
     conditionRequired: "Se requiere condición.",
     actionRequired: "Se requiere acción.",
     instanceTypeRequired: "Se requiere el tipo de instancia.",
-    eventRequired: "Se requiere evento."
+    eventRequired: "Se requiere evento.",
+    fieldRequired: "Este campo es obligatorio."
   }
 };
