@@ -2,7 +2,7 @@ import React, { Suspense, useEffect } from "react";
 import Loader from "./components/Loader";
 import AppRoutes from "./router";
 import { BrowserRouter } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getLocalStorage } from "./utils/storage";
 import { getAccountInfo, setLogout } from "./redux/slice/authSlice";
 import { fetchMasterData } from "./redux/slice/masterSlice";
@@ -14,6 +14,8 @@ function App() {
 
   // Initialize QueryClient
   const queryClient = new QueryClient();
+
+  const {token} = useSelector((state)=> state?.authSlice)
 
   // CALL ACCOUNT INFO API HERE SO CAN VALIDATE THAT USER TOKEN IS STILL VALID OR NOT
   // MANAGE LOGIN FLOW ALSO IF USER IS LOGGED IN THAT SHOULD DIRECTLY GO ON FILE A CLAIM
@@ -43,6 +45,15 @@ function App() {
 
     validateToken();
   }, [dispatch]);
+
+
+  useEffect(()=>{
+
+    if(token){
+      dispatch(fetchMasterData()); 
+    }
+
+  },[token])
 
 
   return (
