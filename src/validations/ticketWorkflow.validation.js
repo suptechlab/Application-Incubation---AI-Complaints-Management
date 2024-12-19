@@ -32,7 +32,11 @@ const ticketWorkflowSchema = Yup.object({
             Yup.object().shape({
                 actionId: Yup.string().required(msg.actionRequired),
                 actionFilter1: Yup.string().required(msg.fieldRequired),
-                actionFilter2: Yup.string().required(msg.fieldRequired),
+                actionFilter2: Yup.string().when('actionId', {
+                    is: 'MAIL_TO_CUSTOMER',
+                    then: (schema) => schema.notRequired(), // Required only for "CREATED"
+                    otherwise: (schema) => schema.required(msg.fieldRequired), // Optional otherwise
+                }),
             })
         )
         .min(1, msg.actionsRequired),
@@ -44,7 +48,11 @@ const ticketWorkflowSchema = Yup.object({
                 .of(
                     Yup.object().shape({
                         conditionId: Yup.string().required(msg.conditionRequired),
-                        conditionCatId: Yup.string().required(msg.fieldRequired),
+                        conditionCatId: Yup.string().when('eventId', {
+                            is: 'CREATED',
+                            then: (schema) => schema.required(msg.fieldRequired), // Required only for "CREATED"
+                            otherwise: (schema) => schema, // Optional otherwise
+                        }),
                     })
                 ),
             otherwise: (schema) => schema

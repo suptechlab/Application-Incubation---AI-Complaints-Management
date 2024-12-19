@@ -53,6 +53,7 @@ export default function TicketWorkFlowAddEdit() {
     const [eventTypeArr, setEventTypeArr] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState([]);
     const [selectedOrg, setSelectedOrg] = useState([]);
+    const [selectedAction, setSelectedAction] = useState([]);
     const [conditionsArr, setConditionsArr] = useState([]);
     const [conditionsCatArr, setConditionsCatArr] = useState([]);
     const [actionsArr, setActionsArr] = useState([]);
@@ -102,7 +103,6 @@ export default function TicketWorkFlowAddEdit() {
         setLoading(true);
         try {
             const response = await getTeamMemberList(teamId);
-            console.log('Response:', response);
             const formattedData = response.data.map((item) => ({
                 label: item.name,
                 value: item.id
@@ -115,16 +115,19 @@ export default function TicketWorkFlowAddEdit() {
         }
     };
 
-    const getTemplateLists = async () => {
+    const getTemplateLists = async (type) => {
         setLoading(true);
         try {
             const response = await getTemplateList();
-            console.log('Response:', response);
             const formattedData = response.data.map((item) => ({
                 label: item.name,
                 value: item.id
             }));
-            setActionCategory2Arr(formattedData);
+            if (type === 'actionFilter2') {
+                setActionCategory2Arr(formattedData);
+            } else {
+                setActionCategory1Arr(formattedData);
+            }
         } catch (error) {
             console.error("Error fetching team list:", error);
         } finally {
@@ -164,7 +167,6 @@ export default function TicketWorkFlowAddEdit() {
                 label: item.name,
                 value: item.id
             }));
-
             setActionCategory1Arr(formattedData);
         } catch (error) {
             console.error("Error fetching team list:", error);
@@ -237,10 +239,24 @@ export default function TicketWorkFlowAddEdit() {
                 }
                 break;
             case 'MAIL_TO_CUSTOMER':
+                return getTemplateLists('actionFilter1');
+                break;
             case 'MAIL_TO_FI_TEAM':
             case 'MAIL_TO_FI_AGENT':
+                if (selectedOrg) {
+                    return await getAgentLists(selectedOrg);
+                } else {
+                    return getAgentLists();
+                }
+                break;
             case 'MAIL_TO_SEPS_TEAM':
             case 'MAIL_TO_SEPS_AGENT':
+                if (selectedOrg) {
+                    return await getAgentLists(selectedOrg);
+                } else {
+                    return getAgentLists();
+                }
+                break;
                 return setActionCategory1Arr([]);
         }
     };
@@ -253,11 +269,16 @@ export default function TicketWorkFlowAddEdit() {
                 }
                 break;
             case 'ASSIGN_TO_AGENT':
-            case 'MAIL_TO_CUSTOMER':
+                return await getTemplateLists('actionFilter2');
+                break;
             case 'MAIL_TO_FI_TEAM':
             case 'MAIL_TO_FI_AGENT':
+                return getTemplateLists('actionFilter2');
+                break;
             case 'MAIL_TO_SEPS_TEAM':
             case 'MAIL_TO_SEPS_AGENT':
+                return getTemplateLists('actionFilter2');
+                break;
                 return setActionCategory1Arr([]);
         }
     };
@@ -295,50 +316,80 @@ export default function TicketWorkFlowAddEdit() {
     }
 
     const generateDynamicPayload = (selectedEvent, values) => {
-        // Map the event types to their respective condition and action keys and subfield mappings
         const eventKeyMap = {
             CREATED: {
                 conditionsKey: "createConditions",
                 actionsKey: "createActions",
                 conditionFields: { conditionId: "claimTypeId", conditionCatId: "claimSubTypeId" },
-                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+                actionFields: {
+                    ASSIGN_TO_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId" },
+                    ASSIGN_TO_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_FI_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_SEPS_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_CUSTOMER: { actionId: "action", actionFilter1: "templateId" },
+                },
             },
             TICKET_STATUS: {
                 conditionsKey: "ticketStatusConditions",
                 actionsKey: "ticketStatusActions",
                 conditionFields: { conditionId: "status" },
-                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+                actionFields: {
+                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_FI_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_SEPS_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                },
             },
             TICKET_PRIORITY: {
                 conditionsKey: "ticketPriorityConditions",
                 actionsKey: "ticketPriorityActions",
                 conditionFields: { conditionId: "priority" },
-                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+                actionFields: {
+                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_FI_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_SEPS_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" }
+                },
             },
             SLA_DAYS_REMINDER: {
                 conditionsKey: "slaDaysReminderConditions",
                 actionsKey: "slaDaysReminderActions",
                 conditionFields: { conditionId: "noOfDays" },
-                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+                 actionFields: {
+                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_FI_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_SEPS_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                },
             },
             SLA_BREACH: {
                 actionsKey: "slaBreachActions",
-                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+                 actionFields: {
+                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_FI_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_SEPS_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                },
             },
             TICKET_DATE_EXTENSION: {
                 actionsKey: "ticketPriorityActions",
-                actionFields: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+                 actionFields: {
+                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_FI_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_SEPS_AGENT: { actionId: "action", actionFilter1: "agentId", actionFilter2: "templateId" },
+                },
             }
         };
 
-        // Determine the keys and field mappings based on the selected event
         const { conditionsKey, actionsKey, conditionFields, actionFields } = eventKeyMap[selectedEvent] || {};
 
         if (!actionsKey || !actionFields) {
             throw new Error(`Invalid event type: ${selectedEvent}`);
         }
 
-        // Map conditions dynamically based on field mappings if they exist
         let conditions;
         if (conditionsKey && conditionFields) {
             conditions = values?.conditions.map((item) => {
@@ -350,18 +401,20 @@ export default function TicketWorkFlowAddEdit() {
             });
         }
 
-        // Map actions dynamically based on field mappings
         const actions = values?.actions.map((item) => {
+            const specificActionFields = actionFields[item.actionId]; 
+            if (!specificActionFields) {
+                throw new Error(`Invalid action type: ${item.actionId}`);
+            }
             const transformedAction = {};
-            Object.keys(actionFields).forEach((key) => {
-                transformedAction[actionFields[key]] = item[key];
+            Object.keys(specificActionFields).forEach((key) => {
+                transformedAction[specificActionFields[key]] = item[key];
             });
             return transformedAction;
         });
 
-        // Build the dynamic payload
         const payload = {
-            ...(conditionsKey ? { [conditionsKey]: conditions } : {}), // Add conditions only if they exist
+            ...(conditionsKey ? { [conditionsKey]: conditions } : {}),
             [actionsKey]: actions,
             organizationId: values.entityId,
             instanceType: values.instanceTypeId,
@@ -373,11 +426,8 @@ export default function TicketWorkFlowAddEdit() {
         return payload;
     };
 
-
-
-
     const handleSubmit = async (values, actions) => {
-        setLoading(true);
+        // setLoading(true);
         actions.setSubmitting(true);
 
         const payload = generateDynamicPayload(selectedEvent, values);
@@ -691,6 +741,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                             `actions[${index}].actionId`,
                                                                             option?.target?.value
                                                                         )
+                                                                        setSelectedAction(option?.target?.value);
                                                                         setActionCategory1Arr([]);
                                                                         setActionCategory2Arr([]);
                                                                         updateActionCategory1Filter(option?.target?.value)
@@ -720,24 +771,26 @@ export default function TicketWorkFlowAddEdit() {
                                                                 />
                                                             </Col>
 
-                                                            <Col sm={6} lg={4}>
-                                                                <ReactSelect
-                                                                    wrapperClassName={'mb-3'}
-                                                                    placeholder={t('SELECT')}
-                                                                    name={`actions[${index}].actionFilter2`}
-                                                                    options={actionCategory2Arr}
-                                                                    onBlur={formikProps.handleBlur}
-                                                                    onChange={(option) => {
-                                                                        formikProps.setFieldValue(
-                                                                            `actions[${index}].actionFilter2`,
-                                                                            option?.target?.value
-                                                                        );
-                                                                    }}
-                                                                    value={formikProps.values.actions[index].actionFilter2}
-                                                                    error={formikProps.errors?.actions?.[index]?.actionFilter2}
-                                                                    touched={formikProps.touched?.actions?.[index]?.actionFilter2}
-                                                                />
-                                                            </Col>
+                                                            {formikProps.values.actions[index].actionId !== 'MAIL_TO_CUSTOMER' &&
+                                                                <Col sm={6} lg={4}>
+                                                                    <ReactSelect
+                                                                        wrapperClassName={'mb-3'}
+                                                                        placeholder={t('SELECT')}
+                                                                        name={`actions[${index}].actionFilter2`}
+                                                                        options={actionCategory2Arr}
+                                                                        onBlur={formikProps.handleBlur}
+                                                                        onChange={(option) => {
+                                                                            formikProps.setFieldValue(
+                                                                                `actions[${index}].actionFilter2`,
+                                                                                option?.target?.value
+                                                                            );
+                                                                        }}
+                                                                        value={formikProps.values.actions[index].actionFilter2}
+                                                                        error={formikProps.errors?.actions?.[index]?.actionFilter2}
+                                                                        touched={formikProps.touched?.actions?.[index]?.actionFilter2}
+                                                                    />
+                                                                </Col>
+                                                            }
 
                                                             {index > 0 && (
                                                                 <Col xs="auto" className="custom-margin-right--66 pe-0">
