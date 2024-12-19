@@ -126,6 +126,11 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         }
                         break;
+                    case MAIL_TO_CUSTOMER:
+                        if (action.getTemplateId() == null) {
+                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        }
+                        break;
                     default:
                         LOG.warn("Unrecognized action: {}", action.getAction());
                         break;
@@ -183,6 +188,11 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         }
                         break;
+                    case MAIL_TO_CUSTOMER:
+                        if (action.getTemplateId() == null) {
+                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        }
+                        break;
                     default:
                         LOG.warn("Unrecognized action ticket status: {}", action.getAction());
                         break;
@@ -227,6 +237,11 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
                         }
+                        if (action.getTemplateId() == null) {
+                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        }
+                        break;
+                    case MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         }
@@ -278,6 +293,11 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         }
                         break;
+                    case MAIL_TO_CUSTOMER:
+                        if (action.getTemplateId() == null) {
+                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        }
+                        break;
                     default:
                         LOG.warn("Unrecognized action sla days reminder: {}", action.getAction());
                         break;
@@ -320,6 +340,11 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         }
                         break;
+                    case MAIL_TO_CUSTOMER:
+                        if (action.getTemplateId() == null) {
+                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        }
+                        break;
                     default:
                         LOG.warn("Unrecognized action sla breach event: {}", action.getAction());
                         break;
@@ -358,6 +383,11 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
                         }
+                        if (action.getTemplateId() == null) {
+                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        }
+                        break;
+                    case MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         }

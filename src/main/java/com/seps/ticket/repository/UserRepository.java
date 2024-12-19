@@ -3,6 +3,7 @@ package com.seps.ticket.repository;
 import com.seps.ticket.domain.Authority;
 import com.seps.ticket.domain.User;
 import com.seps.ticket.enums.UserStatusEnum;
+import com.seps.ticket.service.mapper.UserMapper;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +31,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = "authorities")
     Optional<User> findOneByIdAndOrganizationIdAndAuthoritiesInAndStatusIn(Long id, Long organizationId, Set<Authority> authorities, Set<UserStatusEnum> statuses);
 
+    @EntityGraph(attributePaths = "authorities")
+    Optional<User> findOneByIdAndAndStatusIn(Long agentId, Set<UserStatusEnum> requiredStatuses);
 }

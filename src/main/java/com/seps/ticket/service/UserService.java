@@ -33,11 +33,11 @@ public class UserService {
             .orElse(null);
     }
 
-    public List<User> getUserListByRoleSlug(String  roleSlug){
+    public List<User> getUserListByRoleSlug(String roleSlug) {
         return userRepository.findAllByRoleSlug(roleSlug);
     }
 
-    public List<User> getUserListByRoleSlug(Long organizationId, String  roleSlug){
+    public List<User> getUserListByRoleSlug(Long organizationId, String roleSlug) {
         return userRepository.findAllByOrganizationIdAndRoleSlug(organizationId, roleSlug);
     }
 
@@ -45,4 +45,9 @@ public class UserService {
         return userRepository.findById(id)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
     }
+
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
 }

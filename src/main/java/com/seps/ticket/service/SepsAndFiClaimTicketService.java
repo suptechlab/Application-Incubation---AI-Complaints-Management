@@ -70,9 +70,10 @@ public class SepsAndFiClaimTicketService {
     private final DocumentService documentService;
     private final ClaimTicketDocumentRepository claimTicketDocumentRepository;
     private static final boolean IS_INTERNAL_DOCUMENT = false;
-    private static final String ATTACHMENTS ="attachments";
+    private static final String ATTACHMENTS = "attachments";
     private static final String REASON = "reason";
     private final TemplateVariableMappingService templateVariableMappingService;
+
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -80,18 +81,18 @@ public class SepsAndFiClaimTicketService {
      * provide access to repositories, utilities, and services that allow the service to perform operations such as creating
      * and updating claim tickets, logging activities, and sending notifications.</p>
      *
-     * @param claimTicketRepository the repository for interacting with claim tickets.
-     * @param userService the service for interacting with user-related operations.
-     * @param claimTicketMapper the mapper for converting between claim ticket entities and DTOs.
-     * @param claimTicketActivityLogService the service for managing activity logs for claim tickets.
-     * @param messageSource the service for retrieving localized messages.
-     * @param enumUtil the utility class for handling enum-related operations.
-     * @param gson the library for converting objects to JSON.
-     * @param auditLogService the service for logging audit activities.
-     * @param claimTicketAssignLogRepository the repository for managing claim ticket assignment logs.
+     * @param claimTicketRepository            the repository for interacting with claim tickets.
+     * @param userService                      the service for interacting with user-related operations.
+     * @param claimTicketMapper                the mapper for converting between claim ticket entities and DTOs.
+     * @param claimTicketActivityLogService    the service for managing activity logs for claim tickets.
+     * @param messageSource                    the service for retrieving localized messages.
+     * @param enumUtil                         the utility class for handling enum-related operations.
+     * @param gson                             the library for converting objects to JSON.
+     * @param auditLogService                  the service for logging audit activities.
+     * @param claimTicketAssignLogRepository   the repository for managing claim ticket assignment logs.
      * @param claimTicketPriorityLogRepository the repository for managing claim ticket priority logs.
-     * @param claimTicketStatusLogRepository the repository for managing claim ticket status logs.
-     * @param mailService the service for sending email notifications.
+     * @param claimTicketStatusLogRepository   the repository for managing claim ticket status logs.
+     * @param mailService                      the service for sending email notifications.
      */
     public SepsAndFiClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService,
                                        ClaimTicketMapper claimTicketMapper, ClaimTicketActivityLogService claimTicketActivityLogService,
@@ -120,25 +121,24 @@ public class SepsAndFiClaimTicketService {
     /**
      * Retrieves a paginated list of claim tickets based on the provided filter criteria.
      *
-     * @param pageable       the pagination and sorting information.
-     * @param filterRequest  the filter criteria for the claim tickets, which includes optional
-     *                       parameters like search, claim ticket status, priority, date range,
-     *                       organization ID, and claim type ID. If {@code null}, a default filter
-     *                       request will be initialized.
+     * @param pageable      the pagination and sorting information.
+     * @param filterRequest the filter criteria for the claim tickets, which includes optional
+     *                      parameters like search, claim ticket status, priority, date range,
+     *                      organization ID, and claim type ID. If {@code null}, a default filter
+     *                      request will be initialized.
      * @return a {@link Page} of {@link ClaimTicketListDTO} containing the filtered claim tickets.
-     *
      * @throws CustomException if the current user lacks appropriate permissions to view claim tickets.
-     *
-     * This method performs the following operations:
-     * <ul>
-     *   <li>Initializes a default filter request if none is provided.</li>
-     *   <li>Identifies the current user's roles and authorities to apply appropriate filtering logic.</li>
-     *   <li>Automatically filters claim tickets based on the current user's organization if they
-     *       belong to the FI group.</li>
-     *   <li>Applies additional filtering for FI agents or SEPS agents based on the user's role and ID.</li>
-     *   <li>Uses a specification to dynamically build the query for fetching claim tickets from
-     *       the repository.</li>
-     * </ul>
+     *                         <p>
+     *                         This method performs the following operations:
+     *                         <ul>
+     *                           <li>Initializes a default filter request if none is provided.</li>
+     *                           <li>Identifies the current user's roles and authorities to apply appropriate filtering logic.</li>
+     *                           <li>Automatically filters claim tickets based on the current user's organization if they
+     *                               belong to the FI group.</li>
+     *                           <li>Applies additional filtering for FI agents or SEPS agents based on the user's role and ID.</li>
+     *                           <li>Uses a specification to dynamically build the query for fetching claim tickets from
+     *                               the repository.</li>
+     *                         </ul>
      */
 
     @Transactional
@@ -153,13 +153,13 @@ public class SepsAndFiClaimTicketService {
             .toList();
         Long fiAgentId = null;
         Long sepsAgentId = null;
-        if(authority.contains(AuthoritiesConstants.FI)){
+        if (authority.contains(AuthoritiesConstants.FI)) {
             filterRequest.setOrganizationId(currentUser.getOrganization().getId());
-            if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT)){
+            if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT)) {
                 fiAgentId = currentUser.getId();
             }
-        }else {
-            if(currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)){
+        } else {
+            if (currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)) {
                 sepsAgentId = currentUser.getId();
             }
         }
@@ -173,9 +173,7 @@ public class SepsAndFiClaimTicketService {
      *
      * @param id the unique identifier of the claim ticket.
      * @return the {@link ClaimTicketDTO} corresponding to the provided ID.
-     *
      * @throws CustomException if the claim ticket is not found or the user does not have the required permissions.
-     *
      * @see UserService#getCurrentUser()
      * @see ClaimTicketRepository#findByIdAndOrganizationId(Long, Long)
      * @see ClaimTicketMapper#toDTO(ClaimTicket)
@@ -187,15 +185,15 @@ public class SepsAndFiClaimTicketService {
             .map(Authority::getName)
             .toList();
         Long organizationId = null;
-        if(authority.contains(AuthoritiesConstants.FI)){
+        if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganization().getId();
         }
-        if(organizationId!=null) {
+        if (organizationId != null) {
             return claimTicketRepository.findByIdAndOrganizationId(id, organizationId)
                 .map(claimTicketMapper::toDTO)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{id.toString()}, null));
-        }else{
+        } else {
             return claimTicketRepository.findById(id)
                 .map(claimTicketMapper::toDTO)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
@@ -211,7 +209,6 @@ public class SepsAndFiClaimTicketService {
      * - For users with SEPS Admin or global Admin rights, it retrieves all SEPS agents.</p>
      *
      * @return a list of {@link DropdownListDTO} representing agents available to the current user.
-     *
      * @see UserService#getCurrentUser()
      * @see UserService#getUserListByRoleSlug(Long, String)
      * @see UserService#getUserListByRoleSlug(String)
@@ -254,17 +251,15 @@ public class SepsAndFiClaimTicketService {
      * It ensures the tickets belong to the same organization as the current user and throws an exception if
      * the agent is not an FI Agent or no tickets are found for the provided IDs.</p>
      *
-     * @param agentId the ID of the FI agent to whom the tickets will be assigned.
+     * @param agentId                the ID of the FI agent to whom the tickets will be assigned.
      * @param assignTicketRequestDTO the DTO containing the list of ticket IDs to be assigned.
      * @return a list of updated {@link ClaimTicket} entities reflecting the assignment.
-     *
      * @throws CustomException if:
-     *         <ul>
-     *             <li>The specified agent is not an FI Agent.</li>
-     *             <li>No tickets are found with the provided IDs.</li>
-     *             <li>The current user is not authorized to perform the operation.</li>
-     *         </ul>
-     *
+     *                         <ul>
+     *                             <li>The specified agent is not an FI Agent.</li>
+     *                             <li>No tickets are found with the provided IDs.</li>
+     *                             <li>The current user is not authorized to perform the operation.</li>
+     *                         </ul>
      * @see UserService#getUserById(Long)
      * @see ClaimTicketRepository#findAllByIdInAndOrganizationId(List, Long)
      * @see ClaimTicketActivityLogService#saveActivityLog(ClaimTicketActivityLog)
@@ -280,7 +275,7 @@ public class SepsAndFiClaimTicketService {
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
-        if(authority.contains(AuthoritiesConstants.FI) && currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
+        if (authority.contains(AuthoritiesConstants.FI) && currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
             Long organizationId = currentUser.getOrganization().getId();
             if (!agent.hasRoleSlug(Constants.RIGHTS_FI_AGENT)) {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.IS_NOT_FI_AGENT, new String[]{agentId.toString()}, null);
@@ -299,11 +294,11 @@ public class SepsAndFiClaimTicketService {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE, new String[]{enumUtil.getLocalizedEnumValue(InstanceTypeEnum.FIRST_INSTANCE, LocaleContextHolder.getLocale())}, null);
             }
             List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
-            List<ClaimTicketAssignLog> assignLogsList= new ArrayList<>();
-            List<ClaimTicketStatusLog> claimTicketStatusLogList= new ArrayList<>();
+            List<ClaimTicketAssignLog> assignLogsList = new ArrayList<>();
+            List<ClaimTicketStatusLog> claimTicketStatusLogList = new ArrayList<>();
             // Assign the agent to each ticket
             tickets.forEach(ticket -> {
-                if(ticket.getFiAgentId() != null && ticket.getFiAgentId().equals(agentId)) {
+                if (ticket.getFiAgentId() != null && ticket.getFiAgentId().equals(agentId)) {
                     return;
                 }
                 ClaimTicketActivityLog activityLog = createAssignToAgentActivityLog(currentUser, ticket, agent);
@@ -342,7 +337,7 @@ public class SepsAndFiClaimTicketService {
             claimTicketAssignLogRepository.saveAll(assignLogsList);
             claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
             return savedTickets;
-        }else{
+        } else {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, new String[]{assignTicketRequestDTO.toString()}, null);
         }
     }
@@ -355,44 +350,43 @@ public class SepsAndFiClaimTicketService {
      * and new assignees, and ticket-specific details. The activity log is localized in multiple languages.</p>
      *
      * @param currentUser the current user performing the action.
-     * @param ticket the claim ticket being assigned or reassigned.
-     * @param agent the FI agent to whom the ticket is assigned or reassigned.
+     * @param ticket      the claim ticket being assigned or reassigned.
+     * @param agent       the FI agent to whom the ticket is assigned or reassigned.
      * @return a populated {@link ClaimTicketActivityLog} containing the details of the action.
-     *
      * @see ClaimTicketActivityLog
      * @see ClaimTicketActivityEnum
      * @see LanguageEnum
      */
-    private ClaimTicketActivityLog createAssignToAgentActivityLog(User currentUser, ClaimTicket ticket, User agent){
+    private ClaimTicketActivityLog createAssignToAgentActivityLog(User currentUser, ClaimTicket ticket, User agent) {
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
         Map<String, String> activityTitle = new HashMap<>();
         Map<String, String> linkedUser = new HashMap<>();
         Map<String, Object> activityDetail = new HashMap<>();
-        if(ticket.getFiAgentId() != null) {
+        if (ticket.getFiAgentId() != null) {
             activityLog.setActivityType(ClaimTicketActivityEnum.REASSIGNED.name());
-            linkedUser.put(ticket.getFiAgentId().toString(),ticket.getFiAgent().getFirstName());
+            linkedUser.put(ticket.getFiAgentId().toString(), ticket.getFiAgent().getFirstName());
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
                 String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.reassigned.to.agent",
-                    new Object[]{"@"+currentUser.getId(), "@"+ticket.getFiAgentId(), "@"+agent.getId()}, Locale.forLanguageTag(language.getCode()));
+                    new Object[]{"@" + currentUser.getId(), "@" + ticket.getFiAgentId(), "@" + agent.getId()}, Locale.forLanguageTag(language.getCode()));
                 activityTitle.put(language.getCode(), messageAudit);
             });
-            activityDetail.put("previousAssignee",convertEntityToMap(claimTicketMapper.toFIUserDTO(ticket.getFiAgent())));
+            activityDetail.put("previousAssignee", convertEntityToMap(claimTicketMapper.toFIUserDTO(ticket.getFiAgent())));
             activityDetail.put("newAssignee", convertEntityToMap(claimTicketMapper.toFIUserDTO(agent)));
-        }else{
+        } else {
             activityLog.setActivityType(ClaimTicketActivityEnum.ASSIGNED.name());
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
                 String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.assigned.to.agent",
-                    new Object[]{"@"+currentUser.getId(), "@"+agent.getId()}, Locale.forLanguageTag(language.getCode()));
+                    new Object[]{"@" + currentUser.getId(), "@" + agent.getId()}, Locale.forLanguageTag(language.getCode()));
                 activityTitle.put(language.getCode(), messageAudit);
             });
-            activityDetail.put("newAssignee",convertEntityToMap(claimTicketMapper.toFIUserDTO(agent)));
+            activityDetail.put("newAssignee", convertEntityToMap(claimTicketMapper.toFIUserDTO(agent)));
         }
-        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toFIUserDTO(currentUser)));
-        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
-        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
-        linkedUser.put(agent.getId().toString(),agent.getFirstName());
+        activityDetail.put(Constants.PERFORM_BY, convertEntityToMap(claimTicketMapper.toFIUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
+        linkedUser.put(agent.getId().toString(), agent.getFirstName());
 
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
@@ -407,12 +401,11 @@ public class SepsAndFiClaimTicketService {
      * It ensures that only tickets of type {@link InstanceTypeEnum#SECOND_INSTANCE} are assigned. The method
      * also updates the SLA breach date, creates activity logs, and saves the status and assignment logs for each ticket.</p>
      *
-     * @param agentId the ID of the SEPS agent to whom the tickets are being assigned.
+     * @param agentId                the ID of the SEPS agent to whom the tickets are being assigned.
      * @param assignTicketRequestDTO the DTO containing the list of ticket IDs to be assigned.
      * @return a list of updated {@link ClaimTicket} entities.
      * @throws CustomException if the agent is not a SEPS agent, tickets are not found,
      *                         tickets are not of the required instance type, or the current user is unauthorized.
-     *
      * @see ClaimTicket
      * @see AssignTicketRequestDTO
      * @see ClaimTicketActivityLog
@@ -430,7 +423,7 @@ public class SepsAndFiClaimTicketService {
             .map(Authority::getName)
             .toList();
 
-        if(authority.contains(AuthoritiesConstants.SEPS) || authority.contains(AuthoritiesConstants.ADMIN)) {
+        if (authority.contains(AuthoritiesConstants.SEPS) || authority.contains(AuthoritiesConstants.ADMIN)) {
             if (!agent.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)) {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.IS_NOT_SEPS_AGENT, new String[]{agentId.toString()}, null);
             }
@@ -450,11 +443,11 @@ public class SepsAndFiClaimTicketService {
             }
 
             List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
-            List<ClaimTicketAssignLog> assignLogsList= new ArrayList<>();
-            List<ClaimTicketStatusLog> claimTicketStatusLogList= new ArrayList<>();
+            List<ClaimTicketAssignLog> assignLogsList = new ArrayList<>();
+            List<ClaimTicketStatusLog> claimTicketStatusLogList = new ArrayList<>();
             // Assign the agent to each ticket
             tickets.forEach(ticket -> {
-                if(ticket.getSepsAgentId() != null && ticket.getSepsAgentId().equals(agentId)) {
+                if (ticket.getSepsAgentId() != null && ticket.getSepsAgentId().equals(agentId)) {
                     return;
                 }
                 ClaimTicketActivityLog activityLog = createAssignToAgentActivityLog(currentUser, ticket, agent);
@@ -491,7 +484,7 @@ public class SepsAndFiClaimTicketService {
             claimTicketAssignLogRepository.saveAll(assignLogsList);
             claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
             return ticketList;
-        }else{
+        } else {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, new String[]{assignTicketRequestDTO.toString()}, null);
         }
     }
@@ -503,11 +496,10 @@ public class SepsAndFiClaimTicketService {
      * It logs the activity and audit details, saves a priority log, and sends a notification email about
      * the priority change.</p>
      *
-     * @param ticketId the ID of the claim ticket to update.
-     * @param priority the new priority to be set for the ticket.
+     * @param ticketId    the ID of the claim ticket to update.
+     * @param priority    the new priority to be set for the ticket.
      * @param requestInfo the request information for auditing purposes.
      * @throws CustomException if the user does not have the required permissions or if the ticket is not found.
-     *
      * @see ClaimTicket
      * @see ClaimTicketPriorityEnum
      * @see ClaimTicketActivityLog
@@ -534,17 +526,17 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI)) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
-                new String[]{ticketId.toString()}, null));
-        }else{
+                    new String[]{ticketId.toString()}, null));
+        } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        ClaimTicketActivityLog activityLog = createUpdatePriorityActivityLog(currentUser,ticket,priority);
+        ClaimTicketActivityLog activityLog = createUpdatePriorityActivityLog(currentUser, ticket, priority);
         Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
         // Update the priority
         ticket.setPriority(priority);
@@ -553,7 +545,7 @@ public class SepsAndFiClaimTicketService {
         ClaimTicket savedTicket = claimTicketRepository.save(ticket);
         claimTicketActivityLogService.saveActivityLog(activityLog);
         // Save the priority log
-        ClaimTicketPriorityLog claimTicketPriorityLog= new ClaimTicketPriorityLog();
+        ClaimTicketPriorityLog claimTicketPriorityLog = new ClaimTicketPriorityLog();
         claimTicketPriorityLog.setTicketId(ticket.getId());
         claimTicketPriorityLog.setCreatedBy(currentUser.getId());
         claimTicketPriorityLog.setPriority(priority);
@@ -573,7 +565,7 @@ public class SepsAndFiClaimTicketService {
         req.put("newPriority", priority.name());
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "updatePriority", ActionTypeEnum.CLAIM_TICKET_PRIORITY_CHANGE.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
-            null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+            null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
         this.sendPriorityChangeEmail(savedTicket, priority, currentUser);
     }
@@ -585,11 +577,11 @@ public class SepsAndFiClaimTicketService {
      * the user performing the action, and localized messages in multiple languages.</p>
      *
      * @param currentUser the user performing the priority update.
-     * @param ticket the claim ticket whose priority is being updated.
-     * @param priority the new priority being set.
+     * @param ticket      the claim ticket whose priority is being updated.
+     * @param priority    the new priority being set.
      * @return the created {@link ClaimTicketActivityLog} object containing activity details.
      */
-    private ClaimTicketActivityLog createUpdatePriorityActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketPriorityEnum priority){
+    private ClaimTicketActivityLog createUpdatePriorityActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketPriorityEnum priority) {
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
@@ -601,17 +593,17 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityType(ClaimTicketActivityEnum.CHANGED_PRIORITY.name());
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.changed.priority",
-                new Object[]{"@"+currentUser.getId(), enumUtil.getLocalizedEnumValue(priority, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{"@" + currentUser.getId(), enumUtil.getLocalizedEnumValue(priority, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             activityTitle.put(language.getCode(), messageAudit);
             oldPriority.put(language.getCode(), enumUtil.getLocalizedEnumValue(ticket.getPriority(), Locale.forLanguageTag(language.getCode())));
             newPriority.put(language.getCode(), enumUtil.getLocalizedEnumValue(priority, Locale.forLanguageTag(language.getCode())));
         });
-        activityDetail.put("oldPriority",oldPriority);
+        activityDetail.put("oldPriority", oldPriority);
         activityDetail.put("newPriority", newPriority);
 
-        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toFIUserDTO(currentUser)));
-        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
-        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+        activityDetail.put(Constants.PERFORM_BY, convertEntityToMap(claimTicketMapper.toFIUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
 
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
@@ -626,13 +618,12 @@ public class SepsAndFiClaimTicketService {
      * logs the activity, and records the audit details for the SLA extension. If the new SLA date is invalid or the ticket is
      * not assigned to an FI agent, a custom exception is thrown.</p>
      *
-     * @param ticketId the ID of the claim ticket whose SLA date is being extended.
-     * @param newSlaDate the new SLA breach date to be set for the ticket.
-     * @param reason the reason for extending the SLA date.
+     * @param ticketId    the ID of the claim ticket whose SLA date is being extended.
+     * @param newSlaDate  the new SLA breach date to be set for the ticket.
+     * @param reason      the reason for extending the SLA date.
      * @param requestInfo the request information for auditing purposes.
      * @throws CustomException if the user does not have the required permissions, the ticket is not assigned,
-     * or the new SLA date is invalid.
-     *
+     *                         or the new SLA date is invalid.
      * @see ClaimTicket
      * @see ClaimTicketActivityLog
      * @see ClaimTicketPriorityEnum
@@ -648,17 +639,17 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI)) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
-        }else{
+        } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(ticket.getFiAgentId() == null){
+        if (ticket.getFiAgentId() == null) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_ASSIGNED, null, null);
         }
         // Validate the new SLA date
@@ -668,7 +659,7 @@ public class SepsAndFiClaimTicketService {
 
         Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
 
-        ClaimTicketActivityLog activityLog = createExtendDateActivityLog(currentUser,ticket,newSlaDate,reason);
+        ClaimTicketActivityLog activityLog = createExtendDateActivityLog(currentUser, ticket, newSlaDate, reason);
         ticket.setSlaBreachDate(newSlaDate);
         ticket.setUpdatedBy(currentUser.getId());
 
@@ -691,7 +682,7 @@ public class SepsAndFiClaimTicketService {
         req.put("reason", reason);
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "extendSlaDate", ActionTypeEnum.CLAIM_TICKET_EXTEND_SLA_DATE.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
-            null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+            null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
     }
 
     /**
@@ -702,11 +693,10 @@ public class SepsAndFiClaimTicketService {
      * is created in multiple languages based on the language enum.</p>
      *
      * @param currentUser the user who performed the action of extending the SLA date.
-     * @param ticket the claim ticket for which the SLA date is being extended.
-     * @param newSlaDate the new SLA breach date to be set for the ticket.
-     * @param reason the reason provided for extending the SLA date.
+     * @param ticket      the claim ticket for which the SLA date is being extended.
+     * @param newSlaDate  the new SLA breach date to be set for the ticket.
+     * @param reason      the reason provided for extending the SLA date.
      * @return a {@link ClaimTicketActivityLog} containing the details of the SLA date extension.
-     *
      * @see ClaimTicket
      * @see ClaimTicketActivityLog
      */
@@ -721,15 +711,15 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityType(ClaimTicketActivityEnum.DATE_EXTENDED.name());
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.extend.sla.date",
-                new Object[]{"@"+currentUser.getId(), newSlaDate.toString()}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{"@" + currentUser.getId(), newSlaDate.toString()}, Locale.forLanguageTag(language.getCode()));
             activityTitle.put(language.getCode(), messageAudit);
         });
-        activityDetail.put("previousSlaDate",ticket.getSlaBreachDate());
+        activityDetail.put("previousSlaDate", ticket.getSlaBreachDate());
         activityDetail.put("newSlaDate", newSlaDate);
-        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
-        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
-        activityDetail.put("text",reason);
-        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+        activityDetail.put(Constants.PERFORM_BY, convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        activityDetail.put("text", reason);
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
 
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
@@ -746,7 +736,6 @@ public class SepsAndFiClaimTicketService {
      * of claim statuses to their respective counts and the total count of all claims.</p>
      *
      * @return a {@link ClaimStatusCountResponseDTO} containing the count of claims by status and the total count of claims.
-     *
      * @see ClaimStatusCountResponseDTO
      * @see ClaimTicketStatusEnum
      */
@@ -759,17 +748,17 @@ public class SepsAndFiClaimTicketService {
             .map(Authority::getName)
             .toList();
         List<ClaimStatusCountProjection> projections;
-        if(authority.contains(AuthoritiesConstants.FI)) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
-            if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)){
+            if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalFiAgentAndOrganizationId(null, organizationId);
-            }else{
+            } else {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalFiAgentAndOrganizationId(userId, organizationId);
             }
-        }else{
-            if(currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)){
+        } else {
+            if (currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)) {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalSEPS(userId);
-            }else {
+            } else {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalSEPS(null);
             }
         }
@@ -802,10 +791,9 @@ public class SepsAndFiClaimTicketService {
      * ticket can be closed, the status is updated, a status log is created, and the activity is logged. The method also
      * sends an email notification about the closure of the ticket.</p>
      *
-     * @param ticketId the ID of the claim ticket to be closed.
+     * @param ticketId                 the ID of the claim ticket to be closed.
      * @param claimTicketClosedRequest the request containing the details of the closure, such as the close sub-status and reason.
-     * @param requestInfo information about the request that triggered this action.
-     *
+     * @param requestInfo              information about the request that triggered this action.
      * @throws CustomException if the ticket cannot be found, is already closed or rejected, or if any validation fails.
      */
     @Transactional
@@ -818,21 +806,21 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI)) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
-        }else{
+        } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+        if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT, null, null);
         }
         Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
-        ClaimTicketActivityLog activityLog = createClosedClaimActivityLog(currentUser,ticket,claimTicketClosedRequest);
+        ClaimTicketActivityLog activityLog = createClosedClaimActivityLog(currentUser, ticket, claimTicketClosedRequest);
 
         ticket.setStatus(ClaimTicketStatusEnum.CLOSED);
         ticket.setClosedStatus(claimTicketClosedRequest.getCloseSubStatus());
@@ -854,7 +842,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.closed",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(),Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(), Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
         // Convert attachments (MultipartFile to filenames)
@@ -874,9 +862,9 @@ public class SepsAndFiClaimTicketService {
         req.put(ATTACHMENTS, attachments);
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "closedClaimTicket", ActionTypeEnum.CLAIM_TICKET_CLOSED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
-            null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+            null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
-        this.sendClosedTicketEmail(savedTicket,claimTicketClosedRequest);
+        this.sendClosedTicketEmail(savedTicket, claimTicketClosedRequest);
     }
 
     /**
@@ -886,8 +874,8 @@ public class SepsAndFiClaimTicketService {
      * the ticket information, the close sub-status, the reason for closure, and the relevant details. The activity log
      * includes localized messages and associates the current user with the action.</p>
      *
-     * @param currentUser the user who is performing the action of closing the ticket.
-     * @param ticket the claim ticket being closed.
+     * @param currentUser              the user who is performing the action of closing the ticket.
+     * @param ticket                   the claim ticket being closed.
      * @param claimTicketClosedRequest the request containing details of the closure such as the close sub-status and reason.
      * @return the created {@link ClaimTicketActivityLog} object containing the details of the ticket closure.
      */
@@ -912,15 +900,15 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityType(ClaimTicketActivityEnum.CLOSED.name());
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.closed",
-                new Object[]{"@"+currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{"@" + currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
             activityTitle.put(language.getCode(), messageAudit);
-            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(),Locale.forLanguageTag(language.getCode())));
+            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(), Locale.forLanguageTag(language.getCode())));
         });
-        activityDetail.put("subStatus",subStatus);
-        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
-        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
-        activityDetail.put("text",claimTicketClosedRequest.getReason());
-        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+        activityDetail.put("subStatus", subStatus);
+        activityDetail.put(Constants.PERFORM_BY, convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        activityDetail.put("text", claimTicketClosedRequest.getReason());
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
 
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
@@ -934,7 +922,7 @@ public class SepsAndFiClaimTicketService {
      *
      * <p>This method sends email notifications to the customer, FI Admin, FI agent, and SEPS agent regarding the closure of a claim ticket.</p>
      *
-     * @param ticket the claim ticket that has been closed.
+     * @param ticket                   the claim ticket that has been closed.
      * @param claimTicketClosedRequest the request containing details of the closure, including the reason and sub-status.
      */
     private void sendClosedTicketEmail(ClaimTicket ticket, ClaimTicketClosedRequest claimTicketClosedRequest) {
@@ -968,7 +956,7 @@ public class SepsAndFiClaimTicketService {
      *
      * <p>This method sends email notifications to the FI Admin, FI agent, and SEPS agent when a claim ticket's priority is changed.</p>
      *
-     * @param ticket the claim ticket whose priority is changed.
+     * @param ticket      the claim ticket whose priority is changed.
      * @param newPriority the new priority value assigned to the ticket.
      * @param currentUser the user who is updating the ticket priority.
      */
@@ -1009,10 +997,10 @@ public class SepsAndFiClaimTicketService {
         User agent = userService.getUserById(agentId);
         tickets.forEach(ticket -> {
             // Send email to the customer
-            mailService.sendToCustomerTicketAssignmentEmail(ticket,ticket.getUser(),agent.getFirstName());
+            mailService.sendToCustomerTicketAssignmentEmail(ticket, ticket.getUser(), agent.getFirstName());
 
             // Send email to the FI agent
-            mailService.sendToAgentTicketAssignmentEmail(ticket,agent);
+            mailService.sendToAgentTicketAssignmentEmail(ticket, agent);
         });
     }
 
@@ -1021,9 +1009,9 @@ public class SepsAndFiClaimTicketService {
      * and performs associated activities such as saving logs, sending audit information,
      * and notifying relevant users via email.
      *
-     * @param ticketId the ID of the ticket to reject
+     * @param ticketId                 the ID of the ticket to reject
      * @param claimTicketRejectRequest the details of the rejection, including reason and sub-status
-     * @param requestInfo additional request-related information for auditing
+     * @param requestInfo              additional request-related information for auditing
      * @throws CustomException if the ticket is not found or is already closed/rejected
      */
     @Transactional
@@ -1036,21 +1024,21 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI)) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
-        }else{
+        } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+        if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT, null, null);
         }
         Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
-        ClaimTicketActivityLog activityLog = createRejectedClaimActivityLog(currentUser,ticket,claimTicketRejectRequest);
+        ClaimTicketActivityLog activityLog = createRejectedClaimActivityLog(currentUser, ticket, claimTicketRejectRequest);
 
         ticket.setStatus(ClaimTicketStatusEnum.REJECTED);
         ticket.setRejectedStatus(claimTicketRejectRequest.getRejectedStatus());
@@ -1072,7 +1060,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.rejected",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
         // Convert attachments (MultipartFile to filenames)
@@ -1092,17 +1080,17 @@ public class SepsAndFiClaimTicketService {
         req.put(ATTACHMENTS, attachments);
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "rejectClaimTicket", ActionTypeEnum.CLAIM_TICKET_REJECTED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
-            null, auditMessageMap,entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+            null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
-        this.sendRejectedTicketEmail(savedTicket,claimTicketRejectRequest);
+        this.sendRejectedTicketEmail(savedTicket, claimTicketRejectRequest);
     }
 
     /**
      * Creates a log entry for a rejected claim ticket, capturing details about the action
      * and associated metadata such as the user performing the action and the reason for rejection.
      *
-     * @param currentUser the user performing the rejection
-     * @param ticket the claim ticket being rejected
+     * @param currentUser              the user performing the rejection
+     * @param ticket                   the claim ticket being rejected
      * @param claimTicketRejectRequest the details of the rejection, including reason and sub-status
      * @return a populated ClaimTicketActivityLog instance
      */
@@ -1127,15 +1115,15 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityType(ClaimTicketActivityEnum.REJECTED.name());
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.rejected",
-                new Object[]{"@"+currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{"@" + currentUser.getId()}, Locale.forLanguageTag(language.getCode()));
             activityTitle.put(language.getCode(), messageAudit);
-            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(),Locale.forLanguageTag(language.getCode())));
+            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(language.getCode())));
         });
-        activityDetail.put("subStatus",subStatus);
-        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
-        activityDetail.put(Constants.TICKET_ID,ticket.getTicketId().toString());
-        activityDetail.put("text",claimTicketRejectRequest.getReason());
-        linkedUser.put(currentUser.getId().toString(),currentUser.getFirstName());
+        activityDetail.put("subStatus", subStatus);
+        activityDetail.put(Constants.PERFORM_BY, convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        activityDetail.put("text", claimTicketRejectRequest.getReason());
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
 
         activityLog.setActivityTitle(activityTitle);
         activityLog.setLinkedUsers(linkedUser);
@@ -1150,7 +1138,7 @@ public class SepsAndFiClaimTicketService {
      * - FI Admin users in the ticket's organization
      * - The FI Agent assigned to the ticket
      *
-     * @param ticket the rejected claim ticket
+     * @param ticket                   the rejected claim ticket
      * @param claimTicketRejectRequest the details of the rejection, including reason and sub-status
      */
     private void sendRejectedTicketEmail(ClaimTicket ticket, ClaimTicketRejectRequest claimTicketRejectRequest) {
@@ -1179,7 +1167,7 @@ public class SepsAndFiClaimTicketService {
      * Validates the user's authority and ensures they are authorized to perform the action.
      * Handles file attachments and logs the activity in the ticket history.
      *
-     * @param ticketId               the ID of the ticket to which the reply is being made
+     * @param ticketId                the ID of the ticket to which the reply is being made
      * @param claimTicketReplyRequest the reply request containing the message and optional attachments
      * @throws CustomException if the ticket is not found or the user is not authorized to perform this action
      */
@@ -1192,20 +1180,20 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
-                Long organizationId = currentUser.getOrganization().getId();
-                ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
-                    .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
-                        new String[]{ticketId.toString()}, null));
-        }else{
+        if (authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
+        if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
-        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+        if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.REPLY_CUSTOMER.name());
@@ -1242,7 +1230,7 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityType(activityType);
         String msgOne = "ticket.activity.log.replied.with.attachment";
         String msgTwo = "ticket.activity.log.replied";
-        if(activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name())){
+        if (activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name())) {
             msgOne = "ticket.activity.log.internal.note.added.with.attachment";
             msgTwo = "ticket.activity.log.internal.note.added";
         }
@@ -1253,7 +1241,7 @@ public class SepsAndFiClaimTicketService {
                     new Object[]{"@" + currentUser.getId(), "@" + ticket.getUserId()}, Locale.forLanguageTag(language.getCode()));
                 activityTitle.put(language.getCode(), messageAudit);
             });
-        }else{
+        } else {
             final String messageTwo = msgTwo;
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
                 String messageAudit = messageSource.getMessage(messageTwo,
@@ -1261,7 +1249,7 @@ public class SepsAndFiClaimTicketService {
                 activityTitle.put(language.getCode(), messageAudit);
             });
         }
-        activityDetail.put(Constants.PERFORM_BY,convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.PERFORM_BY, convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
         activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
         activityDetail.put("text", claimTicketReplyRequest.getMessage());
         linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
@@ -1324,7 +1312,7 @@ public class SepsAndFiClaimTicketService {
      * Validates the user's authority and ensures they are authorized to perform the action.
      * Logs the activity in the ticket history.
      *
-     * @param ticketId               the ID of the ticket to which the internal reply is being made
+     * @param ticketId                the ID of the ticket to which the internal reply is being made
      * @param claimTicketReplyRequest the reply request containing the message and optional attachments
      * @throws CustomException if the ticket is not found or the user is not authorized to perform this action
      */
@@ -1337,20 +1325,20 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+        if (authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
-        }else{
+        } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
+        if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
-        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+        if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE.name());
@@ -1358,11 +1346,11 @@ public class SepsAndFiClaimTicketService {
 
     private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser) {
         Map<String, String> ticketDetail = new HashMap<>();
-        ticketDetail.put("ticketNumber",ticket.getTicketId().toString());
-        ticketDetail.put("senderName",currentUser.getFirstName());
-        ticketDetail.put("messageContent",currentUser.getFirstName());
+        ticketDetail.put("ticketNumber", ticket.getTicketId().toString());
+        ticketDetail.put("senderName", currentUser.getFirstName());
+        ticketDetail.put("messageContent", currentUser.getFirstName());
         ticketDetail.put("id", ticket.getId().toString());
-        if(activityType.equals(ClaimTicketActivityEnum.REPLY_CUSTOMER.name())){
+        if (activityType.equals(ClaimTicketActivityEnum.REPLY_CUSTOMER.name())) {
             mailService.sendReplyToCustomerEmail(ticketDetail, claimTicketRejectRequest, ticket.getUser());
         }
 //        if(activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE.name())){
@@ -1382,20 +1370,20 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if(authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+        if (authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
-        }else{
+        } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
+        if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
-        if(ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)){
+        if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name());
@@ -1405,6 +1393,15 @@ public class SepsAndFiClaimTicketService {
     public Map<String, String> getSepsFiClaimTicketByIdTest(Long id) {
         ClaimTicketDTO claimTicket = this.getSepsFiClaimTicketById((id));
         User user = userService.getCurrentUser();
+
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateId(9L);
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setIsStatic(false);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(claimTicket, user));
+        mailService.sendDynamicContentEmail(mailDTO);
+
         return templateVariableMappingService.mapVariables(claimTicket, user);
 
     }

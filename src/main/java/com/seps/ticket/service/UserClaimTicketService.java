@@ -182,6 +182,7 @@ public class UserClaimTicketService {
                 LocalDate slaBreachDate = LocalDate.now().plusDays(newClaimTicket.getSlaBreachDays());
                 newClaimTicket.setSlaBreachDate(slaBreachDate);
             }
+            responseDTO.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO.getId());
         }
         claimTicketRepository.save(newClaimTicket);
 
@@ -1085,5 +1086,18 @@ public class UserClaimTicketService {
         }
         complaintRequestForJson.setAttachments(attachments);
         return complaintRequestForJson;
+    }
+
+    /**
+     * Retrieves a Claim Ticket by its ID.
+     *
+     * @param id the ID of the Claimed ticket to retrieve
+     * @return the DTO representing the city
+     * @throws CustomException if the Claimed ticket is not found
+     */
+    @Transactional(readOnly = true)
+    public ClaimTicketDTO findClaimTicketById(Long id) {
+        return claimTicketRepository.findById(id)
+            .map(claimTicketMapper::toDTO).orElse(null);
     }
 }

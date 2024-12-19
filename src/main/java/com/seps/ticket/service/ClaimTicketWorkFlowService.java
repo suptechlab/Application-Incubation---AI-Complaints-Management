@@ -392,8 +392,8 @@ public class ClaimTicketWorkFlowService {
         return action.equals(CreateActionEnum.ASSIGN_TO_TEAM) || action.equals(CreateActionEnum.ASSIGN_TO_AGENT);
     }
 
-    private UserDTO findUserForAction(InstanceTypeEnum instanceType, Long agentId, Long organizationId, Set<Authority> authorities,
-                                      Set<UserStatusEnum> requiredStatuses, Long workflowId) {
+    public UserDTO findUserForAction(InstanceTypeEnum instanceType, Long agentId, Long organizationId, Set<Authority> authorities,
+                                     Set<UserStatusEnum> requiredStatuses, Long workflowId) {
         return instanceType.equals(InstanceTypeEnum.FIRST_INSTANCE)
             ? userRepository.findOneByIdAndOrganizationIdAndAuthoritiesInAndStatusIn(agentId, organizationId, authorities, requiredStatuses)
             .map(userMapper::toDto)
@@ -422,4 +422,38 @@ public class ClaimTicketWorkFlowService {
         claimTicketWorkflowFailureLogRepository.save(failureLog);
         LOG.warn("Workflow failure logged: {}", reasonMap);
     }
+
+    public User findFIUserForMailAction(Long agentId, ClaimTicketWorkFlowDTO workFlowDTO) {
+        Long organizationId = workFlowDTO.getOrganizationId();
+        Long workflowId = workFlowDTO.getId();
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.FI).ifPresent(authorities::add);
+        Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.ACTIVE);
+        return userRepository.findOneByIdAndOrganizationIdAndAuthoritiesInAndStatusIn(agentId, organizationId, authorities, requiredStatuses)
+            .orElseGet(() -> {
+                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
+                return null;
+            });
+    }
+
+    public User findSEPSUserForMailAction(Long agentId, ClaimTicketWorkFlowDTO workFlowDTO) {
+        Long workflowId = workFlowDTO.getId();
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.SEPS).ifPresent(authorities::add);
+        Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.ACTIVE);
+        return userRepository.findOneByIdAndAuthoritiesInAndStatusIn(agentId, authorities, requiredStatuses)
+            .orElseGet(() -> {
+                logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId);
+                return null;
+            });
+    }
+
+    @Transactional(readOnly = true)
+    public ClaimTicketWorkFlowDTO findClaimTicketWorkFlowById(Long id) {
+        ClaimTicketWorkFlow claimTicketWorkFlow = claimTicketWorkFlowRepository.findById(id).orElse(null);
+        // Map the entity to the DTO
+        return claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+    }
+
+
 }
