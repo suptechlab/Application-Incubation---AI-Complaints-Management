@@ -55,11 +55,6 @@ export default function TicketsList() {
             if (["TICKET_CREATED_BY_SEPS", "TICKET_CREATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
                 updatedPermissions.addModule = true;
             }
-
-            // if (["TICKET_CHANGE_STATUS_BY_SEPS", "TICKET_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
-            //     updatedPermissions.editModule = true;
-            // }
-
             if (["TICKET_ASSIGNED_TO_AGENT_FI", "TICKET_ASSIGNED_TO_AGENT_SEPS"].some(permission => permissionArr.includes(permission))) {
                 updatedPermissions.assignPermission = true;
             }
@@ -193,7 +188,7 @@ export default function TicketsList() {
         setAttachmentsModalShow(true)
     }
 
-   
+
     const getFilteredColumns = (columnsArray) => {
         // All available column definitions
         const allColumns = [
@@ -273,8 +268,6 @@ export default function TicketsList() {
                             row?.original?.claimTicketDocuments && row?.original?.claimTicketDocuments?.length > 0 ?
                                 <MdAttachFile size={16} /> : ""
                         }
-
-
 
 
                         {/* <AppTooltip title="Attachments">
@@ -421,7 +414,7 @@ export default function TicketsList() {
     const addNewClickHanlder = () => {
         navigate('/tickets/add')
     }
-   
+
 
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope

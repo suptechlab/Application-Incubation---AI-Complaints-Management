@@ -22,9 +22,50 @@ import ConsumerInfoModal from '../modals/consumerInfoModal';
 
 const TicketsView = () => {
 
-  const {currentUser } = useContext(AuthenticationContext);
+  const {currentUser ,permissions = {}} = useContext(AuthenticationContext);
 
   const { masterData } = useContext(MasterDataContext);
+
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+      addModule: false,
+      // editModule: false,
+      assignPermission: false
+  });
+
+  useEffect(() => {
+      const updatedPermissions = {
+          statusModule: false,
+          addModule: false,
+          rejectPermission: false,
+          closePermission: false,
+          priorityPermission: false,
+          downloadPermission: false,
+          assignPermission: false
+      };
+      if (currentUser === "SUPER_ADMIN") {
+          updatedPermissions.statusModule = true;
+          updatedPermissions.addModule = true;
+          updatedPermissions.rejectPermission = true;
+          updatedPermissions.closePermission = true;
+          updatedPermissions.priorityPermission = true;
+          updatedPermissions.downloadPermission = true;
+          updatedPermissions.assignPermission = true;
+      } else {
+          const permissionArr = permissions['Ticket'] ?? [];
+
+          if (["TICKET_CREATED_BY_SEPS", "TICKET_CREATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
+              updatedPermissions.addModule = true;
+          }
+          if (["TICKET_ASSIGNED_TO_AGENT_FI", "TICKET_ASSIGNED_TO_AGENT_SEPS"].some(permission => permissionArr.includes(permission))) {
+              updatedPermissions.assignPermission = true;
+          }
+
+      }
+
+      setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
 
   const { t } = useTranslation()
 
