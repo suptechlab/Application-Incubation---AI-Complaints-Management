@@ -28,7 +28,7 @@ const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs,ticketData, getTicket
         },
         {
             id: 'internalNote',
-            name: 'Add an Internal Note',
+            name: t("ADD_INTERNAL_NOTE"),
             tabIcon: <MdOutlineNoteAdd size={14} />,
             Component: <ReplyTab ticketId={ticketId} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketData} currentTab="INTERNAL_NOTE" />,
             disabled: false,

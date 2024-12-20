@@ -276,10 +276,7 @@ export default function TicketsList() {
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
                             {"#" + row?.original?.ticketId}
                         </Link>
-                        {
-                            row?.original?.claimTicketDocuments && row?.original?.claimTicketDocuments?.length > 0 ?
-                                <MdAttachFile size={16} /> : ""
-                        }
+                        {row?.original?.haveClaimTicketDocuments &&  <MdAttachFile size={16} />}
 
 
 
@@ -347,7 +344,7 @@ export default function TicketsList() {
                     <span
                         className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
                     >
-                        {rowData.row.original.priority}
+                        {masterData?.claimTicketPriority[rowData?.row?.original?.priority]}
                     </span>
                 ),
             },
@@ -366,23 +363,17 @@ export default function TicketsList() {
                 header: () => t("STATUS"),
                 size: "100",
                 cell: (rowData) => (
-
                     rowData?.row?.original?.status === 'CLOSED' ? <AppTooltip title={masterData?.closedStatus[rowData?.row?.original?.closedStatus]}>
                         <span
                             className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
                         >
-                            {rowData.row.original.status}
+                            {masterData?.claimTicketStatus[rowData.row.original.status]}
                         </span>
-
-
                     </AppTooltip> : <span
                         className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
                     >
-                        {rowData.row.original.status}
+                        {masterData?.claimTicketStatus[rowData.row.original.status]}
                     </span>
-
-
-
                 ),
             },
         ];

@@ -52,7 +52,7 @@ const DataGridPagination = ({
       </span>
       <div className="pageShowText mb-md-0 me-sm-4">
         {1 + (currentPage - 1) * rowsPerPage}-{""}
-        {currentTotalRecord + (currentPage - 1) * rowsPerPage} of {totalRecords}{" "}
+        {currentTotalRecord + (currentPage - 1) * rowsPerPage} {t("OF")} {totalRecords}{" "}
       </div>
 
       <ReactPaginate

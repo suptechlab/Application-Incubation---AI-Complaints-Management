@@ -255,11 +255,11 @@ export const englishLang = {
     "REPLIES": "Replies",
     "CONSUMER_INFO": "Consumer Info",
     "ENTER_EXTENDED_DATE": "Enter Extended Date",
-    "DAYS REMAINING":"Days remaining",
+    "DAYS_REMAINING":"Days remaining",
     "DAYS" :"Days",
     "ALL_PRIORITY":"All Priority",
     "INSTANCE_TYPE":"Instance Type",
-    "ADD_INTERNAL_NOTE":"Add Internal Note",
+    "ADD_INTERNAL_NOTE":"Add an Internal Note",
     "COMPLAINT" : "Complaint",
     "NO_ATTACHMENT" : "There is no attachment included.",
     "TICKET_CLOSE_STATUS" : "Ticket Close Status",
@@ -267,5 +267,6 @@ export const englishLang = {
     "ATTACHMENT" : "Attachment",
     "BROWSE":"Browse",
     "REASON":"Reason",
-    "SUB-STATUS":'Sub-Status'
+    "SUB-STATUS":'Sub-Status',
+    "OF":'Of',
 }

@@ -160,8 +160,8 @@ const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference)
                         {title ?? ""}
                         {isSlaBreachDateValid && (
                             daysDifference > 2
-                                ? renderBadge("custom-info", "custom-info", `${daysDifference} Days remaining`)
-                                : renderBadge("custom-danger", "custom-danger", `${daysDifference} Days remaining`)
+                                ? renderBadge("custom-info", "custom-info", `${daysDifference} ${t("DAYS_REMAINING")}`)
+                                : renderBadge("custom-danger", "custom-danger", `${daysDifference} ${t("DAYS_REMAINING")}`)
                         )}
                         {
                             ticketData?.instanceType === "FIRST_INSTANCE" ?

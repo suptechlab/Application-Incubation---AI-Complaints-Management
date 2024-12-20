@@ -34,6 +34,11 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
                 endDate: moment(newEndDate).format("YYYY-MM-DD")
             });
+        }else{
+            setFilter({
+                startDate: '',
+                endDate:''
+            });  
         }
     };
     // GET CLAIM TYPE DROPDOWN LIST
@@ -183,7 +188,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             size="sm"
                             options={[
                                 {
-                                    label: t("ALL PRIORITY"),
+                                    label: t("ALL_PRIORITY"),
                                     value: "",
                                     class: "label-class",
                                 },
@@ -270,6 +275,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             selectsRange={true}
                             placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
+                            maxDate={new Date()} // Prevent future date selection
                         />
                     </div>
 

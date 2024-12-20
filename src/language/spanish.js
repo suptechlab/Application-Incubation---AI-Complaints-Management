@@ -252,5 +252,6 @@ export const spanishLang = {
     "ATTACHMENT": "Adjunto",
     "BROWSE": "Buscar",
     "REASON": "Razón",
-    "SUB-STATUS": "Subestado"
+    "SUB-STATUS": "Subestado",
+    "OF":'De',
 }
