@@ -33,4 +33,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = "authorities")
     Optional<User> findOneByIdAndAndStatusIn(Long agentId, Set<UserStatusEnum> requiredStatuses);
+
+    @EntityGraph(attributePaths = "authorities")
+    Optional<User> findOneByIdAndStatusIn(Long id, Set<UserStatusEnum> statuses);
 }

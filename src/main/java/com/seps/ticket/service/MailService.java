@@ -508,7 +508,6 @@ public class MailService {
                     }
                     break;
                 case MAIL_TO_FI_TEAM:
-                case MAIL_TO_FI_AGENT:
                     if (templateId == null) {
                         claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
                             new Object[]{createAction.getAction()}, null, null);
@@ -531,8 +530,30 @@ public class MailService {
                         continue;
                     }
                     break;
+                case MAIL_TO_FI_AGENT:
+                    if (templateId == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    if (templateMaster == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.not.found",
+                            new Object[]{templateId}, null, templateId);
+                        continue;
+                    }
+                    if (claimTicketDTO.getFiAgent() == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.agent.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    user = userService.findUserById(claimTicketDTO.getFiAgent().getId());
+                    if (user == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.user.not.found",
+                            new Object[]{claimTicketDTO.getFiAgent().getId()}, claimTicketDTO.getFiAgent().getId(), null);
+                        continue;
+                    }
+                    break;
                 case MAIL_TO_SEPS_TEAM:
-                case MAIL_TO_SEPS_AGENT:
                     if (templateId == null) {
                         claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
                             new Object[]{createAction.getAction()}, null, null);
@@ -549,6 +570,27 @@ public class MailService {
                     user = claimTicketWorkFlowService.findSEPSUserForMailAction(agentId, claimTicketWorkFlowDTO);
                     if (user == null) {
                         claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{agentId}, agentId, null);
+                        continue;
+                    }
+                    break;
+                case MAIL_TO_SEPS_AGENT:
+                    if (templateId == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    if (templateMaster == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.not.found", new Object[]{templateId}, null, templateId);
+                        continue;
+                    }
+                    if (claimTicketDTO.getSepsAgentId() == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.agent.id.null",
+                            new Object[]{createAction.getAction()}, null, null);
+                        continue;
+                    }
+                    user = userService.findUserById(claimTicketDTO.getSepsAgentId());
+                    if (user == null) {
+                        claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.user.not.found", new Object[]{claimTicketDTO.getSepsAgentId()}, claimTicketDTO.getSepsAgentId(), null);
                         continue;
                     }
                     break;

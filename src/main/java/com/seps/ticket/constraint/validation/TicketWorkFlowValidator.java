@@ -1,5 +1,12 @@
 package com.seps.ticket.constraint.validation;
 
+import com.seps.ticket.domain.Team;
+import com.seps.ticket.domain.TemplateMaster;
+import com.seps.ticket.domain.User;
+import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.service.TeamService;
+import com.seps.ticket.service.TemplateMasterService;
+import com.seps.ticket.service.UserService;
 import com.seps.ticket.service.dto.workflow.*;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -10,9 +17,15 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFlowCondition, ClaimTicketWorkFlowDTO> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TicketWorkFlowValidator.class);
+
     private final MessageSource messageSource;
 
-    private static final Logger LOG = LoggerFactory.getLogger(TicketWorkFlowValidator.class);
+    private final TemplateMasterService templateMasterService;
+
+    private final UserService userService;
+
+    private final TeamService teamService;
 
     // Constants for literals
     private static final String CREATE_ACTIONS = "createActions";
@@ -28,9 +41,13 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
     private static final String NOT_EMPTY = "not.empty";
     private static final String ACTION = ".action";
     private static final String ACTION_FORMAT = "%s[%d]";
+    private static final String NOT_FOUND = "not.found";
 
-    public TicketWorkFlowValidator(MessageSource messageSource) {
+    public TicketWorkFlowValidator(MessageSource messageSource, TemplateMasterService templateMasterService, UserService userService, TeamService teamService) {
         this.messageSource = messageSource;
+        this.templateMasterService = templateMasterService;
+        this.userService = userService;
+        this.teamService = teamService;
     }
 
     @Override
@@ -85,50 +102,88 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
             for (int i = 0; i < dto.getCreateActions().size(); i++) {
                 CreateAction action = dto.getCreateActions().get(i);
                 String actionPath = String.format(ACTION_FORMAT, CREATE_ACTIONS, i);
-
                 if (action.getAction() == null) {
                     isValid = addValidationMessage(actionPath + ACTION, NOT_NULL, context) && isValid;
                     continue;
                 }
-
+                TemplateMaster templateMaster;
+                User user;
+                Team team;
                 switch (action.getAction()) {
                     case ASSIGN_TO_TEAM:
                         assignToTeamPresent = true;
+                        //TEAM
                         if (action.getTeamId() == null) {
                             isValid = addValidationMessage(actionPath + TEAM_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            team = teamService.findActiveTeam(action.getTeamId());
+                            if (team == null) {
+                                isValid = addValidationMessage(actionPath + TEAM_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
+                        //AGENT
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            if (dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                                user = userService.findActiveFIUser(action.getAgentId(), dto.getOrganizationId());
+                            } else {
+                                user = userService.findActiveSEPSUser(action.getAgentId());
+                            }
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     case ASSIGN_TO_AGENT:
                         assignToAgentPresent = true;
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            if (dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                                user = userService.findActiveFIUser(action.getAgentId(), dto.getOrganizationId());
+                            } else {
+                                user = userService.findActiveSEPSUser(action.getAgentId());
+                            }
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     case MAIL_TO_FI_TEAM, MAIL_TO_SEPS_TEAM:
                         if (action.getTeamId() == null) {
                             isValid = addValidationMessage(actionPath + TEAM_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            team = teamService.findActiveTeam(action.getTeamId());
+                            if (team == null) {
+                                isValid = addValidationMessage(actionPath + TEAM_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            user = userService.findActiveSEPSOrFIUser(action.getAgentId());
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
-                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT:
-                        if (action.getAgentId() == null) {
-                            isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
-                        }
+                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT, MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
-                        }
-                        break;
-                    case MAIL_TO_CUSTOMER:
-                        if (action.getTemplateId() == null) {
-                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     default:
@@ -162,35 +217,49 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
             for (int i = 0; i < dto.getTicketStatusActions().size(); i++) {
                 TicketStatusAction action = dto.getTicketStatusActions().get(i);
                 String actionPath = String.format(ACTION_FORMAT, TICKET_STATUS_ACTIONS, i);
-
                 if (action.getAction() == null) {
                     isValid = addValidationMessage(actionPath + ACTION, NOT_NULL, context) && isValid;
                     continue;
                 }
 
+                TemplateMaster templateMaster;
+                User user;
+                Team team;
                 switch (action.getAction()) {
                     case MAIL_TO_FI_TEAM, MAIL_TO_SEPS_TEAM:
                         if (action.getTeamId() == null) {
                             isValid = addValidationMessage(actionPath + TEAM_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            team = teamService.findActiveTeam(action.getTeamId());
+                            if (team == null) {
+                                isValid = addValidationMessage(actionPath + TEAM_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            user = userService.findActiveSEPSOrFIUser(action.getAgentId());
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
-                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT:
-                        if (action.getAgentId() == null) {
-                            isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
-                        }
+                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT, MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
-                        }
-                        break;
-                    case MAIL_TO_CUSTOMER:
-                        if (action.getTemplateId() == null) {
-                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     default:
@@ -221,29 +290,45 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                     continue;
                 }
 
+                TemplateMaster templateMaster;
+                User user;
+                Team team;
+
                 switch (action.getAction()) {
                     case MAIL_TO_FI_TEAM, MAIL_TO_SEPS_TEAM:
                         if (action.getTeamId() == null) {
                             isValid = addValidationMessage(actionPath + TEAM_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            team = teamService.findActiveTeam(action.getTeamId());
+                            if (team == null) {
+                                isValid = addValidationMessage(actionPath + TEAM_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            user = userService.findActiveSEPSOrFIUser(action.getAgentId());
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
-                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT:
-                        if (action.getAgentId() == null) {
-                            isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
-                        }
+                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT, MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
-                        }
-                        break;
-                    case MAIL_TO_CUSTOMER:
-                        if (action.getTemplateId() == null) {
-                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     default:
@@ -273,29 +358,45 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                     continue;
                 }
 
+                TemplateMaster templateMaster;
+                User user;
+                Team team;
+
                 switch (action.getAction()) {
                     case MAIL_TO_FI_TEAM, MAIL_TO_SEPS_TEAM:
                         if (action.getTeamId() == null) {
                             isValid = addValidationMessage(actionPath + TEAM_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            team = teamService.findActiveTeam(action.getTeamId());
+                            if (team == null) {
+                                isValid = addValidationMessage(actionPath + TEAM_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            user = userService.findActiveSEPSOrFIUser(action.getAgentId());
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
-                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT:
-                        if (action.getAgentId() == null) {
-                            isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
-                        }
+                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT, MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
-                        }
-                        break;
-                    case MAIL_TO_CUSTOMER:
-                        if (action.getTemplateId() == null) {
-                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     default:
@@ -320,29 +421,47 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                     isValid = addValidationMessage(actionPath + ACTION, NOT_NULL, context) && isValid;
                     continue;
                 }
+
+                TemplateMaster templateMaster;
+                User user;
+                Team team;
+
                 switch (action.getAction()) {
                     case MAIL_TO_FI_TEAM, MAIL_TO_SEPS_TEAM:
                         if (action.getTeamId() == null) {
                             isValid = addValidationMessage(actionPath + TEAM_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            team = teamService.findActiveTeam(action.getTeamId());
+                            if (team == null) {
+                                isValid = addValidationMessage(actionPath + TEAM_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            user = userService.findActiveSEPSOrFIUser(action.getAgentId());
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
+
                         break;
-                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT:
-                        if (action.getAgentId() == null) {
-                            isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
-                        }
+                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT, MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
-                        }
-                        break;
-                    case MAIL_TO_CUSTOMER:
-                        if (action.getTemplateId() == null) {
-                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     default:
@@ -367,29 +486,46 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                     isValid = addValidationMessage(actionPath + ACTION, NOT_NULL, context) && isValid;
                     continue;
                 }
+
+                TemplateMaster templateMaster;
+                User user;
+                Team team;
+
                 switch (action.getAction()) {
                     case MAIL_TO_FI_TEAM, MAIL_TO_SEPS_TEAM:
                         if (action.getTeamId() == null) {
                             isValid = addValidationMessage(actionPath + TEAM_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            team = teamService.findActiveTeam(action.getTeamId());
+                            if (team == null) {
+                                isValid = addValidationMessage(actionPath + TEAM_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            user = userService.findActiveSEPSOrFIUser(action.getAgentId());
+                            if (user == null) {
+                                isValid = addValidationMessage(actionPath + AGENT_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
-                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT:
-                        if (action.getAgentId() == null) {
-                            isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
-                        }
+                    case MAIL_TO_FI_AGENT, MAIL_TO_SEPS_AGENT, MAIL_TO_CUSTOMER:
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
-                        }
-                        break;
-                    case MAIL_TO_CUSTOMER:
-                        if (action.getTemplateId() == null) {
-                            isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
+                        } else {
+                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            if (templateMaster == null) {
+                                isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
+                            }
                         }
                         break;
                     default:
