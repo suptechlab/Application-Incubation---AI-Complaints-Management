@@ -61,7 +61,7 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User findActiveFIUser(Long id, Long organizationId) {
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.FI).ifPresent(authorities::add);
@@ -70,7 +70,7 @@ public class UserService {
             .orElse(null);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User findActiveSEPSUser(Long id) {
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.SEPS).ifPresent(authorities::add);
@@ -79,14 +79,14 @@ public class UserService {
             .orElse(null);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User findActiveUser(Long id) {
         Set<UserStatusEnum> statuses = Set.of(UserStatusEnum.ACTIVE);
         return userRepository.findOneByIdAndStatusIn(id, statuses)
             .orElse(null);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public User findActiveSEPSOrFIUser(Long id) {
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.SEPS).ifPresent(authorities::add);

@@ -23,7 +23,7 @@ public class TeamService {
         this.teamMemberRepository = teamMemberRepository;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Team findActiveTeam(Long id) {
         return teamRepository.findOneByIdAndStatus(id, true)
             .orElse(null);

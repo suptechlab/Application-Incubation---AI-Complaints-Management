@@ -81,7 +81,10 @@ public class ClaimTicketWorkFlowService {
         LOG.debug("ticket work flow:{}", claimTicketWorkFlowDTO);
         User currentUser = userService.getCurrentUser();
         Long organizationId = resolveOrganizationId(claimTicketWorkFlowDTO.getOrganizationId(), currentUser);
-        Organization organization = findOrganization(organizationId);
+        Organization organization = null;
+        if (organizationId != null) {
+            organization = findOrganization(organizationId);
+        }
         // Map DTO to Entity
         ClaimTicketWorkFlow claimTicketWorkFlow = mapDTOToEntity(claimTicketWorkFlowDTO, currentUser, organization);
         claimTicketWorkFlowRepository.save(claimTicketWorkFlow);
@@ -204,6 +207,7 @@ public class ClaimTicketWorkFlowService {
                 .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND, null, null));
             // Map the entity to the DTO
         } else {
+            LOG.debug("id:{}", id);
             claimTicketWorkFlow = claimTicketWorkFlowRepository.findById(id)
                 .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND, null, null));
             // Map the entity to the DTO
@@ -220,15 +224,24 @@ public class ClaimTicketWorkFlowService {
      * @throws CustomException If the claim ticket workflow is not found or the user doesn't have access to it.
      */
     @Transactional
-    public void updateClaimTicketWorkFlow(Long id, @Valid ClaimTicketWorkFlowDTO claimTicketWorkflowDTO, RequestInfo requestInfo) {
+    public void updateClaimTicketWorkFlow(@Valid ClaimTicketWorkFlowDTO claimTicketWorkflowDTO, RequestInfo requestInfo) {
+        if (claimTicketWorkflowDTO.getId() == null) {
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND, null, null);
+        }
         LOG.debug("Updating ticket workflow: {}", claimTicketWorkflowDTO);
         User currentUser = userService.getCurrentUser();
-        Long organizationId = resolveOrganizationId(claimTicketWorkflowDTO.getOrganizationId(), currentUser);
-        ClaimTicketWorkFlow existingWorkflow = claimTicketWorkFlowRepository.findById(id)
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        ClaimTicketWorkFlow existingWorkflow = claimTicketWorkFlowRepository.findById(claimTicketWorkflowDTO.getId())
             .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND, null, null));
-        if (!existingWorkflow.getOrganization().getId().equals(organizationId)) {
-            throw new CustomException(Status.FORBIDDEN, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND, null, null);
+
+        if (existingWorkflow.getOrganization() != null && authority.contains(AuthoritiesConstants.FI)) {
+            if (!existingWorkflow.getOrganization().getId().equals(currentUser.getOrganizationId())) {
+                throw new CustomException(Status.FORBIDDEN, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND, null, null);
+            }
         }
+
         Map<String, Object> oldData = convertEntityToMap(claimTicketWorkFlowMapper.mapEntityToDTO(existingWorkflow));
         // Update entity fields
         existingWorkflow.setInstanceType(claimTicketWorkflowDTO.getInstanceType());

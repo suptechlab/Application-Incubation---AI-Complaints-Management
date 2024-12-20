@@ -25,11 +25,11 @@ public class ClaimTicketWorkFlow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "organization_id", nullable = false, insertable = false, updatable = false)
+    @Column(name = "organization_id", insertable = false, updatable = false)
     private Long organizationId;
 
     @ManyToOne
-    @JoinColumn(name = "organization_id", nullable = false, updatable = false)
+    @JoinColumn(name = "organization_id")
     private Organization organization;
 
     @Enumerated

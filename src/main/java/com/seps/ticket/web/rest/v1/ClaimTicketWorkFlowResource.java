@@ -80,7 +80,7 @@ public class ClaimTicketWorkFlowResource {
     public ResponseEntity<ResponseStatus> updateClaimTicketWorkFlow(@PathVariable Long id, @Valid @RequestBody ClaimTicketWorkFlowDTO claimTicketWorkflowDTO,
                                                                     HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
-        claimTicketWorkFlowService.updateClaimTicketWorkFlow(id, claimTicketWorkflowDTO, requestInfo);
+        claimTicketWorkFlowService.updateClaimTicketWorkFlow(claimTicketWorkflowDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.workflow.updated.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),

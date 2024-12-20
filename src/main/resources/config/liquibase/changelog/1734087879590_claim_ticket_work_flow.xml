@@ -85,4 +85,7 @@
   <changeSet id="1734096634244" author="matellio">
     <dropNotNullConstraint tableName="claim_ticket_work_flow" columnName="conditions"/>
   </changeSet>
+  <changeSet id="1734696408968" author="matellio">
+    <dropNotNullConstraint tableName="claim_ticket_work_flow" columnName="organization_id"/>
+  </changeSet>
 </databaseChangeLog>
