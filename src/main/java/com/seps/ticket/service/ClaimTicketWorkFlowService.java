@@ -452,46 +452,6 @@ public class ClaimTicketWorkFlowService {
         return claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
     }
 
-    public void triggerPriorityWorkflow(ClaimTicketDTO claimTicket){
-
-        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO;
-        // Find the next workflow excluding already processed ones
-        claimTicketWorkFlowDTO = this.findPriorityWorkFlow(claimTicket.getOrganizationId(), claimTicket.getInstanceType(),
-                claimTicket.getPriority());
-
-        if (claimTicketWorkFlowDTO != null) {
-            for (TicketPriorityAction priorityAction : claimTicketWorkFlowDTO.getTicketPriorityActions()) {
-                Long agentId = priorityAction.getAgentId();
-                Long templateId = priorityAction.getTemplateId();
-                User user = null;
-                switch (priorityAction.getAction()) {
-                    case MAIL_TO_CUSTOMER:
-                        user = userService.findUserById(claimTicket.getUserId());
-                        break;
-                    case MAIL_TO_FI_TEAM, MAIL_TO_FI_AGENT:
-                        user = this.findFIUserForMailAction(agentId, claimTicketWorkFlowDTO);
-                        break;
-                    case MAIL_TO_SEPS_TEAM, MAIL_TO_SEPS_AGENT:
-                        user = this.findSEPSUserForMailAction(agentId, claimTicketWorkFlowDTO);
-                        break;
-                    // Add other cases if needed
-                    default:
-                        // Handle unsupported actions or log them
-                        break;
-                }
-                if (user != null && templateId != null) {
-                    MailDTO mailDTO = new MailDTO();
-                    mailDTO.setTemplateId(templateId);
-                    mailDTO.setTo(user.getEmail());
-                    mailDTO.setLocale(user.getLangKey());
-                    mailDTO.setIsStatic(false);
-                    //mailDTO.setDataVariables(templateVariableMappingService.mapVariables(claimTicket, user));
-                    //mailService.sendDynamicContentEmail(mailDTO);
-                }
-            }
-        }
-    }
-
     public ClaimTicketWorkFlowDTO findPriorityWorkFlow(Long organizationId, InstanceTypeEnum instanceType, ClaimTicketPriorityEnum priority) {
         // Retrieve workflows
         List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
@@ -508,6 +468,32 @@ public class ClaimTicketWorkFlowService {
                 // Check each condition for a match
                 for (TicketPriorityCondition priorityCondition : priorityConditionList) {
                     if (priority.equals(priorityCondition.getPriority())) {
+                        // Return the DTO if a match is found
+                        return claimTicketWorkFlowDTO;
+                    }
+                }
+            }
+        }
+        // Return null if no match is found
+        return null;
+    }
+
+    public ClaimTicketWorkFlowDTO findTicketStatusWorkFlow(Long organizationId, InstanceTypeEnum instanceType, ClaimTicketStatusEnum status) {
+        // Retrieve workflows
+        List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
+                findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.TICKET_STATUS, true)
+                .stream()
+                .toList();
+
+        // If the list is not empty, process each workflow
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
+                // Map the entity to a DTO
+                ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+                List<TicketStatusCondition> statusConditionList = claimTicketWorkFlowDTO.getTicketStatusConditions();
+                // Check each condition for a match
+                for (TicketStatusCondition statusCondition : statusConditionList) {
+                    if (status.equals(statusCondition.getStatus())) {
                         // Return the DTO if a match is found
                         return claimTicketWorkFlowDTO;
                     }

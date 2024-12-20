@@ -1,13 +1,18 @@
 package com.seps.ticket.service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
+import com.seps.ticket.config.InstantTypeAdapter;
 import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.*;
+import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
+import com.seps.ticket.service.dto.workflow.TicketPriorityAction;
+import com.seps.ticket.service.dto.workflow.TicketStatusAction;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import com.seps.ticket.service.specification.ClaimTicketSpecification;
@@ -28,6 +33,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -73,7 +79,8 @@ public class SepsAndFiClaimTicketService {
     private static final String ATTACHMENTS = "attachments";
     private static final String REASON = "reason";
     private final TemplateVariableMappingService templateVariableMappingService;
-
+    private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
+    private final TemplateMasterRepository templateMasterRepository;
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -100,14 +107,16 @@ public class SepsAndFiClaimTicketService {
                                        ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                        ClaimTicketStatusLogRepository claimTicketStatusLogRepository, MailService mailService, DocumentService documentService,
                                        ClaimTicketDocumentRepository claimTicketDocumentRepository,
-                                       TemplateVariableMappingService templateVariableMappingService) {
+                                       TemplateVariableMappingService templateVariableMappingService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterRepository templateMasterRepository) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
         this.enumUtil = enumUtil;
-        this.gson = gson;
+        this.gson = new GsonBuilder()
+            .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+            .create();
         this.auditLogService = auditLogService;
         this.claimTicketAssignLogRepository = claimTicketAssignLogRepository;
         this.claimTicketPriorityLogRepository = claimTicketPriorityLogRepository;
@@ -116,6 +125,8 @@ public class SepsAndFiClaimTicketService {
         this.documentService = documentService;
         this.claimTicketDocumentRepository = claimTicketDocumentRepository;
         this.templateVariableMappingService = templateVariableMappingService;
+        this.claimTicketWorkFlowService = claimTicketWorkFlowService;
+        this.templateMasterRepository = templateMasterRepository;
     }
 
     /**
@@ -567,7 +578,6 @@ public class SepsAndFiClaimTicketService {
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "updatePriority", ActionTypeEnum.CLAIM_TICKET_PRIORITY_CHANGE.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
-        this.sendPriorityChangeEmail(savedTicket, priority, currentUser);
     }
 
     /**
@@ -679,7 +689,7 @@ public class SepsAndFiClaimTicketService {
         entityData.put(Constants.NEW_DATA, newData);
         Map<String, String> req = new HashMap<>();
         req.put("newSlaDate", newSlaDate.toString());
-        req.put("reason", reason);
+        req.put(REASON, reason);
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "extendSlaDate", ActionTypeEnum.CLAIM_TICKET_EXTEND_SLA_DATE.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
@@ -825,6 +835,7 @@ public class SepsAndFiClaimTicketService {
         ticket.setStatus(ClaimTicketStatusEnum.CLOSED);
         ticket.setClosedStatus(claimTicketClosedRequest.getCloseSubStatus());
         ticket.setStatusComment(claimTicketClosedRequest.getReason());
+        ticket.setResolvedOn(Instant.now());
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -837,6 +848,7 @@ public class SepsAndFiClaimTicketService {
         claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.CLOSED);
         claimTicketStatusLog.setSubStatus(claimTicketClosedRequest.getCloseSubStatus().ordinal());
         claimTicketStatusLog.setCreatedBy(currentUser.getId());
+        claimTicketStatusLog.setInstanceType(ticket.getInstanceType());
         claimTicketStatusLogRepository.save(claimTicketStatusLog);
 
         Map<String, String> auditMessageMap = new HashMap<>();
@@ -1054,6 +1066,7 @@ public class SepsAndFiClaimTicketService {
         claimTicketStatusLog.setTicketId(ticket.getId());
         claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.REJECTED);
         claimTicketStatusLog.setSubStatus(claimTicketRejectRequest.getRejectedStatus().ordinal());
+        claimTicketStatusLog.setInstanceType(ticket.getInstanceType());
         claimTicketStatusLog.setCreatedBy(currentUser.getId());
         claimTicketStatusLogRepository.save(claimTicketStatusLog);
 
@@ -1353,12 +1366,6 @@ public class SepsAndFiClaimTicketService {
         if (activityType.equals(ClaimTicketActivityEnum.REPLY_CUSTOMER.name())) {
             mailService.sendReplyToCustomerEmail(ticketDetail, claimTicketRejectRequest, ticket.getUser());
         }
-//        if(activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE.name())){
-//            ticketDetail.put("customerName",ticket.getUser().getFirstName());
-//            ticketDetail.put("status", enumUtil.getLocalizedEnumValue(ticket.getStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
-//
-//            mailService.sendReplyToInternalEmail(ticketDetail, claimTicketRejectRequest, currentUser);
-//        }
     }
 
     @Transactional
@@ -1404,5 +1411,311 @@ public class SepsAndFiClaimTicketService {
 
         return templateVariableMappingService.mapVariables(claimTicket, user);
 
+    }
+
+    /**
+     * Triggers the priority workflow for a given claim ticket.
+     *
+     * <p>This method identifies the appropriate workflow actions for the specified claim ticket
+     * based on its priority, organization, and instance type. It performs the following:
+     * <ul>
+     *   <li>Retrieves the associated workflow details.</li>
+     *   <li>Performs actions like sending emails to customers or agents as defined in the workflow.</li>
+     *   <li>Logs workflow failures, if any, and updates the workflow data in the database.</li>
+     * </ul>
+     *
+     * @param claimTicketId the ID of the claim ticket to process.
+     * @throws NullPointerException if the claim ticket is not found.
+     */
+    @Async
+    @Transactional
+    public void triggerPriorityWorkflow(Long claimTicketId){
+
+        ClaimTicket claimTicket = claimTicketRepository.findById(claimTicketId).orElse(null);
+        if(claimTicket!=null) {
+            ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+            ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowService.findPriorityWorkFlow(claimTicketDTO.getOrganizationId(), claimTicketDTO.getInstanceType(),
+                claimTicketDTO.getPriority());
+
+            if (claimTicketWorkFlowDTO != null) {
+                for (TicketPriorityAction priorityAction : claimTicketWorkFlowDTO.getTicketPriorityActions()) {
+                    Long agentId = priorityAction.getAgentId();
+                    Long templateId = priorityAction.getTemplateId();
+
+                    if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),priorityAction.getAction().name()))
+                        continue;
+
+                    User user = null;
+                    switch (priorityAction.getAction()) {
+                        case MAIL_TO_CUSTOMER:
+                            user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),priorityAction.getAction().name());
+                            break;
+                        case MAIL_TO_FI_TEAM:
+                            user = findAgent(agentId, claimTicketWorkFlowDTO, priorityAction.getAction().name(), UserTypeEnum.FI_USER);
+                            break;
+                        case MAIL_TO_FI_AGENT:
+                            user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, priorityAction.getAction().name(), UserTypeEnum.FI_USER);
+                            break;
+                        case MAIL_TO_SEPS_TEAM:
+                            user = findAgent(agentId, claimTicketWorkFlowDTO, priorityAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                            break;
+                        case MAIL_TO_SEPS_AGENT:
+                            user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, priorityAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                            break;
+                        // Add other cases if needed
+                        default:
+                            // Handle unsupported actions or log them
+                            break;
+                    }
+                    mailService.workflowEmailSend(templateId, claimTicketDTO, user);
+                }
+                savePriorityWorkFlowData(claimTicketId, claimTicketWorkFlowDTO);
+            } else {
+                User user = userService.findUserById(claimTicketDTO.getUpdatedBy());
+                this.sendPriorityChangeEmail(claimTicket, claimTicketDTO.getPriority(), user);
+            }
+        }
+    }
+
+    /**
+     * Saves the priority workflow data for a given claim ticket.
+     *
+     * <p>This method updates the {@code ClaimTicketPriorityLog} entity with workflow details
+     * and logs the workflow actions performed for the ticket.
+     *
+     * @param claimTicketId the ID of the claim ticket to update.
+     * @param claimTicketWorkFlowDTO the workflow data to save.
+     */
+    @Transactional
+    public void savePriorityWorkFlowData(Long claimTicketId, ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO){
+        ClaimTicketPriorityLog claimTicketPriority = claimTicketPriorityLogRepository.findFirstByTicketIdOrderByCreatedAtDesc(claimTicketId).orElse(null);
+        if(claimTicketPriority!=null){
+            claimTicketPriority.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO.getId());
+            claimTicketPriority.setClaimTicketWorkFlowData(gson.toJson(claimTicketWorkFlowDTO));
+            claimTicketPriorityLogRepository.save(claimTicketPriority);
+        }
+    }
+
+    private boolean templateValidate(Long templateId, Long workflowId, String action){
+        boolean result = true;
+        if (templateId != null) {
+            TemplateMaster templateMaster = templateMasterRepository.findByIdAndStatus(templateId, true).orElse(null);
+            if (templateMaster == null) {
+                claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.not.found",
+                    new Object[]{templateId}, null, templateId);
+            } else {
+                result = false;
+            }
+        } else {
+            claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.template.id.null",
+                new Object[]{action}, null, null);
+        }
+        return result;
+    }
+
+    private User findCustomer(Long customerId, Long workflowId, String action){
+        User user = null;
+        if (customerId == null) {
+            claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.customer.id.null",
+                new Object[]{action}, null, null);
+        }else {
+            user = userService.findUserById(customerId);
+            if (user == null) {
+                claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.customer.not.found",
+                    new Object[]{customerId}, customerId, null);
+            }
+        }
+        return user;
+    }
+
+    private User findAgent(Long agentId, ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO, String action, UserTypeEnum userType){
+        User user = null;
+        if (agentId == null) {
+            claimTicketWorkFlowService.logWorkflowFailure(claimTicketWorkFlowDTO.getId(), "workflow.agent.id.null", new Object[]{action}, null, null);
+        }else{
+            user = userType.equals(UserTypeEnum.FI_USER) ? claimTicketWorkFlowService.findFIUserForMailAction(agentId, claimTicketWorkFlowDTO) :
+                claimTicketWorkFlowService.findSEPSUserForMailAction(agentId, claimTicketWorkFlowDTO);
+            if (user == null) {
+                claimTicketWorkFlowService.logWorkflowFailure(claimTicketWorkFlowDTO.getId(), "workflow.user.not.found", new Object[]{agentId}, agentId, null);
+            }
+        }
+        return user;
+    }
+
+    /**
+     * Updates the status of a claim ticket.
+     *
+     * <p>This method changes the status of a claim ticket, logs the status change in the
+     * activity log and status log tables, and performs necessary validations to prevent
+     * redundant updates.
+     *
+     * @param ticketId the ID of the claim ticket to update.
+     * @param status the new status to set for the claim ticket.
+     * @param requestInfo the request information for audit logging.
+     * @throws CustomException if the claim ticket is not found or already in the specified status.
+     */
+    @Transactional
+    public void updateTicketStatus(Long ticketId, ClaimTicketStatusEnum status, RequestInfo requestInfo) {
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        } else {
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        if (ticket.getStatus().equals(status)) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_IN_STATUS, new String[]{enumUtil.getLocalizedEnumValue(status, LocaleContextHolder.getLocale())}, null);
+        }
+        Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
+        ClaimTicketActivityLog activityLog = createStatusChangeActivityLog(currentUser, ticket, status);
+        ticket.setStatus(status);
+        ticket.setUpdatedBy(currentUser.getId());
+
+        // Save the updated ticket
+        ClaimTicket savedTicket = claimTicketRepository.save(ticket);
+        claimTicketActivityLogService.saveActivityLog(activityLog);
+
+        //Save ClaimTicketStatusLog table
+        ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+        claimTicketStatusLog.setTicketId(ticket.getId());
+        claimTicketStatusLog.setStatus(status);
+        claimTicketStatusLog.setInstanceType(ticket.getInstanceType());
+        claimTicketStatusLog.setCreatedBy(currentUser.getId());
+        claimTicketStatusLogRepository.save(claimTicketStatusLog);
+
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.ticket.change.status",
+                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(status, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(this.getSepsFiClaimTicketById(savedTicket.getId()));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        Map<String, Object> req = new HashMap<>();
+        req.put("status", status.name());
+        String requestBody = gson.toJson(req);
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "updateTicketStatus", ActionTypeEnum.CLAIM_TICKET_CHANGED_STATUS.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
+            null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+
+    }
+
+    private ClaimTicketActivityLog createStatusChangeActivityLog(User currentUser, ClaimTicket ticket, ClaimTicketStatusEnum status) {
+
+        ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
+        activityLog.setTicketId(ticket.getId());
+        activityLog.setPerformedBy(currentUser.getId());
+        Map<String, String> activityTitle = new HashMap<>();
+        Map<String, String> linkedUser = new HashMap<>();
+        Map<String, Object> activityDetail = new HashMap<>();
+        activityLog.setActivityType(ClaimTicketActivityEnum.STATUS_CHANGED.name());
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.change.status",
+                new Object[]{"@" + currentUser.getId(), enumUtil.getLocalizedEnumValue(status, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+            activityTitle.put(language.getCode(), messageAudit);
+        });
+        activityDetail.put(Constants.PERFORM_BY, convertEntityToMap(claimTicketMapper.toUserDTO(currentUser)));
+        activityDetail.put(Constants.TICKET_ID, ticket.getTicketId().toString());
+        linkedUser.put(currentUser.getId().toString(), currentUser.getFirstName());
+        activityLog.setActivityTitle(activityTitle);
+        activityLog.setLinkedUsers(linkedUser);
+        activityLog.setActivityDetails(activityDetail);
+        return activityLog;
+    }
+
+    /**
+     * Triggers the status change workflow for a given claim ticket.
+     *
+     * <p>This method identifies the workflow actions to be executed when the status of a claim
+     * ticket changes. It performs the following:
+     * <ul>
+     *   <li>Retrieves the associated workflow details based on the ticket's status.</li>
+     *   <li>Performs actions like sending emails to customers or agents as defined in the workflow.</li>
+     *   <li>Logs workflow failures, if any.</li>
+     * </ul>
+     *
+     * @param claimTicketId the ID of the claim ticket whose status has changed.
+     * @throws NullPointerException if the claim ticket is not found.
+     */
+    @Async
+    @Transactional
+    public void triggerChangeStatusWorkflow(Long claimTicketId){
+
+        ClaimTicket claimTicket = claimTicketRepository.findById(claimTicketId).orElse(null);
+        if(claimTicket!=null) {
+            ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+            ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowService.findTicketStatusWorkFlow(claimTicketDTO.getOrganizationId(), claimTicketDTO.getInstanceType(),
+                claimTicketDTO.getStatus());
+
+            if (claimTicketWorkFlowDTO != null) {
+                for (TicketStatusAction statusAction : claimTicketWorkFlowDTO.getTicketStatusActions()) {
+                    Long agentId = statusAction.getAgentId();
+                    Long templateId = statusAction.getTemplateId();
+
+                    if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),statusAction.getAction().name()))
+                        continue;
+
+                    User user = null;
+                    switch (statusAction.getAction()) {
+                        case MAIL_TO_CUSTOMER:
+                            user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),statusAction.getAction().name());
+                            break;
+                        case MAIL_TO_FI_TEAM:
+                            user = findAgent(agentId, claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.FI_USER);
+                            break;
+                        case MAIL_TO_FI_AGENT:
+                            user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.FI_USER);
+                            break;
+                        case MAIL_TO_SEPS_TEAM:
+                            user = findAgent(agentId, claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                            break;
+                        case MAIL_TO_SEPS_AGENT:
+                            user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                            break;
+                        // Add other cases if needed
+                        default:
+                            // Handle unsupported actions or log them
+                            break;
+                    }
+                    mailService.workflowEmailSend(templateId, claimTicketDTO, user);
+                }
+                saveChangeStatusWorkFlowData(claimTicketId, claimTicketWorkFlowDTO);
+            } else {
+                LOG.info("Default change status email execute.");
+                this.sendStatusChangeEmail(claimTicketDTO);
+            }
+        }
+    }
+
+    @Transactional
+    public void saveChangeStatusWorkFlowData(Long claimTicketId, ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO){
+        ClaimTicketStatusLog claimTicketStatus = claimTicketStatusLogRepository.findFirstByTicketIdOrderByCreatedAtDesc(claimTicketId).orElse(null);
+        if(claimTicketStatus!=null){
+            claimTicketStatus.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO.getId());
+            claimTicketStatus.setClaimTicketWorkFlowData(gson.toJson(claimTicketWorkFlowDTO));
+            claimTicketStatusLogRepository.save(claimTicketStatus);
+        }
+    }
+
+    private void sendStatusChangeEmail(ClaimTicketDTO ticket) {
+
+        // Send email to the Customer
+        if (ticket.getUserId() != null) {
+            User customer = userService.getUserById(ticket.getUserId());
+            mailService.sendStatusChangeEmail(ticket, customer);
+        }
     }
 }
