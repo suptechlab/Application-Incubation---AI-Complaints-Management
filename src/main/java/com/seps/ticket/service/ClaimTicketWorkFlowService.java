@@ -323,15 +323,12 @@ public class ClaimTicketWorkFlowService {
 
     public ClaimTicketWorkFlowDTO findCreateWorkFlow(Long organizationId, InstanceTypeEnum instanceType, Long claimTypeId,
                                                      Long claimSubTypeId, List<Long> processedWorkflowIds) {
-
         // Retrieve workflows excluding already processed ones
         List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
             findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.CREATED, true)
             .stream()
             .filter(workflow -> !processedWorkflowIds.contains(workflow.getId()))
             .collect(Collectors.toList());
-
-
         // If the list is not empty, process each workflow
         if (!claimTicketWorkFlowList.isEmpty()) {
             for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
