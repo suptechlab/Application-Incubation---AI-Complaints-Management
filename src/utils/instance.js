@@ -18,7 +18,7 @@ const createAxiosInstance = (baseURL) => {
     instance.interceptors.request.use(
         (config) => {
             const token = getLocalStorage('access_token');
-            const userLanguage = 'es';
+            const userLanguage = 'en';
 
             // Set Accept-Language header
             config.headers["Accept-Language"] = userLanguage ?? "en";
