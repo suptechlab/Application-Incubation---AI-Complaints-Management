@@ -8,6 +8,8 @@ import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
+import com.seps.ticket.service.dto.ClaimTicketDTO;
+import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.RequestInfo;
 import com.seps.ticket.service.dto.UserDTO;
 import com.seps.ticket.service.dto.workflow.*;
@@ -460,5 +462,55 @@ public class ClaimTicketWorkFlowService {
         return claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
     }
 
+    public ClaimTicketWorkFlowDTO findPriorityWorkFlow(Long organizationId, InstanceTypeEnum instanceType, ClaimTicketPriorityEnum priority) {
+        // Retrieve workflows
+        List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
+                findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.TICKET_PRIORITY, true)
+                .stream()
+                .toList();
 
+        // If the list is not empty, process each workflow
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
+                // Map the entity to a DTO
+                ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+                List<TicketPriorityCondition> priorityConditionList = claimTicketWorkFlowDTO.getTicketPriorityConditions();
+                // Check each condition for a match
+                for (TicketPriorityCondition priorityCondition : priorityConditionList) {
+                    if (priority.equals(priorityCondition.getPriority())) {
+                        // Return the DTO if a match is found
+                        return claimTicketWorkFlowDTO;
+                    }
+                }
+            }
+        }
+        // Return null if no match is found
+        return null;
+    }
+
+    public ClaimTicketWorkFlowDTO findTicketStatusWorkFlow(Long organizationId, InstanceTypeEnum instanceType, ClaimTicketStatusEnum status) {
+        // Retrieve workflows
+        List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
+                findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.TICKET_STATUS, true)
+                .stream()
+                .toList();
+
+        // If the list is not empty, process each workflow
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
+                // Map the entity to a DTO
+                ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+                List<TicketStatusCondition> statusConditionList = claimTicketWorkFlowDTO.getTicketStatusConditions();
+                // Check each condition for a match
+                for (TicketStatusCondition statusCondition : statusConditionList) {
+                    if (status.equals(statusCondition.getStatus())) {
+                        // Return the DTO if a match is found
+                        return claimTicketWorkFlowDTO;
+                    }
+                }
+            }
+        }
+        // Return null if no match is found
+        return null;
+    }
 }

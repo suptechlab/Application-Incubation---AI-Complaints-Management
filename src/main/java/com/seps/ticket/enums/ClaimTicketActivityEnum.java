@@ -14,5 +14,6 @@ public enum ClaimTicketActivityEnum {
     CLOSED,
     REJECTED,
     CUSTOMER_REPLY,
-    INTERNAL_NOTE_ADDED
+    INTERNAL_NOTE_ADDED,
+    STATUS_CHANGED
 }
