@@ -6,11 +6,12 @@ const msg = getValidationMessages();
 const ticketWorkflowSchema = Yup.object({
 
     entityId: Yup.string()
-        .when('userType', {
-            is: (userType) => userType === 'SUPER_ADMIN' || userType === 'SEPS_ADMIN',
-            then: (schema) => schema.required(msg.entityRequired),
-            otherwise: (schema) => schema,
-        }),
+    .when(['userType', 'instanceTypeId'], {
+        is: (userType, instanceTypeId) =>
+            (userType === 'SUPER_ADMIN' || userType === 'SEPS_ADMIN') && instanceTypeId === 'FIRST_INSTANCE',
+        then: (schema) => schema.required(msg.entityRequired),
+        otherwise: (schema) => schema,
+    }),
 
     instanceTypeId: Yup.string()
         .required(msg.instanceTypeRequired),

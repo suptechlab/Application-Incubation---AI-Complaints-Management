@@ -16,7 +16,7 @@ import { claimTypesDropdownList, getClaimSubTypeById } from "../../../services/c
 import { getOrganizationList } from "../../../services/teamManagment.service";
 import { convertToLabelValue } from "../../../services/ticketmanagement.service";
 import { ticketWorkflowSchema } from "../../../validations/ticketWorkflow.validation";
-import { addTicketWorkflow, editTicketWorkflow, getAgentList, getTeamList, getTeamMemberList, getTemplateList } from "../../../services/ticketWorkflow.service";
+import { addTicketWorkflow, editTicketWorkflow, getAgentList, getTeamList, getTeamMemberList, getTemplateList, handleGetWorkflowById } from "../../../services/ticketWorkflow.service";
 
 export default function TicketWorkFlowAddEdit() {
     const [loading, setLoading] = useState(false);
@@ -204,11 +204,14 @@ export default function TicketWorkFlowAddEdit() {
             setClaimTicketPriorityArr(convertToLabelValue(masterData.claimTicketPriority || {}));
         }
         if (currentUser) {
+
+            const instanceType = currentUser === 'FI_ADMIN' ? 'FIRST_INSTANCE' : ""
+
             setInitialValues({
                 userType: currentUser,
                 entityId: "",
                 eventId: "",
-                instanceTypeId: "",
+                instanceTypeId: instanceType ?? '',
                 workflowName: "",
                 description: "",
                 conditions: [
@@ -293,27 +296,27 @@ export default function TicketWorkFlowAddEdit() {
         switch (event) {
             case 'CREATED':
                 return [
-                    setActionsArr([{ label: t('SELECT'), value: 'select', disabled: true }, ...convertToLabelValue(masterData.createAction || {})]),
+                    setActionsArr([{ label: t('SELECT'), value: 'select', disabled: true }, ...convertToLabelValue(masterData?.createAction || {})]),
                     getClaimTypeDropdownList()
                 ];
             case 'SLA_BREACH':
                 return [
-                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData.slaBreachAction || {})])
+                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData?.slaBreachAction || {})])
                 ];
             case 'SLA_DAYS_REMINDER':
                 return [
-                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData.slaDaysReminderAction || {})])
+                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData?.slaDaysReminderAction || {})])
                 ];
             case 'TICKET_DATE_EXTENSION':
-                return setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData.ticketDateExtensionAction || {})]);
+                return setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData?.ticketDateExtensionAction || {})]);
             case 'TICKET_PRIORITY':
                 return [
-                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData.ticketPriorityAction || {})]),
+                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData?.ticketPriorityAction || {})]),
                     setConditionsArr([{ label: t('SELECT'), value: '' }, ...claimTicketPriorityArr])
                 ];
             case 'TICKET_STATUS':
                 return [
-                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData.ticketStatusAction || {})]),
+                    setActionsArr([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData?.ticketStatusAction || {})]),
                     setConditionsArr([{ label: t('SELECT'), value: '' }, ...claimTicketStatusArr])
                 ];
             default:
@@ -343,6 +346,7 @@ export default function TicketWorkFlowAddEdit() {
     }
 
     const generateDynamicPayload = (selectedEvent, values) => {
+
         const eventKeyMap = {
             CREATED: {
                 conditionsKey: "createConditions",
@@ -410,7 +414,6 @@ export default function TicketWorkFlowAddEdit() {
                 },
             }
         };
-
         const { conditionsKey, actionsKey, conditionFields, actionFields } = eventKeyMap[selectedEvent] || {};
 
         if (!actionsKey || !actionFields) {
@@ -443,6 +446,7 @@ export default function TicketWorkFlowAddEdit() {
 
         const organizationId = currentUser === 'FI_ADMIN' ? userData?.organizationId : values?.entityId
 
+
         const payload = {
             ...(conditionsKey ? { [conditionsKey]: conditions } : {}),
             [actionsKey]: actions,
@@ -464,21 +468,21 @@ export default function TicketWorkFlowAddEdit() {
 
         console.log('payload', payload)
 
-        // try {
-        //     const action = isEdit
-        //         ? editTicketWorkflow(id, { ...payload })
-        //         : addTicketWorkflow({ ...payload });
+        try {
+            const action = isEdit
+                ? editTicketWorkflow(id, { ...payload })
+                : addTicketWorkflow({ ...payload });
 
-        //     const response = await action;
-        //     toast.success(response.data.message);
-        //     navigate('/tickets-workflow');
-        // } catch (error) {
-        //     const errorMessage = error.response?.data?.errorDescription;
-        //     toast.error(errorMessage);
-        // } finally {
-        //     setLoading(false);
-        //     actions.setSubmitting(false);
-        // }
+            const response = await action;
+            toast.success(response.data.message);
+            navigate('/tickets-workflow');
+        } catch (error) {
+            const errorMessage = error.response?.data?.errorDescription;
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+            actions.setSubmitting(false);
+        }
     };
 
 
@@ -525,7 +529,7 @@ export default function TicketWorkFlowAddEdit() {
         setSelectedActions((prevSelectedActions) => {
             const updatedSelectedActions = [...prevSelectedActions];
             const previousValue = formikProps.values.actions[index]?.actionId;
-    
+
             // Remove the previous value from the selected actions
             if (previousValue) {
                 const prevIndex = updatedSelectedActions.indexOf(previousValue);
@@ -533,23 +537,44 @@ export default function TicketWorkFlowAddEdit() {
                     updatedSelectedActions.splice(prevIndex, 1);
                 }
             }
-    
+
+            if (previousValue === 'ASSIGN_TO_AGENT') {
+                const prevIndex = updatedSelectedActions.indexOf('ASSIGN_TO_TEAM');
+                if (prevIndex > -1) {
+                    updatedSelectedActions.splice(prevIndex, 1);
+                }
+            }
+
+            if (previousValue === 'ASSIGN_TO_TEAM') {
+                const prevIndex = updatedSelectedActions.indexOf('ASSIGN_TO_AGENT');
+                if (prevIndex > -1) {
+                    updatedSelectedActions.splice(prevIndex, 1);
+                }
+            }
+
             // Add the new value to the selected actions
             if (value) {
                 updatedSelectedActions.push(value);
             }
-    
+
+            if (value === 'ASSIGN_TO_AGENT') {
+                updatedSelectedActions.push('ASSIGN_TO_TEAM');
+            }
+            if (value === 'ASSIGN_TO_TEAM') {
+                updatedSelectedActions.push('ASSIGN_TO_AGENT');
+            }
+
             // Update Formik's field value
             formikProps.setFieldValue(`actions[${index}].actionId`, value);
-    
+
             // Reset and update action categories
             setActionCategory1Arr([]);
             setActionCategory2Arr([]);
             updateActionCategory1Filter(value);
-    
+
             return updatedSelectedActions;
         });
-    
+
         // Update the disabled state of options
         setActionsArr((prevActionsArr) =>
             prevActionsArr.map((action) => {
@@ -563,13 +588,105 @@ export default function TicketWorkFlowAddEdit() {
             })
         );
     };
-    
+
+
+    // const isActionDisabled = (value, currentValue) => {
+    //     return selectedActions.includes(value) && currentValue !== value;
+    // };
 
     const isActionDisabled = (value, currentValue) => {
+        // Specific logic for ASSIGN_TO_TEAM and ASSIGN_TO_AGENT
+        if ((value === 'ASSIGN_TO_TEAM' || value === 'ASSIGN_TO_AGENT')) {
+            return (
+                selectedActions.includes('ASSIGN_TO_TEAM') ||
+                selectedActions.includes('ASSIGN_TO_AGENT')
+            ) && !(currentValue === 'ASSIGN_TO_TEAM' || currentValue === 'ASSIGN_TO_AGENT');
+        }
+
+        // General logic for other values
         return selectedActions.includes(value) && currentValue !== value;
     };
 
 
+
+    const getTicketWorkflowData = () => {
+        setLoading(true)
+        handleGetWorkflowById(id).then(response => {
+            const responseValues = response?.data
+            if (responseValues?.event) {
+                const newEventId = responseValues?.event
+                setSelectedEvent(newEventId);
+                getEventActionsConditions(newEventId);
+                getConditionLabel(newEventId);
+            }
+
+            let conditions = [
+                {
+                    conditionId: "",
+                    conditionCatId: "",
+                },
+            ]
+
+            // Process conditions
+            // const conditions = apiResponse[conditionsKey]?.map((condition) => ({
+            //     conditionId: condition[conditionFields.conditionId] ?? "",
+            //     conditionCatId: condition[conditionFields.conditionCatId] ?? "",
+            // })) ?? [];
+
+            // switch (responseValues.event) {
+            //     case 'CREATED':
+
+
+                  
+
+            //         break;
+            //     default:
+            //         conditions = [
+            //             {
+            //                 conditionId: "",
+            //                 conditionCatId: "",
+            //             },
+            //         ]
+
+            // }
+
+          
+            let actions = [
+                {
+                    actionId: "",
+                    actionFilter1: "",
+                    actionFilter2: "",
+                },
+            ]
+
+
+            setInitialValues({
+                entityId: responseValues.organizationId?.toString() ?? "",
+                instanceTypeId: responseValues.instanceType ?? "",
+                eventId: responseValues.event ?? "",
+                workflowName: responseValues.title ?? "",
+                description: responseValues.description ?? "",
+                conditions: conditions,
+                actions: actions,
+                userType: currentUser ?? "",
+            })
+
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH TICKET WORKFLOW DETAILS");
+            }
+        }).finally(() => {
+            setLoading(false)
+        })
+    }
+
+    useEffect(() => {
+        if (isEdit === true && masterData) {
+            getTicketWorkflowData()
+        }
+    }, [isEdit, masterData])
 
     return (
         <React.Fragment>
@@ -589,6 +706,24 @@ export default function TicketWorkFlowAddEdit() {
                                     <div className="text-break d-flex flex-column small pt-0">
                                         {/* First Section Starts*/}
                                         <Row>
+                                            <Col sm={6} lg={4}>
+                                                <ReactSelect
+                                                    label={t('INSTANCE_TYPE') + '*'}
+                                                    options={instanceTypeArr}
+                                                    value={formikProps.values.instanceTypeId || ""}
+                                                    onChange={(option) => {
+                                                        formikProps.setFieldValue(
+                                                            "instanceTypeId",
+                                                            option?.target?.value.toString() ?? ""
+                                                        );
+                                                    }}
+                                                    name="instanceTypeId"
+                                                    onBlur={formikProps.handleBlur}
+                                                    error={formikProps.errors.instanceTypeId}
+                                                    touched={formikProps.touched.instanceTypeId}
+                                                    disabled={currentUser === 'FI_ADMIN' ? true : false}
+                                                />
+                                            </Col>
                                             {(currentUser === 'SUPER_ADMIN' || currentUser === 'SEPS_ADMIN') && (
                                                 <Col sm={6} lg={4}>
                                                     <ReactSelect
@@ -606,24 +741,9 @@ export default function TicketWorkFlowAddEdit() {
                                                     />
                                                 </Col>
                                             )}
-                                            <Col sm={6} lg={4}>
-                                                <ReactSelect
-                                                    label={t('INSTANCE_TYPE') + '*'}
-                                                    options={instanceTypeArr}
-                                                    value={formikProps.values.instanceTypeId || ""}
-                                                    onChange={(option) => {
-                                                        formikProps.setFieldValue(
-                                                            "instanceTypeId",
-                                                            option?.target?.value.toString() ?? ""
-                                                        );
-                                                    }}
-                                                    name="instanceTypeId"
-                                                    onBlur={formikProps.handleBlur}
-                                                    error={formikProps.errors.instanceTypeId}
-                                                    touched={formikProps.touched.instanceTypeId}
-                                                />
-                                            </Col>
-                                            <Col sm={6} lg={4}>
+                                        </Row>
+                                        <Row>
+                                            <Col lg={8}>
                                                 <FormInput
                                                     id="workflowName"
                                                     label={t('WORKFLOW_NAME') + '*'}
@@ -742,7 +862,6 @@ export default function TicketWorkFlowAddEdit() {
                                                                             }))}
                                                                             onBlur={formikProps.handleBlur}
                                                                             onChange={(option) => {
-
                                                                                 handleConditionChange(formikProps, option?.target?.value, index)
                                                                                 // formikProps.setFieldValue(
                                                                                 //     `conditions[${index}].conditionId`,
@@ -753,7 +872,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                                 // }
                                                                             }}
                                                                             label={conditionLabel}
-                                                                            value={formikProps?.values?.conditions[index].conditionId || ''}
+                                                                            value={formikProps?.values?.conditions[index].conditionId}
                                                                             error={formikProps.errors?.conditions?.[index]?.conditionId}
                                                                             touched={formikProps.touched?.conditions?.[index]?.conditionId}
                                                                         />
@@ -871,7 +990,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                         // setActionCategory2Arr([]);
                                                                         // updateActionCategory1Filter(option?.target?.value)
                                                                     }}
-                                                                    value={formikProps.values.actions[index].actionId}
+                                                                    value={formikProps.values.actions[index]?.actionId}
                                                                     error={formikProps.errors?.actions?.[index]?.actionId}
                                                                     touched={formikProps.touched?.actions?.[index]?.actionId}
                                                                 />
