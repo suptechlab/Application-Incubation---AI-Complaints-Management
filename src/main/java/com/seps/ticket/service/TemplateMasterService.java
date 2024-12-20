@@ -18,14 +18,10 @@ public class TemplateMasterService {
         this.templateMasterRepository = templateMasterRepository;
     }
 
-    /**
-     * Retrieves a TemplateMaster by its ID.
-     *
-     * @param id the ID of the template
-     * @return the DTO of the template
-     */
-    public TemplateMaster findTemplateById(Long id) {
-        return templateMasterRepository.findById(id).orElse(null);
+
+    public TemplateMaster findActiveTemplate(Long id) {
+        return templateMasterRepository.findByIdAndStatus(id, true).orElse(null);
     }
+
 
 }

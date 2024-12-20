@@ -170,7 +170,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -180,7 +180,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -246,7 +246,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -256,7 +256,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -315,7 +315,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -325,7 +325,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -383,7 +383,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -393,7 +393,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -447,7 +447,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -458,7 +458,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -512,7 +512,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }
@@ -522,7 +522,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getTemplateId() == null) {
                             isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_NULL, context) && isValid;
                         } else {
-                            templateMaster = templateMasterService.findTemplateById(action.getTemplateId());
+                            templateMaster = templateMasterService.findActiveTemplate(action.getTemplateId());
                             if (templateMaster == null) {
                                 isValid = addValidationMessage(actionPath + TEMPLATE_ID, NOT_FOUND, context) && isValid;
                             }

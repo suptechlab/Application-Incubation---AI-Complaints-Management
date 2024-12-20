@@ -480,7 +480,7 @@ public class MailService {
             Long templateId = createAction.getTemplateId();
             TemplateMaster templateMaster = null;
             if (templateId != null) {
-                templateMaster = templateMasterService.findTemplateById(templateId);
+                templateMaster = templateMasterService.findActiveTemplate(templateId);
             }
             User user = null;
             switch (createAction.getAction()) {
