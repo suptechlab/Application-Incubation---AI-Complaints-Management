@@ -513,4 +513,13 @@ public class ClaimTicketWorkFlowService {
         // Return null if no match is found
         return null;
     }
+
+    public List<ClaimTicketWorkFlowDTO> findTicketDateExtensionWorkFlow(Long organizationId, InstanceTypeEnum instanceType) {
+        // Retrieve workflows
+        return claimTicketWorkFlowRepository.
+                findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.TICKET_DATE_EXTENSION, true)
+                .stream()
+                .map(claimTicketWorkFlowMapper::mapEntityToDTO)
+                .toList();
+    }
 }

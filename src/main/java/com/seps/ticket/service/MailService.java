@@ -635,4 +635,14 @@ public class MailService {
         mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, customer));
         sendDynamicContentEmail(mailDTO);
     }
+
+    public void sendDateExtensionEmail(ClaimTicketDTO ticket, User agent) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("SLA_DATE_EXTENSION_MAIL_TO_AGENT");
+        mailDTO.setTo(agent.getEmail());
+        mailDTO.setLocale(agent.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, agent));
+        sendDynamicContentEmail(mailDTO);
+    }
 }

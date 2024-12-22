@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -15,4 +16,6 @@ public interface ClaimTicketActivityLogRepository extends JpaRepository<ClaimTic
     Page<ClaimTicketActivityLog> findAllByTicketId(Long ticketId, Pageable pageable);
 
     Page<ClaimTicketActivityLog> findAllByTicketIdAndActivityTypeIn(Long ticketId, List<String> activityTypes, Pageable pageable);
+
+    Optional<ClaimTicketActivityLog> findFirstByTicketIdAndActivityTypeOrderByPerformedAtDesc(Long ticketId, String activityTpe);
 }

@@ -148,6 +148,7 @@ public class SepsAndFiClaimTicketResource {
             LocalDate newSlaDate = LocalDate.parse(slaDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             RequestInfo requestInfo = new RequestInfo(request);
             sepsAndFiClaimTicketService.extendSlaDate(ticketId, newSlaDate, reason, requestInfo);
+            sepsAndFiClaimTicketService.triggerDateExtensionWorkflow(ticketId);
             ResponseStatus responseStatus = new ResponseStatus(
                 messageSource.getMessage("claim.ticket.sla.extended.successfully", null, LocaleContextHolder.getLocale()),
                 HttpStatus.OK.value(),

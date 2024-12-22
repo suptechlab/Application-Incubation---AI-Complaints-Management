@@ -11,6 +11,7 @@ import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
+import com.seps.ticket.service.dto.workflow.TicketDateExtensionAction;
 import com.seps.ticket.service.dto.workflow.TicketPriorityAction;
 import com.seps.ticket.service.dto.workflow.TicketStatusAction;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
@@ -1496,6 +1497,14 @@ public class SepsAndFiClaimTicketService {
         }
     }
 
+    /**
+     * Validates if the template is applicable for the given workflow action.
+     *
+     * @param templateId        the ID of the email template to validate.
+     * @param workflowId        the ID of the workflow to validate against.
+     * @param action        the name of the workflow action.
+     * @return {@code true} if the template is valid for the action; {@code false} otherwise.
+     */
     private boolean templateValidate(Long templateId, Long workflowId, String action){
         boolean result = true;
         if (templateId != null) {
@@ -1513,6 +1522,14 @@ public class SepsAndFiClaimTicketService {
         return result;
     }
 
+    /**
+     * Finds the customer user associated with the claim ticket.
+     *
+     * @param customerId        the ID of the customer user.
+     * @param workflowId    the ID of the workflow being processed.
+     * @param action    the name of the action being performed.
+     * @return the {@link User} representing the customer, or {@code null} if not found.
+     */
     private User findCustomer(Long customerId, Long workflowId, String action){
         User user = null;
         if (customerId == null) {
@@ -1528,6 +1545,15 @@ public class SepsAndFiClaimTicketService {
         return user;
     }
 
+    /**
+     * Finds an agent user based on the given agent ID, workflow, and user type.
+     *
+     * @param agentId       the ID of the agent.
+     * @param claimTicketWorkFlowDTO   the DTO of the workflow being processed.
+     * @param action    the name of the action being performed.
+     * @param userType      the type of user to find (e.g., FI_USER, SEPS_USER).
+     * @return the {@link User} representing the agent, or {@code null} if not found.
+     */
     private User findAgent(Long agentId, ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO, String action, UserTypeEnum userType){
         User user = null;
         if (agentId == null) {
@@ -1716,6 +1742,74 @@ public class SepsAndFiClaimTicketService {
         if (ticket.getUserId() != null) {
             User customer = userService.getUserById(ticket.getUserId());
             mailService.sendStatusChangeEmail(ticket, customer);
+        }
+    }
+
+    /**
+     * Triggers the date extension workflow for a claim ticket. This method is executed asynchronously
+     * and processes the date extension workflow based on the actions configured in the workflow.
+     * It sends emails to the respective users based on the workflow configuration.
+     *
+     * @param claimTicketId the ID of the claim ticket for which the date extension workflow is triggered.
+     */
+    @Async
+    @Transactional
+    public void triggerDateExtensionWorkflow(Long claimTicketId){
+
+        ClaimTicket claimTicket = claimTicketRepository.findById(claimTicketId).orElse(null);
+        if(claimTicket!=null) {
+            ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+            List<ClaimTicketWorkFlowDTO> claimTicketWorkFlowList = claimTicketWorkFlowService.findTicketDateExtensionWorkFlow(claimTicketDTO.getOrganizationId(), claimTicketDTO.getInstanceType());
+            if (!claimTicketWorkFlowList.isEmpty()) {
+                claimTicketWorkFlowList.forEach(claimTicketWorkFlowDTO->{
+                    for (TicketDateExtensionAction dateExtensionAction : claimTicketWorkFlowDTO.getTicketDateExtensionActions()) {
+                        Long agentId = dateExtensionAction.getAgentId();
+                        Long templateId = dateExtensionAction.getTemplateId();
+                        if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),dateExtensionAction.getAction().name()))
+                            continue;
+                        User user = null;
+                        switch (dateExtensionAction.getAction()) {
+                            case MAIL_TO_CUSTOMER:
+                                user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),dateExtensionAction.getAction().name());
+                                break;
+                            case MAIL_TO_FI_TEAM:
+                                user = findAgent(agentId, claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.FI_USER);
+                                break;
+                            case MAIL_TO_FI_AGENT:
+                                user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.FI_USER);
+                                break;
+                            case MAIL_TO_SEPS_TEAM:
+                                user = findAgent(agentId, claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                                break;
+                            case MAIL_TO_SEPS_AGENT:
+                                user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                                break;
+                            // Add other cases if needed
+                            default:
+                                // Handle unsupported actions or log them
+                                break;
+                        }
+                        mailService.workflowEmailSend(templateId, claimTicketDTO, user);
+                    }
+                });
+            } else {
+                LOG.info("Default Date extension email execute.");
+                this.sendDateExtensionEmail(claimTicketDTO);
+            }
+        }
+    }
+
+    /**
+     * Sends the default date extension email when no specific workflow is configured for the claim ticket.
+     *
+     * @param ticket the DTO of the claim ticket for which the date extension email is to be sent.
+     */
+    private void sendDateExtensionEmail(ClaimTicketDTO ticket) {
+
+        // Send email to the Customer
+        if (ticket.getFiAgentId() != null) {
+            User customer = userService.getUserById(ticket.getFiAgentId());
+            mailService.sendDateExtensionEmail(ticket, customer);
         }
     }
 }
