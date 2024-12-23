@@ -876,8 +876,6 @@ public class SepsAndFiClaimTicketService {
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "closedClaimTicket", ActionTypeEnum.CLAIM_TICKET_CLOSED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
-
-        this.sendClosedTicketEmail(savedTicket, claimTicketClosedRequest);
     }
 
     /**
@@ -1095,8 +1093,6 @@ public class SepsAndFiClaimTicketService {
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "rejectClaimTicket", ActionTypeEnum.CLAIM_TICKET_REJECTED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
             null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
-
-        this.sendRejectedTicketEmail(savedTicket, claimTicketRejectRequest);
     }
 
     /**
@@ -1687,42 +1683,52 @@ public class SepsAndFiClaimTicketService {
                 claimTicketDTO.getStatus());
 
             if (claimTicketWorkFlowDTO != null) {
-                for (TicketStatusAction statusAction : claimTicketWorkFlowDTO.getTicketStatusActions()) {
-                    Long agentId = statusAction.getAgentId();
-                    Long templateId = statusAction.getTemplateId();
-
-                    if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),statusAction.getAction().name()))
-                        continue;
-
-                    User user = null;
-                    switch (statusAction.getAction()) {
-                        case MAIL_TO_CUSTOMER:
-                            user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),statusAction.getAction().name());
-                            break;
-                        case MAIL_TO_FI_TEAM:
-                            user = findAgent(agentId, claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.FI_USER);
-                            break;
-                        case MAIL_TO_FI_AGENT:
-                            user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.FI_USER);
-                            break;
-                        case MAIL_TO_SEPS_TEAM:
-                            user = findAgent(agentId, claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.SEPS_USER);
-                            break;
-                        case MAIL_TO_SEPS_AGENT:
-                            user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.SEPS_USER);
-                            break;
-                        // Add other cases if needed
-                        default:
-                            // Handle unsupported actions or log them
-                            break;
-                    }
-                    mailService.workflowEmailSend(templateId, claimTicketDTO, user);
-                }
+                statusChangeActionLoop(claimTicketWorkFlowDTO, claimTicketDTO);
                 saveChangeStatusWorkFlowData(claimTicketId, claimTicketWorkFlowDTO);
             } else {
                 LOG.info("Default change status email execute.");
                 this.sendStatusChangeEmail(claimTicketDTO);
             }
+        }
+    }
+
+    /**
+     * Executes the actions defined in the workflow for a ticket status change.
+     *
+     * @param claimTicketWorkFlowDTO the workflow configuration for the ticket's status change.
+     * @param claimTicketDTO the DTO object representing the claim ticket.
+     */
+    private void statusChangeActionLoop(ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO, ClaimTicketDTO claimTicketDTO) {
+        for (TicketStatusAction statusAction : claimTicketWorkFlowDTO.getTicketStatusActions()) {
+            Long agentId = statusAction.getAgentId();
+            Long templateId = statusAction.getTemplateId();
+
+            if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),statusAction.getAction().name()))
+                continue;
+
+            User user = null;
+            switch (statusAction.getAction()) {
+                case MAIL_TO_CUSTOMER:
+                    user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),statusAction.getAction().name());
+                    break;
+                case MAIL_TO_FI_TEAM:
+                    user = findAgent(agentId, claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.FI_USER);
+                    break;
+                case MAIL_TO_FI_AGENT:
+                    user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.FI_USER);
+                    break;
+                case MAIL_TO_SEPS_TEAM:
+                    user = findAgent(agentId, claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                    break;
+                case MAIL_TO_SEPS_AGENT:
+                    user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, statusAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                    break;
+                // Add other cases if needed
+                default:
+                    // Handle unsupported actions or log them
+                    break;
+            }
+            mailService.workflowEmailSend(templateId, claimTicketDTO, user);
         }
     }
 
@@ -1812,4 +1818,59 @@ public class SepsAndFiClaimTicketService {
             mailService.sendDateExtensionEmail(ticket, customer);
         }
     }
+
+    /**
+     * Triggers the workflow for closing a claim ticket. This method identifies the workflow associated with
+     * the closed status of the ticket and performs the required actions. If no workflow is defined, it executes
+     * the default email notification.
+     *
+     * @param claimTicketId the ID of the claim ticket to close.
+     * @param claimTicketClosedRequest the request object containing additional details for closing the ticket.
+     */
+    @Async
+    @Transactional
+    public void triggerCloseClaimTicketWorkflow(Long claimTicketId, ClaimTicketClosedRequest claimTicketClosedRequest){
+        ClaimTicket claimTicket = claimTicketRepository.findById(claimTicketId).orElse(null);
+        if(claimTicket!=null) {
+            ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+            ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowService.findTicketStatusWorkFlow(claimTicketDTO.getOrganizationId(), claimTicketDTO.getInstanceType(),
+                claimTicketDTO.getStatus(), claimTicketDTO.getClosedStatus());
+
+            if (claimTicketWorkFlowDTO != null) {
+                statusChangeActionLoop(claimTicketWorkFlowDTO, claimTicketDTO);
+                saveChangeStatusWorkFlowData(claimTicketId, claimTicketWorkFlowDTO);
+            } else {
+                LOG.info("Default change Closed status email execute.");
+                this.sendClosedTicketEmail(claimTicket, claimTicketClosedRequest);
+            }
+        }
+    }
+
+    /**
+     * Triggers the workflow for rejecting a claim ticket. This method identifies the workflow associated with
+     * the rejected status of the ticket and performs the required actions. If no workflow is defined, it executes
+     * the default email notification.
+     *
+     * @param claimTicketId the ID of the claim ticket to reject.
+     * @param claimTicketRejectRequest the request object containing additional details for rejecting the ticket.
+     */
+    @Async
+    @Transactional
+    public void triggerRejectClaimTicketWorkflow(Long claimTicketId, ClaimTicketRejectRequest claimTicketRejectRequest){
+        ClaimTicket claimTicket = claimTicketRepository.findById(claimTicketId).orElse(null);
+        if(claimTicket!=null) {
+            ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+            ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowService.findTicketStatusWorkFlow(claimTicketDTO.getOrganizationId(), claimTicketDTO.getInstanceType(),
+                claimTicketDTO.getStatus(), claimTicketDTO.getRejectedStatus());
+
+            if (claimTicketWorkFlowDTO != null) {
+                statusChangeActionLoop(claimTicketWorkFlowDTO, claimTicketDTO);
+                saveChangeStatusWorkFlowData(claimTicketId, claimTicketWorkFlowDTO);
+            } else {
+                LOG.info("Default change Rejected status email execute.");
+                this.sendRejectedTicketEmail(claimTicket, claimTicketRejectRequest);
+            }
+        }
+    }
+
 }

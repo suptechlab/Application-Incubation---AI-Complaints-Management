@@ -195,6 +195,7 @@ public class SepsAndFiClaimTicketResource {
         RequestInfo requestInfo = new RequestInfo(request);
         // Delegate to service
         sepsAndFiClaimTicketService.closedClaimTicket(ticketId, claimTicketClosedRequest, requestInfo);
+        sepsAndFiClaimTicketService.triggerCloseClaimTicketWorkflow(ticketId, claimTicketClosedRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.closed.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -224,6 +225,7 @@ public class SepsAndFiClaimTicketResource {
     ) {
         RequestInfo requestInfo = new RequestInfo(request);
         sepsAndFiClaimTicketService.rejectClaimTicket(ticketId, claimTicketRejectRequest, requestInfo);
+        sepsAndFiClaimTicketService.triggerRejectClaimTicketWorkflow(ticketId, claimTicketRejectRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.rejected.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
