@@ -522,4 +522,58 @@ public class ClaimTicketWorkFlowService {
                 .map(claimTicketWorkFlowMapper::mapEntityToDTO)
                 .toList();
     }
+
+    public ClaimTicketWorkFlowDTO findTicketStatusWorkFlow(Long organizationId, InstanceTypeEnum instanceType, ClaimTicketStatusEnum status, ClosedStatusEnum closedStatus) {
+        // Retrieve workflows
+        List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
+            findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.TICKET_STATUS, true)
+            .stream()
+            .toList();
+
+        // If the list is not empty, process each workflow
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
+                // Map the entity to a DTO
+                ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+                List<TicketStatusCondition> statusConditionList = claimTicketWorkFlowDTO.getTicketStatusConditions();
+                // Check each condition for a match
+                for (TicketStatusCondition statusCondition : statusConditionList) {
+                    if (status.equals(statusCondition.getStatus()) &&
+                        statusCondition.getClosedStatus().equals(closedStatus)) {
+                        // Return the DTO if a match is found
+                        return claimTicketWorkFlowDTO;
+                    }
+                }
+            }
+        }
+        // Return null if no match is found
+        return null;
+    }
+
+    public ClaimTicketWorkFlowDTO findTicketStatusWorkFlow(Long organizationId, InstanceTypeEnum instanceType, ClaimTicketStatusEnum status, RejectedStatusEnum rejectedStatus) {
+        // Retrieve workflows
+        List<ClaimTicketWorkFlow> claimTicketWorkFlowList = claimTicketWorkFlowRepository.
+            findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.TICKET_STATUS, true)
+            .stream()
+            .toList();
+
+        // If the list is not empty, process each workflow
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
+                // Map the entity to a DTO
+                ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkFlow);
+                List<TicketStatusCondition> statusConditionList = claimTicketWorkFlowDTO.getTicketStatusConditions();
+                // Check each condition for a match
+                for (TicketStatusCondition statusCondition : statusConditionList) {
+                    if (status.equals(statusCondition.getStatus()) &&
+                        statusCondition.getRejectedStatus().equals(rejectedStatus)) {
+                        // Return the DTO if a match is found
+                        return claimTicketWorkFlowDTO;
+                    }
+                }
+            }
+        }
+        // Return null if no match is found
+        return null;
+    }
 }
