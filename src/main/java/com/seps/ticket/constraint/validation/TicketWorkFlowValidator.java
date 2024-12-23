@@ -4,6 +4,7 @@ import com.seps.ticket.domain.Authority;
 import com.seps.ticket.domain.Team;
 import com.seps.ticket.domain.TemplateMaster;
 import com.seps.ticket.domain.User;
+import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.enums.InstanceTypeEnum;
 import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.TeamService;
@@ -241,6 +242,20 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
         // Validate ticketStatusConditions
         if (dto.getTicketStatusConditions() == null || dto.getTicketStatusConditions().isEmpty()) {
             isValid = addValidationMessage("ticketStatusConditions", NOT_EMPTY, context) && isValid;
+        } else {
+            // Validate each TicketStatusCondition
+            for (int i = 0; i < dto.getTicketStatusConditions().size(); i++) {
+                TicketStatusCondition condition = dto.getTicketStatusConditions().get(i);
+                String conditionPath = String.format(ACTION_FORMAT, "ticketStatusConditions", i);
+                // Check if status is CLOSED, then closedStatus is required
+                if (condition.getStatus() == ClaimTicketStatusEnum.CLOSED && condition.getClosedStatus() == null) {
+                    isValid = addValidationMessage(conditionPath + ".closedStatus", NOT_NULL, context) && isValid;
+                }
+                // Check if status is REJECTED, then rejectedStatus is required
+                if (condition.getStatus() == ClaimTicketStatusEnum.REJECTED && condition.getRejectedStatus() == null) {
+                    isValid = addValidationMessage(conditionPath + ".rejectedStatus", NOT_NULL, context) && isValid;
+                }
+            }
         }
         // Validate ticketStatusActions
         if (dto.getTicketStatusActions() == null || dto.getTicketStatusActions().isEmpty()) {
