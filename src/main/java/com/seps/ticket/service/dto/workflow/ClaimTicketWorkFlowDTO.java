@@ -24,7 +24,6 @@ public class ClaimTicketWorkFlowDTO {
 
     private Long id;
 
-    @NotNull
     private Long organizationId;
 
     private OrganizationDTO organization;

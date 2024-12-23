@@ -215,7 +215,7 @@ public class MailService {
     }
 
     public void sendDynamicContentEmail(MailDTO mailDTO) {
-        TemplateMaster template = mailDTO.getIsStatic() ? templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
+        TemplateMaster template = mailDTO.getIsStatic() ? templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatusAndIsGeneralTrue(mailDTO.getTemplateKey(), true)
             .orElse(null) : templateMasterRepository.findByIdAndStatus(mailDTO.getTemplateId(), true)
             .orElse(null);
 
@@ -609,5 +609,40 @@ public class MailService {
                 sendDynamicContentEmail(mailDTO);
             }
         }
+    }
+
+    @Async
+    public void workflowEmailSend(Long templateId, ClaimTicketDTO claimTicketDTO, User user){
+        if (user != null && templateId != null) {
+            MailDTO mailDTO = new MailDTO();
+            mailDTO.setTemplateId(templateId);
+            mailDTO.setTo(user.getEmail());
+            mailDTO.setLocale(user.getLangKey());
+            mailDTO.setIsStatic(false);
+            mailDTO.setDataVariables(templateVariableMappingService.mapVariables(claimTicketDTO, user));
+            sendDynamicContentEmail(mailDTO);
+        }else{
+            LOG.info("User ({}) or template Id ({}) not found", user, templateId);
+        }
+    }
+
+    public void sendStatusChangeEmail(ClaimTicketDTO ticket, User customer) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("TICKET_STATUS_CHANGE_MAIL_TO_CUSTOMER");
+        mailDTO.setTo(customer.getEmail());
+        mailDTO.setLocale(customer.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, customer));
+        sendDynamicContentEmail(mailDTO);
+    }
+
+    public void sendDateExtensionEmail(ClaimTicketDTO ticket, User agent) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("SLA_DATE_EXTENSION_MAIL_TO_AGENT");
+        mailDTO.setTo(agent.getEmail());
+        mailDTO.setLocale(agent.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, agent));
+        sendDynamicContentEmail(mailDTO);
     }
 }

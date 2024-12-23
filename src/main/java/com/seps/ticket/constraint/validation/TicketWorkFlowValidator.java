@@ -1,9 +1,12 @@
 package com.seps.ticket.constraint.validation;
 
+import com.seps.ticket.domain.Authority;
 import com.seps.ticket.domain.Team;
 import com.seps.ticket.domain.TemplateMaster;
 import com.seps.ticket.domain.User;
+import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.TeamService;
 import com.seps.ticket.service.TemplateMasterService;
 import com.seps.ticket.service.UserService;
@@ -14,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.util.List;
 
 public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFlowCondition, ClaimTicketWorkFlowDTO> {
 
@@ -57,8 +62,36 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
 
     @Override
     public boolean isValid(ClaimTicketWorkFlowDTO dto, ConstraintValidatorContext context) {
-        LOG.debug("dto:{}", dto);
         boolean isValid = true;
+
+        User currentUser = userService.getCurrentUser();
+        List<String> authorities = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        if (dto.getInstanceType() != null && dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+            if (dto.getOrganizationId() == null) {
+                isValid = addValidationMessage("organizationId", NOT_NULL, context) && isValid;
+            }
+        }
+
+        if (authorities.contains(AuthoritiesConstants.FI)) {
+            if (dto.getInstanceType() != null && !(dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE))) {
+                isValid = addValidationMessage("instanceType", "workflow.invalid.instance.type.fi", context) && isValid;
+            }
+            if (dto.getOrganizationId() == null) {
+                isValid = addValidationMessage("organizationId", NOT_NULL, context) && isValid;
+            } else {
+                if (dto.getOrganizationId() != currentUser.getOrganizationId()) {
+                    isValid = addValidationMessage("organizationId", NOT_FOUND, context) && isValid;
+                }
+            }
+        }
+
+        if (!isValid) {
+            return false;
+        }
+
         switch (dto.getEvent()) {
             case CREATED:
                 isValid = validateCreateEvent(dto, context);
@@ -125,7 +158,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
                         } else {
-                            if (dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                            if (dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE) && dto.getOrganizationId() != null) {
                                 user = userService.findActiveFIUser(action.getAgentId(), dto.getOrganizationId());
                             } else {
                                 user = userService.findActiveSEPSUser(action.getAgentId());
@@ -140,7 +173,7 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
                         if (action.getAgentId() == null) {
                             isValid = addValidationMessage(actionPath + AGENT_ID, NOT_NULL, context) && isValid;
                         } else {
-                            if (dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                            if (dto.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE) && dto.getOrganizationId() != null) {
                                 user = userService.findActiveFIUser(action.getAgentId(), dto.getOrganizationId());
                             } else {
                                 user = userService.findActiveSEPSUser(action.getAgentId());
@@ -209,6 +242,20 @@ public class TicketWorkFlowValidator implements ConstraintValidator<TicketWorkFl
         // Validate ticketStatusConditions
         if (dto.getTicketStatusConditions() == null || dto.getTicketStatusConditions().isEmpty()) {
             isValid = addValidationMessage("ticketStatusConditions", NOT_EMPTY, context) && isValid;
+        } else {
+            // Validate each TicketStatusCondition
+            for (int i = 0; i < dto.getTicketStatusConditions().size(); i++) {
+                TicketStatusCondition condition = dto.getTicketStatusConditions().get(i);
+                String conditionPath = String.format(ACTION_FORMAT, "ticketStatusConditions", i);
+                // Check if status is CLOSED, then closedStatus is required
+                if (condition.getStatus() == ClaimTicketStatusEnum.CLOSED && condition.getClosedStatus() == null) {
+                    isValid = addValidationMessage(conditionPath + ".closedStatus", NOT_NULL, context) && isValid;
+                }
+                // Check if status is REJECTED, then rejectedStatus is required
+                if (condition.getStatus() == ClaimTicketStatusEnum.REJECTED && condition.getRejectedStatus() == null) {
+                    isValid = addValidationMessage(conditionPath + ".rejectedStatus", NOT_NULL, context) && isValid;
+                }
+            }
         }
         // Validate ticketStatusActions
         if (dto.getTicketStatusActions() == null || dto.getTicketStatusActions().isEmpty()) {

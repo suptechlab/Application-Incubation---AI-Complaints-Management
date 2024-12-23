@@ -2,6 +2,7 @@ package com.seps.ticket.web.rest.v1;
 
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
+import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
 import com.seps.ticket.service.dto.*;
@@ -122,6 +123,7 @@ public class SepsAndFiClaimTicketResource {
     ) {
         RequestInfo requestInfo = new RequestInfo(request);
         sepsAndFiClaimTicketService.updatePriority(ticketId, priority, requestInfo);
+        sepsAndFiClaimTicketService.triggerPriorityWorkflow(ticketId);
         return ResponseEntity.ok().build();
     }
 
@@ -146,6 +148,7 @@ public class SepsAndFiClaimTicketResource {
             LocalDate newSlaDate = LocalDate.parse(slaDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             RequestInfo requestInfo = new RequestInfo(request);
             sepsAndFiClaimTicketService.extendSlaDate(ticketId, newSlaDate, reason, requestInfo);
+            sepsAndFiClaimTicketService.triggerDateExtensionWorkflow(ticketId);
             ResponseStatus responseStatus = new ResponseStatus(
                 messageSource.getMessage("claim.ticket.sla.extended.successfully", null, LocaleContextHolder.getLocale()),
                 HttpStatus.OK.value(),
@@ -319,5 +322,30 @@ public class SepsAndFiClaimTicketResource {
     @GetMapping("/{id}/test")
     public ResponseEntity<Map<String, String>> getSepsFiClaimTicketByIdTest(@PathVariable Long id) {
         return ResponseEntity.ok(sepsAndFiClaimTicketService.getSepsFiClaimTicketByIdTest(id));
+    }
+
+    @Operation(summary = "Update Claim Ticket Status", description = "Update the status of a specific claim ticket (IN_PROGRESS, PENDING)")
+    @ApiResponse(responseCode = "200", description = "Claim ticket status updated successfully")
+    @PatchMapping("/{ticketId}/change-status")
+    public ResponseEntity<ResponseStatus> changeClaimTicketStatus(
+        @PathVariable Long ticketId,
+        @RequestParam("status") ClaimTicketStatusEnum status,
+        HttpServletRequest request
+    ) {
+        // Validate that only IN_PROGRESS and PENDING are allowed
+        if (status != ClaimTicketStatusEnum.IN_PROGRESS && status != ClaimTicketStatusEnum.PENDING) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALLOW_ONLY_STATUS,
+                new String[]{ClaimTicketStatusEnum.IN_PROGRESS.name() + ", "+ ClaimTicketStatusEnum.PENDING.name()},
+                null);
+        }
+        RequestInfo requestInfo = new RequestInfo(request);
+        sepsAndFiClaimTicketService.updateTicketStatus(ticketId, status, requestInfo);
+        sepsAndFiClaimTicketService.triggerChangeStatusWorkflow(ticketId);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.status.changed.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
     }
 }

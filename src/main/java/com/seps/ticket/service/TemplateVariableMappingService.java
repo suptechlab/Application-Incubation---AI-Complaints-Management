@@ -2,13 +2,12 @@ package com.seps.ticket.service;
 
 import com.seps.ticket.component.DateUtil;
 import com.seps.ticket.component.EnumUtil;
-import com.seps.ticket.domain.ClaimTicketInstanceLog;
-import com.seps.ticket.domain.ClaimTicketPriorityLog;
-import com.seps.ticket.domain.ClaimTicketStatusLog;
-import com.seps.ticket.domain.User;
+import com.seps.ticket.domain.*;
+import com.seps.ticket.enums.ClaimTicketActivityEnum;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.repository.ClaimTicketActivityLogRepository;
 import com.seps.ticket.repository.ClaimTicketInstanceLogRepository;
 import com.seps.ticket.repository.ClaimTicketPriorityLogRepository;
 import com.seps.ticket.repository.ClaimTicketStatusLogRepository;
@@ -17,7 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tech.jhipster.config.JHipsterProperties;
 
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -29,17 +30,19 @@ public class TemplateVariableMappingService {
     private final ClaimTicketInstanceLogRepository instanceLogRepository;
     private final ClaimTicketPriorityLogRepository priorityLogRepository;
     private final ClaimTicketStatusLogRepository statusLogRepository;
+    private final ClaimTicketActivityLogRepository claimTicketActivityLogRepository;
 
     @Value("${website.user-base-url:test}")
     private String userBaseUrl;
 
 
-    public TemplateVariableMappingService(EnumUtil enumUtil, JHipsterProperties jHipsterProperties, ClaimTicketInstanceLogRepository instanceLogRepository, ClaimTicketPriorityLogRepository priorityLogRepository, ClaimTicketStatusLogRepository statusLogRepository) {
+    public TemplateVariableMappingService(EnumUtil enumUtil, JHipsterProperties jHipsterProperties, ClaimTicketInstanceLogRepository instanceLogRepository, ClaimTicketPriorityLogRepository priorityLogRepository, ClaimTicketStatusLogRepository statusLogRepository, ClaimTicketActivityLogRepository claimTicketActivityLogRepository) {
         this.enumUtil = enumUtil;
         this.jHipsterProperties = jHipsterProperties;
         this.instanceLogRepository = instanceLogRepository;
         this.priorityLogRepository = priorityLogRepository;
         this.statusLogRepository = statusLogRepository;
+        this.claimTicketActivityLogRepository = claimTicketActivityLogRepository;
     }
 
     public Map<String, String> mapVariables(ClaimTicketDTO claimTicketDTO, User sendToUser) {
@@ -75,6 +78,8 @@ public class TemplateVariableMappingService {
         variableMap.put("createdDate", DateUtil.formatDate(claimTicketDTO.getCreatedAt(), sendToUser.getLangKey()));
         variableMap.put("secondInstanceFiledDate", DateUtil.formatDate(claimTicketDTO.getSecondInstanceFiledAt(), sendToUser.getLangKey()));
         variableMap.put("complaintFiledDate", DateUtil.formatDate(claimTicketDTO.getComplaintFiledAt(), sendToUser.getLangKey()));
+        variableMap.put("resolveOnDate", DateUtil.formatDate(claimTicketDTO.getResolvedOn(), sendToUser.getLangKey()));
+        variableMap.put("slaBreachDate", DateUtil.formatDate(claimTicketDTO.getSlaBreachDate(), sendToUser.getLangKey()));
 
         // Agent names
         variableMap.put("fiAgentName", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getName() : "N/A");
@@ -82,7 +87,7 @@ public class TemplateVariableMappingService {
 
         // URLs
         variableMap.put("userTicketUrl", this.userBaseUrl + "/my-account/" + claimTicketDTO.getTicketId());
-        variableMap.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/ticket/view/" + claimTicketDTO.getId());
+        variableMap.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/tickets/view/" + claimTicketDTO.getId());
 
         // Audit details
         variableMap.put("createdBy", claimTicketDTO.getCreatedByUser() != null ? claimTicketDTO.getCreatedByUser().getName() : "System");
@@ -98,6 +103,35 @@ public class TemplateVariableMappingService {
         ClaimTicketPriorityEnum previousPriority = priorityLogRepository.findFirstByTicketIdOrderByCreatedAtDesc(claimTicketDTO.getId()).map(ClaimTicketPriorityLog::getPriority).orElse(null);
         variableMap.put("previousPriority", enumUtil.getLocalizedEnumValue(previousPriority, userLocale)); // Placeholder
 
+        ClaimTicketActivityLog previousExtensionDate = claimTicketActivityLogRepository
+                .findFirstByTicketIdAndActivityTypeOrderByPerformedAtDesc(
+                        claimTicketDTO.getId(),
+                        ClaimTicketActivityEnum.DATE_EXTENDED.name()
+                ).orElse(null);
+
+        if (previousExtensionDate != null) {
+            Map<String, Object> activityDetail = previousExtensionDate.getActivityDetails();
+
+            // Extract previousSlaDate
+            List<Integer> previousSlaDateList = (List<Integer>) activityDetail.get("previousSlaDate"); //NOSONAR
+            LocalDate previousSlaDate = LocalDate.of(
+                    previousSlaDateList.get(0), // Year
+                    previousSlaDateList.get(1), // Month
+                    previousSlaDateList.get(2)  // Day
+            );
+
+            // Extract text (reason)
+            String reason = (String) activityDetail.get("text");
+            variableMap.put(
+                    "previousSlaDate",
+                    DateUtil.formatDate(previousSlaDate, sendToUser.getLangKey())
+            ); // Placeholder
+            variableMap.put("reasonSlaDateExtension", reason); // Placeholder
+        } else {
+            // Handle the case when no previous extension date is found
+            variableMap.put("previousSlaDate", "N/A");
+            variableMap.put("reasonSlaDateExtension", "N/A");
+        }
 
         return variableMap;
     }

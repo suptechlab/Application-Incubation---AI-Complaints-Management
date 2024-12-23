@@ -1,0 +1,51 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at,is_general,organization_id,user_type,is_static
+CLAIM_TICKET_PRIORITY_CHANGE_CUSTOMER,Enviar correo electrónico al cliente cuando cambie la prioridad.,EMAIL,Se modificó la prioridad del ticket de reclamo #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>La prioridad de su ticket de reclamo #{{ticketNumber}} se ha actualizado a <strong>{{priority}}</strong>.</p>
+<ul>
+<li>
+<strong>Actualizado por:</strong>
+<span>{{updatedBy}}</span>
+</li>
+<li>
+<strong>Prioridad:</strong>
+<span>{{priority}}</span>
+</li>
+<li>
+<strong>Estado:</strong>
+<span>{{status}}</span>
+</li>
+</ul>
+<p>Puede ver los detalles de su ticket mediante el siguiente enlace:</p>
+<p><a href=""{{userTicketUrl}}"">Ver ticket</a></p>
+<p>Si tiene alguna pregunta, no dude en contactarnos.</p>","{{username}},{{ticketNumber}},{{priority}},{{updatedBy}},{{status}},{{userTicketUrl}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,2,False
+SLA_DATE_EXTENSION_MAIL_TO_AGENT,Notificación de extensión de fecha de SLA al agente,EMAIL,Notificación de extensión de fecha de SLA para reclamo de ID de ticket: #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Le escribimos para informarle que se ha extendido la fecha del SLA para reclamar el boleto {{ticketNumber}}.</p>
+<p>Detalles de la extensión del SLA:</p>
+<ul>
+  <li>
+    <strong>Fecha del SLA anterior: </strong>
+    <span>{{previousSlaDate}}</span>
+  </li>
+  <li>
+    <strong>Nueva fecha del SLA: </strong>
+    <span>{{slaBreachDate}}</span>
+  </li>
+</ul>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>Tome nota de la fecha de SLA actualizada y continúe monitoreando el progreso del ticket en consecuencia.</p>
+<p>Si tiene alguna pregunta o necesita más información, no dude en comunicarse con el equipo de administración.</p>
+<p>Thank you for your cooperation.</p>","{{username}},{{ticketNumber}},{{previousSlaDate}},{{slaBreachDate}},{{adminTicketUrl}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,1,True
+SLA_DATE_EXTENSION_MAIL_TO_CUSTOMER,Notificación de extensión de fecha de SLA al cliente,EMAIL,Actualización del ID de su ticket de reclamo: #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Esperamos que este correo electrónico te llegue bien. Queremos informarte que se ha actualizado la fecha del SLA (Acuerdo de nivel de servicio) para tu ticket de reclamo {{ticketNumber}}.</p>
+<p>Details of the SLA Update:</p>
+<ul>
+  <li>
+    <strong>Fecha del SLA anterior: </strong>
+    <span>{{previousSlaDate}}</span>
+  </li>
+  <li>
+    <strong>Nueva fecha del SLA: </strong>
+    <span>{{slaBreachDate}}</span>
+  </li>
+</ul>
+<p>Agradecemos su paciencia y comprensión mientras trabajamos diligentemente para resolver su ticket. Si tiene alguna pregunta o necesita más ayuda, no dude en comunicarse con nuestro equipo de soporte.</p>","{{username}},{{ticketNumber}},{{previousSlaDate}},{{slaBreachDate}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,2,True
