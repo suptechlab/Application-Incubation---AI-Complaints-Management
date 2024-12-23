@@ -33,11 +33,11 @@ const ticketWorkflowSchema = Yup.object({
             Yup.object().shape({
                 actionId: Yup.string().required(msg.actionRequired),
                 actionFilter1: Yup.string().required(msg.fieldRequired),
-                actionFilter2: Yup.string().when('actionId', {
-                    is: 'MAIL_TO_CUSTOMER',
-                    then: (schema) => schema.notRequired(), // Required only for "CREATED"
-                    otherwise: (schema) => schema.required(msg.fieldRequired), // Optional otherwise
-                }),
+                // actionFilter2: Yup.string().when('actionId', {
+                //     is: 'MAIL_TO_CUSTOMER',
+                //     then: (schema) => schema.notRequired(), // Required only for "CREATED"
+                //     otherwise: (schema) => schema.required(msg.fieldRequired), // Optional otherwise
+                // }),
             })
         )
         .min(1, msg.actionsRequired),

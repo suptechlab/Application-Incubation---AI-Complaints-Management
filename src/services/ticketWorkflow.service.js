@@ -48,8 +48,8 @@ export const getTeamMemberList = async (teamId) => {
 }
 
 //Get Team Members List
-export const getTemplateList = async () => {
-    return await adminApi.get(`/${API_VERSION}/templates/dropdown-list-for-workflow`);
+export const getTemplateList = async (type) => {
+    return await adminApi.get(`/${API_VERSION}/templates/dropdown-list-for-workflow?userType=${type}`);
 }
 
 //Get Team Members List

@@ -268,10 +268,13 @@ export const spanishLang = {
      "CONDITION_MESSAGE": "Se establecen condiciones que verifican escenarios específicos.",
      "ADD_MORE": "Añadir más",
      "ADD_OR_CONDITION": "Agregar condición O",
-     "ACTIONS": "Acciónes",
+     "ACTION": "Acción",
      "ACTION_MSG": "Las acciones le ayudan a automatizar los tickets.",
      "SAVE_WORKFLOW": "Guardar flujo de trabajo",
      "CREATE_NEW_TICKET_WORKFLOW": "Crear nuevo flujo de trabajo de tickets",
      "EDIT_TICKET_WORKFLOW": "Editar flujo de trabajo de tickets",
-     "OR": "O"
+     "OR": "O",
+     "SELECT TEAM" :"Seleccionar equipo",
+     "SELECT TEMPLATE" : "Seleccionar plantilla",
+     "TEMPLATES" :"Plantillas"
 }
