@@ -2,17 +2,34 @@ import { Navigate } from "react-router-dom";
 import { useContext } from "react";
 
 import { AuthenticationContext } from "../contexts/authentication.context";
+import NotAuthorized from "../pages/not-authorized";
 
-const PrivateRoute = ({ element }) => {
-    const { isAuthenticated } = useContext(AuthenticationContext);
+const PrivateRoute = ({ element, moduleName ="", route_permissions = [] }) => {
+    const { currentUser , isAuthenticated, permissions = {},isLoading=true } = useContext(AuthenticationContext);
 
+    // Check if the module exists in permissions and if it has any matching permission
+    const hasPermission = permissions[moduleName]?.some(permission =>
+        route_permissions.includes(permission)
+    );
 
-    // CHANGE CONDITION HERE TO if(isAuthenticated) FOR NOW I'VE BYPASS LOGIN
-    if (isAuthenticated) {
-        return element;
-    } else {
-        return <Navigate to='/login' replace />;
+    // Bypass permission check for SUPER_ADMIN
+    const isSuperAdmin = currentUser === "SUPER_ADMIN";
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
     }
+
+    if (!isSuperAdmin && !hasPermission && !isLoading) {
+        return <NotAuthorized />;
+    }
+
+    return element;
+
+    // if (isAuthenticated) {
+    //     return element;
+    // } else {
+    //     return <Navigate to='/login' replace />;
+    // }
 };
 
 export default PrivateRoute;

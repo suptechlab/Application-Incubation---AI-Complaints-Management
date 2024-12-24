@@ -217,7 +217,7 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
                           type="button"
                           key={index + 1}
                           onClick={() => handleAttachmentDownload(actionItem)}
-                          className='btn fw-semibold text-decoration-none link-primary'
+                          className='btn fw-semibold text-decoration-none link-primary m-0 p-0'
                         >
                           <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
                         </button>

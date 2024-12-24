@@ -65,6 +65,11 @@ export const ticketReplyToCustomer = async (ticketId, data) => {
 export const ticketReplyInternal = async (ticketId, data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-internal`,data);
 }
+
+//TICKET INTERNAL NOTE API
+export const internalNoteApi = async (ticketId, data) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/add-internal-note`,data);
+}
 //TICKET ATTACHMENT DOWNLOAD API
 export const downloadTicketsAttachment = async (attachmentId) => {
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/download/${attachmentId}`,{ responseType: 'arraybuffer' });
