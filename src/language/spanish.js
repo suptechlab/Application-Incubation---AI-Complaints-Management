@@ -280,5 +280,6 @@ export const spanishLang = {
     "SEPS": "SEPS",
     "CUSTOMER": "Cliente",
     "TEMPLATES":"Plantillas",
-    "ALL TEMPLATES" : "Todas las plantillas"
+    "ALL TEMPLATES" : "Todas las plantillas",
+    "TEMPLATE_INFO_MESSAGE": "Puedes copiar plantillas generales desde aquí"
 }

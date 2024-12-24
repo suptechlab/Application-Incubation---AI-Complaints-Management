@@ -296,5 +296,6 @@ export const englishLang = {
     "SEPS":"SEPS",
     "CUSTOMER":"Customer",
     "TEMPLATES":"Templates",
-    "ALL TEMPLATES":"All Templates"
+    "ALL TEMPLATES":"All Templates",
+    "TEMPLATE_INFO_MESSAGE": "You can copy general templates from here"
 }
