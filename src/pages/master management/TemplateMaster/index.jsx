@@ -179,17 +179,18 @@ const TemplateMaster = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
-            permission.current.statusModule ?
-              <Toggle
-                id={`status-${info?.row?.original?.id}`}
-                key={"status"}
-                // label="Status"
-                name="status"
-                value={info?.row?.original?.status}
-                checked={info?.row?.original?.status}
-                onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-                tooltip="Active"
-              /> : ''
+            // permission.current.statusModule ?
+            <Toggle
+              id={`status-${info?.row?.original?.id}`}
+              key={"status"}
+              // label="Status"
+              name="status"
+              value={info?.row?.original?.status}
+              checked={info?.row?.original?.status}
+              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+              tooltip="Active"
+            />
+            //  : ''
           )
         },
         id: "status",
@@ -200,21 +201,22 @@ const TemplateMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ?
-            <DataGridActions
-              controlId="role-rights"
-              rowData={rowData}
-              customButtons={[
-                {
-                  name: "edit",
-                  enabled: permission.current.editModule,
-                  type: "button",
-                  title: "Edit",
-                  icon: <MdEdit size={18} />,
-                  handler: () => editTemplateMaster(rowData?.row?.original),
-                },
-              ]}
-            /> : ''
+          // permission.current.editModule ?
+          <DataGridActions
+            controlId="role-rights"
+            rowData={rowData}
+            customButtons={[
+              {
+                name: "edit",
+                enabled: true,
+                type: "button",
+                title: "Edit",
+                icon: <MdEdit size={18} />,
+                handler: () => editTemplateMaster(rowData?.row?.original),
+              },
+            ]}
+          />
+          // : ''
         ),
         header: () => (
           <div className="text-center">{t("ACTIONS")}</div>
@@ -283,7 +285,7 @@ const TemplateMaster = () => {
           title={t("TEMPLATE MASTER")}
           actions={[
             { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-            { label: t("ADD NEW"), to: "/template-master/add", variant: "warning" ,disabled:true },
+            { label: t("ADD NEW"), to: "/template-master/add", variant: "warning", disabled: false },
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
