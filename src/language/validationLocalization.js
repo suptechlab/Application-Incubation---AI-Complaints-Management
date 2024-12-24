@@ -174,6 +174,7 @@ export const messages = {
     actionRequired: "Se requiere acción.",
     instanceTypeRequired: "Se requiere el tipo de instancia.",
     eventRequired: "Se requiere evento.",
-    fieldRequired: "Este campo es obligatorio."
+    fieldRequired: "Este campo es obligatorio.",
+    userTypeRequired: "El tipo de usuario es obligatorio."
   }
 };
