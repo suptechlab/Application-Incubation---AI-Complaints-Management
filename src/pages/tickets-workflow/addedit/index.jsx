@@ -39,6 +39,7 @@ export default function TicketWorkFlowAddEdit() {
     const [actionsArr, setActionsArr] = useState([]);
     const [actionCategory1Arr, setActionCategory1Arr] = useState({});
     const [actionCategory2Arr, setActionCategory2Arr] = useState({});
+    const [actionCategory3Arr, setActionCategory3Arr] = useState({});
     const { currentUser, userData } = useContext(AuthenticationContext);
     const [conditionLabel, setConditionLabel] = useState('')
     const [actionFilter2Label, setActionFilter2Label] = useState('')
@@ -85,10 +86,10 @@ export default function TicketWorkFlowAddEdit() {
         }
     }
 
-    const getTeamLists = async (orgId,index) => {
+    const getTeamLists = async (orgId, index) => {
         setLoading(true);
         try {
-            const response = orgId
+            const response = (orgId && orgId !==null)
                 ? await getTeamList(orgId)
                 : await getTeamList();
 
@@ -112,7 +113,7 @@ export default function TicketWorkFlowAddEdit() {
         }
     };
 
-    const getTeamMemberLists = async (teamId,index) => {
+    const getTeamMemberLists = async (teamId, index) => {
         setLoading(true);
         try {
             const response = await getTeamMemberList(teamId);
@@ -256,7 +257,7 @@ export default function TicketWorkFlowAddEdit() {
         }
     }, [masterData, currentUser]);
 
-    const updateActionCategory1Filter = async (selectedActionCat1, index) => {
+    const updateActionCategory1Filter = async (selectedActionCat1, index, instanceType) => {
         switch (selectedActionCat1) {
             case 'MAIL_TO_CUSTOMER':
                 getTemplateLists('CUSTOMER', index);
@@ -274,63 +275,45 @@ export default function TicketWorkFlowAddEdit() {
                     return getAgentLists(null, index);
                 }
             case 'ASSIGN_TO_TEAM':
-                if (selectedOrg) {
-                    return await getTeamLists(selectedOrg,index);
+                if (instanceType === "FIRST_INSTANCE" && selectedOrg) {
+                    return await getTeamLists(selectedOrg, index);
                 } else {
                     return getTeamLists(null, index);
                 }
+            case 'MAIL_TO_SEPS_TEAM':
+                console.log("ARE YOU HRER")
+                getTeamLists(null, index);
+                break;
+            case 'MAIL_TO_FI_TEAM':
+                if (selectedOrg) {
+                    return await getTeamLists(selectedOrg, index);
+                } else {
+                    toast.error("Please select organization id.")
+                    // return getTeamLists(null, index);
+                }
+                break;
             default:
                 // setActionCategory1Arr([]);
                 break;
-
-
-            // case 'ASSIGN_TO_TEAM':
-            // if (selectedOrg) {
-            //     return await getTeamLists(selectedOrg);
-            // } else {
-            //     return getTeamLists();
-            // }
-            // case 'ASSIGN_TO_AGENT':
-            // if (selectedOrg) {
-            //     return await getAgentLists(selectedOrg);
-            // } else {
-            //     return getAgentLists();
-            // }
-            // case 'MAIL_TO_CUSTOMER':
-            //     return getTemplateLists('actionFilter1');
-            // case 'MAIL_TO_FI_TEAM':
-            // case 'MAIL_TO_FI_AGENT':
-            //     if (selectedOrg) {
-            //         return await getAgentLists(selectedOrg);
-            //     } else {
-            //         return getAgentLists();
-            //     }
-            //     break;
-            // case 'MAIL_TO_SEPS_TEAM':
-            // case 'MAIL_TO_SEPS_AGENT':
-            //     if (selectedOrg) {
-            //         return await getAgentLists(selectedOrg);
-            //     } else {
-            //         return getAgentLists();
-            //     }
-            //     break;
-            //     return setActionCategory1Arr([]);
         }
     };
 
-    const updateActionCategory2Filter = async (selectedAction, selectedValue,index) => {
-        console.log({selectedAction})
+    const updateActionCategory2Filter = async (selectedAction, selectedValue, index) => {
+       
         switch (selectedAction) {
             case 'ASSIGN_TO_TEAM':
+            case 'MAIL_TO_FI_TEAM':
+            case 'MAIL_TO_SEPS_TEAM':
                 if (selectedValue) {
-                    return getTeamMemberLists(selectedValue,index);
+                    return getTeamMemberLists(selectedValue, index);
                 }
                 break;
-            default :
-                break;
             // case 'ASSIGN_TO_AGENT':
-            //     return await getTemplateLists('actionFilter2');
+            //     return await getTemplateLists(selectedValue, index);
             //     break;
+            // default:
+            //     break;
+
             // case 'MAIL_TO_FI_TEAM':
             // case 'MAIL_TO_FI_AGENT':
             //     return getTemplateLists('actionFilter2');
@@ -343,6 +326,14 @@ export default function TicketWorkFlowAddEdit() {
         }
     };
 
+
+    const updateActionCategory3Filter = (selectedAction, selectedValue, index)=>{
+        if(selectedAction==='MAIL_TO_SEPS_TEAM'){
+            getTemplateLists('SEPS', index); 
+        }else if (selectedAction==='MAIL_TO_FI_TEAM'){
+            getTemplateLists('FI', index);    
+        }
+    }
     const getEventActionsConditions = async (event) => {
         switch (event) {
             case 'CREATED':
@@ -402,8 +393,8 @@ export default function TicketWorkFlowAddEdit() {
                 conditionFields: { conditionId: "claimTypeId", conditionCatId: "claimSubTypeId" },
                 actionFields: {
                     ASSIGN_TO_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId" },
-                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
-                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", templateId: "templateId" },
+                    MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
+                    MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
                     ASSIGN_TO_AGENT: { actionId: "action", actionFilter1: "agentId" },
                     MAIL_TO_SEPS_AGENT: { actionId: "action", actionFilter1: "templateId" },
                     MAIL_TO_FI_AGENT: { actionId: "action", actionFilter1: "templateId" },
@@ -607,7 +598,7 @@ export default function TicketWorkFlowAddEdit() {
                 formikProps.setFieldValue(`actions[${index}].actionId`, value);
 
                 // Reset and update action categories
-                updateActionCategory1Filter(value, index);
+                updateActionCategory1Filter(value, index, formikProps?.values?.instanceTypeId);
 
                 return updatedSelectedActions;
             });
@@ -618,7 +609,7 @@ export default function TicketWorkFlowAddEdit() {
 
             // For other values, directly update Formik and action categories
             formikProps.setFieldValue(`actions[${index}].actionId`, value);
-            updateActionCategory1Filter(value, index);
+            updateActionCategory1Filter(value, index, formikProps?.values?.instanceTypeId);
         }
 
         // Update the disabled state of options
@@ -727,7 +718,7 @@ export default function TicketWorkFlowAddEdit() {
                 getEventActionsConditions(newEventId);
                 getConditionLabel(newEventId);
             }
-            if(responseValues?.organizationId){
+            if (responseValues?.organizationId) {
                 setSelectedOrg(responseValues?.organizationId)
             }
             let actions = [
@@ -740,7 +731,7 @@ export default function TicketWorkFlowAddEdit() {
 
             const prevConditions = await initializeConditions(responseValues)
             setInitialValues({
-                entityId: responseValues.organizationId??  "",
+                entityId: responseValues.organizationId ?? "",
                 instanceTypeId: responseValues.instanceType ?? "",
                 eventId: responseValues.event ?? "",
                 workflowName: responseValues.title ?? "",
@@ -1118,7 +1109,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                 </Col>
                                                             }
                                                             {
-                                                                formikProps.values.actions[index].actionId === 'ASSIGN_TO_TEAM' &&
+                                                                (formikProps.values.actions[index].actionId === 'ASSIGN_TO_TEAM' || formikProps.values.actions[index].actionId === 'MAIL_TO_SEPS_TEAM' || formikProps.values.actions[index].actionId === 'MAIL_TO_FI_TEAM') &&
                                                                 <Col sm={6} lg={4}>
                                                                     <ReactSelect
                                                                         wrapperClassName={'mb-3'}
@@ -1132,7 +1123,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                                 `actions[${index}].actionFilter1`,
                                                                                 option?.target?.value
                                                                             );
-                                                                            updateActionCategory2Filter(formikProps.values.actions[index].actionId, option?.target?.value,index)
+                                                                            updateActionCategory2Filter(formikProps.values.actions[index].actionId, option?.target?.value, index)
                                                                         }}
                                                                         value={formikProps.values.actions[index].actionFilter1}
                                                                         error={formikProps.errors?.actions?.[index]?.actionFilter1}
@@ -1141,7 +1132,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                 </Col>
                                                             }
                                                             {
-                                                                formikProps.values.actions[index].actionId === 'ASSIGN_TO_TEAM' &&
+                                                                (formikProps.values.actions[index].actionId === 'ASSIGN_TO_TEAM' || formikProps.values.actions[index].actionId === 'MAIL_TO_SEPS_TEAM' || formikProps.values.actions[index].actionId === 'MAIL_TO_FI_TEAM') &&
                                                                 <Col sm={6} lg={4}>
                                                                     <ReactSelect
                                                                         wrapperClassName={'mb-3'}
@@ -1155,11 +1146,34 @@ export default function TicketWorkFlowAddEdit() {
                                                                                 `actions[${index}].actionFilter2`,
                                                                                 option?.target?.value
                                                                             );
-                                                                            // updateActionCategory2Filter(formikProps.values.actions[index].actionId, option?.target?.value,index)
+                                                                            // updateActionCategory3Filter(formikProps.values.actions[index].actionId, option?.target?.value,index)
                                                                         }}
                                                                         value={formikProps.values.actions[index].actionFilter2}
                                                                         error={formikProps.errors?.actions?.[index]?.actionFilter2}
                                                                         touched={formikProps.touched?.actions?.[index]?.actionFilter2}
+                                                                    />
+                                                                </Col>
+                                                            }
+                                                            {
+                                                                (formikProps.values.actions[index].actionId === 'MAIL_TO_SEPS_TEAM' || formikProps.values.actions[index].actionId === 'MAIL_TO_FI_TEAM') &&
+                                                                <Col sm={6} lg={4}>
+                                                                    <ReactSelect
+                                                                        wrapperClassName={'mb-3'}
+                                                                        placeholder={t('SELECT TEMPLATE')}
+                                                                        name={`actions[${index}].actionFilter3`}
+                                                                        options={actionCategory3Arr[index] ?? []}
+                                                                        onBlur={formikProps.handleBlur}
+                                                                        label={t("TEMPLATES")}
+                                                                        onChange={(option) => {
+                                                                            formikProps.setFieldValue(
+                                                                                `actions[${index}].actionFilter3`,
+                                                                                option?.target?.value
+                                                                            );
+                                                                            // updateActionCategory2Filter(formikProps.values.actions[index].actionId, option?.target?.value,index)
+                                                                        }}
+                                                                        value={formikProps.values.actions[index]?.actionFilter3}
+                                                                        error={formikProps.errors?.actions?.[index]?.actionFilter3}
+                                                                        touched={formikProps.touched?.actions?.[index]?.actionFilter3}
                                                                     />
                                                                 </Col>
                                                             }

@@ -36,7 +36,7 @@ export const handleGetWorkflowById = async (id) => {
 //Get Team list by Org id
 export const getTeamList = async (orgId) => {
     let url = `/${API_VERSION}/teams/dropdown-list-for-workflow`;
-    if (orgId.length !== 0) {
+    if (orgId && orgId?.length !== 0) {
         url += `?organizationId=${orgId}`;
     }
     return await adminApi.get(url);
