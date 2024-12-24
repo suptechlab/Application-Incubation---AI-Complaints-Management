@@ -8,21 +8,23 @@ import {
   Navbar,
   Offcanvas,
 } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
+import { MdAccountBox, MdAccountCircle, MdKey, MdLogout } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import Logo from "../../../assets/images/logo.svg";
-import "./header.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { setLogout, verifyLoginOTP } from "../../../redux/slice/authSlice";
-import { useTranslation } from "react-i18next";
-import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
+import FileClaimMainModal from "../../../pages/auth";
 import ProfileModal from "../../../pages/profile";
-import OnlyLoginModal from "../../../pages/auth/user-direct-login";
-import { MdAccountBox, MdAccountCircle, MdKey, MdLogout } from "react-icons/md";
+import { setLogout } from "../../../redux/slice/authSlice";
+import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
+import "./header.scss";
 
 const Header = ({ layout }) => {
   const [profileModalShow, setProfileModalShow] = useState(false);
-  const [loginModalShow, setLoginModalShow] = useState(false);
+  const [fileClaimMainModalShow, setFileClaimMainModalShow] = useState(false);
+  const [isFileClaimModalShow, setIsFileClaimModalShow] = useState(false);
+
 
   const { isLoggedIn, user } = useSelector((state) => state?.authSlice)
 
@@ -57,28 +59,15 @@ const Header = ({ layout }) => {
   }
 
   const handleLoginClick = () => {
-    setLoginModalShow(true);
-  }
-
-  const handleSuccessButtonClick = async (values, actions) => {
-    // verifyLoginOTP
-    const result = await dispatch(verifyLoginOTP(values));
-    if (verifyLoginOTP.fulfilled.match(result)) {
-      navigate('/my-account');
-      handleCloseModal();
-      actions.setSubmitting(false)
+    if (isLoggedIn) {
+      setIsFileClaimModalShow(true)
     } else {
-      console.error('VERIFY OTP ERROR:', result.error.message);
-      actions.setSubmitting(false)
+      setFileClaimMainModalShow(true);
     }
   }
 
   const handleProfileClick = () => {
     setProfileModalShow(true)
-  }
-
-  const handleCloseModal = () => {
-    setLoginModalShow(false);
   }
 
   return (
@@ -189,11 +178,11 @@ const Header = ({ layout }) => {
       />
 
       {/* Login Modal */}
-      <OnlyLoginModal
-        handleShow={loginModalShow}
-        handleClose={handleCloseModal}
-        handleLoginSucccesSubmit={handleSuccessButtonClick}
-        isFromDirectLogin={true}
+      <FileClaimMainModal
+        handleShow={fileClaimMainModalShow}
+        handleClose={() => setFileClaimMainModalShow(false)}
+        isFileClaimModalShow={isFileClaimModalShow}
+        setIsFileClaimModalShow={setIsFileClaimModalShow}
       />
     </header>
   );
