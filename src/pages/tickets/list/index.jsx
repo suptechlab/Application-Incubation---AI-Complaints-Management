@@ -454,7 +454,7 @@ export default function TicketsList() {
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
         return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns

@@ -60,6 +60,10 @@ export const englishLang = {
     "EXPORT TO CSV": "Export To CSV",
     "SUB-CLAIM": "Sub-claim",
     // Authentication
+    "CHANGE_PASSWORD": "Change Password",
+    "LOGOUT": "Logout",
+    "ADMINISTRATOR": "Administrator",
+    "VERIFY_OTP": "Verify Otp",
     "ONE TIME PASSWORD": "One Time Password",
     "WE VE SENT A ONE-TIME PASSWORD (OTP)": "We’ve sent a One-Time Password (OTP) to your email address. Please enter it below to verify.",
     "BACK": "Back",
@@ -202,7 +206,7 @@ export const englishLang = {
     "FINISH": "Finish",
     "ADD_NEW_CLAIM": "Add New Claim",
     "INFO_CARDS": "Information Cards",
-
+    "DAYS_REMAINING": "Days remaining",
     "TICKET_ID": "Ticket ID",
     "CREATION_DATE": "Creation Date",
     "CLAIM_FILED_BY": "Claim filed by",
@@ -269,4 +273,21 @@ export const englishLang = {
     "REASON":"Reason",
     "SUB-STATUS":'Sub-Status',
     "OF":'Of',
+    //Tickets Workflow
+    "TICKETS_WORKFLOW": "Ticket Workflow",
+    "WORKFLOW": "Workflow",
+    "WORKFLOW_NAME": "Workflow Name",
+    "EVENTS": "Events",
+    "EVENT_SELECTION": "Event Selection",
+    "SELECT_ACTION": "Select Action",
+    "CONDITIONS": "Conditions",
+    "CONDITION_MESSAGE": "Conditions are set of which check for specific scenarios.",
+    "ADD_MORE": "Add More",
+    "ADD_OR_CONDITION": "Add OR Condition",
+    "ACTIONS": "Actions",
+    "ACTION_MSG": "Actions help you automate tickets.",
+    "SAVE_WORKFLOW": "Save Workflow",
+    "CREATE_NEW_TICKET_WORKFLOW": "Create New Ticket Workflow",
+    "EDIT_TICKET_WORKFLOW": "Edit Ticket Workflow",
+    "OR": "OR"
 }

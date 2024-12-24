@@ -79,21 +79,65 @@ export default function UserList() {
     status: "",
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedRow, setSelectedRow] = useState();
   const [deleteShow, setDeleteShow] = useState(false);
   const [deleteId, setDeleteId] = useState();
 
+  // const dataQuery = useQuery({
+  //   queryKey: ["data", pagination, sorting, filter],
+  //   queryFn: async() => {
+  //     setLoading(true);
+  //     try {
+  //       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+  //       Object.keys(filterObj).forEach(
+  //         (key) => filterObj[key] === "" && delete filterObj[key]
+  //       );
+
+  //       let response;
+  //       if (sorting.length === 0) {
+  //         response = await handleGetUsers({
+  //           page: pagination.pageIndex,
+  //           size: pagination.pageSize,
+  //           ...filterObj,
+  //         });
+  //       } else {
+  //         response = await handleGetUsers({
+  //           page: pagination.pageIndex,
+  //           size: pagination.pageSize,
+  //           sort: sorting
+  //             .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+  //             .join(","),
+  //           ...filterObj,
+  //         });
+  //       }
+  //       return response;
+  //     } catch (error) {
+  //     } finally {
+  //       setLoading(false); // Start loading
+  //     }
+  //   },
+  //   // onError: () => setLoading(false), // Ensure loading state is reset on error
+  //   staleTime: 0, // Data is always stale, so it refetches
+  //   cacheTime: 0, // Cache expires immediately
+  //   refetchOnWindowFocus: false, // Disable refetching on window focus
+  //   refetchOnMount: false, // Prevent refetching on component remount
+  //   retry: 0, //Disable retry on failure
+  // });
+
+  //handle last page deletion item
+  
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: async () => {
+    queryFn: async  () => {
+      // Set loading state to true before the request starts
       setLoading(true);
+
       try {
         const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-        Object.keys(filterObj).forEach(
-          (key) => filterObj[key] === "" && delete filterObj[key]
-        );
+        Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
+        // Make the API request based on sorting
         let response;
         if (sorting.length === 0) {
           response = await handleGetUsers({
@@ -106,26 +150,31 @@ export default function UserList() {
             page: pagination.pageIndex,
             size: pagination.pageSize,
             sort: sorting
-              .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+              .map(
+                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+              )
               .join(","),
             ...filterObj,
           });
         }
+
+        // Return the API response data
         return response;
       } catch (error) {
+        console.error("Error fetching data", error);
+        // Optionally, handle errors here
       } finally {
-        setLoading(false); // Start loading
+        // Set loading state to false when the request finishes (whether successful or not)
+        setLoading(false);
       }
     },
-    onError: () => setLoading(false), // Ensure loading state is reset on error
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
     refetchOnWindowFocus: false, // Disable refetching on window focus
-    refetchOnMount: false, // Prevent refetching on component remount
+    refetchOnMount: true, // Prevent refetching on component remount
     retry: 0, //Disable retry on failure
   });
-
-  //handle last page deletion item
+  
   useEffect(() => {
 
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {

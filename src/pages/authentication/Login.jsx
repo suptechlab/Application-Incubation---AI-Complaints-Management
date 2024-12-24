@@ -149,7 +149,7 @@ export default function Login() {
                                                                 onBlur={handleBlur}
                                                                 onChange={handleChange}
                                                                 type="checkbox"
-                                                                label="Acuérdate de mí"
+                                                                label={t('REMEMBER ME')}
                                                             />                                                    
                                                         </Col>
                                                         <Col xs="auto">

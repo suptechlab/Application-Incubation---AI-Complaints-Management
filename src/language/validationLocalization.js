@@ -77,7 +77,14 @@ export const messages = {
     rejectSubStatusRequired: "Reject sub status is required!",
     noFileSelected: "No file selected.",
     invalidFileType: "Invalid file type. Please upload an allowed file.",
-    fileSizeExceeded: "File size exceeds {size} MB. Please upload a smaller file."
+    fileSizeExceeded: "File size exceeds {size} MB. Please upload a smaller file.",
+    //Ticket Workflow
+    workflowNameRequired: "Workflow name is required.",
+    conditionRequired: "Condition is required.",
+    actionRequired: "Action is required.",
+    instanceTypeRequired: "Instance type is required.",
+    eventRequired: "Event is required.",
+    fieldRequired: "This field is required."
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -157,6 +164,13 @@ export const messages = {
     rejectSubStatusRequired: "¡Se requiere el subestado de rechazo!",
     noFileSelected: "No se ha seleccionado ningún archivo.",
     invalidFileType: "Tipo de archivo no válido. Por favor, suba un archivo permitido.",
-    fileSizeExceeded: "El tamaño del archivo supera los {size} MB. Por favor, suba un archivo más pequeño."
+    fileSizeExceeded: "El tamaño del archivo supera los {size} MB. Por favor, suba un archivo más pequeño.",
+    //Ticket Workflow
+    workflowNameRequired: "El nombre del flujo de trabajo es obligatorio.",
+    conditionRequired: "Se requiere condición.",
+    actionRequired: "Se requiere acción.",
+    instanceTypeRequired: "Se requiere el tipo de instancia.",
+    eventRequired: "Se requiere evento.",
+    fieldRequired: "Este campo es obligatorio."
   }
 };

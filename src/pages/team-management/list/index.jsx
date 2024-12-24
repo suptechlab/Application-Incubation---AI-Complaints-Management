@@ -18,44 +18,44 @@ import { handleGetTableData, handleStatusChangeState } from "../../../services/t
 export default function TeamManagementList() {
 
 
-  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
-  // PERMISSIONS work
+    const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+    // PERMISSIONS work
 
-  const [permissionsState, setPermissionsState] = React.useState({
-    statusModule: false,
-    addModule: false,
-    editModule: false,
-  });
+    const [permissionsState, setPermissionsState] = React.useState({
+        statusModule: false,
+        addModule: false,
+        editModule: false,
+    });
 
-  useEffect(() => {
-    const updatedPermissions = {
-      statusModule: false,
-      addModule: false,
-      editModule: false,
-    };
-    if (currentUser === "SUPER_ADMIN") {
-      updatedPermissions.statusModule = true;
-      updatedPermissions.addModule = true;  
-      updatedPermissions.editModule = true;
-    } else {
-      const permissionArr = permissions['Teams Manage'] ?? [];
+    useEffect(() => {
+        const updatedPermissions = {
+            statusModule: false,
+            addModule: false,
+            editModule: false,
+        };
+        if (currentUser === "SUPER_ADMIN") {
+            updatedPermissions.statusModule = true;
+            updatedPermissions.addModule = true;
+            updatedPermissions.editModule = true;
+        } else {
+            const permissionArr = permissions['Teams Manage'] ?? [];
 
-      if (["TEAMS_CREATE_BY_SEPS", "TEAMS_CREATE_BY_FI"].some(permission => permissionArr.includes(permission))) {
-          updatedPermissions.addModule = true;
-      }
-      
-      if (["TEAMS_CHANGE_STATUS_BY_SEPS", "TEAMS_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
-          updatedPermissions.editModule = true;
-      }
-      
-      if (["TEAMS_UPDATED_BY_SEPS", "TEAMS_UPDATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
-          updatedPermissions.statusModule = true;
-      }
-      
-    }
+            if (["TEAMS_CREATE_BY_SEPS", "TEAMS_CREATE_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.addModule = true;
+            }
 
-    setPermissionsState(updatedPermissions);
-  }, [permissions, currentUser]);
+            if (["TEAMS_CHANGE_STATUS_BY_SEPS", "TEAMS_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.editModule = true;
+            }
+
+            if (["TEAMS_UPDATED_BY_SEPS", "TEAMS_UPDATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.statusModule = true;
+            }
+
+        }
+
+        setPermissionsState(updatedPermissions);
+    }, [permissions, currentUser]);
 
     const location = useLocation();
     const queryClient = useQueryClient();
@@ -76,7 +76,7 @@ export default function TeamManagementList() {
 
     const [loading, setLoading] = useState(false);
 
-  
+
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
@@ -174,63 +174,65 @@ export default function TeamManagementList() {
             },
             ...(permissionsState?.statusModule
                 ? [
-            {
-                id: "status",
-                isAction: true,
-                cell: (info) => {
+                    {
+                        id: "status",
+                        isAction: true,
+                        cell: (info) => {
 
-                    if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
-                        return (
-                            <Toggle
-                                id={`status-${info?.row?.original?.id}`}
-                                key={"status"}
-                                name="status"
-                                value={info?.row?.original?.status === true}
-                                checked={info?.row?.original?.status === true}
-                                onChange={() =>
-                                    changeStatus(
-                                        info?.row?.original?.id,
-                                        info?.row?.original?.status
-                                    )
-                                }
-                                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
-                            />
-                        );
-                    } else {
-                        return <span>{info?.row?.original?.status} </span>
-                    }
-                },
-                header: () => t("STATUS"),
-                enableSorting: false,
-                size: "80",
-            }] :[]),
+                            if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
+                                return (
+                                    //   permission.current.statusModule ?
+                                    <Toggle
+                                        id={`status-${info?.row?.original?.id}`}
+                                        key={"status"}
+                                        name="status"
+                                        value={info?.row?.original?.status === true}
+                                        checked={info?.row?.original?.status === true}
+                                        onChange={() =>
+                                            changeStatus(
+                                                info?.row?.original?.id,
+                                                info?.row?.original?.status
+                                            )
+                                        }
+                                        tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+                                    />
+                                    //   : ''
+                                );
+                            } else {
+                                return <span>{info?.row?.original?.status} </span>
+                            }
+                        },
+                        header: () => t("STATUS"),
+                        enableSorting: false,
+                        size: "80",
+                    }] : []),
             // Conditionally add the "actions" column
             ...(permissionsState?.editModule
                 ? [
-            {
-                id: "actions",
-                isAction: true,
-                cell: (rowData) => (
-                    <div className="pointer">
-                        <DataGridActions
-                            controlId="team-management"
-                            rowData={rowData}
-                            customButtons={[
-                                {
-                                    name: "edit",
-                                    enabled: true,
-                                    type: "link",
-                                    title: "Edit",
-                                    icon: <MdEdit size={18} />,
-                                },
-                            ]}
-                        />
-                    </div>
-                ),
-                header: () => <div className="text-center">{t("ACTIONS")}</div>,
-                enableSorting: false,
-                size: "80",
-            }] : []),
+                    {
+                        id: "actions",
+                        isAction: true,
+                        cell: (rowData) => (
+                            <div className="pointer">
+                                <DataGridActions
+                                    controlId="team-management"
+                                    rowData={rowData}
+                                    customButtons={[
+                                        {
+                                            name: "edit",
+                                            enabled: true,
+                                            type: "link",
+                                            title: "Edit",
+                                            icon: <MdEdit size={18} />,
+                                        },
+                                    ]}
+                                />
+                            </div>
+                        ),
+                        header: () => <div className="text-center">{t("ACTIONS")}</div>,
+                        enableSorting: false,
+                        size: "80",
+                    }] : []),
         ],
         [permissionsState]
     )
@@ -249,8 +251,8 @@ export default function TeamManagementList() {
     }, [queryClient]);
 
     const actions = permissionsState?.addModule
-    ? [{ label: t('ADD NEW'), to: "/team-management/add", variant: "warning" }]
-    : [];
+        ? [{ label: t('ADD NEW'), to: "/team-management/add", variant: "warning" }]
+        : [];
 
 
     return (
@@ -263,7 +265,7 @@ export default function TeamManagementList() {
                 />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <ListingSearchForm filter={filter} setFilter={setFilter} hideFilter={true}/>
+                        <ListingSearchForm filter={filter} setFilter={setFilter} />
                         <CommonDataTable
                             columns={columns}
                             dataQuery={dataQuery}

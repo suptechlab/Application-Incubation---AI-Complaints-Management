@@ -279,7 +279,7 @@ const TemplateMaster = () => {
           title={t("TEMPLATE MASTER")}
           actions={[
             { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-            { label: "Add New", onClick: toggle, variant: "warning" },
+            { label: "Add New", onClick: toggle, variant: "warning" ,disabled:true },
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
