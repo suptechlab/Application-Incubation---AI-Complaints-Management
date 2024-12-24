@@ -7,13 +7,14 @@ import { MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import ReactSelect from '../../../../components/ReactSelect';
 import { MasterDataContext } from '../../../../contexts/masters.context';
-import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent } from '../../../../services/ticketmanagement.service';
+import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent, ticketStatusChange } from '../../../../services/ticketmanagement.service';
 import { calculateDaysDifference } from '../../../../utils/commonutils';
 import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
+import Loader from '../../../../components/Loader';
 
 const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData }) => {
 
@@ -33,24 +34,20 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
     const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
     const handleSelect = (status) => {
+        const actions = {
+            CLOSE: () => setCloseTicketModalShow(true),
+            REJECT: () => setRejectTicketModalShow(true),
+            IN_PROGRESS: () => handleTicketStatusChange('IN_PROGRESS'),
+            PENDING: () => handleTicketStatusChange('PENDING')
+        };
 
-        // setSelectedStatus(status);
-
-        if (status === "CLOSE") {
-            setCloseTicketModalShow(true)
-        } else if (status === "REJECT") {
-            setRejectTicketModalShow(true)
-        }
-        
-        // else if (status === "IN_PROGRESS"){
-
-        // }
+        actions[status]?.();
     };
 
     // The color class based on the status
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
-    const statusOptions = [{ label: t('CLOSE'), value: 'CLOSE' }, { label: t('REJECT'), value: 'REJECT' }];
+    const statusOptions = [{ label: t('CLOSE'), value: 'CLOSE' }, { label: t('REJECT'), value: 'REJECT' }, { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' }, { label: t('PENDING'), value: 'PENDING' }];
     // if (selectedStatus === 'NEW') {
     //     statusOptions.push({ label: t('IN_PROGRESS'), value: 'IN_PROGRESS' });
     //   }
@@ -79,6 +76,22 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
     const handleAddAttachmentsClick = () => {
         setAddAttachmentsModalShow(true)
     }
+
+    //Handle Ticket Status Change
+    const handleTicketStatusChange = async (status) => {
+        setLoading(true);
+        try {
+            const response = await ticketStatusChange(ticketData?.id, status);
+            toast.success(response.data.message);
+            await getTicketData();
+        } catch (error) {
+            const errorMessage = error?.response?.data?.errorDescription || "An unexpected error occurred.";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Custom function to display "remaining" for future dates
     // Handle Date Extension Click
     const handleDateExtensionClick = () => {
@@ -142,8 +155,8 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
         getAgentDropdownListing()
     }, [])
 
-const daysDifference = calculateDaysDifference(ticketData?.slaBreachDate);
-const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference);
+    const daysDifference = calculateDaysDifference(ticketData?.slaBreachDate);
+    const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference);
     const renderBadge = (bgColor, textColor, message) => (
         <Badge
             bg={bgColor}
@@ -157,6 +170,7 @@ const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference)
 
     return (
         <React.Fragment>
+            <Loader isLoading={loading} />
             <div className="pb-3">
                 <Stack
                     direction="horizontal"
@@ -197,10 +211,10 @@ const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference)
 
 
                         {
-                           ( (currentUser === 'FI_ADMIN' && ticketData?.instanceType === 'FIRST_INSTANCE') || 
-                            ((currentUser === 'SEPS_ADMIN' || currentUser === 'SUPER_ADMIN') && 
-                            ticketData?.instanceType === 'SECOND_INSTANCE')  &&
-                            (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
+                            ((currentUser === 'FI_ADMIN' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                                ((currentUser === 'SEPS_ADMIN' || currentUser === 'SUPER_ADMIN') &&
+                                    ticketData?.instanceType === 'SECOND_INSTANCE') &&
+                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
                                     wrapperClassName="mb-0"

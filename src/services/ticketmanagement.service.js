@@ -83,3 +83,8 @@ export const convertToLabelValue = (obj) => {
     value: key    // Use the key as the value
   }));
 }
+
+//TICKET STATUS CHANGE
+export const ticketStatusChange = async (ticketId,status) => {
+  return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/change-status?status=${status}`);
+}
