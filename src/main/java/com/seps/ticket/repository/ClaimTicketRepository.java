@@ -1,6 +1,7 @@
 package com.seps.ticket.repository;
 
 import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.enums.InstanceTypeEnum;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import org.springframework.data.domain.Page;
@@ -55,4 +56,14 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
                                                                                          @Param("organizationId") Long organizationId);
 
     Optional<ClaimTicket> findByIdAndUserIdAndInstanceType(Long claimTicketId, Long currentUserId, InstanceTypeEnum instanceTypeEnum);
+
+//    @Query("SELECT c FROM ClaimTicket c WHERE c.status NOT IN :excludedStatuses AND c.slaBreachDate IS NOT NULL")
+//    List<ClaimTicket> findEligibleTickets(@Param("excludedStatuses") List<ClaimTicketStatusEnum> excludedStatuses);
+
+    @Query("SELECT c FROM ClaimTicket c JOIN FETCH c.user u JOIN FETCH u.roles WHERE c.status NOT IN :excludedStatuses AND c.slaBreachDate IS NOT NULL")
+    List<ClaimTicket> findEligibleTickets(@Param("excludedStatuses") List<ClaimTicketStatusEnum> excludedStatuses);
+
+    List<ClaimTicket> findAllByStatusNotInAndSlaBreachDateIsNotNull(List<ClaimTicketStatusEnum> excludedStatuses);
+
+
 }

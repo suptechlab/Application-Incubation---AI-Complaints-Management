@@ -34,7 +34,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                             Long entityId, String entityName, Map<String, String> entityTitle, Map<String, String> message,
                             Map<String, Object> entityData, String activityType, String requestBody) {
         AuditLog auditLog = new AuditLog();
-        auditLog.setIpAddress(commonHelper.getRemoteInfo());
+        auditLog.setIpAddress(request.getMethod().equals("CRON")?request.getRemoteAddr() : commonHelper.getRemoteInfo());
         auditLog.setUserId(userId);
         auditLog.setLoggedBy(loggedBy);
         auditLog.setMicroservice(Constants.MICROSERVICE_NAME);

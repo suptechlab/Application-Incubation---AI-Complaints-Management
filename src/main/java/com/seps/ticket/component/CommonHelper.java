@@ -28,15 +28,17 @@ public class CommonHelper {
     }
 
     public String getRemoteInfo() {
-        String remoteAddress = "";
-        if (httpServletRequest != null) {
-            remoteAddress = httpServletRequest.getHeader("X-FORWARDED-FOR");
-            if (StringUtils.isBlank(remoteAddress)) {
-                remoteAddress = httpServletRequest.getRemoteAddr();
-            }
+        if (httpServletRequest == null) {
+            log.warn("HttpServletRequest is not available, returning default IP address.");
+            return "127.0.0.1"; // or some default IP
+        }
+        String remoteAddress = httpServletRequest.getHeader("X-FORWARDED-FOR");
+        if (StringUtils.isBlank(remoteAddress)) {
+            remoteAddress = httpServletRequest.getRemoteAddr();
         }
         return remoteAddress;
     }
+
 
     public Instant getInstant(LocalDate date, LocalTime time) {
         LocalDateTime localDateTime = LocalDateTime.of(date, time);

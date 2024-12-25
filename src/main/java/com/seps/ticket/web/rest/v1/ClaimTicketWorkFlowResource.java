@@ -96,10 +96,20 @@ public class ClaimTicketWorkFlowResource {
     @GetMapping
     public ResponseEntity<List<ClaimTicketWorkFlowDTO>> listClaimTicketWorkFlows(Pageable pageable, @RequestParam(value = "search", required = false) String search,
                                                                                  @Parameter(description = "Filter by status (true for active, false for inactive)")
-                                                                                 @RequestParam(required = false) Boolean status) {
-        Page<ClaimTicketWorkFlowDTO> page = claimTicketWorkFlowService.listClaimTicketWorkFlows(pageable, search, status);
+                                                                                 @RequestParam(required = false) Boolean status,
+                                                                                 @RequestParam(required = false) Long organizationId) {
+        Page<ClaimTicketWorkFlowDTO> page = claimTicketWorkFlowService.listClaimTicketWorkFlows(pageable, search, status, organizationId);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @Operation(summary = "Change the status of a workflow", description = "Updates the status (active/inactive) of a workflow by its ID")
+    @ApiResponse(responseCode = "204", description = "Status changed successfully")
+    @ApiResponse(responseCode = "404", description = "Workflow not found")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        claimTicketWorkFlowService.changeStatus(id, status, requestInfo);
+        return ResponseEntity.noContent().build();
+    }
 }

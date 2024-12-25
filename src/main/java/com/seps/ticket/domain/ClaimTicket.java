@@ -143,6 +143,7 @@ public class ClaimTicket {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "claimTicket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClaimTicketDocument> claimTicketDocuments = new ArrayList<>();  // List of associated documents
 

@@ -626,6 +626,7 @@ public class MailService {
         }
     }
 
+    @Async
     public void sendStatusChangeEmail(ClaimTicketDTO ticket, User customer) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTemplateKey("TICKET_STATUS_CHANGE_MAIL_TO_CUSTOMER");
@@ -636,9 +637,54 @@ public class MailService {
         sendDynamicContentEmail(mailDTO);
     }
 
+    @Async
     public void sendDateExtensionEmail(ClaimTicketDTO ticket, User agent) {
         MailDTO mailDTO = new MailDTO();
         mailDTO.setTemplateKey("SLA_DATE_EXTENSION_MAIL_TO_AGENT");
+        mailDTO.setTo(agent.getEmail());
+        mailDTO.setLocale(agent.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, agent));
+        sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendSLAReminderToFIEmail(ClaimTicketDTO ticket, User agent) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("SLA_REMINDER_SEND_TO_FI_AGENT");
+        mailDTO.setTo(agent.getEmail());
+        mailDTO.setLocale(agent.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, agent));
+        sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendSLAReminderToSEPSEmail(ClaimTicketDTO ticket, User agent) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("SLA_REMINDER_SEND_TO_SEPS_AGENT");
+        mailDTO.setTo(agent.getEmail());
+        mailDTO.setLocale(agent.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, agent));
+        sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendSLABreachedToFIEmail(ClaimTicketDTO ticket, User agent) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("SLA_BREACH_MAIL_SEND_TO_FI_AGENT");
+        mailDTO.setTo(agent.getEmail());
+        mailDTO.setLocale(agent.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, agent));
+        sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendSLABreachedToSEPSEmail(ClaimTicketDTO ticket, User agent) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("SLA_BREACH_MAIL_SEND_TO_SEPS_AGENT");
         mailDTO.setTo(agent.getEmail());
         mailDTO.setLocale(agent.getLangKey());
         mailDTO.setIsStatic(true);

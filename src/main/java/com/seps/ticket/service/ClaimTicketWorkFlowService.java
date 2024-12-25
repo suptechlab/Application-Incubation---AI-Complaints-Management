@@ -8,8 +8,6 @@ import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
-import com.seps.ticket.service.dto.ClaimTicketDTO;
-import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.service.dto.RequestInfo;
 import com.seps.ticket.service.dto.UserDTO;
 import com.seps.ticket.service.dto.workflow.*;
@@ -220,7 +218,6 @@ public class ClaimTicketWorkFlowService {
     /**
      * Updates an existing claim ticket workflow.
      *
-     * @param id                     The ID of the claim ticket workflow to update.
      * @param claimTicketWorkflowDTO The updated claim ticket workflow data.
      * @param requestInfo            Information about the request.
      * @throws CustomException If the claim ticket workflow is not found or the user doesn't have access to it.
@@ -307,9 +304,9 @@ public class ClaimTicketWorkFlowService {
      * @return A paginated list of claim ticket workflows matching the given filters.
      */
     @Transactional(readOnly = true)
-    public Page<ClaimTicketWorkFlowDTO> listClaimTicketWorkFlows(Pageable pageable, String search, Boolean status) {
+    public Page<ClaimTicketWorkFlowDTO> listClaimTicketWorkFlows(Pageable pageable, String search, Boolean status, Long organizationId) {
         User currentUser = userService.getCurrentUser();
-        Long organizationId = validateOrganizationAccess(currentUser);
+        organizationId = validateOrganizationAccess(currentUser, organizationId);
         return claimTicketWorkFlowRepository.findAll(ClaimTicketWorkFlowSpecification.byFilter(search, status, organizationId), pageable).map(claimTicketWorkFlowMapper::mapEntityToDTO);
     }
 
@@ -320,18 +317,18 @@ public class ClaimTicketWorkFlowService {
      * @return The organization ID if the user has access.
      * @throws CustomException If the user does not have valid access to the organization.
      */
-    private Long validateOrganizationAccess(User currentUser) {
+    private Long validateOrganizationAccess(User currentUser, Long organizationId) {
         List<String> authorities = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
         if (authorities.contains(AuthoritiesConstants.FI)) {
-            Long organizationId = currentUser.getOrganizationId();
+            organizationId = currentUser.getOrganizationId();
             if (organizationId == null) {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.SOMETHING_GOES_WRONG, null, null);
             }
             return organizationId;
         }
-        return null;
+        return organizationId;
     }
 
     public ClaimTicketWorkFlowDTO findCreateWorkFlow(Long organizationId, InstanceTypeEnum instanceType, Long claimTypeId,
@@ -341,7 +338,7 @@ public class ClaimTicketWorkFlowService {
             findByOrganizationIdAndInstanceTypeAndEventAndStatus(organizationId, instanceType, TicketWorkflowEventEnum.CREATED, true)
             .stream()
             .filter(workflow -> !processedWorkflowIds.contains(workflow.getId()))
-            .collect(Collectors.toList());
+            .toList();
         // If the list is not empty, process each workflow
         if (!claimTicketWorkFlowList.isEmpty()) {
             for (ClaimTicketWorkFlow claimTicketWorkFlow : claimTicketWorkFlowList) {
@@ -438,7 +435,6 @@ public class ClaimTicketWorkFlowService {
 
     public User findFIUserForMailAction(Long agentId, ClaimTicketWorkFlowDTO workFlowDTO) {
         Long organizationId = workFlowDTO.getOrganizationId();
-        Long workflowId = workFlowDTO.getId();
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.FI).ifPresent(authorities::add);
         Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.ACTIVE);
@@ -575,5 +571,57 @@ public class ClaimTicketWorkFlowService {
         }
         // Return null if no match is found
         return null;
+    }
+
+    /**
+     * Changes the status of a claim ticket workflow and logs the audit information.
+     * <p>
+     * This method checks the user's authorities and determines if the user belongs to the
+     * "FI" group to apply organization-based filtering when retrieving the claim ticket workflow.
+     * After updating the status, it saves the changes to the repository and logs the activity
+     * in the audit log, including both old and new data.
+     * </p>
+     *
+     * @param id The ID of the claim ticket workflow to be updated.
+     * @param status The new status to be applied to the claim ticket workflow.
+     * @param requestInfo The request information containing metadata about the request.
+     * @throws CustomException If the claim ticket workflow is not found.
+     */
+    @Transactional
+    public void changeStatus(Long id, Boolean status, RequestInfo requestInfo) {
+        User currentUser = userService.getCurrentUser();
+        List<String> authorities = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        ClaimTicketWorkFlow claimTicketWorkflow;
+        if (authorities.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganizationId();
+            claimTicketWorkflow = claimTicketWorkFlowRepository.findByIdAndOrganizationId(id, organizationId).orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND,
+                new String[]{id.toString()}, null));
+        }else {
+            claimTicketWorkflow = claimTicketWorkFlowRepository.findById(id).orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.CLAIM_TICKET_WORKFLOW_NOT_FOUND,
+                new String[]{id.toString()}, null));
+        }
+        Map<String, Object> oldData = convertEntityToMap(claimTicketWorkFlowMapper.mapEntityToDTO(claimTicketWorkflow));
+        claimTicketWorkflow.setStatus(status);
+        ClaimTicketWorkFlow savedClaimTicketWorkflow = claimTicketWorkFlowRepository.save(claimTicketWorkflow);
+
+        //Audit Log Data
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.claim.ticket.work.flow.status.changed",
+                new Object[]{currentUser.getEmail(), status.toString()}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(claimTicketWorkFlowMapper.mapEntityToDTO(savedClaimTicketWorkflow));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        Map<String, String> req = new HashMap<>();
+        req.put("status", status.toString());
+        String requestBody = gson.toJson(req);
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "changeStatus",
+            ActionTypeEnum.CLAIM_TICKET_CHANGED_STATUS.name(), savedClaimTicketWorkflow.getId(), ClaimTicketWorkFlow.class.getSimpleName(),
+            null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), requestBody);
     }
 }
