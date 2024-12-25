@@ -96,7 +96,7 @@
       separator=","
       tableName="modules"/>
   </changeSet>
-  <changeSet id="1735149932775" author="matellio">
+  <changeSet id="1735153950849" author="matellio">
     <update tableName="permissions">
       <column name="module_id" value="22" />
       <where>id IN (63, 64, 65)</where>
