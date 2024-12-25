@@ -584,8 +584,6 @@ public class TeamService {
         if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganizationId();
         }
-        if(organizationId==null)
-            organizationId = 0L;
 
         return teamRepository.findAll(TeamSpecification.byFilterWorkflow(organizationId))
             .stream().map(teamMapper::toDropDownDTO).toList();
