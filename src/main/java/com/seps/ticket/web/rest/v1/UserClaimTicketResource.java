@@ -3,6 +3,7 @@ package com.seps.ticket.web.rest.v1;
 import com.seps.ticket.service.*;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
+import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
@@ -162,7 +163,7 @@ public class UserClaimTicketResource {
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
         UserClaimTicketDTO prevUserClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // File the claim
-        userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
+        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
         // Retrieve the claim ticket
         UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // Send an email notification
