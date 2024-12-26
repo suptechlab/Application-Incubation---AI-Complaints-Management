@@ -1,5 +1,6 @@
 package com.seps.ticket.web.rest.v1;
 
+import com.seps.ticket.enums.InstanceTypeEnum;
 import com.seps.ticket.service.*;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
@@ -248,5 +249,12 @@ public class UserClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @GetMapping("/list-for-file-second-instance-or-complaint/{instanceType}")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<List<ClaimTicketListDTO>> listUserClaimTicketsForChatbot(@PathVariable InstanceTypeEnum instanceType) {
+        List<ClaimTicketListDTO> page = userClaimTicketService.listUserClaimTicketsForChatbot(instanceType);
+        return ResponseEntity.ok().body(page);
     }
 }

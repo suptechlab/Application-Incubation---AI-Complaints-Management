@@ -1176,4 +1176,30 @@ public class UserClaimTicketService {
         return claimTicketRepository.findById(id)
             .map(claimTicketMapper::toDTO).orElse(null);
     }
+
+    @Transactional
+    public List<ClaimTicketListDTO> listUserClaimTicketsForChatbot(InstanceTypeEnum instanceType) {
+        User currentUser = userService.getCurrentUser();
+        List<ClaimTicketListDTO> claimTicketList = List.of();
+        if(instanceType.equals(InstanceTypeEnum.SECOND_INSTANCE)){
+            claimTicketList= claimTicketRepository.findValidClaimTickets(
+                currentUser.getId(),
+                InstanceTypeEnum.FIRST_INSTANCE,
+                ClaimTicketStatusEnum.CLOSED,
+                ClosedStatusEnum.CLOSE_WITH_EXPIRED,
+                ClaimTicketStatusEnum.REJECTED,
+                RejectedStatusEnum.EXPIRED)
+                .stream().map(claimTicketMapper::toListDTO).toList();
+        } else if (instanceType.equals(InstanceTypeEnum.COMPLAINT)) {
+            claimTicketList= claimTicketRepository.findValidClaimTickets(
+                    currentUser.getId(),
+                    InstanceTypeEnum.SECOND_INSTANCE,
+                    ClaimTicketStatusEnum.CLOSED,
+                    ClosedStatusEnum.CLOSE_WITH_EXPIRED,
+                    ClaimTicketStatusEnum.REJECTED,
+                    RejectedStatusEnum.EXPIRED)
+                .stream().map(claimTicketMapper::toListDTO).toList();
+        }
+        return claimTicketList;
+    }
 }

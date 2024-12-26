@@ -2,7 +2,9 @@ package com.seps.ticket.repository;
 
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
+import com.seps.ticket.enums.ClosedStatusEnum;
 import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.enums.RejectedStatusEnum;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,5 +67,16 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
 
     List<ClaimTicket> findAllByStatusNotInAndSlaBreachDateIsNotNull(List<ClaimTicketStatusEnum> excludedStatuses);
 
+
+    @Query("SELECT c FROM ClaimTicket c WHERE c.user.id = :userId " +
+        "AND c.instanceType = :instanceType " +
+        "AND ((c.status = :closedStatus AND c.closedStatus <> :excludedClosedStatus) " +
+        "OR (c.status = :rejectedStatus AND c.rejectedStatus <> :excludedRejectedStatus))")
+    List<ClaimTicket> findValidClaimTickets(@Param("userId") Long userId,
+                                            @Param("instanceType") InstanceTypeEnum instanceType,
+                                            @Param("closedStatus") ClaimTicketStatusEnum closedStatus,
+                                            @Param("excludedClosedStatus") ClosedStatusEnum excludedClosedStatus,
+                                            @Param("rejectedStatus") ClaimTicketStatusEnum rejectedStatus,
+                                            @Param("excludedRejectedStatus") RejectedStatusEnum excludedRejectedStatus);
 
 }
