@@ -320,7 +320,7 @@ export default function UserList() {
   }, [queryClient]);
 
   const actions = permissionsState?.addModule
-  ? [{ label: t('ADD NEW'), to: "/team-management/add", variant: "warning" }]
+  ? [{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
   : [];
 
   return (
