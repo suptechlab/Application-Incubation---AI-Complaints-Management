@@ -284,7 +284,7 @@ export const englishLang = {
     "CONDITION_MESSAGE": "Conditions are set of which check for specific scenarios.",
     "ADD_MORE": "Add More",
     "ADD_OR_CONDITION": "Add OR Condition",
-    "ACTIONS": "Actions",
+    "ACTION": "Action",
     "ACTION_MSG": "Actions help you automate tickets.",
     "SAVE_WORKFLOW": "Save Workflow",
     "CREATE_NEW_TICKET_WORKFLOW": "Create New Ticket Workflow",
@@ -296,5 +296,11 @@ export const englishLang = {
     "SEPS":"SEPS",
     "CUSTOMER":"Customer",
     "TEMPLATES":"Templates",
-    "ALL TEMPLATES":"All Templates"
+    "ALL TEMPLATES":"All Templates",
+    "SELECT TEAM" :"Select Team",
+    "SELECT TEMPLATE" : "Select Template",
+    "TEMPLATES" :"Templates",
+    "AGENTS" :"Agents",
+    "SELECT AGENT" : "Select Agent",
+    "TEAMS":"Teams"
 }

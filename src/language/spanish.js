@@ -268,7 +268,7 @@ export const spanishLang = {
      "CONDITION_MESSAGE": "Se establecen condiciones que verifican escenarios específicos.",
      "ADD_MORE": "Añadir más",
      "ADD_OR_CONDITION": "Agregar condición O",
-     "ACTIONS": "Acciónes",
+     "ACTION": "Acción",
      "ACTION_MSG": "Las acciones le ayudan a automatizar los tickets.",
      "SAVE_WORKFLOW": "Guardar flujo de trabajo",
      "CREATE_NEW_TICKET_WORKFLOW": "Crear nuevo flujo de trabajo de tickets",
@@ -280,5 +280,8 @@ export const spanishLang = {
     "SEPS": "SEPS",
     "CUSTOMER": "Cliente",
     "TEMPLATES":"Plantillas",
-    "ALL TEMPLATES" : "Todas las plantillas"
+    "ALL TEMPLATES" : "Todas las plantillas",
+     "SELECT TEAM" :"Seleccionar equipo",
+     "SELECT TEMPLATE" : "Seleccionar plantilla",
+     "TEMPLATES" :"Plantillas"
 }
