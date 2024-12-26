@@ -15,10 +15,8 @@ export const handleGetWorkflowTableData = async (params) => {
 }
 
 //Edit Workflow
-export const editTicketWorkflow = async (params) => {
-    return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets`, {
-        params
-    });
+export const editTicketWorkflow = async (id , data) => {
+    return await ticketApi.put(`/${API_VERSION}/claim-ticket-work-flow/${id}`, data);
 }
 
 //Status Change
