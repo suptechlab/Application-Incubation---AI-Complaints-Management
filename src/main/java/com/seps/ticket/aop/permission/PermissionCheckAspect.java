@@ -27,7 +27,7 @@ public class PermissionCheckAspect {
         this.userService = userService;
     }
 
-    @Before("@annotation(permissionCheck) && execution(* com.seps.admin.web.rest..*(..))")
+    @Before("@annotation(permissionCheck) && execution(* com.seps.ticket.web.rest..*(..))")
     public void checkPermission(PermissionCheck permissionCheck) {
         String[] requiredPermissions = permissionCheck.value();
 
