@@ -37,7 +37,8 @@ public enum SepsStatusCode implements StatusType {
     COMPLAINT_INVALID_CLAIM_TICKET_STATUS(40023, "complaint.invalid.claim.ticket.status"),
     CLAIM_TICKET_WORKFLOW_NOT_FOUND(20030, "claim.ticket.workflow.not.found"),
     CLAIM_TICKET_ALLOW_ONLY_STATUS(20031, "claim.ticket.allow.only.status"),
-    CLAIM_TICKET_ALREADY_IN_STATUS(20032, "claim.ticket.already.in.status");
+    CLAIM_TICKET_ALREADY_IN_STATUS(20032, "claim.ticket.already.in.status"),
+    UNAUTHORIZED_ACCESS(200046,"unauthorized.access");
 
     private final int code;
 

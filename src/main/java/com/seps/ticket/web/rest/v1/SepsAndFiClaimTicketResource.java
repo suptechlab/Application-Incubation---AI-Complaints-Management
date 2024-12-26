@@ -1,5 +1,6 @@
 package com.seps.ticket.web.rest.v1;
 
+import com.seps.ticket.aop.permission.PermissionCheck;
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
@@ -92,6 +93,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Assign tickets to FI Agent", description = "Assign a list of tickets to a specific FI agent")
     @ApiResponse(responseCode = "200", description = "Tickets assigned successfully")
     @PostMapping("/{agentId}/assign-tickets-fi-agent")
+    @PermissionCheck({"TICKET_ASSIGNED_TO_AGENT_FI"})
     public ResponseEntity<Void> assignTicketToFiAgent(
         @PathVariable Long agentId,
         @RequestBody @Valid AssignTicketRequestDTO assignTicketRequestDTO
@@ -104,6 +106,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Assign tickets to SEPS Agent", description = "Assign a list of tickets to a specific SEPS agent")
     @ApiResponse(responseCode = "200", description = "Tickets assigned successfully")
     @PostMapping("/{agentId}/assign-tickets-seps-agent")
+    @PermissionCheck({"TICKET_ASSIGNED_TO_AGENT_SEPS"})
     public ResponseEntity<Void> assignTicketToSepsAgent(
         @PathVariable Long agentId,
         @RequestBody @Valid AssignTicketRequestDTO assignTicketRequestDTO
@@ -116,6 +119,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Update Claim Ticket Priority", description = "Update the priority of a specific claim ticket")
     @ApiResponse(responseCode = "200", description = "Claim ticket priority updated successfully")
     @PatchMapping("/{ticketId}/priority")
+    @PermissionCheck({"TICKET_PRIORITY_CHANGE_FI","TICKET_PRIORITY_CHANGE_SEPS"})
     public ResponseEntity<Void> updateClaimTicketPriority(
         @PathVariable Long ticketId,
         @RequestParam("priority") ClaimTicketPriorityEnum priority,
@@ -139,6 +143,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Extend SLA for a Claim Ticket", description = "Extend the SLA (Service Level Agreement) for a specific claim ticket")
     @ApiResponse(responseCode = "200", description = "Claim ticket SLA extended successfully")
     @PostMapping("/{ticketId}/extend-sla")
+    @PermissionCheck({"TICKET_DATE_EXTENSION_FI","TICKET_DATE_EXTENSION_SEPS"})
     public ResponseEntity<ResponseStatus> extendClaimTicketSla(
         @PathVariable Long ticketId,
         @RequestParam("slaDate") String slaDate,
@@ -188,6 +193,7 @@ public class SepsAndFiClaimTicketResource {
         }
     )
     @PostMapping("/{ticketId}/closed")
+    @PermissionCheck({"TICKET_CLOSED_FI","TICKET_CLOSED_SEPS"})
     public ResponseEntity<ResponseStatus> closeClaimTicket(
         @PathVariable Long ticketId, @ModelAttribute @Valid ClaimTicketClosedRequest claimTicketClosedRequest,
         HttpServletRequest request
@@ -219,6 +225,7 @@ public class SepsAndFiClaimTicketResource {
         }
     )
     @PostMapping("/{ticketId}/reject")
+    @PermissionCheck({"TICKET_REJECT_FI","TICKET_REJECT_SEPS"})
     public ResponseEntity<ResponseStatus> rejectClaimTicket(
         @PathVariable Long ticketId, @ModelAttribute @Valid ClaimTicketRejectRequest claimTicketRejectRequest,
         HttpServletRequest request
@@ -250,6 +257,7 @@ public class SepsAndFiClaimTicketResource {
         )
     })
     @PostMapping("/{ticketId}/reply-to-customer")
+    @PermissionCheck({"TICKET_REPLY_TO_CUSTOMER_FI","TICKET_REPLY_TO_CUSTOMER_SEPS"})
     public ResponseEntity<ResponseStatus> replyToCustomer(@PathVariable Long ticketId,
         @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
@@ -277,6 +285,7 @@ public class SepsAndFiClaimTicketResource {
         )
     })
     @PostMapping("/{ticketId}/reply-to-internal")
+    @PermissionCheck({"TICKET_REPLY_TO_INTERNAL_FI","TICKET_REPLY_TO_INTERNAL_SEPS"})
     public ResponseEntity<ResponseStatus> replyToInternal(@PathVariable Long ticketId,
                                                           @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
@@ -309,6 +318,7 @@ public class SepsAndFiClaimTicketResource {
         )
     })
     @PostMapping("/{ticketId}/add-internal-note")
+    @PermissionCheck({"TICKET_INTERNAL_NOTE_FI","TICKET_INTERNAL_NOTE_SEPS"})
     public ResponseEntity<ResponseStatus> replyToInternalNote(@PathVariable Long ticketId,
                                                           @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
@@ -329,6 +339,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Update Claim Ticket Status", description = "Update the status of a specific claim ticket (IN_PROGRESS, PENDING)")
     @ApiResponse(responseCode = "200", description = "Claim ticket status updated successfully")
     @PatchMapping("/{ticketId}/change-status")
+    @PermissionCheck({"TICKET_CHANGE_STATUS_BY_SEPS","TICKET_CHANGE_STATUS_BY_FI"})
     public ResponseEntity<ResponseStatus> changeClaimTicketStatus(
         @PathVariable Long ticketId,
         @RequestParam("status") ClaimTicketStatusEnum status,
