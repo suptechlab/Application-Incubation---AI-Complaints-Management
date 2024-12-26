@@ -19,4 +19,6 @@ public interface ClaimTicketWorkFlowRepository extends JpaRepository<ClaimTicket
     Optional<ClaimTicketWorkFlow> findByIdAndOrganizationId(Long id, Long organizationId);
 
     List<ClaimTicketWorkFlow> findByOrganizationIdAndInstanceTypeAndEventAndStatus(Long organizationId, InstanceTypeEnum instanceType, TicketWorkflowEventEnum ticketWorkflowEventEnum, boolean status);
+
+    List<ClaimTicketWorkFlow> findByEventInAndStatusTrue(List<TicketWorkflowEventEnum> ticketWorkflowEventEnum);
 }

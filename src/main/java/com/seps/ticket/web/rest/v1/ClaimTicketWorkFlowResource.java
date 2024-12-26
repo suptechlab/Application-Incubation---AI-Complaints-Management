@@ -1,5 +1,6 @@
 package com.seps.ticket.web.rest.v1;
 
+import com.seps.ticket.aop.permission.PermissionCheck;
 import com.seps.ticket.service.ClaimTicketWorkFlowService;
 import com.seps.ticket.service.dto.RequestInfo;
 import com.seps.ticket.service.dto.ResponseStatus;
@@ -49,9 +50,11 @@ public class ClaimTicketWorkFlowResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PostMapping
+    @PermissionCheck({"TICKET_WF_CREATED_BY_SEPS","TICKET_WF_CREATED_BY_FI"})
     public ResponseEntity<ResponseStatus> addClaimTicketWorkFlow(@Valid @RequestBody ClaimTicketWorkFlowDTO claimTicketWorkflowDTO,
                                                                  HttpServletRequest request)
         throws URISyntaxException {
+        LOG.debug("Create new workflow: {}", claimTicketWorkflowDTO);
         RequestInfo requestInfo = new RequestInfo(request);
         Long id = claimTicketWorkFlowService.addClaimTicketWorkFlow(claimTicketWorkflowDTO, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
@@ -68,6 +71,7 @@ public class ClaimTicketWorkFlowResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ClaimTicketWorkFlowDTO.class)))
     @GetMapping("/{id}")
+    @PermissionCheck({"TICKET_WF_UPDATED_BY_SEPS","TICKET_WF_UPDATED_BY_FI"})
     public ResponseEntity<ClaimTicketWorkFlowDTO> getClaimTicketWorkFlowById(@PathVariable Long id) {
         return ResponseEntity.ok(claimTicketWorkFlowService.getClaimTicketWorkFlowById(id));
     }
@@ -77,6 +81,7 @@ public class ClaimTicketWorkFlowResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseStatus.class)))
     @PutMapping("/{id}")
+    @PermissionCheck({"TICKET_WF_UPDATED_BY_SEPS","TICKET_WF_UPDATED_BY_FI"})
     public ResponseEntity<ResponseStatus> updateClaimTicketWorkFlow(@PathVariable Long id, @Valid @RequestBody ClaimTicketWorkFlowDTO claimTicketWorkflowDTO,
                                                                     HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
@@ -94,12 +99,24 @@ public class ClaimTicketWorkFlowResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = ClaimTicketWorkFlowDTO.class)))
     @GetMapping
+    @PermissionCheck({"TICKET_WF_CREATED_BY_SEPS","TICKET_WF_CREATED_BY_FI","TICKET_WF_UPDATED_BY_SEPS","TICKET_WF_UPDATED_BY_FI","TICKET_WF_CHANGE_STATUS_BY_FI","TICKET_WF_CHANGE_STATUS_BY_SEPS"})
     public ResponseEntity<List<ClaimTicketWorkFlowDTO>> listClaimTicketWorkFlows(Pageable pageable, @RequestParam(value = "search", required = false) String search,
                                                                                  @Parameter(description = "Filter by status (true for active, false for inactive)")
-                                                                                 @RequestParam(required = false) Boolean status) {
-        Page<ClaimTicketWorkFlowDTO> page = claimTicketWorkFlowService.listClaimTicketWorkFlows(pageable, search, status);
+                                                                                 @RequestParam(required = false) Boolean status,
+                                                                                 @RequestParam(required = false) Long organizationId) {
+        Page<ClaimTicketWorkFlowDTO> page = claimTicketWorkFlowService.listClaimTicketWorkFlows(pageable, search, status, organizationId);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @Operation(summary = "Change the status of a workflow", description = "Updates the status (active/inactive) of a workflow by its ID")
+    @ApiResponse(responseCode = "204", description = "Status changed successfully")
+    @ApiResponse(responseCode = "404", description = "Workflow not found")
+    @PatchMapping("/{id}/status")
+    @PermissionCheck({"TICKET_WF_CHANGE_STATUS_BY_FI","TICKET_WF_CHANGE_STATUS_BY_SEPS"})
+    public ResponseEntity<Void> changeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        claimTicketWorkFlowService.changeStatus(id, status, requestInfo);
+        return ResponseEntity.noContent().build();
+    }
 }

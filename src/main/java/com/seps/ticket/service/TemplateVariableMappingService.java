@@ -80,6 +80,7 @@ public class TemplateVariableMappingService {
         variableMap.put("complaintFiledDate", DateUtil.formatDate(claimTicketDTO.getComplaintFiledAt(), sendToUser.getLangKey()));
         variableMap.put("resolveOnDate", DateUtil.formatDate(claimTicketDTO.getResolvedOn(), sendToUser.getLangKey()));
         variableMap.put("slaBreachDate", DateUtil.formatDate(claimTicketDTO.getSlaBreachDate(), sendToUser.getLangKey()));
+        variableMap.put("slaRemainingDays", DateUtil.getSlaBreachStatus(claimTicketDTO.getSlaBreachDate(), sendToUser.getLangKey()));
 
         // Agent names
         variableMap.put("fiAgentName", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getName() : "N/A");
