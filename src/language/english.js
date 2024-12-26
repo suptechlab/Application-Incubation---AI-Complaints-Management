@@ -302,5 +302,6 @@ export const englishLang = {
     "TEMPLATES" :"Templates",
     "AGENTS" :"Agents",
     "SELECT AGENT" : "Select Agent",
-    "TEAMS":"Teams"
+    "TEAMS":"Teams",
+    "TEMPLATE_INFO_MESSAGE": "You can copy general templates from here"
 }

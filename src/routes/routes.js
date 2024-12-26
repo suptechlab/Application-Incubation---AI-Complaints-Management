@@ -140,15 +140,19 @@ const routes = [
   },
   {
     path: "/template-master/add",
-    element:<AddTemplate/>,
+    element: <AddTemplate />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Template Master",
+    permissions: ["TEMPLATE_CREATE", "TEMPLATE_CREATE_FI"]
   },
   {
     path: "/template-master/edit/:id",
-    element: <EditTemplate/>,
+    element: <EditTemplate />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Template Master",
+    permissions: ["TEMPLATE_UPDATE", "TEMPLATE_UPDATE_FI"]
   },
   {
     path: "/login",
@@ -196,7 +200,7 @@ const routes = [
     element: <UserList />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"SEPS User",
+    module: "SEPS User",
     permissions: ["SEPS_USER_CREATE_BY_SEPS", "SEPS_USER_UPDATE_BY_SEPS", "SEPS_USER_STATUS_CHANGE_BY_SEPS"]
   },
   {
@@ -216,7 +220,7 @@ const routes = [
     element: <AddUserPage isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"SEPS User",
+    module: "SEPS User",
     permissions: ["SEPS_USER_CREATE_BY_SEPS"]
   },
   {
@@ -224,7 +228,7 @@ const routes = [
     element: <AddUserPage isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"SEPS User",
+    module: "SEPS User",
     permissions: ["SEPS_USER_UPDATE_BY_SEPS"]
   },
   {
@@ -261,7 +265,7 @@ const routes = [
     path: "/fi-users",
     element: <FIUserList />,
     isPrivate: true,
-    module:"FI User",
+    module: "FI User",
     layoutType: "Auth",
     permissions: ["FI_USER_CREATE_BY_SEPS",
       "FI_UPDATE_CREATE_BY_SEPS",
@@ -276,7 +280,7 @@ const routes = [
     element: <FIUserAddEdit isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"FI User",
+    module: "FI User",
     permissions: ["FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI"]
   },
   {
@@ -284,14 +288,14 @@ const routes = [
     element: <FIUserAddEdit isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"FI User",
+    module: "FI User",
     permissions: ["FI_UPDATE_CREATE_BY_SEPS", "FI_UPDATE_CREATE_BY_FI"]
   },
   {
     path: "/fi-users/import",
     element: <ImportFIUser isEdit={false} />,
     isPrivate: true,
-    module:"FI User",
+    module: "FI User",
     layoutType: "Auth",
   },
   {
@@ -299,7 +303,7 @@ const routes = [
     element: <AuditLogs />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"Audit Trails",
+    module: "Audit Trails",
     permissions: ["AUDIT_TRAILS_VIEW"]
   },
   {
@@ -307,7 +311,7 @@ const routes = [
     element: <ViewAuditTrail />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"Audit Trails",
+    module: "Audit Trails",
     permissions: ["AUDIT_TRAILS_VIEW"]
   },
   {
@@ -315,7 +319,7 @@ const routes = [
     element: <SLAComplianceReport />,
     isPrivate: true,
     layoutType: "Auth",
-    module : "Reports",
+    module: "Reports",
     permissions: ["SLA_COMPLIANCE"]
   },
   {
@@ -323,7 +327,7 @@ const routes = [
     element: <ClaimOverviewReport />,
     isPrivate: true,
     layoutType: "Auth",
-    module : "Reports",
+    module: "Reports",
     permissions: ["CLAIM_OVERVIEW_REPORT"]
   },
   {
@@ -337,7 +341,7 @@ const routes = [
     element: <TicketsList />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"Ticket",
+    module: "Ticket",
     permissions: [
       "TICKET_CREATED_BY_SEPS",
       "TICKET_UPDATED_BY_SEPS",
@@ -362,7 +366,7 @@ const routes = [
     element: <TicketsView />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"Ticket",
+    module: "Ticket",
     permissions: ["TICKET_CHANGE_STATUS_BY_FI",
       "TICKET_CHANGE_STATUS_BY_SEPS",
       "TICKET_ASSIGNED_TO_AGENT_FI",
@@ -382,7 +386,7 @@ const routes = [
     element: <CreateClaim />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"Ticket",
+    module: "Ticket",
     permissions: ["TICKET_CREATED_BY_SEPS", "TICKET_CREATED_BY_FI"]
   },
   {
@@ -390,7 +394,7 @@ const routes = [
     element: <TeamManagementList />,
     isPrivate: true,
     layoutType: "Auth",
-    module:"Teams Manage",
+    module: "Teams Manage",
     permissions: ["TEAMS_CREATE_BY_SEPS",
       "TEAMS_UPDATED_BY_SEPS",
       "TEAMS_CHANGE_STATUS_BY_SEPS",
@@ -403,15 +407,15 @@ const routes = [
     element: <TeamManagementAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
-    module : "Teams Manage",
-    permissions: ["TEAMS_CREATE_BY_SEPS","TEAMS_CREATE_BY_FI"]
+    module: "Teams Manage",
+    permissions: ["TEAMS_CREATE_BY_SEPS", "TEAMS_CREATE_BY_FI"]
   },
   {
     path: "/team-management/edit/:id",
     element: <TeamManagementAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
-    module : "Teams Manage",
+    module: "Teams Manage",
     permissions: ["TEAMS_UPDATED_BY_SEPS", "TEAMS_UPDATED_BY_FI"]
   },
   {
@@ -419,7 +423,7 @@ const routes = [
     element: <TicketWorkFlowList />,
     isPrivate: true,
     layoutType: "Auth",
-    module : "Ticket Workflow",
+    module: "Ticket Workflow",
     permissions: ["TICKET_WF_CREATED_BY_SEPS",
       "TICKET_WF_UPDATED_BY_SEPS",
       "TICKET_WF_CHANGE_STATUS_BY_SEPS",
@@ -433,7 +437,7 @@ const routes = [
     element: <TicketWorkFlowAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
-    module : "Ticket Workflow",
+    module: "Ticket Workflow",
     permissions: ["TICKET_WF_CREATED_BY_SEPS", "TICKET_WF_CREATED_BY_FI"]
   },
   {
@@ -441,7 +445,7 @@ const routes = [
     element: <TicketWorkFlowAddEdit />,
     isPrivate: true,
     layoutType: "Auth",
-    module : "Ticket Workflow",
+    module: "Ticket Workflow",
     permissions: ["TICKET_WF_UPDATED_BY_SEPS", "TICKET_WF_UPDATED_BY_FI"]
   },
 ];

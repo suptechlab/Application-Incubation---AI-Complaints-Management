@@ -238,7 +238,7 @@ export const spanishLang = {
     "NO": "No",
     "YES": "Sí",
     "DATE_EXTENSION": "Extensión de fecha",
-    "ATTACHMENT DOWNLOADED": "Attachment downloaded",
+    "ATTACHMENT DOWNLOADED": "Adjunto descargado",
     "DOWNLOAD_IN_PROGRESS": "Descarga en progreso",
     "DOWNLOAD_ERROR": "Error de descarga",
     "REPLIES": "Respuestas",
@@ -283,5 +283,6 @@ export const spanishLang = {
     "ALL TEMPLATES" : "Todas las plantillas",
      "SELECT TEAM" :"Seleccionar equipo",
      "SELECT TEMPLATE" : "Seleccionar plantilla",
-     "TEMPLATES" :"Plantillas"
+     "TEMPLATES" :"Plantillas",
+    "TEMPLATE_INFO_MESSAGE": "Puedes copiar plantillas generales desde aquí"
 }

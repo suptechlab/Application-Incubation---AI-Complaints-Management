@@ -322,7 +322,7 @@ const TicketsView = () => {
               </Card>
               {/* SECOND INSTANCE DETAILS */}
               {
-                ticketData?.instanceType === 'SECOND_INSTANCE' &&
+                (ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
                 <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                   <Card.Body className='mh-100'>
                     <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5>

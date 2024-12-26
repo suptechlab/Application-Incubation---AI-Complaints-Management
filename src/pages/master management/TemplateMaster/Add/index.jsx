@@ -40,6 +40,7 @@ const AddTemplate = () => {
     content: "",
     templateId: "",
     templateType: "",
+    usersType: currentUser
   })
 
 
@@ -47,7 +48,6 @@ const AddTemplate = () => {
   const [variableList, setVariableList] = useState([])
 
   const onSubmit = async (values, actions) => {
-
     const formValues = { ...values, copyFrom: values?.templateId }
     setLoading(true);
     createNewTemplateMaster(formValues).then(response => {
@@ -234,7 +234,7 @@ const AddTemplate = () => {
                                   getCopiedTemplateData(option?.target?.value)
                                 }}
                                 name="templateId"
-                                label={t("TEMPLATES")}
+                                label={t("TEMPLATES") + "*" + " (" + t("TEMPLATE_INFO_MESSAGE") + ")"}
                                 className={`${touched?.templateId && errors?.templateId ? "is-invalid" : ""
                                   } mb-3`}
                                 onBlur={handleBlur}

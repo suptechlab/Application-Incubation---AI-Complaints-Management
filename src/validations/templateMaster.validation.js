@@ -20,6 +20,13 @@ const validationSchema = Yup.object({
   content: Yup.string()
     .max(8500, msg.templateContentMax1500) // Dynamic message for max 1500 characters
     .required(msg.templateContentRequired), // Dynamic message for required field
+
+  templateId: Yup.string()
+    .when('usersType', {
+      is: (usersType) => usersType === 'FI_ADMIN',
+      then: (schema) => schema.required(msg.templateRequired),
+      otherwise: (schema) => schema,
+    }),
 });
 
 export { validationSchema };
