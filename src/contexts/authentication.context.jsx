@@ -84,7 +84,7 @@ export default function AuthenticationProvider({ children }) {
     const refreshToken = async (localStorageRefreshToken) => {
         return handleRefreshToken(localStorageRefreshToken).then((response) => {
             if (response.data.data.jwt) {
-                setLocalStorage("langKey", 'es');
+                // setLocalStorage("langKey", 'es');
                 setLocalStorage("access_token", response.data.data.jwt.accessToken);
                 setLocalStorage("refresh_token", response.data.data.jwt.refreshToken);
                 setIsAuthenticated(true);

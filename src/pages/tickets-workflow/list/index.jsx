@@ -7,12 +7,12 @@ import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
-import ListingSearchForm from "../../../components/ListingSearchForm";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import { handleGetWorkflowTableData, ticketWorkflowStatusChange } from "../../../services/ticketWorkflow.service";
+import ListingSearchForm from "../listingSearchForm";
 
 export default function TicketWorkFlowList() {
 
@@ -113,6 +113,15 @@ export default function TicketWorkFlowList() {
                 id: "workflow",
                 header: () => t('WORKFLOW'),
                 enableSorting: true,
+            },
+            {
+                accessorFn: (row) => row?.organization?.razonSocial,
+                id: "organizationId",
+                header: () => t('ENTITY NAME'),
+                enableSorting: false,
+                cell : ({row})=>{
+                    return <span>{row?.original?.organization?.razonSocial}</span>
+                }
             },
             {
                 id: "status",

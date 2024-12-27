@@ -294,5 +294,6 @@ export const englishLang = {
     "TEMPLATES" :"Templates",
     "AGENTS" :"Agents",
     "SELECT AGENT" : "Select Agent",
-    "TEAMS":"Teams"
+    "TEAMS":"Teams",
+    "SELECT_ORGANIZATION_ID_MSG" : "Please select organization id."
 }

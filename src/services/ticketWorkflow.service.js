@@ -20,10 +20,8 @@ export const editTicketWorkflow = async (id , data) => {
 }
 
 //Status Change
-export const ticketWorkflowStatusChange = async (params) => {
-    return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets`, {
-        params
-    });
+export const ticketWorkflowStatusChange = async (id,status) => {
+    return await ticketApi.patch(`/${API_VERSION}/claim-ticket-work-flow/${id}/status?status=${status}`);
 }
 
 //Get Workflow by Id

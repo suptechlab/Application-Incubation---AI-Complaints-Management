@@ -6,12 +6,12 @@ const msg = getValidationMessages();
 const ticketWorkflowSchema = Yup.object({
 
     entityId: Yup.string()
-    .when(['userType', 'instanceTypeId'], {
-        is: (userType, instanceTypeId) =>
-            (userType === 'SUPER_ADMIN' || userType === 'SEPS_ADMIN') && instanceTypeId === 'FIRST_INSTANCE',
-        then: (schema) => schema.required(msg.entityRequired),
-        otherwise: (schema) => schema,
-    }),
+        .when(['userType', 'instanceTypeId'], {
+            is: (userType, instanceTypeId) =>
+                (userType === 'SUPER_ADMIN' || userType === 'SEPS_ADMIN') && instanceTypeId === 'FIRST_INSTANCE',
+            then: (schema) => schema.required(msg.entityRequired),
+            otherwise: (schema) => schema,
+        }),
 
     instanceTypeId: Yup.string()
         .required(msg.instanceTypeRequired),
@@ -33,11 +33,18 @@ const ticketWorkflowSchema = Yup.object({
             Yup.object().shape({
                 actionId: Yup.string().required(msg.actionRequired),
                 actionFilter1: Yup.string().required(msg.fieldRequired),
-                // actionFilter2: Yup.string().when('actionId', {
-                //     is: 'MAIL_TO_CUSTOMER',
-                //     then: (schema) => schema.notRequired(), // Required only for "CREATED"
-                //     otherwise: (schema) => schema.required(msg.fieldRequired), // Optional otherwise
-                // }),
+                actionFilter2: Yup.string().when('actionId', {
+                    is: (value) =>
+                        ['ASSIGN_TO_TEAM', 'MAIL_TO_FI_TEAM', 'MAIL_TO_SEPS_TEAM'].includes(value),
+                    then: (schema) => schema.required(msg.fieldRequired),
+                    otherwise: (schema) => schema.notRequired(),
+                }),
+                actionFilter3: Yup.string().when('actionId', {
+                    is: (value) =>
+                        ['MAIL_TO_FI_TEAM', 'MAIL_TO_SEPS_TEAM'].includes(value),
+                    then: (schema) => schema.required(msg.fieldRequired),
+                    otherwise: (schema) => schema.notRequired(),
+                }),
             })
         )
         .min(1, msg.actionsRequired),

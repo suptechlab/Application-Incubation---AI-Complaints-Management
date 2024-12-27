@@ -2,6 +2,7 @@ import React from "react";
 import { MdArrowDropDown } from "react-icons/md";
 import Select from "react-select";
 import "./ReactSelect.scss";
+import { useTranslation } from "react-i18next";
 
 const ReactSelect = ({
   options,
@@ -17,7 +18,12 @@ const ReactSelect = ({
   defaultValue = null,
   disabled,
 }) => {
+
+
+  const {t} = useTranslation()
   const customStyles = {
+
+
     control: (base, state) => ({
       ...base,
       borderColor: state.isFocused ? "#00549E" : error && touched ? "#FF1418" : "#7F7F7F",
@@ -96,7 +102,7 @@ const ReactSelect = ({
           onChange({ target: { name, value: option ? option.value : "", label: option ? option.label : "" } })
         }
         options={formattedOptions}
-        placeholder={placeholder || 'Select'}
+        placeholder={placeholder || t('SELECT')}
         isClearable={selectedOption?.value != ""}
         classNamePrefix="react-select"
         defaultValue={defaultValue}
