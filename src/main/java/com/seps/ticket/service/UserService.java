@@ -47,8 +47,18 @@ public class UserService {
         return userRepository.findAllByRoleSlug(roleSlug);
     }
 
+    public List<User> getUserListBySepsUser() {
+        String userRole = AuthoritiesConstants.SEPS;
+        return userRepository.findUsersSEPSByRole(userRole);
+    }
+
     public List<User> getUserListByRoleSlug(Long organizationId, String roleSlug) {
         return userRepository.findAllByOrganizationIdAndRoleSlug(organizationId, roleSlug);
+    }
+
+    public List<User> getUserListByOrganizationIdFI(Long organizationId) {
+        String userRole = AuthoritiesConstants.FI;
+        return userRepository.findUsersFIByRole(organizationId, userRole);
     }
 
     public User getUserById(Long id) {
