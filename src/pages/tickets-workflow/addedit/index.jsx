@@ -733,14 +733,12 @@ export default function TicketWorkFlowAddEdit() {
 
     // INITIALIZE CONDITIONS DATA FOR EDIT FORM
     const initializeConditions = async (responseValues) => {
-
         let conditions = [
             {
                 conditionId: "",
                 conditionCatId: "",
             },
         ];
-
         switch (responseValues?.event) {
             case "CREATED":
                 conditions = responseValues?.createConditions?.map((condition) => ({
@@ -818,7 +816,7 @@ export default function TicketWorkFlowAddEdit() {
             const actionCat1 = {};
             const actionCat2 = {};
             const actionCat3 = {};
-
+            setLoading(true);
             // Map through conditions and fetch sub-type options
             await Promise.all(
                 actions.map(async (actions, index) => {
@@ -843,8 +841,6 @@ export default function TicketWorkFlowAddEdit() {
                             break;
                         }
                         case 'ASSIGN_TO_AGENT': {
-
-                            
                             const agentData = await getAgentList(instanceType === "FIRST_INSTANCE" && organizationId ? organizationId : undefined);
 
                             const agentList = agentData?.data?.length > 0
@@ -965,6 +961,8 @@ export default function TicketWorkFlowAddEdit() {
                 });
             });
 
+            setLoading(false);
+
             return { actionCat1, actionCat2, actionCat3 };
         } catch (error) {
             console.error("Error fetching claim sub-types:", error);
@@ -995,12 +993,18 @@ export default function TicketWorkFlowAddEdit() {
         if (responseValues?.event === 'CREATED') {
             actions = responseValues?.createActions?.map((action) => {
                 if (action["action"] === 'ASSIGN_TO_TEAM') {
+                   
+
+                    setSelectedActions( (prevSelectedActions) => (
+                        [...prevSelectedActions,'ASSIGN_TO_TEAM','ASSIGN_TO_AGENT']))
                     return {
                         actionId: action["action"] ?? "",
                         actionFilter1: action["teamId"] ?? "",
                         actionFilter2: action["agentId"] ?? "",
                     };
                 } else if (action["action"] === 'ASSIGN_TO_AGENT') {
+                    setSelectedActions( (prevSelectedActions) => (
+                        [...prevSelectedActions,'ASSIGN_TO_TEAM','ASSIGN_TO_AGENT']))
                     return {
                         actionId: action["action"] ?? "",
                         actionFilter1: action["agentId"] ?? "",
@@ -1108,7 +1112,7 @@ export default function TicketWorkFlowAddEdit() {
                 toast.error(error?.message ?? "FAILED TO FETCH TICKET WORKFLOW DETAILS");
             }
         }).finally(() => {
-            setLoading(false)
+            // setLoading(false)
         })
     }
 
