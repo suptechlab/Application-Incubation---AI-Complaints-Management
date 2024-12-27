@@ -15,7 +15,6 @@ import { handleGetWorkflowTableData, ticketWorkflowStatusChange } from "../../..
 import ListingSearchForm from "../listingSearchForm";
 
 export default function TicketWorkFlowList() {
-
     const location = useLocation();
     const queryClient = useQueryClient();
     const { t } = useTranslation();
@@ -184,20 +183,17 @@ export default function TicketWorkFlowList() {
         ],
         []
     );
-
     useEffect(() => {
         setPagination({
             pageIndex: 0,
             pageSize: 10,
         });
     }, [filter]);
-
     useEffect(() => {
         return () => {
             queryClient.removeQueries("data");
         };
     }, [queryClient]);
-
     return (
         <React.Fragment>
             <Loader isLoading={loading} />
