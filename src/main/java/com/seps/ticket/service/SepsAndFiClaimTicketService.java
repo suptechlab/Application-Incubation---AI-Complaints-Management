@@ -167,11 +167,11 @@ public class SepsAndFiClaimTicketService {
         Long sepsAgentId = null;
         if (authority.contains(AuthoritiesConstants.FI)) {
             filterRequest.setOrganizationId(currentUser.getOrganization().getId());
-            if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT)) {
+            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
                 fiAgentId = currentUser.getId();
             }
         } else {
-            if (currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)) {
+            if (!currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
                 sepsAgentId = currentUser.getId();
             }
         }
@@ -231,20 +231,14 @@ public class SepsAndFiClaimTicketService {
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
-        List<DropdownListDTO> agentList = new ArrayList<>();
+        List<DropdownListDTO> agentList;
         if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
-            if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
-                List<User> userList = userService.getUserListByRoleSlug(organizationId, Constants.RIGHTS_FI_AGENT);
-                agentList = userList.stream()
-                    .map(this::mapToDropdown)
-                    .toList();
-            }
-        } else if (currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) || authority.contains(AuthoritiesConstants.ADMIN)) {
-            List<User> userList = userService.getUserListByRoleSlug(Constants.RIGHTS_SEPS_AGENT);
-            agentList = userList.stream()
-                .map(this::mapToDropdown)
-                .toList();
+            List<User> userList = userService.getUserListByOrganizationIdFI(organizationId);
+            agentList = userList.stream().map(this::mapToDropdown).toList();
+        } else {
+            List<User> userList = userService.getUserListBySepsUser();
+            agentList = userList.stream().map(this::mapToDropdown).toList();
         }
         return agentList;
     }
@@ -281,77 +275,75 @@ public class SepsAndFiClaimTicketService {
     @Transactional
     public List<ClaimTicket> assignTicketsToFiAgent(Long agentId, @Valid AssignTicketRequestDTO assignTicketRequestDTO) {
         // Validate agent
-        User agent = userService.getUserById(agentId);
-
         User currentUser = userService.getCurrentUser();
-        List<String> authority = currentUser.getAuthorities().stream()
-            .map(Authority::getName)
-            .toList();
-        if (authority.contains(AuthoritiesConstants.FI) && currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
-            Long organizationId = currentUser.getOrganization().getId();
-            if (!agent.hasRoleSlug(Constants.RIGHTS_FI_AGENT)) {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.IS_NOT_FI_AGENT, new String[]{agentId.toString()}, null);
-            }
-            // Fetch tickets by IDs
-            List<ClaimTicket> tickets = claimTicketRepository.findAllByIdInAndOrganizationId(assignTicketRequestDTO.getTicketIds(), organizationId);
-
-            if (tickets.isEmpty()) {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NO_TICKET_FOUND_WITH_PROVIDED_IDS, new String[]{assignTicketRequestDTO.toString()}, null);
-            }
-            // Validate that all tickets are of the FIRST_INSTANCE type
-            boolean allSecondInstance = tickets.stream()
-                .allMatch(ticket -> ticket.getInstanceType() == InstanceTypeEnum.FIRST_INSTANCE);
-
-            if (!allSecondInstance) {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE, new String[]{enumUtil.getLocalizedEnumValue(InstanceTypeEnum.FIRST_INSTANCE, LocaleContextHolder.getLocale())}, null);
-            }
-            List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
-            List<ClaimTicketAssignLog> assignLogsList = new ArrayList<>();
-            List<ClaimTicketStatusLog> claimTicketStatusLogList = new ArrayList<>();
-            // Assign the agent to each ticket
-            tickets.forEach(ticket -> {
-                if (ticket.getFiAgentId() != null && ticket.getFiAgentId().equals(agentId)) {
-                    return;
-                }
-                ClaimTicketActivityLog activityLog = createAssignToAgentActivityLog(currentUser, ticket, agent);
-                // Calculate and set SLA breach date
-                if (ticket.getSlaBreachDays() != null && ticket.getFiAgentId() == null) {
-                    LocalDate slaBreachDate = LocalDate.now().plusDays(ticket.getSlaBreachDays());
-                    ticket.setSlaBreachDate(slaBreachDate);
-                }
-                ticket.setFiAgentId(agent.getId());
-                ticket.setFiAgent(agent);
-                ticket.setStatus(ClaimTicketStatusEnum.ASSIGNED);
-                ticket.setAssignedAt(Instant.now());
-
-                activityLogList.add(activityLog);
-
-                //Save ClaimTicketAssignLog table
-                ClaimTicketAssignLog assignLog = new ClaimTicketAssignLog();
-                assignLog.setTicketId(ticket.getId());
-                assignLog.setUserId(agentId);
-                assignLog.setUserType(UserTypeEnum.FI_USER);
-                assignLog.setCreatedBy(currentUser.getId());
-                assignLogsList.add(assignLog);
-
-                //Save ClaimTicketStatusLog table
-                ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
-                claimTicketStatusLog.setTicketId(ticket.getId());
-                claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.ASSIGNED);
-                claimTicketStatusLog.setCreatedBy(currentUser.getId());
-                claimTicketStatusLogList.add(claimTicketStatusLog);
-            });
-
-            // Save the updated tickets
-            List<ClaimTicket> savedTickets = claimTicketRepository.saveAll(tickets);
-
-            activityLogList.forEach(claimTicketActivityLogService::saveActivityLog);
-            claimTicketAssignLogRepository.saveAll(assignLogsList);
-            claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
-            return savedTickets;
-        } else {
+        List<String> authority = currentUser.getAuthorities().stream().map(Authority::getName).toList();
+        if (!authority.contains(AuthoritiesConstants.FI)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, new String[]{assignTicketRequestDTO.toString()}, null);
         }
+        Long organizationId = currentUser.getOrganization().getId();
+        User agent = userService.getUserById(agentId);
+        List<String> agentAuthority = agent.getAuthorities().stream().map(Authority::getName).toList();
+        if (!agentAuthority.contains(AuthoritiesConstants.FI)) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.IS_NOT_FI_AGENT, new String[]{agentId.toString()}, null);
+        }
+        // Fetch tickets by IDs
+        List<ClaimTicket> tickets = claimTicketRepository.findAllByIdInAndOrganizationId(assignTicketRequestDTO.getTicketIds(), organizationId);
+
+        if (tickets.isEmpty()) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NO_TICKET_FOUND_WITH_PROVIDED_IDS, new String[]{assignTicketRequestDTO.toString()}, null);
+        }
+        // Validate that all tickets are of the FIRST_INSTANCE type
+        boolean allSecondInstance = tickets.stream()
+            .allMatch(ticket -> ticket.getInstanceType() == InstanceTypeEnum.FIRST_INSTANCE);
+
+        if (!allSecondInstance) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE, new String[]{enumUtil.getLocalizedEnumValue(InstanceTypeEnum.FIRST_INSTANCE, LocaleContextHolder.getLocale())}, null);
+        }
+        List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
+        List<ClaimTicketAssignLog> assignLogsList = new ArrayList<>();
+        List<ClaimTicketStatusLog> claimTicketStatusLogList = new ArrayList<>();
+        // Assign the agent to each ticket
+        tickets.forEach(ticket -> {
+            if (ticket.getFiAgentId() != null && ticket.getFiAgentId().equals(agentId)) {
+                return;
+            }
+            ClaimTicketActivityLog activityLog = createAssignToAgentActivityLog(currentUser, ticket, agent);
+            // Calculate and set SLA breach date
+            if (ticket.getSlaBreachDays() != null && ticket.getFiAgentId() == null) {
+                LocalDate slaBreachDate = LocalDate.now().plusDays(ticket.getSlaBreachDays());
+                ticket.setSlaBreachDate(slaBreachDate);
+            }
+            ticket.setFiAgentId(agent.getId());
+            ticket.setFiAgent(agent);
+            ticket.setStatus(ClaimTicketStatusEnum.ASSIGNED);
+            ticket.setAssignedAt(Instant.now());
+
+            activityLogList.add(activityLog);
+
+            //Save ClaimTicketAssignLog table
+            ClaimTicketAssignLog assignLog = new ClaimTicketAssignLog();
+            assignLog.setTicketId(ticket.getId());
+            assignLog.setUserId(agentId);
+            assignLog.setUserType(UserTypeEnum.FI_USER);
+            assignLog.setCreatedBy(currentUser.getId());
+            assignLogsList.add(assignLog);
+
+            //Save ClaimTicketStatusLog table
+            ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+            claimTicketStatusLog.setTicketId(ticket.getId());
+            claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.ASSIGNED);
+            claimTicketStatusLog.setCreatedBy(currentUser.getId());
+            claimTicketStatusLogList.add(claimTicketStatusLog);
+        });
+
+        // Save the updated tickets
+        List<ClaimTicket> savedTickets = claimTicketRepository.saveAll(tickets);
+
+        activityLogList.forEach(claimTicketActivityLogService::saveActivityLog);
+        claimTicketAssignLogRepository.saveAll(assignLogsList);
+        claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
+        return savedTickets;
+
     }
 
     /**
@@ -428,15 +420,14 @@ public class SepsAndFiClaimTicketService {
     @Transactional
     public List<ClaimTicket> assignTicketsToSepsAgent(Long agentId, @Valid AssignTicketRequestDTO assignTicketRequestDTO) {
         // Validate agent
-        User agent = userService.getUserById(agentId);
 
         User currentUser = userService.getCurrentUser();
-        List<String> authority = currentUser.getAuthorities().stream()
-            .map(Authority::getName)
-            .toList();
+        List<String> authority = currentUser.getAuthorities().stream().map(Authority::getName).toList();
 
         if (authority.contains(AuthoritiesConstants.SEPS) || authority.contains(AuthoritiesConstants.ADMIN)) {
-            if (!agent.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)) {
+            User agent = userService.getUserById(agentId);
+            List<String> agentAuthority = agent.getAuthorities().stream().map(Authority::getName).toList();
+            if (!agentAuthority.contains(AuthoritiesConstants.SEPS)) {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.IS_NOT_SEPS_AGENT, new String[]{agentId.toString()}, null);
             }
             // Fetch tickets by IDs
@@ -446,11 +437,12 @@ public class SepsAndFiClaimTicketService {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NO_TICKET_FOUND_WITH_PROVIDED_IDS, new String[]{assignTicketRequestDTO.toString()}, null);
             }
 
-            // Validate that all tickets are of the SECOND_INSTANCE type
-            boolean allSecondInstance = tickets.stream()
-                .allMatch(ticket -> ticket.getInstanceType() == InstanceTypeEnum.SECOND_INSTANCE);
+            // Validate that all tickets are of the SECOND_INSTANCE type or COMPLAINT type
+            boolean allValidTypes = tickets.stream()
+                .allMatch(ticket -> ticket.getInstanceType() == InstanceTypeEnum.SECOND_INSTANCE
+                    || ticket.getInstanceType() == InstanceTypeEnum.COMPLAINT);
 
-            if (!allSecondInstance) {
+            if (!allValidTypes) {
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE, new String[]{enumUtil.getLocalizedEnumValue(InstanceTypeEnum.SECOND_INSTANCE, LocaleContextHolder.getLocale())}, null);
             }
 
@@ -525,16 +517,6 @@ public class SepsAndFiClaimTicketService {
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
-
-        // Check if the user is FI-Admin
-        if (
-            (authority.contains(AuthoritiesConstants.FI) && !currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) ||
-                (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) ||
-                (!authority.contains(AuthoritiesConstants.ADMIN) &&
-                    !(authority.contains(AuthoritiesConstants.FI) || authority.contains(AuthoritiesConstants.SEPS)))
-        ) {
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
-        }
 
         // Find the ticket by ID
         ClaimTicket ticket;
@@ -767,7 +749,7 @@ public class SepsAndFiClaimTicketService {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalFiAgentAndOrganizationId(userId, organizationId);
             }
         } else {
-            if (currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_AGENT)) {
+            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalSEPS(userId);
             } else {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalSEPS(null);
@@ -1190,7 +1172,7 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if (authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
@@ -1200,9 +1182,7 @@ public class SepsAndFiClaimTicketService {
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
-        }
+
         if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
@@ -1335,7 +1315,7 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if (authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
@@ -1345,9 +1325,7 @@ public class SepsAndFiClaimTicketService {
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
-        }
+
         if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }
@@ -1374,7 +1352,7 @@ public class SepsAndFiClaimTicketService {
 
         // Find the ticket by ID
         ClaimTicket ticket;
-        if (authority.contains(AuthoritiesConstants.FI) && (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT))) {
+        if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
@@ -1384,9 +1362,7 @@ public class SepsAndFiClaimTicketService {
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_AGENT) && !ticket.getFiAgentId().equals(currentUser.getId())) {
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
-        }
+
         if (ticket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || ticket.getStatus().equals(ClaimTicketStatusEnum.REJECTED)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY, null, null);
         }

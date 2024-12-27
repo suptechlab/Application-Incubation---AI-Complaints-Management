@@ -162,13 +162,16 @@ public class UserClaimTicketResource {
                                                                   HttpServletRequest httpServletRequest) {
         Long id = secondInstanceRequest.getId();
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
-        UserClaimTicketDTO prevUserClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // File the claim
         ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
-        // Retrieve the claim ticket
-        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
-        // Send an email notification
-        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO, userClaimTicketDTO);
+        if(claimTicketWorkFlowDTO == null) {
+            // Retrieve the claim ticket
+            ClaimTicketDTO claimTicketDTO = userClaimTicketService.getClaimTicketById(id);
+            // Send an email notification
+            mailService.sendSecondInstanceClaimEmail(claimTicketDTO);
+        }else{
+            mailService.handleWorkflowFileClaimTicket(id, claimTicketWorkFlowDTO.getId());
+        }
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("second.instance.filed.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
