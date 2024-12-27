@@ -9,7 +9,7 @@ import { resendLoginOTPonEmail } from "../../../redux/slice/authSlice";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-const OtpFormSection = ({ otpToken, handleFormSubmit, isFromDirectLogin }) => {
+const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
     const [optSendStatus, setOptSendStatus] = useState(false);
     const [isResendDisabled, setIsResendDisabled] = useState(false);
     const [timer, setTimer] = useState(0);
@@ -54,7 +54,6 @@ const OtpFormSection = ({ otpToken, handleFormSubmit, isFromDirectLogin }) => {
     };
 
     useEffect(() => {
-        console.log('isDirect', isFromDirectLogin)
         let countdown;
         if (timer > 0) {
             countdown = setInterval(() => {
@@ -76,9 +75,7 @@ const OtpFormSection = ({ otpToken, handleFormSubmit, isFromDirectLogin }) => {
         >
             {(formikProps) => (
                 <React.Fragment>
-                    {!isFromDirectLogin && (
-                        <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
-                    )}
+                    <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
                     <div className="fw-semibold mb-2">{t('VERIFY_EMAIL_LABEL')}</div>
                     <p>{t('OTP_SENT_INSTRUCTION')}</p>
                     <FormOtpInputBox

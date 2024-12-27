@@ -183,6 +183,7 @@ const Header = ({ layout }) => {
         handleClose={() => setFileClaimMainModalShow(false)}
         isFileClaimModalShow={isFileClaimModalShow}
         setIsFileClaimModalShow={setIsFileClaimModalShow}
+        isDirectLogin={true}
       />
     </header>
   );
