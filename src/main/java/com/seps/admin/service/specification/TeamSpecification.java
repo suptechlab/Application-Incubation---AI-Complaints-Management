@@ -44,8 +44,11 @@ public class TeamSpecification {
         return (root, query, criteriaBuilder) -> {
             // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
-
-            predicates.add(criteriaBuilder.equal(root.get("entityId"), organizationId));
+            if(organizationId!=null) {
+                predicates.add(criteriaBuilder.equal(root.get("entityId"), organizationId));
+            }else{
+                predicates.add(criteriaBuilder.isNull(root.get("entityId")));
+            }
             // Filter by status (if provided)
             predicates.add(criteriaBuilder.equal(root.get("status"), true));
 
