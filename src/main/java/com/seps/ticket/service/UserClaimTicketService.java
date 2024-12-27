@@ -656,7 +656,8 @@ public class UserClaimTicketService {
             claimTicket.setStatus(ClaimTicketStatusEnum.NEW);
             claimTicket.setSlaBreachDate(null);
         }
-
+        claimTicket.setClosedStatus(null);
+        claimTicket.setRejectedStatus(null);
         claimTicket.setSecondInstanceFiledAt(Instant.now());
         claimTicket.setSecondInstanceComment(secondInstanceRequest.getComment());
         claimTicket.setUpdatedAt(Instant.now());
@@ -682,11 +683,11 @@ public class UserClaimTicketService {
         // Convert user claim ticket documents to UserClaimTicketDTO
         List<UserClaimTicketDocumentDTO> userClaimTicketDTOList = userClaimTicketDocumentList.stream()
             .map(this::convertToUserClaimTicketDocumentDTO)
-            .collect(Collectors.toList());
+            .toList();
         // Convert claim ticket documents to ClaimTicketDTO
         List<ClaimTicketDocumentDTO> claimTicketDTOList = claimTicketDocumentList.stream()
             .map(this::convertToClaimTicketDocumentDTO)
-            .collect(Collectors.toList());
+            .toList();
 
         UserClaimTicketDTO userClaimTicketDTO = userClaimTicketMapper.toUserClaimTicketDTO(claimTicket);
         ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);

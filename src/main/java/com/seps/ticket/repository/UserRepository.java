@@ -7,6 +7,7 @@ import com.seps.ticket.service.mapper.UserMapper;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -36,4 +37,25 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = "authorities")
     Optional<User> findOneByIdAndStatusIn(Long id, Set<UserStatusEnum> statuses);
+
+    @Query("""
+        SELECT u
+        FROM User u
+        JOIN u.authorities a
+        WHERE a.name = :role
+        AND u.activated = true
+        AND u.organizationId = :organizationId
+    """)
+    List<User> findUsersFIByRole(@Param("organizationId") Long organizationId, @Param("role") String role);
+
+
+    @Query("""
+        SELECT u
+        FROM User u
+        JOIN u.authorities a
+        WHERE a.name = :role
+          AND u.activated = true
+    """)
+    List<User> findUsersSEPSByRole(@Param("role") String role);
+
 }
