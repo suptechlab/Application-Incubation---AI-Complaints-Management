@@ -5,10 +5,10 @@ import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
-import ListingSearchForm from "../../../components/ListingSearchForm";
+
 import PageHeader from "../../../components/PageHeader";
 import Toggle from "../../../components/Toggle";
 import {
@@ -17,8 +17,7 @@ import {
 } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
-
-
+import ListingSearchForm from "./ListingSearchForm";
 import {
   handleGetTemplateMaster,
   changeTemplateMaster,
@@ -30,7 +29,8 @@ const TemplateMaster = () => {
   const { t } = useTranslation();
 
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
   const [isDownloading, setDownloading] = useState(false)
   const [pagination, setPagination] = useState({
@@ -86,7 +86,8 @@ const TemplateMaster = () => {
   }, []);
 
   const editTemplateMaster = async (rowData) => {
-    setEditModal({ row: rowData, open: !editModal?.open });
+    navigate(`/template-master/edit/${rowData?.id}`)
+    // setEditModal({ row: rowData, open: !editModal?.open });
   };
 
   const dataQuery = useQuery({
@@ -128,7 +129,7 @@ const TemplateMaster = () => {
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
     refetchOnWindowFocus: false, // Disable refetching on window focus
-    refetchOnMount: false, // Prevent refetching on component remount
+    refetchOnMount: true, // Prevent refetching on component remount
     retry: 0, //Disable retry on failure
   });
 
@@ -169,22 +170,27 @@ const TemplateMaster = () => {
         id: "templateType",
         header: () => t("TEMPLATE TYPE"),
       },
-
+      {
+        accessorFn: (row) => row?.userType,
+        id: "userType",
+        header: () => t("USER TYPE"),
+      },
       {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
-            permission.current.statusModule ?
-              <Toggle
-                id={`status-${info?.row?.original?.id}`}
-                key={"status"}
-                // label="Status"
-                name="status"
-                value={info?.row?.original?.status}
-                checked={info?.row?.original?.status}
-                onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-                tooltip="Active"
-              /> : ''
+            // permission.current.statusModule ?
+            <Toggle
+              id={`status-${info?.row?.original?.id}`}
+              key={"status"}
+              // label="Status"
+              name="status"
+              value={info?.row?.original?.status}
+              checked={info?.row?.original?.status}
+              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+              tooltip="Active"
+            />
+            //  : ''
           )
         },
         id: "status",
@@ -195,21 +201,22 @@ const TemplateMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ?
-            <DataGridActions
-              controlId="role-rights"
-              rowData={rowData}
-              customButtons={[
-                {
-                  name: "edit",
-                  enabled: permission.current.editModule,
-                  type: "button",
-                  title: "Edit",
-                  icon: <MdEdit size={18} />,
-                  handler: () => editTemplateMaster(rowData?.row?.original),
-                },
-              ]}
-            /> : ''
+          // permission.current.editModule ?
+          <DataGridActions
+            controlId="role-rights"
+            rowData={rowData}
+            customButtons={[
+              {
+                name: "edit",
+                enabled: true,
+                type: "button",
+                title: "Edit",
+                icon: <MdEdit size={18} />,
+                handler: () => editTemplateMaster(rowData?.row?.original),
+              },
+            ]}
+          />
+          // : ''
         ),
         header: () => (
           <div className="text-center">{t("ACTIONS")}</div>
@@ -274,12 +281,11 @@ const TemplateMaster = () => {
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-
         <PageHeader
           title={t("TEMPLATE MASTER")}
           actions={[
-            { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-            { label: "Add New", onClick: toggle, variant: "warning" },
+            { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+            { label: t("ADD NEW"), to: "/template-master/add", variant: "warning", disabled: false },
           ]}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
@@ -298,7 +304,6 @@ const TemplateMaster = () => {
         <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
         <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
       </div>
-
     </React.Fragment>
   );
 };

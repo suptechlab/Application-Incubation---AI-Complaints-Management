@@ -16,6 +16,8 @@ import { AuthenticationContext } from "../../../contexts/authentication.context"
 import { calculateDaysDifference } from "../../../utils/commonutils";
 import moment from "moment/moment";
 import { MdAttachFile } from "react-icons/md";
+import { MasterDataContext } from "../../../contexts/masters.context";
+import AppTooltip from "../../../components/tooltip";
 
 export default function TicketsList() {
     const location = useLocation();
@@ -23,6 +25,7 @@ export default function TicketsList() {
 
 
     const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+    const { masterData } = useContext(MasterDataContext)
     // PERMISSIONS work
 
     const [permissionsState, setPermissionsState] = React.useState({
@@ -205,8 +208,10 @@ export default function TicketsList() {
                             // Filter rows based on status and only include rows that are not "CLOSED" or "REJECTED"
                             const allSelectedIds = e.target.checked
                                 ? table.getRowModel().rows
-                                    .filter((row) => (currentUser === "SEPS_ADMIN" && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED") ||
-                                        (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_ADMIN"))
+                                    .filter((row) => (
+                                        (currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED")
+                                        ||
+                                        (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_ADMIN" && currentUser !== "SUPER_ADMIN"))
                                     .map((row) => row.original.id)
                                 : [];
 
@@ -227,9 +232,11 @@ export default function TicketsList() {
                 cell: ({ row }) => (
 
                     (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && (
-                        (currentUser === "SEPS_ADMIN" && row?.original?.instanceType === 'SECOND_INSTANCE') ||
-                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE') ||
-                        (currentUser !== "SEPS_ADMIN" && currentUser !== "FI_ADMIN")
+                        ((currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE') ||
+                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE')
+
+
+                        // (currentUser !== "SEPS_ADMIN" && currentUser !== "FI_ADMIN")
                     )) ? (
                         <Form.Check
                             className="form-check-cursor"
@@ -264,10 +271,7 @@ export default function TicketsList() {
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
                             {"#" + row?.original?.ticketId}
                         </Link>
-                        {
-                            row?.original?.claimTicketDocuments && row?.original?.claimTicketDocuments?.length > 0 ?
-                                <MdAttachFile size={16} /> : ""
-                        }
+                        {row?.original?.haveClaimTicketDocuments &&  <MdAttachFile size={16} />}
 
 
                         {/* <AppTooltip title="Attachments">
@@ -320,6 +324,9 @@ export default function TicketsList() {
                 id: "instanceType",
                 header: () => t("INSTANCE_TYPE"),
                 enableSorting: false,
+                cell: ({ row }) => (
+                    <span>{(row?.original?.instanceType && masterData?.instanceType) && masterData?.instanceType[row?.original?.instanceType]}</span>
+                )
             },
             {
                 accessorFn: (row) => row?.priority,
@@ -330,7 +337,7 @@ export default function TicketsList() {
                     <span
                         className={`text-nowrap fw-semibold ${getPriorityClass(rowData.row.original.priority)}`}
                     >
-                        {rowData.row.original.priority}
+                        {masterData?.claimTicketPriority[rowData?.row?.original?.priority]}
                     </span>
                 ),
             },
@@ -349,10 +356,16 @@ export default function TicketsList() {
                 header: () => t("STATUS"),
                 size: "100",
                 cell: (rowData) => (
-                    <span
+                    rowData?.row?.original?.status === 'CLOSED' ? <AppTooltip title={masterData?.closedStatus[rowData?.row?.original?.closedStatus]}>
+                        <span
+                            className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+                        >
+                            {masterData?.claimTicketStatus[rowData.row.original.status]}
+                        </span>
+                    </AppTooltip> : <span
                         className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
                     >
-                        {rowData.row.original.status}
+                        {masterData?.claimTicketStatus[rowData.row.original.status]}
                     </span>
                 ),
             },
@@ -365,7 +378,7 @@ export default function TicketsList() {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
 
-            if (currentUser === "SEPS_ADMIN") {
+            if (currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") {
                 agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setClearTableSelection(true)
@@ -434,7 +447,7 @@ export default function TicketsList() {
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
         return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns

@@ -24,12 +24,21 @@ export const getTemplateMaster = async (id) => {
 
 // UPDATE TEMPLATE MASTER STATUS
 export const changeTemplateMaster = async (id, status) => {
-  console.log('currentStatus',status.status)
   return await adminApi.patch(`/v1/templates/${id}/status?status=${status.status}`);
 }
 
 // EXPORT TEMPLATE MASTER LIST
 export const downloadTemplateList = async ({params}) => {
   return await adminApi.get(`/v1/templates/download`, { params, responseType: 'arraybuffer' });
+}
+
+// TEMPLATE DROPDOWN
+export const templateDropdownList = async () => {
+  return await adminApi.get(`/v1/templates/dropdown-list`);
+}
+
+// GET TEMPLATE DETAIL FOR COPY
+export const templateDetailForCopy = async (id) => {
+  return await adminApi.get(`/v1/templates/${id}/for-copy`);
 }
 

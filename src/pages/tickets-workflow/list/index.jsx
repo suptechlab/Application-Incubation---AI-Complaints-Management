@@ -7,18 +7,18 @@ import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
-import ListingSearchForm from "../../../components/ListingSearchForm";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
-import { handleGetTableData, handleStatusChangeState } from "../../../services/teamManagment.service";
 import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
+import { handleGetWorkflowTableData, ticketWorkflowStatusChange } from "../../../services/ticketWorkflow.service";
+import ListingSearchForm from "../listingSearchForm";
 
 export default function TicketWorkFlowList() {
 
     const location = useLocation();
     const queryClient = useQueryClient();
-    const { t } = useTranslation(); // use the translation hook
+    const { t } = useTranslation();
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -35,7 +35,6 @@ export default function TicketWorkFlowList() {
 
     const [loading, setLoading] = useState(false);
 
-    // Permissoin work
     const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
@@ -51,13 +50,13 @@ export default function TicketWorkFlowList() {
 
                 let response;
                 if (sorting.length === 0) {
-                    response = await handleGetTableData({
+                    response = await handleGetWorkflowTableData({
                         page: pagination.pageIndex,
                         size: pagination.pageSize,
                         ...filterObj,
                     });
                 } else {
-                    response = await handleGetTableData({
+                    response = await handleGetWorkflowTableData({
                         page: pagination.pageIndex,
                         size: pagination.pageSize,
                         sort: sorting
@@ -67,24 +66,20 @@ export default function TicketWorkFlowList() {
                     });
                 }
 
-                // Return the API response data
                 return response;
             } catch (error) {
                 console.error("Error fetching data", error);
-                // Optionally, handle errors here
             } finally {
-                // Set loading state to false when the request finishes (whether successful or not)
                 setLoading(false);
             }
         },
-        staleTime: 0, // Data is always stale, so it refetches
-        cacheTime: 0, // Cache expires immediately
-        refetchOnWindowFocus: false, // Disable refetching on window focus
-        refetchOnMount: false, // Prevent refetching on component remount
-        retry: 0, //Disable retry on failure
+        staleTime: 0,
+        cacheTime: 0,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        retry: 0,
     });
 
-    //handle last page deletion item
     useEffect(() => {
         if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
             setPagination({
@@ -95,35 +90,43 @@ export default function TicketWorkFlowList() {
     }, [dataQuery.data?.data?.totalPages]);
 
     const changeStatus = async (id, currentStatus) => {
-        // setLoading(true)
-        // let toggleStatus = currentStatus === true ? false : true;
-        // handleStatusChangeState(id, toggleStatus).then(response => {
-        //     toast.success(t("STATUS UPDATED"));
-        //     dataQuery.refetch();
-        // }).catch((error) => {
-        //     if (error?.response?.data?.errorDescription) {
-        //         toast.error(error?.response?.data?.errorDescription);
-        //     } else {
-        //         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-        //     }
-        // }).finally(() => {
-        //     setLoading(false)
-        // })
+        setLoading(true)
+        let toggleStatus = currentStatus === true ? false : true;
+        ticketWorkflowStatusChange(id, toggleStatus).then(response => {
+            toast.success(t("STATUS UPDATED"));
+            dataQuery.refetch();
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+            }
+        }).finally(() => {
+            setLoading(false)
+        })
     };
 
     const columns = React.useMemo(
         () => [
             {
-                accessorFn: (row) => row.teamName,
+                accessorFn: (row) => row.title,
                 id: "workflow",
                 header: () => t('WORKFLOW'),
                 enableSorting: true,
             },
             {
+                accessorFn: (row) => row?.organization?.razonSocial,
+                id: "organizationId",
+                header: () => t('ENTITY NAME'),
+                enableSorting: false,
+                cell : ({row})=>{
+                    return <span>{row?.original?.organization?.razonSocial}</span>
+                }
+            },
+            {
                 id: "status",
                 isAction: true,
                 cell: (info) => {
-
                     if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
                         return (
                             //   permission.current.statusModule ?
