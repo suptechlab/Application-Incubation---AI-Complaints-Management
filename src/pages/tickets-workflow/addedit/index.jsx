@@ -239,7 +239,7 @@ export default function TicketWorkFlowAddEdit() {
         }
         if (currentUser) {
 
-            const instanceType = currentUser === 'FI_ADMIN' ? 'FIRST_INSTANCE' : ""
+            const instanceType = currentUser === 'FI_USER' ? 'FIRST_INSTANCE' : ""
 
             setInitialValues({
                 userType: currentUser,
@@ -506,7 +506,7 @@ export default function TicketWorkFlowAddEdit() {
         });
 
 
-        const organizationId = currentUser === 'FI_ADMIN' ? userData?.organizationId : values?.entityId
+        const organizationId = currentUser === 'FI_USER' ? userData?.organizationId : values?.entityId
 
 
         const payload = {
@@ -1151,10 +1151,10 @@ export default function TicketWorkFlowAddEdit() {
                                                     onBlur={formikProps.handleBlur}
                                                     error={formikProps.errors.instanceTypeId}
                                                     touched={formikProps.touched.instanceTypeId}
-                                                    disabled={currentUser === 'FI_ADMIN' || isEdit ? true : false}
+                                                    disabled={currentUser === 'FI_USER' || isEdit ? true : false}
                                                 />
                                             </Col>
-                                            {(currentUser === 'SUPER_ADMIN' || currentUser === 'SEPS_ADMIN') && (
+                                            {(currentUser === 'SYSTEM_ADMIN' || currentUser === 'SEPS_USER') && (
                                                 <Col sm={6} lg={4}>
                                                     <ReactSelect
                                                         label={`${t('ENTITY NAME')}*`}

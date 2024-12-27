@@ -4,7 +4,7 @@ import { MdOutlineNote, MdOutlineNoteAdd, MdOutlineReply } from 'react-icons/md'
 import ReplyTab from './reply-tab';
 import { useTranslation } from 'react-i18next';
 
-const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs,ticketData, getTicketData}) => {
+const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs,ticketData, getTicketData,permissionState}) => {
     const {t} = useTranslation()
     const [activeTab, setActiveTab] = useState('replies');
 
@@ -23,7 +23,7 @@ const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs,ticketData, getTicket
             id: 'replies',
             name: t('REPLIES'),
             tabIcon: <MdOutlineReply size={14} />,
-            Component: <ReplyTab ticketId={ticketId} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketData} currentTab="REPLY"/>,
+            Component: <ReplyTab ticketId={ticketId} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketData} currentTab="REPLY" permissionState={permissionState}/>,
             disabled: false,
         },
         {
@@ -31,7 +31,7 @@ const TicketTabsSection = ({ticketId,setIsGetAcitivityLogs,ticketData, getTicket
             name: t("ADD_INTERNAL_NOTE"),
             tabIcon: <MdOutlineNoteAdd size={14} />,
             Component: <ReplyTab ticketId={ticketId} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketData} currentTab="INTERNAL_NOTE" />,
-            disabled: false,
+            disabled: permissionState?.internalNotePermission !== true ?? false,
         },
         // {
         //     id: 'resolutionNotes',

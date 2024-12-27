@@ -137,14 +137,14 @@ export default function AuthenticationProvider({ children }) {
                 const roles = data?.roles || [];
                 if (!authorities.includes("ROLE_ADMIN")) {
                     if (roles?.length > 0) {
-                        const roleMap = {
-                            'fi-admin': 'FI_ADMIN',
-                            'fi-agent': 'FI_AGENT',
-                            'seps-admin': 'SEPS_ADMIN',
-                            'seps-agent': 'SEPS_AGENT',
-                        };
-                        const roleName = roles[0]?.roleSlug;
-                        setCurrentUser(roleMap[roleName] || 'SUPER_ADMIN');
+                        // const roleMap = {
+                        //     'fi-admin': 'FI_USER',
+                        //     'fi-agent': 'FI_USER',
+                        //     'seps-admin': 'SEPS_USER',
+                        //     'seps-agent': 'SEPS_USER',
+                        // };
+                        const roleName = roles[0]?.userType;
+                        setCurrentUser(roleName || 'SYSTEM_ADMIN');
 
                         const rolePermissionMap = roles.reduce((acc, role) => {
                             const modules = role.modules || [];
@@ -158,12 +158,12 @@ export default function AuthenticationProvider({ children }) {
                         setModules(roles[0]?.modules);
                         setPermissions(rolePermissionMap);
                     } else {
-                        setCurrentUser('SUPER_ADMIN');
+                        setCurrentUser('SYSTEM_ADMIN');
                     }
 
 
                 } else {
-                    setCurrentUser('SUPER_ADMIN')
+                    setCurrentUser('SYSTEM_ADMIN')
                 }
             })
             .catch((error) => {
