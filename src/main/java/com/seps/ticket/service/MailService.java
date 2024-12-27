@@ -461,8 +461,18 @@ public class MailService {
         LOG.info("Reply to team on ticket and email sent successfully to team {}", currentUser.getEmail());
     }
 
-    public void sendComplaintEmail(UserClaimTicketDTO userClaimTicketDTO) {
-
+    @Async
+    public void sendComplaintEmail(ClaimTicketDTO ticket) {
+        User customer = userService.findUserById(ticket.getUser().getId());
+        if(customer!=null) {
+            MailDTO mailDTO = new MailDTO();
+            mailDTO.setTemplateKey("TICKET_COMPLAINT_SEND_TO_CUSTOMER");
+            mailDTO.setTo(customer.getEmail());
+            mailDTO.setLocale(customer.getLangKey());
+            mailDTO.setIsStatic(true);
+            mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, customer));
+            sendDynamicContentEmail(mailDTO);
+        }
     }
 
     @Async

@@ -749,8 +749,10 @@ public class UserClaimTicketService {
             assignLog.setUserId(claimTicket.getSepsAgent().getId());
             assignLog.setUserType(UserTypeEnum.SEPS_USER);
             assignLog.setInstanceType(claimTicket.getInstanceType());
-            assignLog.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO.getId());
-            assignLog.setClaimTicketWorkFlowData(gson.toJson(claimTicketWorkFlowDTO));
+            if (claimTicketWorkFlowDTO != null && userDTO != null) {
+                assignLog.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO.getId());
+                assignLog.setClaimTicketWorkFlowData(gson.toJson(claimTicketWorkFlowDTO));
+            }
             assignLog.setCreatedBy(currentUserId);
             claimTicketAssignLogRepository.save(assignLog);
         }
@@ -1023,7 +1025,7 @@ public class UserClaimTicketService {
     }
 
     @Transactional
-    public void fileComplaint(ComplaintRequest complaintRequest, RequestInfo requestInfo) {
+    public ClaimTicketWorkFlowDTO fileComplaint(ComplaintRequest complaintRequest, RequestInfo requestInfo) {
         // Extract claim ticket ID from the request
         Long id = complaintRequest.getId();
         // Retrieve the current logged-in user
@@ -1064,9 +1066,45 @@ public class UserClaimTicketService {
         auditData.put(Constants.OLD_DATA, convertEntityToMap(claimTicketMapper.toDTO(oldClaimTicket)));
         // Business logic for filing the second instance claim
         claimTicket.setInstanceType(InstanceTypeEnum.COMPLAINT);
-        claimTicket.setStatus(ClaimTicketStatusEnum.NEW);
-        claimTicket.setSlaBreachDate(null);
         claimTicket.setResolvedOn(null);
+        claimTicket.setClosedStatus(null);
+        claimTicket.setRejectedStatus(null);
+        //Workflow Start
+        List<Long> processedWorkflowIds = new ArrayList<>(); // Track processed workflow IDs
+        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO;
+        UserDTO userDTO = null;
+        do {
+            // Find the next workflow excluding already processed ones
+            claimTicketWorkFlowDTO = claimTicketWorkFlowService.findCreateWorkFlow(claimTicket.getOrganizationId(),
+                InstanceTypeEnum.COMPLAINT, claimTicket.getClaimTypeId(), claimTicket.getClaimSubTypeId(), processedWorkflowIds);
+            if (claimTicketWorkFlowDTO == null) {
+                // No more workflows to process
+                break;
+            }
+            // Add current workflow ID to the processed list
+            processedWorkflowIds.add(claimTicketWorkFlowDTO.getId());
+            // Validate the workflow
+            userDTO = claimTicketWorkFlowService.validateAssignAction(claimTicketWorkFlowDTO);
+            // If `UserDTO` is null, skip this workflow and continue
+        } while (userDTO == null);
+        //Workflow End
+        if (claimTicketWorkFlowDTO != null && userDTO != null) {
+            User sepsAgent = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
+
+            claimTicket.setSepsAgent(sepsAgent);
+            claimTicket.setAssignedAt(Instant.now());
+            claimTicket.setStatus(ClaimTicketStatusEnum.ASSIGNED);
+            if (claimTicket.getSlaBreachDays() != null) {
+                LocalDate slaBreachDate = LocalDate.now().plusDays(claimTicket.getSlaBreachDays());
+                claimTicket.setSlaBreachDate(slaBreachDate);
+            }
+        } else {
+            // Business logic for filing the Complaint
+            claimTicket.setStatus(ClaimTicketStatusEnum.NEW);
+            claimTicket.setSlaBreachDate(null);
+        }
+
         claimTicket.setComplaintPrecedents(complaintRequest.getPrecedents());
         claimTicket.setComplaintSpecificPetition(complaintRequest.getSpecificPetition());
         claimTicket.setComplaintFiledAt(Instant.now());
@@ -1082,19 +1120,9 @@ public class UserClaimTicketService {
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
-        // Log claim ticket status change
-        ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
-        claimTicketStatusLog.setTicketId(id);
-        claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.NEW);
-        claimTicketStatusLog.setCreatedBy(currentUserId);
-        claimTicketStatusLogRepository.save(claimTicketStatusLog);
 
-        // Log claim ticket instance change
-        ClaimTicketInstanceLog claimTicketInstanceLog = new ClaimTicketInstanceLog();
-        claimTicketInstanceLog.setTicketId(id);
-        claimTicketInstanceLog.setInstanceType(InstanceTypeEnum.COMPLAINT);
-        claimTicketInstanceLog.setCreatedBy(currentUserId);
-        claimTicketInstanceLogRepository.save(claimTicketInstanceLog);
+        //Log all claim related ticket details
+        logClaimTicketDetails(claimTicket, claimTicketWorkFlowDTO, userDTO, currentUserId);
 
         // Set the updated list of documents back to the claim ticket
         List<ClaimTicketDocument> userClaimTicketDocumentList = claimTicketDocumentRepository.findAllByClaimTicketIdAndInternal(id, false);
@@ -1102,11 +1130,11 @@ public class UserClaimTicketService {
         // Convert user claim ticket documents to UserClaimTicketDTO
         List<UserClaimTicketDocumentDTO> userClaimTicketDTOList = userClaimTicketDocumentList.stream()
             .map(this::convertToUserClaimTicketDocumentDTO)
-            .collect(Collectors.toList());
+            .toList();
         // Convert claim ticket documents to ClaimTicketDTO
         List<ClaimTicketDocumentDTO> claimTicketDTOList = claimTicketDocumentList.stream()
             .map(this::convertToClaimTicketDocumentDTO)
-            .collect(Collectors.toList());
+            .toList();
 
         UserClaimTicketDTO userClaimTicketDTO = userClaimTicketMapper.toUserClaimTicketDTO(claimTicket);
         ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
@@ -1118,6 +1146,8 @@ public class UserClaimTicketService {
         // Perform additional logging and auditing actions
         logActivityAndAuditOfComplaint(claimTicket, activityData, auditData, complaintRequest, requestInfo, currentUser);
         LOG.info("Complaint filed for claim ticket {} by user {}", id, currentUserId);
+
+        return claimTicketWorkFlowDTO;
     }
 
     private void logActivityAndAuditOfComplaint(ClaimTicket claimTicket, Map<String, Object> activityData, Map<String, Object> auditData,

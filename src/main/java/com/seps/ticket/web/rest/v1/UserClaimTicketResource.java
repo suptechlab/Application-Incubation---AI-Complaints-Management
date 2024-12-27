@@ -238,11 +238,15 @@ public class UserClaimTicketResource {
         Long id = complaintRequest.getId();
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
         // Raise the complaint
-        userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
-        // Retrieve the claim ticket
-        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
-        // Send an email notification
-        mailService.sendComplaintEmail(userClaimTicketDTO);
+        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
+        if(claimTicketWorkFlowDTO==null) {
+            // Retrieve the claim ticket
+            ClaimTicketDTO claimTicketDTO = userClaimTicketService.getClaimTicketById(id);
+            // Send an email notification
+            mailService.sendComplaintEmail(claimTicketDTO);
+        }else{
+            mailService.handleWorkflowFileClaimTicket(id,claimTicketWorkFlowDTO.getId());
+        }
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("complaint.raised.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),

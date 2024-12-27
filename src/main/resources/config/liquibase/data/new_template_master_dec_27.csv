@@ -1,0 +1,33 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at,is_general,organization_id,user_type,is_static
+TICKET_COMPLAINT_SEND_TO_SEPS_AGENT,Presentar una queja enviando un correo electrónico al agente de SEPS,EMAIL,Nueva queja asignada: número de ticket #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Se le ha asignado una nueva queja por el número de ticket <strong>#{{ticketNumber}}</strong>. A continuación se muestran los detalles:</p>
+<ul>
+<li><strong>Nombre del cliente: </strong><span>{{customerName}}</span></li>
+<li><strong>Fecha de presentación: </strong><span>{{complaintFiledDate}}</span></li>
+<li><strong>Prioridad: </strong><span>{{priority}}</span></li>
+</ul>
+<p>Revise los detalles y tome las medidas correspondientes. Puede ver el ticket completo haciendo clic en el siguiente enlace:</p>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>Garantizar una comunicación oportuna con el cliente y la resolución de la queja según el SLA.</p>","{{username}},{{ticketNumber}},{{customerName}},{{complaintFiledDate}},{{priority}},{{adminTicketUrl}}",True,1,2024-12-02 00:00:00.627679,1,NULL,True,NULL,0,False
+TICKET_COMPLAINT_SEND_TO_SEPS_ADMIN,Presentar una queja enviando un correo electrónico a la administración de SEPS,EMAIL,Nueva alerta de queja: ticket n.° #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Se ha presentado una nueva denuncia que requiere su atención. A continuación se detallan los detalles:</p>
+<ul>
+<li><strong>Nombre del cliente: </strong><span>{{customerName}}</span></li>
+<li><strong>Número de ticket: </strong><span>{{ticketNumber}}</span></li>
+<li><strong>Fecha de presentación de la queja: </strong><span>{{complaintFiledDate}}</span></li>
+<li><strong>Estado: </strong><span>{{status}}</span></li>
+<li><strong>Tipo de instancia: </strong><span>{{instanceType}}</span></li>
+</ul>
+<p>Asegúrese de que el agente asignado atienda la queja de manera oportuna y eficiente. Puede ver los detalles del ticket y monitorear el progreso mediante el siguiente enlace:</p>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>Para cualquier escalada o información adicional, no dude en ponerse en contacto con el equipo de soporte.</p>","{{username}},{{customerName}},{{ticketNumber}},{{complaintFiledDate}},{{status}},{{instanceType}},{{adminTicketUrl}}",True,1,2024-12-02 00:00:00.627679,1,NULL,True,NULL,0,False
+TICKET_COMPLAINT_SEND_TO_CUSTOMER,Presentar una queja enviar correo al cliente,EMAIL,Reclamo recibido - Ticket n.º #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Hemos recibido su queja sobre el billete n.º <strong>#{{ticketNumber}}</strong>. A continuación, encontrará los detalles:</p>
+<ul>
+<li><strong>Fecha de presentación de la queja:</strong> <span>{{complaintFiledDate}}</span></li>
+<li><strong>Estado:</strong> <span>{{status}}</span></li>
+</ul>
+<p>Nuestro equipo está revisando su queja y tomará las medidas necesarias para resolver el problema. Puede realizar un seguimiento del estado de su ticket visitando el siguiente enlace:</p>
+<p><a href=""{{userTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>Si tiene más inquietudes o desea proporcionar más detalles, no dude en responder a este correo electrónico o contactarnos directamente.</p>
+<p>Agradecemos su paciencia y le aseguramos nuestro compromiso de resolver su inquietud lo antes posible.</p>","{{username}},{{ticketNumber}},{{complaintFiledDate}},{{status}},{{userTicketUrl}}",True,1,2024-12-02 00:00:00.627679,1,NULL,True,NULL,2,False
