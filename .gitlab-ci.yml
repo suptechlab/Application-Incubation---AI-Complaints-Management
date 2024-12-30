@@ -1,6 +1,6 @@
-## Execute gitlab construction to sprin boot project.
+# Execute gitlab construction to sprin boot project.
 
-# Author = author name
+## Author = author name
 
 # Maintainer = user seps manteiner
 variables:

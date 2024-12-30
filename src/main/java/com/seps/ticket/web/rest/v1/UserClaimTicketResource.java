@@ -1,12 +1,10 @@
 package com.seps.ticket.web.rest.v1;
 
-import com.seps.ticket.domain.ClaimTicket;
-import com.seps.ticket.service.ClaimTicketActivityLogService;
-import com.seps.ticket.service.MailService;
-import com.seps.ticket.service.UserClaimTicketService;
-import com.seps.ticket.service.UserService;
+import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.service.*;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
+import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
@@ -34,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
-import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "User Claim Ticket Management", description = "APIs for Users to manage their Claim Tickets")
@@ -48,14 +45,15 @@ public class UserClaimTicketResource {
     private final MessageSource messageSource;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
 
-    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService,
-                                   MessageSource messageSource, ClaimTicketActivityLogService claimTicketActivityLogService) {
+    public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService, MessageSource messageSource,
+                                   ClaimTicketActivityLogService claimTicketActivityLogService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.documentService = documentService;
         this.messageSource = messageSource;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
     }
+
 
     @Operation(
         summary = "File a claim API",
@@ -76,8 +74,12 @@ public class UserClaimTicketResource {
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
         ClaimTicketResponseDTO claimTicketResponseDTO = userClaimTicketService.fileClaimTicket(claimTicketRequest, requestInfo);
         if (claimTicketResponseDTO.getNewId() != null) {
-            UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(claimTicketResponseDTO.getNewId());
-            mailService.sendClaimTicketCreationEmail(userClaimTicketDTO);
+            if (claimTicketResponseDTO.getClaimTicketWorkFlowId() == null) {
+                UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(claimTicketResponseDTO.getNewId());
+                mailService.sendClaimTicketCreationEmail(userClaimTicketDTO);
+            } else {
+                mailService.handleWorkflowFileClaimTicket(claimTicketResponseDTO.getNewId(), claimTicketResponseDTO.getClaimTicketWorkFlowId());
+            }
         }
         return ResponseEntity.status(HttpStatus.OK).body(claimTicketResponseDTO);
     }
@@ -160,13 +162,16 @@ public class UserClaimTicketResource {
                                                                   HttpServletRequest httpServletRequest) {
         Long id = secondInstanceRequest.getId();
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
-        UserClaimTicketDTO prevUserClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
         // File the claim
-        userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
-        // Retrieve the claim ticket
-        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
-        // Send an email notification
-        mailService.sendSecondInstanceClaimEmail(prevUserClaimTicketDTO, userClaimTicketDTO);
+        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
+        if(claimTicketWorkFlowDTO == null) {
+            // Retrieve the claim ticket
+            ClaimTicketDTO claimTicketDTO = userClaimTicketService.getClaimTicketById(id);
+            // Send an email notification
+            mailService.sendSecondInstanceClaimEmail(claimTicketDTO);
+        }else{
+            mailService.handleWorkflowFileClaimTicket(id, claimTicketWorkFlowDTO.getId());
+        }
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("second.instance.filed.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -236,16 +241,27 @@ public class UserClaimTicketResource {
         Long id = complaintRequest.getId();
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
         // Raise the complaint
-        userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
-        // Retrieve the claim ticket
-        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketService.getUserClaimTicketById(id);
-        // Send an email notification
-        mailService.sendComplaintEmail(userClaimTicketDTO);
+        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
+        if(claimTicketWorkFlowDTO==null) {
+            // Retrieve the claim ticket
+            ClaimTicketDTO claimTicketDTO = userClaimTicketService.getClaimTicketById(id);
+            // Send an email notification
+            mailService.sendComplaintEmail(claimTicketDTO);
+        }else{
+            mailService.handleWorkflowFileClaimTicket(id,claimTicketWorkFlowDTO.getId());
+        }
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("complaint.raised.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @GetMapping("/list-for-file-second-instance-or-complaint/{instanceType}")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<List<ClaimTicketListDTO>> listUserClaimTicketsForChatbot(@PathVariable InstanceTypeEnum instanceType) {
+        List<ClaimTicketListDTO> page = userClaimTicketService.listUserClaimTicketsForChatbot(instanceType);
+        return ResponseEntity.ok().body(page);
     }
 }

@@ -10,4 +10,5 @@ public class ClaimTicketResponseDTO {
     private Long newTicketId;
     private Long newId;
     private String email;
+    private Long claimTicketWorkFlowId;
 }

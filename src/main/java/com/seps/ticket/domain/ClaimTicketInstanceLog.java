@@ -1,11 +1,13 @@
 package com.seps.ticket.domain;
 
 import com.seps.ticket.enums.InstanceTypeEnum;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import java.time.Instant;
 
@@ -33,6 +35,13 @@ public class ClaimTicketInstanceLog {
 
     @Column(name = "created_by", nullable = false)
     private Long createdBy;
+
+    @Column(name = "claim_ticket_work_flow_id")
+    private Long claimTicketWorkFlowId;
+
+    @Type(JsonType.class)
+    @Column(name = "claim_ticket_work_flow_data", columnDefinition = "jsonb")
+    private String claimTicketWorkFlowData; // JSON will be stored as a String or a JSON type in DB
 
     // Getters and Setters
 }

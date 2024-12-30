@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1734514481964" author="matellio">
+    <createTable tableName="claim_ticket_work_flow_failure_log">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="claim_ticket_work_flow_id" type="bigint" remarks="Ticket work flow id">
+        <constraints nullable="false"/>
+      </column>
+      <column name="agent_id" type="bigint" remarks="Agent id">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Reason-->
+      <column name="reason" type="jsonb" remarks="Reason of the failure">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Timestamp when the failure logged -->
+      <column name="logged_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseColumnNames="claim_ticket_work_flow_id"
+                             baseTableName="claim_ticket_work_flow_failure_log"
+                             constraintName="fk_claim_ticket_work_flow_failure_log_claim_ticket_work_flow_id"
+                             referencedColumnNames="id"
+                             referencedTableName="organization"/>
+  </changeSet>
+  <changeSet id="1734516907569" author="matellio">
+    <dropNotNullConstraint tableName="claim_ticket_work_flow_failure_log" columnName="agent_id"/>
+  </changeSet>
+  <changeSet id="1734517073201" author="matellio">
+    <dropForeignKeyConstraint baseTableName="claim_ticket_work_flow_failure_log"
+                              constraintName="fk_claim_ticket_work_flow_failure_log_claim_ticket_work_flow_id"/>
+  </changeSet>
+  <changeSet id="1734617791902" author="matellio">
+    <addColumn tableName="claim_ticket_work_flow_failure_log">
+      <column name="template_id" type="bigint" remarks="Template ID">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+</databaseChangeLog>

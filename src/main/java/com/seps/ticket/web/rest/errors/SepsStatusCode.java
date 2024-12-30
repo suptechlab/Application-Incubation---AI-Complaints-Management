@@ -14,6 +14,7 @@ public enum SepsStatusCode implements StatusType {
     USER_ACCOUNT_STATUS_PENDING(10029, "user.account.status.pending"),
     USER_ACCOUNT_STATUS_BLOCKED(10030, "user.account.status.blocked"),
     USER_ACCOUNT_STATUS_DELETED(10031, "user.account.status.deleted"),
+    SOMETHING_GOES_WRONG(10032, "something.goes.wrong"),
     CLAIM_TYPE_NOT_FOUND(20015, "claim.type.not.found"),
     CLAIM_SUB_TYPE_NOT_FOUND(20017, "claim.sub.type.not.found"),
     PROVINCE_NOT_FOUND(20019, "province.not.found"),
@@ -33,7 +34,11 @@ public enum SepsStatusCode implements StatusType {
     CLAIM_TICKET_ALREADY_CLOSED_OR_REJECT(40020, "claim.ticket.already.closed.or.reject"),
     SECOND_INSTANCE_INVALID_CLAIM_TICKET_STATUS(40021, "second.instance.invalid.claim.ticket.status"),
     CLAIM_TICKET_ALREADY_CLOSED_OR_REJECTED_YOU_CANNOT_REPLY(40022, "claim.ticket.already.closed.or.rejected.you.cannot.reply"),
-    COMPLAINT_INVALID_CLAIM_TICKET_STATUS(40023, "complaint.invalid.claim.ticket.status");
+    COMPLAINT_INVALID_CLAIM_TICKET_STATUS(40023, "complaint.invalid.claim.ticket.status"),
+    CLAIM_TICKET_WORKFLOW_NOT_FOUND(20030, "claim.ticket.workflow.not.found"),
+    CLAIM_TICKET_ALLOW_ONLY_STATUS(20031, "claim.ticket.allow.only.status"),
+    CLAIM_TICKET_ALREADY_IN_STATUS(20032, "claim.ticket.already.in.status"),
+    UNAUTHORIZED_ACCESS(200046,"unauthorized.access");
 
     private final int code;
 

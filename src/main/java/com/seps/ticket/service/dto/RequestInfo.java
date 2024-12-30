@@ -28,4 +28,17 @@ public class RequestInfo {
         this.remoteHost = httpServletRequest.getRemoteHost();
         this.remotePort = httpServletRequest.getRemotePort();
     }
+
+    // Factory method for cron jobs
+    public static RequestInfo createForCronJob() {
+        return new RequestInfo(
+            "CRON", // No HTTP method, use "SYSTEM" or "CRON"
+            "/cron-job", // Placeholder URI for tracking
+            null, // No query string
+            "127.0.0.1", // Localhost as the source IP
+            "SYSTEM_USER", // Placeholder for system user
+            "localhost", // Placeholder for host
+            0 // No remote port
+        );
+    }
 }

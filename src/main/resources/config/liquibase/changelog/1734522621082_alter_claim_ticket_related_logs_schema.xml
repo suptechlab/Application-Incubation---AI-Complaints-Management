@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+  <changeSet id="1734522621082" author="matellio">
+    <addColumn tableName="claim_ticket_status_log">
+      <column name="instance_type" type="int" remarks="Instance type of ticket (e.g., first,second,claim etc)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="claim_ticket_status_log">
+      <column name="claim_ticket_work_flow_id" type="bigint" remarks="Ticket work flow id">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="claim_ticket_priority_log">
+      <column name="instance_type" type="int" remarks="Instance type of ticket (e.g., first,second,claim etc)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+    <addColumn tableName="claim_ticket_priority_log">
+      <column name="claim_ticket_work_flow_id" type="bigint" remarks="Ticket work flow id">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="claim_ticket_assign_log">
+      <column name="instance_type" type="int" remarks="Instance type of ticket (e.g., first,second,claim etc)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="claim_ticket_work_flow_id" type="bigint" remarks="Ticket work flow id">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+  </changeSet>
+
+  <changeSet id="1734526670481" author="matellio">
+    <addColumn tableName="claim_ticket_status_log">
+      <column name="claim_ticket_work_flow_data" type="jsonb" remarks="Ticket work flow data">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="claim_ticket_priority_log">
+      <column name="claim_ticket_work_flow_data" type="jsonb" remarks="Ticket work flow data">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="claim_ticket_assign_log">
+      <column name="claim_ticket_work_flow_data" type="jsonb" remarks="Ticket work flow data">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="claim_ticket_instance_log">
+      <column name="claim_ticket_work_flow_id" type="bigint" remarks="Ticket work flow id">
+        <constraints nullable="true"/>
+      </column>
+      <column name="claim_ticket_work_flow_data" type="jsonb" remarks="Ticket work flow data">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+</databaseChangeLog>

@@ -123,7 +123,7 @@ questions:
   #   type: string
   #   required: true
   #   label: Readiness initial delay seconds
-  #   group: "Readiness Probe Settings"
+  #   group: "Readiness Probe Settings"...
 
   ## PERSISTENCE
   - variable: deployment.persistence.enabled

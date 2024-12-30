@@ -1,0 +1,68 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at,is_general,organization_id,user_type,is_static
+SLA_REMINDER_SEND_TO_FI_AGENT,Recordatorio de SLA enviado al agente de FI,EMAIL,Urgente: Se acerca la fecha límite de SLA para el boleto #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Este es un recordatorio de que se acerca la fecha límite del SLA para el ticket <strong>#{{ticketNumber}}</strong>. Tome medidas inmediatas para resolver el problema dentro del plazo del SLA para mantener el cumplimiento y garantizar la satisfacción del cliente.</p>
+<p>Detalles del ticket:</p>
+<ul>
+<li><strong>ID del ticket: </strong><span>{{ticketNumber}}</span></li>
+<li><strong>Nombre del cliente: </strong><span>{{customerName}}</span></li>
+<li><strong>Estado actual: </strong><span>{{status}}</span></li>
+<li><strong>Fecha de incumplimiento del SLA: </strong><span>{{slaBreachDate}}</span></li>
+<li><strong>Tiempo restante: </strong><span>{{slaRemainingDays}}</span></li>
+</ul>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>Priorice este ticket para evitar una infracción del SLA. Si necesita recursos o asistencia adicionales, comuníquese con el equipo de administración.</p>
+<p>Gracias por su pronta atención a este asunto.</p>","{{username}},{{ticketNumber}},{{ticketNumber}},{{customerName}},{{status}},{{slaBreachDate}},{{slaRemainingDays}},{{adminTicketUrl}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,1,False
+SLA_REMINDER_SEND_TO_SEPS_AGENT,Recordatorio de SLA enviado al agente SEPS,EMAIL,Urgente: Se acerca la fecha límite de SLA para el boleto #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Este es un recordatorio de que se acerca la fecha límite del SLA para el ticket <strong>#{{ticketNumber}}</strong>. Tome medidas inmediatas para resolver el problema dentro del plazo del SLA para mantener el cumplimiento y garantizar la satisfacción del cliente.</p>
+<p>Detalles del ticket:</p>
+<ul>
+<li><strong>ID del ticket: </strong><span>{{ticketNumber}}</span></li>
+<li><strong>Nombre del cliente: </strong><span>{{customerName}}</span></li>
+<li><strong>Estado actual: </strong><span>{{status}}</span></li>
+<li><strong>Fecha de incumplimiento del SLA: </strong><span>{{slaBreachDate}}</span></li>
+<li><strong>Tiempo restante: </strong><span>{{slaRemainingDays}}</span></li>
+</ul>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>Priorice este ticket para evitar una infracción del SLA. Si necesita recursos o asistencia adicionales, comuníquese con el equipo de administración.</p>
+<p>Gracias por su pronta atención a este asunto.</p>","{{username}},{{ticketNumber}},{{ticketNumber}},{{customerName}},{{status}},{{slaBreachDate}},{{slaRemainingDays}},{{adminTicketUrl}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,0,False
+SLA_REMINDER_SEND_TO_CUSTOMER,Recordatorio de SLA enviar al cliente,EMAIL,Actualización: Su ticket #{{ticketNumber}} está siendo atendido,"<p>Estimado {{username}},</p>
+<p>Queremos asegurarle que nuestro equipo está trabajando activamente para resolver su inquietud con respecto al ticket <strong>#{{ticketNumber}}</strong>. Nos comprometemos a brindarle el mejor servicio posible y a cumplir con nuestros acuerdos de nivel de servicio (SLA).</p>
+<p>Detalles del ticket:</p>
+<ul>
+<li><strong>ID del ticket: </strong><span>{{ticketNumber}}</span></li>
+<li><strong>Fecha de resolución prevista: </strong><span>{{slaBreachDate}}</span></li>
+</ul>
+<p>Nuestro equipo de soporte está trabajando diligentemente para resolver el problema antes de la fecha límite del acuerdo de nivel de servicio. Si tiene información adicional para proporcionar o necesita más ayuda, no dude en comunicarse con nuestro equipo de soporte.</p>
+<p>Agradecemos su paciencia y comprensión.</p>","{{username}},{{ticketNumber}},{{ticketNumber}},{{slaBreachDate}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,2,False
+SLA_BREACH_MAIL_SEND_TO_FI_AGENT,Incumplimiento de SLA enviar al agente de FI,EMAIL,Notificación de incumplimiento del SLA: ticket cerrado automáticamente,"<p>Estimado {{username}},</p>
+<p>Le notificamos que se ha incumplido el SLA para el siguiente ticket y que el sistema lo ha cerrado automáticamente:</p>
+<ul>
+<li><strong>ID del ticket: </strong><span> {{ticketNumber}}</span></li>
+<li><strong>Nombre del cliente: </strong><span> {{customerName}}</span></li>
+<li><strong>Fecha de incumplimiento: </strong><span> {{slaBreachDate}}</span></li>
+<li><strong>Estado: </strong><span> {{status}}</span></li>
+<li><strong>Subestado: </strong><span> {{closedStatus}}</span></li>
+</ul>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>No es necesario que realice ninguna otra acción en este momento. Si el cliente desea reabrir el caso, deberá presentar una segunda instancia o un ticket de queja.</p>","{{username}},{{ticketNumber}},{{customerName}},{{slaBreachDate}},{{status}},{{closedStatus}},{{adminTicketUrl}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,1,False
+SLA_BREACH_MAIL_SEND_TO_SEPS_AGENT,Incumplimiento de SLA enviar al agente de FI,EMAIL,Notificación de incumplimiento del SLA: ticket cerrado automáticamente,"<p>Estimado {{username}},</p>
+<p>Le notificamos que se ha incumplido el SLA para el siguiente ticket y que el sistema lo ha cerrado automáticamente:</p>
+<ul>
+<li><strong>ID del ticket: </strong><span> {{ticketNumber}}</span></li>
+<li><strong>Nombre del cliente: </strong><span> {{customerName}}</span></li>
+<li><strong>Fecha de incumplimiento: </strong><span> {{slaBreachDate}}</span></li>
+<li><strong>Estado: </strong><span> {{status}}</span></li>
+<li><strong>Subestado: </strong><span> {{closedStatus}}</span></li>
+</ul>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>No es necesario que realice ninguna otra acción en este momento. Si el cliente desea reabrir el caso, deberá presentar una segunda instancia o un ticket de queja.</p>","{{username}},{{ticketNumber}},{{customerName}},{{slaBreachDate}},{{status}},{{closedStatus}},{{adminTicketUrl}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,0,False
+SLA_BREACH_MAIL_SEND_TO_CUSTOMER,Incumplimiento de SLA enviar al cliente,EMAIL,Ticket cerrado por incumplimiento del SLA,"<p>Estimado {{username}},</p>
+<p>Le escribimos para informarle que se ha incumplido el SLA de su ticket y que el ticket se ha cerrado automáticamente según nuestro proceso.</p>
+<ul>
+<li><strong>ID del ticket: </strong><span> {{ticketNumber}}</span></li>
+<li><strong>Fecha de incumplimiento: </strong><span> {{slaBreachDate}}</span></li>
+<li><strong>Estado: </strong><span> {{status}}</span></li>
+<li><strong>Subestado: </strong><span> {{closedStatus}}</span></li>
+</ul>
+<p>Si desea reabrir este caso, puede hacerlo presentando un ticket de segunda instancia o de queja a través de nuestro portal de soporte.</p>
+<p>Le pedimos disculpas por cualquier inconveniente que esto pueda haberle causado y estamos aquí para ayudarlo con cualquier consulta o solicitud de soporte adicional.</p>","{{username}},{{ticketNumber}},{{slaBreachDate}},{{status}},{{closedStatus}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,2,False

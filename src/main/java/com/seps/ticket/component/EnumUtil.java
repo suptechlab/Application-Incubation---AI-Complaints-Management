@@ -3,8 +3,7 @@ package com.seps.ticket.component;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,16 +36,19 @@ public class EnumUtil {
      * <p>
      * The localization is based on the provided {@link Locale}.
      *
-     * @param <E>        the type of the enum, which must extend {@link Enum} and implement {@link EnumWithDescription}
-     * @param enumClass  the {@link Class} object of the enum type
-     * @param locale     the {@link Locale} to be used for fetching localized descriptions
+     * @param <E>       the type of the enum, which must extend {@link Enum} and implement {@link EnumWithDescription}
+     * @param enumClass the {@link Class} object of the enum type
+     * @param locale    the {@link Locale} to be used for fetching localized descriptions
      * @return a {@link Map} where the keys are enum constant names and the values are localized descriptions
      */
     public <E extends Enum<E> & EnumWithDescription> Map<String, String> enumToLocalizedMap(Class<E> enumClass, Locale locale) {
         return Stream.of(enumClass.getEnumConstants())
+            .sorted(Comparator.comparing(Enum::name)) // Sort by enum name
             .collect(Collectors.toMap(
                 Enum::name,
-                e -> messageSource.getMessage(e.getDescription(), null, locale)
+                e -> messageSource.getMessage(e.getDescription(), null, locale),
+                (existing, replacement) -> existing, // Merge function for duplicate keys
+                LinkedHashMap::new // Preserve order
             ));
     }
 
@@ -59,6 +61,22 @@ public class EnumUtil {
      * @return the localized description of the enum value
      */
     public <E extends Enum<E> & EnumWithDescription> String getLocalizedEnumValue(E enumValue, Locale locale) {
+        if (enumValue == null) {
+            return "N/A";  // or return a default value, e.g., "Unknown"
+        }
         return messageSource.getMessage(enumValue.getDescription(), null, locale);
+    }
+
+    public <E extends Enum<E> & EnumWithDescription> Map<String, String> createFilteredEnumMap(
+        E[] enumValues, Locale locale, E[] excludedEnums) {
+        List<E> excludedList = Arrays.asList(excludedEnums);
+        return Stream.of(enumValues)
+            .filter(enumValue -> !excludedList.contains(enumValue)) // Exclude specified enums
+            .collect(Collectors.toMap(
+                Enum::name,
+                e -> messageSource.getMessage(e.getDescription(), null, locale),
+                (existing, replacement) -> existing, // Merge function for duplicate keys
+                LinkedHashMap::new // Preserve insertion order
+            ));
     }
 }
