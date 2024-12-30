@@ -171,7 +171,7 @@ public class SepsAndFiClaimTicketService {
                 fiAgentId = currentUser.getId();
             }
         } else {
-            if (!currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
+            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
                 sepsAgentId = currentUser.getId();
             }
         }
