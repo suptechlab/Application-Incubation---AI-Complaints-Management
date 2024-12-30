@@ -5,7 +5,7 @@ import FormInput from "../../../components/FormInput";
 import ReactSelect from "../../../components/ReactSelect";
 import { getOrganizationList } from "../../../services/teamManagment.service";
 
-const ListingSearchForm = ({ filter, setFilter, hideFilter }) => {
+const ListingSearchForm = ({ filter, setFilter, currentUser }) => {
   const { t } = useTranslation();
 
   const [organizationArr, setOrganizationArr] = useState([])
@@ -18,12 +18,11 @@ const ListingSearchForm = ({ filter, setFilter, hideFilter }) => {
           label: item.name,
           value: item.id
         }));
-        setOrganizationArr([...formattedOrgData]);
+        setOrganizationArr([{label :t('ALL_ENTITIES'), value: ''},...formattedOrgData]);
       });
     } catch (error) {
     }
   }
-
 
   useEffect(() => {
     getOrganizationLists()
@@ -58,9 +57,9 @@ const ListingSearchForm = ({ filter, setFilter, hideFilter }) => {
             value={filter.search}
           />
         </div>
-        {!hideFilter &&
+        {currentUser !== 'FI_USER' &&
           <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-            <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+            <div className="custom-width-250 flex-grow-1 flex-md-grow-0">
               <ReactSelect
                 wrapperClassName="mb-0"
                 class="form-select "
