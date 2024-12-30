@@ -308,5 +308,6 @@ export const spanishLang = {
     "AGENTS": "Agentes",
     "SELECT AGENT": "Seleccionar Agente",
     "TEAMS": "equipos",
-    "SELECT_ORGANIZATION_ID_MSG": "Seleccione la identificación de la organización."
+    "SELECT_ORGANIZATION_ID_MSG": "Seleccione la identificación de la organización.",
+    "CONSUMER_NAME" : "Nombre del consumidor"
 }
