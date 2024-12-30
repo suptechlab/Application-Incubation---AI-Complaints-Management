@@ -420,77 +420,76 @@ public class SepsAndFiClaimTicketService {
     @Transactional
     public List<ClaimTicket> assignTicketsToSepsAgent(Long agentId, @Valid AssignTicketRequestDTO assignTicketRequestDTO) {
         // Validate agent
-
         User currentUser = userService.getCurrentUser();
         List<String> authority = currentUser.getAuthorities().stream().map(Authority::getName).toList();
 
-        if (authority.contains(AuthoritiesConstants.SEPS) || authority.contains(AuthoritiesConstants.ADMIN)) {
-            User agent = userService.getUserById(agentId);
-            List<String> agentAuthority = agent.getAuthorities().stream().map(Authority::getName).toList();
-            if (!agentAuthority.contains(AuthoritiesConstants.SEPS)) {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.IS_NOT_SEPS_AGENT, new String[]{agentId.toString()}, null);
-            }
-            // Fetch tickets by IDs
-            List<ClaimTicket> tickets = claimTicketRepository.findAllById(assignTicketRequestDTO.getTicketIds());
-
-            if (tickets.isEmpty()) {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NO_TICKET_FOUND_WITH_PROVIDED_IDS, new String[]{assignTicketRequestDTO.toString()}, null);
-            }
-
-            // Validate that all tickets are of the SECOND_INSTANCE type or COMPLAINT type
-            boolean allValidTypes = tickets.stream()
-                .allMatch(ticket -> ticket.getInstanceType() == InstanceTypeEnum.SECOND_INSTANCE
-                    || ticket.getInstanceType() == InstanceTypeEnum.COMPLAINT);
-
-            if (!allValidTypes) {
-                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE, new String[]{enumUtil.getLocalizedEnumValue(InstanceTypeEnum.SECOND_INSTANCE, LocaleContextHolder.getLocale())}, null);
-            }
-
-            List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
-            List<ClaimTicketAssignLog> assignLogsList = new ArrayList<>();
-            List<ClaimTicketStatusLog> claimTicketStatusLogList = new ArrayList<>();
-            // Assign the agent to each ticket
-            tickets.forEach(ticket -> {
-                if (ticket.getSepsAgentId() != null && ticket.getSepsAgentId().equals(agentId)) {
-                    return;
-                }
-                ClaimTicketActivityLog activityLog = createAssignToAgentActivityLog(currentUser, ticket, agent);
-                // Calculate and set SLA breach date
-                if (ticket.getSlaBreachDays() != null && ticket.getSepsAgentId() == null) {
-                    LocalDate slaBreachDate = LocalDate.now().plusDays(ticket.getSlaBreachDays());
-                    ticket.setSlaBreachDate(slaBreachDate);
-                }
-                ticket.setSepsAgentId(agent.getId());
-                ticket.setSepsAgent(agent);
-                ticket.setAssignedAt(Instant.now());
-                activityLogList.add(activityLog);
-
-                //Save ClaimTicketAssignLog table
-                ClaimTicketAssignLog assignLog = new ClaimTicketAssignLog();
-                assignLog.setTicketId(ticket.getId());
-                assignLog.setUserId(agentId);
-                assignLog.setUserType(UserTypeEnum.SEPS_USER);
-                assignLog.setCreatedBy(currentUser.getId());
-                assignLogsList.add(assignLog);
-
-                //Save ClaimTicketStatusLog table
-                ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
-                claimTicketStatusLog.setTicketId(ticket.getId());
-                claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.ASSIGNED);
-                claimTicketStatusLog.setCreatedBy(currentUser.getId());
-                claimTicketStatusLogList.add(claimTicketStatusLog);
-
-            });
-
-            // Save the updated tickets
-            List<ClaimTicket> ticketList = claimTicketRepository.saveAll(tickets);
-            activityLogList.forEach(claimTicketActivityLogService::saveActivityLog);
-            claimTicketAssignLogRepository.saveAll(assignLogsList);
-            claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
-            return ticketList;
-        } else {
+        if (!authority.contains(AuthoritiesConstants.SEPS) && !authority.contains(AuthoritiesConstants.ADMIN)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, new String[]{assignTicketRequestDTO.toString()}, null);
         }
+        User agent = userService.getUserById(agentId);
+        List<String> agentAuthority = agent.getAuthorities().stream().map(Authority::getName).toList();
+        if (!agentAuthority.contains(AuthoritiesConstants.SEPS)) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.IS_NOT_SEPS_AGENT, new String[]{agentId.toString()}, null);
+        }
+        // Fetch tickets by IDs
+        List<ClaimTicket> tickets = claimTicketRepository.findAllById(assignTicketRequestDTO.getTicketIds());
+
+        if (tickets.isEmpty()) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.NO_TICKET_FOUND_WITH_PROVIDED_IDS, new String[]{assignTicketRequestDTO.toString()}, null);
+        }
+
+        // Validate that all tickets are of the SECOND_INSTANCE type or COMPLAINT type
+        boolean allValidTypes = tickets.stream()
+            .allMatch(ticket -> ticket.getInstanceType() == InstanceTypeEnum.SECOND_INSTANCE
+                || ticket.getInstanceType() == InstanceTypeEnum.COMPLAINT);
+
+        if (!allValidTypes) {
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_INSTANCE_TYPE_ALLOW_ONLY_INSTANCE, new String[]{enumUtil.getLocalizedEnumValue(InstanceTypeEnum.SECOND_INSTANCE, LocaleContextHolder.getLocale())}, null);
+        }
+
+        List<ClaimTicketActivityLog> activityLogList = new ArrayList<>();
+        List<ClaimTicketAssignLog> assignLogsList = new ArrayList<>();
+        List<ClaimTicketStatusLog> claimTicketStatusLogList = new ArrayList<>();
+        // Assign the agent to each ticket
+        tickets.forEach(ticket -> {
+            if (ticket.getSepsAgentId() != null && ticket.getSepsAgentId().equals(agentId)) {
+                return;
+            }
+            ClaimTicketActivityLog activityLog = createAssignToAgentActivityLog(currentUser, ticket, agent);
+            // Calculate and set SLA breach date
+            if (ticket.getSlaBreachDays() != null && ticket.getSepsAgentId() == null) {
+                LocalDate slaBreachDate = LocalDate.now().plusDays(ticket.getSlaBreachDays());
+                ticket.setSlaBreachDate(slaBreachDate);
+            }
+            ticket.setSepsAgentId(agent.getId());
+            ticket.setSepsAgent(agent);
+            ticket.setAssignedAt(Instant.now());
+            activityLogList.add(activityLog);
+
+            //Save ClaimTicketAssignLog table
+            ClaimTicketAssignLog assignLog = new ClaimTicketAssignLog();
+            assignLog.setTicketId(ticket.getId());
+            assignLog.setUserId(agentId);
+            assignLog.setUserType(UserTypeEnum.SEPS_USER);
+            assignLog.setCreatedBy(currentUser.getId());
+            assignLogsList.add(assignLog);
+
+            //Save ClaimTicketStatusLog table
+            ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+            claimTicketStatusLog.setTicketId(ticket.getId());
+            claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.ASSIGNED);
+            claimTicketStatusLog.setCreatedBy(currentUser.getId());
+            claimTicketStatusLogList.add(claimTicketStatusLog);
+
+        });
+
+        // Save the updated tickets
+        List<ClaimTicket> ticketList = claimTicketRepository.saveAll(tickets);
+        activityLogList.forEach(claimTicketActivityLogService::saveActivityLog);
+        claimTicketAssignLogRepository.saveAll(assignLogsList);
+        claimTicketStatusLogRepository.saveAll(claimTicketStatusLogList);
+        return ticketList;
+
     }
 
     /**
@@ -1739,45 +1738,46 @@ public class SepsAndFiClaimTicketService {
     public void triggerDateExtensionWorkflow(Long claimTicketId){
 
         ClaimTicket claimTicket = claimTicketRepository.findById(claimTicketId).orElse(null);
-        if(claimTicket!=null) {
-            ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
-            List<ClaimTicketWorkFlowDTO> claimTicketWorkFlowList = claimTicketWorkFlowService.findTicketDateExtensionWorkFlow(claimTicketDTO.getOrganizationId(), claimTicketDTO.getInstanceType());
-            if (!claimTicketWorkFlowList.isEmpty()) {
-                claimTicketWorkFlowList.forEach(claimTicketWorkFlowDTO->{
-                    for (TicketDateExtensionAction dateExtensionAction : claimTicketWorkFlowDTO.getTicketDateExtensionActions()) {
-                        Long agentId = dateExtensionAction.getAgentId();
-                        Long templateId = dateExtensionAction.getTemplateId();
-                        if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),dateExtensionAction.getAction().name()))
-                            continue;
-                        User user = null;
-                        switch (dateExtensionAction.getAction()) {
-                            case MAIL_TO_CUSTOMER:
-                                user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),dateExtensionAction.getAction().name());
-                                break;
-                            case MAIL_TO_FI_TEAM:
-                                user = findAgent(agentId, claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.FI_USER);
-                                break;
-                            case MAIL_TO_FI_AGENT:
-                                user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.FI_USER);
-                                break;
-                            case MAIL_TO_SEPS_TEAM:
-                                user = findAgent(agentId, claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.SEPS_USER);
-                                break;
-                            case MAIL_TO_SEPS_AGENT:
-                                user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.SEPS_USER);
-                                break;
-                            // Add other cases if needed
-                            default:
-                                // Handle unsupported actions or log them
-                                break;
-                        }
-                        mailService.workflowEmailSend(templateId, claimTicketDTO, user);
+        if(claimTicket==null) {
+            return;
+        }
+        ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(claimTicket);
+        List<ClaimTicketWorkFlowDTO> claimTicketWorkFlowList = claimTicketWorkFlowService.findTicketDateExtensionWorkFlow(claimTicketDTO.getOrganizationId(), claimTicketDTO.getInstanceType());
+        if (!claimTicketWorkFlowList.isEmpty()) {
+            claimTicketWorkFlowList.forEach(claimTicketWorkFlowDTO->{
+                for (TicketDateExtensionAction dateExtensionAction : claimTicketWorkFlowDTO.getTicketDateExtensionActions()) {
+                    Long agentId = dateExtensionAction.getAgentId();
+                    Long templateId = dateExtensionAction.getTemplateId();
+                    if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),dateExtensionAction.getAction().name()))
+                        continue;
+                    User user = null;
+                    switch (dateExtensionAction.getAction()) {
+                        case MAIL_TO_CUSTOMER:
+                            user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),dateExtensionAction.getAction().name());
+                            break;
+                        case MAIL_TO_FI_TEAM:
+                            user = findAgent(agentId, claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.FI_USER);
+                            break;
+                        case MAIL_TO_FI_AGENT:
+                            user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.FI_USER);
+                            break;
+                        case MAIL_TO_SEPS_TEAM:
+                            user = findAgent(agentId, claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                            break;
+                        case MAIL_TO_SEPS_AGENT:
+                            user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, dateExtensionAction.getAction().name(), UserTypeEnum.SEPS_USER);
+                            break;
+                        // Add other cases if needed
+                        default:
+                            // Handle unsupported actions or log them
+                            break;
                     }
-                });
-            } else {
-                LOG.info("Default Date extension email execute.");
-                this.sendDateExtensionEmail(claimTicketDTO);
-            }
+                    mailService.workflowEmailSend(templateId, claimTicketDTO, user);
+                }
+            });
+        } else {
+            LOG.info("Default Date extension email execute.");
+            this.sendDateExtensionEmail(claimTicketDTO);
         }
     }
 
