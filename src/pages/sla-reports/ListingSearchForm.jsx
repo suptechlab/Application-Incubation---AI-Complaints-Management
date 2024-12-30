@@ -36,22 +36,22 @@ const ListingSearchForm = ({ filter, setFilter }) => {
   // Fetch Claim Sub-Types
   const fetchClaimSubTypes = async (claimTypeId) => {
 
-    // try {
-    //   const response = await claimTypesDropdownList(claimTypeId);
+    try {
+      const response = await claimTypesDropdownList(claimTypeId);
 
-    //   console.log(response?.data?.length > 0)
-    //   if (response?.data?.length > 0) {
-    //     const dropdownData = response.data.map((item) => ({
-    //       value: item.id,
-    //       label: item.name,
-    //     }));
-    //     setClaimSubTypes(dropdownData);
-    //   }
-    // } catch (error) {
-    //   toast.error(
-    //     error?.response?.data?.errorDescription ?? error.message ?? "Failed to fetch claim sub-type data"
-    //   );
-    // }
+      console.log(response?.data?.length > 0)
+      if (response?.data?.length > 0) {
+        const dropdownData = response.data.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }));
+        setClaimSubTypes(dropdownData);
+      }
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.errorDescription ?? error.message ?? "Failed to fetch claim sub-type data"
+      );
+    }
   };
 
   // Update Filters
