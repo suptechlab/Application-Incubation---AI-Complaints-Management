@@ -7,6 +7,7 @@ public class PersonInfoDTO {
     private String genero;
     private String lugarNacimiento;
     private String nacionalidad;
+    private String existUserEmail;
 
     public String getIdentificacion() {
         return identificacion;
@@ -47,4 +48,8 @@ public class PersonInfoDTO {
     public void setNacionalidad(String nacionalidad) {
         this.nacionalidad = nacionalidad;
     }
+
+    public String getExistUserEmail() {return existUserEmail;}
+
+    public void setExistUserEmail(String existUserEmail) {this.existUserEmail = existUserEmail;}
 }

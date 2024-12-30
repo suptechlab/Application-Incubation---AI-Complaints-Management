@@ -1,7 +1,11 @@
 package com.seps.ticket.suptech.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seps.ticket.service.dto.MailDTO;
 import com.seps.ticket.suptech.service.ExternalAPIService;
+import com.seps.ticket.suptech.service.PersonNotFoundException;
+import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
@@ -22,6 +27,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private static final Logger LOG = LoggerFactory.getLogger(ExternalAPIServiceImpl.class);
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${external-api.email-base-url:test}")
     private String emailApiBaseUrl;
@@ -35,18 +41,17 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
     /**
      * Sends an email via an external API.
      *
-     * @param mailDTO          The {@link MailDTO} object containing email details, including recipient, CC, and attachments.
-     * @param subject          The subject of the email.
-     * @param renderedContent  The email content rendered with placeholders replaced.
-     * @return                 {@code true} if the email was sent successfully via the external API;
-     *                         {@code false} otherwise, either due to API failure or service being disabled.
-     *
+     * @param mailDTO         The {@link MailDTO} object containing email details, including recipient, CC, and attachments.
+     * @param subject         The subject of the email.
+     * @param renderedContent The email content rendered with placeholders replaced.
+     * @return {@code true} if the email was sent successfully via the external API;
+     * {@code false} otherwise, either due to API failure or service being disabled.
      * @throws RuntimeException If there is an error reading attachment files.
      */
     @Override
     public Boolean sendEmailViaApi(MailDTO mailDTO, String subject, String renderedContent) {
 
-        if(Boolean.FALSE.equals(Boolean.valueOf(this.emailServiceEnable))){
+        if (Boolean.FALSE.equals(Boolean.valueOf(this.emailServiceEnable))) {
             return false;
         }
 
@@ -98,8 +103,7 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
      * Reads the content of a file and converts it into a byte array.
      *
      * @param file The {@link java.io.File} to be read.
-     * @return     A byte array containing the file's content.
-     *
+     * @return A byte array containing the file's content.
      * @throws RuntimeException If an error occurs while reading the file.
      */
     private byte[] readFileToByteArray(java.io.File file) {
@@ -108,6 +112,39 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
         } catch (Exception e) {
             LOG.error("Error reading file: {}", file.getName(), e);
             throw new RuntimeException("Error reading attachment file: " + file.getName(), e);
+        }
+    }
+
+    @Override
+    public PersonInfoDTO getPersonInfo(String identificacion) {
+        String url = "http://sca.seps.local/seps-consulta/consultaDinardap/obtenerInformacionPersona?identificacion=" + identificacion;
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            // Parse the response as JSON
+            JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+            // Check the response status and return if successful
+            if (jsonResponse.has("status") && "Succefull".equals(jsonResponse.get("status").asText())) {
+                JsonNode objectNode = jsonResponse.get("object");
+                // Map the JSON to PersonInfoDTO
+                PersonInfoDTO personInfo = new PersonInfoDTO();
+                personInfo.setIdentificacion(objectNode.get("identificacion").asText());
+                personInfo.setNombreCompleto(objectNode.get("nombreCompleto").asText());
+                personInfo.setGenero(objectNode.get("genero").asText());
+                personInfo.setLugarNacimiento(objectNode.get("lugarNacimiento").asText());
+                personInfo.setNacionalidad(objectNode.get("nacionalidad").asText());
+                return personInfo;
+            } else {
+                throw new PersonNotFoundException("Person with ID " + identificacion + " not found.");
+            }
+        } catch (HttpClientErrorException e) {
+            // Handle 4xx errors, assuming person not found
+            if (e.getStatusCode().is4xxClientError()) {
+                throw new PersonNotFoundException("Person with ID " + identificacion + " not found.");
+            } else {
+                throw new RuntimeException("API request failed with status: " + e.getStatusCode(), e);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while calling the external API", e);
         }
     }
 }

@@ -7,9 +7,11 @@ import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
 import com.seps.ticket.service.ClaimTicketService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
+import com.seps.ticket.service.UserService;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.suptech.service.DocumentService;
+import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.*;
@@ -362,6 +364,47 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok(responseStatus);
     }
 
+    @Operation(
+        summary = "Validate user identificacion for claim ticket",
+        description = "Checks if the provided user identificacion is valid for creating a claim ticket."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Identificacion validation result.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = PersonInfoDTO.class)
+            )
+        )
+    })
+    @GetMapping("/validate-identificacion")
+    public ResponseEntity<PersonInfoDTO> validateClaimTicketIdentificacion(@RequestParam(name = "identificacion") String identificacion) {
+        return ResponseEntity.ok(claimTicketService.validateClaimTicketIdentificacion(identificacion));
+    }
+
+
+    @Operation(
+        summary = "Validate user email for claim ticket",
+        description = "Checks if the provided user email is valid for creating a claim ticket."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Email validation result.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Boolean.class)
+            )
+        )
+    })
+    @PostMapping("/validate-user-email")
+    public ResponseEntity<Boolean> validateClaimTicketUserEmail(@Valid @RequestBody EmailRequest emailRequest) {
+        String email = emailRequest.getEmail();
+        return ResponseEntity.ok(claimTicketService.validateClaimTicketUserEmail(email));
+    }
+
+
     @Operation(summary = "Create a new claim", description = "A new claim created by Either SEPS or FI User")
     @ApiResponses(value = {
         @ApiResponse(
@@ -379,5 +422,6 @@ public class SepsAndFiClaimTicketResource {
         ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
     }
+
 
 }
