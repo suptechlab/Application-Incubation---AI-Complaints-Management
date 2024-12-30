@@ -27,6 +27,9 @@ import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import jakarta.validation.Valid;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -45,7 +48,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
 
@@ -1210,7 +1212,11 @@ public class SepsAndFiClaimTicketService {
             Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
             attachments.put(ATTACHMENTS, attachDocument);
         }
+        // getTagged User list
+        List<String> taggedUsers = getTaggedUsers(claimTicketReplyRequest.getMessage());
+        if(!taggedUsers.isEmpty()){
 
+        }
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
@@ -1251,6 +1257,19 @@ public class SepsAndFiClaimTicketService {
         activityLog.setAttachmentUrl(attachments);
         claimTicketActivityLogService.saveActivityLog(activityLog);
         this.sendReplyEmail(ticket, claimTicketReplyRequest, activityType, currentUser);
+    }
+
+    private List<String> getTaggedUsers(String messageHtml) {
+        // Parse the HTML message
+        Document document = Jsoup.parse(messageHtml);
+
+        // Select all <a> tags with a specific pattern, e.g., data-user-id="1025"
+        Elements taggedLinks = document.select("a[data-user-id]");
+
+        // Extract email addresses from the href attribute
+        return taggedLinks.stream()
+            .map(link -> link.attr("data-user-id"))
+            .toList();
     }
 
     private List<ClaimTicketDocument> uploadFileAttachments(List<MultipartFile> attachments, ClaimTicket newClaimTicket, User currentUser, DocumentSourceEnum source) {
@@ -1848,50 +1867,5 @@ public class SepsAndFiClaimTicketService {
                 this.sendRejectedTicketEmail(claimTicket, claimTicketRejectRequest);
             }
         }
-    }
-
-    /**
-     * Retrieves a combined list of SEPS users and FI users associated with a specific claim ticket
-     * and maps them into `DropdownListAgentForTagDTO` objects.
-     *
-     * @param ticketId the ID of the claim ticket for which the agent list needs to be retrieved.
-     * @return a list of `DropdownListAgentForTagDTO` objects containing the details of SEPS users and FI users.
-     *
-     * @throws CustomException if the claim ticket is not found for the given ticket ID or
-     *                         if the user does not have the necessary authority.
-     */
-    @Transactional
-    public List<DropdownListAgentForTagDTO> getAgentListForTagging(Long ticketId) {
-        User currentUser = userService.getCurrentUser();
-
-        List<String> authority = currentUser.getAuthorities().stream()
-            .map(Authority::getName)
-            .toList();
-
-        // Find the ticket by ID
-        ClaimTicket ticket;
-        if (authority.contains(AuthoritiesConstants.FI)) {
-            Long organizationId = currentUser.getOrganization().getId();
-            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
-                    new String[]{ticketId.toString()}, null));
-        } else {
-            ticket = claimTicketRepository.findById(ticketId)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
-                    new String[]{ticketId.toString()}, null));
-        }
-
-        List<User> sepsUsers =  userService.getUserListBySepsUser();
-        List<User> fiUsers = userService.getUserListByOrganizationIdFI(ticket.getOrganizationId());
-
-        // Combine the lists and map them to DTOs
-        return Stream.concat(sepsUsers.stream(), fiUsers.stream())
-            .map(user -> new DropdownListAgentForTagDTO(
-                user.getId(),
-                user.getFirstName(),
-                user.getEmail()
-            ))
-            .distinct() // Optional: Remove duplicates if necessary
-            .toList();
     }
 }

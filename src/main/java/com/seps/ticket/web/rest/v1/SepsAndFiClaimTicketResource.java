@@ -368,7 +368,7 @@ public class SepsAndFiClaimTicketResource {
             schema = @Schema(implementation = DropdownListDTO.class)))
     @GetMapping("/{ticketId}/agents-for-tag")
     public ResponseEntity<List<DropdownListAgentForTagDTO>> getAgentListForTag(@PathVariable Long ticketId) {
-        return ResponseEntity.ok(sepsAndFiClaimTicketService.getAgentListForTagging(ticketId));
+        return ResponseEntity.ok(claimTicketService.getAgentListForTagging(ticketId));
     }
 
 

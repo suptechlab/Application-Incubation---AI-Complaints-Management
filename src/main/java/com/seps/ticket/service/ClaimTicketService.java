@@ -4,11 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.InstantTypeAdapter;
+import com.seps.ticket.domain.Authority;
+import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.domain.User;
 import com.seps.ticket.repository.*;
+import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
+import com.seps.ticket.service.dto.DropdownListAgentForTagDTO;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
 import com.seps.ticket.suptech.service.DocumentService;
+import com.seps.ticket.web.rest.errors.CustomException;
+import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -16,8 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.zalando.problem.Status;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class ClaimTicketService {
@@ -80,4 +91,50 @@ public class ClaimTicketService {
                                                     HttpServletRequest request) {
         return null;
     }
+
+    /**
+     * Retrieves a combined list of SEPS users and FI users associated with a specific claim ticket
+     * and maps them into `DropdownListAgentForTagDTO` objects.
+     *
+     * @param ticketId the ID of the claim ticket for which the agent list needs to be retrieved.
+     * @return a list of `DropdownListAgentForTagDTO` objects containing the details of SEPS users and FI users.
+     *
+     * @throws CustomException if the claim ticket is not found for the given ticket ID or
+     *                         if the user does not have the necessary authority.
+     */
+    @Transactional
+    public List<DropdownListAgentForTagDTO> getAgentListForTagging(Long ticketId) {
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        } else {
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+
+        List<User> sepsUsers =  userService.getUserListBySepsUser();
+        List<User> fiUsers = userService.getUserListByOrganizationIdFI(ticket.getOrganizationId());
+
+        // Combine the lists and map them to DTOs
+        return Stream.concat(sepsUsers.stream(), fiUsers.stream())
+            .map(user -> new DropdownListAgentForTagDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getEmail()
+            ))
+            .distinct() // Optional: Remove duplicates if necessary
+            .toList();
+    }
+
 }
