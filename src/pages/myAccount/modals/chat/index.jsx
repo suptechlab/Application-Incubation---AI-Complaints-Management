@@ -127,13 +127,13 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
             const chatActivities = result?.payload?.map((chat, index) => {
                 const text = chat?.activityDetails?.text || ""; // Safely extract text
                 const containsHTML = isHTML(text);
-               return {
+                return {
                     id: chat?.id,
                     message: <> {containsHTML ? (
                         <p className="" dangerouslySetInnerHTML={{ __html: text }} />
-                      ) : (
+                    ) : (
                         <p className="">{text}</p>
-                      )}</>,
+                    )}</>,
                     userMode: chat?.activityType === "CUSTOMER_REPLY" ? true : false,
                     userName: chat?.performBy?.name,
                     dateTime: chat?.performedAt ? moment(chat?.performedAt).format('DD-MM-YY | hh:mm:ss') : '',
@@ -172,30 +172,30 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
         setFileName('');
         if (selectedRow?.id) {
             getConversationData()
-        }else{
+        } else {
             setChatData([])
         }
     }, [selectedRow])
 
     // ATTACHMENT DOWNLOAD
-    const handleAttachmentDownload = async(id,attachmentData) => {
+    const handleAttachmentDownload = async (id, attachmentData) => {
         // WRITE HERE FUNCTION FOR ATTACHMENT DOWNLOAD
         setIsLoading(true);
         const result = await dispatch(downloadDocument(id));
         if (downloadDocument.fulfilled.match(result)) {
-            downloadFile(result?.payload,attachmentData?.originalTitle).then(()=>{
-               
-            }).catch((error)=>{
+            downloadFile(result?.payload, attachmentData?.originalTitle).then(() => {
 
-            }).finally(()=>{
+            }).catch((error) => {
+
+            }).finally(() => {
                 setIsLoading(false)
             })
-            
+
         } else {
             setIsLoading(false);
         }
     }
-   
+
     return (
         <Modal
             show={handleShow}
@@ -229,7 +229,6 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                         key={id}
                                         className={`mb-4 ${userMode ? 'text-end' : ''}`}
                                     >
-
                                         <Stack
                                             direction="horizontal"
                                             gap={3}
@@ -270,11 +269,11 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                                                 className="flex-wrap mt-2"
                                                             >
                                                                 {attachments?.map((actionItem) => {
-                                                                    const { id,externalDocumentId, originalTitle } = actionItem;
+                                                                    const { id, externalDocumentId, originalTitle } = actionItem;
                                                                     return (
                                                                         <button
                                                                             key={id}
-                                                                            onClick={() => handleAttachmentDownload(externalDocumentId , actionItem)}
+                                                                            onClick={() => handleAttachmentDownload(externalDocumentId, actionItem)}
                                                                             className='btn fw-semibold text-decoration-none link-primary'
                                                                         >
                                                                             <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
@@ -297,13 +296,13 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                     <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>Chat Ended</span>
                                 </Stack>
                             } */}
-                           
+
                             {
                                 chatData && chatData?.length === 0 && isLoading === false &&
                                 <Stack direction='horizontal' className='position-relative justify-content-center border-top border-2 border-opacity-10 border-black my-4'>
                                     <span className='bg-body-tertiary fs-12 fw-semibold lh-sm position-absolute px-2 py-1 start-50 text-black text-opacity-50 top-50 translate-middle z-1'>{t("NO_CHAT_AVAILABLE")}</span>
-                                </Stack> 
-                               
+                                </Stack>
+
                             }
                             <div ref={messagesEndRef} />
                         </Modal.Body>
@@ -347,7 +346,7 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                     type="text"
                                     value={formikProps.values.message || ""}
                                     autoComplete="off"
-                                    disabled = {formikProps?.isSubmitting ?? false}
+                                    disabled={formikProps?.isSubmitting ?? false}
                                 />
                                 <AppTooltip title="Send">
                                     <Button

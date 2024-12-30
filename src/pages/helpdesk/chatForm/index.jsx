@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Offcanvas, Stack } from 'react-bootstrap';
+import { Badge, Button, Offcanvas, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { MdKeyboardBackspace, MdPerson } from 'react-icons/md';
+import { MdAttachFile, MdKeyboardBackspace, MdPerson } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormInputBox from '../../../components/FormInput';
 import SvgIcons from '../../../components/SVGIcons';
 import { sendQuery } from '../../../redux/slice/helpDeskSlice';
+import AppTooltip from '../../../components/tooltip';
 
 const ChatBotForm = () => {
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const chatEndRef = useRef(null);
     const [isLoading, setLoading] = useState(false)
     const dispatch = useDispatch()
@@ -317,7 +318,7 @@ const ChatBotForm = () => {
                             id: idx + 1,
                             suggestion: btn.title,
                             // positive: idx === 0, // Assuming the first button is positive
-                            positive : (item.buttons?.length === 2 && idx === 0  ),
+                            positive: (item.buttons?.length === 2 && idx === 0),
                             payload: btn.payload,
                         }))
                         : [],
@@ -457,13 +458,26 @@ const ChatBotForm = () => {
                             <div ref={chatEndRef} />
                         </div>
 
+                       
+                    
+
                         {/* Chatbot Body Footer */}
                         <div className='chatbot-body-footer p-3'>
-                        {isLoading === true ? <div className='chat-loader mb-1'></div> : ""}
+                            {isLoading === true ? <div className='chat-loader mb-1'></div> : ""}
+                            {/* <div className='me-auto mb-2'>
+                                    <Badge
+                                        pill
+                                        bg='info-subtle'
+                                        className='text-info'
+                                    >
+                                        {"fileName"}
+                                    </Badge>
+                                </div> */}
                             <div className='position-relative'>
-                      
+
                                 <FormInputBox
                                     wrapperClassName='mb-0'
+                                    inputClassName="ps-5"
                                     id="message"
                                     placeholder="Type a message"
                                     name="message"
@@ -476,6 +490,27 @@ const ChatBotForm = () => {
                                     autoComplete="off"
                                     readOnly={isLoading}
                                 />
+                                <div className="overflow-hidden position-absolute top-0 z-1 flex-shrink-0  p-2 d-block h-100">
+                                    <AppTooltip title="Add Attachments">
+                                        <label
+                                            htmlFor="attachments"
+                                            className="link-primary cursor-pointer"
+                                            aria-label='Add Attachments'
+                                        >
+                                            <MdAttachFile size={24} />
+                                        </label>
+                                    </AppTooltip>
+
+                                    <input
+                                        name="attachments"
+                                        id="attachments"
+                                        // accept="image/png, image/jpeg, image/jpg"
+                                        accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                        className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                        type="file"
+                                        // onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
+                                    />
+                                </div>
                                 <Button
                                     type="submit"
                                     variant="link"
