@@ -347,6 +347,7 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                                     type="text"
                                     value={formikProps.values.message || ""}
                                     autoComplete="off"
+                                    disabled = {formikProps?.isSubmitting ?? false}
                                 />
                                 <AppTooltip title="Send">
                                     <Button

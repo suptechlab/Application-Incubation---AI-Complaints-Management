@@ -145,5 +145,6 @@ export const englishLang = {
   "ASK_OR_REPLY...":"Ask or reply...",
   "DOWNLOAD": "Download",
   "COMPLAINT_RAISED_SUCCES": "Complaint raised successfully",
-  "LOGIN": "Login"
+  "LOGIN": "Login",
+  "CHATBOT_INITIAL_TEXT" : 'How may i help you ?'
 }

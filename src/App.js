@@ -23,9 +23,9 @@ function App() {
 
   useEffect(() => {
     const validateToken = async () => {
-      const token = getLocalStorage('id_token');
+      const id_token = getLocalStorage('id_token');
 
-      if (token) {
+      if (id_token) {
         try {
           // Dispatch getAccountInfo to validate the token
           const response = await dispatch(getAccountInfo()).unwrap();

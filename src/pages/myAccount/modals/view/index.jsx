@@ -30,13 +30,6 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             const result = await dispatch(getClaimDetails(row?.id));
             if (getClaimDetails.fulfilled.match(result)) {
                 setClaimTicketData(result?.payload?.data);
-                const attachmentsDataList = result?.payload?.data?.claimTicketDocuments?.map((documents) => {
-                    return {
-                        id: documents?.id,
-                        file_name: documents?.originalTitle,
-                        externalDocumentId: documents?.externalDocumentId
-                    }
-                });
                 const roleUserAttachments = result?.payload?.data?.claimTicketDocuments
                     .filter((doc) => doc.uploadedByUser.authorities.includes("ROLE_USER"))
                     .map(({ id, externalDocumentId, originalTitle }) => ({
@@ -193,18 +186,18 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             body: roleUserDocuments,
             condition: true,
         },
-        // {
-        //     eventKey: '1',
-        //     header: t('ATTACHMENTS_SENT_BY_ENTITY'),
-        //     body: roleFiUserDocuments,
-        //     condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE' && claimTicketData?.instanceType !== 'COMPLAINT',
-        // },
-        // {
-        //     eventKey: '2',
-        //     header: t('ATTACHMENTS_SENT_BY_SEPS'),
-        //     body: roleSepsUserDocuments,
-        //     condition: claimTicketData?.instanceType === 'SECOND_INSTANCE' || claimTicketData?.instanceType === 'COMPLAINT',
-        // },
+        {
+            eventKey: '1',
+            header: t('ATTACHMENTS_SENT_BY_ENTITY'),
+            body: roleFiUserDocuments,
+            condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE' && claimTicketData?.instanceType !== 'COMPLAINT',
+        },
+        {
+            eventKey: '2',
+            header: t('ATTACHMENTS_SENT_BY_SEPS'),
+            body: roleSepsUserDocuments,
+            condition: claimTicketData?.instanceType === 'SECOND_INSTANCE' || claimTicketData?.instanceType === 'COMPLAINT',
+        },
     ];
 
     // View Bottom Data

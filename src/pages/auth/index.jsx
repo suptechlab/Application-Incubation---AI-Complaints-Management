@@ -9,6 +9,7 @@ import { dpaAcceptance } from "../../redux/slice/helpDeskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { registerUser, verifyLoginOTP } from "../../redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 /**
  * File a Claim Main Modal
@@ -19,7 +20,7 @@ import { registerUser, verifyLoginOTP } from "../../redux/slice/authSlice";
  * @returns {*}
  */
 
-const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, setIsFileClaimModalShow, setLoading }) => {
+const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, setIsFileClaimModalShow, setLoading, isDirectLogin }) => {
 
 
 
@@ -30,7 +31,8 @@ const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, set
   const [setupSuccesModalShow, setSetupSuccesModalShow] = useState(false);
 
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Handle Privacy Form Submit
   const handlePrivacyFormSubmit = (values, actions) => {
@@ -87,10 +89,14 @@ const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, set
     // verifyLoginOTP
     const result = await dispatch(verifyLoginOTP(values));
     if (verifyLoginOTP.fulfilled.match(result)) {
-      setSetupSuccesModalShow(false)
-      handleCloseReset()
-      setIsFileClaimModalShow(true)
-      actions.setSubmitting(false)
+      setSetupSuccesModalShow(false);
+      handleCloseReset();
+      if (isDirectLogin) {
+        navigate('/my-account');
+      } else {
+        setIsFileClaimModalShow(true);
+      }
+      actions.setSubmitting(false);
     } else {
       console.error('VERIFY OTP ERROR:', result.error.message);
       actions.setSubmitting(false)
@@ -144,7 +150,7 @@ const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, set
       <FileClaimModal
         handleShow={isFileClaimModalShow}
         handleClose={() => setIsFileClaimModalShow(false)}
-        // handleFormSubmit={()=>setIsFileClaimModalShow(false)}
+      // handleFormSubmit={()=>setIsFileClaimModalShow(false)}
       />
     </React.Fragment>
   );

@@ -12,6 +12,7 @@ const initialState = {
   instance_types: [],
   loading: false,
   error: null,
+  masterData : {}
 };
 
 // HELPER FUNCTION TO FORMAT GENERAL DATA FOR DROPDOWN
@@ -46,6 +47,7 @@ export const fetchMasterData = createAsyncThunk(
       ] = responses;
 
       return {
+        masterData : masterDataResponse?.data ,
         customer_types: formatGeneralData(masterDataResponse.data.customerType),
         priority_care_group: formatGeneralData(masterDataResponse.data.priorityCareGroup),
         claim_types: formatListData(claimTypesResponse.data),
@@ -125,6 +127,7 @@ const masterSlice = createSlice({
         state.province_list = action.payload.province_list;
         state.organizational_units = action.payload.organizational_units;
         state.instance_types = action.payload.instance_types;
+        state.masterData = action.payload.masterData
       })
       .addCase(fetchMasterData.rejected, (state, action) => {
         state.loading = false;
