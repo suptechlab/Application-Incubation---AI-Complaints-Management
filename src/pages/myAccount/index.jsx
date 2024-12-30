@@ -40,7 +40,7 @@ export default function MyAccount() {
   const [showTicketModal, setTicketModal] = useState(false);
   const [instanceModalShow, setInstanceModalShow] = useState(false);
   const [raisedComplaintModalShow, setRaisedComplaintModalShow] = useState(false);
-  const { instance_types } = useSelector((state) => state?.masterSlice);
+  const { instance_types,masterData } = useSelector((state) => state?.masterSlice);
 
 
   const handleShowModal = (row) => {
@@ -143,14 +143,14 @@ export default function MyAccount() {
         header: t("INSTANCE_TYPE"),
         enableSorting: true,
         cell: (rowData) => {
-          const matchedInstanceType = instance_types.find(
-            (type) => type.value === rowData.row.original.instanceType
-          );
-          const displayLabel = matchedInstanceType ? matchedInstanceType.label : rowData.row.original.instanceType;
+          // const matchedInstanceType = instance_types.find(
+          //   (type) => type.value === rowData.row.original.instanceType
+          // );
+          // const displayLabel = matchedInstanceType ? matchedInstanceType.label : rowData.row.original.instanceType;
 
           return (
             <span className={rowData.row.original.instanceType === 'COMPLAINT' ? 'text-danger' : ''}>
-              {displayLabel}
+              {masterData?.instanceType[rowData?.row?.original?.instanceType]}
             </span>
           );
         }
@@ -164,7 +164,7 @@ export default function MyAccount() {
           <span
             className={`text-nowrap bg-opacity-25 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
           >
-            {rowData.row.original.status}
+            {masterData?.claimTicketStatus[rowData?.row?.original?.status]}
           </span>
         )
       },
@@ -221,7 +221,7 @@ export default function MyAccount() {
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
                   aria-label={t("CHAT")}
-                  disabled={false}
+                  disabled={['CLOSED', 'REJECTED'].includes(info?.row?.original?.status)}
                 >
                   <MdChatBubbleOutline size={24} />
                   {/* <Badge

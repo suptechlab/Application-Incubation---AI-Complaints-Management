@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Offcanvas, Stack } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { MdKeyboardBackspace, MdPerson } from 'react-icons/md';
+import { useDispatch, useSelector } from 'react-redux';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormInputBox from '../../../components/FormInput';
 import SvgIcons from '../../../components/SVGIcons';
-import { ChatBotFormSchema } from '../validations';
-import { useDispatch, useSelector } from 'react-redux';
-import { clearApiResponse, sendQuery } from '../../../redux/slice/helpDeskSlice';
+import { sendQuery } from '../../../redux/slice/helpDeskSlice';
 
 const ChatBotForm = () => {
+    const {t} = useTranslation()
     const chatEndRef = useRef(null);
     const [isLoading, setLoading] = useState(false)
     const dispatch = useDispatch()
@@ -17,13 +18,13 @@ const ChatBotForm = () => {
         message: '',
     };
 
-    const { apiResponse, queryError } = useSelector((state) => state.helpDeskSlice);
+    const { queryError } = useSelector((state) => state.helpDeskSlice);
     const [chatEnded, setChatEnded] = useState(false)
 
 
     const [chatData, setChatData] = useState([{
         id: 1,
-        message: <>How may i help you ?</>,
+        message: <>{t("CHATBOT_INITIAL_TEXT")}</>,
         userMode: false,
         botViewMode: true,
         botReview: [],
@@ -357,143 +358,6 @@ const ChatBotForm = () => {
             chatEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
         }
     }, [chatData]);
-
-    // useEffect(() => {
-    //     if (Array.isArray(apiResponse) && apiResponse.length > 0) {
-    //         // Compare current apiResponse with the previous one to avoid duplicates
-    //         const isDuplicateResponse = JSON.stringify(apiResponse) === JSON.stringify(prevApiResponse);
-
-    //         if (!isDuplicateResponse) {
-    //             setChatData((prevChatData) => {
-    //                 // Map through the apiResponse to create new chat data
-    //                 const newChatData = apiResponse?.map((item, index) => {
-    //                     const hasButtons = item.buttons && item.buttons.length > 0;
-    //                     return {
-    //                         id: prevChatData.length + index + 1,
-    //                         message: <>{item.text}</>,
-    //                         userMode: false,
-    //                         botViewMode: true,
-    //                         recipientId: item.recipientId,
-    //                         botReview: hasButtons
-    //                             ? item.buttons.map((btn, idx) => ({
-    //                                 id: idx + 1,
-    //                                 suggestion: btn.title,
-    //                                 positive: idx === 0, // Assuming the first button is positive
-    //                                 payload: btn.payload,
-    //                             }))
-    //                             : [],
-    //                         botSuggestion: [],
-    //                     };
-    //                 });
-
-    //                 // Return the new chat data
-    //                 return [...prevChatData, ...newChatData];
-    //             });
-
-    //             // Update senderId if the last recipientId exists
-    //             const lastRecipientId = apiResponse.at(-1)?.recipientId;
-    //             if (lastRecipientId) setSenderId(lastRecipientId);
-    //             // Set the new apiResponse as prevApiResponse
-    //             setPrevApiResponse(apiResponse);
-    //         }
-    //     }else if(prevApiResponse !== null){
-    //         // setChatEnded(true)
-    //     }
-
-    //     if (queryError) {
-    //         // Add queryError as a new message if not already added
-    // setChatData((prevChatData) => {
-    //     const lastError = prevChatData.at(-1)?.error;
-
-    //     // Avoid adding duplicate error messages
-    //     if (lastError === queryError) return prevChatData;
-
-    //     const userMessage = {
-    //         id: prevChatData.length + 1, // Use prevChatData length for unique ID
-    //         message: '',
-    //         userMode: false,
-    //         botViewMode: false,
-    //         botReview: [],
-    //         botSuggestion: [],
-    //         error: queryError,
-    //     };
-
-    //     return [...prevChatData, userMessage];
-    // });
-    //     }
-
-    // }, [apiResponse, queryError]);
-
-
-
-
-    // useEffect(() => {
-    //     let updatedChatData = [...chatData]; // Start with existing chat data
-
-    //     // Step 2: Handle new API responses
-    //     if (Array.isArray(apiResponse) && apiResponse.length > 0) {
-    //         const isDuplicateResponse = JSON.stringify(apiResponse) === JSON.stringify(prevApiResponse);
-
-    //         if (!isDuplicateResponse) {
-    //             // Map through the apiResponse to create new chat entries
-    //             const newChatData = apiResponse.map((item, index) => {
-    //                 const hasButtons = item.buttons && item.buttons.length > 0;
-    //                 return {
-    //                     id: chatData.length + index + 1,
-    //                     message: <>{item.text}</>,
-    //                     userMode: false,
-    //                     botViewMode: true,
-    //                     recipientId: item.recipientId,
-    //                     botReview: hasButtons
-    //                         ? item.buttons.map((btn, idx) => ({
-    //                             id: idx + 1,
-    //                             suggestion: btn.title,
-    //                             positive: idx === 0, // Assuming the first button is positive
-    //                             payload: btn.payload,
-    //                         }))
-    //                         : [],
-    //                     botSuggestion: [],
-    //                 };
-    //             });
-
-    //             updatedChatData = [...chatData, ...newChatData];
-    //             setPrevApiResponse(apiResponse);
-
-    //             // Update the previous response to avoid duplicates
-    //         }
-    //     }
-
-    //     // Step 3: Handle query errors
-    //     if (queryError) {
-    //         const lastError = chatData.at(-1)?.error;
-
-    //         if (lastError !== queryError) {
-    //             const errorMessage = {
-    //                 id: updatedChatData.length + 1,
-    //                 message: '',
-    //                 userMode: false,
-    //                 botViewMode: false,
-    //                 botReview: [],
-    //                 botSuggestion: [],
-    //                 error: queryError,
-    //             };
-    //             updatedChatData.push(errorMessage);
-    //         }
-    //     }
-
-    //     // Step 4: Update chat data state and persist it
-    //     if (updatedChatData.length !== chatData.length) {
-    //         setChatData(updatedChatData);
-    //         dispatch(clearApiResponse())
-    //     }
-
-    //     // Step 5: Update senderId if there's a new recipientId
-    // if (Array.isArray(apiResponse) && apiResponse.length > 0) {
-    //     const lastRecipientId = apiResponse.at(-1)?.recipientId;
-    //     if (lastRecipientId) setSenderId(lastRecipientId);
-    // }
-
-    // }, [apiResponse, queryError]);
 
 
     return (
