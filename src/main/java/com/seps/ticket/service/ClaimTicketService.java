@@ -9,19 +9,24 @@ import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.domain.User;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
+import com.seps.ticket.service.dto.ClaimTicketListDTO;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
 import com.seps.ticket.service.dto.DropdownListAgentForTagDTO;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
+import com.seps.ticket.service.specification.ClaimTicketSpecification;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
+import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
@@ -137,4 +142,41 @@ public class ClaimTicketService {
             .toList();
     }
 
+    /**
+     * Retrieves a paginated list of claim tickets for SEPS and FI users that are tagged to the current user.
+     *
+     * <p>This method applies filters based on the provided {@link ClaimTicketFilterRequest}
+     * and the current user's role and organization. If no filter request is provided,
+     * a default filter is initialized. The method ensures that FI users are restricted
+     * to claim tickets within their organization.
+     *
+     * <p>The claim tickets are fetched using a custom specification that matches the
+     * "tagged to user" criteria, and the result mapped to {@link ClaimTicketListDTO}.
+     *
+     * @param pageable      the pagination and sorting information
+     * @param filterRequest the filter criteria for claim tickets; if null, a default filter is used
+     * @return a {@link Page} of {@link ClaimTicketListDTO} containing the filtered claim tickets
+     *
+     */
+    @Transactional(readOnly = true)
+    public Page<ClaimTicketListDTO> listSepsAndFiClaimTicketsForTaggedUser(Pageable pageable, ClaimTicketFilterRequest filterRequest) {
+
+        // If no filterRequest is provided, initialize a default object
+        if (filterRequest == null) {
+            filterRequest = new ClaimTicketFilterRequest();
+        }
+
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+                .map(Authority::getName)
+                .toList();
+
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            filterRequest.setOrganizationId(currentUser.getOrganization().getId());
+        }
+
+        return claimTicketRepository.findAll(ClaimTicketSpecification.taggedToUser(filterRequest, currentUser.getId()), pageable)
+                .map(claimTicketMapper::toListDTO);
+    }
 }

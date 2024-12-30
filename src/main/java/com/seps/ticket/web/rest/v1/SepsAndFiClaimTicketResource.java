@@ -390,4 +390,16 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
     }
 
+    @Operation(summary = "List all Claim Ticket For tagged user", description = "Retrieve a paginated list of all claim tickets")
+    @ApiResponse(responseCode = "200", description = "Claim Ticket List retrieved successfully",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = ClaimTicketDTO.class)))
+    @GetMapping("/for-tagged-users")
+    public ResponseEntity<List<ClaimTicketListDTO>> listSepsFiClaimTicketsForTaggedUser(Pageable pageable,
+                                                                           @ModelAttribute ClaimTicketFilterRequest filterRequest) {
+        Page<ClaimTicketListDTO> page = claimTicketService.listSepsAndFiClaimTicketsForTaggedUser(pageable, filterRequest);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
 }

@@ -85,6 +85,7 @@ public class SepsAndFiClaimTicketService {
     private final TemplateVariableMappingService templateVariableMappingService;
     private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
     private final TemplateMasterRepository templateMasterRepository;
+    private final ClaimTicketTaggedUserRepository claimTicketTaggedUserRepository;
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -111,13 +112,14 @@ public class SepsAndFiClaimTicketService {
                                        ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                        ClaimTicketStatusLogRepository claimTicketStatusLogRepository, MailService mailService, DocumentService documentService,
                                        ClaimTicketDocumentRepository claimTicketDocumentRepository,
-                                       TemplateVariableMappingService templateVariableMappingService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterRepository templateMasterRepository) {
+                                       TemplateVariableMappingService templateVariableMappingService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterRepository templateMasterRepository, ClaimTicketTaggedUserRepository claimTicketTaggedUserRepository) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
         this.enumUtil = enumUtil;
+        this.claimTicketTaggedUserRepository = claimTicketTaggedUserRepository;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -1215,7 +1217,17 @@ public class SepsAndFiClaimTicketService {
         // getTagged User list
         List<String> taggedUsers = getTaggedUsers(claimTicketReplyRequest.getMessage());
         if(!taggedUsers.isEmpty()){
-
+            List<ClaimTicketTaggedUser> claimTicketTaggedUserList = new ArrayList<>();
+            taggedUsers.forEach(taggedUser->{
+                User tagUser = userService.findUserById(Long.valueOf(taggedUser));
+                if(tagUser!=null) {
+                    ClaimTicketTaggedUser claimTicketTaggedUser = new ClaimTicketTaggedUser();
+                    claimTicketTaggedUser.setTicketId(ticket.getId());
+                    claimTicketTaggedUser.setUserId(tagUser.getId());
+                    claimTicketTaggedUserList.add(claimTicketTaggedUser);
+                }
+            });
+            claimTicketTaggedUserRepository.saveAll(claimTicketTaggedUserList);
         }
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
