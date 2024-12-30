@@ -21,7 +21,7 @@ import UserLoader from "../../components/UserLoader";
 
 export default function AddStatePage() {
 
-  
+
   const [loading, setLoading] = useState(true);
   const [userLoading, setUserLoading] = useState(false);
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ export default function AddStatePage() {
     mobileCode: "+91",
     mobileNo: "",
     activated: true,
-    profileImage: "",
+    profileImage: ""
   });
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function AddStatePage() {
       }
       setRolesOptions(roleList);
     });
-    
+
   }, []);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function AddStatePage() {
         setInitialValues({
           name: response.data?.name ? response.data?.name : "",
           email: response.data?.email ? response.data?.email : "",
-          roleId: response.data?.roleId ??  "",
+          roleId: response.data?.roleId ?? "",
           department: response.data?.department ? response.data?.department : "",
           // activated: response.data?.status == 'ACTIVE' ? true : false,
           //mobileCode: "+91",
@@ -89,7 +89,7 @@ export default function AddStatePage() {
   }, [id, isEdit]);
 
   // Get SEPS user verification
-  const verifyEmail = async (email,setFieldValue) => {
+  const verifyEmail = async (email, setFieldValue) => {
     if (!email) return;
 
     try {
@@ -99,7 +99,7 @@ export default function AddStatePage() {
       if (response.data) {
         const { displayName, department } = response.data;
         toast.success("Email verified successfully.");
-        
+
         // Update the Formik fields with the response data
         setFieldValue("name", displayName || "");
         setFieldValue("department", department || "");
@@ -115,65 +115,33 @@ export default function AddStatePage() {
 
   const onSubmit = async (values, actions) => {
     setUserLoading(true);
-    // const formData = new FormData();
-    // if (!isImageSet) {
-    //   delete values.profileImage;
-    // }
-    // for (const key in values) {
-    //   formData.append(key, values[key]);
-    // }
-
+    const payload = { ...values, langKey: "es" };
+  
+    const handleAction = isEdit
+      ? () => handleUpdateUser(id, payload)
+      : () => handleAddUser(payload);
+  
     try {
-      if (isEdit) {
-        // formData.append("id", id);
-        // const response = await handleUpdateUser(id, formData, {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //   },
-        // });
-        
-       
-        delete values.profileImage;
-        delete values.profileImage;
-        delete values.activated;
-        delete values.mobileCode;
-        delete values.mobileNo;
-        await handleUpdateUser( id, { ...values }).then((response) => {
-          toast.success(response.data.message)
-          actions.resetForm()
-          navigate('/users')
-        }).catch((error) => {
-          setUserLoading(false);
-          toast.error(error.response.data.errorDescription ?? error.response.data.detail);
-
-        }).finally(() => {
-          actions.setSubmitting(false)
+      await handleAction()
+        .then((response) => {
+          toast.success(response.data.message);
+          actions.resetForm();
+          navigate('/users');
         })
-      }
-      else {
-        
-        delete values.profileImage;
-        delete values.profileImage;
-        delete values.activated;
-        delete values.mobileCode;
-        delete values.mobileNo;
-        await handleAddUser({ ...values }).then((response) => {
-          toast.success(response.data.message)
-          actions.resetForm()
-          navigate('/users')
-        }).catch((error) => {
-          setUserLoading(false);
+        .catch((error) => {
           toast.error(error.response.data.errorDescription ?? error.response.data.detail);
-
-        }).finally(() => {
-          actions.setSubmitting(false)
         })
-      }
+        .finally(() => {
+          setUserLoading(false);
+          actions.setSubmitting(false);
+        });
     } catch (error) {
       setUserLoading(false);
       toast.error(t('SOMETHING WENT WRONG'));
     }
   };
+  
+
 
   return (
     <React.Fragment>
@@ -188,136 +156,134 @@ export default function AddStatePage() {
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
             {
-              loading ? "" : 
-            
-            <Formik
-              initialValues={initialValues}
-              validationSchema={validationSchema}
-              onSubmit={onSubmit}
-            // enableReinitialize
-            >
-              {({
-                errors,
-                handleBlur,
-                handleChange,
-                handleSubmit,
-                touched,
-                values,
-                setFieldValue,
-              }) => (
-                <FormikForm
-                  onSubmit={handleSubmit}
-                  className="d-flex flex-column h-100"
+              loading ? "" :
+                <Formik
+                  initialValues={initialValues}
+                  validationSchema={validationSchema}
+                  onSubmit={onSubmit}
                 >
-                  <Row>
-                    
-                    <Col sm={6} md={6} lg={4}>
-                      <FormInput
-                        error={errors.email}
-                        id="email"
-                        key={"email"}
-                        label={t('EMAIL')}
-                        name="email"
-                        // onBlur={handleBlur}
-                        onBlur={(e) => {
-                          handleBlur(e);
-                          verifyEmail(e.target.value, setFieldValue); // Pass setFieldValue here
-                        }}
-                        onChange={handleChange}
-                        touched={touched.email}
-                        type="text"
-                        value={values.email || ""}
-                        disabled={emailDisabled}
-                      />
-                    </Col>
-                    <Col sm={6} md={6} lg={4}>
-                      <FormInput
-                        error={errors.name}
-                        id="name"
-                        key={"name"}
-                        label={t('NAME')}
-                        name="name"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        touched={touched.name}
-                        type="text"
-                        value={values.name || ""}
-                        disabled={true}
-                      />
-                    </Col>
-                    <Col sm={6} md={6} lg={4}>
-                      <FormInput
-                        error={errors.department}
-                        id="department"
-                        key={"department"}
-                        label={t('UNIDAD ORGANIZACIONAL')}
-                        name="department"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        touched={touched.department}
-                        type="text"
-                        value={values.department || ""}
-                        disabled={true}
-                      />
-                    </Col>
-                    <Col sm={6} md={6} lg={4}>
-                    <div>
-                        <ReactSelect
-                            label={t('ROLE')}
-                            error={errors.roleId}
-                            options={rolesOptions}
-                            value={values.roleId}
-                            onChange={(option) => {
-                              setFieldValue(
-                                "roleId",
-                                option?.target?.value ?? ""
-                              );
-                            }}
-                            name="roleId"
-                            className={
-                              touched.roleId && errors.roleId
-                                ? "is-invalid"
-                                : ""
-                            }
-                            onBlur={handleBlur}
-                            touched={touched.roleId}
-                          />
-                    </div>
-                      {/* Separate error box for roleId */}
-                      {touched.roleId && errors.roleId && (
-                        <div className="error-box">
-                          {/* {errors.roleId} */}
-                        </div>
-                      )}
-                      
-                    </Col>
-                    
-                  </Row>
-
-                  <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
-                    <Stack
-                      direction="horizontal"
-                      gap={3}
-                      className="justify-content-end flex-wrap"
+                  {({
+                    errors,
+                    handleBlur,
+                    handleChange,
+                    handleSubmit,
+                    touched,
+                    values,
+                    setFieldValue,
+                  }) => (
+                    <FormikForm
+                      onSubmit={handleSubmit}
+                      className="d-flex flex-column h-100"
                     >
-                      <Link
-                        to={"/users"}
-                        className="btn btn-outline-dark custom-min-width-85"
-                      >
-                        {t('CANCEL')}
-                      </Link>
-                      <Button
-                        type="submit"
-                        variant="warning"
-                        className="custom-min-width-85"
-                      >
-                        {isEdit ? t('UPDATE') : t('SUBMIT')}
-                      </Button>
-                    </Stack>
-                  </div>
-                </FormikForm>
-              )}
-            </Formik>
+                      <Row>
+
+                        <Col sm={6} md={6} lg={4}>
+                          <FormInput
+                            error={errors.email}
+                            id="email"
+                            key={"email"}
+                            label={t('EMAIL')}
+                            name="email"
+                            // onBlur={handleBlur}
+                            onBlur={(e) => {
+                              handleBlur(e);
+                              verifyEmail(e.target.value, setFieldValue); // Pass setFieldValue here
+                            }}
+                            onChange={handleChange}
+                            touched={touched.email}
+                            type="text"
+                            value={values.email || ""}
+                            disabled={emailDisabled}
+                          />
+                        </Col>
+                        <Col sm={6} md={6} lg={4}>
+                          <FormInput
+                            error={errors.name}
+                            id="name"
+                            key={"name"}
+                            label={t('NAME')}
+                            name="name"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            touched={touched.name}
+                            type="text"
+                            value={values.name || ""}
+                            disabled={true}
+                          />
+                        </Col>
+                        <Col sm={6} md={6} lg={4}>
+                          <FormInput
+                            error={errors.department}
+                            id="department"
+                            key={"department"}
+                            label={t('UNIDAD ORGANIZACIONAL')}
+                            name="department"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            touched={touched.department}
+                            type="text"
+                            value={values.department || ""}
+                            disabled={true}
+                          />
+                        </Col>
+                        <Col sm={6} md={6} lg={4}>
+                          <div>
+                            <ReactSelect
+                              label={t('ROLE')}
+                              error={errors.roleId}
+                              options={rolesOptions}
+                              value={values.roleId}
+                              onChange={(option) => {
+                                setFieldValue(
+                                  "roleId",
+                                  option?.target?.value ?? ""
+                                );
+                              }}
+                              name="roleId"
+                              className={
+                                touched.roleId && errors.roleId
+                                  ? "is-invalid"
+                                  : ""
+                              }
+                              onBlur={handleBlur}
+                              touched={touched.roleId}
+                            />
+                          </div>
+                          {/* Separate error box for roleId */}
+                          {touched.roleId && errors.roleId && (
+                            <div className="error-box">
+                              {/* {errors.roleId} */}
+                            </div>
+                          )}
+
+                        </Col>
+
+                      </Row>
+
+                      <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
+                        <Stack
+                          direction="horizontal"
+                          gap={3}
+                          className="justify-content-end flex-wrap"
+                        >
+                          <Link
+                            to={"/users"}
+                            className="btn btn-outline-dark custom-min-width-85"
+                          >
+                            {t('CANCEL')}
+                          </Link>
+                          <Button
+                            type="submit"
+                            variant="warning"
+                            className="custom-min-width-85"
+                          >
+                            {isEdit ? t('UPDATE') : t('SUBMIT')}
+                          </Button>
+                        </Stack>
+                      </div>
+                    </FormikForm>
+                  )}
+                </Formik>
             }
           </Card.Body>
         </Card>

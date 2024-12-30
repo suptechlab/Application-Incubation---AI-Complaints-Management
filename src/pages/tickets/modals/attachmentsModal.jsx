@@ -9,8 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { downloadFile } from "../../../utils/commonutils";
 
-const AttachmentsModal = ({ modal, toggle, ticketData }) => {
-
+const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissionState }) => {
     const [AttachmentsModalData, setAttachmentModalData] = useState(ticketData?.claimTicketDocuments ?? [])
     const [isDownloading, setDownloading] = useState(false)
 
@@ -19,15 +18,18 @@ const AttachmentsModal = ({ modal, toggle, ticketData }) => {
     useEffect(() => {
         // setAttachmentModalData(ticketData?.claimTicketDocuments ?? [])
         setAttachmentModalData(() => {
-            if (ticketData?.instanceType === "FIRST_INSTANCE") {
-              return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "FIRST_INSTANCE") ?? [];
-            } else if (ticketData?.instanceType === "SECOND_INSTANCE") {
-              return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "SECOND_INSTANCE") ?? [];
-            } else {
-              return []; // Return empty if no valid instanceType
+            if (currentInstance === "FIRST_INSTANCE") {
+                return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "FIRST_INSTANCE") ?? [];
+            } else if (currentInstance === "SECOND_INSTANCE") {
+                return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "SECOND_INSTANCE") ?? [];
             }
-          });
-    }, [ticketData?.claimTicketDocuments])
+            else if (currentInstance === "COMPLAINT") {
+                return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "COMPLAINT") ?? [];
+            } else {
+                return []; // Return empty if no valid instanceType
+            }
+        });
+    }, [ticketData?.claimTicketDocuments, currentInstance])
 
     // Modal Data
     // const AttachmentsModalData = [
@@ -60,8 +62,8 @@ const AttachmentsModal = ({ modal, toggle, ticketData }) => {
                     .catch((error) => {
                         console.log(error)
                         // Handle any error that occurred during the download
-                        toast.error(error?.message ?? t("DOWNLOAD_ERROR") , { id: "downloading" });
-                    }).finally(()=>{
+                        toast.error(error?.message ?? t("DOWNLOAD_ERROR"), { id: "downloading" });
+                    }).finally(() => {
                         setDownloading(false)
                     });
             } else {
@@ -70,9 +72,9 @@ const AttachmentsModal = ({ modal, toggle, ticketData }) => {
             }
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription ,  { id: "downloading" });
+                toast.error(error?.response?.data?.errorDescription, { id: "downloading" });
             } else {
-                toast.error(error?.message ?? t("DOWNLOAD ERROR") , { id: "downloading" });
+                toast.error(error?.message ?? t("DOWNLOAD ERROR"), { id: "downloading" });
             }
             toast.dismiss("downloading");
         }).finally(() => {
@@ -106,26 +108,30 @@ const AttachmentsModal = ({ modal, toggle, ticketData }) => {
                 </Modal.Header>
                 <Modal.Body className="text-break pt-0 pb-3">
                     <ListGroup variant="flush">
-                        {AttachmentsModalData?.map((item, index) => (
+                        {AttachmentsModalData?.length > 0 ? AttachmentsModalData?.map((item, index) => (
                             <ListGroup.Item
                                 key={"data_view_" + index}
                                 className="small px-0 d-flex gap-2 justify-content-between align-items-start"
                             >
                                 <span className="me-auto py-1">{item?.originalTitle}</span>
-                                <AppTooltip title="Download">
-                                    <button
-                                        // to={item.dowlnloadUrl}
-                                        onClick={() => handleAttachmentDownload(item)}
-                                        className="text-decoration-none btn link-primary"
-                                        target="_blank"
-                                        aria-label="Download"
-                                        disabled={isDownloading ?? false}
-                                    >
-                                        <MdDownload size={20} />
-                                    </button>
-                                </AppTooltip>
+
+                                {
+                                    permissionState?.downloadPermission === true &&
+                                    <AppTooltip title="Download">
+                                        <button
+                                            // to={item.dowlnloadUrl}
+                                            onClick={() => handleAttachmentDownload(item)}
+                                            className="text-decoration-none btn link-primary"
+                                            target="_blank"
+                                            aria-label="Download"
+                                            disabled={isDownloading ?? false}
+                                        >
+                                            <MdDownload size={20} />
+                                        </button>
+
+                                    </AppTooltip>}
                             </ListGroup.Item>
-                        ))}
+                        )) : <p>There is no attachment included.</p>}
                     </ListGroup>
                 </Modal.Body>
             </Modal>

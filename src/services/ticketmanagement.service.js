@@ -65,6 +65,11 @@ export const ticketReplyToCustomer = async (ticketId, data) => {
 export const ticketReplyInternal = async (ticketId, data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-internal`,data);
 }
+
+//TICKET INTERNAL NOTE API
+export const internalNoteApi = async (ticketId, data) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/add-internal-note`,data);
+}
 //TICKET ATTACHMENT DOWNLOAD API
 export const downloadTicketsAttachment = async (attachmentId) => {
   return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/download/${attachmentId}`,{ responseType: 'arraybuffer' });
@@ -77,4 +82,9 @@ export const convertToLabelValue = (obj) => {
     label: value, // Use the value as the label
     value: key    // Use the key as the value
   }));
+}
+
+//TICKET STATUS CHANGE
+export const ticketStatusChange = async (ticketId,status) => {
+  return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/change-status?status=${status}`);
 }

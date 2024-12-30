@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,7 @@ import Add from "./Add";
 import Edit from "./Edit";
 import { changeProvinceMasterStatus, downloadProvinceMasterList, handleGetProvinceMaster } from "../../../services/provinceMaster.service";
 import Loader from "../../../components/Loader";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 const ProvinceMaster = () => {
 
@@ -46,35 +47,44 @@ const ProvinceMaster = () => {
 
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
-  const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    addModule: false,
+    editModule: false,
+  });
 
   useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-        permission.current.addModule = true;
-        permission.current.editModule = true;
-        permission.current.deleteModule = true;
-        permission.current.statusModule = true;
-      } else {
-        getModulePermissions("Province Master").then(response => {
-          if (response.includes("PROVINCE_CREATE")) {
-            permission.current.addModule = true;
-          }
-          if (response.includes("PROVINCE_UPDATE")) {
-            permission.current.editModule = true;
-          }
-          if (response.includes("PROVINCE_STATUS_CHANGE")) {
-            permission.current.deleteModule = true;
-          }
-        }).catch(error => {
-          console.error("Error fetching permissions:", error);
-        });
-      }
-    }).catch(error => {
-      console.error("Error get during to fetch Province Master", error);
-    })
+    const updatedPermissions = {
+      statusModule: false,
+      addModule: false,
+      editModule: false,
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.addModule = true;
+      updatedPermissions.editModule = true;
+    } else {
+      const permissionArr = permissions['Province Master'] ?? [];
 
-  }, []);
+      if (["PROVINCE_CREATE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.addModule = true;
+      }
+
+      if (["PROVINCE_UPDATE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.editModule = true;
+      }
+
+      if (["PROVINCE_STATUS_CHANGE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
   
   const editProvinceMaster = async (rowData) => {
     setEditModal({ row: rowData, open: !editModal?.open })
@@ -157,7 +167,7 @@ const ProvinceMaster = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
-            permission.current.statusModule ? 
+            permissionsState.statusModule ? 
             <Toggle
               id={`status-${info?.row?.original?.id}`}
               key={"status"}
@@ -180,14 +190,14 @@ const ProvinceMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ?
+          permissionsState.editModule ?
           <DataGridActions
             controlId="province-master"
             rowData={rowData}
             customButtons={[
               {
                 name: "edit",
-                enabled: permission.current.editModule,
+                enabled: permissionsState.editModule,
                 type: "button",
                 title:t("EDIT"),
                 icon: <MdEdit size={18} />,
@@ -201,7 +211,7 @@ const ProvinceMaster = () => {
         size: '80',
       },
     ],
-    []
+    [permissionsState]
   );
 
   useEffect(() => {
@@ -255,7 +265,7 @@ const ProvinceMaster = () => {
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
-    {permission.current.addModule
+    {permissionsState.addModule
         ?
     <PageHeader
       title={t("PROVINCE MASTER")}

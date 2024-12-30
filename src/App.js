@@ -12,27 +12,27 @@ function App() {
   // const currentLanguage = i18n?.language ?? getLocalStorage('langKey') ?? 'en'
   const { setUserData, logout, isAuthenticated, isLoading } = useContext(AuthenticationContext);
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem("access_token");
+  // useEffect(() => {
+  //   const accessToken = localStorage.getItem("access_token");
 
-    if (accessToken) {
-      handleGetAccountDetail()
-        .then((response) => {
-          const { data } = response;
-          setUserData(data);
-        })
-        .catch((error) => {
-          console.log(error)
-          console.error("Error fetching account details:", error);
+  //   if (accessToken) {
+  //     handleGetAccountDetail()
+  //       .then((response) => {
+  //         const { data } = response;
+  //         setUserData(data);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error)
+  //         console.error("Error fetching account details:", error);
         
-          if (error?.response?.status === '401') {
-            toast.error("Session expired. Please log in again.");
-            logout();
-          }
+  //         if (error?.response?.status === '401') {
+  //           toast.error("Session expired. Please log in again.");
+  //           logout();
+  //         }
 
-        });
-    }
-  }, []);
+  //       });
+  //   }
+  // }, []);
 
   if (isLoading) {
     return <Loader isLoading={isLoading} />;

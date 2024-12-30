@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 
-const PageHeader = ({ title = "", actions=[] }) => {
+const PageHeader = ({ title = "", actions = [] }) => {
     const { t } = useTranslation();
 
     return (
@@ -57,12 +57,12 @@ PageHeader.propTypes = {
         onClick: PropTypes.func,
         to: PropTypes.string, // If present, renders a Link
         variant: PropTypes.string, // Only for Button
-        disabled: PropTypes.boolean, // Only for Button
+        disabled: PropTypes.bool, // Only for Button
     })),
 };
 
-PageHeader.defaultProps = {
-    actions: [],
-};
+// PageHeader.defaultProps = {
+//     actions: [],
+// };
 
 export default PageHeader;

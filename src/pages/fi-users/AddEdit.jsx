@@ -15,7 +15,7 @@ import { getRolesDropdownData } from "../../services/rolerights.service";
 import { validationSchema } from "../../validations/fiUsers.validation";
 
 export default function FIUserAddEdit() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -60,6 +60,14 @@ export default function FIUserAddEdit() {
           roleId: response.data?.roleId ? response.data?.roleId : "",
         })
         setLoading(false);
+      }).catch((error)=>{
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      }).finally(()=>{
+        setLoading(false)
       });
     } else {
         setLoading(false);
