@@ -316,7 +316,8 @@ const ChatBotForm = () => {
                         ? item.buttons.map((btn, idx) => ({
                             id: idx + 1,
                             suggestion: btn.title,
-                            positive: idx === 0, // Assuming the first button is positive
+                            // positive: idx === 0, // Assuming the first button is positive
+                            positive : (item.buttons?.length === 2 && idx === 0  ),
                             payload: btn.payload,
                         }))
                         : [],
