@@ -1,20 +1,29 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
-import ListingSearchForm from "../../../components/ListingSearchForm";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
 import { handleGetWorkflowTableData, ticketWorkflowStatusChange } from "../../../services/ticketWorkflow.service";
+import ListingSearchForm from "../listingSearchForm";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 export default function TicketWorkFlowList() {
+
+    const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+
+    const [permissionsState, setPermissionsState] = React.useState({
+        statusModule: false,
+        addModule: false,
+        editModule: false,
+    });
 
     const location = useLocation();
     const queryClient = useQueryClient();
@@ -25,7 +34,7 @@ export default function TicketWorkFlowList() {
         pageSize: params.limit ? parseInt(params.limit) : 10,
     });
 
-    const [sorting, setSorting] = React.useState([]);
+    const [sorting, setSzorting] = React.useState([]);
 
     const [filter, setFilter] = React.useState({
         search: "",
@@ -34,8 +43,6 @@ export default function TicketWorkFlowList() {
     });
 
     const [loading, setLoading] = useState(false);
-
-    const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
@@ -106,6 +113,35 @@ export default function TicketWorkFlowList() {
         })
     };
 
+    useEffect(() => {
+        const updatedPermissions = {
+            statusModule: false,
+            addModule: false,
+            editModule: false,
+        };
+        if (currentUser === "SYSTEM_ADMIN") {
+            updatedPermissions.statusModule = true;
+            updatedPermissions.addModule = true;
+            updatedPermissions.editModule = true;
+        } else {
+            const permissionArr = permissions['Ticket Workflow'] ?? [];
+
+
+            if (["TICKET_WF_CREATED_BY_SEPS", "TICKET_WF_CREATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.addModule = true;
+            }
+
+            if (["TICKET_WF_CHANGE_STATUS_BY_SEPS", "TICKET_WF_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.statusModule = true;
+            }
+
+            if (["TICKET_WF_UPDATED_BY_SEPS", "TICKET_WF_UPDATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.editModule = true;
+            }
+
+        }
+        setPermissionsState(updatedPermissions);
+    }, [permissions, currentUser]);
     const columns = React.useMemo(
         () => [
             {
@@ -115,79 +151,95 @@ export default function TicketWorkFlowList() {
                 enableSorting: true,
             },
             {
-                id: "status",
-                isAction: true,
-                cell: (info) => {
-                    if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
-                        return (
-                            //   permission.current.statusModule ?
-                            <Toggle
-                                id={`status-${info?.row?.original?.id}`}
-                                key={"status"}
-                                name="status"
-                                value={info?.row?.original?.status === true}
-                                checked={info?.row?.original?.status === true}
-                                onChange={() =>
-                                    changeStatus(
-                                        info?.row?.original?.id,
-                                        info?.row?.original?.status
-                                    )
-                                }
-                                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
-                            />
-                            //   : ''
-                        );
-                    } else {
-                        return <span>{info?.row?.original?.status} </span>
-                    }
-                },
-                header: () => t("STATUS"),
+                accessorFn: (row) => row?.organization?.razonSocial,
+                id: "organizationId",
+                header: () => t('ENTITY NAME'),
                 enableSorting: false,
-                size: "80",
+                cell: ({ row }) => {
+                    return <span>{row?.original?.organization?.razonSocial}</span>
+                }
             },
+            ...(permissionsState?.statusModule
+                ? [{
+                    id: "status",
+                    isAction: true,
+                    cell: (info) => {
+                        if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
+                            return (
+                                //   permission.current.statusModule ?
+                                <Toggle
+                                    id={`status-${info?.row?.original?.id}`}
+                                    key={"status"}
+                                    name="status"
+                                    value={info?.row?.original?.status === true}
+                                    checked={info?.row?.original?.status === true}
+                                    onChange={() =>
+                                        changeStatus(
+                                            info?.row?.original?.id,
+                                            info?.row?.original?.status
+                                        )
+                                    }
+                                    tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+                                />
+                                //   : ''
+                            );
+                        } else {
+                            return <span>{info?.row?.original?.status} </span>
+                        }
+                    },
+                    header: () => t("STATUS"),
+                    enableSorting: false,
+                    size: "80",
+                }] : [])
+            ,
             // Conditionally add the "actions" column
-            // ...(permission.current.editModule
-            //     ? [
-            {
-                id: "actions",
-                isAction: true,
-                cell: (rowData) => (
-                    <div className="pointer">
-                        <DataGridActions
-                            controlId="tickets-workflow"
-                            rowData={rowData}
-                            customButtons={[
-                                {
-                                    name: "edit",
-                                    enabled: true,
-                                    type: "link",
-                                    title: "Edit",
-                                    icon: <MdEdit size={18} />,
-                                },
-                            ]}
-                        />
-                    </div>
-                ),
-                header: () => <div className="text-center">{t("ACTIONS")}</div>,
-                enableSorting: false,
-                size: "80",
-            },
+            ...(permissionsState?.editModule
+                ? [
+                    {
+                        id: "actions",
+                        isAction: true,
+                        cell: (rowData) => (
+                            <div className="pointer">
+                                <DataGridActions
+                                    controlId="tickets-workflow"
+                                    rowData={rowData}
+                                    customButtons={[
+                                        {
+                                            name: "edit",
+                                            enabled: true,
+                                            type: "link",
+                                            title: "Edit",
+                                            icon: <MdEdit size={18} />,
+                                        },
+                                    ]}
+                                />
+                            </div>
+                        ),
+                        header: () => <div className="text-center">{t("ACTIONS")}</div>,
+                        enableSorting: false,
+                        size: "80",
+                    }] : []),
         ],
-        []
+        [permissionsState]
     );
-
     useEffect(() => {
         setPagination({
             pageIndex: 0,
             pageSize: 10,
         });
     }, [filter]);
-
     useEffect(() => {
         return () => {
             queryClient.removeQueries("data");
         };
     }, [queryClient]);
+
+
+
+
+    const actions = permissionsState?.addModule
+        ? [{ label: t('ADD NEW'), to: "/tickets-workflow/add", variant: "warning" }]
+        : [];
 
     return (
         <React.Fragment>
@@ -195,7 +247,7 @@ export default function TicketWorkFlowList() {
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
                 <PageHeader
                     title={t('TICKET WORKFLOW')}
-                    actions={[{ label: t('ADD NEW'), to: "/tickets-workflow/add", variant: "warning" }]}
+                    actions={actions ?? []}
                 />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
