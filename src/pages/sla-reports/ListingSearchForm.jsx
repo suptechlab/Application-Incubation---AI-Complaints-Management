@@ -35,7 +35,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
 
   // Fetch Claim Sub-Types
   const fetchClaimSubTypes = async (claimTypeId) => {
-   
+
     // try {
     //   const response = await claimTypesDropdownList(claimTypeId);
 
@@ -68,7 +68,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
     const claimTypeId = selectedOption?.target?.value ?? "";
     updateFilter("claimTypeId", claimTypeId);
     updateFilter("claimSubTypeId", ""); // Clear sub-type filter when claim type changes
-    console.log({claimType : claimTypeId})
+    console.log({ claimType: claimTypeId })
     if (claimTypeId) {
       fetchClaimSubTypes(claimTypeId);
     } else {
@@ -98,6 +98,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
               wrapperClassName="mb-0"
               placeholder={t("CLAIM TYPE")}
               options={claimTypes}
+              size="sm"
               onChange={handleClaimTypeChange}
               value={claimTypes.find((option) => option.value === filter.claimTypeId) || null}
             />
@@ -107,6 +108,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
               wrapperClassName="mb-0"
               placeholder={t("CLAIM SUB TYPE")}
               options={claimSubTypes}
+              size="sm"
               onChange={(selectedOption) => updateFilter("claimSubTypeId", selectedOption?.value || "")}
               value={claimSubTypes.find((option) => option.value === filter.claimSubTypeId) || null}
               isDisabled={!filter.claimTypeId}
@@ -116,6 +118,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
             <ReactSelect
               wrapperClassName="mb-0"
               placeholder={t("STATUS")}
+              size="sm"
               options={[
                 { label: t("ALL STATUS"), value: "" },
                 { label: t("ACTIVE"), value: true },
