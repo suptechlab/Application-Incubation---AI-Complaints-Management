@@ -63,7 +63,8 @@ const routes = [
     element: <Dashboard />,
     isPrivate: true,
     layoutType: "Auth",
-    module: "Dashboard"
+    module: "Dashboard",
+    permissions : ["DASHBOARD_VIEW_FI","DASHBOARD_VIEW_SEPS"]
   },
 
   {
