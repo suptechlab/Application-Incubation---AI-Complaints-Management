@@ -53,4 +53,24 @@ public class UserSpecification {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    public static Specification<User> byFilterWorkFlow(List<String> authorities, Long organizationId) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Filter by roles
+            if (authorities != null && !authorities.isEmpty()) {
+                Join<Object, Object> userAuth = root.join("authorities", JoinType.INNER);
+                predicates.add(userAuth.get("name").in(authorities));
+            }
+
+            if (organizationId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("organizationId"), organizationId));
+            }
+
+            predicates.add(criteriaBuilder.equal(root.get("status"), UserStatusEnum.ACTIVE));
+            // Combine all predicates with 'and'
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }

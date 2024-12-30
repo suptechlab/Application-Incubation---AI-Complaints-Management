@@ -1,6 +1,7 @@
 package com.seps.admin.service.specification;
 
 import com.seps.admin.domain.TemplateMaster;
+import com.seps.admin.enums.EmailUserTypeEnum;
 import com.seps.admin.enums.TemplateTypeEnum;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +19,7 @@ public class TemplateMasterSpecification {
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
+    private static final String ORGANIZATION_ID = "organizationId";
     private TemplateMasterSpecification() {
     }
 
@@ -60,9 +62,47 @@ public class TemplateMasterSpecification {
             // Filter by organizationId (if provided)
             if (organizationId != null) {
                 predicates.add(
-                    criteriaBuilder.equal(root.get("organizationId"), organizationId)
+                    criteriaBuilder.equal(root.get(ORGANIZATION_ID), organizationId)
                 );
             }
+            // Combine all predicates with 'and'
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    public static Specification<TemplateMaster> byFilterWorkflowTemplateList(EmailUserTypeEnum userType, Long organizationId, Boolean isFI) {
+        return (root, query, criteriaBuilder) -> {
+            // Create a list to hold all predicates (conditions)
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Apply filter based on organizationId and FI role
+            if (isFI != null) {
+                if (isFI) {
+                    // If user is FI, include templates where organizationId is either null or matches the provided organizationId
+                    predicates.add(
+                        criteriaBuilder.or(
+                            criteriaBuilder.isNull(root.get(ORGANIZATION_ID)),
+                            criteriaBuilder.equal(root.get(ORGANIZATION_ID), organizationId)
+                        )
+                    );
+                } else {
+                    // If user is not FI, only include templates where organizationId is null
+                    predicates.add(
+                        criteriaBuilder.isNull(root.get(ORGANIZATION_ID))
+                    );
+                }
+            }
+
+            // Filter by templateType (if provided)
+            if (userType != null) {
+                predicates.add(
+                    criteriaBuilder.equal(root.get("userType"), userType)
+                );
+            }
+
+            predicates.add(criteriaBuilder.equal(root.get("isStatic"), false));
+            predicates.add(criteriaBuilder.equal(root.get("status"), true));
+
             // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

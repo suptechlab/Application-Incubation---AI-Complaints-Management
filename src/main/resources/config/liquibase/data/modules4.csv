@@ -1,0 +1,3 @@
+id,name,name_es,description,description_es,user_type,sort_order
+23,Dashboard,Panel,For SEPS,Para SEPS,SEPS_USER,23
+24,Dashboard,Panel,For FI,Para FI,FI_USER,24

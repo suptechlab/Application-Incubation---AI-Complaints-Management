@@ -70,7 +70,7 @@ deployment:
     targetPort: 8080
 
   ingress:
-    enabled: true
+    enabled: false
     className: "nginx"
     annotations:
         nginx.ingress.kubernetes.io/enable-cors: "true"

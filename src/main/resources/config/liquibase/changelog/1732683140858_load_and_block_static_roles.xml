@@ -90,4 +90,24 @@
       separator=","
       tableName="permissions"/>
   </changeSet>
+  <changeSet id="1734524352476" author="matellio">
+    <loadData
+      file="config/liquibase/data/modules4.csv"
+      separator=","
+      tableName="modules"/>
+  </changeSet>
+  <changeSet id="1735153950849" author="matellio">
+    <update tableName="permissions">
+      <column name="module_id" value="22" />
+      <where>id IN (63, 64, 65)</where>
+    </update>
+    <update tableName="permissions">
+      <column name="module_id" value="21" />
+      <where>id IN (66, 67, 68)</where>
+    </update>
+    <loadData
+      file="config/liquibase/data/permissions4.csv"
+      separator=","
+      tableName="permissions"/>
+  </changeSet>
 </databaseChangeLog>

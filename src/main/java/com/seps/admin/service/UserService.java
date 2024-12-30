@@ -9,6 +9,7 @@ import com.seps.admin.repository.RoleRepository;
 import com.seps.admin.repository.UserRepository;
 import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.security.SecurityUtils;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.FIUserDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.suptech.service.LdapSearchService;
@@ -53,6 +54,9 @@ public class UserService {
     private final MessageSource messageSource;
     private final Gson gson;
     private final LdapSearchService ldapSearchService;
+    private static final String DISPLAY_NAME = "displayName";
+    private static final String DEPARTMENT = "department";
+    private static final String TITLE = "title";
 
     public UserService(UserRepository userRepository, AuthorityRepository authorityRepository,
                        PasswordEncoder passwordEncoder, UserMapper userMapper, ExternalAPIService externalAPIService,
@@ -86,7 +90,7 @@ public class UserService {
      * </p>
      *
      * @param userDTO     the data transfer object containing user details (name, email, etc.)
-     * @param requestInfo
+     * @param requestInfo   the request information for logging
      * @return the created {@link User} entity
      */
     @Transactional
@@ -94,8 +98,8 @@ public class UserService {
         User currenUser = getCurrentUser();
         String normalizedEmail = userDTO.getEmail().toLowerCase();
         Map<String, String> data = verifySEPSUser(normalizedEmail);
-        String name = data.get("displayName");
-        String department = data.get("department");
+        String name = data.get(DISPLAY_NAME);
+        String department = data.get(DEPARTMENT);
         // Fetch role or throw exception if not found
         Long roleId = userDTO.getRoleId();
         Role role = roleRepository.findByIdAndUserType(roleId, UserTypeEnum.SEPS_USER.toString())
@@ -156,7 +160,7 @@ public class UserService {
      *
      * @param id          the ID of the user to be updated
      * @param userDTO     the data transfer object containing updated user details
-     * @param requestInfo
+     * @param requestInfo   the request information for logging
      * @throws CustomException if the user is not found or lacks SEPS authority
      */
     @Transactional
@@ -166,9 +170,9 @@ public class UserService {
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
 
-        List<String> authorityList = user.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = user.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
-            LOG.warn("SEPS User not found with id:{}", id);
+            LOG.warn("SEPS User not found with id:{} for Edit", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
@@ -214,14 +218,13 @@ public class UserService {
         User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
-        List<String> authorityList = entity.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = entity.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
-            LOG.warn("SEPS User not found with id:{}", id);
+            LOG.warn("SEPS User not found with id:{} for detail", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
-        SEPSUserDTO sepsUserDTO = userMapper.userToSEPSUserDTO(entity);
-        return sepsUserDTO;
+        return userMapper.userToSEPSUserDTO(entity);
     }
 
     /**
@@ -246,7 +249,7 @@ public class UserService {
         User user = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
-        List<String> authorityList = user.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = user.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.SEPS)) {
             LOG.warn("SEPS User not found with id:{}", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
@@ -276,10 +279,8 @@ public class UserService {
         Map<String, Object> newData = convertEntityToMap(this.getSEPSUserById(user.getId()));
         entityData.put(Constants.OLD_DATA, oldData);
         entityData.put(Constants.NEW_DATA, newData);
-        Map<String, Object> req = new HashMap<>();
-        String requestBody = null;
         auditLogService.logActivity(null, currenUser.getId(), requestInfo, "changeSEPSStatus", ActionTypeEnum.SEPS_USER_STATUS_CHANGE.name(), user.getId(), User.class.getSimpleName(),
-            null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), requestBody);
+            null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), null);
     }
 
     /**
@@ -405,15 +406,13 @@ public class UserService {
         User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
-        List<String> authorityList = entity.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = entity.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.FI)) {
-            LOG.warn("FI User not found with id:{}", id);
+            LOG.warn("FI User not found with id:{} for detail", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
-        FIUserDTO fiUserDTO = userMapper.userToFIUserDTO(entity);
-        return fiUserDTO;
-
+        return userMapper.userToFIUserDTO(entity);
     }
 
     /**
@@ -452,9 +451,9 @@ public class UserService {
         User currenUser = getCurrentUser();
         User user = userRepository.findOneWithAuthoritiesById(id).orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
             new String[]{id.toString()}, null));
-        List<String> authorityList = user.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = user.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.FI)) {
-            LOG.warn("FI User not found with id:{}", id);
+            LOG.warn("FI User not found with id:{} for edit", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.FI_USER_NOT_FOUND,
                 new String[]{id.toString()}, null);
         }
@@ -506,7 +505,7 @@ public class UserService {
         User user = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
             () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
                 new String[]{id.toString()}, null));
-        List<String> authorityList = user.getAuthorities().stream().map(authority -> authority.getName()).toList();
+        List<String> authorityList = user.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.FI)) {
             LOG.warn("FI User not found with id:{}", id);
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.FI_USER_NOT_FOUND,
@@ -536,10 +535,8 @@ public class UserService {
         Map<String, Object> newData = convertEntityToMap(this.getFIUserById(user.getId()));
         entityData.put(Constants.OLD_DATA, oldData);
         entityData.put(Constants.NEW_DATA, newData);
-        Map<String, Object> req = new HashMap<>();
-        String requestBody = null;
         auditLogService.logActivity(null, currenUser.getId(), requestInfo, "changeFIStatus", ActionTypeEnum.FI_USER_STATUS_CHANGE.name(), user.getId(), User.class.getSimpleName(),
-            null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), requestBody);
+            null, auditMessageMap, entityData, ActivityTypeEnum.STATUS_CHANGE.name(), null);
     }
 
     /**
@@ -564,14 +561,14 @@ public class UserService {
             // Call the LDAP search service to fetch user details
             Map<String, String> ldapDetails = ldapSearchService.searchByEmail(email);
             // Filter only the required attributes (displayName, department, and title)
-            if (ldapDetails.containsKey("displayName")) {
-                userDetails.put("displayName", ldapDetails.get("displayName"));
+            if (ldapDetails.containsKey(DISPLAY_NAME)) {
+                userDetails.put(DISPLAY_NAME, ldapDetails.get(DISPLAY_NAME));
             }
-            if (ldapDetails.containsKey("department")) {
-                userDetails.put("department", ldapDetails.get("department"));
+            if (ldapDetails.containsKey(DEPARTMENT)) {
+                userDetails.put(DEPARTMENT, ldapDetails.get(DEPARTMENT));
             }
-            if (ldapDetails.containsKey("title")) {
-                userDetails.put("title", ldapDetails.get("title"));
+            if (ldapDetails.containsKey(TITLE)) {
+                userDetails.put(TITLE, ldapDetails.get(TITLE));
             }
         } catch (UserNotFoundException e) {
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_VERIFICATION_FAILED, e.getMessage());
@@ -586,4 +583,48 @@ public class UserService {
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CURRENT_USER_NOT_FOUND, null, null));
     }
 
+    /**
+     * Retrieves a list of active agents for workflow based on the current user's authority
+     * and the provided organization ID.
+     *
+     * <p>This method determines the appropriate list of agents to return based on the
+     * user's role (FI or SEPS) and their associated organization. If the current user
+     * has the FI role, the method uses the user's organization ID to filter the agents.
+     * Otherwise, it checks the provided organization ID and filters agents based on
+     * either FI or SEPS roles.
+     *
+     * @param organizationId the ID of the organization to filter agents by;
+     *                       can be null if filtering is based on the user's role.
+     * @return a list of {@link DropdownListDTO} objects representing the active agents
+     *         with their IDs and names. If an agent's first name is null, the name will
+     *         be set to an empty string.
+     * @throws IllegalStateException if the current user is not authenticated or has no roles assigned.
+     * @see UserSpecification#byFilterWorkFlow(List, Long)
+     */
+    @Transactional
+    public List<DropdownListDTO> listActiveAgentsForWorkFlow(Long organizationId) {
+        User currentUser = getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        List<String> authorities = new ArrayList<>();
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+            authorities.add(AuthoritiesConstants.FI);
+        }else{
+            if(organizationId!=null){
+                authorities.add(AuthoritiesConstants.FI);
+            }else {
+                authorities.add(AuthoritiesConstants.SEPS);
+            }
+        }
+        return userRepository.findAll(UserSpecification.byFilterWorkFlow(authorities, organizationId)).stream()
+            .map(user -> {
+                DropdownListDTO dropdown = new DropdownListDTO();
+                dropdown.setId(user.getId());
+                dropdown.setName(user.getFirstName() != null ? user.getFirstName() : ""); // Handle null names
+                return dropdown;
+            })
+            .toList();
+    }
 }

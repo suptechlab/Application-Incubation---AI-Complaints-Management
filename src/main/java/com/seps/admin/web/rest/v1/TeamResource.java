@@ -1,6 +1,7 @@
 package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.aop.permission.PermissionCheck;
+import com.seps.admin.enums.EmailUserTypeEnum;
 import com.seps.admin.enums.TeamEntityTypeEnum;
 import com.seps.admin.service.TeamService;
 import com.seps.admin.service.dto.*;

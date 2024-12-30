@@ -1,0 +1,11 @@
+id,module_id,name,description,description_es
+77,23,DASHBOARD_VIEW_FI,View,Vista
+78,24,DASHBOARD_VIEW_SEPS,View,Vista
+79,16,TICKET_DATE_EXTENSION_FI,Date Extension,Prórroga de fecha
+80,10,TICKET_DATE_EXTENSION_SEPS,Date Extension,Prórroga de fecha
+81,16,TICKET_REPLY_TO_CUSTOMER_FI,Reply to Customer,Responder al cliente
+82,10,TICKET_REPLY_TO_CUSTOMER_SEPS,Reply to Customer,Responder al cliente
+83,16,TICKET_REPLY_TO_INTERNAL_FI,Reply to Internal,Responder a Interno
+84,10,TICKET_REPLY_TO_INTERNAL_SEPS,Reply to Internal,Responder a Interno
+85,16,TICKET_INTERNAL_NOTE_FI,Add Internal Note,Agregar nota interna
+86,10,TICKET_INTERNAL_NOTE_SEPS,Add Internal Note,Agregar nota interna
