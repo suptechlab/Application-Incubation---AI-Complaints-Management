@@ -361,4 +361,14 @@ public class SepsAndFiClaimTicketResource {
         );
         return ResponseEntity.ok(responseStatus);
     }
+
+    @Operation(summary = "Retrieve list of agents for Tagging", description = "Get a list of agents available for ticket tagging")
+    @ApiResponse(responseCode = "200", description = "Agent list retrieved successfully",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = DropdownListDTO.class)))
+    @GetMapping("/{ticketId}/agents-for-tag")
+    public ResponseEntity<List<DropdownListAgentForTagDTO>> getAgentListForTag(@PathVariable Long ticketId) {
+        return ResponseEntity.ok(sepsAndFiClaimTicketService.getAgentListForTagging(ticketId));
+    }
+    
 }
