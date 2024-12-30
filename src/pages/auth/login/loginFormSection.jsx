@@ -7,7 +7,7 @@ import Captcha from "../../../components/Captcha";
 import FormCheckbox from "../../../components/formCheckbox";
 import { useTranslation } from "react-i18next";
 
-const LoginFormSection = ({ handleFormSubmit, isFromDirectLogin }) => {
+const LoginFormSection = ({ handleFormSubmit }) => {
     const { t } = useTranslation()
     // Initial Values
     const initialValues = {
@@ -33,9 +33,7 @@ const LoginFormSection = ({ handleFormSubmit, isFromDirectLogin }) => {
         >
             {(formikProps) => (
                 <React.Fragment>
-                    {!isFromDirectLogin && (
-                        <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
-                    )}
+                    <h6 className="fw-bold">{t('EXISTING_USER_PROMPT')}</h6>
                     <p>{t('LOGIN_INSTRUCTION')}</p>
                     <FormInputBox
                         wrapperClassName="mb-3"
