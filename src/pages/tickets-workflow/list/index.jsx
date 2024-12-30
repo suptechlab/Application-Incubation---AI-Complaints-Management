@@ -146,7 +146,7 @@ export default function TicketWorkFlowList() {
         () => [
             {
                 accessorFn: (row) => row.title,
-                id: "workflow",
+                id: "title",
                 header: () => t('WORKFLOW'),
                 enableSorting: true,
             },
