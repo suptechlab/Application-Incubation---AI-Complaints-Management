@@ -52,7 +52,7 @@ export default function FIUserList() {
       addModule: false,
       editModule: false,
     };
-    if (currentUser === "SUPER_ADMIN") {
+    if (currentUser === "SYSTEM_ADMIN") {
       updatedPermissions.statusModule = true;
       updatedPermissions.addModule = true;
       updatedPermissions.editModule = true;

@@ -36,37 +36,20 @@ export default function TicketsList() {
 
     useEffect(() => {
         const updatedPermissions = {
-            statusModule: false,
             addModule: false,
-            rejectPermission: false,
-            closePermission: false,
-            priorityPermission: false,
-            downloadPermission: false,
             assignPermission: false
         };
-        if (currentUser === "SUPER_ADMIN") {
-            updatedPermissions.statusModule = true;
+        if (currentUser === "SYSTEM_ADMIN") {
             updatedPermissions.addModule = true;
-            updatedPermissions.rejectPermission = true;
-            updatedPermissions.closePermission = true;
-            updatedPermissions.priorityPermission = true;
-            updatedPermissions.downloadPermission = true;
             updatedPermissions.assignPermission = true;
         } else {
             const permissionArr = permissions['Ticket'] ?? [];
-
             if (["TICKET_CREATED_BY_SEPS", "TICKET_CREATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
                 updatedPermissions.addModule = true;
             }
-
-            // if (["TICKET_CHANGE_STATUS_BY_SEPS", "TICKET_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
-            //     updatedPermissions.editModule = true;
-            // }
-
             if (["TICKET_ASSIGNED_TO_AGENT_FI", "TICKET_ASSIGNED_TO_AGENT_SEPS"].some(permission => permissionArr.includes(permission))) {
                 updatedPermissions.assignPermission = true;
             }
-
         }
 
         setPermissionsState(updatedPermissions);
@@ -214,9 +197,9 @@ export default function TicketsList() {
                             const allSelectedIds = e.target.checked
                                 ? table.getRowModel().rows
                                     .filter((row) => (
-                                        (currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED")
+                                        (currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED")
                                         ||
-                                        (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_ADMIN" && currentUser !== "SUPER_ADMIN"))
+                                        (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_USER" && currentUser !== "SYSTEM_ADMIN"))
                                     .map((row) => row.original.id)
                                 : [];
 
@@ -237,11 +220,11 @@ export default function TicketsList() {
                 cell: ({ row }) => (
 
                     (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && (
-                        ((currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE') ||
-                        (currentUser === "FI_ADMIN" && row?.original?.instanceType === 'FIRST_INSTANCE')
+                        ((currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE') ||
+                        (currentUser === "FI_USER" && row?.original?.instanceType === 'FIRST_INSTANCE')
 
 
-                        // (currentUser !== "SEPS_ADMIN" && currentUser !== "FI_ADMIN")
+                        // (currentUser !== "SEPS_USER" && currentUser !== "FI_USER")
                     )) ? (
                         <Form.Check
                             className="form-check-cursor"
@@ -276,9 +259,7 @@ export default function TicketsList() {
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
                             {"#" + row?.original?.ticketId}
                         </Link>
-                        {row?.original?.haveClaimTicketDocuments &&  <MdAttachFile size={16} />}
-
-
+                        {row?.original?.haveClaimTicketDocuments && <MdAttachFile size={16} />}
 
 
                         {/* <AppTooltip title="Attachments">
@@ -385,7 +366,7 @@ export default function TicketsList() {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
 
-            if (currentUser === "SEPS_ADMIN" || currentUser === "SUPER_ADMIN") {
+            if (currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") {
                 agentTicketToSEPSagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setClearTableSelection(true)
@@ -401,7 +382,7 @@ export default function TicketsList() {
                 }).finally(() => {
                     setLoading(false)
                 })
-            } else if (currentUser === "FI_ADMIN") {
+            } else if (currentUser === "FI_USER") {
                 //ASSIGN TICKET TO FI AGENT
                 agentTicketToFIagent(agentId, { ticketIds: ticketIdsArr }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
@@ -440,29 +421,35 @@ export default function TicketsList() {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
 
         switch (currentUser) {
-            case 'FI_ADMIN':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+            case 'FI_USER':
+                selectedColumns = [ "ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
                 selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
-            case 'SEPS_ADMIN':
-                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+            case 'SEPS_USER':
+                selectedColumns = [ "ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_AGENT':
                 selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                break;
+            case 'SYSTEM_ADMIN':
+                selectedColumns = ["select-col", "ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
                 selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
+
+        if (permissionsState?.assignPermission === true) {
+            selectedColumns.unshift("select-col"); // Adds "select-col" to the beginning of the array
+        }
         return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns
     };
 
     // Inside your component, dynamically decide the columns
     const columns = getColumnsForUser(currentUser);
-
 
     // Info Cards Data
 
@@ -506,6 +493,7 @@ export default function TicketsList() {
                             handleTicketAssign={handleTicketAssignment}
                             ticketArr={ticketIdsArr}
                             clearTableSelection={clearTableSelection}
+                            permissionsState={permissionsState}
                         />
                         <CommonDataTable
                             columns={columns}

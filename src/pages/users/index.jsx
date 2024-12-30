@@ -40,7 +40,7 @@ export default function UserList() {
       addModule: false,
       editModule: false,
     };
-    if (currentUser === "SUPER_ADMIN") {
+    if (currentUser === "SYSTEM_ADMIN") {
       updatedPermissions.statusModule = true;
       updatedPermissions.addModule = true;
       updatedPermissions.editModule = true;

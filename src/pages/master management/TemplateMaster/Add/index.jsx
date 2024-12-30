@@ -217,7 +217,7 @@ const AddTemplate = () => {
                             />
                           </Col>
                           {
-                            currentUser === "FI_ADMIN" &&
+                            currentUser === "FI_USER" &&
                             <Col lg={12}>
                               <ReactSelect
                                 error={errors?.templateId}

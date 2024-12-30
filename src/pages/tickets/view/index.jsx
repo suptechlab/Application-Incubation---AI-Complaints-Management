@@ -22,9 +22,85 @@ import ConsumerInfoModal from '../modals/consumerInfoModal';
 
 const TicketsView = () => {
 
-  const { currentUser } = useContext(AuthenticationContext);
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext);
 
   const { masterData } = useContext(MasterDataContext);
+
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    rejectPermission: false,
+    closePermission: false,
+    priorityPermission: false,
+    downloadPermission: false,
+    assignPermission: false,
+    dateExtPermission : false,
+    replyToCustomerPermission : false,
+    replyInternalPermission : false,
+    internalNotePermission : false
+  });
+
+  useEffect(() => {
+    const updatedPermissions = {
+      statusModule: false,
+      rejectPermission: false,
+      closePermission: false,
+      priorityPermission: false,
+      downloadPermission: false,
+      assignPermission: false,
+      dateExtPermission : false,
+      replyToCustomerPermission : false,
+      replyInternalPermission : false,
+      internalNotePermission : false
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.rejectPermission = true;
+      updatedPermissions.closePermission = true;
+      updatedPermissions.priorityPermission = true;
+      updatedPermissions.downloadPermission = true;
+      updatedPermissions.assignPermission = true;
+      updatedPermissions.dateExtPermission = true;
+      updatedPermissions.replyToCustomerPermission = true;
+      updatedPermissions.replyInternalPermission = true;
+      updatedPermissions.internalNotePermission = true;
+    } else {
+      const permissionArr = permissions['Ticket'] ?? [];
+      if (["TICKET_ASSIGNED_TO_AGENT_FI", "TICKET_ASSIGNED_TO_AGENT_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.assignPermission = true;
+      }
+      if (["TICKET_CHANGE_STATUS_BY_SEPS", "TICKET_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+      if (["TICKET_REJECT_FI", "TICKET_REJECT_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.rejectPermission = true;
+      }
+      if (["TICKET_CLOSED_FI", "TICKET_CLOSED_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.closePermission = true;
+      }
+      if (["TICKET_PRIORITY_CHANGE_FI", "TICKET_PRIORITY_CHANGE_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.priorityPermission = true;
+      }
+      if (["TICKET_DOWNLOAD_PDF_FI", "TICKET_DOWNLOAD_PDF_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.downloadPermission = true;
+      }
+      if (["TICKET_DATE_EXTENSION_FI", "TICKET_DATE_EXTENSION_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.dateExtPermission = true;
+      }
+      if (["TICKET_REPLY_TO_CUSTOMER_FI", "TICKET_REPLY_TO_CUSTOMER_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.replyToCustomerPermission = true;
+      }
+      if (["TICKET_REPLY_TO_INTERNAL_FI", "TICKET_REPLY_TO_INTERNAL_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.replyInternalPermission = true;
+      }
+      if (["TICKET_INTERNAL_NOTE_FI", "TICKET_INTERNAL_NOTE_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.internalNotePermission = true;
+      }
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
 
   const { t } = useTranslation()
 
@@ -149,7 +225,7 @@ const TicketsView = () => {
       label: t("PRIORITY"),
       value: (<Stack direction='horizontal' gap={1}>
         {
-          ((currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN") && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) ?
+          (permissionsState?.priorityPermission === true && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) ?
             <Dropdown>
               <Dropdown.Toggle
                 variant="link"
@@ -294,18 +370,14 @@ const TicketsView = () => {
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
-
-
-
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         {loading !== true && <TicketViewHeader
           title={"#" + ticketData?.ticketId}
           ticketData={ticketData}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
           getTicketData={getTicketDetails}
+          permissionState = {permissionsState}
         />}
-
-
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
             <Col lg={6} className='mh-100 d-flex flex-column'>
@@ -376,9 +448,9 @@ const TicketsView = () => {
                     </Col>
                   </Row>
                 </Card.Header>
-                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketDetails} />
+                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketDetails} permissionState={permissionsState}/>
               </Card>
-              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} />
+              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} permissionState ={permissionsState}/>
               {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
                   <ListGroup variant="flush">
@@ -431,6 +503,7 @@ const TicketsView = () => {
         toggle={() => setAttachmentsModalShow(false)}
         currentInstance={currentInstance}
         ticketData={ticketData}
+        permissionState = {permissionsState}
       />
     </React.Fragment>
   )

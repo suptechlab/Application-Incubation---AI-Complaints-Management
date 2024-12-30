@@ -63,7 +63,8 @@ const routes = [
     element: <Dashboard />,
     isPrivate: true,
     layoutType: "Auth",
-    module: "Dashboard"
+    module: "Dashboard",
+    permissions : ["DASHBOARD_VIEW_FI","DASHBOARD_VIEW_SEPS"]
   },
 
   {
@@ -345,10 +346,10 @@ const routes = [
     permissions: [
       "TICKET_CREATED_BY_SEPS",
       "TICKET_UPDATED_BY_SEPS",
-      "TICKET_CHANGE_STATUS_BY_SEPS",
       "TICKET_CREATED_BY_FI",
       "TICKET_UPDATED_BY_FI",
       "TICKET_CHANGE_STATUS_BY_FI",
+      "TICKET_CHANGE_STATUS_BY_SEPS",
       "TICKET_ASSIGNED_TO_AGENT_FI",
       "TICKET_ASSIGNED_TO_AGENT_SEPS",
       "TICKET_CLOSED_FI",
@@ -358,7 +359,15 @@ const routes = [
       "TICKET_CLOSED_SEPS",
       "TICKET_REJECT_SEPS",
       "TICKET_PRIORITY_CHANGE_SEPS",
-      "TICKET_DOWNLOAD_PDF_SEPS"
+      "TICKET_DOWNLOAD_PDF_SEPS",
+      "TICKET_DATE_EXTENSION_FI",
+      "TICKET_DATE_EXTENSION_SEPS",
+      "TICKET_REPLY_TO_CUSTOMER_FI",
+      "TICKET_REPLY_TO_CUSTOMER_SEPS",
+      "TICKET_REPLY_TO_INTERNAL_FI",
+      "TICKET_REPLY_TO_INTERNAL_SEPS",
+      "TICKET_INTERNAL_NOTE_FI",
+      "TICKET_INTERNAL_NOTE_SEPS"
     ]
   },
   {
@@ -378,7 +387,15 @@ const routes = [
       "TICKET_CLOSED_SEPS",
       "TICKET_REJECT_SEPS",
       "TICKET_PRIORITY_CHANGE_SEPS",
-      "TICKET_DOWNLOAD_PDF_SEPS"
+      "TICKET_DOWNLOAD_PDF_SEPS",
+      "TICKET_DATE_EXTENSION_FI",
+      "TICKET_DATE_EXTENSION_SEPS",
+      "TICKET_REPLY_TO_CUSTOMER_FI",
+      "TICKET_REPLY_TO_CUSTOMER_SEPS",
+      "TICKET_REPLY_TO_INTERNAL_FI",
+      "TICKET_REPLY_TO_INTERNAL_SEPS",
+      "TICKET_INTERNAL_NOTE_FI",
+      "TICKET_INTERNAL_NOTE_SEPS"
     ]
   },
   {

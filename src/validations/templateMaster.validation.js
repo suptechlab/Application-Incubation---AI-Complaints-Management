@@ -23,7 +23,7 @@ const validationSchema = Yup.object({
 
   templateId: Yup.string()
     .when('usersType', {
-      is: (usersType) => usersType === 'FI_ADMIN',
+      is: (usersType) => usersType === 'FI_USER',
       then: (schema) => schema.required(msg.templateRequired),
       otherwise: (schema) => schema,
     }),

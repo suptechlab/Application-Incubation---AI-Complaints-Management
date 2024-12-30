@@ -16,7 +16,7 @@ import RejectTicketModal from '../../modals/rejectTicketModal';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import Loader from '../../../../components/Loader';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData, permissionState }) => {
 
     const { t } = useTranslation();
 
@@ -47,7 +47,11 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
     // The color class based on the status
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
-    const statusOptions = [{ label: t('CLOSE'), value: 'CLOSE' }, { label: t('REJECT'), value: 'REJECT' }, { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' }, { label: t('PENDING'), value: 'PENDING' }];
+    const statusOptions = [
+        ...(permissionState?.closePermission === true ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),    
+        ...(permissionState?.rejectPermission === true ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
+        { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
+        { label: t('PENDING'), value: 'PENDING' }];
     // if (selectedStatus === 'NEW') {
     //     statusOptions.push({ label: t('IN_PROGRESS'), value: 'IN_PROGRESS' });
     //   }
@@ -101,7 +105,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
         setLoading(true)
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
-            if (currentUser === "SEPS_ADMIN" || currentUser === "ADMIN") {
+            if (currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") {
                 agentTicketToSEPSagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setSelectedAgent(null)
@@ -114,7 +118,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 }).finally(() => {
                     setLoading(false)
                 })
-            } else if (currentUser === "FI_ADMIN") {
+            } else if (currentUser === "FI_USER") {
                 agentTicketToFIagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setSelectedAgent(null)
@@ -128,7 +132,6 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                     setLoading(false)
                 })
             }
-
         } else {
             toast.error("You are not allowed to assign tickets.")
         }
@@ -211,9 +214,10 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
 
 
                         {
-                            ((currentUser === 'FI_ADMIN' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
-                                ((currentUser === 'SEPS_ADMIN' || currentUser === 'SUPER_ADMIN') &&
-                                    ticketData?.instanceType === 'SECOND_INSTANCE') &&
+
+                            permissionState?.assignPermission === true && 
+                            ((currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') && ticketData?.instanceType === 'SECOND_INSTANCE') &&
                                 (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
@@ -238,7 +242,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                             </div>
                         }
                         {
-                            ((currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN") &&
+                            (permissionState?.dateExtPermission === true &&
                                 (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
                                 <Button
                                     type="submit"
@@ -250,7 +254,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                         }
 
                         {
-                            selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED" ?
+                            (permissionState?.statusModule === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
                                 <Dropdown>
                                     <Dropdown.Toggle
                                         id="ticket-detail-status"
