@@ -5,16 +5,14 @@ import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.service.ClaimTicketActivityLogService;
+import com.seps.ticket.service.ClaimTicketService;
 import com.seps.ticket.service.SepsAndFiClaimTicketService;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
-import com.seps.ticket.web.rest.vm.ClaimTicketClosedRequest;
-import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
-import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
-import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
+import com.seps.ticket.web.rest.vm.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,13 +48,15 @@ public class SepsAndFiClaimTicketResource {
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
     private final MessageSource messageSource;
     private final DocumentService documentService;
+    private final ClaimTicketService claimTicketService;
 
     public SepsAndFiClaimTicketResource(SepsAndFiClaimTicketService sepsAndFiClaimTicketService, ClaimTicketActivityLogService claimTicketActivityLogService,
-                                        MessageSource messageSource, DocumentService documentService) {
-        this.sepsAndFiClaimTicketService =  sepsAndFiClaimTicketService;
+                                        MessageSource messageSource, DocumentService documentService, ClaimTicketService claimTicketService) {
+        this.sepsAndFiClaimTicketService = sepsAndFiClaimTicketService;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
         this.documentService = documentService;
+        this.claimTicketService = claimTicketService;
     }
 
     @Operation(summary = "List all Claim Ticket", description = "Retrieve a paginated list of all claim tickets")
@@ -119,7 +119,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Update Claim Ticket Priority", description = "Update the priority of a specific claim ticket")
     @ApiResponse(responseCode = "200", description = "Claim ticket priority updated successfully")
     @PatchMapping("/{ticketId}/priority")
-    @PermissionCheck({"TICKET_PRIORITY_CHANGE_FI","TICKET_PRIORITY_CHANGE_SEPS"})
+    @PermissionCheck({"TICKET_PRIORITY_CHANGE_FI", "TICKET_PRIORITY_CHANGE_SEPS"})
     public ResponseEntity<Void> updateClaimTicketPriority(
         @PathVariable Long ticketId,
         @RequestParam("priority") ClaimTicketPriorityEnum priority,
@@ -143,7 +143,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Extend SLA for a Claim Ticket", description = "Extend the SLA (Service Level Agreement) for a specific claim ticket")
     @ApiResponse(responseCode = "200", description = "Claim ticket SLA extended successfully")
     @PostMapping("/{ticketId}/extend-sla")
-    @PermissionCheck({"TICKET_DATE_EXTENSION_FI","TICKET_DATE_EXTENSION_SEPS"})
+    @PermissionCheck({"TICKET_DATE_EXTENSION_FI", "TICKET_DATE_EXTENSION_SEPS"})
     public ResponseEntity<ResponseStatus> extendClaimTicketSla(
         @PathVariable Long ticketId,
         @RequestParam("slaDate") String slaDate,
@@ -193,7 +193,7 @@ public class SepsAndFiClaimTicketResource {
         }
     )
     @PostMapping("/{ticketId}/closed")
-    @PermissionCheck({"TICKET_CLOSED_FI","TICKET_CLOSED_SEPS"})
+    @PermissionCheck({"TICKET_CLOSED_FI", "TICKET_CLOSED_SEPS"})
     public ResponseEntity<ResponseStatus> closeClaimTicket(
         @PathVariable Long ticketId, @ModelAttribute @Valid ClaimTicketClosedRequest claimTicketClosedRequest,
         HttpServletRequest request
@@ -225,7 +225,7 @@ public class SepsAndFiClaimTicketResource {
         }
     )
     @PostMapping("/{ticketId}/reject")
-    @PermissionCheck({"TICKET_REJECT_FI","TICKET_REJECT_SEPS"})
+    @PermissionCheck({"TICKET_REJECT_FI", "TICKET_REJECT_SEPS"})
     public ResponseEntity<ResponseStatus> rejectClaimTicket(
         @PathVariable Long ticketId, @ModelAttribute @Valid ClaimTicketRejectRequest claimTicketRejectRequest,
         HttpServletRequest request
@@ -257,9 +257,9 @@ public class SepsAndFiClaimTicketResource {
         )
     })
     @PostMapping("/{ticketId}/reply-to-customer")
-    @PermissionCheck({"TICKET_REPLY_TO_CUSTOMER_FI","TICKET_REPLY_TO_CUSTOMER_SEPS"})
+    @PermissionCheck({"TICKET_REPLY_TO_CUSTOMER_FI", "TICKET_REPLY_TO_CUSTOMER_SEPS"})
     public ResponseEntity<ResponseStatus> replyToCustomer(@PathVariable Long ticketId,
-        @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+                                                          @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
         sepsAndFiClaimTicketService.replyToCustomer(ticketId, claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
@@ -285,7 +285,7 @@ public class SepsAndFiClaimTicketResource {
         )
     })
     @PostMapping("/{ticketId}/reply-to-internal")
-    @PermissionCheck({"TICKET_REPLY_TO_INTERNAL_FI","TICKET_REPLY_TO_INTERNAL_SEPS"})
+    @PermissionCheck({"TICKET_REPLY_TO_INTERNAL_FI", "TICKET_REPLY_TO_INTERNAL_SEPS"})
     public ResponseEntity<ResponseStatus> replyToInternal(@PathVariable Long ticketId,
                                                           @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
@@ -318,9 +318,9 @@ public class SepsAndFiClaimTicketResource {
         )
     })
     @PostMapping("/{ticketId}/add-internal-note")
-    @PermissionCheck({"TICKET_INTERNAL_NOTE_FI","TICKET_INTERNAL_NOTE_SEPS"})
+    @PermissionCheck({"TICKET_INTERNAL_NOTE_FI", "TICKET_INTERNAL_NOTE_SEPS"})
     public ResponseEntity<ResponseStatus> replyToInternalNote(@PathVariable Long ticketId,
-                                                          @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+                                                              @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
         sepsAndFiClaimTicketService.replyToInternalNote(ticketId, claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
@@ -339,7 +339,7 @@ public class SepsAndFiClaimTicketResource {
     @Operation(summary = "Update Claim Ticket Status", description = "Update the status of a specific claim ticket (IN_PROGRESS, PENDING)")
     @ApiResponse(responseCode = "200", description = "Claim ticket status updated successfully")
     @PatchMapping("/{ticketId}/change-status")
-    @PermissionCheck({"TICKET_CHANGE_STATUS_BY_SEPS","TICKET_CHANGE_STATUS_BY_FI"})
+    @PermissionCheck({"TICKET_CHANGE_STATUS_BY_SEPS", "TICKET_CHANGE_STATUS_BY_FI"})
     public ResponseEntity<ResponseStatus> changeClaimTicketStatus(
         @PathVariable Long ticketId,
         @RequestParam("status") ClaimTicketStatusEnum status,
@@ -348,7 +348,7 @@ public class SepsAndFiClaimTicketResource {
         // Validate that only IN_PROGRESS and PENDING are allowed
         if (status != ClaimTicketStatusEnum.IN_PROGRESS && status != ClaimTicketStatusEnum.PENDING) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALLOW_ONLY_STATUS,
-                new String[]{ClaimTicketStatusEnum.IN_PROGRESS.name() + ", "+ ClaimTicketStatusEnum.PENDING.name()},
+                new String[]{ClaimTicketStatusEnum.IN_PROGRESS.name() + ", " + ClaimTicketStatusEnum.PENDING.name()},
                 null);
         }
         RequestInfo requestInfo = new RequestInfo(request);
@@ -370,5 +370,24 @@ public class SepsAndFiClaimTicketResource {
     public ResponseEntity<List<DropdownListAgentForTagDTO>> getAgentListForTag(@PathVariable Long ticketId) {
         return ResponseEntity.ok(sepsAndFiClaimTicketService.getAgentListForTagging(ticketId));
     }
-    
+
+
+    @Operation(summary = "Create a new claim", description = "A new claim created by Either SEPS or FI User")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Claim created successfully.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ClaimTicketResponseDTO.class)
+            )
+        )
+    })
+    @PostMapping
+    public ResponseEntity<ClaimTicketResponseDTO> createClaimTicket(@ModelAttribute @Valid CreateClaimTicketRequest claimTicketRequest,
+                                                                    HttpServletRequest request) {
+        ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
+    }
+
 }
