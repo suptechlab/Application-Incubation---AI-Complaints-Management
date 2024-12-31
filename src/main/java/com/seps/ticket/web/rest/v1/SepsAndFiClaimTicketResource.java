@@ -362,6 +362,16 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok(responseStatus);
     }
 
+    @Operation(summary = "Retrieve list of agents for Tagging", description = "Get a list of agents available for ticket tagging")
+    @ApiResponse(responseCode = "200", description = "Agent list retrieved successfully",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = DropdownListDTO.class)))
+    @GetMapping("/{ticketId}/agents-for-tag")
+    public ResponseEntity<List<DropdownListAgentForTagDTO>> getAgentListForTag(@PathVariable Long ticketId) {
+        return ResponseEntity.ok(claimTicketService.getAgentListForTagging(ticketId));
+    }
+
+
     @Operation(summary = "Create a new claim", description = "A new claim created by Either SEPS or FI User")
     @ApiResponses(value = {
         @ApiResponse(
@@ -378,6 +388,18 @@ public class SepsAndFiClaimTicketResource {
                                                                     HttpServletRequest request) {
         ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
+    }
+
+    @Operation(summary = "List all Claim Ticket For tagged user", description = "Retrieve a paginated list of all claim tickets")
+    @ApiResponse(responseCode = "200", description = "Claim Ticket List retrieved successfully",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = ClaimTicketDTO.class)))
+    @GetMapping("/for-tagged-users")
+    public ResponseEntity<List<ClaimTicketListDTO>> listSepsFiClaimTicketsForTaggedUser(Pageable pageable,
+                                                                           @ModelAttribute ClaimTicketFilterRequest filterRequest) {
+        Page<ClaimTicketListDTO> page = claimTicketService.listSepsAndFiClaimTicketsForTaggedUser(pageable, filterRequest);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
 }

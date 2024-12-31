@@ -1,0 +1,14 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at,is_general,organization_id,user_type,is_static
+SEND_MAIL_TO_TAGGED_USER_ON_CLAIM,Enviar correo electrónico al usuario etiquetado en el ticket de reclamo,EMAIL,Se le ha etiquetado en el ticket de reclamo #{{ticketNumber}},"<p>Estimado {{username}},</p>
+<p>Se le ha etiquetado en el ticket de reclamo #{{ticketNumber}}. A continuación, encontrará los detalles:</p>
+<p>Detalles del ticket:</p>
+<ul>
+<li><strong>Prioridad:</strong><span>{{priority}}</span></li>
+<li><strong>Estado:</strong><span>{{status}}</span></li>
+<li><strong>Etiquetado por:</strong><span>{{taggedBy}}</span></li>
+</ul>
+<p><strong>Comentario:</strong></p>
+<p>{{messageContent}}</p>
+<p>Por favor revise y tome las medidas necesarias lo antes posible.</p>
+<p><a href=""{{adminTicketUrl}}"" class=""email-button"" target=""_blank"">Ver ticket</a></p>
+<p>Si tiene alguna pregunta o necesita más aclaraciones, comuníquese con {{taggedBy}} o comuníquese con nuestro equipo de soporte.</p>","{{username}},{{ticketNumber}},{{priority}},{{status}},{{taggedBy}},{{messageContent}},{{adminTicketUrl}},{{taggedBy}}",True,1,2024-12-02 00:00:00.627679,NULL,NULL,True,NULL,0,True
