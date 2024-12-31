@@ -5,6 +5,7 @@ import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import jakarta.persistence.criteria.*;
+import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 import org.zalando.problem.Status;
@@ -157,4 +158,28 @@ public class ClaimTicketSpecification {
         return date.atStartOfDay().toInstant(ZoneOffset.UTC);
     }
 
+    public static Specification<ClaimTicket> taggedToUser(ClaimTicketFilterRequest filterRequest, Long userId) {
+        return (root, query, criteriaBuilder) -> {
+            if (query != null) {
+                query.distinct(true); // Ensure distinct results
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Add filters based on the available criteria
+            addSearchFilter(filterRequest, root, criteriaBuilder, predicates);
+            addOrganizationFilter(filterRequest, root, criteriaBuilder, predicates);
+            addStatusFilter(filterRequest, root, criteriaBuilder, predicates);
+            addPriorityFilter(filterRequest, root, criteriaBuilder, predicates);
+            addClaimTypeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addDateRangeFilter(filterRequest, root, criteriaBuilder, predicates);
+
+            // Add predicate for userId from ClaimTicketTaggedUsers
+            Join<Object, Object> taggedUsersJoin = root.join("claimTicketTaggedUsers", JoinType.INNER);
+            predicates.add(criteriaBuilder.equal(taggedUsersJoin.get("userId"), userId));
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+
+        };
+    }
 }

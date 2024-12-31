@@ -21,9 +21,10 @@ import java.util.Map;
 public class MasterResource {
 
     private final MasterDataService masterDataService;
-
-    public MasterResource(MasterDataService masterDataService) {
+    private final CronService cronService;
+    public MasterResource(MasterDataService masterDataService, CronService cronService) {
         this.masterDataService = masterDataService;
+        this.cronService = cronService;
     }
 
 
@@ -45,5 +46,11 @@ public class MasterResource {
         return ResponseEntity.ok(masterData);
     }
 
+
+    @GetMapping("/cron-hit-test")
+    public ResponseEntity<String> cronHitTesting() {
+        cronService.processSLAWorkflows();
+        return ResponseEntity.ok("Cron executed");
+    }
 
 }
