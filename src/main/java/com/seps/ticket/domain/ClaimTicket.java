@@ -169,5 +169,8 @@ public class ClaimTicket {
     @Column(name = "complaint_filed_at")
     private Instant complaintFiledAt;
 
+    @OneToMany
+    @JoinColumn(name = "ticket_id")
+    private List<ClaimTicketTaggedUser> claimTicketTaggedUsers = new ArrayList<>();
 
 }

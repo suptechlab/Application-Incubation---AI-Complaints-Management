@@ -70,6 +70,8 @@ public class MailService {
 
     private static final String REASON = "reason";
 
+    private static final String PRIORITY = "priority";
+
     private final JHipsterProperties jHipsterProperties;
 
     private final JavaMailSender javaMailSender;
@@ -196,7 +198,7 @@ public class MailService {
             dataVariables.put(TICKET_NUMBER, claimTicket.getTicketId().toString());
             dataVariables.put("claimType", claimTicket.getClaimType().getName());
             dataVariables.put("claimSubType", claimTicket.getClaimSubType().getName());
-            dataVariables.put("priority", enumUtil.getLocalizedEnumValue(claimTicket.getPriority(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
+            dataVariables.put(PRIORITY, enumUtil.getLocalizedEnumValue(claimTicket.getPriority(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
             dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(claimTicket.getStatus(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
             dataVariables.put("razonSocial", claimTicket.getOrganization().getRazonSocial());
             dataVariables.put("ruc", claimTicket.getOrganization().getRuc());
@@ -430,6 +432,26 @@ public class MailService {
         this.sendDynamicContentEmail(mailDTO);
 
         LOG.info("Reply to Customer on ticket and email sent successfully to customer {}", currentUser.getEmail());
+    }
+
+    @Async
+    public void sendEmailToTaggedUser(Map<String, String> ticketDetail, User currentUser) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTo(currentUser.getEmail());
+        mailDTO.setLocale(currentUser.getLangKey());
+        mailDTO.setTemplateKey("SEND_MAIL_TO_TAGGED_USER_ON_CLAIM");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put(USERNAME, currentUser.getFirstName());
+        dataVariables.put(TICKET_NUMBER, ticketDetail.get(TICKET_NUMBER));
+        dataVariables.put(PRIORITY, ticketDetail.get(PRIORITY));
+        dataVariables.put(STATUS, ticketDetail.get(STATUS));
+        dataVariables.put("taggedBy", ticketDetail.get("taggedBy"));
+        dataVariables.put(MESSAGE_CONTENT, ticketDetail.get(MESSAGE_CONTENT));
+        dataVariables.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/tickets/view/" + ticketDetail.get("id"));
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+
+        LOG.info("Tagged User on ticket and email sent successfully to tagged User {}", currentUser.getEmail());
     }
 
     @Async

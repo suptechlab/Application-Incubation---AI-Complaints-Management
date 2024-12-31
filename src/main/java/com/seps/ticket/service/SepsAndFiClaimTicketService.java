@@ -27,6 +27,9 @@ import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketRejectRequest;
 import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
 import jakarta.validation.Valid;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -82,6 +85,7 @@ public class SepsAndFiClaimTicketService {
     private final TemplateVariableMappingService templateVariableMappingService;
     private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
     private final TemplateMasterRepository templateMasterRepository;
+    private final ClaimTicketTaggedUserRepository claimTicketTaggedUserRepository;
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -108,13 +112,14 @@ public class SepsAndFiClaimTicketService {
                                        ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                        ClaimTicketStatusLogRepository claimTicketStatusLogRepository, MailService mailService, DocumentService documentService,
                                        ClaimTicketDocumentRepository claimTicketDocumentRepository,
-                                       TemplateVariableMappingService templateVariableMappingService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterRepository templateMasterRepository) {
+                                       TemplateVariableMappingService templateVariableMappingService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterRepository templateMasterRepository, ClaimTicketTaggedUserRepository claimTicketTaggedUserRepository) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
         this.enumUtil = enumUtil;
+        this.claimTicketTaggedUserRepository = claimTicketTaggedUserRepository;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -1209,7 +1214,23 @@ public class SepsAndFiClaimTicketService {
             Set<ClaimTicketDocumentDTO> attachDocument = claimTicketMapper.toClaimTicketDocumentDTOs(savedDocuments);
             attachments.put(ATTACHMENTS, attachDocument);
         }
-
+        // getTagged User list
+        List<String> taggedUsers = getTaggedUsers(claimTicketReplyRequest.getMessage());
+        List<User> taggedUserList = new ArrayList<>();
+        if(!taggedUsers.isEmpty()){
+            List<ClaimTicketTaggedUser> claimTicketTaggedUserList = new ArrayList<>();
+            taggedUsers.forEach(taggedUser->{
+                User tagUser = userService.findUserById(Long.valueOf(taggedUser));
+                if(tagUser!=null) {
+                    ClaimTicketTaggedUser claimTicketTaggedUser = new ClaimTicketTaggedUser();
+                    claimTicketTaggedUser.setTicketId(ticket.getId());
+                    claimTicketTaggedUser.setUserId(tagUser.getId());
+                    claimTicketTaggedUserList.add(claimTicketTaggedUser);
+                    taggedUserList.add(tagUser);
+                }
+            });
+            claimTicketTaggedUserRepository.saveAll(claimTicketTaggedUserList);
+        }
         ClaimTicketActivityLog activityLog = new ClaimTicketActivityLog();
         activityLog.setTicketId(ticket.getId());
         activityLog.setPerformedBy(currentUser.getId());
@@ -1249,7 +1270,20 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityDetails(activityDetail);
         activityLog.setAttachmentUrl(attachments);
         claimTicketActivityLogService.saveActivityLog(activityLog);
-        this.sendReplyEmail(ticket, claimTicketReplyRequest, activityType, currentUser);
+        this.sendReplyEmail(ticket, claimTicketReplyRequest, activityType, currentUser, taggedUserList);
+    }
+
+    private List<String> getTaggedUsers(String messageHtml) {
+        // Parse the HTML message
+        Document document = Jsoup.parse(messageHtml);
+
+        // Select all <a> tags with a specific pattern, e.g., data-user-id="1025"
+        Elements taggedLinks = document.select("a[data-user-id]");
+
+        // Extract email addresses from the href attribute
+        return taggedLinks.stream()
+            .map(link -> link.attr("data-user-id"))
+            .toList();
     }
 
     private List<ClaimTicketDocument> uploadFileAttachments(List<MultipartFile> attachments, ClaimTicket newClaimTicket, User currentUser, DocumentSourceEnum source) {
@@ -1331,14 +1365,20 @@ public class SepsAndFiClaimTicketService {
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE.name());
     }
 
-    private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser) {
+    private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser, List<User> taggedUserList) {
         Map<String, String> ticketDetail = new HashMap<>();
         ticketDetail.put("ticketNumber", ticket.getTicketId().toString());
         ticketDetail.put("senderName", currentUser.getFirstName());
-        ticketDetail.put("messageContent", currentUser.getFirstName());
+        ticketDetail.put("messageContent", claimTicketRejectRequest.getMessage());
         ticketDetail.put("id", ticket.getId().toString());
         if (activityType.equals(ClaimTicketActivityEnum.REPLY_CUSTOMER.name())) {
             mailService.sendReplyToCustomerEmail(ticketDetail, claimTicketRejectRequest, ticket.getUser());
+        }
+        if(!taggedUserList.isEmpty()){
+            ticketDetail.put("priority", enumUtil.getLocalizedEnumValue(ticket.getPriority(), Locale.forLanguageTag(currentUser.getLangKey())));
+            ticketDetail.put("status", enumUtil.getLocalizedEnumValue(ticket.getStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
+            ticketDetail.put("taggedBy", currentUser.getFirstName());
+            taggedUserList.forEach(user -> mailService.sendEmailToTaggedUser(ticketDetail, user));
         }
     }
 
@@ -1848,5 +1888,4 @@ public class SepsAndFiClaimTicketService {
             }
         }
     }
-
 }
