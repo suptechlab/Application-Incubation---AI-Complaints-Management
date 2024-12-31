@@ -103,7 +103,7 @@ const Header = ({ layout }) => {
                     {link.label}
                   </Nav.Link>
                 ))}
-                {/* {!isLoggedIn &&
+                {!isLoggedIn &&
                   <Button
                     type="button"
                     className="py-2 custom-min-width-90"
@@ -112,7 +112,7 @@ const Header = ({ layout }) => {
                   >
                     {t('LOGIN')}
                   </Button>
-                } */}
+                }
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
