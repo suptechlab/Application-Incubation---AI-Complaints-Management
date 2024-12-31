@@ -41,8 +41,11 @@ public enum SepsStatusCode implements StatusType {
     CLAIM_TICKET_ALLOW_ONLY_STATUS(20031, "claim.ticket.allow.only.status"),
     CLAIM_TICKET_ALREADY_IN_STATUS(20032, "claim.ticket.already.in.status"),
     UNAUTHORIZED_ACCESS(200046, "unauthorized.access"),
-    AUTHORITY_NOT_FOUND(20047, "authority.not.found"),
-    INVALID_USER_EMAIL_FOR_CLAIM(20048, "invalid.user.email.for.claim");
+    AUTHORITY_NOT_FOUND(40023, "authority.not.found"),
+    INVALID_USER_EMAIL_FOR_CLAIM(40028, "invalid.user.email.for.claim"),
+    OTP_COD_ALREADY_USED(40029, "otp.already.used"),
+    INVALID_OTP_CODE(40030, "invalid.otp.code"),
+    EMAIL_NOT_VERIFIED(40031, "email.not.verified");
 
     private final int code;
 

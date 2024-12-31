@@ -66,8 +66,9 @@ public class ClaimTicketService {
     private final AuthorityRepository authorityRepository;
     private final PersonaRepository personaRepository;
     private final UserClaimTicketService userClaimTicketService;
+    private final ClaimTicketOTPRepository claimTicketOTPRepository;
 
-    public ClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository, OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository, ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService) {
+    public ClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository, OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository, ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -81,9 +82,10 @@ public class ClaimTicketService {
         this.authorityRepository = authorityRepository;
         this.personaRepository = personaRepository;
         this.userClaimTicketService = userClaimTicketService;
+        this.claimTicketOTPRepository = claimTicketOTPRepository;
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-                .create();
+            .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+            .create();
         this.messageSource = messageSource;
         this.claimTicketMapper = claimTicketMapper;
         this.documentService = documentService;
@@ -100,21 +102,34 @@ public class ClaimTicketService {
 
 
     @Transactional
-    public ClaimTicketResponseDTO createClaimTicket(@Valid CreateClaimTicketRequest claimTicketRequest,
-                                                    HttpServletRequest request) {
-        String identificacion = claimTicketRequest.getIdentificacion();
+    public ClaimTicketResponseDTO createClaimTicket(@Valid CreateClaimTicketRequest claimTicketRequest, HttpServletRequest request) {
+        String email = claimTicketRequest.getEmail();
+        ClaimTicketOTP otpEntity = claimTicketOTPRepository.findOneByEmailIgnoreCase(email)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null));
+        if (otpEntity.getExpiryTime().isBefore(Instant.now())) {
+            LOG.error("OTP code is expired");
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
+        }
+        if (!otpEntity.isUsed()) {
+            LOG.error("Email not verified :{}", email);
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_NOT_VERIFIED, null, null);
+        }
         User currentUser = userService.getCurrentUser();
 
+
+        String identificacion = claimTicketRequest.getIdentificacion();
         ClaimTicketResponseDTO responseDTO = new ClaimTicketResponseDTO();
         responseDTO.setCheckDuplicate(claimTicketRequest.getCheckDuplicate());
+
         //Fetch USER authority
         Authority userAuthority = authorityRepository.findById(AuthoritiesConstants.USER)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.AUTHORITY_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.AUTHORITY_NOT_FOUND, null, null));
         //Check if a user exists with the given identificacion and USER authority
         Set<Authority> authorities = new HashSet<>();
         authorities.add(userAuthority);
         User existUser = userRepository.findOneByIdentificacionAndAuthoritiesIn(identificacion, authorities).orElse(null);
         Long existUserId = null;
+
         // Step 3: Validate user account if a user exists
         if (existUser != null) {
             validateClaimTicketUserAccount(existUser);
@@ -137,17 +152,16 @@ public class ClaimTicketService {
         ClaimType claimType = userClaimTicketService.findClaimType(claimTicketRequest.getClaimTypeId());
         ClaimSubType claimSubType = userClaimTicketService.findClaimSubType(claimTicketRequest.getClaimSubTypeId(), claimTicketRequest.getClaimTypeId());
 
-
         // Create and save the new claim ticket
         ClaimTicket newClaimTicket = createClaimTicket(claimTicketRequest, existUser, province, city, organization, claimType,
-                claimSubType, currentUser);
+            claimSubType, currentUser);
         claimTicketRepository.save(newClaimTicket);
 
 
         // Handle attachments and save documents
         DocumentSourceEnum source = DocumentSourceEnum.FILE_A_CLAIM;
         List<ClaimTicketDocument> claimTicketDocuments = userClaimTicketService.uploadFileAttachments(claimTicketRequest.getAttachments(), newClaimTicket,
-                currentUser, source);
+            currentUser, source);
         // Save documents if any were uploaded
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
@@ -163,7 +177,7 @@ public class ClaimTicketService {
 
     private ClaimTicket findDuplicateTicket(CreateClaimTicketRequest claimTicketRequest, Long userId) {
         List<ClaimTicket> duplicateTickets = claimTicketRepository.findByUserIdAndClaimTypeIdAndClaimSubTypeIdAndOrganizationId(userId,
-                claimTicketRequest.getClaimTypeId(), claimTicketRequest.getClaimSubTypeId(), claimTicketRequest.getOrganizationId());
+            claimTicketRequest.getClaimTypeId(), claimTicketRequest.getClaimSubTypeId(), claimTicketRequest.getOrganizationId());
         return duplicateTickets.stream().findAny().orElse(null);
     }
 
@@ -195,7 +209,7 @@ public class ClaimTicketService {
     public PersonInfoDTO validateClaimTicketIdentificacion(String identificacion) {
         // Step 1: Fetch USER authority
         Authority userAuthority = authorityRepository.findById(AuthoritiesConstants.USER)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.AUTHORITY_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.AUTHORITY_NOT_FOUND, null, null));
         // Step 2: Check if a user exists with the given identificacion and USER authority
         Set<Authority> authorities = new HashSet<>();
         authorities.add(userAuthority);
@@ -234,7 +248,7 @@ public class ClaimTicketService {
     @Transactional(readOnly = true)
     public Boolean validateClaimTicketUserEmail(String email) {
         Authority userAuthority = authorityRepository.findById(AuthoritiesConstants.USER)
-                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.AUTHORITY_NOT_FOUND, null, null));
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.AUTHORITY_NOT_FOUND, null, null));
         boolean isInvalidUser = userRepository.existsByEmailIgnoreCaseAndAuthoritiesNotContaining(email, userAuthority);
         if (isInvalidUser) {
             LOG.warn("Invalid user email :{} for claim ", email);

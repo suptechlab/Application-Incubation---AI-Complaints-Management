@@ -2,6 +2,7 @@ package com.seps.ticket.service;
 
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.domain.ClaimTicketOTP;
 import com.seps.ticket.domain.TemplateMaster;
 import com.seps.ticket.domain.User;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
@@ -35,6 +36,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import tech.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,7 +95,6 @@ public class MailService {
     private final UserClaimTicketService userClaimTicketService;
 
     private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
-
 
 
     private final UserService userService;
@@ -377,7 +379,7 @@ public class MailService {
         LOG.debug("Preparing claim ticket instance creation email for user '{}'", claimTicketDTO.getUser().getName());
         try {
             User customer = userService.findUserById(claimTicketDTO.getUser().getId());
-            if(customer!=null) {
+            if (customer != null) {
                 MailDTO mailDTO = new MailDTO();
                 mailDTO.setTemplateKey("SECOND_INSTANCE_TICKET_CREATE_MAIL_TO_CUSTOMER");
                 mailDTO.setTo(customer.getEmail());
@@ -455,7 +457,7 @@ public class MailService {
     @Async
     public void sendComplaintEmail(ClaimTicketDTO ticket) {
         User customer = userService.findUserById(ticket.getUser().getId());
-        if(customer!=null) {
+        if (customer != null) {
             MailDTO mailDTO = new MailDTO();
             mailDTO.setTemplateKey("TICKET_COMPLAINT_SEND_TO_CUSTOMER");
             mailDTO.setTo(customer.getEmail());
@@ -469,12 +471,12 @@ public class MailService {
     /**
      * Validates if the template is applicable for the given workflow action.
      *
-     * @param templateId        the ID of the email template to validate.
-     * @param workflowId        the ID of the workflow to validate against.
-     * @param action        the name of the workflow action.
+     * @param templateId the ID of the email template to validate.
+     * @param workflowId the ID of the workflow to validate against.
+     * @param action     the name of the workflow action.
      * @return {@code true} if the template is valid for the action; {@code false} otherwise.
      */
-    private boolean templateValidate(Long templateId, Long workflowId, String action){
+    private boolean templateValidate(Long templateId, Long workflowId, String action) {
         boolean result = true;
         if (templateId != null) {
             TemplateMaster templateMaster = templateMasterRepository.findByIdAndStatus(templateId, true).orElse(null);
@@ -494,17 +496,17 @@ public class MailService {
     /**
      * Finds the customer user associated with the claim ticket.
      *
-     * @param customerId        the ID of the customer user.
-     * @param workflowId    the ID of the workflow being processed.
-     * @param action    the name of the action being performed.
+     * @param customerId the ID of the customer user.
+     * @param workflowId the ID of the workflow being processed.
+     * @param action     the name of the action being performed.
      * @return the {@link User} representing the customer, or {@code null} if not found.
      */
-    private User findCustomer(Long customerId, Long workflowId, String action){
+    private User findCustomer(Long customerId, Long workflowId, String action) {
         User user = null;
         if (customerId == null) {
             claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.customer.id.null",
                 new Object[]{action}, null, null);
-        }else {
+        } else {
             user = userService.findUserById(customerId);
             if (user == null) {
                 claimTicketWorkFlowService.logWorkflowFailure(workflowId, "workflow.customer.not.found",
@@ -517,17 +519,17 @@ public class MailService {
     /**
      * Finds an agent user based on the given agent ID, workflow, and user type.
      *
-     * @param agentId       the ID of the agent.
-     * @param claimTicketWorkFlowDTO   the DTO of the workflow being processed.
-     * @param action    the name of the action being performed.
-     * @param userType      the type of user to find (e.g., FI_USER, SEPS_USER).
+     * @param agentId                the ID of the agent.
+     * @param claimTicketWorkFlowDTO the DTO of the workflow being processed.
+     * @param action                 the name of the action being performed.
+     * @param userType               the type of user to find (e.g., FI_USER, SEPS_USER).
      * @return the {@link User} representing the agent, or {@code null} if not found.
      */
-    private User findAgent(Long agentId, ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO, String action, UserTypeEnum userType){
+    private User findAgent(Long agentId, ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO, String action, UserTypeEnum userType) {
         User user = null;
         if (agentId == null) {
             claimTicketWorkFlowService.logWorkflowFailure(claimTicketWorkFlowDTO.getId(), "workflow.agent.id.null", new Object[]{action}, null, null);
-        }else{
+        } else {
             user = userType.equals(UserTypeEnum.FI_USER) ? claimTicketWorkFlowService.findFIUserForMailAction(agentId, claimTicketWorkFlowDTO) :
                 claimTicketWorkFlowService.findSEPSUserForMailAction(agentId, claimTicketWorkFlowDTO);
             if (user == null) {
@@ -551,13 +553,13 @@ public class MailService {
             Long agentId = createAction.getAgentId();
             Long templateId = createAction.getTemplateId();
 
-            if(templateValidate(templateId, claimTicketWorkFlowDTO.getId(),createAction.getAction().name()))
+            if (templateValidate(templateId, claimTicketWorkFlowDTO.getId(), createAction.getAction().name()))
                 continue;
 
             User user = null;
             switch (createAction.getAction()) {
                 case MAIL_TO_CUSTOMER:
-                    user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(),createAction.getAction().name());
+                    user = findCustomer(claimTicketDTO.getUserId(), claimTicketWorkFlowDTO.getId(), createAction.getAction().name());
                     break;
                 case MAIL_TO_FI_TEAM:
                     user = findAgent(agentId, claimTicketWorkFlowDTO, createAction.getAction().name(), UserTypeEnum.FI_USER);
@@ -589,7 +591,7 @@ public class MailService {
     }
 
     @Async
-    public void workflowEmailSend(Long templateId, ClaimTicketDTO claimTicketDTO, User user){
+    public void workflowEmailSend(Long templateId, ClaimTicketDTO claimTicketDTO, User user) {
         if (user != null && templateId != null) {
             MailDTO mailDTO = new MailDTO();
             mailDTO.setTemplateId(templateId);
@@ -598,7 +600,7 @@ public class MailService {
             mailDTO.setIsStatic(false);
             mailDTO.setDataVariables(templateVariableMappingService.mapVariables(claimTicketDTO, user));
             sendDynamicContentEmail(mailDTO);
-        }else{
+        } else {
             LOG.info("User ({}) or template Id ({}) not found", user, templateId);
         }
     }
@@ -667,5 +669,27 @@ public class MailService {
         mailDTO.setIsStatic(true);
         mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticket, agent));
         sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendClaimTicketOTPEmail(ClaimTicketOTP otp, Locale locale) {
+        if (otp.getEmail() == null) {
+            LOG.debug("Email doesn't exist for user while sending register otp email to '{}'", otp.getEmail());
+            return;
+        }
+        LOG.debug("Sending register otp email to '{}'", otp.getEmail());
+        Instant now = Instant.now();
+        long secondsLeft = Duration.between(now, otp.getExpiryTime()).getSeconds();
+        long minutesLeft = (long) Math.ceil(secondsLeft / 60.0); // Round up to the nearest minute
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(locale.getLanguage());
+        mailDTO.setTo(otp.getEmail());
+        mailDTO.setTemplateKey("CLAIM_TICKET_OTP");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put("minutes", String.valueOf(minutesLeft));
+        dataVariables.put("otpCode", String.valueOf(otp.getOtpCode()));
+        dataVariables.put("consentLink", userBaseUrl + "/terms-and-conditions/claim-ticket-consent");
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
     }
 }
