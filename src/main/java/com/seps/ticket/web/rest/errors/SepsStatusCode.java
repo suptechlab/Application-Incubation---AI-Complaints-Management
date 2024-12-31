@@ -20,7 +20,9 @@ public enum SepsStatusCode implements StatusType {
     PROVINCE_NOT_FOUND(20019, "province.not.found"),
     CITY_NOT_FOUND(20019, "city.not.found"),
     INVALID_DATE_FORMAT(20024, "invalid.date.format"),
-    ORGANIZATION_NOT_FOUND(20030, "organization.not.found"),
+    PERSON_NOT_FOUND(20030, "person.not.found"),
+    ORGANIZATION_RUC_NOT_FOUND(20031, "organization.ruc.not.found"),
+    ORGANIZATION_NOT_FOUND(20032, "organization.not.found"),
     CLAIM_TICKET_NOT_FOUND(40010, "claim.ticket.not.found"),
     IS_NOT_FI_AGENT(40011, "is.not.fi.agent"),
     IS_NOT_SEPS_AGENT(40012, "is.not.seps.agent"),
@@ -38,7 +40,12 @@ public enum SepsStatusCode implements StatusType {
     CLAIM_TICKET_WORKFLOW_NOT_FOUND(20030, "claim.ticket.workflow.not.found"),
     CLAIM_TICKET_ALLOW_ONLY_STATUS(20031, "claim.ticket.allow.only.status"),
     CLAIM_TICKET_ALREADY_IN_STATUS(20032, "claim.ticket.already.in.status"),
-    UNAUTHORIZED_ACCESS(200046,"unauthorized.access");
+    UNAUTHORIZED_ACCESS(200046, "unauthorized.access"),
+    AUTHORITY_NOT_FOUND(40023, "authority.not.found"),
+    INVALID_USER_EMAIL_FOR_CLAIM(40028, "invalid.user.email.for.claim"),
+    OTP_COD_ALREADY_USED(40029, "otp.already.used"),
+    INVALID_OTP_CODE(40030, "invalid.otp.code"),
+    EMAIL_NOT_VERIFIED(40031, "email.not.verified");
 
     private final int code;
 

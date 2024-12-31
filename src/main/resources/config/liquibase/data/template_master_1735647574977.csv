@@ -1,0 +1,8 @@
+template_key,template_name,template_type,subject,content,supported_variables,status,created_by,created_at,updated_by,updated_at,is_general,organization_id,user_type,is_static
+CLAIM_TICKET_OTP,Contraseña de un solo uso (OTP) para la creación de tickets de reclamo,EMAIL,Contraseña de un solo uso (OTP) para la creación de tickets de reclamo,"<p>Estimado usuario:</p>
+<p>Hemos recibido una solicitud para crear un ticket de reclamo en su nombre. Para continuar con este proceso, utilice la siguiente contraseña de un solo uso (OTP):</p>
+<p><strong>{{otpCode}}</strong></p>
+<p>Esta OTP es válida durante los próximos {{minutes}} minutos. No comparta este código con nadie.</p>
+<p>Al utilizar esta OTP, usted acepta que creemos un ticket de reclamo en su nombre. Para obtener más información sobre este proceso o para revisar nuestra política de consentimiento, visite el siguiente enlace:</p>
+<p><a href=""{{consentLink}}"" target=""_blank"">Revisar la política de consentimiento y acuerdo</a></p>
+<p> Ignore este correo electrónico si no solicitó esta acción.</p>","{{otpCode}},{{minutes}},{{consentLink}}",True,1,2024-12-02 00:00:00.627679,1,NULL,True,NULL,2,True
