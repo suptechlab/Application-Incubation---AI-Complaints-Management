@@ -1216,6 +1216,7 @@ public class SepsAndFiClaimTicketService {
         }
         // getTagged User list
         List<String> taggedUsers = getTaggedUsers(claimTicketReplyRequest.getMessage());
+        List<User> taggedUserList = new ArrayList<>();
         if(!taggedUsers.isEmpty()){
             List<ClaimTicketTaggedUser> claimTicketTaggedUserList = new ArrayList<>();
             taggedUsers.forEach(taggedUser->{
@@ -1225,6 +1226,7 @@ public class SepsAndFiClaimTicketService {
                     claimTicketTaggedUser.setTicketId(ticket.getId());
                     claimTicketTaggedUser.setUserId(tagUser.getId());
                     claimTicketTaggedUserList.add(claimTicketTaggedUser);
+                    taggedUserList.add(tagUser);
                 }
             });
             claimTicketTaggedUserRepository.saveAll(claimTicketTaggedUserList);
@@ -1268,7 +1270,7 @@ public class SepsAndFiClaimTicketService {
         activityLog.setActivityDetails(activityDetail);
         activityLog.setAttachmentUrl(attachments);
         claimTicketActivityLogService.saveActivityLog(activityLog);
-        this.sendReplyEmail(ticket, claimTicketReplyRequest, activityType, currentUser);
+        this.sendReplyEmail(ticket, claimTicketReplyRequest, activityType, currentUser, taggedUserList);
     }
 
     private List<String> getTaggedUsers(String messageHtml) {
@@ -1363,14 +1365,20 @@ public class SepsAndFiClaimTicketService {
         replyLogActivity(claimTicketReplyRequest, ticket, currentUser, ClaimTicketActivityEnum.INTERNAL_NOTE.name());
     }
 
-    private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser) {
+    private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser, List<User> taggedUserList) {
         Map<String, String> ticketDetail = new HashMap<>();
         ticketDetail.put("ticketNumber", ticket.getTicketId().toString());
         ticketDetail.put("senderName", currentUser.getFirstName());
-        ticketDetail.put("messageContent", currentUser.getFirstName());
+        ticketDetail.put("messageContent", claimTicketRejectRequest.getMessage());
         ticketDetail.put("id", ticket.getId().toString());
         if (activityType.equals(ClaimTicketActivityEnum.REPLY_CUSTOMER.name())) {
             mailService.sendReplyToCustomerEmail(ticketDetail, claimTicketRejectRequest, ticket.getUser());
+        }
+        if(!taggedUserList.isEmpty()){
+            ticketDetail.put("priority", enumUtil.getLocalizedEnumValue(ticket.getPriority(), Locale.forLanguageTag(currentUser.getLangKey())));
+            ticketDetail.put("status", enumUtil.getLocalizedEnumValue(ticket.getStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
+            ticketDetail.put("taggedBy", currentUser.getFirstName());
+            taggedUserList.forEach(user -> mailService.sendEmailToTaggedUser(ticketDetail, user));
         }
     }
 
