@@ -247,5 +247,14 @@ export const englishLang = {
     "ENTER_EXTENDED_DATE": "Enter Extended Date",
     "DAYS REMAINING":"Days remaining",
     "DAYS" :"Days",
-    "ALL_PRIORITY":"All Priority"
+    "ALL_PRIORITY":"All Priority",
+    "CHANNEL_OF_ENTRY":"Channel of entry",
+    "ENTITY_TYPE":"Entity Type",
+    "ENTITY_LEGAL_REPRESENTATIVE/PRESIDENT":"Entity's Legal Representative/President",
+    "SEND_OTP_BUTTON":"Send OTP",
+    "RESEND_OTP":"Resend OTP",
+    "OTP_VERIFICATION":"Verify OTP",
+    "OTP_INSTRUCTION": "Didn't receive the OTP? Check your spam folder or click 'Resend OTP' to get a new code.",
+    "FORM_INSTRUCTION": "Fill the below form to create your account then you will be redirected to file a claim.",
+    "EMAIL_VERIFICATION":"Email Verification"
 }

@@ -150,8 +150,6 @@ export default function CreateClaim() {
     return (
         <React.Fragment>
             <Loader isLoading={isLoading} />
-
-
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
                 <PageHeader title={t("CREATE_A_CLAIM")} stepData={stepData} />
                 <Tab.Container

@@ -7,10 +7,10 @@ import CommonFormikComponent from "../../../../components/CommonFormikComponent"
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { countryCodes } from '../../../../constants/CountryCodes';
-import { getPersonalInfo } from "../../../../services/fiusers.services";
-import { BasicInfoFormSchema } from '../../../../validations/createClaim.validation';
+
 import Loader from '../../../../components/Loader';
 import { getCitiesById, provinceDropdownData } from '../../../../services/cityMaster.service';
+import { validateEmailApi, validateIdentificationApi } from '../../../../services/claimcreate.services';
 
 const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
@@ -24,12 +24,16 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     const [cityList, setCityList] = useState([]);
     const [provinceList, setProvinceList] = useState([]);
     const [loadingInfo, setLoadingInfo] = useState(false);
+
+    const [isEmailVerified , setIsEmailVerified] = useState(false)
+
+    const [isEmailAlreadyExists , setIsEmailAlreadyExists] = useState(false)
     const [initialValues, setInitialValues] = useState({
         identification: '',
         email: '',
         name: '',
         gender: '',
-        countryCode: '',
+        countryCode: '+34',
         phoneNumber: '',
         provinceId: '',
         cityId: '',
@@ -58,7 +62,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         setIsLoading(true);
         try {
             const response = await provinceDropdownData();
-
             const provinceFormatList = response?.data?.map((data) => {
                 return {
                     label: data?.name,
@@ -87,14 +90,13 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     // FETCH USER PERSONAL INFO BY ID
     const fetchUserData = async (identification) => {
         setLoadingInfo(true)
-        getPersonalInfo(identification).then((response) => {
+        validateIdentificationApi(identification).then((response) => {
             setLoadingInfo(false)
             if (response?.data?.nombreCompleto) {
                 setInitialValues({ ...initialValues, identification: identification, name: response?.data?.nombreCompleto, gender: response?.data?.genero })
             } else {
                 setInitialValues({ ...initialValues, identification: identification, name: '', gender: '' })
             }
-
         })
             .catch((error) => {
                 if (error?.response?.data?.errorDescription) {
@@ -108,15 +110,42 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
             })
     };
 
+    const handleEmailBlur = (event) => {
+        const email = event.target.value;
+        if (email && email !== "") {
+            handleEmailVerification(email);
+        }
+    };
+
+
+    // VERIFY EMAIL 
+    const handleEmailVerification = (email) => {
+        setLoadingInfo(true)
+        validateEmailApi({ email }).then((response) => {
+            setLoadingInfo(false)
+            setIsEmailVerified(true)
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+            }).finally(() => {
+                setLoadingInfo(false)
+            })
+    };
+
     return (
         <React.Fragment>
             <Loader isLoading={loadingInfo} />
             <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
                 <Card.Body className="d-flex flex-column h-100">
                     <CommonFormikComponent
-                        validationSchema={BasicInfoFormSchema}
+                        // validationSchema={BasicInfoFormSchema}
                         initialValues={initialValues}
                         onSubmit={handleSubmit}
+                        enableReinitialize={true}
                     >
                         {(formikProps) => (
                             <React.Fragment>
@@ -145,7 +174,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 name="email"
                                                 type="email"
                                                 error={formikProps.errors.email}
-                                                onBlur={formikProps.handleBlur}
+                                                onBlur={handleEmailBlur}
                                                 onChange={formikProps.handleChange}
                                                 touched={formikProps.touched.email}
                                                 value={formikProps.values.email || ""}
@@ -153,7 +182,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                         </Col>
                                         <Col sm={6} lg={4}>
                                             <label htmlFor="countryCode" className="mb-1 fs-14">
-                                                {t("CELLPHONE")}
+                                                {t("PHONE")}
                                             </label>
                                             <Row className="gx-2">
                                                 <Col xs="auto">
@@ -162,7 +191,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                             error={formikProps.errors.countryCode}
                                                             options={formattedCountryCodes ?? []}
                                                             placeholder={t("SELECT")}
-                                                            value={formikProps.values.countryCode}
+                                                            value={formikProps?.values?.countryCode ?? ''}
                                                             onChange={(option) => {
                                                                 formikProps.setFieldValue(
                                                                     "countryCode",
@@ -254,6 +283,21 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 className={formikProps?.touched?.cityId && formikProps?.errors?.cityId ? "is-invalid" : ""}
                                                 onBlur={formikProps.handleBlur}
                                                 touched={formikProps.touched.cityId}
+                                            />
+                                        </Col>
+                                        <Col sm={6} lg={4}>
+                                            <ReactSelect
+                                                label={t("CHANNEL_OF_ENTRY")}
+                                                error={formikProps?.errors?.channel}
+                                                options={cityList}
+                                                value={formikProps.values.channel}
+                                                onChange={(option) => {
+                                                    formikProps.setFieldValue("channel", option?.target?.value ?? "");
+                                                }}
+                                                name="channel"
+                                                className={formikProps?.touched?.channel && formikProps?.errors?.channel ? "is-invalid" : ""}
+                                                onBlur={formikProps.handleBlur}
+                                                touched={formikProps.touched.channel}
                                             />
                                         </Col>
                                     </Row>

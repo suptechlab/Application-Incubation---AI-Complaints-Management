@@ -836,7 +836,7 @@ export default function TicketsList() {
                 <PageHeader
                     title={t('TICKETS')}
                     actions={[
-                        { label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: true },
+                        { label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: false },
                     ]}
                 />
                 <div className="info-cards mb-3">

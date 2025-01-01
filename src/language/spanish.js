@@ -239,5 +239,14 @@ export const spanishLang = {
     "ENTER_EXTENDED_DATE": "Ingrese Fecha Extendida",
     "DAYS_REMAINING": "Días restantes",
     "DAYS": "Días",
-     "ALL_PRIORITY":"Toda prioridad"
+    "ALL_PRIORITY": "Toda prioridad",
+    "CHANNEL_OF_ENTRY": "canal de entrada",
+    "ENTITY_TYPE": "Tipo de entidad",
+    "ENTITY_LEGAL_REPRESENTATIVE/PRESIDENT": "Representante Legal/Presidente de la Entidad",
+    "SEND_OTP_BUTTON": "Enviar OTP",
+    "RESEND_OTP": "Reenviar OTP",
+    "OTP_VERIFICATION": "Verificar OTP",
+    "OTP_INSTRUCTION": "¿No recibiste el OTP? Revisa tu carpeta de spam o haz clic en 'Reenviar OTP' para obtener un nuevo código.",
+    "FORM_INSTRUCTION": "Rellena el siguiente formulario para crear tu cuenta y serás redirigido para presentar un reclamo.",
+    "EMAIL_VERIFICATION":"Verificación de Correo Electrónico"
 }

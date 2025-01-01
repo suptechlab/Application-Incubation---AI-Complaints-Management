@@ -62,7 +62,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
             <Card.Body className="d-flex flex-column h-100">
                 <CommonFormikComponent
-                    validationSchema={OtherInfoFormSchema}
+                    // validationSchema={OtherInfoFormSchema}
                     initialValues={initialValues}
                     onSubmit={handleSubmit}
                 >
@@ -155,6 +155,34 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                                             onChange={formikProps.handleChange}
                                             touched={formikProps.touched.entitysTaxID}
                                             value={""}
+                                            readOnly={true}
+                                        />
+                                    </Col>
+                                    <Col sm={6} lg={4}>
+                                        <FormInputBox
+                                            id="entityType"
+                                            label={t("ENTITY_TYPE")}
+                                            name="entityType"
+                                            type="text"
+                                            error={formikProps.errors.entityType}
+                                            onBlur={formikProps.handleBlur}
+                                            onChange={formikProps.handleChange}
+                                            touched={formikProps.touched.entityType}
+                                            value={formikProps.values.entityType || ""}
+                                            readOnly={true}
+                                        />
+                                    </Col>
+                                    <Col sm={6} lg={4}>
+                                        <FormInputBox
+                                            id="legalRepresentative"
+                                            label={t("ENTITY_LEGAL_REPRESENTATIVE/PRESIDENT")}
+                                            name="legalRepresentative"
+                                            type="text"
+                                            error={formikProps.errors.legalRepresentative}
+                                            onBlur={formikProps.handleBlur}
+                                            onChange={formikProps.handleChange}
+                                            touched={formikProps.touched.legalRepresentative}
+                                            value={formikProps.values.legalRepresentative || ""}
                                             readOnly={true}
                                         />
                                     </Col>
