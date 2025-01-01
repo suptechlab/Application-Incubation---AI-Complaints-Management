@@ -169,6 +169,8 @@ export const englishLang = {
 
 
     //Ticket Management
+    "ALL_TICKETS": "All Tickets",
+    "TAGGED_TICKETS": "Tickets I'm Tagged In",
     "CREATE_A_CLAIM": "Create a New Claim",
     "BASIC_INFORMATION": "Basic Information",
     "NATIONAL_ID_NUMBER": "National ID Number",

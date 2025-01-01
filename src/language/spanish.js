@@ -163,6 +163,8 @@ export const spanishLang = {
     "DELETE": "Eliminado",
     "PLEASE_ADD_ATLEAST_ONE_TEAM_MEMBER": "Por favor agregue al menos una miembro del equipo.",
     //Ticket Management
+    "ALL_TICKETS": "Todas las entradas",
+    "TAGGED_TICKETS": "Entradas en las que estoy etiquetado",
     "CREATE_A_CLAIM": "Crear un nuevo reclamo",
     "BASIC_INFORMATION": "Información básica",
     "NATIONAL_ID_NUMBER": "Número de DNI",
