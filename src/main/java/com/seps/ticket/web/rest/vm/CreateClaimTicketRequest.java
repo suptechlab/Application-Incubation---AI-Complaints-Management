@@ -73,10 +73,13 @@ public class CreateClaimTicketRequest {
 
 
     @MultipleFilesCondition(
-        name = FileHelper.FileType.CLAIM_TICKET_DOCUMENTS,
-        message = "{claim.ticket.validation.files.invalid.types}" // Message from the language file
+            name = FileHelper.FileType.CLAIM_TICKET_DOCUMENTS,
+            message = "{claim.ticket.validation.files.invalid.types}" // Message from the language file
     )
     @Size(max = 3, message = "{claim.ticket.validation.files.max.size}") // Message from the language file
     private List<MultipartFile> attachments = new ArrayList<>();
+
+    @NotBlank
+    private String otpCode;
 
 }

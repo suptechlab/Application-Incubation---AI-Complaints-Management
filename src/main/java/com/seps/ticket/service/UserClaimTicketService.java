@@ -275,7 +275,7 @@ public class UserClaimTicketService {
     /**
      * Fetches the province from the repository, throwing an exception if not found.
      */
-    private Province findProvince(Long provinceId) {
+    public Province findProvince(Long provinceId) {
         return provinceRepository.findById(provinceId)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PROVINCE_NOT_FOUND, null, null));
     }
@@ -283,7 +283,7 @@ public class UserClaimTicketService {
     /**
      * Fetches the city from the repository, throwing an exception if not found.
      */
-    private City findCity(Long cityId, Long provinceId) {
+    public City findCity(Long cityId, Long provinceId) {
         return cityRepository.findByIdAndProvinceId(cityId, provinceId)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CITY_NOT_FOUND, null, null));
     }
@@ -291,7 +291,7 @@ public class UserClaimTicketService {
     /**
      * Fetches the organization from the repository, throwing an exception if not found.
      */
-    private Organization findOrganization(Long organizationId) {
+    public Organization findOrganization(Long organizationId) {
         return organizationRepository.findById(organizationId)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.ORGANIZATION_NOT_FOUND, null, null));
     }
@@ -299,7 +299,7 @@ public class UserClaimTicketService {
     /**
      * Fetches the claim type from the repository, throwing an exception if not found.
      */
-    private ClaimType findClaimType(Long claimTypeId) {
+    public ClaimType findClaimType(Long claimTypeId) {
         return claimTypeRepository.findById(claimTypeId)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TYPE_NOT_FOUND, null, null));
     }
@@ -307,7 +307,7 @@ public class UserClaimTicketService {
     /**
      * Fetches the claim subtype from the repository, throwing an exception if not found.
      */
-    private ClaimSubType findClaimSubType(Long claimSubTypeId, Long claimTypeId) {
+    public ClaimSubType findClaimSubType(Long claimSubTypeId, Long claimTypeId) {
         return claimSubTypeRepository.findByIdAndClaimTypeId(claimSubTypeId, claimTypeId)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_SUB_TYPE_NOT_FOUND, null, null));
     }
@@ -485,7 +485,7 @@ public class UserClaimTicketService {
         return result;
     }
 
-    private List<ClaimTicketDocument> uploadFileAttachments(List<MultipartFile> attachments, ClaimTicket newClaimTicket, User currentUser, DocumentSourceEnum source) {
+    public List<ClaimTicketDocument> uploadFileAttachments(List<MultipartFile> attachments, ClaimTicket newClaimTicket, User currentUser, DocumentSourceEnum source) {
         LOG.debug("attachments size:{}", attachments.size());
         List<ClaimTicketDocument> claimTicketDocuments = new ArrayList<>();
         // Handle file uploads and create documents
