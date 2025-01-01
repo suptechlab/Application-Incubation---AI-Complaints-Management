@@ -169,5 +169,11 @@ public class ClaimTicket {
     @Column(name = "complaint_filed_at")
     private Instant complaintFiledAt;
 
+    @Column(name = "source")
+    private SourceEnum source;
+
+    @Column(name = "channel_of_entry")
+    private ChannelOfEntryEnum channelOfEntry;
+
 
 }

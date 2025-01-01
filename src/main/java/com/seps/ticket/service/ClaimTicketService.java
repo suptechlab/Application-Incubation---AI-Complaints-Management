@@ -9,8 +9,7 @@ import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
-import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
-import com.seps.ticket.service.dto.UserDTO;
+import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
@@ -20,7 +19,10 @@ import com.seps.ticket.suptech.service.PersonNotFoundException;
 import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
+import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.ClaimTicketRequestForJson;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequest;
+import com.seps.ticket.web.rest.vm.CreateClaimTicketRequestForJson;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -29,14 +31,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
+import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
 
 @Service
 public class ClaimTicketService {
@@ -108,7 +110,7 @@ public class ClaimTicketService {
 
 
     @Transactional
-    public ClaimTicketResponseDTO createClaimTicket(@Valid CreateClaimTicketRequest claimTicketRequest, HttpServletRequest request) {
+    public ClaimTicketResponseDTO createClaimTicket(@Valid CreateClaimTicketRequest claimTicketRequest, RequestInfo requestInfo) {
         String email = claimTicketRequest.getEmail();
         String identificacion = claimTicketRequest.getIdentificacion();
 
@@ -167,7 +169,8 @@ public class ClaimTicketService {
         // Fetch and validate associated entities
         Province province = userClaimTicketService.findProvince(claimTicketRequest.getProvinceId());
         City city = userClaimTicketService.findCity(claimTicketRequest.getCityId(), claimTicketRequest.getProvinceId());
-        Organization organization = userClaimTicketService.findOrganization(claimTicketRequest.getOrganizationId());
+        Long organizationId = resolveOrganizationId(claimTicketRequest.getOrganizationId(), currentUser);
+        Organization organization = userClaimTicketService.findOrganization(organizationId);
         ClaimType claimType = userClaimTicketService.findClaimType(claimTicketRequest.getClaimTypeId());
         ClaimSubType claimSubType = userClaimTicketService.findClaimSubType(claimTicketRequest.getClaimSubTypeId(), claimTicketRequest.getClaimTypeId());
 
@@ -242,6 +245,11 @@ public class ClaimTicketService {
         responseDTO.setNewId(newClaimTicket.getId());
         responseDTO.setEmail(claimUser.getEmail());
         responseDTO.setFoundDuplicate(false);
+
+        // Log activity and audit
+        newClaimTicket.setClaimTicketDocuments(claimTicketDocuments);
+        logAudit(newClaimTicket, claimTicketRequest, requestInfo, currentUser);
+
         return responseDTO;
     }
 
@@ -272,6 +280,8 @@ public class ClaimTicketService {
         newClaimTicket.setInstanceType(InstanceTypeEnum.FIRST_INSTANCE);
         newClaimTicket.setStatus(ClaimTicketStatusEnum.NEW);
         newClaimTicket.setCreatedByUser(currentUser);
+        newClaimTicket.setChannelOfEntry(claimTicketRequest.getChannelOfEntry());
+        newClaimTicket.setSource(SourceEnum.AGENT);
         return newClaimTicket;
     }
 
@@ -298,6 +308,64 @@ public class ClaimTicketService {
         claimTicketPriorityLog.setPriority(claimTicket.getPriority());
         claimTicketPriorityLog.setInstanceType(claimTicket.getInstanceType());
         claimTicketPriorityLogRepository.save(claimTicketPriorityLog);
+    }
+
+
+    /**
+     * Logs the activity and audit messages for the filed claim ticket.
+     */
+    private void logAudit(ClaimTicket newClaimTicket, CreateClaimTicketRequest claimTicketRequest, RequestInfo requestInfo, User currentUser) {
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Map<String, Object> auditData = new HashMap<>();
+        String plainTicketId = String.valueOf(newClaimTicket.getTicketId());
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String auditMessage = messageSource.getMessage("audit.log.claim.ticket.created",
+                new Object[]{currentUser.getEmail(), plainTicketId}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), auditMessage);
+        });
+        UserClaimTicketDTO userClaimTicketDTO = userClaimTicketMapper.toUserClaimTicketDTO(newClaimTicket);
+        ClaimTicketDTO claimTicketDTO = claimTicketMapper.toDTO(newClaimTicket);
+        auditData.put(Constants.NEW_DATA, convertEntityToMap(claimTicketDTO));
+        // Convert ClaimTicketRequest to ClaimTicketRequestJson using the new method
+        CreateClaimTicketRequestForJson claimTicketRequestJson = convertToClaimTicketRequestJson(claimTicketRequest);
+        // Convert the ClaimTicketRequestJson object to JSON string using Gson
+        Gson gson = new Gson();
+        String requestBody = gson.toJson(claimTicketRequestJson);  // Convert ClaimTicketRequestJson to JSON
+        // Audit Log
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "createClaimTicket",
+            ActionTypeEnum.CLAIM_TICKET_ADD.name(), newClaimTicket.getId(), ClaimTicket.class.getSimpleName(),
+            null, auditMessageMap, auditData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
+    }
+
+    private CreateClaimTicketRequestForJson convertToClaimTicketRequestJson(CreateClaimTicketRequest claimTicketRequest) {
+        // Create a new ClaimTicketRequestJson object
+        CreateClaimTicketRequestForJson claimTicketRequestJson = new CreateClaimTicketRequestForJson();
+        // Map properties from ClaimTicketRequest to ClaimTicketRequestJson
+        claimTicketRequestJson.setIdentificacion(claimTicketRequest.getIdentificacion());
+        claimTicketRequestJson.setEmail(claimTicketRequest.getEmail());
+        claimTicketRequestJson.setName(claimTicketRequest.getName());
+        claimTicketRequestJson.setGender(claimTicketRequest.getGender());
+        claimTicketRequestJson.setCountryCode(claimTicketRequest.getCountryCode());
+        claimTicketRequestJson.setPhoneNumber(claimTicketRequest.getPhoneNumber());
+        claimTicketRequestJson.setProvinceId(claimTicketRequest.getProvinceId());
+        claimTicketRequestJson.setCityId(claimTicketRequest.getCityId());
+        claimTicketRequestJson.setPriorityCareGroup(claimTicketRequest.getPriorityCareGroup());
+        claimTicketRequestJson.setCustomerType(claimTicketRequest.getCustomerType());
+        claimTicketRequestJson.setOrganizationId(claimTicketRequest.getOrganizationId());
+        claimTicketRequestJson.setClaimTypeId(claimTicketRequest.getClaimTypeId());
+        claimTicketRequestJson.setClaimSubTypeId(claimTicketRequest.getClaimSubTypeId());
+        claimTicketRequestJson.setPrecedents(claimTicketRequest.getPrecedents());
+        claimTicketRequestJson.setSpecificPetition(claimTicketRequest.getSpecificPetition());
+        claimTicketRequestJson.setCheckDuplicate(claimTicketRequest.getCheckDuplicate());
+        // Convert attachments (MultipartFile to filenames)
+        List<String> attachments = new ArrayList<>();
+        if (claimTicketRequest.getAttachments() != null) {
+            for (MultipartFile file : claimTicketRequest.getAttachments()) {
+                attachments.add(file.getOriginalFilename());  // Add only file name to the list
+            }
+        }
+        claimTicketRequestJson.setAttachments(attachments);
+        return claimTicketRequestJson;
     }
 
 
@@ -373,11 +441,38 @@ public class ClaimTicketService {
         }
     }
 
+    /**
+     * Resolves the organization ID for the current user based on their authorities.
+     *
+     * @param organizationId The ID of the organization provided in the request.
+     * @param currentUser    The current logged-in user.
+     * @return The resolved organization ID.
+     */
+    private Long resolveOrganizationId(Long organizationId, User currentUser) {
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+        }
+        return organizationId;
+    }
+
+
     @Transactional
     public Persona getPersonaByIdentificacion(String identificacion) {
         return personaRepository.findByIdentificacion(identificacion)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PERSON_NOT_FOUND,
                 new String[]{identificacion}, null));
     }
+
+    @Transactional(readOnly = true)
+    public UserClaimTicketDTO getUserClaimTicketById(Long id) {
+        return claimTicketRepository.findById(id)
+            .map(userClaimTicketMapper::toUserClaimTicketDTO)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{id.toString()}, null));
+    }
+
 
 }

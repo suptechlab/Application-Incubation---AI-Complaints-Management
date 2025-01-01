@@ -2,6 +2,7 @@ package com.seps.ticket.web.rest.vm;
 
 import com.seps.ticket.component.FileHelper;
 import com.seps.ticket.constraint.validation.MultipleFilesCondition;
+import com.seps.ticket.enums.ChannelOfEntryEnum;
 import com.seps.ticket.enums.CustomerTypeEnum;
 import com.seps.ticket.enums.PriorityCareGroupEnum;
 import jakarta.validation.constraints.Email;
@@ -73,13 +74,17 @@ public class CreateClaimTicketRequest {
 
 
     @MultipleFilesCondition(
-            name = FileHelper.FileType.CLAIM_TICKET_DOCUMENTS,
-            message = "{claim.ticket.validation.files.invalid.types}" // Message from the language file
+        name = FileHelper.FileType.CLAIM_TICKET_DOCUMENTS,
+        message = "{claim.ticket.validation.files.invalid.types}" // Message from the language file
     )
     @Size(max = 3, message = "{claim.ticket.validation.files.max.size}") // Message from the language file
     private List<MultipartFile> attachments = new ArrayList<>();
 
     @NotBlank
     private String otpCode;
+
+    @NotNull
+    private ChannelOfEntryEnum channelOfEntry;
+
 
 }
