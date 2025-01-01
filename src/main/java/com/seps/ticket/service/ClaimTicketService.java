@@ -3,12 +3,15 @@ package com.seps.ticket.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.seps.ticket.component.EnumUtil;
+import com.seps.ticket.config.Constants;
 import com.seps.ticket.config.InstantTypeAdapter;
 import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.*;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.ClaimTicketResponseDTO;
+import com.seps.ticket.service.dto.UserDTO;
+import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
 import com.seps.ticket.suptech.service.DocumentService;
@@ -17,16 +20,17 @@ import com.seps.ticket.suptech.service.PersonNotFoundException;
 import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
-import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
+import tech.jhipster.security.RandomUtil;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -67,8 +71,9 @@ public class ClaimTicketService {
     private final PersonaRepository personaRepository;
     private final UserClaimTicketService userClaimTicketService;
     private final ClaimTicketOTPRepository claimTicketOTPRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public ClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository, OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository, ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository) {
+    public ClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository, OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository, ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -83,6 +88,7 @@ public class ClaimTicketService {
         this.personaRepository = personaRepository;
         this.userClaimTicketService = userClaimTicketService;
         this.claimTicketOTPRepository = claimTicketOTPRepository;
+        this.passwordEncoder = passwordEncoder;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -104,40 +110,53 @@ public class ClaimTicketService {
     @Transactional
     public ClaimTicketResponseDTO createClaimTicket(@Valid CreateClaimTicketRequest claimTicketRequest, HttpServletRequest request) {
         String email = claimTicketRequest.getEmail();
-        ClaimTicketOTP otpEntity = claimTicketOTPRepository.findOneByEmailIgnoreCase(email)
-            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null));
-        if (otpEntity.getExpiryTime().isBefore(Instant.now())) {
-            LOG.error("OTP code is expired");
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
-        }
-        if (!otpEntity.isUsed()) {
-            LOG.error("Email not verified :{}", email);
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_NOT_VERIFIED, null, null);
-        }
-        User currentUser = userService.getCurrentUser();
-
-
         String identificacion = claimTicketRequest.getIdentificacion();
+
+        User currentUser = userService.getCurrentUser();
+        User claimUser = null;
+
         ClaimTicketResponseDTO responseDTO = new ClaimTicketResponseDTO();
         responseDTO.setCheckDuplicate(claimTicketRequest.getCheckDuplicate());
 
         //Fetch USER authority
         Authority userAuthority = authorityRepository.findById(AuthoritiesConstants.USER)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.AUTHORITY_NOT_FOUND, null, null));
+
         //Check if a user exists with the given identificacion and USER authority
         Set<Authority> authorities = new HashSet<>();
         authorities.add(userAuthority);
         User existUser = userRepository.findOneByIdentificacionAndAuthoritiesIn(identificacion, authorities).orElse(null);
-        Long existUserId = null;
 
-        // Step 3: Validate user account if a user exists
         if (existUser != null) {
-            validateClaimTicketUserAccount(existUser);
-            existUserId = existUser.getId();
+            email = existUser.getEmail();
         }
+
+        LOG.debug("otpEmail:{}", email);
+
+        ClaimTicketOTP otpEntity = claimTicketOTPRepository.findOneByEmailIgnoreCase(email)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null));
+
+        //MATCH OTP Code
+        if (!otpEntity.getOtpCode().equals(claimTicketRequest.getOtpCode())) {
+            LOG.error("OTP code is not matched");
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
+        }
+
+        //Check OTP Expiration
+        if (otpEntity.getExpiryTime().isBefore(Instant.now())) {
+            LOG.error("OTP code is expired");
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
+        }
+
+        //Check OTP Used
+        if (!otpEntity.isUsed()) {
+            LOG.error("Email not verified :{}", email);
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_NOT_VERIFIED, null, null);
+        }
+
         // Check for duplicate tickets if requested
         if (Boolean.TRUE.equals(claimTicketRequest.getCheckDuplicate()) && existUser != null) {
-            ClaimTicket duplicateTicket = findDuplicateTicket(claimTicketRequest, existUserId);
+            ClaimTicket duplicateTicket = findDuplicateTicket(claimTicketRequest, existUser.getId());
             if (duplicateTicket != null) {
                 responseDTO.setFoundDuplicate(true);
                 responseDTO.setDuplicateTicketId(duplicateTicket.getTicketId());
@@ -152,11 +171,56 @@ public class ClaimTicketService {
         ClaimType claimType = userClaimTicketService.findClaimType(claimTicketRequest.getClaimTypeId());
         ClaimSubType claimSubType = userClaimTicketService.findClaimSubType(claimTicketRequest.getClaimSubTypeId(), claimTicketRequest.getClaimTypeId());
 
-        // Create and save the new claim ticket
-        ClaimTicket newClaimTicket = createClaimTicket(claimTicketRequest, existUser, province, city, organization, claimType,
-            claimSubType, currentUser);
-        claimTicketRepository.save(newClaimTicket);
+        // Validate user account if a user exists
+        if (existUser != null) {
+            validateClaimTicketUserAccount(existUser);
+            claimUser = existUser;
+        } else {
+            //new user registration
+            userRepository
+                .findOneByEmailIgnoreCase(email)
+                .ifPresent(existingUser -> {
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_ALREADY_USED, null, null);
+                });
 
+            userRepository
+                .findOneByIdentificacionAndAuthoritiesIn(identificacion, authorities)
+                .ifPresent(existingUser -> {
+                    throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_IDENTIFICATION_ALREADY_EXIST, new String[]{identificacion}, null);
+                });
+
+            //Get Persona info
+            Persona persona = getPersonaByIdentificacion(identificacion);
+
+            String normalizeEmail = email.toLowerCase();
+            User newUser = new User();
+            String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
+            newUser.setLogin(normalizeEmail);
+            // new user gets initially a generated password
+            newUser.setPassword(encryptedPassword);
+            newUser.setFirstName(persona.getNombreCompleto());
+            newUser.setEmail(normalizeEmail);
+            newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
+            newUser.setActivated(true);
+            newUser.setCountryCode(claimTicketRequest.getCountryCode());
+            newUser.setPhoneNumber(claimTicketRequest.getPhoneNumber());
+            newUser.setStatus(UserStatusEnum.ACTIVE);
+            newUser.setPasswordSet(false);
+            newUser.setIdentificacion(identificacion);
+            newUser.setGender(persona.getGenero());
+            newUser.setFingerprintVerified(false);
+            //Set Authorities
+            newUser.setAuthorities(authorities);
+            userRepository.save(newUser);
+            LOG.debug("Created Information for Registered User: {}", newUser);
+            claimUser = newUser;
+        }
+
+        // Create and save the new claim ticket
+        ClaimTicket newClaimTicket = createClaimTicket(claimTicketRequest, claimUser, province, city, organization,
+            claimType, claimSubType, currentUser);
+
+        claimTicketRepository.save(newClaimTicket);
 
         // Handle attachments and save documents
         DocumentSourceEnum source = DocumentSourceEnum.FILE_A_CLAIM;
@@ -167,13 +231,20 @@ public class ClaimTicketService {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
 
+        // Log all claim ticket-related information
+        logClaimTicketDetails(newClaimTicket, currentUser.getId());
+
+        //Delete Claim OTP Entry
+        claimTicketOTPRepository.deleteByEmail(email);
+
         // Populate response
         responseDTO.setNewTicketId(newClaimTicket.getTicketId());
         responseDTO.setNewId(newClaimTicket.getId());
-        responseDTO.setEmail(currentUser.getEmail());
+        responseDTO.setEmail(claimUser.getEmail());
         responseDTO.setFoundDuplicate(false);
         return responseDTO;
     }
+
 
     private ClaimTicket findDuplicateTicket(CreateClaimTicketRequest claimTicketRequest, Long userId) {
         List<ClaimTicket> duplicateTickets = claimTicketRepository.findByUserIdAndClaimTypeIdAndClaimSubTypeIdAndOrganizationId(userId,
@@ -202,6 +273,31 @@ public class ClaimTicketService {
         newClaimTicket.setStatus(ClaimTicketStatusEnum.NEW);
         newClaimTicket.setCreatedByUser(currentUser);
         return newClaimTicket;
+    }
+
+    private void logClaimTicketDetails(ClaimTicket claimTicket, Long currentUserId) {
+        // Log claim ticket status
+        ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
+        claimTicketStatusLog.setTicketId(claimTicket.getId());
+        claimTicketStatusLog.setStatus(claimTicket.getStatus());
+        claimTicketStatusLog.setCreatedBy(currentUserId);
+        claimTicketStatusLog.setInstanceType(claimTicket.getInstanceType());
+        claimTicketStatusLogRepository.save(claimTicketStatusLog);
+
+        // Log claim ticket instance
+        ClaimTicketInstanceLog claimTicketInstanceLog = new ClaimTicketInstanceLog();
+        claimTicketInstanceLog.setTicketId(claimTicket.getId());
+        claimTicketInstanceLog.setInstanceType(claimTicket.getInstanceType());
+        claimTicketInstanceLog.setCreatedBy(currentUserId);
+        claimTicketInstanceLogRepository.save(claimTicketInstanceLog);
+
+        // Log claim ticket priority
+        ClaimTicketPriorityLog claimTicketPriorityLog = new ClaimTicketPriorityLog();
+        claimTicketPriorityLog.setTicketId(claimTicket.getId());
+        claimTicketPriorityLog.setCreatedBy(currentUserId);
+        claimTicketPriorityLog.setPriority(claimTicket.getPriority());
+        claimTicketPriorityLog.setInstanceType(claimTicket.getInstanceType());
+        claimTicketPriorityLogRepository.save(claimTicketPriorityLog);
     }
 
 
@@ -275,6 +371,13 @@ public class ClaimTicketService {
             LOG.warn("User {} account is deleted", username);
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_ACCOUNT_STATUS_DELETED, null, null);
         }
+    }
+
+    @Transactional
+    public Persona getPersonaByIdentificacion(String identificacion) {
+        return personaRepository.findByIdentificacion(identificacion)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.PERSON_NOT_FOUND,
+                new String[]{identificacion}, null));
     }
 
 }

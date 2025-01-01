@@ -476,8 +476,7 @@ public class SepsAndFiClaimTicketResource {
     @PostMapping
     public ResponseEntity<ClaimTicketResponseDTO> createClaimTicket(@ModelAttribute @Valid CreateClaimTicketRequest claimTicketRequest,
                                                                     HttpServletRequest request) {
-//        ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, request);
-        ClaimTicketResponseDTO claimTicketResponseDTO = null;
+        ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
     }
 
