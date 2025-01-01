@@ -130,7 +130,7 @@ public class ClaimTicket {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+        private Instant createdAt;
 
     @Column(name = "updated_by", nullable = false, insertable = false, updatable = false)
     private Long updatedBy;
