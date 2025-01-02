@@ -3,12 +3,14 @@ package com.seps.user.web.rest.errors;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -96,7 +98,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, NativeWebRequest request) {
         if (problem.getStatus() <= 0) problem.setStatus(toStatus(err));
 
-        if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
+        if (problem.getType() == null || problem.getType().equals(URI.create("about:blank")))
+            problem.setType(getMappedType(err));
 
         // higher precedence to Custom/ResponseStatus types
         String title = extractTitle(err, problem.getStatus());
@@ -116,7 +119,8 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
             getMappedMessageKey(err) != null ? getMappedMessageKey(err) : "error.http." + problem.getStatus()
         );
 
-        if (problemProperties == null || !problemProperties.containsKey(PATH_KEY)) problem.setProperty(PATH_KEY, getPathValue(request));
+        if (problemProperties == null || !problemProperties.containsKey(PATH_KEY))
+            problem.setProperty(PATH_KEY, getPathValue(request));
 
         if (
             (err instanceof MethodArgumentNotValidException fieldException) &&
@@ -225,12 +229,12 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private HttpHeaders buildHeaders(Throwable err) {
         return err instanceof BadRequestAlertException badRequestAlertException
             ? HeaderUtil.createFailureAlert(
-                applicationName,
-                true,
-                badRequestAlertException.getEntityName(),
-                badRequestAlertException.getErrorKey(),
-                badRequestAlertException.getMessage()
-            )
+            applicationName,
+            true,
+            badRequestAlertException.getEntityName(),
+            badRequestAlertException.getErrorKey(),
+            badRequestAlertException.getMessage()
+        )
             : null;
     }
 
@@ -256,7 +260,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         ProblemDetailWithCause pdCause = wrapAndCustomizeProblem(ex, request);
         pdCause.setStatus(ex.getStatus().getStatusCode());
         // Add the custom properties
-        String errorDescription = messageSource.getMessage(ex.getsSepsStatusCode().getReasonPhrase(), ex.getMessageArgs(), request.getLocale());
+        String errorDescription;
+        if (ex.isUseMessageDirectly()) {
+            errorDescription = ex.getMessage(); // Use the direct message
+        } else {
+            // Fetch from language file
+            errorDescription = messageSource.getMessage(ex.getsSepsStatusCode().getReasonPhrase(), ex.getMessageArgs(), request.getLocale());
+        }
         pdCause.setProperty("message", ex.getMessage());
         pdCause.setProperty("errorCode", ex.getsSepsStatusCode().getStatusCode());
         pdCause.setProperty("errorDescription", errorDescription);

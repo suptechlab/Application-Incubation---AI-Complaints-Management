@@ -32,6 +32,7 @@ public class UserDTO {
     private boolean fingerprintVerified;
     private Instant lastLoggedIn;
     private Instant currentLoggedIn;
+    private String externalDocumentId;
 
     public UserDTO(User user) {
         this.id = user.getId();
@@ -53,5 +54,6 @@ public class UserDTO {
         this.fingerprintVerified = user.isFingerprintVerified();
         this.lastLoggedIn = user.getLastLoggedIn();
         this.currentLoggedIn = user.getCurrentLoggedIn();
+        this.externalDocumentId = user.getExternalDocumentId();
     }
 }
