@@ -421,6 +421,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         type="submit"
                                         variant="warning"
                                         className="custom-min-width-85"
+                                        disabled={!isFormEmailValidate}
                                     >
                                         {t("FINISH")}
                                     </Button>
