@@ -9,6 +9,8 @@ public enum SepsStatusCode implements StatusType {
     FORM_VALIDATION_ERROR(10012, "form.validation.error"),
     USER_NOT_FOUND(10013, "user.not.found"),
     CURRENT_USER_NOT_FOUND(10017, "current.user.not.found"),
+    EMAIL_ALREADY_USED(10023, "email.already.used"),
+    USER_IDENTIFICATION_ALREADY_EXIST(10024, "user.identification.already.exist"),
     USER_ACCOUNT_NOT_EXIST(10027, "user.account.not.exist"),
     USER_ACCOUNT_NOT_ACTIVE(10028, "user.account.not.active"),
     USER_ACCOUNT_STATUS_PENDING(10029, "user.account.status.pending"),

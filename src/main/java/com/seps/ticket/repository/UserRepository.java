@@ -66,4 +66,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Check if a user exists with the given identificacion, authorities
     Optional<User> findOneByIdentificacionAndAuthoritiesIn(String identificacion, Set<Authority> authorities);
 
+    Optional<User> findOneByEmailIgnoreCase(String email);
+
+
 }

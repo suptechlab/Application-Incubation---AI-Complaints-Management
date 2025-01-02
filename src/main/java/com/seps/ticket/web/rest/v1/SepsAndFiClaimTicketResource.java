@@ -41,6 +41,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
+
 @Tag(name = "SEPS and FI Claim Ticket Management", description = "APIs for SEPS and FI to manage their Claim Tickets")
 @RestController
 @RequestMapping("/api/v1/seps-fi/claim-tickets")
@@ -485,8 +486,12 @@ public class SepsAndFiClaimTicketResource {
     @PostMapping
     public ResponseEntity<ClaimTicketResponseDTO> createClaimTicket(@ModelAttribute @Valid CreateClaimTicketRequest claimTicketRequest,
                                                                     HttpServletRequest request) {
-//        ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, request);
-        ClaimTicketResponseDTO claimTicketResponseDTO = null;
+        RequestInfo requestInfo = new RequestInfo(request);
+        ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, requestInfo);
+        if (claimTicketResponseDTO.getNewId() != null) {
+            UserClaimTicketDTO userClaimTicketDTO = claimTicketService.getUserClaimTicketById(claimTicketResponseDTO.getNewId());
+            mailService.sendClaimTicketCreationEmail(userClaimTicketDTO);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
     }
 
