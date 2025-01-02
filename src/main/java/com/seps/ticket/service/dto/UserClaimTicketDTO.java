@@ -57,6 +57,8 @@ public class UserClaimTicketDTO {
     private String complaintPrecedents;
     private String complaintSpecificPetition;
     private Instant complaintFiledAt;
+    private SourceEnum source;
+    private ChannelOfEntryEnum channelOfEntry;
 
     // Getters and Setters
 

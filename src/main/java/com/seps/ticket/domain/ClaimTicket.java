@@ -173,4 +173,11 @@ public class ClaimTicket {
     @JoinColumn(name = "ticket_id")
     private List<ClaimTicketTaggedUser> claimTicketTaggedUsers = new ArrayList<>();
 
+    @Column(name = "source")
+    private SourceEnum source;
+
+    @Column(name = "channel_of_entry")
+    private ChannelOfEntryEnum channelOfEntry;
+
+
 }
