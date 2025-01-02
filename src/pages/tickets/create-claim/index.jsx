@@ -9,6 +9,8 @@ import FileAlertModal from "./file-alert";
 import FileSuccesModal from "./file-success";
 import PageHeader from "./header";
 import OtherInfoTab from "./otherInfoTab";
+import { createNewClaimApi } from "../../../services/claimcreate.services";
+import toast from "react-hot-toast";
 
 export default function CreateClaim() {
 
@@ -33,7 +35,6 @@ export default function CreateClaim() {
 
     // Handle Basic Info Submit
     const handleBasicInfoSubmit = (values, actions) => {
-        console.log('step 1 completed')
         setFileClaimValues((prev) => ({ ...prev, ...values }))
         setActiveTab(1)
         setIsBasicInfoSubmitted(true);
@@ -58,28 +59,67 @@ export default function CreateClaim() {
         setActiveTab(1)
     };
 
+    
+    // Handle Close Reset
+    const handleCloseReset = () => {
+        // Close the modal
+        // A timeout to reset the state after a brief delay
+        setTimeout(() => {
+            setIsBasicInfoSubmitted(false);
+            setIsOtherInfoSubmitted(false);
+        }, 500);
+    }
+
+
     // HANDLE CLAIM DETAILS  AND FORM WILL BE FINISH HERE
     const handleClaimDetailsSubmit = async (values, actions) => {
 
-        let formData = { ...fileClaimValues, ...values }
-        formData.checkDuplicate = true
+        let combinedData = { ...fileClaimValues, ...values };
+        combinedData.checkDuplicate = true;
         setFileClaimValues((prev) => ({ ...prev, ...values }))
 
-        // const result = await dispatch(fileClaimForm(formData));
-        // if (fileClaimForm.fulfilled.match(result)) {
-        //     console.log({ result: result?.payload?.data })
-        //     setFileClaimResponse(result?.payload?.data)
-        //     if (result?.payload?.data?.foundDuplicate === true) {
-        //         setFileAlertModalShow(true)
-        //     } else {
-        //         setFileSuccesModalShow(true)
-        //     }
-        //     actions.setSubmitting(false);
-        //     handleCloseReset()
-        // } else {
-        //     console.error('Verification error:', result.error.message);
-        //     actions.setSubmitting(false)
-        // }
+        const formData = new FormData();
+
+        Object.entries(combinedData).forEach(([key, value]) => {
+            if (key === "files") {
+                
+                value.forEach((file, index) => {
+                    formData.append(`attachments[${index}]`, file);
+                });
+            } else {
+                
+                formData.append(key, value);
+            }
+        });
+
+        // Dispatch the FormData
+        setIsLoading(true);
+      
+        createNewClaimApi(formData).then((response)=>{
+
+            setFileClaimResponse(response?.data)
+            if (response?.foundDuplicate === true) {
+                setFileAlertModalShow(true)
+            } else {
+                setFileSuccesModalShow(true)
+            }
+            actions.setSubmitting(false);
+            handleCloseReset()
+
+
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+              toast.error(error?.response?.data?.errorDescription);
+            } else {
+              toast.error(error?.message ?? t("FILE A CLAIM ERROR!"));
+            }
+           
+          }).finally(() => {
+            // Ensure the loading toast is dismissed
+            actions.setSubmitting(false)
+          });
+
+
     };
 
     // HANDLE FILE DUPLICATE CLAIM
@@ -144,7 +184,7 @@ export default function CreateClaim() {
         },
         {
             eventKey: 2,
-            content: <ClaimDetailsTab backButtonClickHandler={backButtonClaimDetailsClickHandler} handleFormSubmit={handleClaimDetailsSubmit} setIsLoading={setIsLoading} />,
+            content: <ClaimDetailsTab backButtonClickHandler={backButtonClaimDetailsClickHandler} handleFormSubmit={handleClaimDetailsSubmit} setIsLoading={setIsLoading} userEmail = {fileClaimValues?.email}/>,
         },
     ];
     return (

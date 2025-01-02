@@ -329,7 +329,6 @@ const ClaimType = () => {
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
-    
       <PageHeader
         title={t("CLAIM TYPE")}
         actions={actions}

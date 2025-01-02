@@ -16,7 +16,7 @@ import { FiInfo } from "react-icons/fi";
 import { requestOTPApi, verifyOTPApi } from '../../../../services/claimcreate.services';
 import toast from 'react-hot-toast';
 
-const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
+const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading, userEmail }) => {
 
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
     const { t } = useTranslation();
@@ -26,7 +26,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
     const [isOTPFormSubmitted, setIsOTPFormSubitted] = useState(false)
 
-    const [isFormEmailValidate , setIsFormEmailValidate] = useState(false)
+    const [isFormEmailValidate, setIsFormEmailValidate] = useState(false)
 
     const [optSendStatus, setOptSendStatus] = useState(false)
 
@@ -47,7 +47,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         if (file) {
             setFileName(file.name);
         } else {
-            setFileName("Fi_Users_data.xlsx");
+            setFileName("");
         }
     };
 
@@ -57,10 +57,10 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     };
 
     // HANDLE RESEND OTP BUTTON
-    const handleResend = async (email) => {
+    const handleResend = async () => {
         // THIS STATE IS FOR SPINNING RESNED OTP BUTTON
 
-        requestOTPApi({ email }).then((response) => {
+        requestOTPApi({ email: userEmail }).then((response) => {
             setOptSendStatus(true);
             toast.success("OTP has been resent successfully.");
         })
@@ -85,40 +85,42 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     };
 
     // HANDLE SEND OTP BUTTON
-    const handleSendOTP = async (email) => {
-
+    const handleSendOTP = async () => {
         setIsOTPFormSubitted(true)
-        // requestOTPApi({ email }).then((response) => {
-        //     setOptSendStatus(true);
-        //     setIsOTPFormSubitted(true)
-        //     toast.success("OTP has been sent successfully.");
-        // })
-        //     .catch((error) => {
-        //         if (error?.response?.data?.errorDescription) {
-        //             toast.error(error?.response?.data?.errorDescription);
-        //         } else {
-        //             toast.error(error?.message);
-        //         }
-        //     }).finally(() => {
-        //         setOptSendStatus(false);
-        //     })
+        requestOTPApi({ email: userEmail }).then((response) => {
+            setOptSendStatus(true);
+            setIsOTPFormSubitted(true)
+            toast.success("OTP has been sent successfully.");
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+            }).finally(() => {
+                setOptSendStatus(false);
+            })
     }
-
-    const handleOTPVerification = async (data)=>{
-        setIsFormEmailValidate(true)
-        // verifyOTPApi(data).then((response) => {
-        //     setIsFormEmailValidate(true)
-        //     toast.success("OTP Verified.");
-        // })
-        //     .catch((error) => {
-        //         if (error?.response?.data?.errorDescription) {
-        //             toast.error(error?.response?.data?.errorDescription);
-        //         } else {
-        //             toast.error(error?.message);
-        //         }
-        //     }).finally(() => {
-        //         setOptSendStatus(false);
-        //     })
+    // HANDLE OTP VERIFICATION
+    const handleOTPVerification = async (data) => {
+        const formData = {
+            otpCode: data?.otpCode,
+            email: userEmail
+        }
+        verifyOTPApi(formData).then((response) => {
+            setIsFormEmailValidate(true)
+            toast.success("OTP Verified.");
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+            }).finally(() => {
+                setOptSendStatus(false);
+            })
     }
 
     const getClaimTypes = useCallback(async () => {
@@ -161,7 +163,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
             <Card.Body className="d-flex flex-column h-100">
                 <CommonFormikComponent
-                    // validationSchema={ClaimDetailsFormSchema}
+                    validationSchema={ClaimDetailsFormSchema}
                     initialValues={initialValues}
                     onSubmit={handleSubmit}
                 >
@@ -240,21 +242,23 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                             <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                                 <label
-                                                    htmlFor="files"
+                                                    htmlFor="attachments"
                                                     className="btn btn-warning"
                                                 >
                                                     {t("UPLOAD_OPTIONAL_ATTACHMENTS")}
                                                 </label>
                                                 <input
-                                                    id="files"
+                                                    id="attachments"
                                                     accept="image/png, image/jpeg, image/jpg"
                                                     className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                                     type="file"
+                                                    // multiple={true}
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
-                                            <span className="opacity-75">Multiple attachment can be uploaded.</span>
+                                            {/* <span className="opacity-75">Multiple attachment can be uploaded.</span> */}
                                         </div>
+
                                         {fileName && (
                                             <div className="pt-1">
                                                 <Link
@@ -298,7 +302,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         onBlur={formikProps.handleBlur}
                                                         onChange={formikProps.handleChange}
                                                         touched={formikProps.touched.email}
-                                                        value={formikProps.values.email || ""}
+                                                        value={userEmail || ""}
                                                         readOnly={isFormEmailValidate ?? false}
                                                         inputIcon={
                                                             isFormEmailValidate && (
@@ -310,6 +314,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         inputClassName={
                                                             isFormEmailValidate && "custom-padding-right-42"
                                                         }
+                                                        disabled={true}
                                                     />
                                                 </Col>
                                                 {!isFormEmailValidate && (
@@ -354,7 +359,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         type="button"
                                                         variant="warning"
                                                         className="custom-min-width-100 custom-margin-top-1"
-                                                        onClick={handleOTPVerification}
+                                                        onClick={()=>handleOTPVerification({otpCode : formikProps.values.otpCode})}
                                                     >
                                                         {t("OTP_VERIFICATION")}
                                                     </Button>

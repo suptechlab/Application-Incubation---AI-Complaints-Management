@@ -8,6 +8,7 @@ import { OtherInfoFormSchema } from '../../../../validations/createClaim.validat
 import { useMasterData } from '../../../../contexts/masters.context';
 import { convertToLabelValue } from '../../../../services/ticketmanagement.service';
 import { getOrganizationList } from '../../../../services/teamManagment.service';
+import { organizationListData } from '../../../../services/claimcreate.services';
 
 const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
 
@@ -16,7 +17,9 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
     const { masterData } = useMasterData();
     const [pcGroupList, setPcGroupList] = useState([]);
     const [customerTypeList, setCustomerTypeList] = useState([]);
-    const [entityList, setEntityList] = useState([]);
+    const [organizationList, setOrganizationList] = useState([]);
+    const [entityTypes, setEntityTypes] = useState([])
+
 
     const { t } = useTranslation()
 
@@ -39,30 +42,55 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                     value: data?.id
                 }
             })
-            setEntityList(entityNameList);
+            setEntityTypes(entityNameList);
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);
         }
-    }, [setEntityList, setIsLoading])
+    }, [setEntityTypes, setIsLoading])
 
-    useEffect(() => {
-        getEntitynameList();
-        if (masterData) {
-            setPcGroupList(convertToLabelValue(masterData.priorityCareGroup || {}));
-            setCustomerTypeList(convertToLabelValue(masterData.customerType || {}));
-        }
-    }, [masterData, getEntitynameList])
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
         handleFormSubmit(values, actions);
     };
+
+
+    // GET ENTITY TYPE LIST
+    const getOrganizationLists = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            await organizationListData().then((response) => {
+                const formattedOrgData = response.data.map((item) => ({
+                    label: item.razonSocial,
+                    value: item.id,
+                    ruc:item.ruc,
+                    entityType : item.tipoOrganizacion
+                }));
+                setOrganizationList([...formattedOrgData]);
+                setIsLoading(false);
+            });
+        } catch (error) {
+            setIsLoading(false);
+        }
+    }, [])
+
+
+    useEffect(() => {
+        getOrganizationLists()
+        getEntitynameList()
+        if (masterData) {
+            setPcGroupList(convertToLabelValue(masterData.priorityCareGroup || {}));
+            setCustomerTypeList(convertToLabelValue(masterData.customerType || {}));
+        }
+    }, [masterData])
+
+
     return (
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
             <Card.Body className="d-flex flex-column h-100">
                 <CommonFormikComponent
-                    // validationSchema={OtherInfoFormSchema}
+                    validationSchema={OtherInfoFormSchema}
                     initialValues={initialValues}
                     onSubmit={handleSubmit}
                 >
@@ -121,17 +149,25 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                                         <ReactSelect
                                             label={t("ENTITY_NAME")}
                                             error={formikProps.errors.organizationId}
-                                            options={entityList}
+                                            options={organizationList}
                                             value={formikProps.values.organizationId}
                                             onChange={(option) => {
-                                                // const selectedUnit = organizational_units.find(
-                                                //     (unit) => unit.value === option?.target?.value
-                                                // )
+                                                const selectedUnit = organizationList.find(
+                                                    (unit) => unit.value === option?.target?.value
+                                                )
                                                 // setSelectedRuc(selectedUnit?.ruc)
-                                                // formikProps.setFieldValue(
-                                                //     "organizationId",
-                                                //     option?.target?.value ?? ""
-                                                // );
+                                                formikProps.setFieldValue(
+                                                    "organizationId",
+                                                    option?.target?.value ?? ""
+                                                );
+                                                formikProps.setFieldValue(
+                                                    "entitysTaxID",
+                                                    selectedUnit?.ruc ?? ""
+                                                );
+                                                formikProps.setFieldValue(
+                                                    "entityType",
+                                                    selectedUnit?.entityType ?? ""
+                                                );
                                             }}
                                             name="organizationId"
                                             className={
@@ -154,7 +190,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                                             onBlur={formikProps.handleBlur}
                                             onChange={formikProps.handleChange}
                                             touched={formikProps.touched.entitysTaxID}
-                                            value={""}
+                                            value={formikProps?.values?.entitysTaxID}
                                             readOnly={true}
                                         />
                                     </Col>
@@ -169,20 +205,6 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                                             onChange={formikProps.handleChange}
                                             touched={formikProps.touched.entityType}
                                             value={formikProps.values.entityType || ""}
-                                            readOnly={true}
-                                        />
-                                    </Col>
-                                    <Col sm={6} lg={4}>
-                                        <FormInputBox
-                                            id="legalRepresentative"
-                                            label={t("ENTITY_LEGAL_REPRESENTATIVE/PRESIDENT")}
-                                            name="legalRepresentative"
-                                            type="text"
-                                            error={formikProps.errors.legalRepresentative}
-                                            onBlur={formikProps.handleBlur}
-                                            onChange={formikProps.handleChange}
-                                            touched={formikProps.touched.legalRepresentative}
-                                            value={formikProps.values.legalRepresentative || ""}
                                             readOnly={true}
                                         />
                                     </Col>
@@ -217,7 +239,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                     )}
                 </CommonFormikComponent>
             </Card.Body>
-        </Card >
+        </Card>
     )
 }
 

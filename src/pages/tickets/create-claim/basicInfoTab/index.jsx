@@ -11,6 +11,9 @@ import { countryCodes } from '../../../../constants/CountryCodes';
 import Loader from '../../../../components/Loader';
 import { getCitiesById, provinceDropdownData } from '../../../../services/cityMaster.service';
 import { validateEmailApi, validateIdentificationApi } from '../../../../services/claimcreate.services';
+import { useMasterData } from '../../../../contexts/masters.context';
+import { convertToLabelValue } from '../../../../services/ticketmanagement.service';
+import { BasicInfoFormSchema } from '../../../../validations/createClaim.validation';
 
 const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
@@ -21,15 +24,20 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
 
     const { t } = useTranslation()
+
+    const { masterData } = useMasterData();
+
     const [cityList, setCityList] = useState([]);
     const [provinceList, setProvinceList] = useState([]);
     const [loadingInfo, setLoadingInfo] = useState(false);
 
-    const [isEmailVerified , setIsEmailVerified] = useState(false)
+    const [channnelOfEntryData, setChannelOfEntryData] = useState([])
 
-    const [isEmailAlreadyExists , setIsEmailAlreadyExists] = useState(false)
+    const [isEmailVerified, setIsEmailVerified] = useState(false)
+
+    const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(false)
     const [initialValues, setInitialValues] = useState({
-        identification: '',
+        identificacion: '',
         email: '',
         name: '',
         gender: '',
@@ -37,10 +45,13 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         phoneNumber: '',
         provinceId: '',
         cityId: '',
+        channelOfEntry:''
     });
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
+
+        console.log({values})
         handleFormSubmit(values, actions);
     };
 
@@ -89,13 +100,20 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
     // FETCH USER PERSONAL INFO BY ID
     const fetchUserData = async (identification) => {
+
         setLoadingInfo(true)
+
         validateIdentificationApi(identification).then((response) => {
             setLoadingInfo(false)
             if (response?.data?.nombreCompleto) {
-                setInitialValues({ ...initialValues, identification: identification, name: response?.data?.nombreCompleto, gender: response?.data?.genero })
+                setInitialValues({ ...initialValues, identificacion: identification, name: response?.data?.nombreCompleto, gender: response?.data?.genero,email : response?.data?.existUserEmail })
             } else {
                 setInitialValues({ ...initialValues, identification: identification, name: '', gender: '' })
+            }
+            if(response?.data?.existUserEmail && response?.data?.existUserEmail!==null){
+                setIsEmailAlreadyExists(true)
+            }else{
+                setIsEmailAlreadyExists(false)
             }
         })
             .catch((error) => {
@@ -123,7 +141,13 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         setLoadingInfo(true)
         validateEmailApi({ email }).then((response) => {
             setLoadingInfo(false)
-            setIsEmailVerified(true)
+
+            if(response?.data === true){
+                toast.success("Email verified!")
+            }else{
+                toast.success("Failed to verify email!")
+            }
+          
         })
             .catch((error) => {
                 if (error?.response?.data?.errorDescription) {
@@ -136,13 +160,20 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
             })
     };
 
+
+    useEffect(() => {
+        if (masterData) {
+            setChannelOfEntryData([{ label: 'Select', value: '' }, ...convertToLabelValue(masterData.channelOfEntry)]);
+        }
+    }, [masterData])
+
     return (
         <React.Fragment>
             <Loader isLoading={loadingInfo} />
             <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
                 <Card.Body className="d-flex flex-column h-100">
                     <CommonFormikComponent
-                        // validationSchema={BasicInfoFormSchema}
+                        validationSchema={BasicInfoFormSchema}
                         initialValues={initialValues}
                         onSubmit={handleSubmit}
                         enableReinitialize={true}
@@ -155,15 +186,15 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                         <Col sm={6} lg={4}>
                                             <FormInputBox
                                                 autoComplete="off"
-                                                id="identification"
+                                                id="identificacion"
                                                 label={t("NATIONAL_ID_NUMBER")}
-                                                name="identification"
+                                                name="identificacion"
                                                 type="text"
-                                                error={formikProps.errors.identification}
+                                                error={formikProps.errors.identificacion}
                                                 onBlur={handleIdentificationBlur}
                                                 onChange={formikProps.handleChange}
-                                                touched={formikProps.touched.identification}
-                                                value={formikProps.values.identification || ""}
+                                                touched={formikProps.touched.identificacion}
+                                                value={formikProps.values.identificacion || ""}
                                             />
                                         </Col>
                                         <Col sm={6} lg={4}>
@@ -178,6 +209,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 onChange={formikProps.handleChange}
                                                 touched={formikProps.touched.email}
                                                 value={formikProps.values.email || ""}
+                                                disabled ={isEmailAlreadyExists}
                                             />
                                         </Col>
                                         <Col sm={6} lg={4}>
@@ -288,16 +320,16 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                         <Col sm={6} lg={4}>
                                             <ReactSelect
                                                 label={t("CHANNEL_OF_ENTRY")}
-                                                error={formikProps?.errors?.channel}
-                                                options={cityList}
-                                                value={formikProps.values.channel}
+                                                error={formikProps?.errors?.channelOfEntry}
+                                                options={channnelOfEntryData ?? []}
+                                                value={formikProps.values.channelOfEntry}
                                                 onChange={(option) => {
-                                                    formikProps.setFieldValue("channel", option?.target?.value ?? "");
+                                                    formikProps.setFieldValue("channelOfEntry", option?.target?.value ?? "");
                                                 }}
-                                                name="channel"
-                                                className={formikProps?.touched?.channel && formikProps?.errors?.channel ? "is-invalid" : ""}
+                                                name="channelOfEntry"
+                                                className={formikProps?.touched?.channelOfEntry && formikProps?.errors?.channelOfEntry ? "is-invalid" : ""}
                                                 onBlur={formikProps.handleBlur}
-                                                touched={formikProps.touched.channel}
+                                                touched={formikProps.touched.channelOfEntry}
                                             />
                                         </Col>
                                     </Row>

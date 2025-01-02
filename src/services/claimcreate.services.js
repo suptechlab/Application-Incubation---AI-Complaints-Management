@@ -1,10 +1,10 @@
-import {ticketApi}  from "../utils/instance";
+import {ticketApi,userApi}  from "../utils/instance";
 const API_VERSION = process.env.REACT_APP_API_VERSION
 
 
 // VALIDATE IDENTIFICATION
 export const validateIdentificationApi = async (identification) => {
-  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/validate-identificacion=${identification}`);
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/validate-identificacion?identificacion=${identification}`);
 }
 // VALIDATE EMAIL
 export const validateEmailApi = async (data) => {
@@ -21,4 +21,8 @@ export const verifyOTPApi = async (data) => {
 // CREATE NEW CLAIM API
 export const createNewClaimApi = async (data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets`,data);
+}
+
+export const organizationListData = async (data) => {
+  return await userApi.get(`/${API_VERSION}/masters/organization-list`,data);
 }
