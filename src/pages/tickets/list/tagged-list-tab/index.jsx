@@ -17,7 +17,7 @@ import { calculateDaysDifference } from "../../../../utils/commonutils";
 import AttachmentsModal from "../../modals/attachmentsModal";
 import TicketsListFilters from "../filters/index";
 
-export default function TicketsTaggedList() {
+const TicketsTaggedList = ({ selectedTab }) => {
     const location = useLocation();
     const { currentUser, permissions = {} } = useContext(AuthenticationContext)
     const { masterData } = useContext(MasterDataContext)
@@ -396,6 +396,11 @@ export default function TicketsTaggedList() {
             pageSize: 10,
         });
     }, [filter]);
+    useEffect(() => {
+        if (selectedTab === 'taggedTickets') {
+            dataQuery.refetch();
+        }
+    }, [selectedTab])
 
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
@@ -467,3 +472,5 @@ export default function TicketsTaggedList() {
         </React.Fragment>
     );
 }
+
+export default TicketsTaggedList

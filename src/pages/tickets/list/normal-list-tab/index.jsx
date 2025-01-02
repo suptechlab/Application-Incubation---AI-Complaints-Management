@@ -18,7 +18,7 @@ import { calculateDaysDifference } from "../../../../utils/commonutils";
 import AttachmentsModal from "../../modals/attachmentsModal";
 import TicketsListFilters from "../filters/index";
 
-export default function TicketsNormalList() {
+const TicketsNormalList = ({ selectedTab }) => {
 
     const location = useLocation();
     const { currentUser, permissions = {} } = useContext(AuthenticationContext);
@@ -413,6 +413,12 @@ export default function TicketsNormalList() {
         });
     }, [filter]);
 
+    useEffect(() => {
+        if (selectedTab === 'allTickets') {
+            dataQuery.refetch();
+        }
+    }, [selectedTab])
+
 
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
@@ -507,3 +513,5 @@ export default function TicketsNormalList() {
         </React.Fragment>
     );
 }
+
+export default TicketsNormalList

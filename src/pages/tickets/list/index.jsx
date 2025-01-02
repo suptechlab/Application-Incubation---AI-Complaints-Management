@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Nav, Stack, Tab } from 'react-bootstrap';
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
 import TicketsNormalList from "./normal-list-tab";
-import TicketsListFilters from "./filters";
 import TicketsTaggedList from "./tagged-list-tab";
 
 export default function TicketsList() {
@@ -15,7 +14,7 @@ export default function TicketsList() {
     const [permissionsState, setPermissionsState] = React.useState({
         addModule: false
     });
-    const [activeTab, setActiveTab] = useState('taggedTickets');
+    const [activeTab, setActiveTab] = useState('allTickets');
 
     //Handle Dropdown Select
     const handleDropdownSelect = (eventKey) => {
@@ -54,17 +53,17 @@ export default function TicketsList() {
     // Tickets Tabs Data
     const ticketsTabsData = [
         {
-            id: 'allTickets',
-            name: t('ALL_TICKETS'),
-            Component: <TicketsNormalList />,
+            id: "allTickets",
+            name: t("ALL_TICKETS"),
+            Component: <TicketsNormalList selectedTab='allTickets' />,
             disabled: false,
         },
         {
-            id: 'taggedTickets',
+            id: "taggedTickets",
             name: t("TAGGED_TICKETS"),
-            Component: <TicketsTaggedList />,
+            Component: <TicketsTaggedList selectedTab='taggedTickets' />,
             disabled: false,
-        }
+        },
     ];
 
     const actions = permissionsState?.addModule ?
