@@ -9,7 +9,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class SlaAdherenceDataDTO {
+public class SlaAdherenceDataProjection {
     private Long slaOnTimeCount;
     private Long slaBreachedCount;
 }

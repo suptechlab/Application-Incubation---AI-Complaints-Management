@@ -15,7 +15,7 @@ import com.seps.ticket.service.dto.DashboardDTO;
 import com.seps.ticket.service.dto.PieChartDTO;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import com.seps.ticket.service.projection.CloseClaimStatusCountProjection;
-import com.seps.ticket.service.projection.SlaAdherenceDataDTO;
+import com.seps.ticket.service.projection.SlaAdherenceDataProjection;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import org.springframework.context.MessageSource;
@@ -113,6 +113,7 @@ public class DashboardService {
         dashboardDTO.setClaimStatusCount(this.countClaimsByStatusAndTotal(organizationId, startInstant, endInstant, userId, isSeps));
         dashboardDTO.setCloseClaimStatusCount(this.countClaimsByClosedStatusAndTotal(organizationId, startInstant, endInstant, userId, isSeps));
         dashboardDTO.setSlaAdherenceGraph(this.slaAdherenceGraphSet(organizationId, startInstant, endInstant, userId, isSeps));
+        dashboardDTO.setAverageResolutionTime(this.getAverageResolutionTime(organizationId, startInstant, endInstant, userId, isSeps));
         return dashboardDTO;
     }
 
@@ -215,7 +216,7 @@ public class DashboardService {
         List<InstanceTypeEnum> instanceTypes = Arrays.asList(InstanceTypeEnum.FIRST_INSTANCE, InstanceTypeEnum.SECOND_INSTANCE);
 
         // Fetch data using the repository method
-        SlaAdherenceDataDTO projections = claimTicketRepository.getClaimSlaAdherence(
+        SlaAdherenceDataProjection projections = claimTicketRepository.getClaimSlaAdherence(
             userId, organizationId, startDate, endDate, isSeps, ClaimTicketStatusEnum.CLOSED, instanceTypes);
 
         List<String> labels = new ArrayList<>();
@@ -228,5 +229,33 @@ public class DashboardService {
         List<PieChartDTO.Dataset> datasets = Collections.singletonList(new PieChartDTO.Dataset(data, backgroundColors, backgroundColors));
 
         return new PieChartDTO(labels, datasets);
+    }
+
+    /**
+     * Calculates the average resolution time of claim tickets based on the provided filters.
+     *
+     * <p>This method retrieves claim ticket data and computes the average resolution time in days.
+     * The resolution time is calculated from the start date of the claim (based on the instance type)
+     * to the resolved date of the ticket. The calculation dynamically adjusts for different
+     * `instance_type` values, considering specific fields such as
+     * `second_instance_filed_at`, `complaint_filed_at`, or `created_at`.
+     *
+     * @param organizationId the ID of the organization to filter claim tickets by.
+     *                       If {@code null}, no organization filtering is applied.
+     * @param startDate      the start date to filter claim tickets by. Only tickets with a start date
+     *                       on or after this value will be included. If {@code null}, no start date filter is applied.
+     * @param endDate        the end date to filter claim tickets by. Only tickets with a start date
+     *                       on or before this value will be included. If {@code null}, no end date filter is applied.
+     * @param userId         the ID of the user to filter claim tickets by. If {@code null}, tickets for all users are included.
+     * @param isSeps         a boolean indicating whether to filter by SEPS agents
+     *                       ({@code true} for SEPS agents, {@code false} for FI agents).
+     * @return the average resolution time in days as a {@link Double}. Returns {@code null} if no tickets match the filters.
+     * @see ClaimTicketRepository#getAvgResolutionTime(Long, Long, Instant, Instant, boolean, ClaimTicketStatusEnum)
+     */
+    @Transactional
+    public Double getAverageResolutionTime(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps){
+        // Fetch data using the repository method
+        return claimTicketRepository.getAvgResolutionTime(
+            userId, organizationId, startDate, endDate, isSeps, ClaimTicketStatusEnum.CLOSED);
     }
 }

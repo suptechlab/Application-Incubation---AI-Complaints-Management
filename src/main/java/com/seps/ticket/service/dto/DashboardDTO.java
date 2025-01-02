@@ -7,4 +7,6 @@ public class DashboardDTO {
     private ClaimStatusCountResponseDTO claimStatusCount;
     private CloseClaimStatusCountResponseDTO closeClaimStatusCount;
     private PieChartDTO slaAdherenceGraph;
+    private Double averageResolutionTime;
+
 }
