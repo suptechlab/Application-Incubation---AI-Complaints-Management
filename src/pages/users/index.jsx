@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect,  useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -13,7 +13,7 @@ import {
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdEdit } from "react-icons/md";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import GenericModal from "../../components/GenericModal";
@@ -21,9 +21,45 @@ import ListingSearchFormUsers from "./ListingSearchFormUsers";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
-import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
+import { AuthenticationContext } from "../../contexts/authentication.context";
 
 export default function UserList() {
+
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    addModule: false,
+    editModule: false,
+  });
+
+  useEffect(() => {
+    const updatedPermissions = {
+      statusModule: false,
+      addModule: false,
+      editModule: false,
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.addModule = true;
+      updatedPermissions.editModule = true;
+    } else {
+      const permissionArr = permissions['SEPS User'] ?? [];
+      if (permissionArr.includes("SEPS_USER_CREATE_BY_SEPS")) {
+        updatedPermissions.addModule = true;
+      }
+      if (permissionArr.includes("SEPS_USER_UPDATE_BY_SEPS")) {
+        updatedPermissions.editModule = true;
+      }
+      if (permissionArr.includes("SEPS_USER_STATUS_CHANGE_BY_SEPS")) {
+        updatedPermissions.statusModule = true;
+      }
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
+
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -43,21 +79,65 @@ export default function UserList() {
     status: "",
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedRow, setSelectedRow] = useState();
   const [deleteShow, setDeleteShow] = useState(false);
   const [deleteId, setDeleteId] = useState();
 
+  // const dataQuery = useQuery({
+  //   queryKey: ["data", pagination, sorting, filter],
+  //   queryFn: async() => {
+  //     setLoading(true);
+  //     try {
+  //       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+  //       Object.keys(filterObj).forEach(
+  //         (key) => filterObj[key] === "" && delete filterObj[key]
+  //       );
+
+  //       let response;
+  //       if (sorting.length === 0) {
+  //         response = await handleGetUsers({
+  //           page: pagination.pageIndex,
+  //           size: pagination.pageSize,
+  //           ...filterObj,
+  //         });
+  //       } else {
+  //         response = await handleGetUsers({
+  //           page: pagination.pageIndex,
+  //           size: pagination.pageSize,
+  //           sort: sorting
+  //             .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+  //             .join(","),
+  //           ...filterObj,
+  //         });
+  //       }
+  //       return response;
+  //     } catch (error) {
+  //     } finally {
+  //       setLoading(false); // Start loading
+  //     }
+  //   },
+  //   // onError: () => setLoading(false), // Ensure loading state is reset on error
+  //   staleTime: 0, // Data is always stale, so it refetches
+  //   cacheTime: 0, // Cache expires immediately
+  //   refetchOnWindowFocus: false, // Disable refetching on window focus
+  //   refetchOnMount: false, // Prevent refetching on component remount
+  //   retry: 0, //Disable retry on failure
+  // });
+
+  //handle last page deletion item
+  
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: async() => {
+    queryFn: async  () => {
+      // Set loading state to true before the request starts
       setLoading(true);
+
       try {
         const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-        Object.keys(filterObj).forEach(
-          (key) => filterObj[key] === "" && delete filterObj[key]
-        );
+        Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
 
+        // Make the API request based on sorting
         let response;
         if (sorting.length === 0) {
           response = await handleGetUsers({
@@ -70,26 +150,31 @@ export default function UserList() {
             page: pagination.pageIndex,
             size: pagination.pageSize,
             sort: sorting
-              .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+              .map(
+                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+              )
               .join(","),
             ...filterObj,
           });
         }
+
+        // Return the API response data
         return response;
       } catch (error) {
+        console.error("Error fetching data", error);
+        // Optionally, handle errors here
       } finally {
-        setLoading(false); // Start loading
+        // Set loading state to false when the request finishes (whether successful or not)
+        setLoading(false);
       }
     },
-    onError: () => setLoading(false), // Ensure loading state is reset on error
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
     refetchOnWindowFocus: false, // Disable refetching on window focus
-    refetchOnMount: false, // Prevent refetching on component remount
+    refetchOnMount: true, // Prevent refetching on component remount
     retry: 0, //Disable retry on failure
   });
-
-  //handle last page deletion item
+  
   useEffect(() => {
 
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
@@ -113,35 +198,7 @@ export default function UserList() {
     }
   };
 
-  // Permissoin work
-  const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
-  useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-        permission.current.statusModule = true;
-        permission.current.addModule = true;
-        permission.current.editModule = true;
-        permission.current.deleteModule = true;
-      } else {
-        getModulePermissions("SEPS User").then(response => {
-          if (response.includes("SEPS_USER_CREATE_BY_SEPS")) {
-            permission.current.addModule = true;
-          }
-          if (response.includes("SEPS_USER_UPDATE_BY_SEPS")) {
-            permission.current.editModule = true;
-          }
-          if (response.includes("SEPS_USER_STATUS_CHANGE_BY_SEPS")) {
-            permission.current.statusModule = true;
-          }
-        }).catch(error => {
-          console.error("Error fetching permissions:", error);
-        });
-      }
-    }).catch(error => {
-      console.error("Error get during to fetch User Type", error);
-    })
 
-  }, []);
 
   //Handle Delete
   const deleteAction = (rowData) => {
@@ -191,37 +248,40 @@ export default function UserList() {
         },
       },
 
-      {
-        cell: (info) => {
-          return (
-            permission.current.statusModule ?
-              <Toggle
-                id={`status-${info?.row?.original?.id}`}
-                key={"status"}
-                name="status"
-                value={info?.row?.original?.status == 'ACTIVE' ? true : false}
-                checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
-                onChange={() =>
-                  changeStatus(
-                    info?.row?.original?.id,
-                    info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE'
-                  )
-                }
-                tooltip="Activo / Bloquear"
-              />
-              : ''
-          );
-        },
-        id: "status",
-        header: () => t('STATUS'),
-        size: "80",
-      },
+      ...(permissionsState?.statusModule
+        ? [
+          {
+            id: "status",
+            header: () => t('STATUS'),
+            size: "80",
+            cell: (info) => {
+              return (
+                <Toggle
+                  id={`status-${info?.row?.original?.id}`}
+                  key={"status"}
+                  name="status"
+                  value={info?.row?.original?.status === 'ACTIVE'}
+                  checked={info?.row?.original?.status === 'ACTIVE'}
+                  onChange={() =>
+                    changeStatus(
+                      info?.row?.original?.id,
+                      info?.row?.original?.status === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE'
+                    )
+                  }
+                  tooltip="Activo / Bloquear"
+                />
+              );
+            },
+          }]
 
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          permission.current.editModule ?
+        : []),
+
+      ...(permissionsState?.editModule
+        ?
+        [{
+          id: "actions",
+          isAction: true,
+          cell: (rowData) => (
             <DataGridActions
               controlId="users"
               rowData={rowData}
@@ -235,14 +295,14 @@ export default function UserList() {
                 },
               ]}
             />
-            : ''
-        ),
-        header: () => <div className="text-center">{t('ACTIONS')}</div>,
-        enableSorting: false,
-        size: "80",
-      },
+
+          ),
+          header: () => <div className="text-center">{t('ACTIONS')}</div>,
+          enableSorting: false,
+          size: "80",
+        }] : []),
     ],
-    []
+    [permissionsState]
   );
 
   useEffect(() => {
@@ -259,31 +319,35 @@ export default function UserList() {
     };
   }, [queryClient]);
 
+  const actions = permissionsState?.addModule
+  ? [{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
+  : [];
+
   return (
     <React.Fragment>
-<Loader isLoading={loading} />
-        <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-          {permission.current.addModule ?
-            <PageHeader
-              title="Usuarios de SEPS"
-              actions={[{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]}
+      <Loader isLoading={loading} />
+      <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
+        {permissionsState?.addModule ?
+          <PageHeader
+            title="Usuarios de SEPS"
+            actions={actions}
+          />
+          : ''}
+        <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
+          <Card.Body className="d-flex flex-column">
+            <ListingSearchFormUsers filter={filter} setFilter={setFilter} />
+            <CommonDataTable
+              columns={columns}
+              dataQuery={dataQuery}
+              pagination={pagination}
+              setPagination={setPagination}
+              sorting={sorting}
+              setSorting={setSorting}
             />
-            : ''}
-          <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
-            <Card.Body className="d-flex flex-column">
-              <ListingSearchFormUsers filter={filter} setFilter={setFilter} />
-              <CommonDataTable
-                columns={columns}
-                dataQuery={dataQuery}
-                pagination={pagination}
-                setPagination={setPagination}
-                sorting={sorting}
-                setSorting={setSorting}
-              />
-            </Card.Body>
-          </Card>
-        </div>
-     
+          </Card.Body>
+        </Card>
+      </div>
+
       {/* Delete Modal */}
       <GenericModal
         show={deleteShow}

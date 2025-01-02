@@ -140,7 +140,7 @@ export default function Otp() {
                                                             <span className="visually-hidden">{t('LOADING')}...</span>
                                                         </Spinner>
                                                     ) : (
-                                                        "Verificar OTP"
+                                                        t('VERIFY_OTP')
                                                     )}
                                                 </Button>
                                             </Stack>

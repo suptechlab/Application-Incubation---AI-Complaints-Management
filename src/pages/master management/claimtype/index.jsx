@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import PageHeader from "../../../components/PageHeader";
 import qs from "qs";
 import CommonDataTable from "../../../components/CommonDataTable";
@@ -16,6 +16,7 @@ import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodu
 import Add from "./Add";
 import Edit from "./Edit";
 import Loader from "../../../components/Loader";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 const ClaimType = () => {
 
@@ -49,35 +50,76 @@ const ClaimType = () => {
 
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
-  const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
+  // const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
+
+  // useEffect(() => {
+  //   isAdminUser().then(response => {
+  //     if (response) {
+  //       permission.current.addModule = true;
+  //       permission.current.editModule = true;
+  //       permission.current.deleteModule = true;
+  //       permission.current.statusModule = true;
+  //     } else {
+  //       getModulePermissions("Claim Type Master").then(response => {
+  //         if (response.includes("CLAIM_TYPE_CREATE")) {
+  //           permission.current.addModule = true;
+  //         }
+  //         if (response.includes("CLAIM_TYPE_UPDATE")) {
+  //           permission.current.editModule = true;
+  //         }
+  //         if (response.includes("CLAIM_TYPE_STATUS_CHANGE")) {
+  //           permission.current.statusModule = true;
+  //         }
+  //       }).catch(error => {
+  //         console.error("Error fetching permissions:", error);
+  //       });
+  //     }
+  //   }).catch(error => {
+  //     console.error("Error get during to fetch User Type", error);
+  //   })
+
+  // }, []);
+
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    addModule: false,
+    editModule: false,
+  });
 
   useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-        permission.current.addModule = true;
-        permission.current.editModule = true;
-        permission.current.deleteModule = true;
-        permission.current.statusModule = true;
-      } else {
-        getModulePermissions("Claim Type Master").then(response => {
-          if (response.includes("CLAIM_TYPE_CREATE")) {
-            permission.current.addModule = true;
-          }
-          if (response.includes("CLAIM_TYPE_UPDATE")) {
-            permission.current.editModule = true;
-          }
-          if (response.includes("CLAIM_TYPE_STATUS_CHANGE")) {
-            permission.current.statusModule = true;
-          }
-        }).catch(error => {
-          console.error("Error fetching permissions:", error);
-        });
-      }
-    }).catch(error => {
-      console.error("Error get during to fetch User Type", error);
-    })
+    const updatedPermissions = {
+      statusModule: false,
+      addModule: false,
+      editModule: false,
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.addModule = true;
+      updatedPermissions.editModule = true;
+    } else {
+      const permissionArr = permissions['Claim Type Master'] ?? [];
 
-  }, []);
+      if (["CLAIM_TYPE_CREATE", "CLAIM_TYPE_CREATE_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.addModule = true;
+      }
+
+      if (["CLAIM_TYPE_STATUS_CHANGE", "CLAIM_TYPE_STATUS_CHANGE_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.editModule = true;
+      }
+
+      if (["CLAIM_TYPE_UPDATE", "CLAIM_TYPE_UPDATE_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
+
+
   // EDIT CLAIM TYPE
   const editClaimType = async (row) => {
     setEditModal({ row: row, open: !editModal?.open })
@@ -220,7 +262,7 @@ const ClaimType = () => {
       {
         cell: (info) => {
           return (
-            permission.current.statusModule ?
+            permissionsState.statusModule ?
               <Toggle
                 tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
                 id={`status-${info?.row?.original?.id}`}
@@ -230,7 +272,7 @@ const ClaimType = () => {
                 checked={info?.row?.original?.status}
                 onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
               />
-            : ''
+              : ''
           )
         },
         id: "status",
@@ -241,28 +283,28 @@ const ClaimType = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ?
-          <DataGridActions
-            controlId="province-master"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permission.current.editModule,
-                type: "button",
-                title: t("EDIT"),
-                icon: <MdEdit size={18} />,
-                handler: () => editClaimType(rowData?.row?.original),
-              },
-            ]}
-          /> : ''
+          permissionsState.editModule ?
+            <DataGridActions
+              controlId="province-master"
+              rowData={rowData}
+              customButtons={[
+                {
+                  name: "edit",
+                  enabled: permissionsState.editModule,
+                  type: "button",
+                  title: t("EDIT"),
+                  icon: <MdEdit size={18} />,
+                  handler: () => editClaimType(rowData?.row?.original),
+                },
+              ]}
+            /> : ''
         ),
         header: () => <div className="text-center">{t("ACTIONS")}</div>,
         enableSorting: false,
         size: '80',
       },
     ],
-    []
+    [permissionsState]
   );
 
   useEffect(() => {
@@ -279,18 +321,19 @@ const ClaimType = () => {
     };
   }, [queryClient]);
 
+  const actions = permissionsState?.addModule
+  ? [  { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
+    { label: t("ADD NEW"), onClick: toggle, variant: "warning" },]
+  : [];
+
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
-    {permission.current.addModule
-        ?
-    <PageHeader
-      title={t("CLAIM TYPE")}
-      actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
-        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
-      ]}
-    /> : ''}
+    
+      <PageHeader
+        title={t("CLAIM TYPE")}
+        actions={actions}
+      /> 
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

@@ -9,6 +9,8 @@
 @include custom-class('font-size', 30);
 @include custom-class('padding-top', 2);
 @include custom-class('padding-bottom', 2);
+@include custom-class('padding-right', 66);
+@include custom-class('margin-right', -66);
 @include custom-class('height', 10);
 @include custom-class('width', 10);
 @include custom-class('height', 26);
@@ -26,6 +28,7 @@
 @include custom-class('height', 60);
 @include custom-class('width', 60);
 @include custom-class('min-width', 65);
+@include custom-class('width', 66);
 @include custom-class('min-width', 75);
 @include custom-class('width', 85);
 @include custom-class('min-width', 85);
@@ -139,6 +142,10 @@
 
 .fs-16 {
     font-size: 16px;
+}
+
+.fs-18 {
+    font-size: 18px;
 }
 
 .fs-20 {
@@ -304,16 +311,22 @@ input:-webkit-autofill:active {
         }
     }
 }
-.form-control {&:read-only {
-    color: $input-disabled-color;
-    background-color: $input-disabled-bg;
-    border-color: $input-disabled-border-color;
+
+.form-control {
+    &:read-only {
+        color: $input-disabled-color;
+        background-color: $input-disabled-bg;
+        border-color: $input-disabled-border-color;
     }
-}    
+}
 
 
 .error-box {
     color: red;
     margin-top: 5px;
     font-size: 14px;
+}
+
+.variable-list{
+    list-style: none;
 }

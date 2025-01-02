@@ -9,17 +9,18 @@ import moment from "moment/moment";
 import toast from "react-hot-toast";
 import { slaDateExtensionApi } from "../../../services/ticketmanagement.service";
 
-const DateExtensionModal = ({ modal, toggle, ticketData }) => {
+const DateExtensionModal = ({ modal, toggle, ticketData,getTicketData }) => {
 
     const { t } = useTranslation();
 
     const handleSubmit = async (values, actions) => {
-        console.log({ values: values })
         actions.setSubmitting(true);
         if (values?.date) {
             slaDateExtensionApi(ticketData?.id, moment(values?.date).format('yyyy-MM-DD'))
                 .then((response) => {
                     toast.success(response?.data?.message);
+                    getTicketData()
+                    toggle()
                 })
                 .catch((error) => {
                     if (error?.response?.data?.errorDescription) {

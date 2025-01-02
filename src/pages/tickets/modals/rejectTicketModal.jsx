@@ -5,11 +5,11 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import ReactSelect from "../../../components/ReactSelect";
-import { validationSchema } from "../../../validations/inquiryType.validation";
 import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus, ticketRejectStatus } from "../../../services/ticketmanagement.service";
-import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
+import { ticketRejectValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
+import { validateFile } from "../../../utils/commonutils";
 const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGetAcitivityLogs }) => {
     const { t } = useTranslation();
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
@@ -17,7 +17,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
     const { masterData } = useContext(MasterDataContext)
 
     const [subStatus, setSubStatus] = useState([])
-
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
         if (masterData?.rejectedStatus) {
             const rejectStatus = convertToLabelValue(masterData?.rejectedStatus)
@@ -26,21 +26,28 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
     }, [masterData])
 
     //Handle File Change
-    const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            setFileName(file.name);
-        } else {
-            setFileName("Fi_Users_data.xlsx");
-        }
-    };
+    // const handleFileChange = (event) => {
+    //     const file = event.currentTarget.files[0];
+    //     if (file) {
+    //         setFileName(file.name);
+    //     } else {
+    //         setFileName("Fi_Users_data.xlsx");
+    //     }
+    // };
 
     const handleSubmit = async (values, actions) => {
-        actions.setSubmitting(true);
-        const formData = {
-            reason: values?.reason,
-            rejectedStatus: values?.rejectedStatus,
-        };
+        // actions.setSubmitting(true);
+        setLoading(true)
+        // const formData = {
+        //     reason: values?.reason,
+        //     rejectedStatus: values?.rejectedStatus,
+        // };
+        const formData = new FormData();
+        formData.append("reason", values.reason);
+        formData.append("closeSubStatus", values.closeSubStatus);
+        if (values.attachments) {
+            formData.append("attachments[0]", values.attachments);
+        }
         ticketRejectStatus(ticketId, formData)
             .then((response) => {
                 setSelectedStatus('REJECTED');
@@ -56,6 +63,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                 }
             })
             .finally(() => {
+                setLoading(false)
                 actions.setSubmitting(false);
             });
     };
@@ -73,14 +81,15 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
             enforceFocus={false}
         >
             <Modal.Header className="pb-3">
-                <Modal.Title as="h4" className="fw-semibold">Ticket Reject Status</Modal.Title>
+                <Modal.Title as="h4" className="fw-semibold">{t("TICKET_REJECT_STATUS")}</Modal.Title>
             </Modal.Header>
             <Formik
                 initialValues={{
                     reason: "",
                     rejectedStatus: "",
+                    attachments: null
                 }}
-                validationSchema={ticketCloseValidation}
+                validationSchema={ticketRejectValidation}
                 onSubmit={handleSubmit}
             >
                 {({
@@ -97,7 +106,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                     <Form>
                         <Modal.Body className="text-break py-0">
                             <FormInput
-                                label="Comments"
+                                label={t("REASON")}
                                 id="reason"
                                 name="reason"
                                 type="text"
@@ -110,7 +119,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                                 touched={touched?.reason}
                             />
                             <ReactSelect
-                                label="Sub-status"
+                                label={t("SUB-STATUS")}
                                 error={errors.rejectedStatus}
                                 options={[
                                     { label: t("SELECT"), value: "" },
@@ -131,35 +140,52 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                                 onBlur={handleBlur}
                                 touched={touched.rejectedStatus}
                             />
-                            {/* <Col xs={12} className="mb-3 pb-1">
-                                <div className="mb-1 fs-14">Attchment</div>
+                            <Col xs={12} className="mb-3 pb-1">
+                                <div className="mb-1 fs-14">{t("ATTACHMENT")}</div>
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
-                                    <div className="overflow-hidden position-relative z-1 flex-shrink-0">
+                                <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
-                                            htmlFor="files"
+                                            htmlFor="attachments"
                                             className="btn btn-outline-dark custom-min-width-85"
                                         >
-                                            Browse
+                                            {t("BROWSE")}
                                         </label>
-                                        <input
+                                        {/* <input
                                             id="files"
                                             accept="image/png, image/jpeg, image/jpg"
                                             className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                             type="file"
                                             onChange={handleFileChange}
-                                        />
+                                        /> */}
+                                        <input
+                                        id="attachments"
+                                        name="attachments"
+                                        accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                        className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                        type="file"
+                                        onChange={(event) => {
+                                            const file = event.currentTarget.files[0];
+                                            const isValidated = validateFile(file)
+                                            if (isValidated === true) {
+                                                setFieldValue("attachments", file);
+                                            } else {
+                                                toast.error(isValidated)
+                                            }
+                                            // Update Formik's state with the file
+                                        }}
+                                    />
                                     </div>
-                                    {fileName && (
-                                        <Link
-                                            target="_blank"
-                                            to="/fi-users/import"
+                                    {values?.attachments && (
+                                        <span
+                                            // target="_blank"
+                                            // to="/fi-users/import"
                                             className="text-decoration-none small mw-100 text-break"
                                         >
-                                            {fileName}
-                                        </Link>
+                                            {values.attachments.name}
+                                        </span>
                                     )}
                                 </div>
-                            </Col> */}
+                            </Col>
                         </Modal.Body>
                         <Modal.Footer className="pt-0">
                             <Button
@@ -174,7 +200,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
                                 type="submit"
                                 variant="warning"
                                 className="custom-min-width-85"
-                                disabled={isSubmitting ?? false}
+                                disabled={loading ?? false}
                             >
                                 {t("SUBMIT")}
                             </Button>

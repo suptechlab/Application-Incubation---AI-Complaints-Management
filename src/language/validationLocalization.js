@@ -52,6 +52,7 @@ export const messages = {
     templateContentMax1500: "Template details cannot exceed 8500 characters.",
     templateContentRequired: "Template details is required.",
     roleIdRequired: "Role is required.", // Add this
+    templateRequired: "Template is required.",
     // Team Managment
     teamNameRequired: "Team name is required", // For team name
     descriptionRequired: "Description is required", // For description
@@ -68,11 +69,24 @@ export const messages = {
     invalidSpecialPetition: "Special Petition must not exceed 1024 characters.",
     specialPetitionRequired: "Special Petition is required.",
     agreeDeclarations: "Please agree to all declarations and conditions to proceed.",
-
-    // Team Managment
-    teamNameRequired: "Team name is required", // For team name
-    descriptionRequired: "Description is required", // For description
-    entityRequired: "Entity name is required."
+    messageRequired: "Message is required!",
+    messageMax500: "Message cannot exceed 500 characters.",
+    dateRequired: "Date is required!",
+    closeSubStatusRequired: "Close sub status is required!",
+    reasonRequired: "Reason is required!",
+    commentRequired: "Comment is required!",
+    rejectSubStatusRequired: "Reject sub status is required!",
+    noFileSelected: "No file selected.",
+    invalidFileType: "Invalid file type. Please upload an allowed file.",
+    fileSizeExceeded: "File size exceeds {size} MB. Please upload a smaller file.",
+    //Ticket Workflow
+    workflowNameRequired: "Workflow name is required.",
+    conditionRequired: "Condition is required.",
+    actionRequired: "Action is required.",
+    instanceTypeRequired: "Instance type is required.",
+    eventRequired: "Event is required.",
+    fieldRequired: "This field is required.",
+    userTypeRequired: 'User Type is required.',
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -127,11 +141,11 @@ export const messages = {
     subjectRequired: "Se requiere el nombre del asunto.",
     templateContentMax1500: "Los detalles de la plantilla no pueden exceder los 8500 caracteres.",
     templateContentRequired: "Se requieren los detalles de la plantilla.",
+    templateRequired: "Se requiere plantilla.",
     // Team managment
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
     entityRequired: "El nombre de la entidad es obligatorio.",
-    roleIdRequired: "El rol es obligatorio.", // Add this
     //create claim
     genderRequired: "Se requiere género.",
     cantonRequired: "Se requiere Cantón de Residencia.",
@@ -144,6 +158,23 @@ export const messages = {
     invalidSpecialPetition: "La petición especial no debe exceder los 1024 caracteres.",
     specialPetitionRequired: "Se requiere una petición especial.",
     agreeDeclarations: "Por favor acepte todas las declaraciones y condiciones para continuar.",
-    entityRequired: "El nombre de la entidad es obligatorio."
+    messageRequired: "¡Se requiere el mensaje!",
+    messageMax500: "El mensaje no puede exceder los 500 caracteres.",
+    dateRequired: "¡Se requiere la fecha!",
+    closeSubStatusRequired: "¡Se requiere el subestado de cierre!",
+    reasonRequired: "¡Se requiere una razón!",
+    commentRequired: "¡Se requiere un comentario!",
+    rejectSubStatusRequired: "¡Se requiere el subestado de rechazo!",
+    noFileSelected: "No se ha seleccionado ningún archivo.",
+    invalidFileType: "Tipo de archivo no válido. Por favor, suba un archivo permitido.",
+    fileSizeExceeded: "El tamaño del archivo supera los {size} MB. Por favor, suba un archivo más pequeño.",
+    //Ticket Workflow
+    workflowNameRequired: "El nombre del flujo de trabajo es obligatorio.",
+    conditionRequired: "Se requiere condición.",
+    actionRequired: "Se requiere acción.",
+    instanceTypeRequired: "Se requiere el tipo de instancia.",
+    eventRequired: "Se requiere evento.",
+    fieldRequired: "Este campo es obligatorio.",
+    userTypeRequired: "El tipo de usuario es obligatorio."
   }
 };

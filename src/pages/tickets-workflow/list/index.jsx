@@ -1,25 +1,23 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
-import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
-import ListingSearchForm from "../../../components/ListingSearchForm";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
+import toast from "react-hot-toast";
 import Toggle from "../../../components/Toggle";
+import { handleGetWorkflowTableData, ticketWorkflowStatusChange } from "../../../services/ticketWorkflow.service";
+import ListingSearchForm from "../listingSearchForm";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
-import { handleGetTableData, handleStatusChangeState } from "../../../services/teamManagment.service";
 
-export default function TeamManagementList() {
-
+export default function TicketWorkFlowList() {
 
     const { currentUser, permissions = {} } = useContext(AuthenticationContext)
-    // PERMISSIONS work
 
     const [permissionsState, setPermissionsState] = React.useState({
         statusModule: false,
@@ -27,39 +25,9 @@ export default function TeamManagementList() {
         editModule: false,
     });
 
-    useEffect(() => {
-        const updatedPermissions = {
-            statusModule: false,
-            addModule: false,
-            editModule: false,
-        };
-        if (currentUser === "SYSTEM_ADMIN") {
-            updatedPermissions.statusModule = true;
-            updatedPermissions.addModule = true;
-            updatedPermissions.editModule = true;
-        } else {
-            const permissionArr = permissions['Teams Manage'] ?? [];
-
-            if (["TEAMS_CREATE_BY_SEPS", "TEAMS_CREATE_BY_FI"].some(permission => permissionArr.includes(permission))) {
-                updatedPermissions.addModule = true;
-            }
-
-            if (["TEAMS_CHANGE_STATUS_BY_SEPS", "TEAMS_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
-                updatedPermissions.editModule = true;
-            }
-
-            if (["TEAMS_UPDATED_BY_SEPS", "TEAMS_UPDATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
-                updatedPermissions.statusModule = true;
-            }
-
-        }
-
-        setPermissionsState(updatedPermissions);
-    }, [permissions, currentUser]);
-
     const location = useLocation();
     const queryClient = useQueryClient();
-    const { t } = useTranslation(); // use the translation hook
+    const { t } = useTranslation();
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
     const [pagination, setPagination] = React.useState({
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
@@ -75,9 +43,6 @@ export default function TeamManagementList() {
     });
 
     const [loading, setLoading] = useState(false);
-
-
-
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
@@ -92,13 +57,13 @@ export default function TeamManagementList() {
 
                 let response;
                 if (sorting.length === 0) {
-                    response = await handleGetTableData({
+                    response = await handleGetWorkflowTableData({
                         page: pagination.pageIndex,
                         size: pagination.pageSize,
                         ...filterObj,
                     });
                 } else {
-                    response = await handleGetTableData({
+                    response = await handleGetWorkflowTableData({
                         page: pagination.pageIndex,
                         size: pagination.pageSize,
                         sort: sorting
@@ -108,24 +73,20 @@ export default function TeamManagementList() {
                     });
                 }
 
-                // Return the API response data
                 return response;
             } catch (error) {
                 console.error("Error fetching data", error);
-                // Optionally, handle errors here
             } finally {
-                // Set loading state to false when the request finishes (whether successful or not)
                 setLoading(false);
             }
         },
-        staleTime: 0, // Data is always stale, so it refetches
-        cacheTime: 0, // Cache expires immediately
-        refetchOnWindowFocus: false, // Disable refetching on window focus
-        refetchOnMount: false, // Prevent refetching on component remount
-        retry: 0, //Disable retry on failure
+        staleTime: 0,
+        cacheTime: 0,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        retry: 0,
     });
 
-    //handle last page deletion item
     useEffect(() => {
         if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
             setPagination({
@@ -138,7 +99,7 @@ export default function TeamManagementList() {
     const changeStatus = async (id, currentStatus) => {
         setLoading(true)
         let toggleStatus = currentStatus === true ? false : true;
-        handleStatusChangeState(id, toggleStatus).then(response => {
+        ticketWorkflowStatusChange(id, toggleStatus).then(response => {
             toast.success(t("STATUS UPDATED"));
             dataQuery.refetch();
         }).catch((error) => {
@@ -152,60 +113,88 @@ export default function TeamManagementList() {
         })
     };
 
+    useEffect(() => {
+        const updatedPermissions = {
+            statusModule: false,
+            addModule: false,
+            editModule: false,
+        };
+        if (currentUser === "SYSTEM_ADMIN") {
+            updatedPermissions.statusModule = true;
+            updatedPermissions.addModule = true;
+            updatedPermissions.editModule = true;
+        } else {
+            const permissionArr = permissions['Ticket Workflow'] ?? [];
+
+
+            if (["TICKET_WF_CREATED_BY_SEPS", "TICKET_WF_CREATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.addModule = true;
+            }
+
+            if (["TICKET_WF_CHANGE_STATUS_BY_SEPS", "TICKET_WF_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.statusModule = true;
+            }
+
+            if (["TICKET_WF_UPDATED_BY_SEPS", "TICKET_WF_UPDATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.editModule = true;
+            }
+
+        }
+        setPermissionsState(updatedPermissions);
+    }, [permissions, currentUser]);
     const columns = React.useMemo(
         () => [
             {
-                accessorFn: (row) => row.teamName,
-                id: "teamName",
-                header: () => t('TEAM NAME'),
+                accessorFn: (row) => row.title,
+                id: "title",
+                header: () => t('WORKFLOW'),
                 enableSorting: true,
             },
-            {
-                accessorFn: (row) => row.description,
-                id: "description",
-                header: () => t('DESCRIPTION'),
-                enableSorting: true,
-            },
-            {
-                accessorFn: (row) => row.entityType ?? t('N/A'),
-                id: "entityType",
-                header: () => t('ASSOCIATION'),
-                enableSorting: true,
-            },
+            ...(currentUser !== 'FI_USER' ? 
+                [ {
+                    accessorFn: (row) => row?.organization?.razonSocial,
+                    id: "organizationId",
+                    header: () => t('ENTITY NAME'),
+                    enableSorting: false,
+                    cell: ({ row }) => {
+                        return <span>{row?.original?.organization?.razonSocial}</span>
+                    }
+                }]: []
+            )
+           ,
             ...(permissionsState?.statusModule
-                ? [
-                    {
-                        id: "status",
-                        isAction: true,
-                        cell: (info) => {
-
-                            if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
-                                return (
-                                    //   permission.current.statusModule ?
-                                    <Toggle
-                                        id={`status-${info?.row?.original?.id}`}
-                                        key={"status"}
-                                        name="status"
-                                        value={info?.row?.original?.status === true}
-                                        checked={info?.row?.original?.status === true}
-                                        onChange={() =>
-                                            changeStatus(
-                                                info?.row?.original?.id,
-                                                info?.row?.original?.status
-                                            )
-                                        }
-                                        tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
-                                    />
-                                    //   : ''
-                                );
-                            } else {
-                                return <span>{info?.row?.original?.status} </span>
-                            }
-                        },
-                        header: () => t("STATUS"),
-                        enableSorting: false,
-                        size: "80",
-                    }] : []),
+                ? [{
+                    id: "status",
+                    isAction: true,
+                    cell: (info) => {
+                        if (info?.row?.original?.status === true || info?.row?.original?.status === false) {
+                            return (
+                                //   permission.current.statusModule ?
+                                <Toggle
+                                    id={`status-${info?.row?.original?.id}`}
+                                    key={"status"}
+                                    name="status"
+                                    value={info?.row?.original?.status === true}
+                                    checked={info?.row?.original?.status === true}
+                                    onChange={() =>
+                                        changeStatus(
+                                            info?.row?.original?.id,
+                                            info?.row?.original?.status
+                                        )
+                                    }
+                                    tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+                                />
+                                //   : ''
+                            );
+                        } else {
+                            return <span>{info?.row?.original?.status} </span>
+                        }
+                    },
+                    header: () => t("STATUS"),
+                    enableSorting: false,
+                    size: "80",
+                }] : [])
+            ,
             // Conditionally add the "actions" column
             ...(permissionsState?.editModule
                 ? [
@@ -215,7 +204,7 @@ export default function TeamManagementList() {
                         cell: (rowData) => (
                             <div className="pointer">
                                 <DataGridActions
-                                    controlId="team-management"
+                                    controlId="tickets-workflow"
                                     rowData={rowData}
                                     customButtons={[
                                         {
@@ -235,37 +224,37 @@ export default function TeamManagementList() {
                     }] : []),
         ],
         [permissionsState]
-    )
-
+    );
     useEffect(() => {
         setPagination({
             pageIndex: 0,
             pageSize: 10,
         });
     }, [filter]);
-
     useEffect(() => {
         return () => {
             queryClient.removeQueries("data");
         };
     }, [queryClient]);
 
-    const actions = permissionsState?.addModule
-        ? [{ label: t('ADD NEW'), to: "/team-management/add", variant: "warning" }]
-        : [];
 
+
+
+    const actions = permissionsState?.addModule
+        ? [{ label: t('ADD NEW'), to: "/tickets-workflow/add", variant: "warning" }]
+        : [];
 
     return (
         <React.Fragment>
             <Loader isLoading={loading} />
             <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
                 <PageHeader
-                    title={t('TEAM MANAGEMENT')}
-                    actions={actions}
+                    title={t('TICKET WORKFLOW')}
+                    actions={actions ?? []}
                 />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <ListingSearchForm filter={filter} setFilter={setFilter} />
+                        <ListingSearchForm filter={filter} setFilter={setFilter} currentUser={currentUser} /> 
                         <CommonDataTable
                             columns={columns}
                             dataQuery={dataQuery}

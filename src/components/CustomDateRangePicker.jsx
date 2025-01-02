@@ -4,7 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { MdDateRange, MdOutlineCalendarToday } from "react-icons/md";
 import "./datepicker.scss";
 
-const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleChange, startDate, endDate, tempDateRange, selectsRange, placeholder, size, disabled }) => {
+const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleChange, startDate, endDate, tempDateRange, selectsRange, placeholder, size, disabled,maxDate }) => {
 
   return (
     <div className={wrapperClassName || ''}>
@@ -25,6 +25,7 @@ const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleCh
         className={`form-control ${size === 'sm' ? 'form-control-sm' : ''}`}
         disabled={disabled}
         portalId="root"
+        maxDate={maxDate}
       />
     </div>
   );

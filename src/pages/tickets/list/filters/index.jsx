@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Dropdown, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { MdOutlineFilterAlt } from "react-icons/md";
@@ -11,13 +11,17 @@ import AppTooltip from "../../../../components/tooltip";
 import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
 import toast from "react-hot-toast";
 import { agentListingApi } from "../../../../services/ticketmanagement.service";
+import { AuthenticationContext } from "../../../../contexts/authentication.context";
 
-const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection, currentUser }) => {
+const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection,permissionsState }) => {
+
+    const { currentUser } = useContext(AuthenticationContext);
 
     const { t } = useTranslation();
     const [claimTypes, setClaimTypes] = useState([])
     const [agentList, setAgentListing] = useState([])
     const [selectedAgent, setSelectedAgent] = useState(null)
+  
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
 
@@ -30,6 +34,11 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
                 endDate: moment(newEndDate).format("YYYY-MM-DD")
             });
+        }else{
+            setFilter({
+                startDate: '',
+                endDate:''
+            });  
         }
     };
     // GET CLAIM TYPE DROPDOWN LIST
@@ -103,11 +112,11 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                                 search: event.target.value,
                             });
                         }}
-                        value={filter.search}
+                        value={filter?.search}
                     />
                 </div>
                 {
-                    currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN' ?
+                    permissionsState?.assignPermission === true ?
                         <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                             <ReactSelect
                                 wrapperClassName="mb-0"
@@ -129,15 +138,17 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                                 }}
                                 value={selectedAgent ?? null}
                             />
-                        </div> : currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT' ? <Button
+                        </div> : ''
+                }
+                
+                {/* currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT' ? <Button
                             type="button"
                             variant="warning"
                             onClick={returnToAdminClick}
                             className="flex-grow-1 flex-sm-grow-0"
                         >
                             {t("RETURN_TO_ADMIN")}
-                        </Button> : ''
-                }
+                        </Button> : */}
 
                 {
                     currentUser === "FI_AGENT" &&
@@ -177,7 +188,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             size="sm"
                             options={[
                                 {
-                                    label: t("ALL PRIORITY"),
+                                    label: t("ALL_PRIORITY"),
                                     value: "",
                                     class: "label-class",
                                 },
@@ -264,11 +275,12 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             selectsRange={true}
                             placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
+                            maxDate={new Date()} // Prevent future date selection
                         />
                     </div>
 
                     {/* Dropdown FILTER */}
-                    <Dropdown>
+                    {/* <Dropdown>
                         <Dropdown.Toggle
                             variant="link"
                             id="filter-dropdown"
@@ -286,7 +298,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                                 {t("SLA")}
                             </Dropdown.Item>
                         </Dropdown.Menu>
-                    </Dropdown>
+                    </Dropdown> */}
                 </Stack>
             </Stack>
         </div>
