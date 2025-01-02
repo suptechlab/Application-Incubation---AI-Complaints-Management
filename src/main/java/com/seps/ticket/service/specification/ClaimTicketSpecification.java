@@ -67,9 +67,16 @@ public class ClaimTicketSpecification {
             addClaimTypeFilter(filterRequest, root, criteriaBuilder, predicates);
             addSepsAgentFilter(sepsAgentId, root, criteriaBuilder, predicates);
             addDateRangeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addInstanceTypeFilter(filterRequest, root, criteriaBuilder, predicates);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private static void addInstanceTypeFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getInstanceType() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("instanceType"), filterRequest.getInstanceType()));
+        }
     }
 
     private static void addSearchFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {

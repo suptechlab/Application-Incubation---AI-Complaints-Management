@@ -2,12 +2,14 @@ package com.seps.ticket.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.seps.ticket.component.DateUtil;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.config.InstantTypeAdapter;
 import com.seps.ticket.domain.Authority;
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.domain.User;
+import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketEnum;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.ClaimTicketListDTO;
@@ -29,9 +31,15 @@ import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequest;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequestForJson;
 import jakarta.validation.Valid;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,6 +49,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
@@ -235,6 +246,7 @@ public class ClaimTicketService {
             claimType, claimSubType, currentUser);
 
         claimTicketRepository.save(newClaimTicket);
+
 
         // Handle attachments and save documents
         DocumentSourceEnum source = DocumentSourceEnum.FILE_A_CLAIM;
@@ -564,4 +576,70 @@ public class ClaimTicketService {
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                 new String[]{id.toString()}, null));
     }
+
+    @Transactional(readOnly = true)
+    public ByteArrayInputStream getDownloadClaimAndComplaintsData(ClaimTicketFilterRequest filterRequest) throws IOException {
+        // If no filterRequest is provided, initialize a default object
+        if (filterRequest == null) {
+            filterRequest = new ClaimTicketFilterRequest();
+        }
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        Long fiAgentId = null;
+        Long sepsAgentId = null;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            filterRequest.setOrganizationId(currentUser.getOrganization().getId());
+            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
+                fiAgentId = currentUser.getId();
+            }
+        } else if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
+            sepsAgentId = currentUser.getId();
+        }
+
+        List<ClaimTicketListDTO> claimAndComplaintsList = claimTicketRepository.findAll(ClaimTicketSpecification.bySepsFiFilter(filterRequest, fiAgentId, sepsAgentId)).stream()
+            .map(claimTicketMapper::toListDTO).toList();
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Claim and Complaints");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+
+            for (ExcelHeaderClaimTicketEnum header : ExcelHeaderClaimTicketEnum.values()) {
+                // Use ordinal() to determine the column index
+                Cell cell = headerRow.createCell(header.ordinal());
+                cell.setCellValue(enumUtil.getLocalizedEnumValue(header, LocaleContextHolder.getLocale()));
+            }
+            // Data
+            int rowIdx = 1;
+            for (ClaimTicketListDTO data : claimAndComplaintsList) {
+                Row row = sheet.createRow(rowIdx++);
+
+                row.createCell(ExcelHeaderClaimTicketEnum.ID.ordinal()).setCellValue(data.getId());
+                row.createCell(ExcelHeaderClaimTicketEnum.TICKET_ID.ordinal()).setCellValue(data.getTicketId());
+                row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
+                row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
+                row.createCell(ExcelHeaderClaimTicketEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
+                row.createCell(ExcelHeaderClaimTicketEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
+                row.createCell(ExcelHeaderClaimTicketEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
+                row.createCell(ExcelHeaderClaimTicketEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser().getName() !=null ? data.getUser().getName():"");
+                row.createCell(ExcelHeaderClaimTicketEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent().getName() != null ? data.getFiAgent().getName():"");
+                row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent().getName() != null ? data.getSepsAgent().getName():"");
+                row.createCell(ExcelHeaderClaimTicketEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
+                row.createCell(ExcelHeaderClaimTicketEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+                row.createCell(ExcelHeaderClaimTicketEnum.SECOND_INSTANCE_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getSecondInstanceFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
+                row.createCell(ExcelHeaderClaimTicketEnum.COMPLAINT_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getComplaintFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
+
+            }
+            // Auto-size columns
+            for (ExcelHeaderClaimTicketEnum header : ExcelHeaderClaimTicketEnum.values()) {
+                sheet.autoSizeColumn(header.ordinal());
+            }
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        }
+    }
+
 }

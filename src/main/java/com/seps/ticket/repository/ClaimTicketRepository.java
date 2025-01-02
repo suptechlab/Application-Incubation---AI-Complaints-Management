@@ -175,5 +175,5 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         @Param("isSeps") boolean isSeps,
         @Param("status") ClaimTicketStatusEnum status);
 
-
+    List<ClaimTicket> findAll(Specification<ClaimTicket> claimTicketSpecification);
 }
