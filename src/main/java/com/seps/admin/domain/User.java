@@ -153,6 +153,9 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "department", length = 255)
     private String department;
 
+    @Column(name = "external_document_id", length = 255)
+    private String externalDocumentId;
+
 
     public Long getId() {
         return id;
@@ -386,6 +389,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getExternalDocumentId() {
+        return externalDocumentId;
+    }
+
+    public void setExternalDocumentId(String externalDocumentId) {
+        this.externalDocumentId = externalDocumentId;
     }
 
     @Override

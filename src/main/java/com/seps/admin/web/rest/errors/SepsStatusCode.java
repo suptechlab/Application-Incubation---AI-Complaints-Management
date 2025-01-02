@@ -33,17 +33,18 @@ public enum SepsStatusCode implements StatusType {
     INVALID_PERMISSION_FOR_USER_TYPE(20034, "invalid.permission.for.user.type"),
     FI_USER_NOT_FOUND(20035, "fi.user.not.found"),
     FI_USER_ALREADY_EXIST(20036, "fi.user.already.exist"),
-    DUPLICATE_TEMPLATE(20037,"duplicate.template"),
-    TEMPLATE_NOT_FOUND(20038,"template.not.found"),
-    SEPS_USER_VERIFICATION_FAILED(20039,"seps.user.verification.failed"),
-    INVALID_MEMBER_LIST(20040,"invalid.member.list"),
-    DUPLICATE_TEAM(20041,"duplicate.team"),
-    MEMBER_ALREADY_ASSIGNED(20042,"member.already.assigned"),
-    TEAM_NOT_FOUND(20043,"team.not.found"),
-    NO_MEMBERS_TO_ASSIGN(20044,"no.member.to.assign"),
-    MEMBER_NOT_FOUND_IN_TEAM(20045,"member.not.found.in.team"),
-    UNAUTHORIZED_ACCESS(200046,"unauthorized.access"),
-    TEMPLATE_ALREADY_EXISTS(200047,"template.email.already.exist");
+    DUPLICATE_TEMPLATE(20037, "duplicate.template"),
+    TEMPLATE_NOT_FOUND(20038, "template.not.found"),
+    SEPS_USER_VERIFICATION_FAILED(20039, "seps.user.verification.failed"),
+    INVALID_MEMBER_LIST(20040, "invalid.member.list"),
+    DUPLICATE_TEAM(20041, "duplicate.team"),
+    MEMBER_ALREADY_ASSIGNED(20042, "member.already.assigned"),
+    TEAM_NOT_FOUND(20043, "team.not.found"),
+    NO_MEMBERS_TO_ASSIGN(20044, "no.member.to.assign"),
+    MEMBER_NOT_FOUND_IN_TEAM(20045, "member.not.found.in.team"),
+    UNAUTHORIZED_ACCESS(200046, "unauthorized.access"),
+    TEMPLATE_ALREADY_EXISTS(200047, "template.email.already.exist"),
+    FILE_STORAGE_ERROR(20048, "file.storage.error");
 
     private final int code;
 
