@@ -4,7 +4,6 @@ import CommonDatePicker from "../../components/commonDatePicker";
 import Loader from "../../components/Loader";
 import TotalClaimsSection from "./sections/total-claims";
 import CaimsAndComplaints from "./sections/caims-and-complaints";
-import comingSoonImage from "../../assets/images/coming-soon.svg";
 
 export default function Dashboard() {
   const [startDate, setStartDate] = useState();

@@ -1,15 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Card } from 'react-bootstrap'
 
-const ClosedClaimList = () => {
+const ClosedClaimList = ({closedClaimData}) => {
+
+
+    const [claimData] = useState(closedClaimData?.countsByStatus)
 
     //Claim Data
-    const claimData = [
-        { label: 'Completely In favor of client', count: 75 },
-        { label: 'Partially In favor of client', count: 82 },
-        { label: 'Denied', count: 1245 },
-        { label: 'Expired', count: 96 },
-    ];
+    // const claimData = [
+    //     { label: 'Completely In favor of client', count: 75 },
+    //     { label: 'Partially In favor of client', count: 82 },
+    //     { label: 'Denied', count: 1245 },
+    //     { label: 'Expired', count: 96 },
+    // ];
 
     return (
         <Card className='rounded-3 border-custom-gray h-100'>
@@ -20,7 +23,7 @@ const ClosedClaimList = () => {
                 <ul className='list-unstyled mb-0'>
                     {claimData?.map((item, index) => (
                         <li key={index} className={`d-flex align-items-center gap-2 justify-content-between small p-3 lh-sm ${index % 2 === 1 ? 'bg-body-tertiary' : ''} ${index === claimData?.length - 1 ? 'rounded-bottom-3' : ''}`}>
-                            <span>{item.label}</span>
+                            <span>{item.title}</span>
                             <span className='text-end'>{item.count}</span>
                         </li>
                     ))}
