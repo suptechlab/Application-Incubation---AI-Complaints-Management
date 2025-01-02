@@ -109,12 +109,9 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "current_logged_in")
     private Instant currentLoggedIn;
 
-
-    @Size(max = 5)
     @Column(name = "country_code", length = 5)
     private String countryCode;
 
-    @Size(max = 15)
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
@@ -136,6 +133,9 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Column(name = "fingerprint_verified_at")
     private Instant fingerprintVerifiedAt;
+
+    @Column(name = "external_document_id", length = 255)
+    private String externalDocumentId;
 
 
     public Long getId() {
@@ -353,6 +353,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setFingerprintVerifiedAt(Instant fingerprintVerifiedAt) {
         this.fingerprintVerifiedAt = fingerprintVerifiedAt;
+    }
+
+    public String getExternalDocumentId() {
+        return externalDocumentId;
+    }
+
+    public void setExternalDocumentId(String externalDocumentId) {
+        this.externalDocumentId = externalDocumentId;
     }
 
     @Override
