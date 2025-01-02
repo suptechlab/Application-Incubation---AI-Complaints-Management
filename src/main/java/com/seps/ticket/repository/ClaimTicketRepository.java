@@ -6,6 +6,8 @@ import com.seps.ticket.enums.ClosedStatusEnum;
 import com.seps.ticket.enums.InstanceTypeEnum;
 import com.seps.ticket.enums.RejectedStatusEnum;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
+import com.seps.ticket.service.projection.CloseClaimStatusCountProjection;
+import com.seps.ticket.service.projection.SlaAdherenceDataProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +16,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,9 +62,6 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
 
     Optional<ClaimTicket> findByIdAndUserIdAndInstanceType(Long claimTicketId, Long currentUserId, InstanceTypeEnum instanceTypeEnum);
 
-//    @Query("SELECT c FROM ClaimTicket c WHERE c.status NOT IN :excludedStatuses AND c.slaBreachDate IS NOT NULL")
-//    List<ClaimTicket> findEligibleTickets(@Param("excludedStatuses") List<ClaimTicketStatusEnum> excludedStatuses);
-
     @Query("SELECT c FROM ClaimTicket c JOIN FETCH c.user u JOIN FETCH u.roles WHERE c.status NOT IN :excludedStatuses AND c.slaBreachDate IS NOT NULL")
     List<ClaimTicket> findEligibleTickets(@Param("excludedStatuses") List<ClaimTicketStatusEnum> excludedStatuses);
 
@@ -78,5 +78,102 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
                                             @Param("excludedClosedStatus") ClosedStatusEnum excludedClosedStatus,
                                             @Param("rejectedStatus") ClaimTicketStatusEnum rejectedStatus,
                                             @Param("excludedRejectedStatus") RejectedStatusEnum excludedRejectedStatus);
+
+
+    @Query("SELECT new com.seps.ticket.service.projection.ClaimStatusCountProjection(ct.status, COUNT(ct)) " +
+        "FROM ClaimTicket ct " +
+        "WHERE (COALESCE(:userId, NULL) IS NULL OR " +
+        "(ct.sepsAgentId = :userId AND :isSeps = true) OR " +
+        "(ct.fiAgentId = :userId AND :isSeps = false)) " +
+        "AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organizationId = :organizationId) " +
+        "AND (COALESCE(:startDate, NULL) IS NULL OR ct.createdAt >= :startDate) " +
+        "AND (COALESCE(:endDate, NULL) IS NULL OR ct.createdAt <= :endDate) " +
+        "GROUP BY ct.status")
+    List<ClaimStatusCountProjection> countClaimsByFilters(@Param("userId") Long userId,
+                                                          @Param("organizationId") Long organizationId,
+                                                          @Param("startDate") Instant startDate,
+                                                          @Param("endDate") Instant endDate,
+                                                          @Param("isSeps") boolean isSeps);
+
+    @Query("SELECT new com.seps.ticket.service.projection.CloseClaimStatusCountProjection(ct.closedStatus, COUNT(ct)) " +
+        "FROM ClaimTicket ct " +
+        "WHERE (COALESCE(:userId, NULL) IS NULL OR " +
+        "(ct.sepsAgentId = :userId AND :isSeps = true) OR " +
+        "(ct.fiAgentId = :userId AND :isSeps = false)) " +
+        "AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organizationId = :organizationId) " +
+        "AND (COALESCE(:startDate, NULL) IS NULL OR ct.createdAt >= :startDate) " +
+        "AND (COALESCE(:endDate, NULL) IS NULL OR ct.createdAt <= :endDate) " +
+        "AND ct.status = :closeStatus " +
+        "GROUP BY ct.closedStatus")
+    List<CloseClaimStatusCountProjection> countClosedClaimsByFilters(@Param("userId") Long userId,
+                                                                     @Param("organizationId") Long organizationId,
+                                                                     @Param("startDate") Instant startDate,
+                                                                     @Param("endDate") Instant endDate,
+                                                                     @Param("isSeps") boolean isSeps,
+                                                                     @Param("closeStatus") ClaimTicketStatusEnum closeStatus);
+
+
+    @Query("SELECT new com.seps.ticket.service.projection.SlaAdherenceDataProjection( " +
+        "SUM(CASE WHEN ct.resolvedOn IS NOT NULL AND ct.slaBreachDate >= ct.resolvedOn THEN 1 ELSE 0 END), " +
+        "SUM(CASE WHEN ct.resolvedOn IS NULL THEN 1 ELSE 0 END)) " +
+        "FROM ClaimTicket ct " +
+        "WHERE (COALESCE(:userId, NULL) IS NULL OR " +
+        "   (ct.sepsAgentId = :userId AND :isSeps = true) OR " +
+        "   (ct.fiAgentId = :userId AND :isSeps = false)) " +
+        "  AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organizationId = :organizationId) " +
+        "  AND (COALESCE(:startDate, NULL) IS NULL OR ct.createdAt >= :startDate) " +
+        "  AND (COALESCE(:endDate, NULL) IS NULL OR ct.createdAt <= :endDate) " +
+        "  AND ct.instanceType IN :instanceType " +
+        "  AND ct.status = :status")
+    SlaAdherenceDataProjection getClaimSlaAdherence(
+        @Param("userId") Long userId,
+        @Param("organizationId") Long organizationId,
+        @Param("startDate") Instant startDate,
+        @Param("endDate") Instant endDate,
+        @Param("isSeps") boolean isSeps,
+        @Param("status") ClaimTicketStatusEnum status,
+        @Param("instanceType") List<InstanceTypeEnum> instanceType);
+
+
+    @Query(value = "SELECT ROUND(AVG(EXTRACT(EPOCH FROM ct.resolved_on - " +
+        "COALESCE(" +
+        "   CASE " +
+        "       WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
+        "       WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
+        "       ELSE ct.created_at " +
+        "   END, ct.created_at" +
+        ")) / 86400), 2) AS avg_resolution_time " +
+        "FROM claim_ticket ct " +
+        "WHERE (:userId IS NULL OR " +
+        "      (:isSeps = true AND ct.seps_agent_id = :userId) OR " +
+        "      (:isSeps = false AND ct.fi_agent_id = :userId)) " +
+        "  AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organization_id = :organizationId) " +
+       // "  AND (COALESCE(:startDate, NULL) IS NULL OR ct.created_at >= :startDate) " +
+       // "  AND (COALESCE(:endDate, NULL) IS NULL OR ct.created_at <= :endDate) " +
+        "  AND (COALESCE(:startDate, NULL) IS NULL OR " +
+        "       COALESCE(" +
+        "           CASE " +
+        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
+        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
+        "               ELSE ct.created_at " +
+        "           END, ct.created_at) >= :startDate) " +
+        "  AND (COALESCE(:endDate, NULL) IS NULL OR " +
+        "       COALESCE(" +
+        "           CASE " +
+        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
+        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
+        "               ELSE ct.created_at " +
+        "           END, ct.created_at) <= :endDate) " +
+        "  AND ct.resolved_on IS NOT NULL " +
+        "  AND ct.status = :status",
+        nativeQuery = true)
+    Double getAvgResolutionTime(
+        @Param("userId") Long userId,
+        @Param("organizationId") Long organizationId,
+        @Param("startDate") Instant startDate,
+        @Param("endDate") Instant endDate,
+        @Param("isSeps") boolean isSeps,
+        @Param("status") ClaimTicketStatusEnum status);
+
 
 }
