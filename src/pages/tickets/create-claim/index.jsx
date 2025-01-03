@@ -80,8 +80,6 @@ export default function CreateClaim() {
 
         const formData = new FormData();
 
-            console.log({combinedData})
-
         Object.entries(combinedData).forEach(([key, value]) => {
             if (key === "files") {
                 value.forEach((file, index) => {
@@ -99,7 +97,7 @@ export default function CreateClaim() {
         createNewClaimApi(formData).then((response)=>{
 
             setFileClaimResponse(response?.data)
-            if (response?.foundDuplicate === true) {
+            if (response?.data?.foundDuplicate === true) {
                 setFileAlertModalShow(true)
             } else {
                 setFileSuccesModalShow(true)
@@ -127,15 +125,42 @@ export default function CreateClaim() {
     // HANDLE FILE DUPLICATE CLAIM
     const handleFileDuplicateClaim = async () => {
         // let formData = { ...fileClaimValues, checkDuplicate: false }
-        // const result = await dispatch(fileClaimForm(formData));
-        // if (fileClaimForm.fulfilled.match(result)) {
-        //     setFileClaimResponse(result?.payload?.data)
-        //     setFileAlertModalShow(false)
-        //     setFileSuccesModalShow(true)
-        //     handleCloseReset()
-        // } else {
-        //     console.error('Verification error:', result.error.message);
-        // }
+
+        let combinedData = { ...fileClaimValues, checkDuplicate: false };
+      
+        setFileClaimValues((prev) => ({ ...prev, ...combinedData }))
+
+        const formData = new FormData();
+
+        Object.entries(combinedData).forEach(([key, value]) => {
+            if (key === "files") {
+                value.forEach((file, index) => {
+                    console.log({file})
+                    formData.append(`attachments[${index}]`, file);
+                });
+            } else {
+                formData.append(key, value);
+            }
+        });
+
+        // Dispatch the FormData
+        setIsLoading(true);
+      
+        createNewClaimApi(formData).then((response)=>{
+            setFileClaimResponse(response?.data)
+            setFileAlertModalShow(false)
+            setFileSuccesModalShow(true)
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+              toast.error(error?.response?.data?.errorDescription);
+            } else {
+              toast.error(error?.message ?? t("FILE A CLAIM ERROR!"));
+            }
+           
+          }).finally(() => {
+            // Ensure the loading toast is dismissed
+            setIsLoading(false);
+          });
     }
     // Handle File Alert Click
     // const handleFileAlertClick = () => {
@@ -221,7 +246,7 @@ export default function CreateClaim() {
             {/* FILE A CLAIM SUCCESS */}
             <FileSuccesModal
                 handleShow={fileSuccesModalShow}
-                handleClose={() => setFileSuccesModalShow(false)}
+                handleClose={() => {setFileSuccesModalShow(false);navigate('/tickets')}}
                 handleFormSubmit={handleFileSuccesClick}
                 fileClaimData={fileClaimResponse}
             />

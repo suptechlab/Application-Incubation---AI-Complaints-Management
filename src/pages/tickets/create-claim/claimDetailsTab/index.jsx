@@ -26,7 +26,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
     const [isOTPFormSubmitted, setIsOTPFormSubitted] = useState(false)
 
-    const [isFormEmailValidate, setIsFormEmailValidate] = useState(false)
+    const [isOTPVerified, setIsOTPVerified] = useState(false)
 
     const [optSendStatus, setOptSendStatus] = useState(false)
 
@@ -144,12 +144,8 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             otpCode: data?.otpCode,
             email: userEmail
         }
-
-        console.log("ARE YOU CALLING")
         verifyOTPApi(formData).then((response) => {
-
-            console.log({response})
-            setIsFormEmailValidate(true)
+            setIsOTPVerified(true)
             toast.success("OTP Verified.");
         })
             .catch((error) => {
@@ -198,6 +194,12 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     useEffect(() => {
         getClaimTypes();
     }, [getClaimTypes])
+
+
+    useEffect(()=>{
+        setIsOTPFormSubitted(false)
+        setIsOTPVerified(false)
+    },[userEmail])
 
     return (
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
@@ -347,7 +349,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         </Stack>
                                     </Col>
 
-                                    {!isOTPFormSubmitted || isFormEmailValidate ? (
+                                    {!isOTPFormSubmitted || isOTPVerified? (
                                         <Col xs={12}>
                                             <Row>
                                                 <Col sm lg={4}>
@@ -362,21 +364,21 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         onChange={formikProps.handleChange}
                                                         touched={formikProps.touched.email}
                                                         value={userEmail || ""}
-                                                        readOnly={isFormEmailValidate ?? false}
+                                                        readOnly={isOTPVerified ?? false}
                                                         inputIcon={
-                                                            isFormEmailValidate && (
+                                                            isOTPVerified && (
                                                                 <span className="text-success position-absolute top-0 end-0 p-1 custom-width-42 h-100 d-inline-flex align-items-center justify-content-center pe-none user-select-none">
                                                                     {svgIconClasses.checkBadgeIcon}
                                                                 </span>
                                                             )
                                                         }
                                                         inputClassName={
-                                                            isFormEmailValidate && "custom-padding-right-42"
+                                                            isOTPVerified && "custom-padding-right-42"
                                                         }
                                                         disabled={true}
                                                     />
                                                 </Col>
-                                                {!isFormEmailValidate && (
+                                                {!isOTPVerified && (
                                                     <Col xs="auto" lg className="pt-sm-4 mb-3 pb-1">
                                                         <Button
                                                             type="submit"
@@ -485,7 +487,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         type="submit"
                                         variant="warning"
                                         className="custom-min-width-85"
-                                        disabled={!isFormEmailValidate}
+                                        disabled={!isOTPVerified}
                                     >
                                         {t("FINISH")}
                                     </Button>

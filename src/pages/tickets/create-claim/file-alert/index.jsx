@@ -39,7 +39,7 @@ const FileAlertModal = ({ handleShow, handleClose, handleFormSubmit, handleFormB
                 <Button
                     type="button"
                     variant="link"
-                    onClick={() => { handleClose(); navigate('/my-account') }}
+                    onClick={() => { handleClose(); navigate('/tickets?search=${fileClaimData?.duplicateTicketId}') }}
                     className='mt-3 text-black p-0 border-0 text-decoration-none fw-medium custom-font-size-12'
                 >
                     No, let me verify existing Claim

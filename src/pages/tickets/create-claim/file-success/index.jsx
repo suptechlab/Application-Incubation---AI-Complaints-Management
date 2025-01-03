@@ -22,7 +22,7 @@ const FileSuccesModal = ({ handleShow, handleClose, handleFormSubmit, fileClaimD
                 <h2 className='fw-bold'>Success! </h2>
                 <h6 className='fw-semibold'>Claim has been filed</h6>
                 <div className='custom-font-size-18 fw-semibold text-danger mb-2'>Ticket No. {fileClaimData?.newTicketId}</div>
-                <p className='lh-sm small mb-4 pt-1'>Your claim has been successfully filed. Details have been sent to your email <Link to={`mainto:email ${fileClaimData.email}`} className='text-decoration-none'>{fileClaimData.email}</Link>.</p>
+                <p className='lh-sm small mb-4 pt-1'>Claim has been successfully filed. Details have been sent to user's email <Link to={`mainto:email ${fileClaimData.email}`} className='text-decoration-none'>{fileClaimData.email}</Link>.</p>
             </Modal.Body>
         </Modal>
     )

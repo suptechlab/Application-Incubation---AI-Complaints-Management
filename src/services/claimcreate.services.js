@@ -1,4 +1,4 @@
-import {ticketApi,userApi}  from "../utils/instance";
+import {adminApi, ticketApi,userApi}  from "../utils/instance";
 const API_VERSION = process.env.REACT_APP_API_VERSION
 
 
@@ -22,7 +22,11 @@ export const verifyOTPApi = async (data) => {
 export const createNewClaimApi = async (data) => {
   return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets`,data);
 }
-
+// GET ORGANIZATION LIST DATA
 export const organizationListData = async (data) => {
   return await userApi.get(`/${API_VERSION}/masters/organization-list`,data);
+}
+// GET CITY LIST DATA
+export const getCitiesDropdownData = async (provinceId) => {
+  return await adminApi.get(`/${API_VERSION}/cities/dropdown-list/${provinceId}`);
 }

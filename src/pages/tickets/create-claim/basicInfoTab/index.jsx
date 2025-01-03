@@ -9,8 +9,8 @@ import ReactSelect from '../../../../components/ReactSelect';
 import { countryCodes } from '../../../../constants/CountryCodes';
 
 import Loader from '../../../../components/Loader';
-import { getCitiesById, provinceDropdownData } from '../../../../services/cityMaster.service';
-import { validateEmailApi, validateIdentificationApi } from '../../../../services/claimcreate.services';
+import { provinceDropdownData } from '../../../../services/cityMaster.service';
+import { getCitiesDropdownData, validateEmailApi, validateIdentificationApi } from '../../../../services/claimcreate.services';
 import { useMasterData } from '../../../../contexts/masters.context';
 import { convertToLabelValue } from '../../../../services/ticketmanagement.service';
 import { BasicInfoFormSchema } from '../../../../validations/createClaim.validation';
@@ -33,8 +33,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
     const [channnelOfEntryData, setChannelOfEntryData] = useState([])
 
-    const [isEmailVerified, setIsEmailVerified] = useState(false)
-
     const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(false)
     const [initialValues, setInitialValues] = useState({
         identificacion: '',
@@ -50,18 +48,19 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
-
-        console.log({ values })
         handleFormSubmit(values, actions);
     };
 
     const getCityList = useCallback(async (provinceId) => {
         setIsLoading(true);
         try {
-            const response = await getCitiesById(provinceId);
-            const cityFormatList = response?.data
-                ? [{ label: response.data.name, value: response.data.id }]
-                : [];
+            const response = await getCitiesDropdownData(provinceId);
+            const cityFormatList = response?.data?.map((data) => {
+                return {
+                    label: data?.name,
+                    value: data?.id
+                }
+            })
             setCityList(cityFormatList);
             setIsLoading(false);
         } catch (error) {
@@ -101,44 +100,47 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     // FETCH USER PERSONAL INFO BY ID
     const fetchUserData = async (identificacion) => {
 
-        const response = {
-            data: {
-                "identificacion": "1712655842",
-                "nombreCompleto": "RUIZ PEREZ GERMANICO VINICIO",
-                "genero": "HOMBRE",
-                "lugarNacimiento": "PICHINCHA/QUITO/SAN BLAS",
-                "nacionalidad": "ECUATORIANA",
-                "existUserEmail": "muskan123@yopmail.com"
+        // const response = {
+        //     data: {
+        //         "identificacion": "1712655842",
+        //         "nombreCompleto": "RUIZ PEREZ GERMANICO VINICIO",
+        //         "genero": "HOMBRE",
+        //         "lugarNacimiento": "PICHINCHA/QUITO/SAN BLAS",
+        //         "nacionalidad": "ECUATORIANA",
+        //         "existUserEmail": "bot2@yopmail.com"
+        //     }
+        // }
+
+        // setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero, email: response?.data?.existUserEmail })
+        // setIsEmailAlreadyExists(true)
+
+
+        //UNCOMMENT FROM HERE AFTER NATIONAL ID START WORKING
+        setLoadingInfo(true)
+
+        validateIdentificationApi(identificacion).then((response) => {
+            setLoadingInfo(false)
+            if (response?.data?.nombreCompleto) {
+                setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero,email : response?.data?.existUserEmail })
+            } else {
+                setInitialValues({ ...initialValues, identificacion: identificacion, name: '', gender: '' })
             }
-        }
-
-        setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero, email: response?.data?.existUserEmail })
-
-        // setLoadingInfo(true)
-
-        // validateIdentificationApi(identification).then((response) => {
-        //     setLoadingInfo(false)
-        //     if (response?.data?.nombreCompleto) {
-        //         setInitialValues({ ...initialValues, identificacion: identification, name: response?.data?.nombreCompleto, gender: response?.data?.genero,email : response?.data?.existUserEmail })
-        //     } else {
-        //         setInitialValues({ ...initialValues, identification: identification, name: '', gender: '' })
-        //     }
-        //     if(response?.data?.existUserEmail && response?.data?.existUserEmail!==null){
-        //         setIsEmailAlreadyExists(true)
-        //     }else{
-        //         setIsEmailAlreadyExists(false)
-        //     }
-        // })
-        //     .catch((error) => {
-        //         if (error?.response?.data?.errorDescription) {
-        //             toast.error(error?.response?.data?.errorDescription);
-        //         } else {
-        //             toast.error(error?.message);
-        //         }
-        //         setInitialValues({ ...initialValues, identification: identification, name: '' })
-        //     }).finally(() => {
-        //         setLoadingInfo(false)
-        //     })
+            if(response?.data?.existUserEmail && response?.data?.existUserEmail!==null){
+                setIsEmailAlreadyExists(true)
+            }else{
+                setIsEmailAlreadyExists(false)
+            }
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+                setInitialValues({ ...initialValues, identificacion: identificacion, name: '' })
+            }).finally(() => {
+                setLoadingInfo(false)
+            })
     };
 
     const handleEmailBlur = (event) => {
@@ -181,7 +183,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     }, [masterData])
 
 
-    
+
 
     return (
         <React.Fragment>
@@ -200,9 +202,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                     <h6 className="mb-3 pb-1 fw-semibold">{t("BASIC_INFORMATION")}</h6>
                                     <Row className="gx-4">
                                         <Col sm={6} lg={4}>
-                                        {
-                                            console.log(formikProps.errors)
-                                        }
                                             <FormInputBox
                                                 autoComplete="off"
                                                 id="identificacion"
