@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Dropdown, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -10,7 +10,8 @@ import FormInput from "../../../../../components/FormInput";
 import ReactSelect from "../../../../../components/ReactSelect";
 import AppTooltip from "../../../../../components/tooltip";
 import { claimTypesDropdownList } from "../../../../../services/claimSubType.service";
-import { agentListingApi } from "../../../../../services/ticketmanagement.service";
+import { agentListingApi, convertToLabelValue } from "../../../../../services/ticketmanagement.service";
+import { MasterDataContext } from "../../../../../contexts/masters.context";
 
 const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySla, clearTableSelection }) => {
     const { t } = useTranslation();
@@ -19,6 +20,8 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
     const [selectedAgent, setSelectedAgent] = useState(null)
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
+    const [statusDropdownData, setStatusDropdownData] = useState([])
+    const { masterData } = useContext(MasterDataContext)
 
     const handleDateFilterChange = ([newStartDate, newEndDate]) => {
         setTempDateRange([newStartDate, newEndDate]);
@@ -73,7 +76,15 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
     useEffect(() => {
         getClaimTypeDropdownList()
         getAgentDropdownListing()
+
     }, [])
+
+    useEffect(()=>{
+        if(masterData?.claimTicketStatus){
+            setStatusDropdownData([{ select: '', label: t('ALL STATUS') }, ...convertToLabelValue(masterData?.claimTicketStatus)])
+        }
+       
+    },[masterData])
 
 
     useEffect(() => {
@@ -114,43 +125,13 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
                 </div>
 
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
+                <ReactSelect
                         wrapperClassName="mb-0"
                         class="form-select "
                         placeholder={t("ALL STATUS")}
                         id="floatingSelect"
                         size="sm"
-                        options={[
-                            {
-                                label: t("ALL STATUS"),
-                                value: "",
-                                class: "label-class",
-                            },
-                            {
-                                label: t("NEW"),
-                                value: "NEW",
-                            },
-                            {
-                                label: t("ASSIGNED"),
-                                value: "ASSIGNED",
-                            },
-                            {
-                                label: t("IN_PROGRESS"),
-                                value: "IN_PROGRESS",
-                            },
-                            {
-                                label: t("PENDING"),
-                                value: "PENDING",
-                            },
-                            {
-                                label: t("REJECTED"),
-                                value: "REJECTED",
-                            },
-                            {
-                                label: t("CLOSED"),
-                                value: "CLOSED",
-                            },
-                        ]}
+                        options={statusDropdownData ?? []}
                         onChange={(e) => {
                             setFilter({
                                 ...filter,
@@ -170,7 +151,7 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
                             startDate={filter?.startDate ?? null}
                             endDate={filter?.endDate}
                             selectsRange={true}
-                            placeholder="Select Date Range"
+                            placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
                         />
                     </div>

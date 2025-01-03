@@ -7,8 +7,12 @@ export const getDashboardGraphAndTiles = async (params) => {
     return await ticketApi.get(`/${API_VERSION}/dashboard/graph-and-tiles`,{params});
 }
 
-
 // GET DASHBOARD GRAPHS AND TILES
 export const getClaimsandComplaints = async (params) => {
     return await ticketApi.get(`/${API_VERSION}/dashboard/claim-and-complaints`,{params});
+}
+
+// DOWNLOAD CLAIM AND COMPLAINTS
+export const downloadClaimAndComplaints = async (params) => {
+    return await ticketApi.get(`/${API_VERSION}/dashboard/claim-and-complaints/download`,{ params, responseType: 'arraybuffer' });
 }

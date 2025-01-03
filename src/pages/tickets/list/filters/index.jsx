@@ -10,18 +10,24 @@ import ReactSelect from "../../../../components/ReactSelect";
 import AppTooltip from "../../../../components/tooltip";
 import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
 import toast from "react-hot-toast";
-import { agentListingApi } from "../../../../services/ticketmanagement.service";
+import { agentListingApi, convertToLabelValue } from "../../../../services/ticketmanagement.service";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
+import { MasterDataContext } from "../../../../contexts/masters.context";
 
-const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection,permissionsState }) => {
+const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection, permissionsState }) => {
 
     const { currentUser } = useContext(AuthenticationContext);
+
+    const { masterData } = useContext(MasterDataContext)
 
     const { t } = useTranslation();
     const [claimTypes, setClaimTypes] = useState([])
     const [agentList, setAgentListing] = useState([])
     const [selectedAgent, setSelectedAgent] = useState(null)
-  
+
+    const [statusDropdownData, setStatusDropdownData] = useState([])
+    const [priorityDropdwonData, setPriorityDropdownData] = useState([])
+
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
 
@@ -34,11 +40,11 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
                 endDate: moment(newEndDate).format("YYYY-MM-DD")
             });
-        }else{
+        } else {
             setFilter({
                 startDate: '',
-                endDate:''
-            });  
+                endDate: ''
+            });
         }
     };
     // GET CLAIM TYPE DROPDOWN LIST
@@ -80,6 +86,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
     useEffect(() => {
         getClaimTypeDropdownList()
         getAgentDropdownListing()
+
     }, [])
     useEffect(() => {
 
@@ -87,6 +94,17 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
             setSelectedAgent('')
         }
     }, [clearTableSelection])
+
+
+    useEffect(()=>{
+        if(masterData?.claimTicketStatus && masterData?.claimTicketPriority){
+            setStatusDropdownData([{ select: '', label: t('ALL STATUS') }, ...convertToLabelValue(masterData?.claimTicketStatus)])
+            setPriorityDropdownData([{ select: '', label: t('ALL_PRIORITY') }, ...convertToLabelValue(masterData?.claimTicketPriority)])
+        }
+       
+    },[masterData])
+
+
     return (
         <div className="theme-card-header header-search mb-3">
             <Stack direction="horizontal" gap={2} className="flex-wrap gap-md-3">
@@ -140,7 +158,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             />
                         </div> : ''
                 }
-                
+
                 {/* currentUser === 'FI_AGENT' || currentUser === 'SEPS_AGENT' ? <Button
                             type="button"
                             variant="warning"
@@ -186,25 +204,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             placeholder={t("PRIORITY")}
                             id="floatingSelect"
                             size="sm"
-                            options={[
-                                {
-                                    label: t("ALL_PRIORITY"),
-                                    value: "",
-                                    class: "label-class",
-                                },
-                                {
-                                    label: t("LOW"),
-                                    value: "LOW",
-                                },
-                                {
-                                    label: t("MEDIUM"),
-                                    value: "MEDIUM",
-                                },
-                                {
-                                    label: t("HIGH"),
-                                    value: "HIGH",
-                                }
-                            ]}
+                            options={priorityDropdwonData ?? []}
                             onChange={(e) => {
                                 setFilter({
                                     ...filter,
@@ -223,37 +223,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         placeholder={t("ALL STATUS")}
                         id="floatingSelect"
                         size="sm"
-                        options={[
-                            {
-                                label: t("ALL STATUS"),
-                                value: "",
-                                class: "label-class",
-                            },
-                            {
-                                label: t("NEW"),
-                                value: "NEW",
-                            },
-                            {
-                                label: t("ASSIGNED"),
-                                value: "ASSIGNED",
-                            },
-                            {
-                                label: t("IN_PROGRESS"),
-                                value: "IN_PROGRESS",
-                            },
-                            {
-                                label: t("PENDING"),
-                                value: "PENDING",
-                            },
-                            {
-                                label: t("REJECTED"),
-                                value: "REJECTED",
-                            },
-                            {
-                                label: t("CLOSED"),
-                                value: "CLOSED",
-                            },
-                        ]}
+                        options={statusDropdownData ?? []}
                         onChange={(e) => {
                             setFilter({
                                 ...filter,

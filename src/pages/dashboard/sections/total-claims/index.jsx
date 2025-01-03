@@ -9,16 +9,18 @@ import ClosedClaimList from './closed-claims';
 import PieChart from './pie-chart';
 import CustomDateRangePicker from '../../../../components/CustomDateRangePicker';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
-const TotalClaimsSection = () => {
+const TotalClaimsSection = ({setLoading}) => {
 
-    const [isLoading, setLoading] = useState(false)
 
     const [dashboardData, setDashboardData] = useState({})
 
     const [orgList, setOrgList] = useState([])
 
     const [filters, setFilters] = useState({})
+
+    const {t} = useTranslation()
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
     const handleDateFilterChange = ([newStartDate, newEndDate]) => {
@@ -71,7 +73,7 @@ const TotalClaimsSection = () => {
                     value: data?.id
                 }
             })
-            setOrgList([{label:'Select',value:''},...orgListData])
+            setOrgList([{label:t('SELECT'),value:''},...orgListData])
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);
@@ -100,9 +102,9 @@ const TotalClaimsSection = () => {
                         className="flex-wrap me-auto"
                     >
                         <div className="fw-semibold fs-4 mb-0">
-                            Total Claims <span className="fs-14 fw-normal">(submitted across all FIs)</span>
+                            {t("TOTAL_CLAIMS")} <span className="fs-14 fw-normal">({t('SUBMITTED_ACROSS_ALL_FIS')})</span>
                         </div>
-                        <div className="bg-primary bg-opacity-10 p-2 small rounded"><span className="me-2">Average Resolution Time:</span> <span className="fw-semibold">{dashboardData?.averageResolutionTime} Days</span></div>
+                        <div className="bg-primary bg-opacity-10 p-2 small rounded"><span className="me-2">{t("AVERAGE_RESOLUTION_TIME")}:</span> <span className="fw-semibold">{dashboardData?.averageResolutionTime} {t("DAYS")}</span></div>
                     </Stack>
                     <Stack
                         direction="horizontal"
@@ -113,7 +115,7 @@ const TotalClaimsSection = () => {
                             <ReactSelect
                                 wrapperClassName="mb-0"
                                 className="form-select "
-                                placeholder="Select"
+                                placeholder={t("SELECT")}
                                 id="organizationId"
                                 size="sm"
                                 onChange={(event) => {
@@ -130,7 +132,7 @@ const TotalClaimsSection = () => {
                                 startDate={filters?.startDate ?? null}
                                 endDate={filters?.endDate}
                                 selectsRange={true}
-                                placeholder="Select Date Range"
+                                placeholder={t("SELECT_DATE_RANGE")}
                                 size="sm"
                             />
                         </div>
@@ -142,7 +144,7 @@ const TotalClaimsSection = () => {
                     <InfoCards claimStatsData={dashboardData?.claimStatusCount} rowClassName="g-3 text-nowrap" />
                 </div>
                 <Row className='gx-4 gy-3'>
-                    <Col lg={6} xla>
+                    <Col lg={6} >
                         <PieChart graphData={dashboardData?.slaAdherenceGraph} />
                     </Col>
                     <Col lg={6}>

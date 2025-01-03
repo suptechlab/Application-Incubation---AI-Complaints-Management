@@ -3,9 +3,12 @@ import { Stack } from "react-bootstrap";
 import Loader from "../../components/Loader";
 import TotalClaimsSection from "./sections/total-claims";
 import ClaimsAndComplaints from "./sections/claims-and-complaints";
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
-  const [loading , setLoading ] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const { t } = useTranslation()
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
@@ -17,14 +20,12 @@ export default function Dashboard() {
             className="flex-wrap custom-min-height-38"
           >
             <h1 className="fw-semibold fs-4 mb-0 me-auto">
-              Dashboard
+              {t("DASHBOARD")}
             </h1>
-
           </Stack>
         </div>
-       
-        <TotalClaimsSection />
-        <ClaimsAndComplaints setLoading={setLoading}/>
+        <TotalClaimsSection setLoading={setLoading} />
+        <ClaimsAndComplaints setLoading={setLoading} />
       </div>
     </React.Fragment>
   );
