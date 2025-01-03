@@ -22,7 +22,13 @@ public enum ChannelOfEntryEnum implements EnumWithDescription {
     /**
      * Represents claims submitted by agents on behalf of users through a chat interface via the Agent Portal.
      */
-    CHAT("enum.channel.chat");
+    CHAT("enum.channel.chat"),
+
+    WHATSAPP("enum.channel.whatsapp"),
+
+    FACEBOOK("enum.channel.facebook"),
+
+    INSTAGRAM("enum.channel.instagram");
 
     private final String key;
 

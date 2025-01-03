@@ -6,11 +6,7 @@ import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.service.dto.workflow.ClaimTicketWorkFlowDTO;
 import com.seps.ticket.suptech.service.DocumentService;
-import com.seps.ticket.web.rest.vm.ClaimTicketReplyRequest;
-import com.seps.ticket.web.rest.vm.ClaimTicketRequest;
-import com.seps.ticket.web.rest.vm.ComplaintRequest;
-import com.seps.ticket.web.rest.vm.SecondInstanceRequest;
-import com.seps.ticket.web.rest.vm.UploadDocumentRequest;
+import com.seps.ticket.web.rest.vm.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -44,14 +40,16 @@ public class UserClaimTicketResource {
     private final DocumentService documentService;
     private final MessageSource messageSource;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
+    private final TempDocumentService tempDocumentService;
 
     public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService, MessageSource messageSource,
-                                   ClaimTicketActivityLogService claimTicketActivityLogService) {
+                                   ClaimTicketActivityLogService claimTicketActivityLogService, TempDocumentService tempDocumentService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.documentService = documentService;
         this.messageSource = messageSource;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
+        this.tempDocumentService = tempDocumentService;
     }
 
 
@@ -264,4 +262,12 @@ public class UserClaimTicketResource {
         List<ClaimTicketListDTO> page = userClaimTicketService.listUserClaimTicketsForChatbot(instanceType);
         return ResponseEntity.ok().body(page);
     }
+
+    // Endpoint for uploading document
+    @PostMapping("/temp-upload")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<String> tempUploadDocument(@Valid @ModelAttribute TempUploadDocumentRequest request) {
+        return tempDocumentService.uploadDocument(request);
+    }
+
 }
