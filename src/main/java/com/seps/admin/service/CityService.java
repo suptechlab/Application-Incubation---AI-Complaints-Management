@@ -11,6 +11,7 @@ import com.seps.admin.enums.LanguageEnum;
 import com.seps.admin.repository.CityRepository;
 import com.seps.admin.repository.ProvinceRepository;
 import com.seps.admin.service.dto.CityDTO;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.mapper.CityMapper;
 import com.seps.admin.service.specification.CitySpecification;
@@ -263,4 +264,12 @@ public class CityService {
             return new ByteArrayInputStream(out.toByteArray());
         }
     }
+
+    public List<DropdownListDTO> listActiveCityByProvinceId(Long provinceId) {
+        return cityRepository.findAllByStatusAndProvinceId(true, provinceId)
+            .stream()
+            .map(cityMapper::toDropDownDTO)
+            .toList();
+    }
+
 }
