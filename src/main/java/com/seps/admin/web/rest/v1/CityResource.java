@@ -3,6 +3,7 @@ package com.seps.admin.web.rest.v1;
 import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.service.CityService;
 import com.seps.admin.service.dto.CityDTO;
+import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -128,5 +129,40 @@ public class CityResource {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(in.readAllBytes());
         }
+    }
+
+    @Operation(
+        summary = "Get list of active cities by province",
+        description = "Fetches a list of all active cities belonging to a specified province for dropdowns or other UI components.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "List of active cities retrieved successfully",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = DropdownListDTO.class)
+                )
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "Invalid province ID provided",
+                content = @Content
+            ),
+            @ApiResponse(
+                responseCode = "404",
+                description = "Province not found or no cities available",
+                content = @Content
+            ),
+            @ApiResponse(
+                responseCode = "500",
+                description = "Internal server error occurred",
+                content = @Content
+            )
+        }
+    )
+    @GetMapping("/dropdown-list/{provinceId}")
+    public ResponseEntity<List<DropdownListDTO>> listActiveCityByProvince(@PathVariable Long provinceId) {
+        List<DropdownListDTO> cities = cityService.listActiveCityByProvinceId(provinceId);
+        return ResponseEntity.ok(cities);
     }
 }
