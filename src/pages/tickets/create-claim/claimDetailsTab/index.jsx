@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Button, Card, Col, Row, Stack } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import { claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
 import FormOtpInputBox from '../../../../components/FormOtpInputBox';
 import { svgIconClasses } from '@mui/material';
-import { MdRefresh } from 'react-icons/md';
+import { MdClose, MdRefresh } from 'react-icons/md';
 import AppTooltip from '../../../../components/tooltip';
 import { FiInfo } from "react-icons/fi";
 import { requestOTPApi, verifyOTPApi } from '../../../../services/claimcreate.services';
@@ -30,30 +30,65 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
     const [optSendStatus, setOptSendStatus] = useState(false)
 
+    const [files, setFiles] = useState([]);
+
     // Initial Values
     const initialValues = {
         claimTypeId: '',
         claimSubTypeId: '',
         precedents: '',
         specificPetition: '',
-        attachments: '',
         agreeDeclarations: false,
         otpCode: ''
     };
 
     //Handle File Change
+    // const handleFileChange = (event) => {
+    //     const file = event.currentTarget.files[0];
+    //     if (file) {
+    //         setFileName(file.name);
+    //     } else {
+    //         setFileName("");
+    //     }
+    // };
+    //Handle File Change
     const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            setFileName(file.name);
-        } else {
-            setFileName("");
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 5 MB in bytes
+        const MAX_FILE_COUNT = 3; // Maximum number of files allowed
+
+        if (event.target.files) {
+            const selectedFiles = Array.from(event.target.files);
+
+            // Filter files based on size
+            const validFiles = selectedFiles.filter((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    toast.error(`${file.name}` + ' ' + t('TOO_LARGE_FILE'));
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                setFiles((prevFiles) => {
+                    const totalFiles = prevFiles.length + validFiles.length;
+
+                    if (totalFiles > MAX_FILE_COUNT) {
+                        toast.error(t('TOO_MANY_FILES'));
+                        return prevFiles;
+                    }
+
+                    return [...prevFiles, ...validFiles];
+                });
+            }
         }
     };
 
+    const removeFile = (indexToRemove) => {
+        setFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
+    };
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
-        handleFormSubmit(values, actions);
+        handleFormSubmit({ ...values, files }, actions);
     };
 
     // HANDLE RESEND OTP BUTTON
@@ -103,12 +138,17 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             })
     }
     // HANDLE OTP VERIFICATION
-    const handleOTPVerification = async (data) => {
+    const handleOTPVerification = async (event ,data) => {
+        event.preventDefault()
         const formData = {
             otpCode: data?.otpCode,
             email: userEmail
         }
+
+        console.log("ARE YOU CALLING")
         verifyOTPApi(formData).then((response) => {
+
+            console.log({response})
             setIsFormEmailValidate(true)
             toast.success("OTP Verified.");
         })
@@ -242,24 +282,43 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                                             <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                                 <label
-                                                    htmlFor="attachments"
+                                                    htmlFor="files"
                                                     className="btn btn-warning"
                                                 >
                                                     {t("UPLOAD_OPTIONAL_ATTACHMENTS")}
                                                 </label>
                                                 <input
-                                                    id="attachments"
-                                                    accept="image/png, image/jpeg, image/jpg"
+                                                    id="files"
+                                                    accept=".pdf, .docx, .doc, .txt, .rtf, image/jpeg, image/jpg"
+                                                    multiple
                                                     className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                                     type="file"
-                                                    // multiple={true}
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
                                             {/* <span className="opacity-75">Multiple attachment can be uploaded.</span> */}
                                         </div>
 
-                                        {fileName && (
+                                        {files.length > 0 && (
+                                            <Stack direction='horizontal' gap={2} className="mt-2">
+                                                {files.map((file, index) => (
+                                                    <Badge key={index} className="d-inline-flex align-items-center gap-2 text-info px-3" pill bg='secondary-subtle'>
+                                                        <span>{file.name}</span>
+                                                        <AppTooltip title={t('REMOVE')}>
+                                                            <Button
+                                                                variant="link"
+                                                                className='p-0 border-0 lh-sm'
+                                                                onClick={() => removeFile(index)}
+                                                            >
+                                                                <MdClose size={16} />
+                                                            </Button>
+                                                        </AppTooltip>
+                                                    </Badge>
+                                                ))}
+                                            </Stack>
+                                        )}
+
+                                        {/* {fileName && (
                                             <div className="pt-1">
                                                 <Link
                                                     target="_blank"
@@ -269,7 +328,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                     {fileName}
                                                 </Link>
                                             </div>
-                                        )}
+                                        )} */}
                                     </Col>
                                     <Col xs={12}>
                                         <Stack direction="horizontal" gap={2} className="mb-3 flex-wrap">
@@ -359,7 +418,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         type="button"
                                                         variant="warning"
                                                         className="custom-min-width-100 custom-margin-top-1"
-                                                        onClick={()=>handleOTPVerification({otpCode : formikProps.values.otpCode})}
+                                                        onClick={(event) => handleOTPVerification(event ,{ otpCode: formikProps.values.otpCode })}
                                                     >
                                                         {t("OTP_VERIFICATION")}
                                                     </Button>

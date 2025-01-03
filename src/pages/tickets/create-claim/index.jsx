@@ -80,14 +80,15 @@ export default function CreateClaim() {
 
         const formData = new FormData();
 
+            console.log({combinedData})
+
         Object.entries(combinedData).forEach(([key, value]) => {
             if (key === "files") {
-                
                 value.forEach((file, index) => {
+                    console.log({file})
                     formData.append(`attachments[${index}]`, file);
                 });
             } else {
-                
                 formData.append(key, value);
             }
         });
@@ -117,6 +118,7 @@ export default function CreateClaim() {
           }).finally(() => {
             // Ensure the loading toast is dismissed
             actions.setSubmitting(false)
+            setIsLoading(false);
           });
 
 

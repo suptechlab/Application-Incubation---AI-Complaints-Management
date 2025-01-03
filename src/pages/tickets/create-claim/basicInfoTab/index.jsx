@@ -45,13 +45,13 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         phoneNumber: '',
         provinceId: '',
         cityId: '',
-        channelOfEntry:''
+        channelOfEntry: ''
     });
 
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
 
-        console.log({values})
+        console.log({ values })
         handleFormSubmit(values, actions);
     };
 
@@ -99,33 +99,46 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     };
 
     // FETCH USER PERSONAL INFO BY ID
-    const fetchUserData = async (identification) => {
+    const fetchUserData = async (identificacion) => {
 
-        setLoadingInfo(true)
+        const response = {
+            data: {
+                "identificacion": "1712655842",
+                "nombreCompleto": "RUIZ PEREZ GERMANICO VINICIO",
+                "genero": "HOMBRE",
+                "lugarNacimiento": "PICHINCHA/QUITO/SAN BLAS",
+                "nacionalidad": "ECUATORIANA",
+                "existUserEmail": "muskan123@yopmail.com"
+            }
+        }
 
-        validateIdentificationApi(identification).then((response) => {
-            setLoadingInfo(false)
-            if (response?.data?.nombreCompleto) {
-                setInitialValues({ ...initialValues, identificacion: identification, name: response?.data?.nombreCompleto, gender: response?.data?.genero,email : response?.data?.existUserEmail })
-            } else {
-                setInitialValues({ ...initialValues, identification: identification, name: '', gender: '' })
-            }
-            if(response?.data?.existUserEmail && response?.data?.existUserEmail!==null){
-                setIsEmailAlreadyExists(true)
-            }else{
-                setIsEmailAlreadyExists(false)
-            }
-        })
-            .catch((error) => {
-                if (error?.response?.data?.errorDescription) {
-                    toast.error(error?.response?.data?.errorDescription);
-                } else {
-                    toast.error(error?.message);
-                }
-                setInitialValues({ ...initialValues, identification: identification, name: '' })
-            }).finally(() => {
-                setLoadingInfo(false)
-            })
+        setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero, email: response?.data?.existUserEmail })
+
+        // setLoadingInfo(true)
+
+        // validateIdentificationApi(identification).then((response) => {
+        //     setLoadingInfo(false)
+        //     if (response?.data?.nombreCompleto) {
+        //         setInitialValues({ ...initialValues, identificacion: identification, name: response?.data?.nombreCompleto, gender: response?.data?.genero,email : response?.data?.existUserEmail })
+        //     } else {
+        //         setInitialValues({ ...initialValues, identification: identification, name: '', gender: '' })
+        //     }
+        //     if(response?.data?.existUserEmail && response?.data?.existUserEmail!==null){
+        //         setIsEmailAlreadyExists(true)
+        //     }else{
+        //         setIsEmailAlreadyExists(false)
+        //     }
+        // })
+        //     .catch((error) => {
+        //         if (error?.response?.data?.errorDescription) {
+        //             toast.error(error?.response?.data?.errorDescription);
+        //         } else {
+        //             toast.error(error?.message);
+        //         }
+        //         setInitialValues({ ...initialValues, identification: identification, name: '' })
+        //     }).finally(() => {
+        //         setLoadingInfo(false)
+        //     })
     };
 
     const handleEmailBlur = (event) => {
@@ -142,12 +155,12 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         validateEmailApi({ email }).then((response) => {
             setLoadingInfo(false)
 
-            if(response?.data === true){
+            if (response?.data === true) {
                 toast.success("Email verified!")
-            }else{
+            } else {
                 toast.success("Failed to verify email!")
             }
-          
+
         })
             .catch((error) => {
                 if (error?.response?.data?.errorDescription) {
@@ -167,6 +180,9 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         }
     }, [masterData])
 
+
+    
+
     return (
         <React.Fragment>
             <Loader isLoading={loadingInfo} />
@@ -184,6 +200,9 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                     <h6 className="mb-3 pb-1 fw-semibold">{t("BASIC_INFORMATION")}</h6>
                                     <Row className="gx-4">
                                         <Col sm={6} lg={4}>
+                                        {
+                                            console.log(formikProps.errors)
+                                        }
                                             <FormInputBox
                                                 autoComplete="off"
                                                 id="identificacion"
@@ -209,7 +228,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 onChange={formikProps.handleChange}
                                                 touched={formikProps.touched.email}
                                                 value={formikProps.values.email || ""}
-                                                disabled ={isEmailAlreadyExists}
+                                                disabled={isEmailAlreadyExists}
                                             />
                                         </Col>
                                         <Col sm={6} lg={4}>
