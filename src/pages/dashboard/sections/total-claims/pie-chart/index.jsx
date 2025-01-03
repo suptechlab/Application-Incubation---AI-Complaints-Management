@@ -11,7 +11,7 @@ const PieChartComponent = ({ graphData }) => {
     // Prepare data for the Pie chart
     const chartData = graphData?.datasets?.[0]?.data?.map((value, index) => ({
         name: graphData?.labels?.[index],
-        value: value
+        value: value ?? 0
     })) || [];
 
     // Get dynamic colors from the API (backgroundColor)

@@ -176,7 +176,7 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
                     </div>
 
                     {/* Dropdown FILTER */}
-                    <Dropdown>
+                    {/* <Dropdown>
                         <Dropdown.Toggle
                             variant="link"
                             id="filter-dropdown"
@@ -194,7 +194,7 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
                                 SLA
                             </Dropdown.Item>
                         </Dropdown.Menu>
-                    </Dropdown>
+                    </Dropdown> */}
                 </Stack>
             </Stack>
         </div>

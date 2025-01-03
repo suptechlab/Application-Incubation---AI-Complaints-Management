@@ -9,8 +9,9 @@ import ReactSelect from '../../../../components/ReactSelect'
 import AppTooltip from '../../../../components/tooltip'
 import AttachmentsModal from '../../../tickets/modals/attachmentsModal'
 import DashboardListFilters from './filters'
+import { getClaimsandComplaints } from '../../../../services/dashboard.service'
 
-const CaimsAndComplaints = () => {
+const ClaimsAndComplaints = ({ setLoading }) => {
     const location = useLocation();
     const queryClient = useQueryClient();
     const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -29,69 +30,115 @@ const CaimsAndComplaints = () => {
     const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
     const [clearTableSelection, setClearTableSelection] = useState(false)
 
-    // const sampleData = [
-    //     {
-    //         ticketId: "TCK-1001",
-    //         claimType: "Health Insurance",
-    //         subClaimType: "Refinancing Request",
-    //         fIEntity: "Entity 1",
-    //         slaBreachDays: "5",
-    //         createdAt: "2024-11-20",
-    //         status: "Closed",
-    //     },
-    //     {
-    //         ticketId: "TCK-1002",
-    //         claimType: "Auto Insurance",
-    //         subClaimType: "Appointment of Managers",
-    //         fIEntity: "Entity 2",
-    //         slaBreachDays: "3",
-    //         createdAt: "2024-11-21",
-    //         status: "In Progress",
-    //     },
-    //     {
-    //         ticketId: "TCK-1003",
-    //         claimType: "Travel Insurance",
-    //         subClaimType: "Novation Request",
-    //         fIEntity: "Entity 3",
-    //         slaBreachDays: "7",
-    //         createdAt: "2024-11-22",
-    //         status: "Rejected",
-    //     },
-    //     {
-    //         ticketId: "TCK-1004",
-    //         claimType: "Property Insurance",
-    //         subClaimType: "Unauthorized Transfers",
-    //         fIEntity: "Entity 4",
-    //         slaBreachDays: "2",
-    //         createdAt: "2024-11-23",
-    //         status: "New",
-    //     },
-    //     {
-    //         ticketId: "TCK-1005",
-    //         claimType: "Life Insurance",
-    //         subClaimType: "Appointment of Managers",
-    //         fIEntity: "Entity 5",
-    //         slaBreachDays: "10",
-    //         createdAt: "2024-11-24",
-    //         status: "Closed",
-    //     },
-    // ];
 
+    // DOWNLOAD CLAIM TYPES LIST
+    // const handleDownload = () => {
+    //     setDownloading(true)
+    //     toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading })
+    //     downloadClaimTypes({ search: filter?.search ?? "" }).then(response => {
+    //       if (response?.data) {
+    //         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //         const blobUrl = window.URL.createObjectURL(blob);
+
+    //         toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+
+
+    //         const tempLink = document.createElement('a');
+    //         tempLink.href = blobUrl;
+    //         tempLink.setAttribute('download', 'claim-types.xlsx');
+
+    //         // Append the link to the document body before clicking it
+    //         document.body.appendChild(tempLink);
+
+    //         tempLink.click();
+
+    //         // Clean up by revoking the Blob URL
+    //         window.URL.revokeObjectURL(blobUrl);
+
+    //         // Remove the link from the document body after clicking
+    //         document.body.removeChild(tempLink);
+    //       } else {
+    //         throw new Error(t("EMPTY RESPONSE"));
+    //       }
+    //       // toast.success(t("STATUS UPDATED"));
+    //     }).catch((error) => {
+    //       if (error?.response?.data?.errorDescription) {
+    //         toast.error(error?.response?.data?.errorDescription);
+    //       } else {
+    //         toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+    //       }
+    //       toast.dismiss("downloading");
+    //     }).finally(() => {
+    //       // Ensure the loading toast is dismissed
+    //       // toast.dismiss("downloading");
+    //       setDownloading(false)
+    //     });
+    //   }
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
-            return { data: [], page: 1, size: 10 }
-        },
-        staleTime: 0,
-        cacheTime: 0,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        retry: 0,
-    });
-   
-    
+            // Set loading state to true before the request starts
+            setLoading(true);
 
-    
+            try {
+                const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+                Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+                // Make the API request based on sorting
+                let response;
+                if (sorting.length === 0) {
+                    response = await getClaimsandComplaints({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        ...filterObj,
+                    });
+                } else {
+                    response = await getClaimsandComplaints({
+                        page: pagination.pageIndex,
+                        size: pagination.pageSize,
+                        sort: sorting
+                            .map(
+                                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                            )
+                            .join(","),
+                        ...filterObj,
+                    });
+                }
+
+                // Return the API response data
+                return response;
+            } catch (error) {
+                console.error("Error fetching data", error);
+                // Optionally, handle errors here
+            } finally {
+                // Set loading state to false when the request finishes (whether successful or not)
+                setLoading(false);
+            }
+        },
+        staleTime: 0, // Data is always stale, so it refetches
+        cacheTime: 0, // Cache expires immediately
+        refetchOnWindowFocus: false, // Disable refetching on window focus
+        refetchOnMount: false, // Prevent refetching on component remount
+        retry: 0, //Disable retry on failure
+    });
+
+    // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+    useEffect(() => {
+        return () => {
+            queryClient.removeQueries("data");
+        };
+    }, [queryClient]);
+    useEffect(() => {
+        if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
+            setPagination({
+                pageIndex: dataQuery.data?.data?.totalPages - 1,
+                pageSize: 10,
+            });
+        }
+    }, [dataQuery.data?.data?.totalPages]);
+
+
+
 
 
     //handle last page deletion item
@@ -272,4 +319,4 @@ const CaimsAndComplaints = () => {
     )
 }
 
-export default CaimsAndComplaints
+export default ClaimsAndComplaints

@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { Card, Image, Stack } from "react-bootstrap";
-import CommonDatePicker from "../../components/commonDatePicker";
+import { Stack } from "react-bootstrap";
 import Loader from "../../components/Loader";
 import TotalClaimsSection from "./sections/total-claims";
-import CaimsAndComplaints from "./sections/caims-and-complaints";
+import ClaimsAndComplaints from "./sections/claims-and-complaints";
 
 export default function Dashboard() {
-  const [startDate, setStartDate] = useState();
   const [loading , setLoading ] = useState(false)
   return (
     <React.Fragment>
@@ -26,7 +24,7 @@ export default function Dashboard() {
         </div>
        
         <TotalClaimsSection />
-        <CaimsAndComplaints />
+        <ClaimsAndComplaints setLoading={setLoading}/>
       </div>
     </React.Fragment>
   );
