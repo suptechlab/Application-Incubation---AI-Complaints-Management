@@ -624,9 +624,9 @@ public class ClaimTicketService {
                 row.createCell(ExcelHeaderClaimTicketEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
                 row.createCell(ExcelHeaderClaimTicketEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
                 row.createCell(ExcelHeaderClaimTicketEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
-                row.createCell(ExcelHeaderClaimTicketEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser().getName() !=null ? data.getUser().getName():"");
-                row.createCell(ExcelHeaderClaimTicketEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent().getName() != null ? data.getFiAgent().getName():"");
-                row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent().getName() != null ? data.getSepsAgent().getName():"");
+                row.createCell(ExcelHeaderClaimTicketEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() !=null ? data.getUser().getName():"");
+                row.createCell(ExcelHeaderClaimTicketEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName():"");
+                row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName():"");
                 row.createCell(ExcelHeaderClaimTicketEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
                 row.createCell(ExcelHeaderClaimTicketEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
                 row.createCell(ExcelHeaderClaimTicketEnum.SECOND_INSTANCE_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getSecondInstanceFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
