@@ -11,6 +11,7 @@ import com.seps.admin.service.dto.FIUserDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import com.seps.admin.suptech.service.dto.PersonInfoDTO;
+import com.seps.admin.web.rest.vm.ImportUserResponseVM;
 import com.seps.admin.web.rest.vm.ImportUserVM;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -158,16 +160,25 @@ public class FIUserResource {
 
 
     @PostMapping("/import")
-    public ResponseEntity<?> importFIUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale) {
-        try {
-            InputStream fileInputStream = importUserVM.getBrowseFile().getInputStream();
-            List<String> errors = importUserService.processAndValidateFile(fileInputStream, locale);
-            if (!errors.isEmpty()) {
-                return ResponseEntity.badRequest().body(errors);
-            }
-            return ResponseEntity.ok("File processed successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process file.");
+    public ResponseEntity<?> importFIUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale) throws IOException {
+        InputStream fileInputStream = importUserVM.getBrowseFile().getInputStream();
+        ImportUserResponseVM importUserResponseVM = importUserService.importFIUser(fileInputStream, locale);
+        if (!importUserResponseVM.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(importUserResponseVM.getErrors());
         }
+
+        //SEND email to newly created FI Users
+        if (!importUserResponseVM.getNewUserList().isEmpty()) {
+            for (User newUser : importUserResponseVM.getNewUserList()) {
+                mailService.sendFIUserCreationEmail(newUser);
+            }
+        }
+
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("fi.user.imported.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
     }
 }

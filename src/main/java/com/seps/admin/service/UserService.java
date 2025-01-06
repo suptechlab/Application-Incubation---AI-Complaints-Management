@@ -1,7 +1,9 @@
 package com.seps.admin.service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.seps.admin.config.Constants;
+import com.seps.admin.config.InstantTypeAdapter;
 import com.seps.admin.domain.*;
 import com.seps.admin.enums.*;
 import com.seps.admin.repository.AuthorityRepository;
@@ -75,7 +77,9 @@ public class UserService {
         this.organizationService = organizationService;
         this.auditLogService = auditLogService;
         this.messageSource = messageSource;
-        this.gson = gson;
+        this.gson = new GsonBuilder()
+            .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+            .create();
         this.ldapSearchService = ldapSearchService;
         this.documentService = documentService;
     }
@@ -408,14 +412,12 @@ public class UserService {
      */
     @Transactional
     public FIUserDTO getFIUserById(Long id) {
-        User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
-            () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
-                new String[]{id.toString()}, null));
+        User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(() ->
+            new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND, new String[]{id.toString()}, null));
         List<String> authorityList = entity.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.FI)) {
             LOG.warn("FI User not found with id:{} for detail", id);
-            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
-                new String[]{id.toString()}, null);
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.FI_USER_NOT_FOUND, new String[]{id.toString()}, null);
         }
         return userMapper.userToFIUserDTO(entity);
     }

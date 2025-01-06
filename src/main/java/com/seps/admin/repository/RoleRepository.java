@@ -31,4 +31,6 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
 
 
     Optional<Role> findByIdAndUserType(Long roleId, String userType);
+
+    Optional<Role> findByRoleSlugIgnoreCase(String roleSlug);
 }
