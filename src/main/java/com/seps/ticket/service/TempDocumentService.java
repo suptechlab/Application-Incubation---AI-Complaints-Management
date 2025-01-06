@@ -1,6 +1,7 @@
 package com.seps.ticket.service;
 
 import com.seps.ticket.domain.*;
+import com.seps.ticket.enums.DocumentSourceEnum;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.suptech.service.FileStorageException;
@@ -34,12 +35,15 @@ public class TempDocumentService {
     private final MessageSource messageSource;
     private final DocumentService documentService;
     private final TempDocumentRepository tempDocumentRepository;
+    private static final boolean IS_INTERNAL_DOCUMENT = false;
+    private final ClaimTicketDocumentRepository claimTicketDocumentRepository;
 
-    public TempDocumentService(UserService userService, MessageSource messageSource, DocumentService documentService, TempDocumentRepository tempDocumentRepository) {
+    public TempDocumentService(UserService userService, MessageSource messageSource, DocumentService documentService, TempDocumentRepository tempDocumentRepository, ClaimTicketDocumentRepository claimTicketDocumentRepository) {
         this.userService = userService;
         this.messageSource = messageSource;
         this.documentService = documentService;
         this.tempDocumentRepository = tempDocumentRepository;
+        this.claimTicketDocumentRepository = claimTicketDocumentRepository;
     }
 
     public List<TempDocument> uploadFileAttachments(List<MultipartFile> attachments, User currentUser) {
@@ -104,5 +108,31 @@ public class TempDocumentService {
         return ResponseEntity.ok(externalDocumentIds);
     }
 
+    public List<ClaimTicketDocument> uploadTempToPermanentFiles(List<Long> attachmentsIds, ClaimTicket claimTicket, DocumentSourceEnum source, User currentUser){
+        List<String> externalDocumentIds = attachmentsIds.stream()
+            .map(String::valueOf) // Convert each Long to String
+            .toList();
+        List<TempDocument> documentList = tempDocumentRepository.findAllByExternalDocumentIdIn(externalDocumentIds);
+
+        List<ClaimTicketDocument> claimTicketDocumentsByIds = new ArrayList<>();
+        if(!documentList.isEmpty()){
+            documentList.forEach(document->{
+                String documentId = documentService.downloadAndUploadDocument(document.getExternalDocumentId(), claimTicket.getTicketId().toString(), document.getTitle());
+                ClaimTicketDocument claimTicketDocument = new ClaimTicketDocument();
+                claimTicketDocument.setClaimTicket(claimTicket);
+                claimTicketDocument.setExternalDocumentId(documentId);
+                claimTicketDocument.setTitle(document.getTitle());  // Set the appropriate title (can customize as needed)
+                claimTicketDocument.setOriginalTitle(document.getOriginalTitle());
+                claimTicketDocument.setInstanceType(claimTicket.getInstanceType());
+                claimTicketDocument.setSource(source);
+                claimTicketDocument.setInternal(IS_INTERNAL_DOCUMENT);
+                claimTicketDocument.setUploadedByUser(currentUser);
+                claimTicketDocumentsByIds.add(claimTicketDocument);
+            });
+            // Delete documents by externalDocumentId
+            //tempDocumentRepository.deleteAllByExternalDocumentIdIn(externalDocumentIds);
+        }
+        return claimTicketDocumentsByIds;
+    }
 
 }

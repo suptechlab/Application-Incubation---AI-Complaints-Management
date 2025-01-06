@@ -74,6 +74,7 @@ public class UserClaimTicketService {
     private final UserRepository userRepository;
     private final ClaimTicketAssignLogRepository claimTicketAssignLogRepository;
     private final TempDocumentRepository tempDocumentRepository;
+    private final TempDocumentService tempDocumentService;
 
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
                                   OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository,
@@ -83,7 +84,7 @@ public class UserClaimTicketService {
                                   ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository,
                                   ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                   EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, MailService mailService,
-                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, TempDocumentRepository tempDocumentRepository) {
+                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, TempDocumentRepository tempDocumentRepository, TempDocumentService tempDocumentService) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -94,6 +95,7 @@ public class UserClaimTicketService {
         this.userClaimTicketMapper = userClaimTicketMapper;
         this.auditLogService = auditLogService;
         this.tempDocumentRepository = tempDocumentRepository;
+        this.tempDocumentService = tempDocumentService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -197,28 +199,10 @@ public class UserClaimTicketService {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
         if(claimTicketRequest.getSource() != null && claimTicketRequest.getSource().equals(SourceEnum.CHATBOT) && !claimTicketRequest.getAttachmentsIds().isEmpty()){
-            List<String> externalDocumentIds = claimTicketRequest.getAttachmentsIds().stream()
-                .map(String::valueOf) // Convert each Long to String
-                .toList();
-            List<TempDocument> documentList = tempDocumentRepository.findAllByExternalDocumentIdIn(externalDocumentIds);
-            List<ClaimTicketDocument> claimTicketDocumentsByIds = new ArrayList<>();
-            if(!documentList.isEmpty()){
-                documentList.forEach(document->{
-                    ClaimTicketDocument claimTicketDocument = new ClaimTicketDocument();
-                    claimTicketDocument.setClaimTicket(newClaimTicket);
-                    claimTicketDocument.setExternalDocumentId(document.getExternalDocumentId());
-                    claimTicketDocument.setTitle(document.getTitle());  // Set the appropriate title (can customize as needed)
-                    claimTicketDocument.setOriginalTitle(document.getOriginalTitle());
-                    claimTicketDocument.setInstanceType(newClaimTicket.getInstanceType());
-                    claimTicketDocument.setSource(source);
-                    claimTicketDocument.setInternal(IS_INTERNAL_DOCUMENT);
-                    claimTicketDocument.setUploadedByUser(currentUser);
-                    claimTicketDocumentsByIds.add(claimTicketDocument);
-                });
+            List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(claimTicketRequest.getAttachmentsIds(), newClaimTicket, source, currentUser);
+            if(!claimTicketDocumentsByIds.isEmpty()){
                 claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
                 claimTicketDocuments.addAll(claimTicketDocumentsByIds);
-                // Delete documents by externalDocumentId
-                tempDocumentRepository.deleteAllByExternalDocumentIdIn(externalDocumentIds);
             }
         }
 
@@ -713,27 +697,9 @@ public class UserClaimTicketService {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
         if(secondInstanceRequest.getSource().equals(SourceEnum.CHATBOT) && !secondInstanceRequest.getAttachmentsIds().isEmpty()){
-            List<String> externalDocumentIds = secondInstanceRequest.getAttachmentsIds().stream()
-                .map(String::valueOf) // Convert each Long to String
-                .toList();
-            List<TempDocument> documentList = tempDocumentRepository.findAllByExternalDocumentIdIn(externalDocumentIds);
-            List<ClaimTicketDocument> claimTicketDocumentsByIds = new ArrayList<>();
-            if(!documentList.isEmpty()){
-                documentList.forEach(document->{
-                    ClaimTicketDocument claimTicketDocument = new ClaimTicketDocument();
-                    claimTicketDocument.setClaimTicket(claimTicket);
-                    claimTicketDocument.setExternalDocumentId(document.getExternalDocumentId());
-                    claimTicketDocument.setTitle(document.getTitle());  // Set the appropriate title (can customize as needed)
-                    claimTicketDocument.setOriginalTitle(document.getOriginalTitle());
-                    claimTicketDocument.setInstanceType(claimTicket.getInstanceType());
-                    claimTicketDocument.setSource(source);
-                    claimTicketDocument.setInternal(IS_INTERNAL_DOCUMENT);
-                    claimTicketDocument.setUploadedByUser(currentUser);
-                    claimTicketDocumentsByIds.add(claimTicketDocument);
-                });
+            List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(secondInstanceRequest.getAttachmentsIds(), claimTicket, source, currentUser);
+            if(!claimTicketDocumentsByIds.isEmpty()){
                 claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
-                // Delete documents by externalDocumentId
-                tempDocumentRepository.deleteAllByExternalDocumentIdIn(externalDocumentIds);
             }
         }
         //Log all claim related ticket details
@@ -1193,27 +1159,9 @@ public class UserClaimTicketService {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
         if(complaintRequest.getSource().equals(SourceEnum.CHATBOT) && !complaintRequest.getAttachmentsIds().isEmpty()){
-            List<String> externalDocumentIds = complaintRequest.getAttachmentsIds().stream()
-                .map(String::valueOf) // Convert each Long to String
-                .toList();
-            List<TempDocument> documentList = tempDocumentRepository.findAllByExternalDocumentIdIn(externalDocumentIds);
-            List<ClaimTicketDocument> claimTicketDocumentsByIds = new ArrayList<>();
-            if(!documentList.isEmpty()){
-                documentList.forEach(document->{
-                    ClaimTicketDocument claimTicketDocument = new ClaimTicketDocument();
-                    claimTicketDocument.setClaimTicket(claimTicket);
-                    claimTicketDocument.setExternalDocumentId(document.getExternalDocumentId());
-                    claimTicketDocument.setTitle(document.getTitle());  // Set the appropriate title (can customize as needed)
-                    claimTicketDocument.setOriginalTitle(document.getOriginalTitle());
-                    claimTicketDocument.setInstanceType(claimTicket.getInstanceType());
-                    claimTicketDocument.setSource(source);
-                    claimTicketDocument.setInternal(IS_INTERNAL_DOCUMENT);
-                    claimTicketDocument.setUploadedByUser(currentUser);
-                    claimTicketDocumentsByIds.add(claimTicketDocument);
-                });
+            List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(complaintRequest.getAttachmentsIds(), claimTicket, source, currentUser);
+            if(!claimTicketDocumentsByIds.isEmpty()){
                 claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
-                // Delete documents by externalDocumentId
-                tempDocumentRepository.deleteAllByExternalDocumentIdIn(externalDocumentIds);
             }
         }
         //Log all claim related ticket details
