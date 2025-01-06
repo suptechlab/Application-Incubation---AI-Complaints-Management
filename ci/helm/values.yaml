@@ -85,6 +85,12 @@ deployment:
       - secretName: seps-cert
         hosts:
           - adminapi-suptechdev.seps.gob.ec
+          
+  virtualRoute:
+    enabled: true
+    host: adminapi-suptechdev.seps.gob.ec
+    path: ~^/admin(/|$)(.*)
+    rewritePath: /$2
 
   resources:
     # We usually recommend not to specify default resources and to leave this as a conscious
