@@ -4,6 +4,7 @@ const EndPoint = {
   LOGIN_API: `/auth/login`,
   DPA_ACCEPT : `/${version}/dpa/accept`,
   SEND_QUERY : `/${version}/chatbot/query`,
+  CHATBOT_FILE_UPLOAD:`/${version}/user/claim-tickets/temp-upload`,
   NATIONAL_ID_VERIFICATION_STATUS : `/validate-identificacion`,
   NATIONAL_ID_VERIFICATION: `/person-info`,
   INDIVIDUAL_PERSON_VALIDATE : `/validate-individual-person`,

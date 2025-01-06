@@ -6,13 +6,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormInputBox from '../../../components/FormInput';
 import SvgIcons from '../../../components/SVGIcons';
-import { sendQuery } from '../../../redux/slice/helpDeskSlice';
+import { chatbotFileUpload, sendQuery } from '../../../redux/slice/helpDeskSlice';
 import AppTooltip from '../../../components/tooltip';
-
+import toast from 'react-hot-toast';
+import { IoCloudUploadOutline } from "react-icons/io5";
 const ChatBotForm = () => {
     const { t } = useTranslation()
     const chatEndRef = useRef(null);
     const [isLoading, setLoading] = useState(false)
+
+
+    const [uploadedFiles, setUploadedFiles] = useState([])
+
+    const fileInputRef = useRef(null);
+
+    const handleButtonClick = () => {
+        // Trigger the file input click event
+        fileInputRef.current.click();
+    };
+
     const dispatch = useDispatch()
     // Initial Values
     const initialValues = {
@@ -322,7 +334,7 @@ const ChatBotForm = () => {
                             payload: btn.payload,
                         }))
                         : [],
-                    botSuggestion: [],
+                    // botSuggestion: [],
                 };
             });
 
@@ -361,6 +373,75 @@ const ChatBotForm = () => {
         }
     }, [chatData]);
 
+    const handleFileChange = (event) => {
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB in bytes
+        const MAX_FILE_COUNT = 3; // Maximum number of files allowed
+
+        if (event.target.files) {
+            const selectedFiles = Array.from(event.target.files);
+
+            // Filter files based on size
+            const validFiles = selectedFiles.filter((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    toast.error(`${file.name}` + ' ' + t('TOO_LARGE_FILE'));
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                setUploadedFiles((prevFiles) => {
+                    const totalFiles = prevFiles.length + validFiles.length;
+
+                    if (totalFiles > MAX_FILE_COUNT) {
+                        toast.error(t('TOO_MANY_FILES'));
+                        return prevFiles;
+                    } else {
+
+                        const formData = new FormData()
+
+                        validFiles?.forEach((validFile, index) => {
+                            formData.append(`attachments[${index}]`, validFile)
+                        })
+                        setLoading(true)
+
+                        dispatch(chatbotFileUpload(formData)).then((result) => {
+
+                            if (chatbotFileUpload.fulfilled.match(result)) {
+
+                                const userMessage = {
+                                    id: chatData.length + 1,
+                                    message: validFiles.map(file => file.name).join(', '), // Join file names as the message,
+                                    userMode: true,
+                                    botViewMode: false,
+                                    botReview: [], // buttons
+                                    botSuggestion: [],
+                                };
+
+                                // Update chat data with the new user message
+                                setChatData([...chatData, userMessage]);
+
+
+                                // SEND RESULT IN SEND QUERY
+                            } else {
+                                console.error("Verification error:", result.error.message);
+                            }
+                        })
+                            .catch(error => {
+                                console.error("Error during file claim submission:", error);
+                            }).finally(() => {
+                                setLoading(false)
+                            });
+                        return [...prevFiles, ...validFiles];
+                    }
+                });
+            }
+        }
+    };
+
+    const removeFile = (indexToRemove) => {
+        setUploadedFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
+    };
 
     return (
         <React.Fragment>
@@ -375,8 +456,10 @@ const ChatBotForm = () => {
                         {/* Chatbot Body */}
                         <div className='chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-3'>
                             {/* Message Repeater Section */}
-                            {chatData?.map((messageItem) => {
+                            {chatData?.map((messageItem, msgIndex) => {
                                 const { id, message, userMode, botViewMode, botSuggestion, botReview, recipientId, error } = messageItem;
+
+                                const isLastMessage = msgIndex === chatData?.length - 1;
                                 return (
                                     <div
                                         key={id}
@@ -411,6 +494,7 @@ const ChatBotForm = () => {
                                                                     key={id}
                                                                     type="button"
                                                                     variant={positive ? "success" : "light"}
+                                                                    disabled={!isLastMessage}
                                                                     className={`bot-tag-btns text-start border-opacity-50 border-primary fs-6 lh-sm py-2 ${positive ? "text-white" : "text-body"}`}
                                                                     onClick={(event) => actionButtonHandler(event, { message: payload, sender: recipientId })}
                                                                 >
@@ -422,7 +506,7 @@ const ChatBotForm = () => {
                                                 )}
                                             </div>
                                         </Stack>
-                                        {botSuggestion && botSuggestion.length > 0 && (
+                                        {/* {botSuggestion && botSuggestion.length > 0 && (
                                             <Stack
                                                 direction="horizontal"
                                                 gap={2}
@@ -443,7 +527,7 @@ const ChatBotForm = () => {
                                                     )
                                                 })}
                                             </Stack>
-                                        )}
+                                        )} */}
                                     </div>
                                 )
 
@@ -458,26 +542,60 @@ const ChatBotForm = () => {
                             <div ref={chatEndRef} />
                         </div>
 
-                       
-                    
 
                         {/* Chatbot Body Footer */}
                         <div className='chatbot-body-footer p-3'>
                             {isLoading === true ? <div className='chat-loader mb-1'></div> : ""}
-                            {/* <div className='me-auto mb-2'>
-                                    <Badge
-                                        pill
-                                        bg='info-subtle'
-                                        className='text-info'
-                                    >
-                                        {"fileName"}
-                                    </Badge>
-                                </div> */}
+                            {/* 
+                            {
+                                uploadedFiles && uploadedFiles?.length > 0 && 
+
+                                uploadedFiles?.map((file)=>{
+                                    return <div className='me-auto mb-2'>
+                                        <Badge
+                                            pill
+                                            bg='info-subtle'
+                                            className='text-info'
+                                        >
+                                            {file?.name}
+                                        </Badge>
+                                    </div> 
+                                })
+                                   
+                            } */}
+
+                            <div>
+                                <div className="">
+                                    <AppTooltip title="Add Attachments">
+                                        <Button
+                                            type="button" // Ensure it's a button element, not an anchor
+                                            className="btn mb-2 w-100"
+                                            variant="outline-primary"
+                                            aria-label="Add Attachments"
+                                            onClick={handleButtonClick} // Trigger the input click on button click
+                                        >
+                                            <IoCloudUploadOutline size={24} className='me-2'/>
+                                            Upload files
+                                        </Button>
+                                    </AppTooltip>
+
+                                    <input
+                                        ref={fileInputRef} // Reference to the file input
+                                        name="attachments"
+                                        id="attachments"
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                        type="file"
+                                        multiple={true}
+                                        onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
+                                    />
+                                </div>
+                            </div>
+
                             <div className='position-relative'>
 
                                 <FormInputBox
                                     wrapperClassName='mb-0'
-                                    inputClassName="ps-5"
                                     id="message"
                                     placeholder="Type a message"
                                     name="message"
@@ -490,7 +608,7 @@ const ChatBotForm = () => {
                                     autoComplete="off"
                                     readOnly={isLoading}
                                 />
-                                <div className="overflow-hidden position-absolute top-0 z-1 flex-shrink-0  p-2 d-block h-100">
+                                {/* <div className="overflow-hidden position-absolute top-0 z-1 flex-shrink-0  p-2 d-block h-100">
                                     <AppTooltip title="Add Attachments">
                                         <label
                                             htmlFor="attachments"
@@ -504,13 +622,14 @@ const ChatBotForm = () => {
                                     <input
                                         name="attachments"
                                         id="attachments"
-                                        // accept="image/png, image/jpeg, image/jpg"
-                                        accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        // accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
                                         className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                         type="file"
-                                        // onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
+                                        multiple={true}
+                                        onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
                                     />
-                                </div>
+                                </div> */}
                                 <Button
                                     type="submit"
                                     variant="link"

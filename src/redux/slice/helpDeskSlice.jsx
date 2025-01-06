@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import EndPoint from "../api/endpoint";
-import { userApi } from "../api/axios";
+import { ticketsApi, userApi } from "../api/axios";
 
 const initialState = {
     chatBotVisible: false,
@@ -59,6 +59,33 @@ export const sendQuery = createAsyncThunk(
     }
 );
 
+
+// CHATBOT FILE UPLOAD
+
+export const chatbotFileUpload = createAsyncThunk(
+    'chatbotFileUpload',
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await ticketsApi.post(EndPoint.CHATBOT_FILE_UPLOAD, formData);
+
+            // Check if the response has any errors
+            if (response.status === 401) {
+                return rejectWithValue('Unauthorized access');
+            }
+            if (response.status !== 200) {
+                return rejectWithValue('Failed to send enquiry');
+            }
+
+            return response.data;
+        } catch (error) {
+            // Handle specific error responses if needed
+            if (error.response?.status === 401) {
+                return rejectWithValue('Unauthorized access');
+            }
+            return rejectWithValue(error.message || 'Something went wrong');
+        }
+    }
+)
 
 // SLICE FOR HELP DESK
 const helpDeskSlice = createSlice({
