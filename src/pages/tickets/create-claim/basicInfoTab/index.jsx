@@ -61,7 +61,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                     value: data?.id
                 }
             })
-            setCityList(cityFormatList);
+            setCityList([{ label: t('SELECT'), value: '' }, ...cityFormatList]);
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);
@@ -121,13 +121,13 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         validateIdentificationApi(identificacion).then((response) => {
             setLoadingInfo(false)
             if (response?.data?.nombreCompleto) {
-                setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero,email : response?.data?.existUserEmail })
+                setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero, email: response?.data?.existUserEmail })
             } else {
                 setInitialValues({ ...initialValues, identificacion: identificacion, name: '', gender: '' })
             }
-            if(response?.data?.existUserEmail && response?.data?.existUserEmail!==null){
+            if (response?.data?.existUserEmail && response?.data?.existUserEmail !== null) {
                 setIsEmailAlreadyExists(true)
-            }else{
+            } else {
                 setIsEmailAlreadyExists(false)
             }
         })
@@ -305,14 +305,17 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 options={provinceList}
                                                 value={formikProps.values.provinceId}
                                                 onChange={(option) => {
-                                                    setCityList([]);
-                                                    formikProps.setFieldValue("cityId", "");
+                                                    // setCityList([]);
                                                     formikProps.setFieldValue("provinceId", option?.target?.value ?? "");
-                                                    if (option?.target?.value && option?.target?.value !== "") {
+                                                    if (option?.target?.value
+                                                        && option?.target?.value !== "" &&
+                                                        option?.target?.value !== formikProps?.values?.provinceId) {
                                                         getCityList(option?.target?.value);
-                                                    } else {
                                                         formikProps.setFieldValue("cityId", "");
                                                     }
+                                                    //  else {
+                                                    //     formikProps.setFieldValue("cityId", "");
+                                                    // }
                                                 }}
                                                 name="provinceId"
                                                 className={formikProps.touched.provinceId && formikProps.errors.provinceId ? "is-invalid" : ""}

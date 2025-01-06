@@ -126,6 +126,11 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             setOptSendStatus(true);
             setIsOTPFormSubitted(true)
             toast.success("OTP has been sent successfully.");
+            // AFTER 5 MINUTES OTP SCREEN WILL BE HIDE
+            setTimeout(() => {
+                setOptSendStatus(false);
+                setIsOTPFormSubitted(false);
+            }, 5 * 60 * 1000); // 5 minutes in milliseconds
         })
             .catch((error) => {
                 if (error?.response?.data?.errorDescription) {
@@ -138,7 +143,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             })
     }
     // HANDLE OTP VERIFICATION
-    const handleOTPVerification = async (event ,data) => {
+    const handleOTPVerification = async (event, data) => {
         event.preventDefault()
         const formData = {
             otpCode: data?.otpCode,
@@ -184,7 +189,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             const claimSubTypeFormatList = response?.data
                 ? [{ label: response.data.name, value: response.data.id }]
                 : [];
-            setClaimSubTypes(claimSubTypeFormatList);
+            setClaimSubTypes([{ label: t('SELECT'), value: '' }, ...claimSubTypeFormatList]);
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);
@@ -196,10 +201,14 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     }, [getClaimTypes])
 
 
-    useEffect(()=>{
+    useEffect(() => {
         setIsOTPFormSubitted(false)
         setIsOTPVerified(false)
-    },[userEmail])
+    }, [userEmail])
+
+
+
+
 
     return (
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
@@ -221,12 +230,11 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                             options={claimTypes}
                                             value={formikProps.values.claimTypeId}
                                             onChange={(option) => {
+                                                getClaimSubTypes(option?.target?.value);
                                                 formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
-                                                formikProps.setFieldValue("claimSubTypeId", "");
-                                                if (option?.target?.value && option?.target?.value !== "") {
-                                                    if (option?.target?.value !== formikProps?.values?.claimTypeId) {
-                                                        getClaimSubTypes(option?.target?.value);
-                                                    }
+                                                if (option?.target?.value !== formikProps?.values?.claimTypeId) {
+                                                    formikProps.setFieldValue("claimSubTypeId", "");
+                                                    // getClaimSubTypes(option?.target?.value);
                                                 }
                                             }}
                                             name="claimTypeId"
@@ -349,7 +357,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         </Stack>
                                     </Col>
 
-                                    {!isOTPFormSubmitted || isOTPVerified? (
+                                    {!isOTPFormSubmitted || isOTPVerified ? (
                                         <Col xs={12}>
                                             <Row>
                                                 <Col sm lg={4}>
@@ -420,7 +428,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         type="button"
                                                         variant="warning"
                                                         className="custom-min-width-100 custom-margin-top-1"
-                                                        onClick={(event) => handleOTPVerification(event ,{ otpCode: formikProps.values.otpCode })}
+                                                        onClick={(event) => handleOTPVerification(event, { otpCode: formikProps.values.otpCode })}
                                                     >
                                                         {t("OTP_VERIFICATION")}
                                                     </Button>
