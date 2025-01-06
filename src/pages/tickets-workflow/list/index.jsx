@@ -118,7 +118,7 @@ export default function TicketWorkFlowList() {
                 id: "organizationId",
                 header: () => t('ENTITY NAME'),
                 enableSorting: false,
-                cell : ({row})=>{
+                cell: ({ row }) => {
                     return <span>{row?.original?.organization?.razonSocial}</span>
                 }
             },
@@ -194,6 +194,9 @@ export default function TicketWorkFlowList() {
             queryClient.removeQueries("data");
         };
     }, [queryClient]);
+    useEffect(() => {
+        dataQuery.refetch()
+    }, [])
     return (
         <React.Fragment>
             <Loader isLoading={loading} />
