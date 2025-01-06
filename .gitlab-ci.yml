@@ -9,4 +9,4 @@ variables:
 include:
   - project: 'admincicd/seps-gitlab-runner-pipeline-shared-lib'
     file: 'maven/.mavenServicePipeline.yml'
-    ref: develop
+    ref: master
