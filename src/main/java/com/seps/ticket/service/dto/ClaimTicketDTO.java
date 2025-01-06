@@ -58,5 +58,18 @@ public class ClaimTicketDTO {
     private Instant complaintFiledAt;
     private SourceEnum source;
     private ChannelOfEntryEnum channelOfEntry;
+    private String slaComment;
+    private Boolean slaPopup;
+    private Instant slaCommentedAt;
+    private Long slaCommentedBy;
+    private UserDTO slaCommentedByUser;
+    private String secondInstanceSlaComment;
+    private Instant secondInstanceSlaCommentedAt;
+    private Long secondInstanceSlaCommentedBy;
+    private UserDTO secondInstanceSlaCommentedByUser;
+    private String complaintSlaComment;
+    private Instant complaintSlaCommentedAt;
+    private Long complaintSlaCommentedBy;
+    private UserDTO complaintSlaCommentedByUser;
 
 }

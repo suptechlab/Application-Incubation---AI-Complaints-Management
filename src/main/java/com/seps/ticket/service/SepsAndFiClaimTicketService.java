@@ -205,17 +205,34 @@ public class SepsAndFiClaimTicketService {
         if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganization().getId();
         }
+
+        ClaimTicket claimTicket;
         if (organizationId != null) {
-            return claimTicketRepository.findByIdAndOrganizationId(id, organizationId)
-                .map(claimTicketMapper::toDTO)
+            claimTicket = claimTicketRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{id.toString()}, null));
         } else {
-            return claimTicketRepository.findById(id)
-                .map(claimTicketMapper::toDTO)
+            claimTicket = claimTicketRepository.findById(id)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{id.toString()}, null));
         }
+        LocalDate slaBreachDate = claimTicket.getSlaBreachDate();
+        if (slaBreachDate != null && !(claimTicket.getStatus().equals(ClaimTicketStatusEnum.CLOSED) || claimTicket.getStatus().equals(ClaimTicketStatusEnum.REJECTED))) {
+            String comment = null;
+            if(claimTicket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE))
+                comment = claimTicket.getSlaComment();
+            else if(claimTicket.getInstanceType().equals(InstanceTypeEnum.SECOND_INSTANCE))
+                comment = claimTicket.getSecondInstanceSlaComment();
+            else if(claimTicket.getInstanceType().equals(InstanceTypeEnum.COMPLAINT))
+                comment = claimTicket.getComplaintSlaComment();
+            // Calculate dates 2 days before the SLA breach date
+            LocalDate twoDaysBefore = slaBreachDate.minusDays(2);
+            if (comment ==null && claimTicket.getSlaPopup() == null && (twoDaysBefore.isBefore(LocalDate.now()) || twoDaysBefore.equals(LocalDate.now()) )) {
+                claimTicket.setSlaPopup(true);
+                claimTicketRepository.save(claimTicket);
+            }
+        }
+        return claimTicketMapper.toDTO(claimTicket);
     }
 
     /**
