@@ -3,8 +3,11 @@ package com.seps.ticket.web.rest.vm;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.seps.ticket.component.FileHelper;
 import com.seps.ticket.constraint.validation.MultipleFilesCondition;
+import com.seps.ticket.enums.ChannelOfEntryEnum;
 import com.seps.ticket.enums.CustomerTypeEnum;
 import com.seps.ticket.enums.PriorityCareGroupEnum;
+import com.seps.ticket.enums.SourceEnum;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -63,4 +66,9 @@ public class ClaimTicketRequest {
     @Size(max = 3, message = "{claim.ticket.validation.files.max.size}") // Message from the language file
     private List<MultipartFile> attachments = new ArrayList<>();
 
+    private SourceEnum source;
+
+    private ChannelOfEntryEnum channelOfEntry;
+
+    private List<Long> attachmentsIds = new ArrayList<>();
 }

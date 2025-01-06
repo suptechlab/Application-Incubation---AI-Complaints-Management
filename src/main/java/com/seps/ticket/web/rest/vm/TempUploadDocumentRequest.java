@@ -2,10 +2,6 @@ package com.seps.ticket.web.rest.vm;
 
 import com.seps.ticket.component.FileHelper;
 import com.seps.ticket.constraint.validation.MultipleFilesCondition;
-import com.seps.ticket.enums.ChannelOfEntryEnum;
-import com.seps.ticket.enums.SourceEnum;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,14 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SecondInstanceRequest {
-
-    @NotNull
-    private Long id;
-
-    @NotBlank
-    @Size(max = 1024)
-    private String comment;
+public class TempUploadDocumentRequest {
 
     @MultipleFilesCondition(
         name = FileHelper.FileType.CLAIM_TICKET_DOCUMENTS,
@@ -33,11 +22,5 @@ public class SecondInstanceRequest {
     )
     @Size(max = 3, message = "{claim.ticket.validation.files.max.size}") // Message from the language file
     private List<MultipartFile> attachments = new ArrayList<>();
-
-    private SourceEnum source;
-
-    private ChannelOfEntryEnum channelOfEntry;
-
-    private List<Long> attachmentsIds = new ArrayList<>();
 
 }

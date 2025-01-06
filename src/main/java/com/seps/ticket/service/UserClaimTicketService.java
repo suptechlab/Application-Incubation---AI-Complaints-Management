@@ -73,6 +73,8 @@ public class UserClaimTicketService {
     private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
     private final UserRepository userRepository;
     private final ClaimTicketAssignLogRepository claimTicketAssignLogRepository;
+    private final TempDocumentRepository tempDocumentRepository;
+    private final TempDocumentService tempDocumentService;
 
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
                                   OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository,
@@ -82,7 +84,7 @@ public class UserClaimTicketService {
                                   ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository,
                                   ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                   EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, MailService mailService,
-                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository) {
+                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, TempDocumentRepository tempDocumentRepository, TempDocumentService tempDocumentService) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -92,6 +94,8 @@ public class UserClaimTicketService {
         this.userService = userService;
         this.userClaimTicketMapper = userClaimTicketMapper;
         this.auditLogService = auditLogService;
+        this.tempDocumentRepository = tempDocumentRepository;
+        this.tempDocumentService = tempDocumentService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -193,6 +197,13 @@ public class UserClaimTicketService {
 
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+        }
+        if(claimTicketRequest.getSource() != null && claimTicketRequest.getSource().equals(SourceEnum.CHATBOT) && !claimTicketRequest.getAttachmentsIds().isEmpty()){
+            List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(claimTicketRequest.getAttachmentsIds(), newClaimTicket, source, currentUser);
+            if(!claimTicketDocumentsByIds.isEmpty()){
+                claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
+                claimTicketDocuments.addAll(claimTicketDocumentsByIds);
+            }
         }
 
         // Log all claim ticket-related information
@@ -334,7 +345,8 @@ public class UserClaimTicketService {
         newClaimTicket.setInstanceType(InstanceTypeEnum.FIRST_INSTANCE);
         newClaimTicket.setStatus(ClaimTicketStatusEnum.NEW);
         newClaimTicket.setCreatedByUser(currentUser);
-        newClaimTicket.setSource(SourceEnum.WEB);
+        newClaimTicket.setSource(claimTicketRequest.getSource() != null ? claimTicketRequest.getSource() : SourceEnum.WEB);
+        newClaimTicket.setChannelOfEntry(claimTicketRequest.getChannelOfEntry());
         return newClaimTicket;
     }
 
@@ -551,6 +563,8 @@ public class UserClaimTicketService {
         claimTicketRequestJson.setPrecedents(claimTicketRequest.getPrecedents());
         claimTicketRequestJson.setSpecificPetition(claimTicketRequest.getSpecificPetition());
         claimTicketRequestJson.setCheckDuplicate(claimTicketRequest.getCheckDuplicate());
+        claimTicketRequestJson.setSource(claimTicketRequest.getSource());
+        claimTicketRequestJson.setChannelOfEntry(claimTicketRequest.getChannelOfEntry());
         // Convert attachments (MultipartFile to filenames)
         List<String> attachments = new ArrayList<>();
         if (claimTicketRequest.getAttachments() != null) {
@@ -559,6 +573,7 @@ public class UserClaimTicketService {
             }
         }
         claimTicketRequestJson.setAttachments(attachments);
+        claimTicketRequestJson.setAttachmentsIds(claimTicketRequest.getAttachmentsIds());
         return claimTicketRequestJson;
     }
 
@@ -663,6 +678,12 @@ public class UserClaimTicketService {
         claimTicket.setSecondInstanceComment(secondInstanceRequest.getComment());
         claimTicket.setUpdatedAt(Instant.now());
         claimTicket.setUpdatedByUser(currentUser);
+        if(secondInstanceRequest.getSource() != null){
+            claimTicket.setSource(secondInstanceRequest.getSource());
+        }
+        if(secondInstanceRequest.getChannelOfEntry()!=null){
+            claimTicket.setChannelOfEntry(secondInstanceRequest.getChannelOfEntry());
+        }
         // Save the updated claim ticket to the database
         claimTicketRepository.save(claimTicket);
 
@@ -674,6 +695,12 @@ public class UserClaimTicketService {
         // Save the documents if any were uploaded
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
+        }
+        if(secondInstanceRequest.getSource().equals(SourceEnum.CHATBOT) && !secondInstanceRequest.getAttachmentsIds().isEmpty()){
+            List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(secondInstanceRequest.getAttachmentsIds(), claimTicket, source, currentUser);
+            if(!claimTicketDocumentsByIds.isEmpty()){
+                claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
+            }
         }
         //Log all claim related ticket details
         logClaimTicketDetails(claimTicket, claimTicketWorkFlowDTO, userDTO, currentUserId);
@@ -824,6 +851,9 @@ public class UserClaimTicketService {
             }
         }
         secondInstanceRequestForJson.setAttachments(attachments);
+        secondInstanceRequestForJson.setSource(secondInstanceRequest.getSource());
+        secondInstanceRequestForJson.setChannelOfEntry(secondInstanceRequest.getChannelOfEntry());
+        secondInstanceRequestForJson.setAttachmentsIds(secondInstanceRequest.getAttachmentsIds());
         return secondInstanceRequestForJson;
     }
 
@@ -1112,6 +1142,12 @@ public class UserClaimTicketService {
         claimTicket.setComplaintFiledAt(Instant.now());
         claimTicket.setUpdatedAt(Instant.now());
         claimTicket.setUpdatedByUser(currentUser);
+        if(complaintRequest.getSource() != null){
+            claimTicket.setSource(complaintRequest.getSource());
+        }
+        if(complaintRequest.getChannelOfEntry()!=null){
+            claimTicket.setChannelOfEntry(complaintRequest.getChannelOfEntry());
+        }
         // Save the updated claim ticket to the database
         claimTicketRepository.save(claimTicket);
         // Handle and save file attachments related to this claim
@@ -1122,7 +1158,12 @@ public class UserClaimTicketService {
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
-
+        if(complaintRequest.getSource().equals(SourceEnum.CHATBOT) && !complaintRequest.getAttachmentsIds().isEmpty()){
+            List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(complaintRequest.getAttachmentsIds(), claimTicket, source, currentUser);
+            if(!claimTicketDocumentsByIds.isEmpty()){
+                claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
+            }
+        }
         //Log all claim related ticket details
         logClaimTicketDetails(claimTicket, claimTicketWorkFlowDTO, userDTO, currentUserId);
 
@@ -1193,6 +1234,9 @@ public class UserClaimTicketService {
             }
         }
         complaintRequestForJson.setAttachments(attachments);
+        complaintRequestForJson.setSource(request.getSource());
+        complaintRequestForJson.setChannelOfEntry(request.getChannelOfEntry());
+        complaintRequestForJson.setAttachmentsIds(request.getAttachmentsIds());
         return complaintRequestForJson;
     }
 
