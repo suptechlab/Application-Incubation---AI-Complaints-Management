@@ -3,6 +3,8 @@ package com.seps.auth.service.dto;
 import com.seps.auth.config.Constants;
 import com.seps.auth.domain.Authority;
 import com.seps.auth.domain.User;
+import com.seps.auth.enums.UserStatusEnum;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 import java.io.Serializable;
@@ -61,7 +63,22 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 15)
     private String phoneNumber;
 
+    private UserStatusEnum status;
+
+    private String identificacion;
+
+    private String gender;
+
+    private boolean isPasswordSet = false;
+
     private List<RoleDTO> roles;
+
+    private Long organizationId;
+
+    private OrganizationDTO organization;
+
+    private String department;
+
 
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
@@ -83,6 +100,15 @@ public class AdminUserDTO implements Serializable {
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
         this.countryCode = user.getCountryCode();
         this.phoneNumber = user.getPhoneNumber();
+        this.status = user.getStatus();
+        this.identificacion = user.getIdentificacion();
+        this.gender = user.getGender();
+        this.isPasswordSet = user.isPasswordSet();
+        this.organizationId = user.getOrganizationId();
+        if (user.getOrganization() != null) {
+            this.organization = new OrganizationDTO(user.getOrganization());
+        }
+        this.department = user.getDepartment();
     }
 
     public Long getId() {
@@ -205,12 +231,68 @@ public class AdminUserDTO implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public UserStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatusEnum status) {
+        this.status = status;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public void setIdentificacion(String identificacion) {
+        this.identificacion = identificacion;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public boolean isPasswordSet() {
+        return isPasswordSet;
+    }
+
+    public void setPasswordSet(boolean passwordSet) {
+        isPasswordSet = passwordSet;
+    }
+
     public List<RoleDTO> getRoles() {
         return roles;
     }
 
     public void setRoles(List<RoleDTO> roles) {
         this.roles = roles;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public OrganizationDTO getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(OrganizationDTO organization) {
+        this.organization = organization;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     // prettier-ignore

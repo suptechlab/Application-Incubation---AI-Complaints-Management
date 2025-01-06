@@ -147,6 +147,17 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @BatchSize(size = 20)
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "organization_id", insertable = false, updatable = false)
+    private Long organizationId;
+
+    @ManyToOne
+    @JoinColumn(name = "organization_id", updatable = false)
+    private Organization organization;
+
+    @Column(name = "department", length = 255)
+    private String department;
+
+
     public Long getId() {
         return id;
     }
@@ -370,6 +381,30 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     @Override
