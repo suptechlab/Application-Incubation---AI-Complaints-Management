@@ -146,5 +146,8 @@ export const englishLang = {
   "DOWNLOAD": "Download",
   "COMPLAINT_RAISED_SUCCES": "Complaint raised successfully",
   "LOGIN": "Login",
-  "CHATBOT_INITIAL_TEXT" : 'How may i help you ?'
+  "CHATBOT_INITIAL_TEXT" : 'How may i help you ?',
+  "EDIT_PROFILE":"Edit Profile",
+  "UPDATE":"Update",
+  "BROWSE_IMAGE":"Browse Image"
 }
