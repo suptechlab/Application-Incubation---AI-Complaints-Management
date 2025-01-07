@@ -32,4 +32,10 @@ export const ticketRejectValidation = Yup.object({
 });
 
 
+// TICKET REMINDER FORM VALIDATION
+export const reminderFormValidation = Yup.object({
+  comment: Yup.string()
+    .required(msg.commentRequired),
+});
+
 export { validationSchema };

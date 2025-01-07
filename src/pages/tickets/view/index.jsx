@@ -19,6 +19,7 @@ import { AuthenticationContext } from '../../../contexts/authentication.context'
 import { MasterDataContext } from '../../../contexts/masters.context';
 import { useTranslation } from 'react-i18next';
 import ConsumerInfoModal from '../modals/consumerInfoModal';
+import SlaReminderModal from '../modals/slaReminderModal';
 
 const TicketsView = () => {
 
@@ -35,10 +36,10 @@ const TicketsView = () => {
     priorityPermission: false,
     downloadPermission: false,
     assignPermission: false,
-    dateExtPermission : false,
-    replyToCustomerPermission : false,
-    replyInternalPermission : false,
-    internalNotePermission : false
+    dateExtPermission: false,
+    replyToCustomerPermission: false,
+    replyInternalPermission: false,
+    internalNotePermission: false
   });
 
   useEffect(() => {
@@ -49,10 +50,10 @@ const TicketsView = () => {
       priorityPermission: false,
       downloadPermission: false,
       assignPermission: false,
-      dateExtPermission : false,
-      replyToCustomerPermission : false,
-      replyInternalPermission : false,
-      internalNotePermission : false
+      dateExtPermission: false,
+      replyToCustomerPermission: false,
+      replyInternalPermission: false,
+      internalNotePermission: false
     };
     if (currentUser === "SYSTEM_ADMIN") {
       updatedPermissions.statusModule = true;
@@ -120,6 +121,12 @@ const TicketsView = () => {
 
   const [currentDate, setCurrentDate] = useState(moment().format("DD-MM-YYYY | hh:mm:a"));
 
+  const [showReminderModal, setShowReminderModal] = useState(false)
+
+  const toggleSLAReminder = () => {
+    setShowReminderModal(!showReminderModal)
+  }
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentDate(moment().format("DD-MM-YYYY | hh:mm:a"));
@@ -156,6 +163,12 @@ const TicketsView = () => {
     ticketDetailsApi(id).then(response => {
       if (response?.data) {
         setTicketData(response?.data)
+
+        if (response?.data?.slaPopup === true) {
+          setShowReminderModal(true)
+        } else {
+          setShowReminderModal(false)
+        }
         setSelectedPriority(response?.data?.priority)
       }
     }).catch((error) => {
@@ -276,6 +289,15 @@ const TicketsView = () => {
       value: ticketData?.team ?? "N/A",
       colProps: { sm: 6 }
     },
+    ...(ticketData?.slaPopup !== null
+      ? [
+        {
+          // label: t("CONSUMER_INFO"),
+          value: <Link onClick={(event) => { setShowReminderModal(true); event.preventDefault() }} className='text-decoration-none'>Provide SLA Comment</Link>,
+          colProps: { sm: 6 },
+        },
+      ]
+      : []),
     ...(ticketData?.createdByUser?.id !== ticketData?.user?.id
       ? [
         {
@@ -315,6 +337,15 @@ const TicketsView = () => {
       value: ticketData?.specificPetition ?? 'N/A',
       colProps: { xs: 12 }
     },
+    ...(ticketData?.slaComment !== null
+      ? [
+        {
+          label: t("SLA_COMMENT"),
+          value: <p className='text-decoration-none text-secondary fw-bold'> {ticketData?.slaComment}</p>,
+          colProps: { sm: 6 },
+        },
+      ]
+      : [])
   ];
   // VIEW BOTTOM DATA
   const viewSecondInstanceData = [
@@ -340,6 +371,15 @@ const TicketsView = () => {
       value: ticketData?.secondInstanceComment ?? 'N/A',
       colProps: { xs: 12 }
     },
+    ...(ticketData?.secondInstanceSlaComment !== null
+      ? [
+        {
+          label: t("SLA_COMMENT"),
+          value: <p className='text-decoration-none text-secondary fw-bold'> {ticketData?.secondInstanceSlaComment}</p>,
+          colProps: { sm: 6 },
+        },
+      ]
+      : [])
   ];
 
   const viewComplaintData = [
@@ -365,6 +405,15 @@ const TicketsView = () => {
       value: ticketData?.complaintPrecedents ?? 'N/A',
       colProps: { xs: 12 }
     },
+    ...(ticketData?.complaintSlaComment !== null
+      ? [
+        {
+          label: t("SLA_COMMENT"),
+          value: <p className='text-decoration-none text-secondary fw-bold'> {ticketData?.complaintSlaComment}</p>,
+          colProps: { sm: 6 },
+        },
+      ]
+      : [])
   ];
 
   return (
@@ -376,7 +425,7 @@ const TicketsView = () => {
           ticketData={ticketData}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
           getTicketData={getTicketDetails}
-          permissionState = {permissionsState}
+          permissionState={permissionsState}
         />}
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
@@ -448,9 +497,9 @@ const TicketsView = () => {
                     </Col>
                   </Row>
                 </Card.Header>
-                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketDetails} permissionState={permissionsState}/>
+                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketDetails} permissionState={permissionsState} />
               </Card>
-              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} permissionState ={permissionsState}/>
+              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} permissionState={permissionsState} />
               {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
                   <ListGroup variant="flush">
@@ -503,8 +552,18 @@ const TicketsView = () => {
         toggle={() => setAttachmentsModalShow(false)}
         currentInstance={currentInstance}
         ticketData={ticketData}
-        permissionState = {permissionsState}
+        permissionState={permissionsState}
       />
+      {
+        ticketData?.slaPopup !== null &&
+        <SlaReminderModal
+          ticketData={ticketData}
+          showModal={showReminderModal}
+          toggle={toggleSLAReminder}
+          getTicketData={getTicketDetails}
+        />
+      }
+
     </React.Fragment>
   )
 }
