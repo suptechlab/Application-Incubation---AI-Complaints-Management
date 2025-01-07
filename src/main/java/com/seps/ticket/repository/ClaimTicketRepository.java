@@ -176,4 +176,11 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         @Param("status") ClaimTicketStatusEnum status);
 
     List<ClaimTicket> findAll(Specification<ClaimTicket> claimTicketSpecification);
+
+    @Query("SELECT c FROM ClaimTicket c WHERE c.slaBreachDate IS NOT NULL " +
+        "AND c.status NOT IN (:closed, :rejected) " +
+        "AND c.slaPopup IS NULL")
+    List<ClaimTicket> findEligibleTicketsForSlaPopup(@Param("closed") ClaimTicketStatusEnum closed,
+                                                     @Param("rejected") ClaimTicketStatusEnum rejected);
+
 }
