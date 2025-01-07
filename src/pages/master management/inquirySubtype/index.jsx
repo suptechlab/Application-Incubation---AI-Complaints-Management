@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PageHeader from "../../../components/PageHeader";
 import qs from "qs";
@@ -17,6 +17,7 @@ import { Card } from "react-bootstrap";
 import DataGridActions from "../../../components/DataGridActions";
 import { MdEdit } from "react-icons/md";
 import Loader from "../../../components/Loader";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 const InquirySubType = () => {
 
@@ -48,36 +49,43 @@ const InquirySubType = () => {
   const toggle = () => setModal(!modal);
 
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
-
-  const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    addModule: false,
+    editModule: false,
+  });
 
   useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-        permission.current.statusModule = true;
-        permission.current.addModule = true;
-        permission.current.editModule = true;
-        permission.current.deleteModule = true;
-      } else {
-        getModulePermissions("Inquiry Sub Type Master").then(response => {
-          if (response.includes("INQUIRY_SUB_TYPE_CREATE")) {
-            permission.current.addModule = true;
-          }
-          if (response.includes("INQUIRY_SUB_TYPE_UPDATE")) {
-            permission.current.editModule = true;
-          }
-          if (response.includes("INQUIRY_SUB_TYPE_STATUS_CHANGE")) {
-            permission.current.statusModule = true;
-          }
-        }).catch(error => {
-          console.error("Error fetching permissions:", error);
-        });
-      }
-    }).catch(error => {
-      console.error("Error get during to fetch Inquiry Type", error);
-    })
+    const updatedPermissions = {
+      statusModule: false,
+      addModule: false,
+      editModule: false,
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.addModule = true;
+      updatedPermissions.editModule = true;
+    } else {
+      const permissionArr = permissions['Inquiry Sub Type Master'] ?? [];
 
-  }, []);
+      if (["INQUIRY_SUB_TYPE_CREATE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.addModule = true;
+      }
+
+      if (["INQUIRY_SUB_TYPE_UPDATE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.editModule = true;
+      }
+
+      if (["INQUIRY_SUB_TYPE_STATUS_CHANGE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
+
 
   const editInquiryType = async (rowData) => {
     setEditModal({ row: rowData, open: !editModal?.open })
@@ -213,7 +221,7 @@ const InquirySubType = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
-            permission.current.statusModule ?
+            permissionsState.statusModule ?
             <Toggle
               tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
               id={`status-${info?.row?.original?.id}`}
@@ -235,14 +243,14 @@ const InquirySubType = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ?
+          permissionsState.editModule ?
           <DataGridActions
             controlId="province-master"
             rowData={rowData}
             customButtons={[
               {
                 name: "edit",
-                enabled: permission.current.editModule,
+                enabled: permissionsState.editModule,
                 type: "button",
                 title:t("EDIT"),
                 icon: <MdEdit size={18} />,
@@ -256,7 +264,7 @@ const InquirySubType = () => {
         size: '80',
       },
     ],
-    []
+    [permissionsState]
   );
 
   useEffect(() => {
@@ -300,7 +308,7 @@ const InquirySubType = () => {
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
-    {permission.current.addModule
+    {permissionsState.addModule
         ?
     <PageHeader title={t("INQUIRY SUB TYPE")}
       actions={[

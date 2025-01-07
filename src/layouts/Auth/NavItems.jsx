@@ -28,8 +28,7 @@ export const NavItems = () => {
           menuName: t("SEPS USERS"),
           title: t("SEPS USERS"),
           path: "/users",
-          roleName: "SEPS User",
-          permissions: ["FI_USER_CREATE_BY_FI"], // Match against userRoles
+          moduleName: "SEPS User",
           disabled: false,
         },
         {
@@ -38,7 +37,6 @@ export const NavItems = () => {
           title: t("FI USERS"),
           path: "/fi-users",
           moduleName: "FI User",
-          permissions: ["FI_USER_CREATE_BY_FI"],
           disabled: false,
         },
         {
@@ -46,7 +44,6 @@ export const NavItems = () => {
           menuName: t("ROLES AND RIGHTS LIST"),
           title: t("ROLES AND RIGHTS LIST"),
           path: "/role-rights",
-          roleName: "admin",
           permissions: [], // No specific permission required for admin
           disabled: false,
         },
@@ -58,8 +55,7 @@ export const NavItems = () => {
       title: t("TEAM MANAGEMENT"),
       menuIcon: <MdSupervisorAccount size={20} />,
       path: "/team-management",
-      roleName: "admin",
-      moduleName:"Teams Manage",
+      moduleName: "Teams Manage",
       disabled: false,
     },
     {
@@ -68,6 +64,7 @@ export const NavItems = () => {
       title: t("MASTER MANAGEMENT"),
       menuIcon: <MdFolder size={20} />,
       path: '#',
+      moduleName: "Master",
       moduleName: "Master",
       roleName: "admin",
       subMenu: [
@@ -135,8 +132,7 @@ export const NavItems = () => {
       title: t("TICKETS"),
       menuIcon: <MdConfirmationNumber size={20} />,
       path: "/tickets",
-      roleName: "admin",
-      moduleName : 'Ticket',
+      moduleName: 'Ticket',
       disabled: false,
     },
     {
@@ -155,31 +151,27 @@ export const NavItems = () => {
       title: t("REPORTS"),
       menuIcon: <BsFillFileTextFill size={20} />,
       path: '#',
-      moduleName: ["reports"],
-      roleName: "Reports",
+      moduleName: "Reports",
       subMenu: [
         {
           id: 71,
           menuName: t("CLAIM OVERVIEW"),
           path: "/reports/claim-overview",
-          moduleName: ["reports"],
-          roleName: "Reports",
+          moduleName: "Audit Trails",
           disabled: true,
         },
         {
           id: 72,
           menuName: t("SLA COMPLIANCE"),
           path: "/reports/sla-compliance",
-          moduleName: ["reports"],
-          roleName: "Reports",
+          moduleName: "Reports",
           disabled: true,
         },
         {
           id: 73,
           menuName: t("AUDIT TRAIL REPORT"),
           path: "/reports/audit-trail",
-          moduleName: ["reports"],
-          roleName: "Audit Trails",
+          moduleName: "Reports",
           disabled: false,
         },
       ],

@@ -8,7 +8,7 @@ const ticketWorkflowSchema = Yup.object({
     entityId: Yup.string()
         .when(['userType', 'instanceTypeId'], {
             is: (userType, instanceTypeId) =>
-                (userType === 'SUPER_ADMIN' || userType === 'SEPS_ADMIN') && instanceTypeId === 'FIRST_INSTANCE',
+                (userType === 'SYSTEM_ADMIN' || userType === 'SEPS_USER') && instanceTypeId === 'FIRST_INSTANCE',
             then: (schema) => schema.required(msg.entityRequired),
             otherwise: (schema) => schema,
         }),

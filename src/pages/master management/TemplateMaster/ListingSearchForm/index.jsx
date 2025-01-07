@@ -1,34 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import FormInput from "../../../components/FormInput";
-import ReactSelect from "../../../components/ReactSelect";
-import { getOrganizationList } from "../../../services/teamManagment.service";
+import FormInput from "../../../../components/FormInput";
+import ReactSelect from "../../../../components/ReactSelect";
 
-const ListingSearchForm = ({ filter, setFilter, currentUser }) => {
+const ListingSearchForm = ({ filter, setFilter, hideFilter }) => {
   const { t } = useTranslation();
-
-  const [organizationArr, setOrganizationArr] = useState([])
-
-
-  const getOrganizationLists = async () => {
-    try {
-      await getOrganizationList().then((response) => {
-        const formattedOrgData = response.data.map((item) => ({
-          label: item.name,
-          value: item.id
-        }));
-        setOrganizationArr([{label :t('ALL_ENTITIES'), value: ''},...formattedOrgData]);
-      });
-    } catch (error) {
-    }
-  }
-
-  useEffect(() => {
-    getOrganizationLists()
-  }, [])
-
-
   return (
     <div className="theme-card-header header-search mb-3">
       <Stack direction="horizontal" gap={2} className="flex-wrap">
@@ -57,23 +34,37 @@ const ListingSearchForm = ({ filter, setFilter, currentUser }) => {
             value={filter.search}
           />
         </div>
-        {currentUser !== 'FI_USER' &&
+        {!hideFilter &&
           <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-            <div className="custom-width-250 flex-grow-1 flex-md-grow-0">
+            <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
               <ReactSelect
                 wrapperClassName="mb-0"
                 class="form-select "
-                placeholder={t("ENTITY NAME")}
+                placeholder={t("TEMPLATE TYPE")}
                 id="floatingSelect"
                 size="sm"
-                options={organizationArr ?? []}
+                options={[
+                  {
+                    label: t("ALL TEMPLATES"),
+                    value: "",
+                    class: "label-class",
+                  },
+                  {
+                    label: t("EMAIL"),
+                    value: "EMAIL",
+                  },
+                  {
+                    label: t("NOTIFICATION"),
+                    value: "NOTIFICATION",
+                  },
+                ]}
                 onChange={(e) => {
                   setFilter({
                     ...filter,
-                    organizationId: e.target.value,
+                    templateType: e.target.value,
                   });
                 }}
-                value={filter.organizationId}
+                value={filter.status}
               />
             </div>
             <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">

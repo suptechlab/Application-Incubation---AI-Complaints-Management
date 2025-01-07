@@ -18,7 +18,12 @@ const Routers = () => {
               <LayoutComponent layoutType={route.layoutType}>
                 {/* {console.log('route routers.jsx 19 -',route)} */}
                 {route.isPrivate ? (
-                  <PrivateRoute path={route.path} element={route.element} />
+                  <PrivateRoute
+                    path={route.path}
+                    element={route.element}
+                    moduleName={route?.module}
+                    route_permissions={route?.permissions}
+                  />
                 ) : (
                   <PublicRoute path={route.path} element={route.element} />
                 )}

@@ -22,9 +22,85 @@ import ConsumerInfoModal from '../modals/consumerInfoModal';
 
 const TicketsView = () => {
 
-  const {currentUser } = useContext(AuthenticationContext);
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext);
 
   const { masterData } = useContext(MasterDataContext);
+
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    rejectPermission: false,
+    closePermission: false,
+    priorityPermission: false,
+    downloadPermission: false,
+    assignPermission: false,
+    dateExtPermission : false,
+    replyToCustomerPermission : false,
+    replyInternalPermission : false,
+    internalNotePermission : false
+  });
+
+  useEffect(() => {
+    const updatedPermissions = {
+      statusModule: false,
+      rejectPermission: false,
+      closePermission: false,
+      priorityPermission: false,
+      downloadPermission: false,
+      assignPermission: false,
+      dateExtPermission : false,
+      replyToCustomerPermission : false,
+      replyInternalPermission : false,
+      internalNotePermission : false
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.rejectPermission = true;
+      updatedPermissions.closePermission = true;
+      updatedPermissions.priorityPermission = true;
+      updatedPermissions.downloadPermission = true;
+      updatedPermissions.assignPermission = true;
+      updatedPermissions.dateExtPermission = true;
+      updatedPermissions.replyToCustomerPermission = true;
+      updatedPermissions.replyInternalPermission = true;
+      updatedPermissions.internalNotePermission = true;
+    } else {
+      const permissionArr = permissions['Ticket'] ?? [];
+      if (["TICKET_ASSIGNED_TO_AGENT_FI", "TICKET_ASSIGNED_TO_AGENT_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.assignPermission = true;
+      }
+      if (["TICKET_CHANGE_STATUS_BY_SEPS", "TICKET_CHANGE_STATUS_BY_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+      if (["TICKET_REJECT_FI", "TICKET_REJECT_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.rejectPermission = true;
+      }
+      if (["TICKET_CLOSED_FI", "TICKET_CLOSED_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.closePermission = true;
+      }
+      if (["TICKET_PRIORITY_CHANGE_FI", "TICKET_PRIORITY_CHANGE_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.priorityPermission = true;
+      }
+      if (["TICKET_DOWNLOAD_PDF_FI", "TICKET_DOWNLOAD_PDF_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.downloadPermission = true;
+      }
+      if (["TICKET_DATE_EXTENSION_FI", "TICKET_DATE_EXTENSION_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.dateExtPermission = true;
+      }
+      if (["TICKET_REPLY_TO_CUSTOMER_FI", "TICKET_REPLY_TO_CUSTOMER_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.replyToCustomerPermission = true;
+      }
+      if (["TICKET_REPLY_TO_INTERNAL_FI", "TICKET_REPLY_TO_INTERNAL_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.replyInternalPermission = true;
+      }
+      if (["TICKET_INTERNAL_NOTE_FI", "TICKET_INTERNAL_NOTE_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.internalNotePermission = true;
+      }
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
 
   const { t } = useTranslation()
 
@@ -34,7 +110,7 @@ const TicketsView = () => {
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
   const [consumerInfoModalShow, setConsumerInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
-  const [currentInstance , setCurrentInstance] = useState('')
+  const [currentInstance, setCurrentInstance] = useState('')
 
   const [loading, setLoading] = useState(false)
 
@@ -149,7 +225,7 @@ const TicketsView = () => {
       label: t("PRIORITY"),
       value: (<Stack direction='horizontal' gap={1}>
         {
-          ((currentUser === "FI_ADMIN" || currentUser === "SEPS_ADMIN" || currentUser === "ADMIN") && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) ?
+          (permissionsState?.priorityPermission === true && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) ?
             <Dropdown>
               <Dropdown.Toggle
                 variant="link"
@@ -157,7 +233,10 @@ const TicketsView = () => {
                 className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
               >
                 <AppTooltip title={t("CHANGE_PRIORITY")} placement="top">
-                  <span><span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span> <MdArrowDropDown size={14} /></span>
+                  <span>
+                    <span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>
+                      {masterData?.claimTicketPriority[selectedPriority]}
+                    </span> <MdArrowDropDown size={14} /></span>
                 </AppTooltip>
               </Dropdown.Toggle>
               <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
@@ -167,7 +246,7 @@ const TicketsView = () => {
                     className={`small ${selectedPriority === priority ? 'active' : ''}`}
                     onClick={() => handlePriorityChange(priority)}
                   >
-                    {priority}
+                    {masterData?.claimTicketPriority[priority]}
                   </Dropdown.Item>
                 ))}
               </Dropdown.Menu>
@@ -222,7 +301,7 @@ const TicketsView = () => {
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <button onClick={()=>handleAttachmentsClick("FIRST_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
+        <button onClick={() => handleAttachmentsClick("FIRST_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
       </Stack>),
       colProps: { sm: 6 }
     },
@@ -252,9 +331,9 @@ const TicketsView = () => {
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <button onClick={()=>handleAttachmentsClick("SECOND_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
+        <button onClick={() => handleAttachmentsClick("SECOND_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
       </Stack>),
-      colProps: { xs: 12}
+      colProps: { xs: 12 }
     },
     {
       label: t("COMMENT"),
@@ -277,9 +356,9 @@ const TicketsView = () => {
     {
       value: (<Stack direction='horizontal' gap={1}>
         <span><MdAttachFile size={16} /></span>
-        <button onClick={()=>handleAttachmentsClick("COMPLAINT")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
+        <button onClick={() => handleAttachmentsClick("COMPLAINT")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
       </Stack>),
-      colProps: { xs: 12}
+      colProps: { xs: 12 }
     },
     {
       label: t("PRECEDENTS"),
@@ -291,18 +370,14 @@ const TicketsView = () => {
   return (
     <React.Fragment>
       <Loader isLoading={loading} />
-
-     
-
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-      {loading!== true &&   <TicketViewHeader
+        {loading !== true && <TicketViewHeader
           title={"#" + ticketData?.ticketId}
           ticketData={ticketData}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
-          getTicketData = {getTicketDetails}
+          getTicketData={getTicketDetails}
+          permissionState = {permissionsState}
         />}
-
-       
         <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
           <Row className='h-100 gy-3 gy-lg-0 gx-3'>
             <Col lg={6} className='mh-100 d-flex flex-column'>
@@ -319,7 +394,7 @@ const TicketsView = () => {
               </Card>
               {/* SECOND INSTANCE DETAILS */}
               {
-                ticketData?.instanceType === 'SECOND_INSTANCE' &&
+                (ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
                 <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                   <Card.Body className='mh-100'>
                     <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5>
@@ -351,31 +426,31 @@ const TicketsView = () => {
               }
             </Col>
             <Col lg={6} className='mh-100 d-flex flex-column'>
-                <Card className="border-0 shadow">
-                  <Card.Header className='bg-body border-0 py-3'>
-                    {/* REPLY SECTION */}
-                    <Row className='g-2'>
-                      <Col xs="auto">
-                        <Image
-                          className="object-fit-cover rounded-circle"
-                          src={defaultAvatar}
-                          width={36}
-                          height={36}
-                          alt={ticketData?.user?.name}
-                        />
-                      </Col>
-                      <Col xs className='small lh-sm'>
-                        <div className='fw-bold'>{ticketData?.user?.name}</div>
-                        <Stack direction='horizontal' gap={2} className='text-secondary'>
-                          <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                          <span> {currentDate} </span>
-                        </Stack>
-                      </Col>
-                    </Row>
-                  </Card.Header>
-                  <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData}  getTicketData={getTicketDetails}/>
-                </Card>
-              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} />
+              <Card className="border-0 shadow">
+                <Card.Header className='bg-body border-0 py-3'>
+                  {/* REPLY SECTION */}
+                  <Row className='g-2'>
+                    <Col xs="auto">
+                      <Image
+                        className="object-fit-cover rounded-circle"
+                        src={defaultAvatar}
+                        width={36}
+                        height={36}
+                        alt={ticketData?.user?.name}
+                      />
+                    </Col>
+                    <Col xs className='small lh-sm'>
+                      <div className='fw-bold'>{ticketData?.user?.name}</div>
+                      <Stack direction='horizontal' gap={2} className='text-secondary'>
+                        <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                        <span> {currentDate} </span>
+                      </Stack>
+                    </Col>
+                  </Row>
+                </Card.Header>
+                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketDetails} permissionState={permissionsState}/>
+              </Card>
+              <ActivityLogs setLoading={setLoading} ticketId={id} isGetActivityLogs={isGetActivityLogs} permissionState ={permissionsState}/>
               {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                 <Card.Body className='py-0'>
                   <ListGroup variant="flush">
@@ -428,6 +503,7 @@ const TicketsView = () => {
         toggle={() => setAttachmentsModalShow(false)}
         currentInstance={currentInstance}
         ticketData={ticketData}
+        permissionState = {permissionsState}
       />
     </React.Fragment>
   )

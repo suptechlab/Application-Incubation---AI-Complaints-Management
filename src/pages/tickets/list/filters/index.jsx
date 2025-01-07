@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import { agentListingApi } from "../../../../services/ticketmanagement.service";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
 
-const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection }) => {
+const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection,permissionsState }) => {
 
     const { currentUser } = useContext(AuthenticationContext);
 
@@ -34,6 +34,11 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
                 endDate: moment(newEndDate).format("YYYY-MM-DD")
             });
+        }else{
+            setFilter({
+                startDate: '',
+                endDate:''
+            });  
         }
     };
     // GET CLAIM TYPE DROPDOWN LIST
@@ -107,11 +112,11 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                                 search: event.target.value,
                             });
                         }}
-                        value={filter.search}
+                        value={filter?.search}
                     />
                 </div>
                 {
-                    currentUser === 'FI_ADMIN' || currentUser === 'SEPS_ADMIN' || currentUser === 'SUPER_ADMIN' ?
+                    permissionsState?.assignPermission === true ?
                         <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                             <ReactSelect
                                 wrapperClassName="mb-0"
@@ -183,7 +188,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             size="sm"
                             options={[
                                 {
-                                    label: t("ALL PRIORITY"),
+                                    label: t("ALL_PRIORITY"),
                                     value: "",
                                     class: "label-class",
                                 },
@@ -270,6 +275,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             selectsRange={true}
                             placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
+                            maxDate={new Date()} // Prevent future date selection
                         />
                     </div>
 
