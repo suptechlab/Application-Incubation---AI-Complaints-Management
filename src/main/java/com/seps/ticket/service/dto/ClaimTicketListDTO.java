@@ -50,4 +50,7 @@ public class ClaimTicketListDTO {
     private String complaintPrecedents;
     private String complaintSpecificPetition;
     private Instant complaintFiledAt;
+    private SourceEnum source;
+    private ChannelOfEntryEnum channelOfEntry;
+    private Boolean slaPopup;
 }
