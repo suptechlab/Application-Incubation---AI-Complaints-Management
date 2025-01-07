@@ -696,7 +696,7 @@ public class UserClaimTicketService {
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
-        if(secondInstanceRequest.getSource().equals(SourceEnum.CHATBOT) && !secondInstanceRequest.getAttachmentsIds().isEmpty()){
+        if(secondInstanceRequest.getSource() != null && secondInstanceRequest.getSource().equals(SourceEnum.CHATBOT) && !secondInstanceRequest.getAttachmentsIds().isEmpty()){
             List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(secondInstanceRequest.getAttachmentsIds(), claimTicket, source, currentUser);
             if(!claimTicketDocumentsByIds.isEmpty()){
                 claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
@@ -1158,7 +1158,7 @@ public class UserClaimTicketService {
         if (!claimTicketDocuments.isEmpty()) {
             claimTicketDocumentRepository.saveAll(claimTicketDocuments);
         }
-        if(complaintRequest.getSource().equals(SourceEnum.CHATBOT) && !complaintRequest.getAttachmentsIds().isEmpty()){
+        if(complaintRequest.getSource() != null && complaintRequest.getSource().equals(SourceEnum.CHATBOT) && !complaintRequest.getAttachmentsIds().isEmpty()){
             List<ClaimTicketDocument> claimTicketDocumentsByIds = tempDocumentService.uploadTempToPermanentFiles(complaintRequest.getAttachmentsIds(), claimTicket, source, currentUser);
             if(!claimTicketDocumentsByIds.isEmpty()){
                 claimTicketDocumentRepository.saveAll(claimTicketDocumentsByIds);
