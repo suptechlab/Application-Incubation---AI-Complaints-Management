@@ -22,7 +22,7 @@ import ConsumerInfoModal from '../modals/consumerInfoModal';
 
 const TicketsView = () => {
 
-  const { currentUser, permissions = {} } = useContext(AuthenticationContext);
+  const { currentUser, permissions = {} ,profileImage} = useContext(AuthenticationContext);
 
   const { masterData } = useContext(MasterDataContext);
 
@@ -433,7 +433,7 @@ const TicketsView = () => {
                     <Col xs="auto">
                       <Image
                         className="object-fit-cover rounded-circle"
-                        src={defaultAvatar}
+                        src={profileImage ?? defaultAvatar}
                         width={36}
                         height={36}
                         alt={ticketData?.user?.name}

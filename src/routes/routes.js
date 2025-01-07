@@ -194,6 +194,7 @@ const routes = [
     path: "/profile",
     element: <AccountProfile />,
     isPrivate: true,
+    module:'profile',
     layoutType: "Auth",
   },
   {

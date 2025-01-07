@@ -12,9 +12,7 @@ const validationSchema = Yup.object({
     firstName: Yup.string()
         .max(250, msg.firstNameMax) // Use dynamic message for first name max length
         .required(msg.firstNameRequired), // Use dynamic message for first name required
-    lastName: Yup.string()
-        .max(250, msg.lastNameMax) // Use dynamic message for last name max length
-        .required(msg.lastNameRequired), // Use dynamic message for last name required
+   profile : Yup.string().required(msg.profileRequired)
 });
 
 export { validationSchema };
