@@ -6,8 +6,9 @@ const msg = getValidationMessages();
 const ticketWorkflowSchema = Yup.object({
 
     entityId: Yup.string()
-        .when('userType', {
-            is: (userType) => userType === 'SUPER_ADMIN' || userType === 'SEPS_ADMIN',
+        .when(['userType', 'instanceTypeId'], {
+            is: (userType, instanceTypeId) =>
+                (userType === 'SYSTEM_ADMIN' || userType === 'SEPS_USER') && instanceTypeId === 'FIRST_INSTANCE',
             then: (schema) => schema.required(msg.entityRequired),
             otherwise: (schema) => schema,
         }),
@@ -33,9 +34,16 @@ const ticketWorkflowSchema = Yup.object({
                 actionId: Yup.string().required(msg.actionRequired),
                 actionFilter1: Yup.string().required(msg.fieldRequired),
                 actionFilter2: Yup.string().when('actionId', {
-                    is: 'MAIL_TO_CUSTOMER',
-                    then: (schema) => schema.notRequired(), // Required only for "CREATED"
-                    otherwise: (schema) => schema.required(msg.fieldRequired), // Optional otherwise
+                    is: (value) =>
+                        ['ASSIGN_TO_TEAM', 'MAIL_TO_FI_TEAM', 'MAIL_TO_SEPS_TEAM'].includes(value),
+                    then: (schema) => schema.required(msg.fieldRequired),
+                    otherwise: (schema) => schema.notRequired(),
+                }),
+                actionFilter3: Yup.string().when('actionId', {
+                    is: (value) =>
+                        ['MAIL_TO_FI_TEAM', 'MAIL_TO_SEPS_TEAM'].includes(value),
+                    then: (schema) => schema.required(msg.fieldRequired),
+                    otherwise: (schema) => schema.notRequired(),
                 }),
             })
         )

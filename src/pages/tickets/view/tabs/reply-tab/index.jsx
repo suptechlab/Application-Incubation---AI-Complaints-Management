@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 import { validateFile } from "../../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
 
-const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, currentTab }) => {
+const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, currentTab,permissionState }) => {
 
     const { t } = useTranslation()
 
@@ -153,6 +153,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                                         className="flex-wrap justify-content-between justify-content-sm-end flex-fill"
                                     >
 
+
                                         <Button
                                             type="button"
                                             size="sm"
@@ -167,7 +168,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                                                     setSendReplyModalShow(true); // Show modal first
                                                 }
                                             }}
-                                            disabled={loading || !isTicketNotClosedOrRejected}
+                                            disabled={(permissionState?.replyToCustomerPermission !== true || loading || !isTicketNotClosedOrRejected)}
                                         >
                                             {loading && submitAction === "customer"
                                                 ? t("SENDING")
@@ -179,7 +180,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                                             size="sm"
                                             variant="warning"
                                             onClick={() => setSubmitAction("internal_reply")}
-                                            disabled={loading || !isTicketNotClosedOrRejected}
+                                            disabled={permissionState?.replyInternalPermission !== true || loading || !isTicketNotClosedOrRejected}
                                         >
                                             {loading && submitAction === "internal_reply"
                                                 ? t("PROCESSING")

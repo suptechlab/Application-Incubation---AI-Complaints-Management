@@ -52,6 +52,7 @@ export const messages = {
     templateContentMax1500: "Template details cannot exceed 8500 characters.",
     templateContentRequired: "Template details is required.",
     roleIdRequired: "Role is required.", // Add this
+    templateRequired: "Template is required.",
     // Team Managment
     teamNameRequired: "Team name is required", // For team name
     descriptionRequired: "Description is required", // For description
@@ -84,7 +85,8 @@ export const messages = {
     actionRequired: "Action is required.",
     instanceTypeRequired: "Instance type is required.",
     eventRequired: "Event is required.",
-    fieldRequired: "This field is required."
+    fieldRequired: "This field is required.",
+    userTypeRequired: 'User Type is required.',
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -139,6 +141,7 @@ export const messages = {
     subjectRequired: "Se requiere el nombre del asunto.",
     templateContentMax1500: "Los detalles de la plantilla no pueden exceder los 8500 caracteres.",
     templateContentRequired: "Se requieren los detalles de la plantilla.",
+    templateRequired: "Se requiere plantilla.",
     // Team managment
     teamNameRequired: "Se requiere el nombre del equipo", // For team name
     descriptionRequired: "Se requiere la descripción", // For description
@@ -171,6 +174,7 @@ export const messages = {
     actionRequired: "Se requiere acción.",
     instanceTypeRequired: "Se requiere el tipo de instancia.",
     eventRequired: "Se requiere evento.",
-    fieldRequired: "Este campo es obligatorio."
+    fieldRequired: "Este campo es obligatorio.",
+    userTypeRequired: "El tipo de usuario es obligatorio."
   }
 };

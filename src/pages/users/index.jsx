@@ -40,7 +40,7 @@ export default function UserList() {
       addModule: false,
       editModule: false,
     };
-    if (currentUser === "SUPER_ADMIN") {
+    if (currentUser === "SYSTEM_ADMIN") {
       updatedPermissions.statusModule = true;
       updatedPermissions.addModule = true;
       updatedPermissions.editModule = true;
@@ -320,7 +320,7 @@ export default function UserList() {
   }, [queryClient]);
 
   const actions = permissionsState?.addModule
-  ? [{ label: t('ADD NEW'), to: "/team-management/add", variant: "warning" }]
+  ? [{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
   : [];
 
   return (

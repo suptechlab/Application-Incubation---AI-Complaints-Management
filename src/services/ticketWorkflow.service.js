@@ -15,17 +15,13 @@ export const handleGetWorkflowTableData = async (params) => {
 }
 
 //Edit Workflow
-export const editTicketWorkflow = async (params) => {
-    return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets`, {
-        params
-    });
+export const editTicketWorkflow = async (id , data) => {
+    return await ticketApi.put(`/${API_VERSION}/claim-ticket-work-flow/${id}`, data);
 }
 
 //Status Change
-export const ticketWorkflowStatusChange = async (params) => {
-    return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets`, {
-        params
-    });
+export const ticketWorkflowStatusChange = async (id,status) => {
+    return await ticketApi.patch(`/${API_VERSION}/claim-ticket-work-flow/${id}/status?status=${status}`);
 }
 
 //Get Workflow by Id
@@ -36,7 +32,7 @@ export const handleGetWorkflowById = async (id) => {
 //Get Team list by Org id
 export const getTeamList = async (orgId) => {
     let url = `/${API_VERSION}/teams/dropdown-list-for-workflow`;
-    if (orgId.length !== 0) {
+    if (orgId && orgId?.length !== 0) {
         url += `?organizationId=${orgId}`;
     }
     return await adminApi.get(url);
@@ -48,8 +44,8 @@ export const getTeamMemberList = async (teamId) => {
 }
 
 //Get Team Members List
-export const getTemplateList = async () => {
-    return await adminApi.get(`/${API_VERSION}/templates/dropdown-list-for-workflow`);
+export const getTemplateList = async (type) => {
+    return await adminApi.get(`/${API_VERSION}/templates/dropdown-list-for-workflow?userType=${type}`);
 }
 
 //Get Team Members List

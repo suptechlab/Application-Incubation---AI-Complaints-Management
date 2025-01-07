@@ -146,19 +146,22 @@ export default function TicketWorkFlowList() {
         () => [
             {
                 accessorFn: (row) => row.title,
-                id: "workflow",
+                id: "title",
                 header: () => t('WORKFLOW'),
                 enableSorting: true,
             },
-            {
-                accessorFn: (row) => row?.organization?.razonSocial,
-                id: "organizationId",
-                header: () => t('ENTITY NAME'),
-                enableSorting: false,
-                cell: ({ row }) => {
-                    return <span>{row?.original?.organization?.razonSocial}</span>
-                }
-            },
+            ...(currentUser !== 'FI_USER' ? 
+                [ {
+                    accessorFn: (row) => row?.organization?.razonSocial,
+                    id: "organizationId",
+                    header: () => t('ENTITY NAME'),
+                    enableSorting: false,
+                    cell: ({ row }) => {
+                        return <span>{row?.original?.organization?.razonSocial}</span>
+                    }
+                }]: []
+            )
+           ,
             ...(permissionsState?.statusModule
                 ? [{
                     id: "status",
@@ -251,7 +254,7 @@ export default function TicketWorkFlowList() {
                 />
                 <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
                     <Card.Body className="d-flex flex-column">
-                        <ListingSearchForm filter={filter} setFilter={setFilter} />
+                        <ListingSearchForm filter={filter} setFilter={setFilter} currentUser={currentUser} /> 
                         <CommonDataTable
                             columns={columns}
                             dataQuery={dataQuery}

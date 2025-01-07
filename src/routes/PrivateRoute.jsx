@@ -12,8 +12,8 @@ const PrivateRoute = ({ element, moduleName ="", route_permissions = [] }) => {
         route_permissions.includes(permission)
     );
 
-    // Bypass permission check for SUPER_ADMIN
-    const isSuperAdmin = currentUser === "SUPER_ADMIN";
+    // Bypass permission check for SYSTEM_ADMIN
+    const isSuperAdmin = currentUser === "SYSTEM_ADMIN";
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;

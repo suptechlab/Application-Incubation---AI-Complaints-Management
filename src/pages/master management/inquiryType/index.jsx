@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,7 @@ import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodu
 import Add from "./Add";
 import Edit from "./Edit";
 import Loader from "../../../components/Loader";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 const InquiryType = () => {
   const location = useLocation();
@@ -46,35 +47,46 @@ const InquiryType = () => {
 
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
-  const permission = useRef({ addModule: false, editModule: false, statusModule: false, deleteModule: false });
+
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    addModule: false,
+    editModule: false,
+  });
 
   useEffect(() => {
-    isAdminUser().then(response => {
-      if (response) {
-        permission.current.addModule = true;
-        permission.current.editModule = true;
-        permission.current.deleteModule = true;
-        permission.current.statusModule = true;
-      } else {
-        getModulePermissions("Inquiry Sub Type Master").then(response => {
-          if (response.includes("INQUIRY_SUB_TYPE_CREATE")) {
-            permission.current.addModule = true;
-          }
-          if (response.includes("INQUIRY_SUB_TYPE_UPDATE")) {
-            permission.current.editModule = true;
-          }
-          if (response.includes("INQUIRY_SUB_TYPE_STATUS_CHANGE")) {
-            permission.current.statusModule = true;
-          }
-        }).catch(error => {
-          console.error("Error fetching permissions:", error);
-        });
-      }
-    }).catch(error => {
-      console.error("Error get during to fetch Inquiry Type", error);
-    })
+    const updatedPermissions = {
+      statusModule: false,
+      addModule: false,
+      editModule: false,
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.addModule = true;
+      updatedPermissions.editModule = true;
+    } else {
+      const permissionArr = permissions['Inquiry Type Master'] ?? [];
 
-  }, []);
+      if (["INQUIRY_TYPE_CREATE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.addModule = true;
+      }
+
+      if (["INQUIRY_TYPE_UPDATE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.editModule = true;
+      }
+
+      if (["INQUIRY_TYPE_STATUS_CHANGE"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
+
   const editInquiryType = async (rowData) => {
     setEditModal({ row: rowData, open: !editModal?.open })
   };
@@ -198,7 +210,7 @@ const InquiryType = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
-            permission.current.statusModule ?
+            permissionsState.statusModule ?
               <Toggle
                 tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
                 id={`status-${info?.row?.original?.id}`}
@@ -220,14 +232,14 @@ const InquiryType = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          permission.current.editModule ?
+          permissionsState.editModule ?
           <DataGridActions
             controlId="province-master"
             rowData={rowData}
             customButtons={[
               {
                 name: "edit",
-                enabled: permission.current.editModule,
+                enabled: permissionsState.editModule,
                 type: "button",
                 title: t("EDIT"),
                 icon: <MdEdit size={18} />,
@@ -242,7 +254,7 @@ const InquiryType = () => {
         size: '80',
       },
     ],
-    []
+    [permissionsState]
   );
   useEffect(() => {
     setPagination({
@@ -261,7 +273,7 @@ const InquiryType = () => {
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
   <Loader isLoading={isLoading}/>
-  {permission.current.addModule
+  {permissionsState.addModule
         ?
     <PageHeader title={t("INQUIRY TYPE")}
       actions={[

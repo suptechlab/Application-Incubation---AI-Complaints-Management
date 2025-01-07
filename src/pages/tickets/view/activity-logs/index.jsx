@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import moment from "moment";
 import { downloadFile, getIconForFile, isHTML } from "../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
-const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
+const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState }) => {
 
   const [ticketActivity, setTicketActivity] = useState([])
 
@@ -212,7 +212,9 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
                   >
                     {reply?.attachments?.map((actionItem, index) => {
                       const { originalTitle } = actionItem;
-                      return (
+
+                      if(permissionState?.downloadPermission === true){
+                        return (
                         <button
                           type="button"
                           key={index + 1}
@@ -222,6 +224,17 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs }) => {
                           <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
                         </button>
                       )
+                      }else{
+                        return (
+                        <p
+                          key={index + 1}
+                          className=' fw-semibold text-decoration-none link-primary m-0 p-0'
+                        >
+                          <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
+                        </p>
+                      )
+                      }
+                    
                     })}
                   </Stack>
                 )}

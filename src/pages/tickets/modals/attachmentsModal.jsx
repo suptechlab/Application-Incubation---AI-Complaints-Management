@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { downloadFile } from "../../../utils/commonutils";
 
-const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance }) => {
+const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissionState }) => {
     const [AttachmentsModalData, setAttachmentModalData] = useState(ticketData?.claimTicketDocuments ?? [])
     const [isDownloading, setDownloading] = useState(false)
 
@@ -108,26 +108,30 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance }) => {
                 </Modal.Header>
                 <Modal.Body className="text-break pt-0 pb-3">
                     <ListGroup variant="flush">
-                        { AttachmentsModalData?.length > 0 ? AttachmentsModalData?.map((item, index) => (
+                        {AttachmentsModalData?.length > 0 ? AttachmentsModalData?.map((item, index) => (
                             <ListGroup.Item
                                 key={"data_view_" + index}
                                 className="small px-0 d-flex gap-2 justify-content-between align-items-start"
                             >
                                 <span className="me-auto py-1">{item?.originalTitle}</span>
-                                <AppTooltip title="Download">
-                                    <button
-                                        // to={item.dowlnloadUrl}
-                                        onClick={() => handleAttachmentDownload(item)}
-                                        className="text-decoration-none btn link-primary"
-                                        target="_blank"
-                                        aria-label="Download"
-                                        disabled={isDownloading ?? false}
-                                    >
-                                        <MdDownload size={20} />
-                                    </button>
-                                </AppTooltip>
+
+                                {
+                                    permissionState?.downloadPermission === true &&
+                                    <AppTooltip title="Download">
+                                        <button
+                                            // to={item.dowlnloadUrl}
+                                            onClick={() => handleAttachmentDownload(item)}
+                                            className="text-decoration-none btn link-primary"
+                                            target="_blank"
+                                            aria-label="Download"
+                                            disabled={isDownloading ?? false}
+                                        >
+                                            <MdDownload size={20} />
+                                        </button>
+
+                                    </AppTooltip>}
                             </ListGroup.Item>
-                        )):<p>There is no attachment included.</p>}
+                        )) : <p>There is no attachment included.</p>}
                     </ListGroup>
                 </Modal.Body>
             </Modal>

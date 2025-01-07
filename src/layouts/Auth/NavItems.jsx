@@ -65,6 +65,7 @@ export const NavItems = () => {
       menuIcon: <MdFolder size={20} />,
       path: '#',
       moduleName: "Master",
+      moduleName: "Master",
       roleName: "admin",
       subMenu: [
         {
@@ -140,8 +141,9 @@ export const NavItems = () => {
       title: t("TICKET WORKFLOW"),
       menuIcon: <MdSchema size={20} />,
       path: "/tickets-workflow",
+      roleName: "admin",
       moduleName : "Ticket Workflow",
-      disabled: true,
+      disabled: false,
     },
     {
       id: 7,
