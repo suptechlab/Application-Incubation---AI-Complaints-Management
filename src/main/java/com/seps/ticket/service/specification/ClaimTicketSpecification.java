@@ -189,4 +189,88 @@ public class ClaimTicketSpecification {
 
         };
     }
+
+    public static Specification<ClaimTicket>  byClaimReportFilter(ClaimTicketFilterRequest filterRequest) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Add filters based on the available criteria
+            addSearchFilter(filterRequest, root, criteriaBuilder, predicates);
+            addOrganizationFilter(filterRequest, root, criteriaBuilder, predicates);
+            addStatusFilter(filterRequest, root, criteriaBuilder, predicates);
+            addPriorityFilter(filterRequest, root, criteriaBuilder, predicates);
+            addAgentFilter(filterRequest.getFiAgentId(), root, criteriaBuilder, predicates);
+            addClaimTypeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addSepsAgentFilter(filterRequest.getSepsAgentId(), root, criteriaBuilder, predicates);
+            addDateRangeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addInstanceTypeFilter(filterRequest, root, criteriaBuilder, predicates);
+
+            addClaimSubTypeIdFilter(filterRequest, root, criteriaBuilder, predicates);
+            addProvinceIdFilter(filterRequest, root, criteriaBuilder, predicates);
+            addCityIdFilter(filterRequest, root, criteriaBuilder, predicates);
+            addPriorityCareGroupFilter(filterRequest, root, criteriaBuilder, predicates);
+            addCustomerTypeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addClosedStatusFilter(filterRequest, root, criteriaBuilder, predicates);
+            addRejectedStatusFilter(filterRequest, root, criteriaBuilder, predicates);
+            addSourceFilter(filterRequest, root, criteriaBuilder, predicates);
+            addChannelOfEntryFilter(filterRequest, root, criteriaBuilder, predicates);
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    private static void addClaimSubTypeIdFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getClaimSubTypeId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("claimSubTypeId"), filterRequest.getClaimSubTypeId()));
+        }
+    }
+
+    private static void addProvinceIdFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getProvinceId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("provinceId"), filterRequest.getProvinceId()));
+        }
+    }
+
+    private static void addCityIdFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getCityId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("provinceId"), filterRequest.getCityId()));
+        }
+    }
+
+    private static void addPriorityCareGroupFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getPriorityCareGroup() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("priorityCareGroup"), filterRequest.getPriorityCareGroup()));
+        }
+    }
+
+    private static void addCustomerTypeFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getCustomerType() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("customerType"), filterRequest.getCustomerType()));
+        }
+    }
+
+    private static void addClosedStatusFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getClosedStatus() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("closedStatus"), filterRequest.getClosedStatus()));
+        }
+    }
+
+    private static void addRejectedStatusFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getRejectedStatus() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("rejectedStatus"), filterRequest.getRejectedStatus()));
+        }
+    }
+
+    private static void addSourceFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getSource() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("source"), filterRequest.getSource()));
+        }
+    }
+
+    private static void addChannelOfEntryFilter(ClaimTicketFilterRequest filterRequest, Root<ClaimTicket> root, CriteriaBuilder criteriaBuilder, List<Predicate> predicates) {
+        if (filterRequest.getChannelOfEntry() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("channelOfEntry"), filterRequest.getChannelOfEntry()));
+        }
+    }
+
 }

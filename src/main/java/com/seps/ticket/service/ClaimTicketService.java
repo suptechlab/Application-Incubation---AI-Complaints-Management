@@ -745,9 +745,6 @@ public class ClaimTicketService {
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(!Boolean.TRUE.equals(ticket.getSlaPopup())){
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
-        }
         ticket.setSlaPopup(false);
         claimTicketRepository.save(ticket);
     }

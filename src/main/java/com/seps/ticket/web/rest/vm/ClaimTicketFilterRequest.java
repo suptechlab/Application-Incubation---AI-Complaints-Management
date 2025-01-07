@@ -1,8 +1,6 @@
 package com.seps.ticket.web.rest.vm;
 
-import com.seps.ticket.enums.ClaimTicketPriorityEnum;
-import com.seps.ticket.enums.ClaimTicketStatusEnum;
-import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.enums.*;
 import lombok.Data;
 
 @Data
@@ -15,5 +13,16 @@ public class ClaimTicketFilterRequest {
     private Long organizationId;
     private Long claimTypeId;
     private InstanceTypeEnum instanceType;
+    private Long fiAgentId;
+    private Long sepsAgentId;
+    private Long claimSubTypeId;
+    private Long provinceId;
+    private Long cityId;
+    private PriorityCareGroupEnum priorityCareGroup;
+    private CustomerTypeEnum customerType;
+    private ClosedStatusEnum closedStatus;
+    private RejectedStatusEnum rejectedStatus;
+    private SourceEnum source;
+    private ChannelOfEntryEnum channelOfEntry;
 }
 
