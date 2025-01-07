@@ -104,19 +104,25 @@ public class ChatbotService {
      * @return a Flux of RasaResponseDTO containing the responses from the Rasa server.
      */
     private Flux<RasaResponseDTO> sendQueryToRasa(ChatbotQueryDTO queryDTO) {
-        return webClient.post()
+        String jwtToken = userService.getCurrentUserJwtToken();
+        WebClient.RequestHeadersSpec<?> requestSpec = webClient.post()
             .uri("/webhooks/rest/webhook")
-            .bodyValue(queryDTO)
-            .retrieve()
+            .bodyValue(queryDTO);
+
+        if (jwtToken != null) {
+            requestSpec.headers(headers -> headers.setBearerAuth(jwtToken));
+        }
+
+        return requestSpec.retrieve()
             .bodyToFlux(RasaResponseDTO.class)
             .map(response -> {
-                log.debug("Rasa response: {}", response);
-                // Check if recipientId is null and set it to queryDTO's sender
                 if (response.getRecipientId() == null || response.getRecipientId().isBlank()) {
                     response.setRecipientId(queryDTO.getSender());
                 }
                 return response;
             });
     }
+
+
 
 }

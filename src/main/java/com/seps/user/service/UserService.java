@@ -14,6 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,4 +89,20 @@ public class UserService {
         }
         return null;
     }
+
+    public String getCurrentUserJwtToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated() && authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+            Object principal = jwtAuthenticationToken.getPrincipal();
+
+            if (principal instanceof Jwt jwt) {
+                return jwt.getTokenValue(); // Return the JWT token value
+            }
+        }
+        return null; // Return null if not authenticated
+    }
+
+
+
+
 }
