@@ -4,7 +4,6 @@ import com.seps.ticket.component.DateUtil;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.*;
-import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketEnum;
 import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketReportEnum;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
@@ -30,6 +29,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Service class responsible for generating and managing reports related to claim tickets.
+ * Provides functionality to list claim ticket data and export claim overview reports in Excel format.
+ */
 @Service
 public class ReportService {
 
@@ -39,6 +42,15 @@ public class ReportService {
     private final UserService userService;
     private final ClaimTicketMapper claimTicketMapper;
     private final EnumUtil enumUtil;
+
+    /**
+     * Constructs a new instance of ReportService with the required dependencies.
+     *
+     * @param claimTicketRepository repository for accessing claim ticket data
+     * @param userService           service for retrieving user-related information
+     * @param claimTicketMapper     mapper for converting claim ticket entities to DTOs
+     * @param enumUtil              utility for localizing enums
+     */
     public ReportService(ClaimTicketRepository claimTicketRepository, UserService userService, ClaimTicketMapper claimTicketMapper, EnumUtil enumUtil) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
@@ -46,8 +58,16 @@ public class ReportService {
         this.enumUtil = enumUtil;
     }
 
+    /**
+     * Retrieves a paginated list of claim tickets based on the provided filter criteria.
+     *
+     * @param pageable      pagination information
+     * @param filterRequest filter criteria for claim tickets
+     * @return a paginated list of claim tickets as {@link ClaimTicketListDTO}
+     */
     @Transactional
     public Page<ClaimTicketListDTO> listClaimOverview(Pageable pageable, ClaimTicketFilterRequest filterRequest) {
+        LOG.debug("View List of Claim Overview");
         // If no filterRequest is provided, initialize a default object
         filterRequest = getClaimTicketFilterRequest(filterRequest);
 
@@ -55,6 +75,12 @@ public class ReportService {
             .map(claimTicketMapper::toListDTO);
     }
 
+    /**
+     * Prepares the {@link ClaimTicketFilterRequest} with default values based on the current user's roles and permissions.
+     *
+     * @param filterRequest the filter request to prepare, or null to create a default request
+     * @return the prepared filter request
+     */
     private ClaimTicketFilterRequest getClaimTicketFilterRequest(ClaimTicketFilterRequest filterRequest) {
         if (filterRequest == null) {
             filterRequest = new ClaimTicketFilterRequest();
@@ -74,7 +100,13 @@ public class ReportService {
         return filterRequest;
     }
 
-
+    /**
+     * Generates an Excel report containing claim overview data based on the provided filter criteria.
+     *
+     * @param filterRequest filter criteria for claim tickets
+     * @return a {@link ByteArrayInputStream} containing the generated Excel file
+     * @throws IOException if an I/O error occurs while creating the report
+     */
     @Transactional
     public ByteArrayInputStream getDownloadClaimOverviewData(ClaimTicketFilterRequest filterRequest) throws IOException {
         // If no filterRequest is provided, initialize a default object
@@ -94,27 +126,13 @@ public class ReportService {
                 Cell cell = headerRow.createCell(header.ordinal());
                 cell.setCellValue(enumUtil.getLocalizedEnumValue(header, LocaleContextHolder.getLocale()));
             }
-            // Data
+            // Populate data rows
             int rowIdx = 1;
             for (ClaimTicketListDTO data : claimAndComplaintsList) {
                 Row row = sheet.createRow(rowIdx++);
-
-                row.createCell(ExcelHeaderClaimTicketReportEnum.ID.ordinal()).setCellValue(data.getId());
-                row.createCell(ExcelHeaderClaimTicketReportEnum.TICKET_ID.ordinal()).setCellValue(data.getTicketId());
-                row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
-                row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
-                row.createCell(ExcelHeaderClaimTicketReportEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
-                row.createCell(ExcelHeaderClaimTicketReportEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
-                row.createCell(ExcelHeaderClaimTicketReportEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
-                row.createCell(ExcelHeaderClaimTicketReportEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() !=null ? data.getUser().getName():"");
-                row.createCell(ExcelHeaderClaimTicketReportEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName():"");
-                row.createCell(ExcelHeaderClaimTicketReportEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName():"");
-                row.createCell(ExcelHeaderClaimTicketReportEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
-                row.createCell(ExcelHeaderClaimTicketReportEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
-                row.createCell(ExcelHeaderClaimTicketReportEnum.SECOND_INSTANCE_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getSecondInstanceFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
-                row.createCell(ExcelHeaderClaimTicketReportEnum.COMPLAINT_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getComplaintFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
-
+                createRows(data, row);
             }
+
             // Auto-size columns
             for (ExcelHeaderClaimTicketReportEnum header : ExcelHeaderClaimTicketReportEnum.values()) {
                 sheet.autoSizeColumn(header.ordinal());
@@ -123,4 +141,43 @@ public class ReportService {
             return new ByteArrayInputStream(out.toByteArray());
         }
     }
+
+    /**
+     * Populates a row in the Excel sheet with data from a {@link ClaimTicketListDTO}.
+     *
+     * @param data the data to populate
+     * @param row  the row to populate
+     */
+    private void createRows(ClaimTicketListDTO data, Row row) {
+        row.createCell(ExcelHeaderClaimTicketReportEnum.ID.ordinal()).setCellValue(data.getId());
+        row.createCell(ExcelHeaderClaimTicketReportEnum.TICKET_ID.ordinal()).setCellValue(data.getTicketId());
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
+        row.createCell(ExcelHeaderClaimTicketReportEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
+        row.createCell(ExcelHeaderClaimTicketReportEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() != null ? data.getUser().getName() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.SECOND_INSTANCE_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getSecondInstanceFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.COMPLAINT_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getComplaintFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.PROVINCE.ordinal()).setCellValue(data.getProvince() != null ? data.getProvince().getName() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CITY.ordinal()).setCellValue(data.getCity() != null ? data.getCity().getName() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.PRIORITY_CARE_GROUP.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getPriorityCareGroup(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CUSTOMER_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getCustomerType(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.PRIORITY.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getPriority(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.SLA_BREACH_DAYS.ordinal()).setCellValue(data.getSlaBreachDays() != null ? data.getSlaBreachDays().toString() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.ASSIGNED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getAssignedAt(), LocaleContextHolder.getLocale().getLanguage()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CLOSED_STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getClosedStatus(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.REJECTED_STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getRejectedStatus(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.RESOLVED_ON.ordinal()).setCellValue(DateUtil.formatDate(data.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CREATED_BY_USER.ordinal()).setCellValue(data.getCreatedByUser() != null ? data.getCreatedByUser().getName() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.COMPLAINT_PRECEDENTS.ordinal()).setCellValue(data.getComplaintPrecedents() != null ? data.getComplaintPrecedents() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.COMPLAINT_SPECIFIC_PETITION.ordinal()).setCellValue(data.getComplaintSpecificPetition() != null ? data.getComplaintSpecificPetition() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.SOURCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getSource(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CHANNEL_OF_ENTRY.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getChannelOfEntry(), LocaleContextHolder.getLocale()));
+    }
+
 }
