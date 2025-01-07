@@ -17,4 +17,49 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet id="1736163625797" author="matellio">
+    <addColumn tableName="claim_ticket">
+      <!-- Indicates the channel of entry used for claim ticket creation -->
+      <column name="sla_popup" type="boolean"  remarks="SLA popup show or not when claim detail view">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Indicates the sla comment of the claim ticket creation -->
+      <column name="sla_comment" type="text" remarks="SLA Comment of claim breach">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the SLA comment was saved -->
+      <column name="sla_commented_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <!-- User who SLA commented the ticket -->
+      <column name="sla_commented_by" type="bigint" remarks="User who SLA Commented when Popup is open">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Indicates the sla comment of the second instance claim ticket creation -->
+      <column name="second_instance_sla_comment" type="text" remarks="SLA Comment of Second Instance claim breach">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the SLA comment was saved for second instance-->
+      <column name="second_instance_sla_commented_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <!-- User who SLA commented the second instance ticket -->
+      <column name="second_instance_sla_commented_by" type="bigint" remarks="User who SLA Commented when Popup is open on Second Instance">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Indicates the sla comment of the complaint claim ticket creation -->
+      <column name="complaint_sla_comment" type="text" remarks="SLA Comment of complaint claim breach">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the SLA comment was saved for complaint-->
+      <column name="complaint_sla_commented_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <!-- User who SLA commented the complaint ticket -->
+      <column name="complaint_sla_commented_by" type="bigint" remarks="User who SLA Commented when Popup is open on complaint">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

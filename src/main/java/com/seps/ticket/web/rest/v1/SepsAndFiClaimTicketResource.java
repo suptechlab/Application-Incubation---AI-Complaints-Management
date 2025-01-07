@@ -507,4 +507,32 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @Operation(
+        summary = "Save SLA comment",
+        description = "Saves an SLA comment for the specified claim ticket."
+    )
+    @PostMapping("/{ticketId}/sla-comment")
+    public ResponseEntity<ResponseStatus> slaCommentSave(@PathVariable Long ticketId,
+                                               @Valid @RequestBody ClaimTicketSlaCommentRequest claimTicketSlaCommentRequest,
+                                               HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        claimTicketService.saveSlaComment(ticketId, claimTicketSlaCommentRequest,requestInfo);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.sla.commented.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
+
+    @Operation(
+        summary = "Dismiss SLA popup",
+        description = "Dismisses the SLA popup for the specified claim ticket."
+    )
+    @PatchMapping("/{ticketId}/dismiss-sla-popup")
+    public ResponseEntity<Void> dismissalSLAPopup(@PathVariable Long ticketId) {
+        claimTicketService.dismissalSLACommentPopup(ticketId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }

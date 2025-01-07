@@ -528,4 +528,33 @@ public class CronService {
         }
         return result;
     }
+
+    @Scheduled(cron = "0 0 * * * ?") // Runs every hour
+    public void processSlaPopupFlags() {
+        List<ClaimTicket> claimTickets = claimTicketRepository.findEligibleTicketsForSlaPopup(ClaimTicketStatusEnum.CLOSED, ClaimTicketStatusEnum.REJECTED);
+
+        for (ClaimTicket claimTicket : claimTickets) {
+            LocalDate slaBreachDate = claimTicket.getSlaBreachDate();
+            LocalDate twoDaysBefore = slaBreachDate.minusDays(2);
+
+            String comment = getSlaComment(claimTicket);
+            if (comment == null && claimTicket.getSlaPopup() == null &&
+                (twoDaysBefore.isBefore(LocalDate.now()) || twoDaysBefore.equals(LocalDate.now()))) {
+                claimTicket.setSlaPopup(true);
+                claimTicketRepository.save(claimTicket);
+            }
+        }
+    }
+
+    private String getSlaComment(ClaimTicket claimTicket) {
+        if (claimTicket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+            return claimTicket.getSlaComment();
+        } else if (claimTicket.getInstanceType().equals(InstanceTypeEnum.SECOND_INSTANCE)) {
+            return claimTicket.getSecondInstanceSlaComment();
+        } else if (claimTicket.getInstanceType().equals(InstanceTypeEnum.COMPLAINT)) {
+            return claimTicket.getComplaintSlaComment();
+        }
+        return null;
+    }
+
 }

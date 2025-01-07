@@ -205,17 +205,17 @@ public class SepsAndFiClaimTicketService {
         if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganization().getId();
         }
+        ClaimTicket claimTicket;
         if (organizationId != null) {
-            return claimTicketRepository.findByIdAndOrganizationId(id, organizationId)
-                .map(claimTicketMapper::toDTO)
+            claimTicket = claimTicketRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{id.toString()}, null));
         } else {
-            return claimTicketRepository.findById(id)
-                .map(claimTicketMapper::toDTO)
+            claimTicket = claimTicketRepository.findById(id)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{id.toString()}, null));
         }
+        return claimTicketMapper.toDTO(claimTicket);
     }
 
     /**

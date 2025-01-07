@@ -28,6 +28,7 @@ import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import com.seps.ticket.suptech.service.ExternalAPIService;
 import com.seps.ticket.suptech.service.PersonNotFoundException;
 import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
+import com.seps.ticket.web.rest.vm.ClaimTicketSlaCommentRequest;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequest;
 import com.seps.ticket.web.rest.vm.CreateClaimTicketRequestForJson;
 import jakarta.validation.Valid;
@@ -640,6 +641,115 @@ public class ClaimTicketService {
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         }
+    }
+
+    @Transactional
+    public ClaimTicketDTO getSepsFiClaimTicketById(Long id) {
+        return claimTicketRepository.findById(id)
+            .map(claimTicketMapper::toDTO)
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{id.toString()}, null));
+    }
+
+    /**
+     * Saves an SLA comment for a claim ticket. This method determines the type of ticket (First Instance,
+     * Second Instance, or Complaint) and updates the corresponding SLA comment fields. It also clears the SLA
+     * popup flag and logs the activity in the audit log.
+     *
+     * @param ticketId the ID of the claim ticket
+     * @param claimTicketSlaCommentRequest the request body containing the SLA comment
+     * @param requestInfo the request information including headers and metadata
+     * @throws CustomException if the claim ticket is not found, the user does not have permission,
+     *                         or the SLA popup flag is null
+     */
+    @Transactional
+    public void saveSlaComment(Long ticketId, @Valid ClaimTicketSlaCommentRequest claimTicketSlaCommentRequest, RequestInfo requestInfo) {
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        } else {
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        if(ticket.getSlaPopup()==null){
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+        }
+        Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
+        if(ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)){
+            ticket.setSlaComment(claimTicketSlaCommentRequest.getSlaComment());
+            ticket.setSlaCommentedAt(Instant.now());
+            ticket.setSlaCommentedByUser(currentUser);
+        } else if (ticket.getInstanceType().equals(InstanceTypeEnum.SECOND_INSTANCE)) {
+            ticket.setSecondInstanceSlaComment(claimTicketSlaCommentRequest.getSlaComment());
+            ticket.setSecondInstanceSlaCommentedAt(Instant.now());
+            ticket.setSecondInstanceSlaCommentedByUser(currentUser);
+        } else if (ticket.getInstanceType().equals(InstanceTypeEnum.COMPLAINT)) {
+            ticket.setComplaintSlaComment(claimTicketSlaCommentRequest.getSlaComment());
+            ticket.setComplaintSlaCommentedAt(Instant.now());
+            ticket.setComplaintSlaCommentedByUser(currentUser);
+        }
+        ticket.setSlaPopup(null);
+        ClaimTicket savedTicket = claimTicketRepository.save(ticket);
+
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.ticket.sla.comment",
+                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), claimTicketSlaCommentRequest.getSlaComment()}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(this.getSepsFiClaimTicketById(savedTicket.getId()));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        String requestBody = gson.toJson(claimTicketSlaCommentRequest);
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "saveSlaComment", ActionTypeEnum.CLAIM_TICKET_SLA_COMMENTED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
+            null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+    }
+
+    /**
+     * Dismisses the SLA popup for a claim ticket. This method verifies the user's authority and ensures
+     * that the SLA popup flag is true before dismissing it. Updates the SLA popup flag to false.
+     *
+     * @param ticketId the ID of the claim ticket
+     * @throws CustomException if the claim ticket is not found or the SLA popup flag is not true
+     */
+    @Transactional
+    public void dismissalSLACommentPopup(Long ticketId) {
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        } else {
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        if(!Boolean.TRUE.equals(ticket.getSlaPopup())){
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+        }
+        ticket.setSlaPopup(false);
+        claimTicketRepository.save(ticket);
     }
 
 }

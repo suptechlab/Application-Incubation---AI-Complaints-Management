@@ -179,5 +179,45 @@ public class ClaimTicket {
     @Column(name = "channel_of_entry")
     private ChannelOfEntryEnum channelOfEntry;
 
+    @Column(name = "sla_popup")
+    private Boolean slaPopup;
 
+    @Column(name = "sla_comment")
+    private String slaComment;
+
+    @Column(name = "sla_commented_at")
+    private Instant slaCommentedAt;
+
+    @Column(name = "sla_commented_by", insertable = false, updatable = false)
+    private Long slaCommentedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "sla_commented_by")
+    private User slaCommentedByUser;
+
+    @Column(name = "second_instance_sla_comment")
+    private String secondInstanceSlaComment;
+
+    @Column(name = "second_instance_sla_commented_at")
+    private Instant secondInstanceSlaCommentedAt;
+
+    @Column(name = "second_instance_sla_commented_by", insertable = false, updatable = false)
+    private Long secondInstanceSlaCommentedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "second_instance_sla_commented_by")
+    private User secondInstanceSlaCommentedByUser;
+
+    @Column(name = "complaint_sla_comment")
+    private String complaintSlaComment;
+
+    @Column(name = "complaint_sla_commented_at")
+    private Instant complaintSlaCommentedAt;
+
+    @Column(name = "complaint_sla_commented_by", insertable = false, updatable = false)
+    private Long complaintSlaCommentedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "complaint_sla_commented_by")
+    private User complaintSlaCommentedByUser;
 }
