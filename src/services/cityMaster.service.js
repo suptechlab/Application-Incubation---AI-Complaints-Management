@@ -38,3 +38,7 @@ export const downloadCityList = async ({ params }) => {
 export const provinceDropdownData = async () => {
   return await adminApi.get(`/${API_VERSION}/provinces/dropdown-list`);
 }
+// CITY DROPDOWN DATA
+export const cityDropdownData = async (provinceId) => {
+  return await adminApi.get(`/${API_VERSION}/cities/dropdown-list/${provinceId}`);
+}
