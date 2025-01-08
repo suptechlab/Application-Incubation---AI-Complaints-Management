@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -24,6 +24,7 @@ import {
   downloadTemplateList,
 } from "../../../services/templateMaster.service";
 import Loader from "../../../components/Loader";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 const TemplateMaster = () => {
   const { t } = useTranslation();
@@ -47,43 +48,84 @@ const TemplateMaster = () => {
   const toggle = () => setModal(!modal);
   const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
 
-  const permission = useRef({
+  // const permission = useRef({
+  //   addModule: false,
+  //   editModule: false,
+  //   deleteModule: false,
+  //   statusModule: false,
+  // });
+
+  // useEffect(() => {
+  //   isAdminUser()
+  //     .then((response) => {
+  //       if (response) {
+  //         permission.current.addModule = true;
+  //         permission.current.editModule = true;
+  //         permission.current.deleteModule = true;
+  //         permission.current.statusModule = true;
+  //       } else {
+  //         getModulePermissions("Template Master")
+  //           .then((response) => {
+  //             if (response.includes("TEMPLATE_CREATE")) {
+  //               permission.current.addModule = true;
+  //             }
+  //             if (response.includes("TEMPLATE_UPDATE")) {
+  //               permission.current.editModule = true;
+  //             }
+  //             if (response.includes("TEMPLATE_STATUS_CHANGE")) {
+  //               permission.current.statusModule = true;
+  //             }
+  //           })
+  //           .catch((error) => {
+  //             console.error("Error fetching permissions:", error);
+  //           });
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error get during to fetch Province Master", error);
+  //     });
+  // }, []);
+
+
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
     addModule: false,
     editModule: false,
-    deleteModule: false,
-    statusModule: false,
   });
 
   useEffect(() => {
-    isAdminUser()
-      .then((response) => {
-        if (response) {
-          permission.current.addModule = true;
-          permission.current.editModule = true;
-          permission.current.deleteModule = true;
-          permission.current.statusModule = true;
-        } else {
-          getModulePermissions("Template Master")
-            .then((response) => {
-              if (response.includes("TEMPLATE_CREATE")) {
-                permission.current.addModule = true;
-              }
-              if (response.includes("TEMPLATE_UPDATE")) {
-                permission.current.editModule = true;
-              }
-              if (response.includes("TEMPLATE_STATUS_CHANGE")) {
-                permission.current.statusModule = true;
-              }
-            })
-            .catch((error) => {
-              console.error("Error fetching permissions:", error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error get during to fetch Province Master", error);
-      });
-  }, []);
+    const updatedPermissions = {
+      statusModule: false,
+      addModule: false,
+      editModule: false,
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.addModule = true;
+      updatedPermissions.editModule = true;
+    } else {
+      const permissionArr = permissions['Claim Type Master'] ?? [];
+
+      if (["CLAIM_TYPE_CREATE", "CLAIM_TYPE_CREATE_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.addModule = true;
+      }
+
+      if (["CLAIM_TYPE_STATUS_CHANGE", "CLAIM_TYPE_STATUS_CHANGE_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.editModule = true;
+      }
+
+      if (["CLAIM_TYPE_UPDATE", "CLAIM_TYPE_UPDATE_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
+
 
   const editTemplateMaster = async (rowData) => {
     navigate(`/template-master/edit/${rowData?.id}`)
@@ -179,18 +221,18 @@ const TemplateMaster = () => {
         // accessorFn: (row) => row.status ? "Active" : "Inactive",
         cell: (info) => {
           return (
-            // permission.current.statusModule ?
-            <Toggle
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              // label="Status"
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-              tooltip="Active"
-            />
-            //  : ''
+            permissionsState.statusModule ?
+              <Toggle
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                // label="Status"
+                name="status"
+                value={info?.row?.original?.status}
+                checked={info?.row?.original?.status}
+                onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+                tooltip="Active"
+              />
+              : ''
           )
         },
         id: "status",
@@ -201,22 +243,22 @@ const TemplateMaster = () => {
         id: "actions",
         isAction: true,
         cell: (rowData) => (
-          // permission.current.editModule ?
-          <DataGridActions
-            controlId="role-rights"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: true,
-                type: "button",
-                title: "Edit",
-                icon: <MdEdit size={18} />,
-                handler: () => editTemplateMaster(rowData?.row?.original),
-              },
-            ]}
-          />
-          // : ''
+          permissionsState.editModule ?
+            <DataGridActions
+              controlId="role-rights"
+              rowData={rowData}
+              customButtons={[
+                {
+                  name: "edit",
+                  enabled: true,
+                  type: "button",
+                  title: "Edit",
+                  icon: <MdEdit size={18} />,
+                  handler: () => editTemplateMaster(rowData?.row?.original),
+                },
+              ]}
+            />
+            : ''
         ),
         header: () => (
           <div className="text-center">{t("ACTIONS")}</div>
@@ -225,7 +267,7 @@ const TemplateMaster = () => {
         size: "80",
       },
     ],
-    []
+    [permissionsState]
   );
 
   useEffect(() => {
@@ -281,13 +323,17 @@ const TemplateMaster = () => {
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-        <PageHeader
-          title={t("TEMPLATE MASTER")}
-          actions={[
-            { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-            { label: t("ADD NEW"), to: "/template-master/add", variant: "warning", disabled: false },
-          ]}
-        />
+        {
+          permissionsState.addModule ?
+            <PageHeader
+              title={t("TEMPLATE MASTER")}
+              actions={[
+                { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+                { label: t("ADD NEW"), to: "/template-master/add", variant: "warning", disabled: false },
+              ]}
+            /> : ''
+        }
+
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
             <ListingSearchForm filter={filter} setFilter={setFilter} />
