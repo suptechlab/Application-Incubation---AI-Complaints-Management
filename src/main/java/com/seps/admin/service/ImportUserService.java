@@ -79,10 +79,23 @@ public class ImportUserService {
         List<String> errors = new ArrayList<>();
         List<User> newUserList = new ArrayList<>();
         List<ImportUserDTO> validUsers = new ArrayList<>();
+        Boolean checkCurrentRUC = false;
+        List<String> currentUserAuthority = currentUser.getAuthorities().stream().map(Authority::getName).toList();
+        if (currentUserAuthority.contains(AuthoritiesConstants.FI)) {
+            checkCurrentRUC = true;
+        }
 
         try (Workbook workbook = WorkbookFactory.create(fileInputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             int lastDataRow = findLastDataRow(sheet);
+            // Validation for maximum row limit
+            if (lastDataRow > Constants.IMPORT_EXCEL_NO_OF_ROWS) {
+                String message = getLocalizedMessage("validation.row.limit.exceeded", locale, Constants.IMPORT_EXCEL_NO_OF_ROWS);
+                errors.add(message);
+                importUserResponseVM.setErrors(errors);
+                return importUserResponseVM; // Return immediately if row limit is exceeded
+            }
+
             for (int i = 1; i <= lastDataRow; i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) {
@@ -101,6 +114,7 @@ public class ImportUserService {
                     // Validate identificacion and ruc
                     validateIdentificacion(userDTO.getIdentificacion(), i, errors);
                     validateRuc(userDTO.getRuc(), i, errors, currentUser);
+                    //Validate Email
                     validateEmail(userDTO.getEmail(), i, userDTO.getIdentificacion(), authorities, requiredStatuses, errors, locale);
                     if (userDTO.getRole().equals("ADMIN")) {
                         validateRole(Constants.RIGHTS_FI_ADMIN, i, errors, locale);
@@ -109,6 +123,11 @@ public class ImportUserService {
                     } else {
                         String roleMessage = getLocalizedMessage("role.not.found", locale, null);
                         errors.add("Row " + (i + 1) + ":" + roleMessage);
+                    }
+                    //Check for current user RUC
+                    if (checkCurrentRUC && !currentUser.getOrganization().getRuc().equals(userDTO.getRuc())) {
+                        String rucMessage = getLocalizedMessage("invalid.current.ruc", locale, null);
+                        errors.add("Row " + (i + 1) + ":" + rucMessage);
                     }
                     // Only add userDTO to validUsers if no new errors were added
                     if (errors.size() == initialErrorCount) {

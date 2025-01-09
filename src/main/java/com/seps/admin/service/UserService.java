@@ -63,6 +63,7 @@ public class UserService {
     private static final String DISPLAY_NAME = "displayName";
     private static final String DEPARTMENT = "department";
     private static final String TITLE = "title";
+    private static final String CN = "cn";
 
     public UserService(UserRepository userRepository, AuthorityRepository authorityRepository,
                        PasswordEncoder passwordEncoder, UserMapper userMapper, ExternalAPIService externalAPIService,
@@ -576,6 +577,9 @@ public class UserService {
             }
             if (ldapDetails.containsKey(TITLE)) {
                 userDetails.put(TITLE, ldapDetails.get(TITLE));
+            }
+            if (ldapDetails.containsKey(CN)) {
+                userDetails.put(CN, ldapDetails.get(CN));
             }
         } catch (UserNotFoundException e) {
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_VERIFICATION_FAILED, e.getMessage());
