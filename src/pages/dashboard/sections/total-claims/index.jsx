@@ -1,50 +1,92 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Stack } from 'react-bootstrap';
-import { MdConfirmationNumber, MdDoDisturb, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
+import toast from 'react-hot-toast';
 import ReactSelect from '../../../../components/ReactSelect';
 import InfoCards from '../../../../components/infoCards';
+import { getDashboardGraphAndTiles } from '../../../../services/dashboard.service';
+import { getOrganizationList } from '../../../../services/teamManagment.service';
 import ClosedClaimList from './closed-claims';
 import PieChart from './pie-chart';
+import CustomDateRangePicker from '../../../../components/CustomDateRangePicker';
+import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
-const TotalClaimsSection = () => {
-    // Info Cards Data
-    const cardsData = [
-        {
-            bgColor: 'bg-primary',
-            Icon: <MdConfirmationNumber size={24} />,
-            title: 'New Tickets',
-            value: 5,
-            colProps: { sm: 6, md: 4, className: "col-xl" }
-        },
-        {
-            bgColor: 'bg-orange',
-            Icon: <MdHourglassEmpty size={24} />,
-            title: 'Tickets in Progress',
-            value: 2,
-            colProps: { sm: 6, md: 4, className: "col-xl" }
-        },
-        {
-            bgColor: 'bg-custom-orange',
-            Icon: <MdPending size={24} />,
-            title: 'Pending Tickets',
-            value: 1,
-            colProps: { sm: 6, md: 4, className: "col-xl" }
-        },
-        {
-            bgColor: 'bg-custom-green',
-            Icon: <MdTaskAlt size={24} />,
-            title: 'Closed Tickets',
-            value: 2,
-            colProps: { sm: 6, md: 4, className: "col-xl" }
-        },
-        {
-            bgColor: 'bg-danger',
-            Icon: <MdDoDisturb size={24} />,
-            title: 'Rejected Tickets',
-            value: 2,
-            colProps: { sm: 6, md: 4, className: "col-xl" }
-        },
-    ];
+const TotalClaimsSection = ({setLoading}) => {
+
+
+    const [dashboardData, setDashboardData] = useState({})
+
+    const [orgList, setOrgList] = useState([])
+
+    const [filters, setFilters] = useState({})
+
+    const {t} = useTranslation()
+    // Temporary state to hold the selected dates
+    const [tempDateRange, setTempDateRange] = useState([null, null]);
+    const handleDateFilterChange = ([newStartDate, newEndDate]) => {
+        setTempDateRange([newStartDate, newEndDate]);
+
+        // Update filter state only if both dates are selected
+        if (newStartDate && newEndDate) {
+            setFilters({
+                startDate: moment(newStartDate).format("YYYY-MM-DD"),
+                endDate: moment(newEndDate).format("YYYY-MM-DD")
+            });
+        } else {
+            setFilters((prevFilters) => {
+                const { startDate, endDate, ...restFilters } = prevFilters;
+                return { ...restFilters };
+            });
+        }
+    };
+
+    // GET DASHBOARD DATA FROM API
+    const getDashboardInfo = async () => {
+        setLoading(true)
+        getDashboardGraphAndTiles(filters).then((response) => {
+            setDashboardData(response?.data)
+            setLoading(false)
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+            }).finally(() => {
+                setLoading(false)
+            })
+    };
+
+    useEffect(() => {
+        getDashboardInfo()
+    }, [filters])
+
+    // GET ORGANIZATION LIST 
+
+    const getOrganizationDropdownData = async () => {
+        setLoading(true)
+        getOrganizationList().then((response) => {
+            const orgListData = response?.data?.map((data) => {
+                return {
+                    label: data?.name,
+                    value: data?.id
+                }
+            })
+            setOrgList([{label:t('SELECT'),value:''},...orgListData])
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message);
+            }
+        }).finally(() => {
+            setLoading(false)
+        })
+    }
+    useEffect(() => {
+        getOrganizationDropdownData()
+    }, [])
 
     return (
         <Card className="border-0 shadow mb-3">
@@ -60,47 +102,57 @@ const TotalClaimsSection = () => {
                         className="flex-wrap me-auto"
                     >
                         <div className="fw-semibold fs-4 mb-0">
-                            Total Claims <span className="fs-14 fw-normal">(submitted across all FIs)</span>
+                            {t("TOTAL_CLAIMS")} <span className="fs-14 fw-normal">({t('SUBMITTED_ACROSS_ALL_FIS')})</span>
                         </div>
-                        <div className="bg-primary bg-opacity-10 p-2 small rounded"><span className="me-2">Average Resolution Time:</span> <span className="fw-semibold">1.2 Days</span></div>
+                        <div className="bg-primary bg-opacity-10 p-2 small rounded"><span className="me-2">{t("AVERAGE_RESOLUTION_TIME")}:</span> <span className="fw-semibold">{dashboardData?.averageResolutionTime} {t("DAYS")}</span></div>
                     </Stack>
-
-                    <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                        <ReactSelect
-                            wrapperClassName="mb-0"
-                            class="form-select "
-                            placeholder="Select"
-                            id="fisAndSeps"
-                            size="sm"
-                            options={[
-                                {
-                                    label: "FIs & SEPS",
-                                    value: "",
-                                },
-                                {
-                                    label: "Option 1",
-                                    value: 'option-1',
-                                },
-                            ]}
-                        />
-                    </div>
+                    <Stack
+                        direction="horizontal"
+                        gap={2}
+                        className="flex-wrap "
+                    >
+                        <div className="custom-max-width-320 custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                            <ReactSelect
+                                wrapperClassName="mb-0"
+                                className="form-select "
+                                placeholder={t("SELECT")}
+                                id="organizationId"
+                                size="sm"
+                                onChange={(event) => {
+                                    setFilters((prev) => ({ ...prev, organizationId: event?.target?.value }))
+                                }}
+                                options={orgList ?? []}
+                            />
+                        </div>
+                        <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                            <CustomDateRangePicker
+                                wrapperClassName="mb-0"
+                                tempDateRange={tempDateRange}
+                                handleChange={handleDateFilterChange}
+                                startDate={filters?.startDate ?? null}
+                                endDate={filters?.endDate}
+                                selectsRange={true}
+                                placeholder={t("SELECT_DATE_RANGE")}
+                                size="sm"
+                            />
+                        </div>
+                    </Stack>
                 </Stack>
             </Card.Header>
             <Card.Body>
                 <div className="info-cards mb-3">
-                    <InfoCards cardsData={cardsData} rowClassName="g-3 text-nowrap" />
+                    <InfoCards claimStatsData={dashboardData?.claimStatusCount} rowClassName="g-3 text-nowrap" />
                 </div>
                 <Row className='gx-4 gy-3'>
-                    <Col lg={6} xla>
-                        <PieChart />
+                    <Col lg={6} >
+                        <PieChart graphData={dashboardData?.slaAdherenceGraph} />
                     </Col>
                     <Col lg={6}>
-                        <ClosedClaimList />
+                        <ClosedClaimList closedClaimData={dashboardData?.closeClaimStatusCount} />
                     </Col>
                 </Row>
             </Card.Body>
         </Card>
     )
 }
-
 export default TotalClaimsSection

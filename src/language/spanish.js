@@ -300,6 +300,12 @@ export const spanishLang = {
     "ALL_ENTITIES": "Todas las entidades",
     "REMINDER": "¡Recordatorio!",
     "SLA_BREACH_NOTICE": "El SLA para #{{ticketId}} se incumplirá en {{days}} días. Por favor, tome las medidas necesarias para garantizar el cumplimiento.",
-    "SLA_COMMENT":"Comentario del SLA"
-
+    "SLA_COMMENT":"Comentario del SLA",
+    "ALL_INSTANCE": "Todas las instancias",
+    "TOTAL_CLAIMS": "Reclamaciones totales",
+    "SUBMITTED_ACROSS_ALL_FIS": "Presentado en todas las IF",
+    "AVERAGE_RESOLUTION_TIME": "Tiempo promedio de resolución",
+    "CLAIM_AND_COMPLAINTS": "Reclamos y Quejas",
+    "FI_ENTITY": "Entidad FI",
+    "SLA ADHERENCE":"Cumplimiento del SLA"
 }

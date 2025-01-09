@@ -305,5 +305,12 @@ export const englishLang = {
     "ALL_ENTITIES": "All Entities",
     "REMINDER": "Reminder!",
     "SLA_BREACH_NOTICE": "The SLA for #{{ticketId}} will breach in {{days}} days. Please take necessary actions to ensure compliance.",
-    "SLA_COMMENT":'SLA Comment'
+    "SLA_COMMENT":'SLA Comment',
+    "ALL_INSTANCE":"All Instances",
+    "TOTAL_CLAIMS" : "Total Claims",
+    "SUBMITTED_ACROSS_ALL_FIS":"submitted across all FIs",
+    "AVERAGE_RESOLUTION_TIME":"Average Resolution Time",
+    "CLAIM_AND_COMPLAINTS":"Claims & Complaints",
+    "FI_ENTITY" : "FI Entity",
+    "SLA ADHERENCE":"SLA Adherence"
 }
