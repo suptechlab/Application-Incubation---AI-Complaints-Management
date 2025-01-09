@@ -1,4 +1,4 @@
-import {authApi} from "../utils/instance";
+import {adminApi, authApi} from "../utils/instance";
 
 const API_VERSION = process.env.REACT_APP_API_VERSION
 
@@ -45,6 +45,14 @@ export const handleGetAccountDetail = async () => {
     return await authApi.get(`/account`);
 }
 
+// DOWNLOAD PROFILE IMAGE
+export const downloadProfileImage = async () => {
+    return await adminApi.get(`/${API_VERSION}/account/download-profile-picture`, {
+        responseType: 'blob', // Ensures the response is treated as a file
+    });
+}
+
+// UPDATE ACCOUNT
 export const handleAccount = async (data) => {
-    return await authApi.post(`/account`, data);
+    return await adminApi.post(`/${API_VERSION}/account`, data);
 }

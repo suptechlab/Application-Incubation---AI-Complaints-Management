@@ -387,7 +387,7 @@ export default function TicketWorkFlowAddEdit() {
             CREATED: {
                 conditionsKey: "createConditions",
                 actionsKey: "createActions",
-                conditionFields: {DEFAULT : {conditionId: "claimTypeId", conditionCatId: "claimSubTypeId" }},
+                conditionFields: { DEFAULT: { conditionId: "claimTypeId", conditionCatId: "claimSubTypeId" } },
                 actionFields: {
                     ASSIGN_TO_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId" },
                     ASSIGN_TO_AGENT: { actionId: "action", actionFilter1: "agentId" },
@@ -418,7 +418,7 @@ export default function TicketWorkFlowAddEdit() {
             TICKET_PRIORITY: {
                 conditionsKey: "ticketPriorityConditions",
                 actionsKey: "ticketPriorityActions",
-                conditionFields: {DEFAULT :{ conditionId: "priority"} },
+                conditionFields: { DEFAULT: { conditionId: "priority" } },
                 actionFields: {
                     MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
                     MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
@@ -430,7 +430,7 @@ export default function TicketWorkFlowAddEdit() {
             SLA_DAYS_REMINDER: {
                 conditionsKey: "slaDaysReminderConditions",
                 actionsKey: "slaDaysReminderActions",
-                conditionFields: {DEFAULT :{ conditionId: "noOfDays" }},
+                conditionFields: { DEFAULT: { conditionId: "noOfDays" } },
                 actionFields: {
                     MAIL_TO_FI_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
                     MAIL_TO_SEPS_TEAM: { actionId: "action", actionFilter1: "teamId", actionFilter2: "agentId", actionFilter3: "templateId" },
@@ -460,9 +460,6 @@ export default function TicketWorkFlowAddEdit() {
                 },
             }
         };
-
-
-        console.log({ eventKeyMap })
         // const { conditionsKey, actionsKey, conditionFields, actionFields } = eventKeyMap[selectedEvent] || {};
 
         const { conditionsKey, actionsKey, conditionFields: rawConditionFields, actionFields } = eventKeyMap[selectedEvent] || {};
@@ -527,8 +524,6 @@ export default function TicketWorkFlowAddEdit() {
 
         const payload = generateDynamicPayload(selectedEvent, values);
 
-        console.log('payload', payload)
-
         try {
             const action = isEdit
                 ? editTicketWorkflow(id, { id: id, ...payload })
@@ -583,8 +578,20 @@ export default function TicketWorkFlowAddEdit() {
             });
         } else {
             // Additional logic for specific events
-            getClaimSubTypes(index, value);
-            formikProps.setFieldValue(`conditions[${index}].conditionId`, value);
+
+
+            if (value !== '' && value !== formikProps?.values?.conditions?.[index]?.conditionId) {
+                getClaimSubTypes(index, value);
+                formikProps.setFieldValue(`conditions[${index}].conditionId`, value);
+
+                if (formikProps?.values?.conditions?.[index].conditionCatId) {
+                    console.log("ARE YOU HERE")
+                    formikProps.setFieldValue(
+                        `conditions[${index}].conditionCatId`,
+                        ''
+                    )
+                }
+            }
         }
     };
 
@@ -599,8 +606,6 @@ export default function TicketWorkFlowAddEdit() {
         if (value === 'ASSIGN_TO_AGENT' || value === 'ASSIGN_TO_TEAM') {
             setSelectedActions((prevSelectedActions) => {
                 const updatedSelectedActions = [...prevSelectedActions];
-
-
                 // Remove conflicting values
                 const conflictingValues = ['ASSIGN_TO_AGENT', 'ASSIGN_TO_TEAM'];
                 conflictingValues.forEach((conflict) => {
@@ -645,6 +650,18 @@ export default function TicketWorkFlowAddEdit() {
                         : action.isDisabled,
             }))
         );
+
+
+        if (value !== formikProps?.values?.actions?.[index]?.actionId) {
+            ['actionFilter1', 'actionFilter2', 'actionFilter3'].forEach((filter) => {
+                if (formikProps?.values?.actions?.[index]?.[filter]) {
+                    formikProps.setFieldValue(`actions[${index}].${filter}`, '');
+                }
+            });
+        }
+
+
+
     };
 
     const isActionDisabled = (value, currentValue) => {
@@ -993,18 +1010,18 @@ export default function TicketWorkFlowAddEdit() {
         if (responseValues?.event === 'CREATED') {
             actions = responseValues?.createActions?.map((action) => {
                 if (action["action"] === 'ASSIGN_TO_TEAM') {
-                   
 
-                    setSelectedActions( (prevSelectedActions) => (
-                        [...prevSelectedActions,'ASSIGN_TO_TEAM','ASSIGN_TO_AGENT']))
+
+                    setSelectedActions((prevSelectedActions) => (
+                        [...prevSelectedActions, 'ASSIGN_TO_TEAM', 'ASSIGN_TO_AGENT']))
                     return {
                         actionId: action["action"] ?? "",
                         actionFilter1: action["teamId"] ?? "",
                         actionFilter2: action["agentId"] ?? "",
                     };
                 } else if (action["action"] === 'ASSIGN_TO_AGENT') {
-                    setSelectedActions( (prevSelectedActions) => (
-                        [...prevSelectedActions,'ASSIGN_TO_TEAM','ASSIGN_TO_AGENT']))
+                    setSelectedActions((prevSelectedActions) => (
+                        [...prevSelectedActions, 'ASSIGN_TO_TEAM', 'ASSIGN_TO_AGENT']))
                     return {
                         actionId: action["action"] ?? "",
                         actionFilter1: action["agentId"] ?? "",
@@ -1327,8 +1344,10 @@ export default function TicketWorkFlowAddEdit() {
                                                                     <Col sm={6} lg={4}>
                                                                         <ReactSelect
                                                                             placeholder={t('SELECT')}
-                                                                            name={`conditions[${index}].conditionCatId`}
-                                                                            options={conditionsCatArr[index] ?? []}
+                                                                            // name={`conditions[${index}].conditionCatId`}
+                                                                            // options={[{label:t('SELECT'),value:''},...conditionsCatArr[index]] ?? []}
+                                                                            options={[{ label: t('SELECT'), value: '' }, ...(Array.isArray(conditionsCatArr[index]) ? conditionsCatArr[index] : [])]}
+
                                                                             onBlur={formikProps.handleBlur}
                                                                             onChange={(option) =>
                                                                                 formikProps.setFieldValue(
@@ -1340,7 +1359,7 @@ export default function TicketWorkFlowAddEdit() {
                                                                             //     (opt) => opt.value === formikProps.values.conditions[index].conditionCatId
                                                                             // ) ?? ''}
                                                                             value={formikProps.values.conditions[index]?.conditionCatId || ''}
-                                                                            label="Claim Sub Type"
+                                                                            label={t("CLAIM SUB TYPE")}
                                                                             error={formikProps.errors?.conditions?.[index]?.conditionCatId}
                                                                             touched={formikProps.touched?.conditions?.[index]?.conditionCatId}
                                                                         />
@@ -1457,13 +1476,23 @@ export default function TicketWorkFlowAddEdit() {
                                                                         placeholder={t('SELECT TEMPLATE')}
                                                                         label={t("TEMPLATES")}
                                                                         name={`actions[${index}].actionFilter1`}
-                                                                        options={actionCategory1Arr[index] ?? []}
+                                                                        // options={actionCategory1Arr[index] ?? []}
+                                                                        options={[{ label: t('SELECT'), value: '' }, ...(Array.isArray(actionCategory1Arr[index]) ? actionCategory1Arr[index] : [])]}
+
                                                                         onBlur={formikProps.handleBlur}
                                                                         onChange={(option) => {
                                                                             formikProps.setFieldValue(
                                                                                 `actions[${index}].actionFilter1`,
                                                                                 option?.target?.value
                                                                             );
+
+                                                                            if (option.target.value !== formikProps?.values?.actions?.[index]?.actionFilter1) {
+                                                                                [ 'actionFilter2', 'actionFilter3'].forEach((filter) => {
+                                                                                    if (formikProps?.values?.actions?.[index]?.[filter]) {
+                                                                                        formikProps.setFieldValue(`actions[${index}].${filter}`, '');
+                                                                                    }
+                                                                                });
+                                                                            }
                                                                         }}
                                                                         value={formikProps.values.actions[index].actionFilter1}
                                                                         error={formikProps.errors?.actions?.[index]?.actionFilter1}
@@ -1477,7 +1506,8 @@ export default function TicketWorkFlowAddEdit() {
                                                                         wrapperClassName={'mb-3'}
                                                                         placeholder={t('SELECT AGENT')}
                                                                         name={`actions[${index}].actionFilter1`}
-                                                                        options={actionCategory1Arr[index] ?? []}
+                                                                        // options={actionCategory1Arr[index] ?? []}
+                                                                        options={[{ label: t('SELECT'), value: '' }, ...(Array.isArray(actionCategory1Arr[index]) ? actionCategory1Arr[index] : [])]}
                                                                         onBlur={formikProps.handleBlur}
                                                                         label={t("AGENTS")}
                                                                         onChange={(option) => {
@@ -1485,6 +1515,13 @@ export default function TicketWorkFlowAddEdit() {
                                                                                 `actions[${index}].actionFilter1`,
                                                                                 option?.target?.value
                                                                             );
+                                                                            if (option.target.value !== formikProps?.values?.actions?.[index]?.actionFilter1) {
+                                                                                [ 'actionFilter2', 'actionFilter3'].forEach((filter) => {
+                                                                                    if (formikProps?.values?.actions?.[index]?.[filter]) {
+                                                                                        formikProps.setFieldValue(`actions[${index}].${filter}`, '');
+                                                                                    }
+                                                                                });
+                                                                            }
                                                                         }}
                                                                         value={formikProps.values.actions[index].actionFilter1}
                                                                         error={formikProps.errors?.actions?.[index]?.actionFilter1}
@@ -1499,7 +1536,8 @@ export default function TicketWorkFlowAddEdit() {
                                                                         wrapperClassName={'mb-3'}
                                                                         placeholder={t('SELECT TEAM')}
                                                                         name={`actions[${index}].actionFilter1`}
-                                                                        options={actionCategory1Arr[index] ?? []}
+                                                                        // options={actionCategory1Arr[index] ?? []}
+                                                                        options={[{ label: t('SELECT'), value: '' }, ...(Array.isArray(actionCategory1Arr[index]) ? actionCategory1Arr[index] : [])]}
                                                                         onBlur={formikProps.handleBlur}
                                                                         label={t("TEAMS")}
                                                                         onChange={(option) => {
@@ -1507,6 +1545,13 @@ export default function TicketWorkFlowAddEdit() {
                                                                                 `actions[${index}].actionFilter1`,
                                                                                 option?.target?.value
                                                                             );
+                                                                            if (option.target.value !== formikProps?.values?.actions?.[index]?.actionFilter1) {
+                                                                                [ 'actionFilter2', 'actionFilter3'].forEach((filter) => {
+                                                                                    if (formikProps?.values?.actions?.[index]?.[filter]) {
+                                                                                        formikProps.setFieldValue(`actions[${index}].${filter}`, '');
+                                                                                    }
+                                                                                });
+                                                                            }
                                                                             updateActionCategory2Filter(formikProps.values.actions[index].actionId, option?.target?.value, index)
                                                                         }}
                                                                         value={formikProps.values.actions[index].actionFilter1}
@@ -1522,7 +1567,8 @@ export default function TicketWorkFlowAddEdit() {
                                                                         wrapperClassName={'mb-3'}
                                                                         placeholder={t('SELECT AGENT')}
                                                                         name={`actions[${index}].actionFilter2`}
-                                                                        options={actionCategory2Arr[index] ?? []}
+                                                                        // options={actionCategory2Arr[index] ?? []}
+                                                                        options={[{ label: t('SELECT'), value: '' }, ...(Array.isArray(actionCategory2Arr[index]) ? actionCategory2Arr[index] : [])]}
                                                                         onBlur={formikProps.handleBlur}
                                                                         label={t("AGENTS")}
                                                                         onChange={(option) => {
@@ -1530,6 +1576,11 @@ export default function TicketWorkFlowAddEdit() {
                                                                                 `actions[${index}].actionFilter2`,
                                                                                 option?.target?.value
                                                                             );
+                                                                            if (option.target.value !== formikProps?.values?.actions?.[index]?.actionFilter2) {
+                                                                                if (formikProps?.values?.actions?.[index]?.actionFilter3) {
+                                                                                        formikProps.setFieldValue(`actions[${index}].actionFilter3`, '');
+                                                                                    }
+                                                                            }
                                                                         }}
                                                                         value={formikProps.values.actions[index].actionFilter2}
                                                                         error={formikProps.errors?.actions?.[index]?.actionFilter2}
@@ -1544,7 +1595,8 @@ export default function TicketWorkFlowAddEdit() {
                                                                         wrapperClassName={'mb-3'}
                                                                         placeholder={t('SELECT TEMPLATE')}
                                                                         name={`actions[${index}].actionFilter3`}
-                                                                        options={actionCategory3Arr[index] ?? []}
+                                                                        // options={actionCategory3Arr[index] ?? []}
+                                                                        options={[{ label: t('SELECT'), value: '' }, ...(Array.isArray(actionCategory3Arr[index]) ? actionCategory3Arr[index] : [])]}
                                                                         onBlur={formikProps.handleBlur}
                                                                         label={t("TEMPLATES")}
                                                                         onChange={(option) => {

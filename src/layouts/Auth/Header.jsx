@@ -28,7 +28,7 @@ import "./header.scss";
 import { useTranslation } from "react-i18next";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
-  const { logout, userData } = useContext(AuthenticationContext);
+  const { logout, userData,profileImage } = useContext(AuthenticationContext);
   const { t } = useTranslation();
 
 
@@ -149,7 +149,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
             >
               <Image
                 className="object-fit-cover rounded-circle"
-                src={imageUrl && imageUrl != null ? imageUrl : defaultAvatar}
+                src={profileImage ? profileImage : imageUrl && imageUrl != null ? imageUrl : defaultAvatar}
                 width={40}
                 height={40}
                 alt={firstName}

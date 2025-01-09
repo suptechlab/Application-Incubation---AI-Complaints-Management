@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card, Col, Image, ListGroup, Row, Stack } from "react-bootstrap";
 import { MdCalendarToday } from "react-icons/md";
 import { Link } from "react-router-dom";
@@ -8,11 +8,14 @@ import toast from "react-hot-toast";
 import moment from "moment";
 import { downloadFile, getIconForFile, isHTML } from "../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
+import { AuthenticationContext } from "../../../../contexts/authentication.context";
 const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState }) => {
 
   const [ticketActivity, setTicketActivity] = useState([])
 
   const [isDownloading, setDownloading] = useState(false)
+
+  const {userData ,profileImage} = useContext(AuthenticationContext)
 
   const { t } = useTranslation()
 
@@ -46,7 +49,7 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
 
           const attachments = activity?.attachmentUrl?.attachments?.length ? activity.attachmentUrl.attachments : [];
 
-
+          const imageUrl = activity?.performedBy === userData?.id ? profileImage :defaultAvatar
           return {
             id: index,
             // name: activity?.activityDetails?.performBy?.name ? getPerformerName(activity?.activityDetails?.performBy?.name, activity?.activityType) : "",
@@ -57,7 +60,7 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
             ) : (
               <p className="text-justify">{text}</p>
             )}</>,
-            avatar: activity?.user?.imageUrl ?? defaultAvatar,
+            avatar: imageUrl,
             variant: activity?.activityType ?? '',
             attachments: attachments && attachments?.length > 0 ? attachments : []
           }
