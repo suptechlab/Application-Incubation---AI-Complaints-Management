@@ -140,7 +140,6 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
             </Dropdown.Menu>
           </Dropdown>
 
-
           <Dropdown className="profileDropdown ms-3 ms-sm-4">
             <Dropdown.Toggle
               variant="link"
@@ -149,7 +148,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
             >
               <Image
                 className="object-fit-cover rounded-circle"
-                src={profileImage ? profileImage : imageUrl && imageUrl != null ? imageUrl : defaultAvatar}
+                src={profileImage ? profileImage : (imageUrl && imageUrl != null) ? imageUrl : defaultAvatar}
                 width={40}
                 height={40}
                 alt={firstName}

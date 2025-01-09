@@ -34,9 +34,9 @@ function App() {
   //   }
   // }, []);
 
-  if (isLoading) {
-    return <Loader isLoading={isLoading} />;
-  }
+  // if (isLoading) {
+  //   return <Loader isLoading={isLoading} />;
+  // }
 
 
   // return <Routers />;

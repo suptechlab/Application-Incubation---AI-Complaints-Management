@@ -123,10 +123,10 @@ const CityMaster = () => {
 
     setPermissionsState(updatedPermissions);
   }, [permissions, currentUser]);
-  
+
 
   const editCityMaster = async (rowData) => {
-     setEditModal({ row: rowData, open: !editModal?.open })
+    setEditModal({ row: rowData, open: !editModal?.open })
   };
 
   // FETCH DATA
@@ -136,27 +136,27 @@ const CityMaster = () => {
     queryKey: ["data", pagination, sorting, filter],
     queryFn: async () => {
       setLoading(true); // Start loading
-  
+
       try {
         // Clean up the filter object to remove empty strings and null values
         const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
         Object.keys(filterObj).forEach(key => {
           if (filterObj[key] === "") delete filterObj[key];
         });
-  
+
         const requestOptions = {
           page: pagination.pageIndex,
           size: pagination.pageSize,
           ...filterObj,
         };
-  
+
         // Handle sorting if applicable
         if (sorting.length > 0) {
           requestOptions.sort = sorting
             .map(sort => `${sort.id},${sort.desc ? "desc" : "asc"}`)
             .join(",");
         }
-  
+
         // Fetch data using handleGetProvinceMaster API call
         const response = await handleGetCities(requestOptions);
         return response;
@@ -210,66 +210,69 @@ const CityMaster = () => {
         id: "provinceName",
         header: () => t("PROVINCE"),
       },
-      {
-        // accessorFn: (row) => row.status ? "Active" : "Inactive",
-        cell: (info) => {
-          return (
-            <div className="d-flex items-center gap-2 pointer">
-                    {permissionsState.statusModule ?
-                        <Toggle
-                            tooltip={
-                              info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
-                            }
-                            id={`status-${info?.row?.original?.id}`}
-                            key={"status"}
-                            // label="Status"
-                            name="status"
-                            value={info?.row?.original?.status}
-                            checked={info?.row?.original?.status}
-                            onChange={() =>
-                              changeStatus(
-                                info?.row?.original?.id,
-                                info?.row?.original?.status
-                              )
-                            }
-                          />
-                    : ""}
-              </div>
-            
-          );
-        },
-        id: "status",
-        header: () => t("STATUS"),
-        size: "80",
-      },
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
+      ...(permissionsState?.statusModule
+        ? [{
+          // accessorFn: (row) => row.status ? "Active" : "Inactive",
+          cell: (info) => {
+            return (
               <div className="d-flex items-center gap-2 pointer">
-                    {permissionsState.editModule ?
-                        <DataGridActions
-                            controlId="province-master"
-                            rowData={rowData}
-                            customButtons={[
-                              {
-                                name: "edit",
-                                enabled: permissionsState.editModule,
-                                type: "button",
-                                title: t("EDIT"),
-                                icon: <MdEdit size={18} />,
-                                handler: () => editCityMaster(rowData?.row?.original),
-                              },
-                            ]}
-                          />
-                    : ""}
-              </div> 
-          
-        ),
-        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-        enableSorting: false,
-        size: "80",
-      },
+                {permissionsState.statusModule ?
+                  <Toggle
+                    tooltip={
+                      info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
+                    }
+                    id={`status-${info?.row?.original?.id}`}
+                    key={"status"}
+                    // label="Status"
+                    name="status"
+                    value={info?.row?.original?.status}
+                    checked={info?.row?.original?.status}
+                    onChange={() =>
+                      changeStatus(
+                        info?.row?.original?.id,
+                        info?.row?.original?.status
+                      )
+                    }
+                  />
+                  : ""}
+              </div>
+
+            );
+          },
+          id: "status",
+          header: () => t("STATUS"),
+          size: "80",
+        }] : [])
+      ,
+      ...(permissionsState?.editModule
+        ? [{
+          id: "actions",
+          isAction: true,
+          cell: (rowData) => (
+            <div className="d-flex items-center gap-2 pointer">
+
+              <DataGridActions
+                controlId="province-master"
+                rowData={rowData}
+                customButtons={[
+                  {
+                    name: "edit",
+                    enabled: permissionsState.editModule,
+                    type: "button",
+                    title: t("EDIT"),
+                    icon: <MdEdit size={18} />,
+                    handler: () => editCityMaster(rowData?.row?.original),
+                  },
+                ]}
+              />
+            </div>
+
+          ),
+          header: () => <div className="text-center">{t("ACTIONS")}</div>,
+          enableSorting: false,
+          size: "80",
+        }] : []),
+
     ],
     [permissionsState]
   );
@@ -284,7 +287,7 @@ const CityMaster = () => {
   // EXPORT TO CSV CLICK HANDLER
   const exportHandler = () => {
     setDownloading(true)
-    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading ?? false})
+    toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading ?? false })
     downloadCityList({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -304,7 +307,7 @@ const CityMaster = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
-        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -358,13 +361,13 @@ const CityMaster = () => {
       <Loader isLoading={isLoading} />
       {permissionsState.addModule
         ?
-      <PageHeader
-        title={t("CITY MASTER")}
-        actions={[
-          {  label: "Export to CSV", onClick: exportHandler, variant: "outline-dark",disabled : isDownloading ? true : false},
-          { label: "Add New", onClick: toggle, variant: "warning" },
-        ]}
-      /> : ''}
+        <PageHeader
+          title={t("CITY MASTER")}
+          actions={[
+            { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ? true : false },
+            { label: "Add New", onClick: toggle, variant: "warning" },
+          ]}
+        /> : ''}
       <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
         <Card.Body className="d-flex flex-column">
           <ListingSearchForm filter={filter} setFilter={setFilter} />

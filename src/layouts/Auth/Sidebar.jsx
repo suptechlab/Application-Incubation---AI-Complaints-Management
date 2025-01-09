@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Button, Nav, Navbar } from "react-bootstrap";
+import { Button, Nav, Navbar, Placeholder } from "react-bootstrap";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import {
   MdOutlineKeyboardArrowDown,
@@ -14,7 +14,7 @@ import { filterNavItemsByModules } from "../../utils/permissionUtils";
 
 const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
 
-  const { authorities = [] , permissions = [], modules =[] } = useContext(AuthenticationContext);
+  const { authorities = [], permissions = [], modules = [], isLoading } = useContext(AuthenticationContext);
   const navItemsArr = NavItems();
   const [navItems, setNavItems] = useState([]);
 
@@ -35,7 +35,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
         }
       }
     }
-  }, [authorities,modules])
+  }, [authorities, modules])
 
   const sidebarRef = useRef(null);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(null);
@@ -104,6 +104,17 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
         <div className="d-flex flex-column w-100 h-100">
           <div className="overflow-x-hidden overflow-y-auto sidebarList">
             <Nav defaultActiveKey="/admin" as="ul" className="flex-column p-2">
+
+              {
+                isLoading &&
+
+                  [...Array(6)].map((element) => (
+
+                    <Placeholder.Button key={element} className="w-100 custom-height-42 my-2" xs={4} aria-hidden="true" bg="light" animation="wave" size={'lg'} />
+                  ))
+            }
+
+
               {navItems?.map((elem) => {
                 const {
                   id,

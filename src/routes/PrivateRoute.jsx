@@ -5,8 +5,6 @@ import { AuthenticationContext } from "../contexts/authentication.context";
 import NotAuthorized from "../pages/not-authorized";
 
 const PrivateRoute = ({ element, moduleName = "", route_permissions = [] }) => {
-
-    console.log({moduleName})
     const { currentUser, isAuthenticated, permissions = {}, isLoading = true } = useContext(AuthenticationContext);
 
     // Check if the module exists in permissions and if it has any matching permission
