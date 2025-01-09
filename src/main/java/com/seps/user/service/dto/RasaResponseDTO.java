@@ -10,6 +10,9 @@ public class RasaResponseDTO {
     private String text;
     private String image;
     private String link;
+    private String event;
+    private String id_token;
+    private Boolean file_upload_required = false;
     private List<ButtonDTO> buttons;
 
     // Getters and Setters
