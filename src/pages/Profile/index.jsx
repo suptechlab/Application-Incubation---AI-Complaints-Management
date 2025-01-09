@@ -13,7 +13,7 @@ import { handleAccount } from "../../services/authentication.service";
 import { validationSchema } from "../../validations/profile.validation";
 
 export default function AccountProfile() {
-  const { userData, profileImage, isDownloadingImg, isLoading } = useContext(AuthenticationContext);
+  const { userData, profileImage, isDownloadingImg, isLoading, currentUser,handleAccountDetails } = useContext(AuthenticationContext);
   const { t } = useTranslation(); // use the translation hook
   const [profileImg, setProfileImg] = useState("");
 
@@ -69,6 +69,7 @@ export default function AccountProfile() {
 
     handleAccount(formData)
       .then((response) => {
+        handleAccountDetails()
         toast.success(response?.data?.message);
       })
       .catch((error) => {
@@ -164,27 +165,31 @@ export default function AccountProfile() {
                               onChange={(event) => handleFileChange(event, setFieldValue)}
                             />
                           </div>
+                          <span> {values?.profile ? values?.profile?.fileName : ''} </span>
                           {touched?.profile && errors?.profile && <small className="form-text text-danger">{errors?.profile}</small>}
                         </div>
                       </Stack>
                     </Col>
                     <Col lg={8}>
                       <Row>
-                        <Col sm={6}>
-                          <FormInput
-                            error={errors.nationalID}
-                            id="nationalID"
-                            key={"nationalID"}
-                            label={t('NATIONAL ID')}
-                            name="nationalID"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            touched={touched.nationalID}
-                            type="text"
-                            value={values.nationalID}
-                            disabled={true}
-                          />
-                        </Col>
+                        {
+                          currentUser === 'FI_USER' ? <Col sm={6}>
+                            <FormInput
+                              error={errors.nationalID}
+                              id="nationalID"
+                              key={"nationalID"}
+                              label={t('NATIONAL ID')}
+                              name="nationalID"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              touched={touched.nationalID}
+                              type="text"
+                              value={values.nationalID}
+                              disabled={true}
+                            />
+                          </Col> : ''
+                        }
+
                         <Col sm={6}>
                           <FormInput
                             error={errors.email}

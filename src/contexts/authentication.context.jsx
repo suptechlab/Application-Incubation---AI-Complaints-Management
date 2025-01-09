@@ -14,7 +14,8 @@ export const AuthenticationContext = createContext({
     permissions: [],
     modules: [],
     setUserData: () => { },
-    profileImage: ''
+    profileImage: '',
+    handleAccountDetails : ()=>{}
 });
 
 
@@ -194,8 +195,6 @@ export default function AuthenticationProvider({ children }) {
     const handleImageDownload = () => {
         setIsDownloadingImg(true)
         downloadProfileImage().then(async (response) => {
-
-            console.log({ response })
             const reader = new FileReader();
             const blob = response.data;
 
@@ -241,7 +240,8 @@ export default function AuthenticationProvider({ children }) {
                 authorities,
                 modules,
                 profileImage,
-                isDownloadingImg
+                isDownloadingImg,
+                handleAccountDetails
             }}>
             {children}
         </AuthenticationContext.Provider>
