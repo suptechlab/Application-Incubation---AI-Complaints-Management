@@ -147,5 +147,8 @@ export const spanishLang = {
   "DOWNLOAD": "Descargar",
   "COMPLAINT_RAISED_SUCCES": "Queja planteada con éxito",
   "LOGIN": "Acceso",
-  "CHATBOT_INITIAL_TEXT" : 'Hola, soy SEPS Bot, tu asistente virtual.'
+  "CHATBOT_INITIAL_TEXT" : 'Hola, soy SEPS Bot, tu asistente virtual.',
+  "EDIT_PROFILE":"Editar perfil",
+  "UPDATE" :"Actualizar",
+  "BROWSE_IMAGE":"Explorar imagen"
 }
