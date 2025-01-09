@@ -42,7 +42,7 @@ const TotalClaimsSection = ({setLoading}) => {
 
     // GET DASHBOARD DATA FROM API
     const getDashboardInfo = async () => {
-        setLoading(true)
+        // setLoading(true)
         getDashboardGraphAndTiles(filters).then((response) => {
             setDashboardData(response?.data)
             setLoading(false)
@@ -54,7 +54,7 @@ const TotalClaimsSection = ({setLoading}) => {
                     toast.error(error?.message);
                 }
             }).finally(() => {
-                setLoading(false)
+                // setLoading(false)
             })
     };
 

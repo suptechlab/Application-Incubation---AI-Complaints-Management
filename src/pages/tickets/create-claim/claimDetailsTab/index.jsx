@@ -7,7 +7,7 @@ import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.vali
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormCheckbox from "../../../../components/formCheckbox";
 import { Link } from "react-router-dom";
-import { claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
+import { claimSubTypeDropdownList, claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
 import FormOtpInputBox from '../../../../components/FormOtpInputBox';
 import { svgIconClasses } from '@mui/material';
 import { MdClose, MdRefresh } from 'react-icons/md';
@@ -184,16 +184,23 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
     const getClaimSubTypes = useCallback(async (claimId) => {
         setIsLoading(true);
-        try {
-            const response = await getClaimSubTypeById(claimId);
-            const claimSubTypeFormatList = response?.data
-                ? [{ label: response.data.name, value: response.data.id }]
-                : [];
-            setClaimSubTypes([{ label: t('SELECT'), value: '' }, ...claimSubTypeFormatList]);
-            setIsLoading(false);
-        } catch (error) {
-            setIsLoading(false);
-        }
+        claimSubTypeDropdownList(claimId).then(response => {
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setClaimSubTypes(dropdownData)
+            }
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        }).finally(() => {
+            setIsLoading(false)
+        })
     }, [setClaimSubTypes, setIsLoading])
 
     useEffect(() => {

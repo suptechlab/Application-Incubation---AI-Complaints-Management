@@ -220,6 +220,17 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 ),
             },
             {
+                accessorFn: (row) => row?.createdAt,
+                id: "createdAt",
+                header: () => t("CREATION_DATE"),
+                enableSorting: true,
+                cell: ({ row }) => (
+                    row?.original?.createdAt
+                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY")
+                        : ''
+                ),
+            },
+            {
                 accessorFn: (row) => row?.claimType?.name,
                 id: "claimType",
                 header: () => t("CLAIM TYPE"),
@@ -245,17 +256,6 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 cell: ({ row }) => (
                     <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
                 )
-            },
-            {
-                accessorFn: (row) => row?.createdAt,
-                id: "createdAt",
-                header: () => t("CREATION_DATE"),
-                enableSorting: true,
-                cell: ({ row }) => (
-                    row?.original?.createdAt
-                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a")
-                        : ''
-                ),
             },
             {
                 accessorFn: (row) => row?.instanceType,
