@@ -146,5 +146,5 @@ export const englishLang = {
   "DOWNLOAD": "Download",
   "COMPLAINT_RAISED_SUCCES": "Complaint raised successfully",
   "LOGIN": "Login",
-  "CHATBOT_INITIAL_TEXT" : 'How may i help you ?'
+  "CHATBOT_INITIAL_TEXT" : "Hello, I am SEPS Bot, your virtual assistant."
 }

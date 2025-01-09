@@ -166,6 +166,17 @@ export const getAccountInfo = createAsyncThunk(
         }
     }
 );
+
+// THUNK FUNCTION: Login with token and fetch account info
+export const loginAndFetchAccountInfo = (payload) => async (dispatch) => {
+    // Step 1: Call loginUserWithToken reducer
+    await dispatch(authSlice.actions.loginUserWithToken(payload));
+
+    // Step 2: Call getAccountInfo thunk to fetch account data
+    await dispatch(getAccountInfo());
+};
+
+
 // AUTH SLICE
 const authSlice = createSlice({
     name: 'auth',
@@ -176,6 +187,13 @@ const authSlice = createSlice({
             state.user = {};
             state.isLoggedIn = false
             removeLocalStorage('id_token');
+        },
+        loginUserWithToken: (state, action) => {
+
+            setLocalStorage('id_token', action.payload.id_token);
+            state.loading = false;
+            state.isLoggedIn = true
+            state.token = action.payload.id_token
         }
     },
 
@@ -311,5 +329,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { setLogout } = authSlice.actions;
+export const { setLogout, loginUserWithToken } = authSlice.actions;
 export default authSlice.reducer;
