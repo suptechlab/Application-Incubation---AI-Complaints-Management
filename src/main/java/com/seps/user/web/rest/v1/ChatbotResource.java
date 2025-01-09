@@ -56,8 +56,9 @@ public class ChatbotResource {
         )
     })
     @PostMapping("/query")
-    public ResponseEntity<Flux<RasaResponseDTO>> queryChatbot(@RequestBody ChatbotQueryDTO queryDTO) {
-        Flux<RasaResponseDTO> response = chatbotService.handleQuery(queryDTO);
+    public ResponseEntity<Flux<Object>> queryChatbot(@RequestBody ChatbotQueryDTO queryDTO) {
+        Flux<Object> response = chatbotService.handleQuery(queryDTO);
         return ResponseEntity.ok(response);
     }
+
 }
