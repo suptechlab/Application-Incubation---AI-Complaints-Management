@@ -51,30 +51,38 @@ export const slaDateExtensionApi = async (ticketId, slaDate) => {
 }
 //TICKET CLOSE API
 export const ticketCloseStatus = async (ticketId, data) => {
-  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/closed`,data);
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/closed`, data);
 }
 //TICKET REJECT API
 export const ticketRejectStatus = async (ticketId, data) => {
-  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reject`,data);
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reject`, data);
 }
 //TICKET REPLY TO CUSTOMER API
 export const ticketReplyToCustomer = async (ticketId, data) => {
-  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-customer`,data);
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-customer`, data);
 }
 //TICKET REPLY INTERNAL API
 export const ticketReplyInternal = async (ticketId, data) => {
-  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-internal`,data);
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/reply-to-internal`, data);
 }
 
 //TICKET INTERNAL NOTE API
 export const internalNoteApi = async (ticketId, data) => {
-  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/add-internal-note`,data);
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/add-internal-note`, data);
 }
 //TICKET ATTACHMENT DOWNLOAD API
 export const downloadTicketsAttachment = async (attachmentId) => {
-  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/download/${attachmentId}`,{ responseType: 'arraybuffer' });
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/download/${attachmentId}`, { responseType: 'arraybuffer' });
+}
+//SLA REMINDER COMMENT API
+export const slaReminderCommentApi = async (id, data) => {
+  return await ticketApi.post(`/${API_VERSION}/seps-fi/claim-tickets/${id}/sla-comment`, data);
 }
 
+//SLA REMINDER DISMISS API
+export const slaReminderDismissApi = async (id) => {
+  return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${id}/dismiss-sla-popup`);
+}
 
 // FUNCTION TO CONVERT MASTER DATA FOR DROPDOWN
 export const convertToLabelValue = (obj) => {
@@ -85,6 +93,6 @@ export const convertToLabelValue = (obj) => {
 }
 
 //TICKET STATUS CHANGE
-export const ticketStatusChange = async (ticketId,status) => {
+export const ticketStatusChange = async (ticketId, status) => {
   return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/change-status?status=${status}`);
 }

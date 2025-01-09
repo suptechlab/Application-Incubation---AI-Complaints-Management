@@ -154,7 +154,7 @@ export const englishLang = {
     "TEAM MANAGEMENT": "Team Management",
     "CREATE NEW TEAM": "Create New Team",
     "EDIT TEAM": "Edit Team",
- 
+
     // Team managmentd
     "TEAM NAME": "Team Name",
     "ASSIGN TEAM MEMBERS": "Assign Team Members",
@@ -270,6 +270,7 @@ export const englishLang = {
     "REASON":"Reason",
     "SUB-STATUS":'Sub-Status',
     "OF":'Of',
+    
     //Tickets Workflow
     "TICKETS_WORKFLOW": "Ticket Workflow",
     "WORKFLOW": "Workflow",
@@ -287,19 +288,22 @@ export const englishLang = {
     "CREATE_NEW_TICKET_WORKFLOW": "Create New Ticket Workflow",
     "EDIT_TICKET_WORKFLOW": "Edit Ticket Workflow",
     "OR": "OR",
-    "USER_TYPE" : "User Type",
-    "FI" : "FI",
-    "SEPS":"SEPS",
-    "CUSTOMER":"Customer",
-    "TEMPLATES":"Templates",
-    "ALL TEMPLATES":"All Templates",
-    "SELECT TEAM" :"Select Team",
-    "SELECT TEMPLATE" : "Select Template",
-    "AGENTS" :"Agents",
-    "SELECT AGENT" : "Select Agent",
-    "TEAMS":"Teams",
+    "USER_TYPE": "User Type",
+    "FI": "FI",
+    "SEPS": "SEPS",
+    "CUSTOMER": "Customer",
+    "TEMPLATES": "Templates",
+    "ALL TEMPLATES": "All Templates",
+    "SELECT TEAM": "Select Team",
+    "SELECT TEMPLATE": "Select Template",
+    "AGENTS": "Agents",
+    "SELECT AGENT": "Select Agent",
+    "TEAMS": "Teams",
     "TEMPLATE_INFO_MESSAGE": "You can copy general templates from here",
-    "SELECT_ORGANIZATION_ID_MSG" : "Please select organization id.",
-    "CONSUMER_NAME" : "Consumer Name",
-    "ALL_ENTITIES" : "All Entities"
+    "SELECT_ORGANIZATION_ID_MSG": "Please select organization id.",
+    "CONSUMER_NAME": "Consumer Name",
+    "ALL_ENTITIES": "All Entities",
+    "REMINDER": "Reminder!",
+    "SLA_BREACH_NOTICE": "The SLA for #{{ticketId}} will breach in {{days}} days. Please take necessary actions to ensure compliance.",
+    "SLA_COMMENT":'SLA Comment'
 }

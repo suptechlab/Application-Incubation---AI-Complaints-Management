@@ -242,8 +242,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                             </div>
                         }
                         {
-                            (permissionState?.dateExtPermission === true &&
-                                (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
+                            (permissionState?.dateExtPermission === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED" && ticketData?.slaBreachDate !== null)) ?
                                 <Button
                                     type="submit"
                                     variant='warning'
