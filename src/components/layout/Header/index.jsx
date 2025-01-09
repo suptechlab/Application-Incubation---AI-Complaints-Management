@@ -36,22 +36,6 @@ const Header = ({ layout }) => {
 
   let expand = "md";
 
-  // Menu Links
-  const menuLinks = [
-    {
-      label: t("MENU_1"),
-      path: "/menu-1",
-    },
-    {
-      label: t("MENU_2"),
-      path: "/menu-2",
-    },
-    {
-      label: t("MENU_3"),
-      path: "/menu-3",
-    },
-  ];
-
   const handleLogout = () => {
     dispatch(setLogout())
     dispatch(resetDPAState())
@@ -92,17 +76,6 @@ const Header = ({ layout }) => {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="justify-content-end align-items-md-center flex-grow-1 header-menu-links">
-                {menuLinks.map((link, index) => (
-                  <Nav.Link
-                    as={NavLink}
-                    to={link.path}
-                    className="mx-md-3"
-                    key={"menu_link_" + index}
-                    disabled={true}
-                  >
-                    {link.label}
-                  </Nav.Link>
-                ))}
                 {!isLoggedIn &&
                   <Button
                     type="button"
