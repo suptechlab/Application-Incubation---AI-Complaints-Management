@@ -274,28 +274,67 @@ const ChatBotForm = () => {
         }
     };
 
+    // // CALL SEND QUERY FUNCTION
+    // const handleSendQuery = async (msg) => {
+    //     const msgData = { message: msg?.message, metadata };
+    //     if (msg) {
+    //         setLoading(true)
+
+
+    //         // Add sender ID if available
+    //         if (senderId) {
+    //             msgData.sender = senderId;
+    //         }
+
+    //         // Dispatch the API query
+    //         const result = await dispatch(sendQuery(msgData));
+    //         if (sendQuery.fulfilled.match(result)) {
+    //             setChatResponse(result.payload); // Set chat response on success
+    //         } else {
+    //             setChatError(); // Handle API failure
+    //         }
+    //         setLoading(false)
+    //     }
+    // }
+
     // CALL SEND QUERY FUNCTION
     const handleSendQuery = async (msg) => {
+        console.log(msg)
+        if (msg) {
+            setLoading(true);
 
-        if (msg && msg !== '') {
-            setLoading(true)
-            const msgData = { message: msg };
+            // Prepare the message data
+            const msgData = {
+                message: msg?.message || msg, // If `msg` is an object, use `msg.message`, otherwise use `msg` directly
+            };
+
+            // Add metadata if it exists
+            if (msg?.metadata) {
+                msgData.metadata = msg.metadata;
+            }
 
             // Add sender ID if available
             if (senderId) {
                 msgData.sender = senderId;
             }
 
-            // Dispatch the API query
-            const result = await dispatch(sendQuery(msgData));
-            if (sendQuery.fulfilled.match(result)) {
-                setChatResponse(result.payload); // Set chat response on success
-            } else {
-                setChatError(); // Handle API failure
+            try {
+                // Dispatch the API query
+                const result = await dispatch(sendQuery(msgData));
+                if (sendQuery.fulfilled.match(result)) {
+                    setChatResponse(result.payload); // Set chat response on success
+                } else {
+                    setChatError(); // Handle API failure
+                }
+            } catch (error) {
+                console.error("Error sending query:", error);
+                setChatError(); // Handle unexpected errors
+            } finally {
+                setLoading(false);
             }
-            setLoading(false)
         }
-    }
+    };
+
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
         actions.setSubmitting(true); // Set submitting state
@@ -317,7 +356,7 @@ const ChatBotForm = () => {
 
             // Proceed only if the message is valid
             if (values?.message) {
-                handleSendQuery(values?.message)
+                handleSendQuery({ message: values?.message })
             }
         } catch (error) {
             setChatError(); // Handle unexpected errors
@@ -409,7 +448,7 @@ const ChatBotForm = () => {
         }
     }, [chatData]);
 
-    const handleFileChange = (event) => {
+    const handleFileChange = (event, setFieldValue) => {
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB in bytes
         const MAX_FILE_COUNT = 3; // Maximum number of files allowed
 
@@ -456,7 +495,36 @@ const ChatBotForm = () => {
 
                                 // Update chat data with the new user message
                                 setChatData([...chatData, userMessage]);
-                                handleSendQuery(result?.payload)
+
+                                const filesId = result?.payload.toString();
+
+                                const metadata = {};
+
+                                console.log(typeof(filesId))
+                                // Check if `filesId` is a single ID or a comma-separated string
+                                if (filesId.includes(',')) {
+                                    // Split and process multiple IDs
+                                    const ids = filesId.split(',');
+                                    ids.forEach((id, index) => {
+                                        metadata[`attachmentsIds[${index}]`] = id;
+                                    });
+                                } else {
+                                    // Process single ID
+                                    metadata['attachmentsIds[0]'] = filesId;
+                                }
+
+                                // {
+                                //     "sender": "user123",
+                                //     "message": "Please process these documents.",
+                                //     "metadata": {
+                                //       "attachment[0]": "212",    // Document ID for the first file
+                                //       "attachment[1]": "211",    // Document ID for the second file
+                                //       "attachment[2]": "310"     // Document ID for the third file
+                                //     }
+                                //   }
+                                setFieldValue('attachments', '')
+                                console.log({ here: { message: 'Please process these documents', metadata } })
+                                handleSendQuery({ message: 'Please process these documents', metadata })
                                 // sendQuery(result?.payload)
 
 
