@@ -220,4 +220,18 @@ public class ClaimTicket {
     @ManyToOne
     @JoinColumn(name = "complaint_sla_commented_by")
     private User complaintSlaCommentedByUser;
+
+    @Column(name = "previous_ticket_id")
+    private Long previousTicketId;
+
+    @ManyToOne
+    @JoinColumn(name = "previous_ticket_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private ClaimTicket previousTicket;
+
+    @OneToMany(mappedBy = "previousTicket", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<ClaimTicket> subsequentTickets = new ArrayList<>();
+
+    @Column(name = "can_create_instance")
+    private Boolean canCreateInstance;
 }

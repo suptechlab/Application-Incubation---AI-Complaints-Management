@@ -71,5 +71,6 @@ public class ClaimTicketDTO {
     private Instant complaintSlaCommentedAt;
     private Long complaintSlaCommentedBy;
     private UserDTO complaintSlaCommentedByUser;
-
+    private Long previousTicketId;
+    private ClaimTicketDTO previousTicket; // Add this field for mapping the previous ticket
 }

@@ -70,6 +70,7 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
 
     @Query("SELECT c FROM ClaimTicket c WHERE c.user.id = :userId " +
         "AND c.instanceType = :instanceType " +
+        "AND c.canCreateInstance = true " +
         "AND ((c.status = :closedStatus AND c.closedStatus <> :excludedClosedStatus) " +
         "OR (c.status = :rejectedStatus AND c.rejectedStatus <> :excludedRejectedStatus))")
     List<ClaimTicket> findValidClaimTickets(@Param("userId") Long userId,
@@ -135,35 +136,35 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         @Param("instanceType") List<InstanceTypeEnum> instanceType);
 
 
-    @Query(value = "SELECT ROUND(AVG(EXTRACT(EPOCH FROM ct.resolved_on - " +
-        "COALESCE(" +
-        "   CASE " +
-        "       WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
-        "       WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
-        "       ELSE ct.created_at " +
-        "   END, ct.created_at" +
-        ")) / 86400), 2) AS avg_resolution_time " +
+    @Query(value = "SELECT ROUND(AVG(EXTRACT(EPOCH FROM ct.resolved_on - ct.created_at " +
+//        "COALESCE(" +
+//        "   CASE " +
+//        "       WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
+//        "       WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
+//        "       ELSE ct.created_at " +
+//        "   END, ct.created_at" +
+        ") / 86400), 2) AS avg_resolution_time " +
         "FROM claim_ticket ct " +
         "WHERE (:userId IS NULL OR " +
         "      (:isSeps = true AND ct.seps_agent_id = :userId) OR " +
         "      (:isSeps = false AND ct.fi_agent_id = :userId)) " +
         "  AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organization_id = :organizationId) " +
-       // "  AND (COALESCE(:startDate, NULL) IS NULL OR ct.created_at >= :startDate) " +
-       // "  AND (COALESCE(:endDate, NULL) IS NULL OR ct.created_at <= :endDate) " +
-        "  AND (COALESCE(:startDate, NULL) IS NULL OR " +
-        "       COALESCE(" +
-        "           CASE " +
-        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
-        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
-        "               ELSE ct.created_at " +
-        "           END, ct.created_at) >= :startDate) " +
-        "  AND (COALESCE(:endDate, NULL) IS NULL OR " +
-        "       COALESCE(" +
-        "           CASE " +
-        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
-        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
-        "               ELSE ct.created_at " +
-        "           END, ct.created_at) <= :endDate) " +
+        "  AND (COALESCE(:startDate, NULL) IS NULL OR ct.created_at >= :startDate) " +
+        "  AND (COALESCE(:endDate, NULL) IS NULL OR ct.created_at <= :endDate) " +
+//        "  AND (COALESCE(:startDate, NULL) IS NULL OR " +
+//        "       COALESCE(" +
+//        "           CASE " +
+//        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
+//        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
+//        "               ELSE ct.created_at " +
+//        "           END, ct.created_at) >= :startDate) " +
+//        "  AND (COALESCE(:endDate, NULL) IS NULL OR " +
+//        "       COALESCE(" +
+//        "           CASE " +
+//        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
+//        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
+//        "               ELSE ct.created_at " +
+//        "           END, ct.created_at) <= :endDate) " +
         "  AND ct.resolved_on IS NOT NULL " +
         "  AND ct.status = :status",
         nativeQuery = true)
@@ -183,4 +184,5 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
     List<ClaimTicket> findEligibleTicketsForSlaPopup(@Param("closed") ClaimTicketStatusEnum closed,
                                                      @Param("rejected") ClaimTicketStatusEnum rejected);
 
+    Optional<ClaimTicket> findByInstanceTypeAndPreviousTicketId(InstanceTypeEnum instanceTypeEnum, Long previousTicketId);
 }

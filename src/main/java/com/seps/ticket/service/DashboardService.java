@@ -213,7 +213,7 @@ public class DashboardService {
     @Transactional
     public PieChartDTO slaAdherenceGraphSet(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps) {
 
-        List<InstanceTypeEnum> instanceTypes = Arrays.asList(InstanceTypeEnum.FIRST_INSTANCE, InstanceTypeEnum.SECOND_INSTANCE);
+        List<InstanceTypeEnum> instanceTypes = Arrays.asList(InstanceTypeEnum.FIRST_INSTANCE, InstanceTypeEnum.SECOND_INSTANCE, InstanceTypeEnum.COMPLAINT);
 
         // Fetch data using the repository method
         SlaAdherenceDataProjection projections = claimTicketRepository.getClaimSlaAdherence(
