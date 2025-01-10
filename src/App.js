@@ -8,35 +8,12 @@ import { handleGetAccountDetail } from "./services/authentication.service";
 import toast from "react-hot-toast";
 
 function App() {
-  // const { i18n } = useTranslation()
-  // const currentLanguage = i18n?.language ?? getLocalStorage('langKey') ?? 'en'
-  const { setUserData, logout, isAuthenticated, isLoading } = useContext(AuthenticationContext);
+  const { isLoading } = useContext(AuthenticationContext);
 
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem("access_token");
 
-  //   if (accessToken) {
-  //     handleGetAccountDetail()
-  //       .then((response) => {
-  //         const { data } = response;
-  //         setUserData(data);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error)
-  //         console.error("Error fetching account details:", error);
-        
-  //         if (error?.response?.status === '401') {
-  //           toast.error("Session expired. Please log in again.");
-  //           logout();
-  //         }
-
-  //       });
-  //   }
-  // }, []);
-
-  // if (isLoading) {
-  //   return <Loader isLoading={isLoading} />;
-  // }
+  if (isLoading) {
+    return <Loader isLoading={isLoading} />;
+  }
 
 
   // return <Routers />;

@@ -6,31 +6,87 @@ import { Link } from "react-router-dom";
 import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import { validationSchema } from "../../validations/fiUsers.validation";
+import { fiImportValidationSchema, validationSchema } from "../../validations/fiUsers.validation";
+import fiUserFile from "../../assets/samplefiles/FI_USERS.xlsx"
+import { handleImportFiUsersApi } from "../../services/fiusers.services";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const ImportFIUser = () => {
+
+  const [loading, setLoading] = useState(false)
+  const { t } = useTranslation()
   const initialValue = {
-    dataFile: "",
-    description: "",
+    browseFile: "",
+    // description: "",
   };
 
   const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
   //Handle File Change
-  const handleFileChange = (event) => {
-    const file = event.currentTarget.files[0];
+  const handleFileChange = (event,setFieldValue) => {
+
+    const file = event.target.files[0];
+
     if (file) {
       setFileName(file.name);
+      setFieldValue('browseFile',file)
     } else {
-      setFileName("Fi_Users_data.xlsx");
+      setFileName("");
     }
   };
 
   //Sumbit Handler
-  const onSubmit = (values) => {
-    console.log("values", values);
+  const handleSubmit = (values) => {
+
+    if (!values.browseFile) {
+      toast.error(t("PLEASE_SELECT_A_FILE_TO_UPLOAD"));
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('browseFile', values.browseFile);
+
+    setLoading(true); // Set loading to true while the API call is in progress
+
+    handleImportFiUsersApi(formData)
+      .then((response) => {
+        if (response?.status === 200) {
+          toast.success(response?.data?.message);
+        } else {
+          toast.error(response?.data?.message || t("Unexpected error occurred during file upload."));
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error.response.data.errorDescription);
+        } else {
+          toast.error(error?.message || t("STATUS UPDATE ERROR"));
+        }
+      })
+      .finally(() => {
+        setLoading(false); // Reset loading state after the API call
+      });
   };
 
+
+  const handleSampleFileDownload = () => {
+    // Define the URL of the sample file
+    const fileUrl = fiUserFile; // Replace with your file URL
+    const fileName = "FI_USERS.xlsx"; // Replace with the desired file name
+
+    // Create an anchor element
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.download = fileName;
+
+    // Trigger the download
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+  };
   return (
     <React.Fragment>
       <Loader isLoading={false} />
@@ -39,8 +95,8 @@ const ImportFIUser = () => {
           title="FI Users"
           actions={[
             {
-              label: "Download Sample User Template",
-              to: "/fi-users/import",
+              label: t("DOWNLOAD_SAMPLE_USER_TEMPLATE"),
+              onClick: handleSampleFileDownload,
               variant: "outline-dark",
               icon: <MdOutlineSimCardDownload size={14} />,
             },
@@ -50,8 +106,8 @@ const ImportFIUser = () => {
           <Card.Body className="d-flex flex-column">
             <Formik
               initialValues={initialValue}
-              validationSchema={validationSchema}
-              onSubmit={onSubmit}
+              validationSchema={fiImportValidationSchema}
+              onSubmit={handleSubmit}
             >
               {({
                 errors,
@@ -68,22 +124,24 @@ const ImportFIUser = () => {
                 >
                   <Row>
                     <Col xs={12} className="mb-3 pb-1">
-                      <div className="mb-1 fs-14">Data File</div>
+                      <div className="mb-1 fs-14">{t('DATA_FILE')}</div>
                       <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
                         <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                           <label
-                            htmlFor="files"
+                            htmlFor="browseFile"
                             className="btn btn-outline-dark custom-min-width-85"
                           >
-                            Browse
+                            {t('BROWSE')}
                           </label>
                           <input
-                            id="files"
-                            accept="image/png, image/jpeg, image/jpg"
+                            id="browseFile"
+                            accept=".xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                             type="file"
-                            onChange={handleFileChange}
+                            name="browseFile"
+                            onChange={(event)=>handleFileChange(event , setFieldValue)}
                           />
+
                         </div>
                         {fileName && (
                           <Link
@@ -95,6 +153,9 @@ const ImportFIUser = () => {
                           </Link>
                         )}
                       </div>
+                      <p>
+                        {touched?.browseFile && errors?.browseFile && <small className="form-text text-danger">{errors?.browseFile}</small>}
+                      </p>
                     </Col>
                     <Col md={10} lg={8}>
                       <FormInput
@@ -102,7 +163,7 @@ const ImportFIUser = () => {
                         isTextarea={true}
                         id="description"
                         key={"description"}
-                        label="Error Details"
+                        label={t("ERROR_DETAILS")}
                         name="description"
                         onBlur={handleBlur}
                         onChange={handleChange}
@@ -124,14 +185,14 @@ const ImportFIUser = () => {
                         to={"/fi-users"}
                         className="btn btn-outline-dark custom-min-width-85"
                       >
-                        Cancel
+                        {t('CANCEL')}
                       </Link>
                       <Button
                         type="submit"
                         variant="warning"
                         className="custom-min-width-85"
                       >
-                        Submit
+                         {t('SUBMIT')}
                       </Button>
                     </Stack>
                   </div>

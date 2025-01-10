@@ -25,4 +25,8 @@ const validationSchema = Yup.object().shape({
   roleId: Yup.string().required(msg.roleIdRequired),
 });
 
+export const fiImportValidationSchema = Yup.object().shape({
+  browseFile: Yup.string().required(msg.fileRequired)
+})
+
 export { validationSchema };

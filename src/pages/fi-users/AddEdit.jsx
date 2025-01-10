@@ -352,8 +352,6 @@ export default function FIUserAddEdit() {
                         </Col>
                       </Row>
                     </Col>
-
-
                     <Col sm={6} md={6} lg={4}>
                       <FormInput
                         error={errors?.ruc}

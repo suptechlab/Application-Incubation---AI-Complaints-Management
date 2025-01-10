@@ -64,7 +64,7 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
     module: "Dashboard",
-    permissions : ["DASHBOARD_VIEW_FI","DASHBOARD_VIEW_SEPS"]
+    permissions: ["DASHBOARD_VIEW_FI", "DASHBOARD_VIEW_SEPS"]
   },
 
   {
@@ -194,7 +194,7 @@ const routes = [
     path: "/profile",
     element: <AccountProfile />,
     isPrivate: true,
-    module:'profile',
+    module: 'profile',
     layoutType: "Auth",
   },
   {
@@ -299,6 +299,7 @@ const routes = [
     isPrivate: true,
     module: "FI User",
     layoutType: "Auth",
+    permissions: ["FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI"]
   },
   {
     path: "/reports/audit-trail",
