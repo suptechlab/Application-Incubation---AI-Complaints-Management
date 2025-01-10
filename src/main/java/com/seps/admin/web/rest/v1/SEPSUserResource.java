@@ -120,7 +120,7 @@ public class SEPSUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = SEPSUserDTO.class)))
     @GetMapping
-    @PermissionCheck({"SEPS_USER_CREATE_BY_SEPS","SEPS_USER_UPDATE_BY_SEPS","SEPS_USER_STATUS_CHANGE_BY_SEPS"})
+    @PermissionCheck({"SEPS_USER_CREATE_BY_SEPS", "SEPS_USER_UPDATE_BY_SEPS", "SEPS_USER_STATUS_CHANGE_BY_SEPS"})
     public ResponseEntity<List<SEPSUserDTO>> listSEPSUsers(Pageable pageable,
                                                            @RequestParam(value = "search", required = false) String search,
                                                            @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
@@ -182,19 +182,20 @@ public class SEPSUserResource {
     }
 
     @PostMapping("/import")
-    public ResponseEntity<?> importSEPSUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale) throws IOException {
+    public ResponseEntity<?> importSEPSUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale, HttpServletRequest request)
+        throws IOException {
+        RequestInfo requestInfo = new RequestInfo(request);
         InputStream fileInputStream = importUserVM.getBrowseFile().getInputStream();
-        ImportUserResponseVM importUserResponseVM = importUserService.importSEPSUser(fileInputStream, locale);
+        ImportUserResponseVM importUserResponseVM = importUserService.importSEPSUser(fileInputStream, locale, requestInfo);
         if (!importUserResponseVM.getErrors().isEmpty()) {
             return ResponseEntity.badRequest().body(importUserResponseVM.getErrors());
         }
         //SEND email to newly created FI Users
         if (!importUserResponseVM.getNewUserList().isEmpty()) {
             for (User newUser : importUserResponseVM.getNewUserList()) {
-                mailService.sendFIUserCreationEmail(newUser);
+                mailService.sendSepsUserCreationEmail(newUser);
             }
         }
-
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("seps.user.imported.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),

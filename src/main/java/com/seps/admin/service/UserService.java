@@ -21,7 +21,6 @@ import com.seps.admin.service.mapper.UserMapper;
 import com.seps.admin.service.specification.UserSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
-import com.seps.admin.web.rest.vm.ImportUserVM;
 import com.seps.admin.web.rest.vm.ProfileVM;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

@@ -10,7 +10,10 @@ import com.seps.admin.repository.*;
 import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.service.dto.ImportSEPSUserDTO;
 import com.seps.admin.service.dto.ImportUserDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.suptech.service.ExternalAPIService;
+import com.seps.admin.suptech.service.LdapSearchService;
+import com.seps.admin.suptech.service.UserNotFoundException;
 import com.seps.admin.suptech.service.dto.OrganizationInfoDTO;
 import com.seps.admin.suptech.service.dto.PersonInfoDTO;
 import com.seps.admin.web.rest.errors.CustomException;
@@ -18,9 +21,6 @@ import com.seps.admin.web.rest.errors.SepsStatusCode;
 import com.seps.admin.web.rest.vm.ImportUserResponseVM;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +53,12 @@ public class ImportUserService {
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
     private final Gson gson;
+    private final LdapSearchService ldapSearchService;
+    private static final String DISPLAY_NAME = "displayName";
+    private static final String DEPARTMENT = "department";
 
     public ImportUserService(Validator validator, MessageSource messageSource, ExternalAPIService externalAPIService,
-                             UserRepository userRepository, AuthorityRepository authorityRepository, PersonaRepository personaRepository, RoleRepository roleRepository, OrganizationRepository organizationRepository, UserService userService, AuditLogService auditLogService, PasswordEncoder passwordEncoder, Gson gson) {
+                             UserRepository userRepository, AuthorityRepository authorityRepository, PersonaRepository personaRepository, RoleRepository roleRepository, OrganizationRepository organizationRepository, UserService userService, AuditLogService auditLogService, PasswordEncoder passwordEncoder, Gson gson, LdapSearchService ldapSearchService) {
         this.validator = validator;
         this.messageSource = messageSource;
         this.externalAPIService = externalAPIService;
@@ -67,13 +70,14 @@ public class ImportUserService {
         this.userService = userService;
         this.auditLogService = auditLogService;
         this.passwordEncoder = passwordEncoder;
+        this.ldapSearchService = ldapSearchService;
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
                 .create();
     }
 
     @Transactional
-    public ImportUserResponseVM importFIUser(InputStream fileInputStream, Locale locale) {
+    public ImportUserResponseVM importFIUser(InputStream fileInputStream, Locale locale, RequestInfo requestInfo) {
         ImportUserResponseVM importUserResponseVM = new ImportUserResponseVM();
         // Check if FI user with given identificacion already exists with specific authorities and statuses
         User currentUser = userService.getCurrentUser();
@@ -144,7 +148,7 @@ public class ImportUserService {
         }
 
         if (errors.isEmpty()) {
-            newUserList = saveValidUsers(validUsers, currentUser);
+            newUserList = saveValidFIUsers(validUsers, currentUser, requestInfo);
         }
         importUserResponseVM.setErrors(errors);
         importUserResponseVM.setNewUserList(newUserList);
@@ -194,7 +198,7 @@ public class ImportUserService {
         };
     }
 
-    private List<User> saveValidUsers(List<ImportUserDTO> importUserDTOS, User currentUser) {
+    private List<User> saveValidFIUsers(List<ImportUserDTO> importUserDTOS, User currentUser, RequestInfo requestInfo) {
         // Save to database or perform other processing
         LOG.debug("import user:{}", importUserDTOS);
         List<User> newUserList = new ArrayList<>();
@@ -280,7 +284,7 @@ public class ImportUserService {
             entityData.put(Constants.NEW_DATA, convertEntityToMap(userService.getFIUserById(newUser.getId())));
             String requestBody = gson.toJson(userDTO);
 
-            auditLogService.logActivity(null, currentUser.getId(), null, "importFIUser", ActionTypeEnum.FI_USER_ADD.name(),
+            auditLogService.logActivity(null, currentUser.getId(), requestInfo, "importFIUser", ActionTypeEnum.FI_USER_ADD.name(),
                     newUser.getId(), User.class.getSimpleName(), null, auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
 
             newUserList.add(newUser);
@@ -362,7 +366,7 @@ public class ImportUserService {
     }
 
     @Transactional
-    public ImportUserResponseVM importSEPSUser(InputStream fileInputStream, Locale locale) {
+    public ImportUserResponseVM importSEPSUser(InputStream fileInputStream, Locale locale, RequestInfo requestInfo) {
         ImportUserResponseVM importUserResponseVM = new ImportUserResponseVM();
         // Check if FI user with given identificacion already exists with specific authorities and statuses
         User currentUser = userService.getCurrentUser();
@@ -418,7 +422,7 @@ public class ImportUserService {
         }
 
         if (errors.isEmpty()) {
-            newUserList = saveValidSEPSUsers(validUsers, currentUser);
+            newUserList = saveValidSEPSUsers(validUsers, currentUser, requestInfo);
         }
 
         importUserResponseVM.setErrors(errors);
@@ -433,12 +437,92 @@ public class ImportUserService {
         }
     }
 
-    private void validateSEPSUser(String email, int i, List<String> errors) {
-
+    private void validateSEPSUser(String email, int rowNum, List<String> errors) {
+        try {
+            // Call the LDAP search service to fetch user details
+            ldapSearchService.searchByEmail(email);
+        } catch (UserNotFoundException e) {
+            errors.add("Row " + (rowNum + 1) + ":" + e.getMessage());
+        } catch (Exception e) {
+            errors.add("Row " + (rowNum + 1) + ":" + e.getMessage());
+        }
     }
 
-    private List<User> saveValidSEPSUsers(List<ImportSEPSUserDTO> validUsers, User currentUser) {
+    private List<User> saveValidSEPSUsers(List<ImportSEPSUserDTO> validUsers, User currentUser, RequestInfo requestInfo) {
         List<User> newUserList = new ArrayList<>();
+        LOG.debug("validUsers:{}", validUsers);
+
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.SEPS).ifPresent(authorities::add);
+
+        for (ImportSEPSUserDTO userDTO : validUsers) {
+            // Check if email is already in use
+            String normalizedEmail = userDTO.getEmail().toLowerCase();
+            if (userRepository.findOneByEmailIgnoreCase(normalizedEmail).isPresent()) {
+                LOG.warn("saveValidSEPSUsers Email {} already in use .", normalizedEmail);
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_ALREADY_USED, null, null);
+            }
+
+            // Fetch role or throw exception if not found
+            String roleSlug = null;
+            if (userDTO.getRole().equals("ADMIN")) {
+                roleSlug = Constants.RIGHTS_SEPS_ADMIN;
+            } else if (userDTO.getRole().equals("AGENT")) {
+                roleSlug = Constants.RIGHTS_SEPS_AGENT;
+            }
+            Role role = roleRepository.findByRoleSlugIgnoreCase(roleSlug).orElse(null);
+            if (role == null) {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.ROLE_NOT_FOUND, null, null);
+            }
+
+            Map<String, String> data = userService.verifySEPSUser(normalizedEmail);
+            String name = data.get(DISPLAY_NAME);
+            String department = data.get(DEPARTMENT);
+
+            // Initialize new User and set its properties
+            User newUser = new User();
+            newUser.setFirstName(name);
+            if (userDTO.getEmail() != null) {
+                newUser.setEmail(normalizedEmail);
+                newUser.setLogin(normalizedEmail);
+            }
+            newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
+            // for a new user sets initially a random password
+            String randomPassword = RandomUtil.generatePassword();
+            String encryptedPassword = passwordEncoder.encode(randomPassword);
+            newUser.setPassword(encryptedPassword);
+            newUser.setActivated(true);
+            //Set Reset Password
+            newUser.setResetKey(RandomUtil.generateResetKey());
+            newUser.setResetDate(Instant.now());
+            newUser.setPasswordSet(false);
+            newUser.setStatus(UserStatusEnum.ACTIVE);
+            newUser.setDepartment(department);
+            //Set Authority
+            newUser.setAuthorities(authorities);
+            //Set Role
+            Set<Role> roles = new HashSet<>();
+            roles.add(role);
+            newUser.setRoles(roles);
+            userRepository.save(newUser);
+            //Audit Logs
+            Map<String, String> auditMessageMap = new HashMap<>();
+            Map<String, Object> entityData = new HashMap<>();
+            Arrays.stream(LanguageEnum.values()).forEach(language -> {
+                String messageAudit = messageSource.getMessage("audit.log.seps.user.created",
+                        new Object[]{currentUser.getEmail(), newUser.getId()}, Locale.forLanguageTag(language.getCode()));
+                auditMessageMap.put(language.getCode(), messageAudit);
+            });
+            entityData.put(Constants.NEW_DATA, convertEntityToMap(userService.getSEPSUserById(newUser.getId())));
+            String requestBody = gson.toJson(userDTO);
+
+            auditLogService.logActivity(null, currentUser.getId(), requestInfo, "importSEPSUser",
+                    ActionTypeEnum.SEPS_USER_ADD.name(), newUser.getId(), User.class.getSimpleName(), null,
+                    auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
+
+            newUserList.add(newUser);
+        }
+
         return newUserList;
     }
 
