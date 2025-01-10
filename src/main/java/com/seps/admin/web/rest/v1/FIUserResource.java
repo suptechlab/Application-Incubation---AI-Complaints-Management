@@ -160,9 +160,11 @@ public class FIUserResource {
 
 
     @PostMapping("/import")
-    public ResponseEntity<?> importFIUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale) throws IOException {
+    public ResponseEntity<?> importFIUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale, HttpServletRequest request)
+        throws IOException {
+        RequestInfo requestInfo = new RequestInfo(request);
         InputStream fileInputStream = importUserVM.getBrowseFile().getInputStream();
-        ImportUserResponseVM importUserResponseVM = importUserService.importFIUser(fileInputStream, locale);
+        ImportUserResponseVM importUserResponseVM = importUserService.importFIUser(fileInputStream, locale, requestInfo);
         if (!importUserResponseVM.getErrors().isEmpty()) {
             return ResponseEntity.badRequest().body(importUserResponseVM.getErrors());
         }

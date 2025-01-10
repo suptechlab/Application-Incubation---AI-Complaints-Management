@@ -4,6 +4,7 @@ import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.UserStatusEnum;
 import com.seps.admin.repository.UserRepository;
+import com.seps.admin.service.ImportUserService;
 import com.seps.admin.service.MailService;
 import com.seps.admin.service.UserService;
 import com.seps.admin.service.dto.RequestInfo;
@@ -12,6 +13,8 @@ import com.seps.admin.service.dto.SEPSUserDTO;
 import com.seps.admin.service.dto.VerifySEPSUserDTO;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
+import com.seps.admin.web.rest.vm.ImportUserResponseVM;
+import com.seps.admin.web.rest.vm.ImportUserVM;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,9 +39,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zalando.problem.Status;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -52,13 +58,15 @@ public class SEPSUserResource {
     private final MessageSource messageSource;
     private final UserRepository userRepository;
     private final MailService mailService;
+    private final ImportUserService importUserService;
 
     public SEPSUserResource(UserService userService, MessageSource messageSource, UserRepository userRepository,
-                            MailService mailService) {
+                            MailService mailService, ImportUserService importUserService) {
         this.userService = userService;
         this.messageSource = messageSource;
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.importUserService = importUserService;
     }
 
     @Operation(
@@ -112,7 +120,7 @@ public class SEPSUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = SEPSUserDTO.class)))
     @GetMapping
-    @PermissionCheck({"SEPS_USER_CREATE_BY_SEPS","SEPS_USER_UPDATE_BY_SEPS","SEPS_USER_STATUS_CHANGE_BY_SEPS"})
+    @PermissionCheck({"SEPS_USER_CREATE_BY_SEPS", "SEPS_USER_UPDATE_BY_SEPS", "SEPS_USER_STATUS_CHANGE_BY_SEPS"})
     public ResponseEntity<List<SEPSUserDTO>> listSEPSUsers(Pageable pageable,
                                                            @RequestParam(value = "search", required = false) String search,
                                                            @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
@@ -171,6 +179,29 @@ public class SEPSUserResource {
     public ResponseEntity<Map<String, String>> verifySEPSUser(@Valid @RequestBody VerifySEPSUserDTO dto) {
         String email = dto.getEmail();
         return ResponseEntity.ok().body(userService.verifySEPSUser(email));
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<?> importSEPSUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale, HttpServletRequest request)
+        throws IOException {
+        RequestInfo requestInfo = new RequestInfo(request);
+        InputStream fileInputStream = importUserVM.getBrowseFile().getInputStream();
+        ImportUserResponseVM importUserResponseVM = importUserService.importSEPSUser(fileInputStream, locale, requestInfo);
+        if (!importUserResponseVM.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(importUserResponseVM.getErrors());
+        }
+        //SEND email to newly created FI Users
+        if (!importUserResponseVM.getNewUserList().isEmpty()) {
+            for (User newUser : importUserResponseVM.getNewUserList()) {
+                mailService.sendSepsUserCreationEmail(newUser);
+            }
+        }
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("seps.user.imported.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
     }
 
 }

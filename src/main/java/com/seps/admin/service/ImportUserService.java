@@ -8,8 +8,12 @@ import com.seps.admin.domain.*;
 import com.seps.admin.enums.*;
 import com.seps.admin.repository.*;
 import com.seps.admin.security.AuthoritiesConstants;
+import com.seps.admin.service.dto.ImportSEPSUserDTO;
 import com.seps.admin.service.dto.ImportUserDTO;
+import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.suptech.service.ExternalAPIService;
+import com.seps.admin.suptech.service.LdapSearchService;
+import com.seps.admin.suptech.service.UserNotFoundException;
 import com.seps.admin.suptech.service.dto.OrganizationInfoDTO;
 import com.seps.admin.suptech.service.dto.PersonInfoDTO;
 import com.seps.admin.web.rest.errors.CustomException;
@@ -49,9 +53,12 @@ public class ImportUserService {
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
     private final Gson gson;
+    private final LdapSearchService ldapSearchService;
+    private static final String DISPLAY_NAME = "displayName";
+    private static final String DEPARTMENT = "department";
 
     public ImportUserService(Validator validator, MessageSource messageSource, ExternalAPIService externalAPIService,
-                             UserRepository userRepository, AuthorityRepository authorityRepository, PersonaRepository personaRepository, RoleRepository roleRepository, OrganizationRepository organizationRepository, UserService userService, AuditLogService auditLogService, PasswordEncoder passwordEncoder, Gson gson) {
+                             UserRepository userRepository, AuthorityRepository authorityRepository, PersonaRepository personaRepository, RoleRepository roleRepository, OrganizationRepository organizationRepository, UserService userService, AuditLogService auditLogService, PasswordEncoder passwordEncoder, Gson gson, LdapSearchService ldapSearchService) {
         this.validator = validator;
         this.messageSource = messageSource;
         this.externalAPIService = externalAPIService;
@@ -63,13 +70,14 @@ public class ImportUserService {
         this.userService = userService;
         this.auditLogService = auditLogService;
         this.passwordEncoder = passwordEncoder;
+        this.ldapSearchService = ldapSearchService;
         this.gson = new GsonBuilder()
-            .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-            .create();
+                .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+                .create();
     }
 
     @Transactional
-    public ImportUserResponseVM importFIUser(InputStream fileInputStream, Locale locale) {
+    public ImportUserResponseVM importFIUser(InputStream fileInputStream, Locale locale, RequestInfo requestInfo) {
         ImportUserResponseVM importUserResponseVM = new ImportUserResponseVM();
         // Check if FI user with given identificacion already exists with specific authorities and statuses
         User currentUser = userService.getCurrentUser();
@@ -140,7 +148,7 @@ public class ImportUserService {
         }
 
         if (errors.isEmpty()) {
-            newUserList = saveValidUsers(validUsers, currentUser);
+            newUserList = saveValidFIUsers(validUsers, currentUser, requestInfo);
         }
         importUserResponseVM.setErrors(errors);
         importUserResponseVM.setNewUserList(newUserList);
@@ -190,7 +198,7 @@ public class ImportUserService {
         };
     }
 
-    private List<User> saveValidUsers(List<ImportUserDTO> importUserDTOS, User currentUser) {
+    private List<User> saveValidFIUsers(List<ImportUserDTO> importUserDTOS, User currentUser, RequestInfo requestInfo) {
         // Save to database or perform other processing
         LOG.debug("import user:{}", importUserDTOS);
         List<User> newUserList = new ArrayList<>();
@@ -209,7 +217,7 @@ public class ImportUserService {
             Organization organization = organizationRepository.findByRuc(ruc).orElse(null);
             if (organization == null) {
                 throw new CustomException(Status.NOT_FOUND, SepsStatusCode.PERSON_NOT_FOUND,
-                    new String[]{identificacion}, null);
+                        new String[]{identificacion}, null);
             }
             // Check if email is already in use
             String userEmail = userDTO.getEmail();
@@ -270,14 +278,14 @@ public class ImportUserService {
             Map<String, Object> entityData = new HashMap<>();
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
                 String messageAudit = messageSource.getMessage("audit.log.fi.user.created",
-                    new Object[]{currentUser.getEmail(), newUser.getId()}, Locale.forLanguageTag(language.getCode()));
+                        new Object[]{currentUser.getEmail(), newUser.getId()}, Locale.forLanguageTag(language.getCode()));
                 auditMessageMap.put(language.getCode(), messageAudit);
             });
             entityData.put(Constants.NEW_DATA, convertEntityToMap(userService.getFIUserById(newUser.getId())));
             String requestBody = gson.toJson(userDTO);
 
-            auditLogService.logActivity(null, currentUser.getId(), null, "importFIUser", ActionTypeEnum.FI_USER_ADD.name(),
-                newUser.getId(), User.class.getSimpleName(), null, auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
+            auditLogService.logActivity(null, currentUser.getId(), requestInfo, "importFIUser", ActionTypeEnum.FI_USER_ADD.name(),
+                    newUser.getId(), User.class.getSimpleName(), null, auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
 
             newUserList.add(newUser);
         }
@@ -355,5 +363,173 @@ public class ImportUserService {
             }
         }
         return true; // Row is empty
+    }
+
+    @Transactional
+    public ImportUserResponseVM importSEPSUser(InputStream fileInputStream, Locale locale, RequestInfo requestInfo) {
+        ImportUserResponseVM importUserResponseVM = new ImportUserResponseVM();
+        // Check if FI user with given identificacion already exists with specific authorities and statuses
+        User currentUser = userService.getCurrentUser();
+        List<String> errors = new ArrayList<>();
+        List<User> newUserList = new ArrayList<>();
+        List<ImportSEPSUserDTO> validUsers = new ArrayList<>();
+        try (Workbook workbook = WorkbookFactory.create(fileInputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            int lastDataRow = findLastDataRow(sheet);
+            // Validation for maximum row limit
+            if (lastDataRow > Constants.IMPORT_EXCEL_NO_OF_ROWS) {
+                String message = getLocalizedMessage("validation.row.limit.exceeded", locale, Constants.IMPORT_EXCEL_NO_OF_ROWS);
+                errors.add(message);
+                importUserResponseVM.setErrors(errors);
+                return importUserResponseVM; // Return immediately if row limit is exceeded
+            }
+
+            for (int i = 1; i <= lastDataRow; i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) {
+                    errors.add(getLocalizedMessage("validation.row.empty", locale, i + 1));
+                    continue;
+                }
+                ImportSEPSUserDTO userDTO = mapRowToSEPSUserDTO(row);
+                Set<ConstraintViolation<ImportSEPSUserDTO>> violations = validator.validate(userDTO);
+                if (!violations.isEmpty()) {
+                    for (ConstraintViolation<ImportSEPSUserDTO> violation : violations) {
+                        errors.add("Row " + (i + 1) + ": " + violation.getMessage());
+                    }
+                } else {
+                    // Track the current error count before validating seps user and ruc
+                    int initialErrorCount = errors.size();
+                    // Validate SEPS User
+                    validateSEPSUser(userDTO.getEmail(), i, errors);
+                    //Validate Email
+                    validateSEPSUserEmail(userDTO.getEmail(), i, errors, locale);
+                    if (userDTO.getRole().equals("ADMIN")) {
+                        validateRole(Constants.RIGHTS_SEPS_ADMIN, i, errors, locale);
+                    } else if (userDTO.getRole().equals("AGENT")) {
+                        validateRole(Constants.RIGHTS_SEPS_AGENT, i, errors, locale);
+                    } else {
+                        String roleMessage = getLocalizedMessage("role.not.found", locale, null);
+                        errors.add("Row " + (i + 1) + ":" + roleMessage);
+                    }
+                    // Only add userDTO to validUsers if no new errors were added
+                    if (errors.size() == initialErrorCount) {
+                        validUsers.add(userDTO);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            errors.add(getLocalizedMessage("validation.file.error", locale, e.getMessage()));
+        }
+
+        if (errors.isEmpty()) {
+            newUserList = saveValidSEPSUsers(validUsers, currentUser, requestInfo);
+        }
+
+        importUserResponseVM.setErrors(errors);
+        importUserResponseVM.setNewUserList(newUserList);
+        return importUserResponseVM;
+    }
+
+    private void validateSEPSUserEmail(String email, int i, List<String> errors, Locale locale) {
+        if (userRepository.findOneByEmailIgnoreCase(email).isPresent()) {
+            String message = getLocalizedMessage("email.already.used", locale);
+            errors.add("Row " + (i + 1) + ":" + message);
+        }
+    }
+
+    private void validateSEPSUser(String email, int rowNum, List<String> errors) {
+        try {
+            // Call the LDAP search service to fetch user details
+            ldapSearchService.searchByEmail(email);
+        } catch (UserNotFoundException e) {
+            errors.add("Row " + (rowNum + 1) + ":" + e.getMessage());
+        } catch (Exception e) {
+            errors.add("Row " + (rowNum + 1) + ":" + e.getMessage());
+        }
+    }
+
+    private List<User> saveValidSEPSUsers(List<ImportSEPSUserDTO> validUsers, User currentUser, RequestInfo requestInfo) {
+        List<User> newUserList = new ArrayList<>();
+        LOG.debug("validUsers:{}", validUsers);
+
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.SEPS).ifPresent(authorities::add);
+
+        for (ImportSEPSUserDTO userDTO : validUsers) {
+            // Check if email is already in use
+            String normalizedEmail = userDTO.getEmail().toLowerCase();
+            if (userRepository.findOneByEmailIgnoreCase(normalizedEmail).isPresent()) {
+                LOG.warn("saveValidSEPSUsers Email {} already in use .", normalizedEmail);
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.EMAIL_ALREADY_USED, null, null);
+            }
+
+            // Fetch role or throw exception if not found
+            String roleSlug = null;
+            if (userDTO.getRole().equals("ADMIN")) {
+                roleSlug = Constants.RIGHTS_SEPS_ADMIN;
+            } else if (userDTO.getRole().equals("AGENT")) {
+                roleSlug = Constants.RIGHTS_SEPS_AGENT;
+            }
+            Role role = roleRepository.findByRoleSlugIgnoreCase(roleSlug).orElse(null);
+            if (role == null) {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.ROLE_NOT_FOUND, null, null);
+            }
+
+            Map<String, String> data = userService.verifySEPSUser(normalizedEmail);
+            String name = data.get(DISPLAY_NAME);
+            String department = data.get(DEPARTMENT);
+
+            // Initialize new User and set its properties
+            User newUser = new User();
+            newUser.setFirstName(name);
+            if (userDTO.getEmail() != null) {
+                newUser.setEmail(normalizedEmail);
+                newUser.setLogin(normalizedEmail);
+            }
+            newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
+            // for a new user sets initially a random password
+            String randomPassword = RandomUtil.generatePassword();
+            String encryptedPassword = passwordEncoder.encode(randomPassword);
+            newUser.setPassword(encryptedPassword);
+            newUser.setActivated(true);
+            //Set Reset Password
+            newUser.setResetKey(RandomUtil.generateResetKey());
+            newUser.setResetDate(Instant.now());
+            newUser.setPasswordSet(false);
+            newUser.setStatus(UserStatusEnum.ACTIVE);
+            newUser.setDepartment(department);
+            //Set Authority
+            newUser.setAuthorities(authorities);
+            //Set Role
+            Set<Role> roles = new HashSet<>();
+            roles.add(role);
+            newUser.setRoles(roles);
+            userRepository.save(newUser);
+            //Audit Logs
+            Map<String, String> auditMessageMap = new HashMap<>();
+            Map<String, Object> entityData = new HashMap<>();
+            Arrays.stream(LanguageEnum.values()).forEach(language -> {
+                String messageAudit = messageSource.getMessage("audit.log.seps.user.created",
+                        new Object[]{currentUser.getEmail(), newUser.getId()}, Locale.forLanguageTag(language.getCode()));
+                auditMessageMap.put(language.getCode(), messageAudit);
+            });
+            entityData.put(Constants.NEW_DATA, convertEntityToMap(userService.getSEPSUserById(newUser.getId())));
+            String requestBody = gson.toJson(userDTO);
+
+            auditLogService.logActivity(null, currentUser.getId(), requestInfo, "importSEPSUser",
+                    ActionTypeEnum.SEPS_USER_ADD.name(), newUser.getId(), User.class.getSimpleName(), null,
+                    auditMessageMap, entityData, ActivityTypeEnum.DATA_ENTRY.name(), requestBody);
+
+            newUserList.add(newUser);
+        }
+
+        return newUserList;
+    }
+
+    private ImportSEPSUserDTO mapRowToSEPSUserDTO(Row row) {
+        ImportSEPSUserDTO userDTO = new ImportSEPSUserDTO();
+        userDTO.setEmail(getCellValue(row.getCell(0)));
+        userDTO.setRole(getCellValue(row.getCell(1)));
+        return userDTO;
     }
 }
