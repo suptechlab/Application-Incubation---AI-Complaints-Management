@@ -158,10 +158,10 @@ export const registerUser = createAsyncThunk(
 // GET ACCOUNT OF LOGGED IN USER
 export const getAccountInfo = createAsyncThunk(
     'getAccountInfo',
-    async (_, { rejectWithValue,dispatch}) => {
+    async (_, { rejectWithValue, dispatch }) => {
         try {
             const response = await userApi.get(EndPoint.ACCOUNT_API);
-            if(response?.data?.externalDocumentId){
+            if (response?.data?.externalDocumentId) {
                 dispatch(downloadAndStoreProfilePicture())
             }
             return response?.data;
@@ -214,7 +214,7 @@ export const downloadAndStoreProfilePicture = createAsyncThunk(
             });
 
             // Store the base64 URL in localStorage
-            localStorage.setItem('profilePicture', base64Url);
+            setLocalStorage('profilePicture', base64Url);
 
             return base64Url; // Return the base64 URL
         } catch (error) {
@@ -233,7 +233,9 @@ const authSlice = createSlice({
             state.token = null;
             state.user = {};
             state.isLoggedIn = false
+            state.profilePicture = null
             removeLocalStorage('id_token');
+            removeLocalStorage('profilePicture');
         },
         loginUserWithToken: (state, action) => {
 

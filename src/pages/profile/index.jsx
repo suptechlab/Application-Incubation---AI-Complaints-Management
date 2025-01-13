@@ -21,7 +21,7 @@ const ProfileModal = ({ handleShow, handleClose }) => {
 
     // Initial Values
     const [initialValues, setInititalValues] = useState({
-        countryCode: user?.countryCode || '+34',
+        countryCode: user?.countryCode || '+593',
         phoneNumber: user?.phoneNumber || "",
         profile: ''
         // phoneNumber: user?.,
@@ -33,8 +33,8 @@ const ProfileModal = ({ handleShow, handleClose }) => {
     }));
 
     const ALLOWEDIMAGETYPES =
-        "Allowed image file extensions are .jpg, .jpeg and .png.";
-    const IMAGESIZE = "Image size must not exceed 2.5 MB.";
+        t("ALLOWED_IMAGE_TYPES_ERROR_MESSAGE");
+    const IMAGESIZE = t("ALLOWED_IMAGE_SIZE_ERROR_MESSAGE");
     const IMAGESIZEINKB = 2500; // 2MB
 
     const handleFileChange = (e, formikProps) => {

@@ -149,5 +149,7 @@ export const englishLang = {
   "CHATBOT_INITIAL_TEXT" : "Hello, I am SEPS Bot, your virtual assistant.",
   "EDIT_PROFILE":"Edit Profile",
   "UPDATE":"Update",
-  "BROWSE_IMAGE":"Browse Image"
+  "BROWSE_IMAGE":"Browse Image",
+  "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE" :"Allowed image file extensions are .jpg, .jpeg and .png.",
+  "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE" : "Image size must not exceed 2.5 MB."
 }

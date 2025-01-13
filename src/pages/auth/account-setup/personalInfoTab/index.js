@@ -37,7 +37,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setI
   // Initial Values
   const initialValues = {
     email: formikRef?.current?.values?.email || "",
-    countryCode: formikRef?.current?.values?.countryCode || "",
+    countryCode: formikRef?.current?.values?.countryCode || "+593",
     phoneNumber: formikRef?.current?.values?.phoneNumber || "",
     otpCode: "",
   };
