@@ -14,6 +14,7 @@ public class AuditListDTO {
     private Instant createdAt;
     private String userName;
     private String activityType;
+    private String message;
     private String ipAddress;
 
 }
