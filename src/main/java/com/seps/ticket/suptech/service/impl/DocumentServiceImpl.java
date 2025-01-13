@@ -239,7 +239,7 @@ public class DocumentServiceImpl implements DocumentService {
         } catch (FileStorageException ex) {
             LOG.error("Error during file transfer: {}", ex.getMessage(), ex);
             String errorMessage = messageSource.getMessage(
-                "error.file.transfer",
+                "error.upload.file",
                 new Object[]{ex.getMessage()},
                 LocaleContextHolder.getLocale()
             );
@@ -247,7 +247,7 @@ public class DocumentServiceImpl implements DocumentService {
         } catch (Exception ex) {
             LOG.error("Unexpected error during file transfer: {}", ex.getMessage(), ex);
             String errorMessage = messageSource.getMessage(
-                "error.unexpected",
+                "error.invalid.response",
                 new Object[]{ex.getMessage()},
                 LocaleContextHolder.getLocale()
             );

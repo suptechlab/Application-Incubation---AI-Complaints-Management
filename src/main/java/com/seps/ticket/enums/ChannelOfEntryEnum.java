@@ -4,6 +4,7 @@ import com.seps.ticket.component.EnumWithDescription;
 
 public enum ChannelOfEntryEnum implements EnumWithDescription {
 
+    WEB("enum.source.web"),
     /**
      * Represents claims submitted by agents during a call interaction with the user via the Agent Portal.
      */

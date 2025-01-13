@@ -60,6 +60,10 @@ public class UserClaimTicketDTO {
     private SourceEnum source;
     private ChannelOfEntryEnum channelOfEntry;
 
+    private Long previousTicketId;
+    private UserClaimTicketDTO previousTicket; // Add this field for mapping the previous ticket
+    private Boolean canCreateInstance;
+
     // Getters and Setters
 
     @Data

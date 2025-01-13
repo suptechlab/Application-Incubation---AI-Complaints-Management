@@ -161,8 +161,6 @@ public class ReportService {
         row.createCell(ExcelHeaderClaimTicketReportEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName() : "");
         row.createCell(ExcelHeaderClaimTicketReportEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
-        row.createCell(ExcelHeaderClaimTicketReportEnum.SECOND_INSTANCE_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getSecondInstanceFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
-        row.createCell(ExcelHeaderClaimTicketReportEnum.COMPLAINT_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getComplaintFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.PROVINCE.ordinal()).setCellValue(data.getProvince() != null ? data.getProvince().getName() : "");
         row.createCell(ExcelHeaderClaimTicketReportEnum.CITY.ordinal()).setCellValue(data.getCity() != null ? data.getCity().getName() : "");
         row.createCell(ExcelHeaderClaimTicketReportEnum.PRIORITY_CARE_GROUP.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getPriorityCareGroup(), LocaleContextHolder.getLocale()));
@@ -174,6 +172,7 @@ public class ReportService {
         row.createCell(ExcelHeaderClaimTicketReportEnum.REJECTED_STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getRejectedStatus(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.RESOLVED_ON.ordinal()).setCellValue(DateUtil.formatDate(data.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.CREATED_BY_USER.ordinal()).setCellValue(data.getCreatedByUser() != null ? data.getCreatedByUser().getName() : "");
+        row.createCell(ExcelHeaderClaimTicketReportEnum.SECOND_INSTANCE_COMMENT.ordinal()).setCellValue(data.getSecondInstanceComment() != null ? data.getSecondInstanceComment() : "");
         row.createCell(ExcelHeaderClaimTicketReportEnum.COMPLAINT_PRECEDENTS.ordinal()).setCellValue(data.getComplaintPrecedents() != null ? data.getComplaintPrecedents() : "");
         row.createCell(ExcelHeaderClaimTicketReportEnum.COMPLAINT_SPECIFIC_PETITION.ordinal()).setCellValue(data.getComplaintSpecificPetition() != null ? data.getComplaintSpecificPetition() : "");
         row.createCell(ExcelHeaderClaimTicketReportEnum.SOURCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getSource(), LocaleContextHolder.getLocale()));

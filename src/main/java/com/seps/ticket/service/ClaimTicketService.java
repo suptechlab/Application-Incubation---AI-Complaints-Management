@@ -68,11 +68,6 @@ public class ClaimTicketService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClaimTicketService.class);
 
-    private final ProvinceRepository provinceRepository;
-    private final CityRepository cityRepository;
-    private final OrganizationRepository organizationRepository;
-    private final ClaimTypeRepository claimTypeRepository;
-    private final ClaimSubTypeRepository claimSubTypeRepository;
     private final ClaimTicketRepository claimTicketRepository;
     private final UserService userService;
     private final UserClaimTicketMapper userClaimTicketMapper;
@@ -80,17 +75,12 @@ public class ClaimTicketService {
     private final Gson gson;
     private final MessageSource messageSource;
     private final ClaimTicketMapper claimTicketMapper;
-    private final DocumentService documentService;
     private final ClaimTicketDocumentRepository claimTicketDocumentRepository;
     private final ClaimTicketStatusLogRepository claimTicketStatusLogRepository;
     private final ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository;
     private final ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository;
-    private static final boolean IS_INTERNAL_DOCUMENT = false;
     private final EnumUtil enumUtil;
-    private final ClaimTicketActivityLogService claimTicketActivityLogService;
-    private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
     private final UserRepository userRepository;
-    private final ClaimTicketAssignLogRepository claimTicketAssignLogRepository;
     private final ExternalAPIService externalAPIService;
     private final AuthorityRepository authorityRepository;
     private final PersonaRepository personaRepository;
@@ -98,12 +88,7 @@ public class ClaimTicketService {
     private final ClaimTicketOTPRepository claimTicketOTPRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public ClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository, OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository, ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, DocumentService documentService, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder) {
-        this.provinceRepository = provinceRepository;
-        this.cityRepository = cityRepository;
-        this.organizationRepository = organizationRepository;
-        this.claimTypeRepository = claimTypeRepository;
-        this.claimSubTypeRepository = claimSubTypeRepository;
+    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.userClaimTicketMapper = userClaimTicketMapper;
@@ -119,16 +104,12 @@ public class ClaimTicketService {
             .create();
         this.messageSource = messageSource;
         this.claimTicketMapper = claimTicketMapper;
-        this.documentService = documentService;
         this.claimTicketDocumentRepository = claimTicketDocumentRepository;
         this.claimTicketStatusLogRepository = claimTicketStatusLogRepository;
         this.claimTicketInstanceLogRepository = claimTicketInstanceLogRepository;
         this.claimTicketPriorityLogRepository = claimTicketPriorityLogRepository;
         this.enumUtil = enumUtil;
-        this.claimTicketActivityLogService = claimTicketActivityLogService;
-        this.claimTicketWorkFlowService = claimTicketWorkFlowService;
         this.userRepository = userRepository;
-        this.claimTicketAssignLogRepository = claimTicketAssignLogRepository;
     }
 
 
@@ -386,6 +367,7 @@ public class ClaimTicketService {
         newClaimTicket.setCreatedByUser(currentUser);
         newClaimTicket.setChannelOfEntry(claimTicketRequest.getChannelOfEntry());
         newClaimTicket.setSource(SourceEnum.AGENT);
+        newClaimTicket.setCanCreateInstance(true);
         return newClaimTicket;
     }
 
@@ -630,8 +612,6 @@ public class ClaimTicketService {
                 row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName():"");
                 row.createCell(ExcelHeaderClaimTicketEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
                 row.createCell(ExcelHeaderClaimTicketEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
-                row.createCell(ExcelHeaderClaimTicketEnum.SECOND_INSTANCE_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getSecondInstanceFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
-                row.createCell(ExcelHeaderClaimTicketEnum.COMPLAINT_CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getComplaintFiledAt(), LocaleContextHolder.getLocale().getLanguage()));
 
             }
             // Auto-size columns
@@ -686,19 +666,9 @@ public class ClaimTicketService {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
         Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
-        if(ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)){
-            ticket.setSlaComment(claimTicketSlaCommentRequest.getSlaComment());
-            ticket.setSlaCommentedAt(Instant.now());
-            ticket.setSlaCommentedByUser(currentUser);
-        } else if (ticket.getInstanceType().equals(InstanceTypeEnum.SECOND_INSTANCE)) {
-            ticket.setSecondInstanceSlaComment(claimTicketSlaCommentRequest.getSlaComment());
-            ticket.setSecondInstanceSlaCommentedAt(Instant.now());
-            ticket.setSecondInstanceSlaCommentedByUser(currentUser);
-        } else if (ticket.getInstanceType().equals(InstanceTypeEnum.COMPLAINT)) {
-            ticket.setComplaintSlaComment(claimTicketSlaCommentRequest.getSlaComment());
-            ticket.setComplaintSlaCommentedAt(Instant.now());
-            ticket.setComplaintSlaCommentedByUser(currentUser);
-        }
+        ticket.setSlaComment(claimTicketSlaCommentRequest.getSlaComment());
+        ticket.setSlaCommentedAt(Instant.now());
+        ticket.setSlaCommentedByUser(currentUser);
         ticket.setSlaPopup(null);
         ClaimTicket savedTicket = claimTicketRepository.save(ticket);
 
