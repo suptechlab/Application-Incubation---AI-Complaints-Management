@@ -25,6 +25,7 @@ import TeamManagementAddEdit from "../pages/team-management/addedit";
 import TicketWorkFlowAddEdit from "../pages/tickets-workflow/addedit";
 import AddTemplate from "../pages/master management/TemplateMaster/Add/index";
 import EditTemplate from "../pages/master management/TemplateMaster/Edit/index";
+import ImportSEPSUser from "../pages/users/importData";
 
 
 const Settings = React.lazy(() => import("../pages/settings"));
@@ -232,6 +233,14 @@ const routes = [
     layoutType: "Auth",
     module: "SEPS User",
     permissions: ["SEPS_USER_UPDATE_BY_SEPS"]
+  },
+  {
+    path: "/users/import",
+    element: <ImportSEPSUser isEdit={false} />,
+    isPrivate: true,
+    module: "SEPS User",
+    layoutType: "Auth",
+    permissions: ["SEPS_USER_CREATE_BY_SEPS"]
   },
   {
     path: "/states/edit/:id",

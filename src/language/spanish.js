@@ -313,5 +313,6 @@ export const spanishLang = {
     "DATA_FILE": "Archivo de datos",
     "DOWNLOAD_SAMPLE_USER_TEMPLATE": "Descargar plantilla de usuario de muestra",
     "ERROR_DETAILS": "Detalles del error",
-    "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Por favor seleccione un archivo para cargar"
+    "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Por favor seleccione un archivo para cargar",
+    "IMPORT_SEPS_USERS":"Importar usuarios de SEPS"
 } 

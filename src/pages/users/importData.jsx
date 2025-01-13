@@ -11,8 +11,9 @@ import fiUserFile from "../../assets/samplefiles/FI_USERS.xlsx"
 import { handleImportFiUsersApi } from "../../services/fiusers.services";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { handleImportSepsUsersApi } from "../../services/user.service";
 
-const ImportFIUser = () => {
+const ImportSEPSUser = () => {
 
   const [loading, setLoading] = useState(false)
   const { t } = useTranslation()
@@ -49,7 +50,7 @@ const ImportFIUser = () => {
 
     setLoading(true); // Set loading to true while the API call is in progress
     actions.setSubmitting(true)
-    handleImportFiUsersApi(formData)
+    handleImportSepsUsersApi(formData)
       .then((response) => {
         if (response?.status === 200) {
           toast.success(response?.data?.message);
@@ -78,7 +79,7 @@ const ImportFIUser = () => {
   const handleSampleFileDownload = () => {
     // Define the URL of the sample file
     const fileUrl = fiUserFile; // Replace with your file URL
-    const fileName = "FI_USERS.xlsx"; // Replace with the desired file name
+    const fileName = "SEPS_USERS.xlsx"; // Replace with the desired file name
 
     // Create an anchor element
     const link = document.createElement("a");
@@ -97,7 +98,7 @@ const ImportFIUser = () => {
       <Loader isLoading={false} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
-          title={t("FI USERS")}
+          title={t("SEPS USERS")}
           actions={[
             {
               label: t("DOWNLOAD_SAMPLE_USER_TEMPLATE"),
@@ -214,4 +215,4 @@ const ImportFIUser = () => {
   );
 };
 
-export default ImportFIUser;
+export default ImportSEPSUser;
