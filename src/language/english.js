@@ -295,5 +295,7 @@ export const englishLang = {
     "ALL_ENTITIES": "All Entities",
     "REMINDER": "Reminder!",
     "SLA_BREACH_NOTICE": "The SLA for #{{ticketId}} will breach in {{days}} days. Please take necessary actions to ensure compliance.",
-    "SLA_COMMENT":'SLA Comment'
+    "SLA_COMMENT":'SLA Comment',
+    "PROVIDE_SLA_COMMENT":"Provide SLA Comment",
+    "FIRST_INSTANCE_CLAIM_DETAILS" :"First Instance claim details"
 }

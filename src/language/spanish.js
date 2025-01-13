@@ -291,6 +291,7 @@ export const spanishLang = {
     "ALL_ENTITIES": "Todas las entidades",
     "REMINDER": "¡Recordatorio!",
     "SLA_BREACH_NOTICE": "El SLA para #{{ticketId}} se incumplirá en {{days}} días. Por favor, tome las medidas necesarias para garantizar el cumplimiento.",
-    "SLA_COMMENT":"Comentario del SLA"
-
+    "SLA_COMMENT": "Comentario del SLA",
+    "PROVIDE_SLA_COMMENT": "Proporcionar comentario de SLA",
+    "FIRST_INSTANCE_CLAIM_DETAILS" :"Detalles del reclamo de primera instancia"
 }
