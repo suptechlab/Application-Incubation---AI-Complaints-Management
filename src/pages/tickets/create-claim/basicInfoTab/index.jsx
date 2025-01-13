@@ -39,7 +39,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         email: '',
         name: '',
         gender: '',
-        countryCode: '+34',
+        countryCode: '+593',
         phoneNumber: '',
         provinceId: '',
         cityId: '',

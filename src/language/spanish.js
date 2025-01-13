@@ -252,7 +252,7 @@ export const spanishLang = {
     "OTP_VERIFICATION": "Verificar OTP",
     "OTP_INSTRUCTION": "¿No recibiste el OTP? Revisa tu carpeta de spam o haz clic en 'Reenviar OTP' para obtener un nuevo código.",
     "FORM_INSTRUCTION": "Rellena el siguiente formulario para crear tu cuenta y serás redirigido para presentar un reclamo.",
-    "EMAIL_VERIFICATION":"Verificación de Correo Electrónico",
+    "EMAIL_VERIFICATION": "Verificación de Correo Electrónico",
     "INSTANCE_TYPE": "Tipo de instancia",
     "ADD_INTERNAL_NOTE": "Agregar nota interna",
     "COMPLAINT": "Queja",
@@ -300,14 +300,17 @@ export const spanishLang = {
     "ALL_ENTITIES": "Todas las entidades",
     "REMINDER": "¡Recordatorio!",
     "SLA_BREACH_NOTICE": "El SLA para #{{ticketId}} se incumplirá en {{days}} días. Por favor, tome las medidas necesarias para garantizar el cumplimiento.",
-    "SLA_COMMENT":"Comentario del SLA",
+    "SLA_COMMENT": "Comentario del SLA",
     "ALL_INSTANCE": "Todas las instancias",
     "TOTAL_CLAIMS": "Reclamaciones totales",
     "SUBMITTED_ACROSS_ALL_FIS": "Presentado en todas las IF",
     "AVERAGE_RESOLUTION_TIME": "Tiempo promedio de resolución",
     "CLAIM_AND_COMPLAINTS": "Reclamos y Quejas",
     "FI_ENTITY": "Entidad FI",
-    "SLA ADHERENCE":"Cumplimiento del SLA",
+    "SLA ADHERENCE": "Cumplimiento del SLA",
     "CLAIM_OVERVIEW_REPORT": "Informe general de reclamaciones",
-    "CLAIM_OVERVIEW_FILTERS": "Claim Overview filters"
+    "CLAIM_OVERVIEW_FILTERS": "Claim Overview filters",
+    "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE": "Las extensiones de archivo de imagen permitidas son .jpg, .jpeg y .png.",
+    "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB."
+
 }

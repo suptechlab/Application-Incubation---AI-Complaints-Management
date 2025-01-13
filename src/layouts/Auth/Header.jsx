@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Badge,
   Button,
@@ -28,7 +28,7 @@ import "./header.scss";
 import { useTranslation } from "react-i18next";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
-  const { logout, userData,profileImage } = useContext(AuthenticationContext);
+  const { logout, userData, profileImage } = useContext(AuthenticationContext);
   const { t } = useTranslation();
 
 

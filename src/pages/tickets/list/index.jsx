@@ -144,6 +144,10 @@ export default function TicketsList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
+    useEffect(() => {
+        dataQuery.refetch()
+    }, [])
+
     // The color class based on the status
     const getPriorityClass = (priority) => {
         switch (priority) {
@@ -259,7 +263,7 @@ export default function TicketsList() {
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
                         {
-                           ( row?.original?.slaPopup &&  row?.original?.slaPopup !== null )&&
+                            (row?.original?.slaPopup && row?.original?.slaPopup !== null) &&
                             <TbBellRingingFilled className="ring text-primary" size={18} />
                         }
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>

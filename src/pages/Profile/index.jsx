@@ -26,8 +26,8 @@ export default function AccountProfile() {
   });
 
   const ALLOWEDIMAGETYPES =
-    "Allowed image file extensions are .jpg, .jpeg and .png.";
-  const IMAGESIZE = "Image size must not exceed 2.5 MB.";
+    t("ALLOWED_IMAGE_TYPES_ERROR_MESSAGE");
+  const IMAGESIZE = t("ALLOWED_IMAGE_SIZE_ERROR_MESSAGE");
   const IMAGESIZEINKB = 2500;
 
   const handleFileChange = (e, setFieldValue) => {
@@ -142,11 +142,8 @@ export default function AccountProfile() {
                                 height={134}
                               /> : <div class="card-text placeholder-glow custom-width-134 custom-height-134">
                                 <span class="placeholder  d-block h-100" ></span>
-
                               </div>
                           }
-
-
                         </div>
                         <div className="theme-upload-cover">
                           <div className="d-block overflow-hidden position-relative z-1">
@@ -154,7 +151,7 @@ export default function AccountProfile() {
                               htmlFor="files"
                               className="btn btn-outline-dark custom-min-width-85"
                             >
-                              {t('UPLOAD')}
+                              {t('BROWSE_IMAGE')}
                             </label>
                             <input
                               name="profile"

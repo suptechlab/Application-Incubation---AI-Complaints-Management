@@ -12,7 +12,7 @@ import PageHeader from "../../../components/PageHeader";
 import ReactSelect from "../../../components/ReactSelect";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
 import { MasterDataContext } from "../../../contexts/masters.context";
-import { claimTypesDropdownList, getClaimSubTypeById } from "../../../services/claimSubType.service";
+import { claimSubTypeDropdownList, claimTypesDropdownList, getClaimSubTypeById } from "../../../services/claimSubType.service";
 import { getOrganizationList } from "../../../services/teamManagment.service";
 import { convertToLabelValue } from "../../../services/ticketmanagement.service";
 import { addTicketWorkflow, editTicketWorkflow, getAgentList, getTeamList, getTeamMemberList, getTemplateList, handleGetWorkflowById } from "../../../services/ticketWorkflow.service";
@@ -211,21 +211,43 @@ export default function TicketWorkFlowAddEdit() {
 
     const getClaimSubTypes = useCallback(async (index, claimId) => {
         setLoading(true);
-        try {
-            const response = await getClaimSubTypeById(claimId);
-            const claimSubTypeFormatList = response?.data
-                ? [{ label: response.data.name, value: response.data.id }]
-                : [];
-            // setConditionsCatArr(claimSubTypeFormatList);
+        claimSubTypeDropdownList(claimId).then(response => {
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setConditionsCatArr((prev) => ({
+                    ...prev,
+                    [index]: dropdownData,
+                }))
+                setLoading(false);
+            }
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+            setLoading(false);
+        })
 
-            setConditionsCatArr((prev) => ({
-                ...prev,
-                [index]: claimSubTypeFormatList,
-            }))
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-        }
+
+        // try {
+        //     const response = await claimSubTypeDropdownList(claimId);
+        //     const claimSubTypeFormatList = response?.data
+        //         ? [{ label: response.data.name, value: response.data.id }]
+        //         : [];
+        //     // setConditionsCatArr(claimSubTypeFormatList);
+
+        //     setConditionsCatArr((prev) => ({
+        //         ...prev,
+        //         [index]: claimSubTypeFormatList,
+        //     }))
+        //     setLoading(false);
+        // } catch (error) {
+        //     setLoading(false);
+        // }
     }, [setConditionsCatArr])
 
 
@@ -1159,7 +1181,7 @@ export default function TicketWorkFlowAddEdit() {
                                         <Row>
                                             <Col sm={6} lg={4}>
                                                 <ReactSelect
-                                                    label={t('INSTANCE_TYPE') + '*'}
+                                                    label={t('INSTANCE_TYPE')}
                                                     options={instanceTypeArr}
                                                     value={formikProps.values.instanceTypeId || ""}
                                                     onChange={(option) => {
@@ -1178,7 +1200,7 @@ export default function TicketWorkFlowAddEdit() {
                                             {(currentUser === 'SYSTEM_ADMIN' || currentUser === 'SEPS_USER') && (
                                                 <Col sm={6} lg={4}>
                                                     <ReactSelect
-                                                        label={`${t('ENTITY NAME')}*`}
+                                                        label={`${t('ENTITY NAME')}`}
                                                         options={organizationArr}
                                                         value={formikProps.values.entityId}
                                                         onChange={(option) => {
@@ -1198,7 +1220,7 @@ export default function TicketWorkFlowAddEdit() {
                                             <Col lg={8}>
                                                 <FormInput
                                                     id="workflowName"
-                                                    label={t('WORKFLOW_NAME') + '*'}
+                                                    label={t('WORKFLOW_NAME')}
                                                     name="workflowName"
                                                     type="text"
                                                     onBlur={formikProps.handleBlur}
@@ -1239,7 +1261,7 @@ export default function TicketWorkFlowAddEdit() {
                                                 <Row className="gx-4">
                                                     <Col sm={6} lg={4}>
                                                         <ReactSelect
-                                                            label={t('EVENT_SELECTION') + '*'}
+                                                            label={t('EVENT_SELECTION')}
                                                             placeholder={t('SELECT')}
                                                             name="eventId"
                                                             wrapperClassName={'mb-3'}

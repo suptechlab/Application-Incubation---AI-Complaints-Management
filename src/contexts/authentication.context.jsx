@@ -55,6 +55,7 @@ export default function AuthenticationProvider({ children }) {
         removeLocalStorage("access_token")
         removeLocalStorage("refresh_token")
         setIsAuthenticated(false)
+        removeLocalStorage("profileImage")
     }
 
     const login = async (data) => {
