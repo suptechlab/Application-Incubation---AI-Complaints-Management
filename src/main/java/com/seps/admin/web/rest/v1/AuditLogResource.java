@@ -8,11 +8,14 @@ import com.seps.admin.service.dto.AuditListDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -43,5 +46,22 @@ public class AuditLogResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
+    @GetMapping("/download")
+    @PermissionCheck({"AUDIT_TRAILS_VIEW"})
+    public ResponseEntity<byte[]> downloadAuditLogs(@RequestParam(required = false) String search,
+                                                    @RequestParam(required = false) ActivityTypeEnum activityType,
+                                                    @RequestParam(required = false) String startDate,
+                                                    @RequestParam(required = false) String endDate) throws IOException  {
+        ByteArrayInputStream in = auditLogService.downloadAuditLogs(search, activityType, startDate, endDate);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=audit_logs.xlsx");
+        try (in) {
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(in.readAllBytes());
+        }
+
+    }
 
 }
