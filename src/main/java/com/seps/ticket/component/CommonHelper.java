@@ -10,9 +10,11 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.text.NumberFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Component("commonHelperProperty")
@@ -80,5 +82,18 @@ public class CommonHelper {
         return map;
     }
 
+    /**
+     * Formats the given amount based on the provided locale.
+     *
+     * @param amount the amount to format
+     * @return the formatted amount as a string
+     */
+    public static String formatAmount(Double amount) {
+        if (amount == null) {
+            return ""; // Return an empty string if the amount is null
+        }
 
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-ES"));
+        return formatter.format(amount);
+    }
 }
