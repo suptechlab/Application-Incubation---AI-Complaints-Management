@@ -8,7 +8,8 @@ const initialState = {
     loading: false,
     error: null,
     user: {},
-    isLoggedIn: false
+    isLoggedIn: false,
+    profilePicture: null
 };
 // NATIONAL ID VERIFICATION STATUS
 export const nationalIDVerificationStatus = createAsyncThunk(
@@ -157,15 +158,72 @@ export const registerUser = createAsyncThunk(
 // GET ACCOUNT OF LOGGED IN USER
 export const getAccountInfo = createAsyncThunk(
     'getAccountInfo',
-    async (_, { rejectWithValue }) => {
+    async (_, { rejectWithValue, dispatch }) => {
         try {
             const response = await userApi.get(EndPoint.ACCOUNT_API);
+            if (response?.data?.externalDocumentId) {
+                dispatch(downloadAndStoreProfilePicture())
+            }
             return response?.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
+
+// THUNK FUNCTION: Login with token and fetch account info
+export const loginAndFetchAccountInfo = (payload) => async (dispatch) => {
+    // Step 1: Call loginUserWithToken reducer
+    await dispatch(authSlice.actions.loginUserWithToken(payload));
+
+    // Step 2: Call getAccountInfo thunk to fetch account data
+    await dispatch(getAccountInfo());
+};
+// UPDATE ACCOUNT OF LOGGED IN USER
+export const updateUserInfo = createAsyncThunk(
+    'updateUserInfo',
+    async (data, { rejectWithValue, dispatch }) => {
+        try {
+            const response = await userApi.post(EndPoint.ACCOUNT_API, data);
+            dispatch(getAccountInfo())
+            return response?.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+// DOWNLOAD PROFILE PICTURE
+export const downloadAndStoreProfilePicture = createAsyncThunk(
+    'downloadAndStoreProfilePicture',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await userApi.get(`${EndPoint.DOWNLOAD_PROFILE_PICTURE}`, {
+                responseType: 'blob', // Ensures the response is treated as a file
+            });
+
+            // Create a URL for the downloaded blob
+            // Convert the blob to a base64 URL
+            const reader = new FileReader();
+            const blob = response.data;
+
+            const base64Url = await new Promise((resolve, reject) => {
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+
+            // Store the base64 URL in localStorage
+            setLocalStorage('profilePicture', base64Url);
+
+            return base64Url; // Return the base64 URL
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
+
+
 // AUTH SLICE
 const authSlice = createSlice({
     name: 'auth',
@@ -175,8 +233,20 @@ const authSlice = createSlice({
             state.token = null;
             state.user = {};
             state.isLoggedIn = false
+            state.profilePicture = null
             removeLocalStorage('id_token');
-        }
+            removeLocalStorage('profilePicture');
+        },
+        loginUserWithToken: (state, action) => {
+
+            setLocalStorage('id_token', action.payload.id_token);
+            state.loading = false;
+            state.isLoggedIn = true
+            state.token = action.payload.id_token
+        },
+        clearProfilePicture(state) {
+            state.profilePicture = null;
+        },
     },
 
     extraReducers: (builder) => {
@@ -194,6 +264,18 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || action.error.message;
             })
+            .addCase(updateUserInfo.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateUserInfo.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(updateUserInfo.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message;
+            })
+
             //NATIONAL ID VERIFICATION STATUS 
             .addCase(nationalIDVerificationStatus.pending, (state) => {
                 state.loading = true;
@@ -308,8 +390,23 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = action?.error?.errorDescription ?? action?.error?.message;
             })
+
+            // DOWNLOAD AND STORE PROFILE PICTURE
+
+            .addCase(downloadAndStoreProfilePicture.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(downloadAndStoreProfilePicture.fulfilled, (state, action) => {
+                state.loading = false;
+                state.profilePicture = action.payload; // Store the profile picture
+            })
+            .addCase(downloadAndStoreProfilePicture.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     },
 });
 
-export const { setLogout } = authSlice.actions;
+export const { setLogout, loginUserWithToken } = authSlice.actions;
 export default authSlice.reducer;

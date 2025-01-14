@@ -25,7 +25,7 @@ const formatListData = (data) =>
 
 // HELPER FUNCTION TO FORMAT CLAM DATA FOR DROPDOWN
 const formatOrganizationalUnits = (data) =>
-  data.map((item) => ({ label: item.nemonicoTipoOrganizacion, value: item.id , ruc : item.ruc }));
+  data.map((item) => ({ label: item.razonSocial, value: item.id , ruc : item.ruc }));
 
 // Async Thunk to fetch and format all dropdown data
 export const fetchMasterData = createAsyncThunk(

@@ -262,7 +262,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
             )
             }
-        </CommonFormikComponent >
+        </CommonFormikComponent>
     )
 }
 

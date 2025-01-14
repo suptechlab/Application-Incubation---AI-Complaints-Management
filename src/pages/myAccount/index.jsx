@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { Badge, Button, Stack } from 'react-bootstrap';
-import { MdChatBubbleOutline, MdOutlineInfo, MdOutlineVisibility } from 'react-icons/md';
+import { Button, Stack } from 'react-bootstrap';
+import { MdChatBubbleOutline, MdOutlineVisibility } from 'react-icons/md';
 import DataTable from '../../components/common/DataTable';
 
 import moment from 'moment';
@@ -192,14 +192,14 @@ export default function MyAccount() {
               label: "FILE_SECOND_INSTANCE",
               onClickHandler: () => instanceClickHandler(info.row.original),
               ariaLabel: t("FILE_SECOND_INSTANCE"),
-              disabled: !(info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED")
+              disabled: !((info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED" )&&(info?.row?.original?.canCreateInstance))
             })
             : info.row.original.instanceType === "SECOND_INSTANCE"
               ? renderButton({
                 label: "RAISE_COMPLAINT",
                 onClickHandler: () => raisedComplaintClickHandler(info.row.original),
                 ariaLabel: t("RAISE_COMPLAINT"),
-                disabled: !(info.row.original.status === "CLOSED")
+                disabled: !((info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED" )&&(info?.row?.original?.canCreateInstance))
               })
               : null;
 
@@ -221,7 +221,7 @@ export default function MyAccount() {
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
                   aria-label={t("CHAT")}
-                  disabled={['CLOSED', 'REJECTED'].includes(info?.row?.original?.status)}
+                  // disabled={['CLOSED', 'REJECTED'].includes(info?.row?.original?.status)}
                 >
                   <MdChatBubbleOutline size={24} />
                   {/* <Badge
@@ -316,7 +316,6 @@ export default function MyAccount() {
   const handleSortingChange = (newSorting) => {
     setSorting(newSorting);
   };
-
 
   return (
     <React.Fragment>

@@ -34,7 +34,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         email: user?.email ?? '',
         name: user?.name ?? '',
         gender: user?.gender ?? '',
-        countryCode: user?.countryCode ?? '',
+        countryCode: user?.countryCode ?? '+593',
         phoneNumber:user?.phoneNumber ?? '',
         provinceId: '',
         cityId: '',

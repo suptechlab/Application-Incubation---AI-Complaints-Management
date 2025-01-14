@@ -26,7 +26,7 @@ const Header = ({ layout }) => {
   const [isFileClaimModalShow, setIsFileClaimModalShow] = useState(false);
 
 
-  const { isLoggedIn, user } = useSelector((state) => state?.authSlice)
+  const { isLoggedIn, user, profilePicture } = useSelector((state) => state?.authSlice)
 
   const { t } = useTranslation()
 
@@ -35,22 +35,6 @@ const Header = ({ layout }) => {
   const navigate = useNavigate()
 
   let expand = "md";
-
-  // Menu Links
-  const menuLinks = [
-    {
-      label: t("MENU_1"),
-      path: "/menu-1",
-    },
-    {
-      label: t("MENU_2"),
-      path: "/menu-2",
-    },
-    {
-      label: t("MENU_3"),
-      path: "/menu-3",
-    },
-  ];
 
   const handleLogout = () => {
     dispatch(setLogout())
@@ -92,18 +76,7 @@ const Header = ({ layout }) => {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="justify-content-end align-items-md-center flex-grow-1 header-menu-links">
-                {menuLinks.map((link, index) => (
-                  <Nav.Link
-                    as={NavLink}
-                    to={link.path}
-                    className="mx-md-3"
-                    key={"menu_link_" + index}
-                    disabled={true}
-                  >
-                    {link.label}
-                  </Nav.Link>
-                ))}
-                {/* {!isLoggedIn &&
+                {!isLoggedIn &&
                   <Button
                     type="button"
                     className="py-2 custom-min-width-90"
@@ -112,7 +85,7 @@ const Header = ({ layout }) => {
                   >
                     {t('LOGIN')}
                   </Button>
-                } */}
+                } 
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
@@ -125,7 +98,7 @@ const Header = ({ layout }) => {
             >
               <Image
                 className="object-fit-cover rounded-circle"
-                src={defaultAvatar}
+                src={profilePicture ?? defaultAvatar}
                 width={40}
                 height={40}
                 alt={"Alex Boston"}
@@ -138,7 +111,7 @@ const Header = ({ layout }) => {
               <Dropdown.Header className="fw-semibold d-md-none">
                 {user?.name ?? ''}
               </Dropdown.Header>
-              <Dropdown.Item as={Button} onClick={handleProfileClick} disabled className="fs-6">
+              <Dropdown.Item as={Button} onClick={handleProfileClick} className="fs-6">
                 <span className="me-2">
                   <MdAccountBox size={18} />
                 </span>
