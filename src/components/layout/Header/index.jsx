@@ -85,7 +85,7 @@ const Header = ({ layout }) => {
                   >
                     {t('LOGIN')}
                   </Button>
-                } 
+                }
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
