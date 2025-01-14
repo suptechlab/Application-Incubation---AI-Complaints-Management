@@ -70,7 +70,7 @@ deployment:
     targetPort: 8080
 
   ingress:
-    enabled: true
+    enabled: false
     className: "nginx"
     annotations:
         nginx.ingress.kubernetes.io/enable-cors: "true"
@@ -85,6 +85,12 @@ deployment:
       - secretName: seps-cert
         hosts:
           - api-stg-suptech.seps.gob.ec
+
+  virtualRoute:
+    enabled: true
+    host: adminapi-suptechdev.seps.gob.ec
+    path: ~^/user(/|$)(.*)
+    rewritePath: /$2
 
   resources:
     # We usually recommend not to specify default resources and to leave this as a conscious
