@@ -73,4 +73,5 @@ public class ClaimTicketDTO {
     private UserDTO complaintSlaCommentedByUser;
     private Long previousTicketId;
     private ClaimTicketDTO previousTicket; // Add this field for mapping the previous ticket
+    private Double claimAmount;
 }
