@@ -1543,18 +1543,14 @@ public class UserClaimTicketService {
                     currentUser.getId(),
                     InstanceTypeEnum.FIRST_INSTANCE,
                     ClaimTicketStatusEnum.CLOSED,
-                    ClosedStatusEnum.CLOSE_WITH_EXPIRED,
-                    ClaimTicketStatusEnum.REJECTED,
-                    RejectedStatusEnum.EXPIRED)
+                    ClaimTicketStatusEnum.REJECTED)
                 .stream().map(claimTicketMapper::toListDTO).toList();
         } else if (instanceType.equals(InstanceTypeEnum.COMPLAINT)) {
             claimTicketList = claimTicketRepository.findValidClaimTickets(
                     currentUser.getId(),
                     InstanceTypeEnum.SECOND_INSTANCE,
                     ClaimTicketStatusEnum.CLOSED,
-                    ClosedStatusEnum.CLOSE_WITH_EXPIRED,
-                    ClaimTicketStatusEnum.REJECTED,
-                    RejectedStatusEnum.EXPIRED)
+                    ClaimTicketStatusEnum.REJECTED)
                 .stream().map(claimTicketMapper::toListDTO).toList();
         }
         return claimTicketList;

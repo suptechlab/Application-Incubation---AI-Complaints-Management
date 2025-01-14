@@ -234,4 +234,8 @@ public class ClaimTicket {
 
     @Column(name = "can_create_instance")
     private Boolean canCreateInstance;
+
+    @Column(name = "claim_amount")
+    private Double claimAmount;
+
 }

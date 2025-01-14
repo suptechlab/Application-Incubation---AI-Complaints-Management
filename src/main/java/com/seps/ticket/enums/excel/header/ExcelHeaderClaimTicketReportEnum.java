@@ -31,6 +31,7 @@ public enum ExcelHeaderClaimTicketReportEnum implements EnumWithDescription {
     SOURCE("excel.header.source"),
     CHANNEL_OF_ENTRY("excel.header.channelOfEntry"),
     SECOND_INSTANCE_COMMENT("excel.header.second.instance.comment"),
+    CLAIM_AMOUNT("excel.header.claim.amount")
     //COMPLAINT_CREATED_AT("excel.header.complaintCreatedAt")
     ;
 

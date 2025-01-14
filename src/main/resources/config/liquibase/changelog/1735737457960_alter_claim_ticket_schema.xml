@@ -92,4 +92,13 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="1736878356050" author="matellio">
+    <!-- Add claim_amount column to claim_ticket table -->
+    <addColumn tableName="claim_ticket">
+      <column name="claim_amount" type="decimal(19, 2)" remarks="Claim Amount when agent closed the ticket">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

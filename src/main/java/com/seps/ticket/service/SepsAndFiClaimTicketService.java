@@ -825,6 +825,7 @@ public class SepsAndFiClaimTicketService {
         ticket.setStatusComment(claimTicketClosedRequest.getReason());
         ticket.setResolvedOn(Instant.now());
         ticket.setSlaPopup(null);
+        ticket.setClaimAmount(claimTicketClosedRequest.getClaimAmount());
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -860,6 +861,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, Object> req = new HashMap<>();
         req.put("closeSubStatus", claimTicketClosedRequest.getCloseSubStatus().name());
         req.put(REASON, claimTicketClosedRequest.getReason());
+        req.put("claimAmount", claimTicketClosedRequest.getClaimAmount());
         req.put(ATTACHMENTS, attachments);
         String requestBody = gson.toJson(req);
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "closedClaimTicket", ActionTypeEnum.CLAIM_TICKET_CLOSED.name(), savedTicket.getId(), ClaimTicket.class.getSimpleName(),
