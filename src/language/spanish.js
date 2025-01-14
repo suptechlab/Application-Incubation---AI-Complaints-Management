@@ -313,5 +313,12 @@ export const spanishLang = {
     "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE": "Las extensiones de archivo de imagen permitidas son .jpg, .jpeg y .png.",
     "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB.",
     "PROVIDE_SLA_COMMENT": "Proporcionar comentario de SLA",
-    "FIRST_INSTANCE_CLAIM_DETAILS" :"Detalles del reclamo de primera instancia"
-}
+    "FIRST_INSTANCE_CLAIM_DETAILS" :"Detalles del reclamo de primera instancia",
+
+    "CLAIM_OVERVIEW_FILTERS": "Filtros de descripción general de reclamos",
+    "DATA_FILE": "Archivo de datos",
+    "DOWNLOAD_SAMPLE_USER_TEMPLATE": "Descargar plantilla de usuario de muestra",
+    "ERROR_DETAILS": "Detalles del error",
+    "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Por favor seleccione un archivo para cargar",
+    "IMPORT_SEPS_USERS":"Importar usuarios de SEPS"
+} 

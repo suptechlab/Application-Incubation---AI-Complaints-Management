@@ -327,5 +327,10 @@ export const englishLang = {
     "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "Image size must not exceed 2.5 MB.",
     "PROVIDE_SLA_COMMENT":"Provide SLA Comment",
     "FIRST_INSTANCE_CLAIM_DETAILS" :"First Instance claim details",
-    "COMPLAINT_DETAILS" : "Complaint Details"
+    "COMPLAINT_DETAILS" : "Complaint Details",
+    "DATA_FILE": "Data file",
+    "DOWNLOAD_SAMPLE_USER_TEMPLATE": "Download sample user template",
+    "ERROR_DETAILS": "Error Details",
+    "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Please select a file to upload.",
+    "IMPORT_SEPS_USERS":"Import SEPS Users"
 }

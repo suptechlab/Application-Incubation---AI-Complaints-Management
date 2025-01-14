@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
-import React, { useContext, useEffect,  useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -84,52 +84,11 @@ export default function UserList() {
   const [deleteShow, setDeleteShow] = useState(false);
   const [deleteId, setDeleteId] = useState();
 
-  // const dataQuery = useQuery({
-  //   queryKey: ["data", pagination, sorting, filter],
-  //   queryFn: async() => {
-  //     setLoading(true);
-  //     try {
-  //       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-  //       Object.keys(filterObj).forEach(
-  //         (key) => filterObj[key] === "" && delete filterObj[key]
-  //       );
-
-  //       let response;
-  //       if (sorting.length === 0) {
-  //         response = await handleGetUsers({
-  //           page: pagination.pageIndex,
-  //           size: pagination.pageSize,
-  //           ...filterObj,
-  //         });
-  //       } else {
-  //         response = await handleGetUsers({
-  //           page: pagination.pageIndex,
-  //           size: pagination.pageSize,
-  //           sort: sorting
-  //             .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-  //             .join(","),
-  //           ...filterObj,
-  //         });
-  //       }
-  //       return response;
-  //     } catch (error) {
-  //     } finally {
-  //       setLoading(false); // Start loading
-  //     }
-  //   },
-  //   // onError: () => setLoading(false), // Ensure loading state is reset on error
-  //   staleTime: 0, // Data is always stale, so it refetches
-  //   cacheTime: 0, // Cache expires immediately
-  //   refetchOnWindowFocus: false, // Disable refetching on window focus
-  //   refetchOnMount: false, // Prevent refetching on component remount
-  //   retry: 0, //Disable retry on failure
-  // });
-
   //handle last page deletion item
-  
+
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: async  () => {
+    queryFn: async () => {
       // Set loading state to true before the request starts
       setLoading(true);
 
@@ -174,7 +133,7 @@ export default function UserList() {
     refetchOnMount: true, // Prevent refetching on component remount
     retry: 0, //Disable retry on failure
   });
-  
+
   useEffect(() => {
 
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
@@ -320,8 +279,16 @@ export default function UserList() {
   }, [queryClient]);
 
   const actions = permissionsState?.addModule
-  ? [{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
-  : [];
+    ? [
+    //   {
+    //   label: t("IMPORT_SEPS_USERS"),
+    //   to: "/users/import",
+    //   variant: "outline-dark",
+    //   disabled: false
+    // }
+    // ,
+     { label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
+    : [];
 
   return (
     <React.Fragment>

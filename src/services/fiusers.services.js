@@ -39,4 +39,7 @@ export const handleEditFIUsers = async (id, data) => {
 export const handleFIUsersStatusChange = async (id, status) => {
   return await adminApi.patch(`/${API_VERSION}/fi-users/${id}/${status}`);
 }
-
+// IMPORT FI USERS API 
+export const handleImportFiUsersApi = async (data)=>{
+  return await adminApi.post(`/${API_VERSION}/fi-users/import`,data);
+}

@@ -305,7 +305,7 @@ export default function FIUserList() {
       label: t("IMPORT FI USERS"),
       to: "/fi-users/import",
       variant: "outline-dark",
-      disabled: true
+      disabled: false
     },
     { label: t("ADD NEW"), to: "/fi-users/add", variant: "warning" },]
     : [];
@@ -313,7 +313,6 @@ export default function FIUserList() {
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-      
           <PageHeader
             title={t("FI USERS")}
             actions={actions}
@@ -332,9 +331,7 @@ export default function FIUserList() {
           </Card.Body>
         </Card>
       </div>
-
       {/* Delete Modal */}
-
     </React.Fragment>
   );
 }

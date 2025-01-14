@@ -12,8 +12,6 @@ function App() {
   // const currentLanguage = i18n?.language ?? getLocalStorage('langKey') ?? 'en'
   const { isLoading } = useContext(AuthenticationContext);
 
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem("access_token");
 
   //   if (accessToken) {
   //     handleGetAccountDetail()
