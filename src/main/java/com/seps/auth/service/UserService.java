@@ -600,18 +600,18 @@ public class UserService {
         String username = user.getLogin();
         if (!user.isActivated()) {
             LOG.warn("User {} account is not activated", username);
-            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_NOT_ACTIVE, null);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_NOT_ACTIVE, null,null);
         }
         UserStatusEnum userStatus = user.getStatus();
         if (userStatus.equals(UserStatusEnum.PENDING)) {
             LOG.error("User {} account is pending", username);
-            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_PENDING, null);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_PENDING, null,null);
         } else if (userStatus.equals(UserStatusEnum.BLOCKED)) {
             LOG.error("User {} account is blocked", username);
-            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_BLOCKED, null);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_BLOCKED, null,null);
         } else if (userStatus.equals(UserStatusEnum.DELETED)) {
             LOG.error("User {} account is deleted", username);
-            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_DELETED, null);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USER_ACCOUNT_STATUS_DELETED, null,null);
         }
     }
 

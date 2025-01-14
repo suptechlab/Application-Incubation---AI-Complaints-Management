@@ -369,18 +369,14 @@ public class AuthenticateController {
     public ResponseEntity<OtpResponse> login(@Valid @RequestBody LoginVM loginVM, HttpServletRequest request) {
         String clientIp = request.getRemoteAddr();
         // Verify reCAPTCHA
-//        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
-//            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
-//            //throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
-//        }
-
-        Optional<User> optionalUser = userService.getUserWithAuthoritiesByLogin(loginVM.getUsername());
-        if (optionalUser.isEmpty()) {
-            LOG.warn("User not found: {}", loginVM.getUsername());
-            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USERNAME_PASSWORD_INVALID, null, null);
+        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
+            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
         }
 
-        User user = optionalUser.get();
+        User user = userService.getUserWithAuthoritiesByLogin(loginVM.getUsername())
+            .orElseThrow(() -> new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USERNAME_PASSWORD_INVALID, null, null));
+
         try {
             // Determine authentication method based on user authorities
             if (hasSEPSAuthority(user)) {
@@ -389,7 +385,7 @@ public class AuthenticateController {
                 performDefaultAuthentication(loginVM.getUsername(), loginVM.getPassword());
             }
 
-
+            userService.validateAccount(user);
             // Update user OTP and send email
             User user1=userService.updateUserOtpInfo(user.getLogin());
             mailService.sendLoginOtpEmail(user1);
