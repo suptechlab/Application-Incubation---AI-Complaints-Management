@@ -51,6 +51,9 @@
 @include custom-class('width', 218);
 @include custom-class('min-width', 240);
 @include custom-class('width', 250);
+@include custom-class('width', 134);
+@include custom-class('height', 134);
+@include custom-class('width', 280);
 @include custom-class('max-width', 320);
 @include generate-color-classes($custom-colors);
 
@@ -312,21 +315,18 @@ input:-webkit-autofill:active {
     }
 }
 
-.form-control {
-    &:read-only {
-        color: $input-disabled-color;
-        background-color: $input-disabled-bg;
-        border-color: $input-disabled-border-color;
-    }
-}
-
-
 .error-box {
     color: red;
     margin-top: 5px;
     font-size: 14px;
 }
 
-.variable-list{
+.variable-list {
     list-style: none;
+}
+
+.chart-container{
+    canvas{
+        height: 250px;
+    }
 }

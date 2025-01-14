@@ -87,6 +87,8 @@ export const messages = {
     eventRequired: "Event is required.",
     fieldRequired: "This field is required.",
     userTypeRequired: 'User Type is required.',
+    profileRequired: 'Profile image is required.',
+    fileRequired: 'File is required.'
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -175,6 +177,8 @@ export const messages = {
     instanceTypeRequired: "Se requiere el tipo de instancia.",
     eventRequired: "Se requiere evento.",
     fieldRequired: "Este campo es obligatorio.",
-    userTypeRequired: "El tipo de usuario es obligatorio."
+    userTypeRequired: "El tipo de usuario es obligatorio.",
+    profileRequired: 'Se requiere imagen de perfil.',
+    fileRequired: 'Se requiere archivo.'
   }
 };

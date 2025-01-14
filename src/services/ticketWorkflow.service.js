@@ -51,7 +51,7 @@ export const getTemplateList = async (type) => {
 //Get Team Members List
 export const getAgentList = async (orgId) => {
     let url = `/${API_VERSION}/agent/dropdown-list-for-workflow`;
-    if (orgId.length !== 0) {
+    if (orgId && orgId?.length !== 0) {
         url += `?organizationId=${orgId}`;
     }
     return await adminApi.get(url);

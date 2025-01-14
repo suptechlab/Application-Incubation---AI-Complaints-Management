@@ -242,8 +242,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                             </div>
                         }
                         {
-                            (permissionState?.dateExtPermission === true &&
-                                (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
+                            (permissionState?.dateExtPermission === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED" && ticketData?.slaBreachDate !== null)) ?
                                 <Button
                                     type="submit"
                                     variant='warning'
@@ -327,6 +326,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
                 setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                getTicketData={getTicketData}
             />
             <RejectTicketModal
                 ticketId={ticketData?.id}
@@ -334,6 +334,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
                 setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                getTicketData={getTicketData}
             />
         </React.Fragment>
     );

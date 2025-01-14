@@ -25,6 +25,7 @@ import TeamManagementAddEdit from "../pages/team-management/addedit";
 import TicketWorkFlowAddEdit from "../pages/tickets-workflow/addedit";
 import AddTemplate from "../pages/master management/TemplateMaster/Add/index";
 import EditTemplate from "../pages/master management/TemplateMaster/Edit/index";
+import ImportSEPSUser from "../pages/users/importData";
 
 
 const Settings = React.lazy(() => import("../pages/settings"));
@@ -64,7 +65,7 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
     module: "Dashboard",
-    permissions : ["DASHBOARD_VIEW_FI","DASHBOARD_VIEW_SEPS"]
+    permissions: ["DASHBOARD_VIEW_FI", "DASHBOARD_VIEW_SEPS"]
   },
 
   {
@@ -194,6 +195,7 @@ const routes = [
     path: "/profile",
     element: <AccountProfile />,
     isPrivate: true,
+    module: 'profile',
     layoutType: "Auth",
   },
   {
@@ -232,6 +234,14 @@ const routes = [
     module: "SEPS User",
     permissions: ["SEPS_USER_UPDATE_BY_SEPS"]
   },
+  // {
+  //   path: "/users/import",
+  //   element: <ImportSEPSUser isEdit={false} />,
+  //   isPrivate: true,
+  //   module: "SEPS User",
+  //   layoutType: "Auth",
+  //   permissions: ["SEPS_USER_CREATE_BY_SEPS"]
+  // },
   {
     path: "/states/edit/:id",
     element: <AddEditState isEdit={true} />,
@@ -298,6 +308,7 @@ const routes = [
     isPrivate: true,
     module: "FI User",
     layoutType: "Auth",
+    permissions: ["FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI"]
   },
   {
     path: "/reports/audit-trail",

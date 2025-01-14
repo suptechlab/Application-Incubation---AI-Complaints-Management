@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Button, Card, Col, Row, Stack } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
@@ -7,9 +7,16 @@ import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.vali
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormCheckbox from "../../../../components/formCheckbox";
 import { Link } from "react-router-dom";
-import { claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
+import { claimSubTypeDropdownList, claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
+import FormOtpInputBox from '../../../../components/FormOtpInputBox';
+import { svgIconClasses } from '@mui/material';
+import { MdClose, MdRefresh } from 'react-icons/md';
+import AppTooltip from '../../../../components/tooltip';
+import { FiInfo } from "react-icons/fi";
+import { requestOTPApi, verifyOTPApi } from '../../../../services/claimcreate.services';
+import toast from 'react-hot-toast';
 
-const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
+const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading, userEmail }) => {
 
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
     const { t } = useTranslation();
@@ -17,6 +24,13 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
     const [claimSubTypes, setClaimSubTypes] = useState([]);
 
 
+    const [isOTPFormSubmitted, setIsOTPFormSubitted] = useState(false)
+
+    const [isOTPVerified, setIsOTPVerified] = useState(false)
+
+    const [optSendStatus, setOptSendStatus] = useState(false)
+
+    const [files, setFiles] = useState([]);
 
     // Initial Values
     const initialValues = {
@@ -24,24 +38,131 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         claimSubTypeId: '',
         precedents: '',
         specificPetition: '',
-        attachments: '',
         agreeDeclarations: false,
+        otpCode: ''
     };
 
     //Handle File Change
+    // const handleFileChange = (event) => {
+    //     const file = event.currentTarget.files[0];
+    //     if (file) {
+    //         setFileName(file.name);
+    //     } else {
+    //         setFileName("");
+    //     }
+    // };
+    //Handle File Change
     const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            setFileName(file.name);
-        } else {
-            setFileName("Fi_Users_data.xlsx");
+        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 5 MB in bytes
+        const MAX_FILE_COUNT = 3; // Maximum number of files allowed
+
+        if (event.target.files) {
+            const selectedFiles = Array.from(event.target.files);
+
+            // Filter files based on size
+            const validFiles = selectedFiles.filter((file) => {
+                if (file.size > MAX_FILE_SIZE) {
+                    toast.error(`${file.name}` + ' ' + t('TOO_LARGE_FILE'));
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length > 0) {
+                setFiles((prevFiles) => {
+                    const totalFiles = prevFiles.length + validFiles.length;
+
+                    if (totalFiles > MAX_FILE_COUNT) {
+                        toast.error(t('TOO_MANY_FILES'));
+                        return prevFiles;
+                    }
+
+                    return [...prevFiles, ...validFiles];
+                });
+            }
         }
     };
 
+    const removeFile = (indexToRemove) => {
+        setFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
+    };
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
-        handleFormSubmit(values, actions);
+        handleFormSubmit({ ...values, files }, actions);
     };
+
+    // HANDLE RESEND OTP BUTTON
+    const handleResend = async () => {
+        // THIS STATE IS FOR SPINNING RESNED OTP BUTTON
+
+        requestOTPApi({ email: userEmail }).then((response) => {
+            setOptSendStatus(true);
+            toast.success("OTP has been resent successfully.");
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+            }).finally(() => {
+                setOptSendStatus(false);
+            })
+
+
+        // const isOtpSent = await sendOTP(email);
+        // if (isOtpSent) {
+        //   setOptSendStatus(false);
+        //   toast.success("OTP has been resent successfully.");
+        // } else {
+        //   setOptSendStatus(false);
+        // }
+    };
+
+    // HANDLE SEND OTP BUTTON
+    const handleSendOTP = async () => {
+        setIsOTPFormSubitted(true)
+        requestOTPApi({ email: userEmail }).then((response) => {
+            setOptSendStatus(true);
+            setIsOTPFormSubitted(true)
+            toast.success("OTP has been sent successfully.");
+            // AFTER 5 MINUTES OTP SCREEN WILL BE HIDE
+            setTimeout(() => {
+                setOptSendStatus(false);
+                setIsOTPFormSubitted(false);
+            }, 5 * 60 * 1000); // 5 minutes in milliseconds
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+            }).finally(() => {
+                setOptSendStatus(false);
+            })
+    }
+    // HANDLE OTP VERIFICATION
+    const handleOTPVerification = async (event, data) => {
+        event.preventDefault()
+        const formData = {
+            otpCode: data?.otpCode,
+            email: userEmail
+        }
+        verifyOTPApi(formData).then((response) => {
+            setIsOTPVerified(true)
+            toast.success("OTP Verified.");
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+            }).finally(() => {
+                setOptSendStatus(false);
+            })
+    }
 
     const getClaimTypes = useCallback(async () => {
         setIsLoading(true);
@@ -63,21 +184,38 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
     const getClaimSubTypes = useCallback(async (claimId) => {
         setIsLoading(true);
-        try {
-            const response = await getClaimSubTypeById(claimId);
-            const claimSubTypeFormatList = response?.data
-                ? [{ label: response.data.name, value: response.data.id }]
-                : [];
-            setClaimSubTypes(claimSubTypeFormatList);
-            setIsLoading(false);
-        } catch (error) {
-            setIsLoading(false);
-        }
+        claimSubTypeDropdownList(claimId).then(response => {
+            if (response?.data && response?.data?.length > 0) {
+                const dropdownData = response?.data.map(item => ({
+                    value: item.id,
+                    label: item.name
+                }));
+                setClaimSubTypes(dropdownData)
+            }
+        }).catch((error) => {
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
+            }
+        }).finally(() => {
+            setIsLoading(false)
+        })
     }, [setClaimSubTypes, setIsLoading])
 
     useEffect(() => {
         getClaimTypes();
     }, [getClaimTypes])
+
+
+    useEffect(() => {
+        setIsOTPFormSubitted(false)
+        setIsOTPVerified(false)
+    }, [userEmail])
+
+
+
+
 
     return (
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow h-100">
@@ -99,12 +237,11 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                             options={claimTypes}
                                             value={formikProps.values.claimTypeId}
                                             onChange={(option) => {
+                                                getClaimSubTypes(option?.target?.value);
                                                 formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
-                                                formikProps.setFieldValue("claimSubTypeId", "");
-                                                if (option?.target?.value && option?.target?.value !== "") {
-                                                    if (option?.target?.value !== formikProps?.values?.claimTypeId) {
-                                                        getClaimSubTypes(option?.target?.value);
-                                                    }
+                                                if (option?.target?.value !== formikProps?.values?.claimTypeId) {
+                                                    formikProps.setFieldValue("claimSubTypeId", "");
+                                                    // getClaimSubTypes(option?.target?.value);
                                                 }
                                             }}
                                             name="claimTypeId"
@@ -169,15 +306,36 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                 </label>
                                                 <input
                                                     id="files"
-                                                    accept="image/png, image/jpeg, image/jpg"
+                                                    accept=".pdf, .docx, .doc, .txt, .rtf, image/jpeg, image/jpg"
+                                                    multiple
                                                     className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                                     type="file"
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
-                                            <span className="opacity-75">Multiple attachment can be uploaded.</span>
+                                            {/* <span className="opacity-75">Multiple attachment can be uploaded.</span> */}
                                         </div>
-                                        {fileName && (
+
+                                        {files.length > 0 && (
+                                            <Stack direction='horizontal' gap={2} className="mt-2">
+                                                {files.map((file, index) => (
+                                                    <Badge key={index} className="d-inline-flex align-items-center gap-2 text-info px-3" pill bg='secondary-subtle'>
+                                                        <span>{file.name}</span>
+                                                        <AppTooltip title={t('REMOVE')}>
+                                                            <Button
+                                                                variant="link"
+                                                                className='p-0 border-0 lh-sm'
+                                                                onClick={() => removeFile(index)}
+                                                            >
+                                                                <MdClose size={16} />
+                                                            </Button>
+                                                        </AppTooltip>
+                                                    </Badge>
+                                                ))}
+                                            </Stack>
+                                        )}
+
+                                        {/* {fileName && (
                                             <div className="pt-1">
                                                 <Link
                                                     target="_blank"
@@ -187,11 +345,131 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                     {fileName}
                                                 </Link>
                                             </div>
-                                        )}
+                                        )} */}
                                     </Col>
                                     <Col xs={12}>
+                                        <Stack direction="horizontal" gap={2} className="mb-3 flex-wrap">
+                                            <h5 className="custom-font-size-18 mb-0 fw-bold">
+                                                {t("EMAIL_VERIFICATION")}
+                                            </h5>
+                                            <AppTooltip title={t("EMAIL_VERIFICATION")}>
+                                                <Button
+                                                    type="button"
+                                                    variant="link"
+                                                    className="p-0 border-0 link-dark"
+                                                >
+                                                    <FiInfo size={22} />
+                                                </Button>
+                                            </AppTooltip>
+                                        </Stack>
+                                    </Col>
+
+                                    {!isOTPFormSubmitted || isOTPVerified ? (
+                                        <Col xs={12}>
+                                            <Row>
+                                                <Col sm lg={4}>
+                                                    <FormInputBox
+                                                        autoComplete="off"
+                                                        id="email"
+                                                        label={t("EMAIL ADDRESS")}
+                                                        name="email"
+                                                        type="email"
+                                                        error={formikProps.errors.email}
+                                                        onBlur={formikProps.handleBlur}
+                                                        onChange={formikProps.handleChange}
+                                                        touched={formikProps.touched.email}
+                                                        value={userEmail || ""}
+                                                        readOnly={isOTPVerified ?? false}
+                                                        inputIcon={
+                                                            isOTPVerified && (
+                                                                <span className="text-success position-absolute top-0 end-0 p-1 custom-width-42 h-100 d-inline-flex align-items-center justify-content-center pe-none user-select-none">
+                                                                    {svgIconClasses.checkBadgeIcon}
+                                                                </span>
+                                                            )
+                                                        }
+                                                        inputClassName={
+                                                            isOTPVerified && "custom-padding-right-42"
+                                                        }
+                                                        disabled={true}
+                                                    />
+                                                </Col>
+                                                {!isOTPVerified && (
+                                                    <Col xs="auto" lg className="pt-sm-4 mb-3 pb-1">
+                                                        <Button
+                                                            type="submit"
+                                                            variant="warning"
+                                                            className="custom-min-width-100 custom-margin-top-1"
+                                                            onClick={handleSendOTP}
+                                                        // disabled={formikProps?.isSubmitting ?? false}
+                                                        >
+                                                            {t("SEND_OTP_BUTTON")}
+                                                        </Button>
+                                                    </Col>
+                                                )}
+                                            </Row>
+                                        </Col>
+                                    ) : (
+                                        <Col xs={12}>
+                                            <p className="mb-4 mt-n2">
+                                                {t("FORM_INSTRUCTION")}
+                                            </p>
+                                            <Row>
+                                                <Col sm lg={4}>
+                                                    <FormOtpInputBox
+                                                        value={formikProps.values.otpCode}
+                                                        numInputs={6}
+                                                        inputStyle={{
+                                                            width: "50px",
+                                                            height: "42px",
+                                                        }}
+                                                        onChange={(event) => {
+                                                            formikProps.setFieldValue("otpCode", event);
+                                                        }}
+                                                        onBlur={formikProps.handleBlur}
+                                                        error={formikProps.errors.otpCode}
+                                                        touched={formikProps.touched.otpCode}
+                                                    />
+                                                </Col>
+                                                <Col xs className="mb-3 pb-1">
+                                                    <Button
+                                                        type="button"
+                                                        variant="warning"
+                                                        className="custom-min-width-100 custom-margin-top-1"
+                                                        onClick={(event) => handleOTPVerification(event, { otpCode: formikProps.values.otpCode })}
+                                                    >
+                                                        {t("OTP_VERIFICATION")}
+                                                    </Button>
+                                                </Col>
+                                                <Col xs={12}>
+                                                    <Button
+                                                        type="button"
+                                                        variant="link"
+                                                        className="fw-semibold text-decoration-none p-0 border-0"
+                                                        onClick={() => {
+                                                            formikProps.setFieldValue("otpCode", "");
+                                                            handleResend(formikProps?.values?.email)
+                                                        }
+                                                        }
+                                                    >
+                                                        <span className="me-1">
+                                                            <MdRefresh
+                                                                size={21}
+                                                                className={optSendStatus ? "spin" : ""}
+                                                            />
+                                                        </span>{" "}
+                                                        {t("RESEND_OTP")}
+                                                    </Button>
+                                                    <p className="pt-3 mb-0 fst-italic custom-font-size-12">
+                                                        {t("OTP_INSTRUCTION")}
+                                                    </p>
+                                                </Col>
+                                            </Row>
+                                        </Col>
+                                    )}
+
+                                    <Col xs={12}>
                                         <FormCheckbox
-                                            wrapperClassName="mb-0"
+                                            // wrapperClassName="mb-0"
                                             className='fs-6 fw-medium'
                                             id="agreeDeclarations"
                                             checked={formikProps.values.agreeDeclarations}
@@ -224,6 +502,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                         type="submit"
                                         variant="warning"
                                         className="custom-min-width-85"
+                                        disabled={!isOTPVerified}
                                     >
                                         {t("FINISH")}
                                     </Button>

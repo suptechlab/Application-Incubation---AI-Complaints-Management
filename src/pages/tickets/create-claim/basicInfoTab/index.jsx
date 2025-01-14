@@ -7,10 +7,13 @@ import CommonFormikComponent from "../../../../components/CommonFormikComponent"
 import FormInputBox from '../../../../components/FormInput';
 import ReactSelect from '../../../../components/ReactSelect';
 import { countryCodes } from '../../../../constants/CountryCodes';
-import { getPersonalInfo } from "../../../../services/fiusers.services";
-import { BasicInfoFormSchema } from '../../../../validations/createClaim.validation';
+
 import Loader from '../../../../components/Loader';
-import { getCitiesById, provinceDropdownData } from '../../../../services/cityMaster.service';
+import { provinceDropdownData } from '../../../../services/cityMaster.service';
+import { getCitiesDropdownData, validateEmailApi, validateIdentificationApi } from '../../../../services/claimcreate.services';
+import { useMasterData } from '../../../../contexts/masters.context';
+import { convertToLabelValue } from '../../../../services/ticketmanagement.service';
+import { BasicInfoFormSchema } from '../../../../validations/createClaim.validation';
 
 const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
@@ -21,18 +24,26 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
 
     const { t } = useTranslation()
+
+    const { masterData } = useMasterData();
+
     const [cityList, setCityList] = useState([]);
     const [provinceList, setProvinceList] = useState([]);
     const [loadingInfo, setLoadingInfo] = useState(false);
+
+    const [channnelOfEntryData, setChannelOfEntryData] = useState([])
+
+    const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(false)
     const [initialValues, setInitialValues] = useState({
-        identification: '',
+        identificacion: '',
         email: '',
         name: '',
         gender: '',
-        countryCode: '',
+        countryCode: '+593',
         phoneNumber: '',
         provinceId: '',
         cityId: '',
+        channelOfEntry: ''
     });
 
     // Handle Submit Handler
@@ -43,11 +54,14 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     const getCityList = useCallback(async (provinceId) => {
         setIsLoading(true);
         try {
-            const response = await getCitiesById(provinceId);
-            const cityFormatList = response?.data
-                ? [{ label: response.data.name, value: response.data.id }]
-                : [];
-            setCityList(cityFormatList);
+            const response = await getCitiesDropdownData(provinceId);
+            const cityFormatList = response?.data?.map((data) => {
+                return {
+                    label: data?.name,
+                    value: data?.id
+                }
+            })
+            setCityList([{ label: t('SELECT'), value: '' }, ...cityFormatList]);
             setIsLoading(false);
         } catch (error) {
             setIsLoading(false);
@@ -58,7 +72,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         setIsLoading(true);
         try {
             const response = await provinceDropdownData();
-
             const provinceFormatList = response?.data?.map((data) => {
                 return {
                     label: data?.name,
@@ -85,14 +98,69 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     };
 
     // FETCH USER PERSONAL INFO BY ID
-    const fetchUserData = async (identification) => {
+    const fetchUserData = async (identificacion) => {
+
+        // const response = {
+        //     data: {
+        //         "identificacion": "1712655842",
+        //         "nombreCompleto": "RUIZ PEREZ GERMANICO VINICIO",
+        //         "genero": "HOMBRE",
+        //         "lugarNacimiento": "PICHINCHA/QUITO/SAN BLAS",
+        //         "nacionalidad": "ECUATORIANA",
+        //         "existUserEmail": "bot2@yopmail.com"
+        //     }
+        // }
+
+        // setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero, email: response?.data?.existUserEmail })
+        // setIsEmailAlreadyExists(true)
+
+
+        //UNCOMMENT FROM HERE AFTER NATIONAL ID START WORKING
         setLoadingInfo(true)
-        getPersonalInfo(identification).then((response) => {
+
+        validateIdentificationApi(identificacion).then((response) => {
             setLoadingInfo(false)
             if (response?.data?.nombreCompleto) {
-                setInitialValues({ ...initialValues, identification: identification, name: response?.data?.nombreCompleto, gender: response?.data?.genero })
+                setInitialValues({ ...initialValues, identificacion: identificacion, name: response?.data?.nombreCompleto, gender: response?.data?.genero, email: response?.data?.existUserEmail })
             } else {
-                setInitialValues({ ...initialValues, identification: identification, name: '', gender: '' })
+                setInitialValues({ ...initialValues, identificacion: identificacion, name: '', gender: '' })
+            }
+            if (response?.data?.existUserEmail && response?.data?.existUserEmail !== null) {
+                setIsEmailAlreadyExists(true)
+            } else {
+                setIsEmailAlreadyExists(false)
+            }
+        })
+            .catch((error) => {
+                if (error?.response?.data?.errorDescription) {
+                    toast.error(error?.response?.data?.errorDescription);
+                } else {
+                    toast.error(error?.message);
+                }
+                setInitialValues({ ...initialValues, identificacion: identificacion, name: '' })
+            }).finally(() => {
+                setLoadingInfo(false)
+            })
+    };
+
+    const handleEmailBlur = (event) => {
+        const email = event.target.value;
+        if (email && email !== "") {
+            handleEmailVerification(email);
+        }
+    };
+
+
+    // VERIFY EMAIL 
+    const handleEmailVerification = (email) => {
+        setLoadingInfo(true)
+        validateEmailApi({ email }).then((response) => {
+            setLoadingInfo(false)
+
+            if (response?.data === true) {
+                toast.success("Email verified!")
+            } else {
+                toast.success("Failed to verify email!")
             }
 
         })
@@ -102,11 +170,20 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                 } else {
                     toast.error(error?.message);
                 }
-                setInitialValues({ ...initialValues, identification: identification, name: '' })
             }).finally(() => {
                 setLoadingInfo(false)
             })
     };
+
+
+    useEffect(() => {
+        if (masterData) {
+            setChannelOfEntryData([{ label: 'Select', value: '' }, ...convertToLabelValue(masterData.channelOfEntry)]);
+        }
+    }, [masterData])
+
+
+
 
     return (
         <React.Fragment>
@@ -117,6 +194,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                         validationSchema={BasicInfoFormSchema}
                         initialValues={initialValues}
                         onSubmit={handleSubmit}
+                        enableReinitialize={true}
                     >
                         {(formikProps) => (
                             <React.Fragment>
@@ -126,15 +204,15 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                         <Col sm={6} lg={4}>
                                             <FormInputBox
                                                 autoComplete="off"
-                                                id="identification"
+                                                id="identificacion"
                                                 label={t("NATIONAL_ID_NUMBER")}
-                                                name="identification"
+                                                name="identificacion"
                                                 type="text"
-                                                error={formikProps.errors.identification}
+                                                error={formikProps.errors.identificacion}
                                                 onBlur={handleIdentificationBlur}
                                                 onChange={formikProps.handleChange}
-                                                touched={formikProps.touched.identification}
-                                                value={formikProps.values.identification || ""}
+                                                touched={formikProps.touched.identificacion}
+                                                value={formikProps.values.identificacion || ""}
                                             />
                                         </Col>
                                         <Col sm={6} lg={4}>
@@ -145,15 +223,16 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 name="email"
                                                 type="email"
                                                 error={formikProps.errors.email}
-                                                onBlur={formikProps.handleBlur}
+                                                onBlur={handleEmailBlur}
                                                 onChange={formikProps.handleChange}
                                                 touched={formikProps.touched.email}
                                                 value={formikProps.values.email || ""}
+                                                disabled={isEmailAlreadyExists}
                                             />
                                         </Col>
                                         <Col sm={6} lg={4}>
                                             <label htmlFor="countryCode" className="mb-1 fs-14">
-                                                {t("CELLPHONE")}
+                                                {t("PHONE")}
                                             </label>
                                             <Row className="gx-2">
                                                 <Col xs="auto">
@@ -162,7 +241,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                             error={formikProps.errors.countryCode}
                                                             options={formattedCountryCodes ?? []}
                                                             placeholder={t("SELECT")}
-                                                            value={formikProps.values.countryCode}
+                                                            value={formikProps?.values?.countryCode ?? ''}
                                                             onChange={(option) => {
                                                                 formikProps.setFieldValue(
                                                                     "countryCode",
@@ -226,14 +305,17 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 options={provinceList}
                                                 value={formikProps.values.provinceId}
                                                 onChange={(option) => {
-                                                    setCityList([]);
-                                                    formikProps.setFieldValue("cityId", "");
+                                                    // setCityList([]);
                                                     formikProps.setFieldValue("provinceId", option?.target?.value ?? "");
-                                                    if (option?.target?.value && option?.target?.value !== "") {
+                                                    if (option?.target?.value
+                                                        && option?.target?.value !== "" &&
+                                                        option?.target?.value !== formikProps?.values?.provinceId) {
                                                         getCityList(option?.target?.value);
-                                                    } else {
                                                         formikProps.setFieldValue("cityId", "");
                                                     }
+                                                    //  else {
+                                                    //     formikProps.setFieldValue("cityId", "");
+                                                    // }
                                                 }}
                                                 name="provinceId"
                                                 className={formikProps.touched.provinceId && formikProps.errors.provinceId ? "is-invalid" : ""}
@@ -254,6 +336,21 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                 className={formikProps?.touched?.cityId && formikProps?.errors?.cityId ? "is-invalid" : ""}
                                                 onBlur={formikProps.handleBlur}
                                                 touched={formikProps.touched.cityId}
+                                            />
+                                        </Col>
+                                        <Col sm={6} lg={4}>
+                                            <ReactSelect
+                                                label={t("CHANNEL_OF_ENTRY")}
+                                                error={formikProps?.errors?.channelOfEntry}
+                                                options={channnelOfEntryData ?? []}
+                                                value={formikProps.values.channelOfEntry}
+                                                onChange={(option) => {
+                                                    formikProps.setFieldValue("channelOfEntry", option?.target?.value ?? "");
+                                                }}
+                                                name="channelOfEntry"
+                                                className={formikProps?.touched?.channelOfEntry && formikProps?.errors?.channelOfEntry ? "is-invalid" : ""}
+                                                onBlur={formikProps.handleBlur}
+                                                touched={formikProps.touched.channelOfEntry}
                                             />
                                         </Col>
                                     </Row>

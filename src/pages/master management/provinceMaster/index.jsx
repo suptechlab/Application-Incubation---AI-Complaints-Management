@@ -85,7 +85,7 @@ const ProvinceMaster = () => {
 
     setPermissionsState(updatedPermissions);
   }, [permissions, currentUser]);
-  
+
   const editProvinceMaster = async (rowData) => {
     setEditModal({ row: rowData, open: !editModal?.open })
   };
@@ -94,27 +94,27 @@ const ProvinceMaster = () => {
     queryKey: ["data", pagination, sorting, filter],
     queryFn: async () => {
       setIsLoading(true); // Start loading
-  
+
       try {
         // Clean up the filter object to remove empty strings and null values
         const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
         Object.keys(filterObj).forEach(key => {
           if (filterObj[key] === "") delete filterObj[key];
         });
-  
+
         const requestOptions = {
           page: pagination.pageIndex,
           size: pagination.pageSize,
           ...filterObj,
         };
-  
+
         // Handle sorting if applicable
         if (sorting.length > 0) {
           requestOptions.sort = sorting
             .map(sort => `${sort.id},${sort.desc ? "desc" : "asc"}`)
             .join(",");
         }
-  
+
         // Fetch data using handleGetProvinceMaster API call
         const response = await handleGetProvinceMaster(requestOptions);
         return response;
@@ -163,53 +163,57 @@ const ProvinceMaster = () => {
         id: "name",
         header: () => t("PROVINCE NAME"),
       },
-      {
-        // accessorFn: (row) => row.status ? "Active" : "Inactive",
-        cell: (info) => {
-          return (
-            permissionsState.statusModule ? 
-            <Toggle
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              tooltip={
-                info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
-              }
-              // label="Status"
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            /> : ''
-          )
-        },
-        id: "status",
-        header: () => t("STATUS"),
-        size: '90',
-      },
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          permissionsState.editModule ?
-          <DataGridActions
-            controlId="province-master"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permissionsState.editModule,
-                type: "button",
-                title:t("EDIT"),
-                icon: <MdEdit size={18} />,
-                handler: () => editProvinceMaster(rowData?.row?.original),
-              },
-            ]}
-          /> : ''
-        ),
-        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-        enableSorting: false,
-        size: '80',
-      },
+      ...(permissionsState?.statusModule
+        ? [{
+          // accessorFn: (row) => row.status ? "Active" : "Inactive",
+          cell: (info) => {
+            return (
+              permissionsState.statusModule ?
+                <Toggle
+                  id={`status-${info?.row?.original?.id}`}
+                  key={"status"}
+                  tooltip={
+                    info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")
+                  }
+                  // label="Status"
+                  name="status"
+                  value={info?.row?.original?.status}
+                  checked={info?.row?.original?.status}
+                  onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+                /> : ''
+            )
+          },
+          id: "status",
+          header: () => t("STATUS"),
+          size: '90',
+        }] : [])
+      ,
+      ...(permissionsState?.editModule
+        ? [{
+          id: "actions",
+          isAction: true,
+          cell: (rowData) => (
+            permissionsState.editModule ?
+              <DataGridActions
+                controlId="province-master"
+                rowData={rowData}
+                customButtons={[
+                  {
+                    name: "edit",
+                    enabled: permissionsState.editModule,
+                    type: "button",
+                    title: t("EDIT"),
+                    icon: <MdEdit size={18} />,
+                    handler: () => editProvinceMaster(rowData?.row?.original),
+                  },
+                ]}
+              /> : ''
+          ),
+          header: () => <div className="text-center">{t("ACTIONS")}</div>,
+          enableSorting: false,
+          size: '80',
+        }] : [])
+      ,
     ],
     [permissionsState]
   );
@@ -224,7 +228,7 @@ const ProvinceMaster = () => {
   // HANDLE PROVINCE MASTER EXPORT
   const exportHandler = () => {
     setIsDownloading(true)
-    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
+    toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading })
     downloadProvinceMasterList({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -244,7 +248,7 @@ const ProvinceMaster = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
-        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -266,15 +270,15 @@ const ProvinceMaster = () => {
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
     {permissionsState.addModule
-        ?
-    <PageHeader
-      title={t("PROVINCE MASTER")}
-      actions={[
-        { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
-        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
-      ]}
-    />
-    : ''}
+      ?
+      <PageHeader
+        title={t("PROVINCE MASTER")}
+        actions={[
+          { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+          { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
+        ]}
+      />
+      : ''}
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">
         <ListingSearchForm filter={filter} setFilter={setFilter} />

@@ -1,5 +1,5 @@
 import { Formik, Form as FormikForm } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -13,8 +13,12 @@ import { countryCodes } from "../../constants/CountryCodes";
 import { getOrganizationInfo, getPersonalInfo, handleAddFIUsers, handleEditFIUsers, handleGetFIuserById } from "../../services/fiusers.services";
 import { getRolesDropdownData } from "../../services/rolerights.service";
 import { validationSchema } from "../../validations/fiUsers.validation";
+import { AuthenticationContext } from "../../contexts/authentication.context";
 
 export default function FIUserAddEdit() {
+
+  const { currentUser, userData } = useContext(AuthenticationContext)
+
   const [loading, setLoading] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const navigate = useNavigate();
@@ -36,7 +40,7 @@ export default function FIUserAddEdit() {
     identification: "",
     name: "",
     email: "",
-    countryCode: "+1",
+    countryCode: "+593",
     phoneNumber: "",
     ruc: "",
     entityName: "",
@@ -52,7 +56,7 @@ export default function FIUserAddEdit() {
           identification: response.data?.identificacion ? response.data?.identificacion : "",
           name: response.data?.name ? response.data?.name : "",
           email: response.data?.email ? response.data?.email : "",
-          countryCode: response?.data?.countryCode ?? "+1",
+          countryCode: response?.data?.countryCode ?? "+593",
           phoneNumber: response?.data?.phoneNumber ? response?.data?.phoneNumber : "",
           ruc: response?.data?.organization?.ruc ? response?.data?.organization?.ruc : "",
           entityName: response?.data?.organization?.razonSocial ? response?.data?.organization?.razonSocial : "",
@@ -60,17 +64,17 @@ export default function FIUserAddEdit() {
           roleId: response.data?.roleId ? response.data?.roleId : "",
         })
         setLoading(false);
-      }).catch((error)=>{
+      }).catch((error) => {
         if (error?.response?.data?.errorDescription) {
           toast.error(error?.response?.data?.errorDescription);
         } else {
           toast.error(error?.message);
         }
-      }).finally(()=>{
+      }).finally(() => {
         setLoading(false)
       });
     } else {
-        setLoading(false);
+      setLoading(false);
     }
   }, [id, isEdit]);
 
@@ -101,12 +105,12 @@ export default function FIUserAddEdit() {
     setLoadingInfo(true)
     getPersonalInfo(identification).then((response) => {
       setLoadingInfo(false)
-      if(response?.data?.nombreCompleto){
+      if (response?.data?.nombreCompleto) {
         setInitialValues({ ...initialValue, identification: identification, name: response?.data?.nombreCompleto })
-      }else{
+      } else {
         setInitialValues({ ...initialValue, identification: identification, name: '' })
       }
-     
+
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -125,12 +129,12 @@ export default function FIUserAddEdit() {
     setLoadingInfo(true)
     getOrganizationInfo(ruc).then((response) => {
       setLoadingInfo(false)
-      if(response?.data?.razonSocial){
+      if (response?.data?.razonSocial) {
         setInitialValues({ ...initialValue, ruc: ruc, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
-      }else{
+      } else {
         setInitialValues({ ...initialValue, ruc: ruc, entityName: '', entityType: '' })
       }
-     
+
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -213,6 +217,18 @@ export default function FIUserAddEdit() {
         });
     }
   };
+
+
+  useEffect(() => {
+    if (currentUser === 'FI_USER') {
+      setInitialValues({
+        ...initialValue,
+        ruc: userData?.organization?.ruc,
+        entityName: userData?.organization?.razonSocial,
+        entityType: userData?.organization?.tipoOrganizacion
+      })
+    }
+  }, [currentUser])
 
   return (
     <React.Fragment>
@@ -351,6 +367,7 @@ export default function FIUserAddEdit() {
                         type="number"
                         value={values?.ruc || ""}
                         readOnly={isEdit ? true : false}
+                        disabled={currentUser === 'FI_USER' ? true : false}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>

@@ -11,7 +11,7 @@ import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import { handleGetAuditLogs } from "../../services/auditlogs.services";
+import { handleGetAuditLogs } from "../../services/reports.services";
 import { downloadClaimTypes } from "../../services/claimType.service";
 import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
 import SearchForm from "./SearchForm";

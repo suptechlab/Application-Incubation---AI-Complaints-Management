@@ -18,6 +18,8 @@ import moment from "moment/moment";
 import { MdAttachFile } from "react-icons/md";
 import { MasterDataContext } from "../../../contexts/masters.context";
 import AppTooltip from "../../../components/tooltip";
+import { TbBellRingingFilled } from "react-icons/tb";
+
 
 export default function TicketsList() {
     const location = useLocation();
@@ -142,6 +144,10 @@ export default function TicketsList() {
         }
     }, [dataQuery.data?.data?.totalPages]);
 
+    useEffect(() => {
+        dataQuery.refetch()
+    }, [])
+
     // The color class based on the status
     const getPriorityClass = (priority) => {
         switch (priority) {
@@ -256,6 +262,10 @@ export default function TicketsList() {
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
+                        {
+                            (row?.original?.slaPopup && row?.original?.slaPopup !== null) &&
+                            <TbBellRingingFilled className="ring text-primary" size={18} />
+                        }
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
                             {"#" + row?.original?.ticketId}
                         </Link>
@@ -282,7 +292,7 @@ export default function TicketsList() {
                 enableSorting: true,
                 cell: ({ row }) => (
                     row?.original?.createdAt
-                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a")
+                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY")
                         : ''
                 ),
             },
@@ -428,19 +438,19 @@ export default function TicketsList() {
 
         switch (currentUser) {
             case 'FI_USER':
-                selectedColumns = [ "ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "consumerName","slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
                 break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
                 selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_USER':
-                selectedColumns = [ "ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy","consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy","consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
@@ -478,7 +488,7 @@ export default function TicketsList() {
 
 
     const actions = permissionsState?.addModule ?
-        [{ label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: true }] : []
+        [{ label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: false }] : []
 
     return (
         <React.Fragment>

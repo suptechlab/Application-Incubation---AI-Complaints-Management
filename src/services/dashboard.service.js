@@ -1,33 +1,18 @@
-import instance from "../utils/instance";
+import {ticketApi} from "../utils/instance";
 
-export const getListingData = async (params) => {
-    return await instance.get('/v1/dashboard/gas-subsidy-values', {
-        params
-    });
+const API_VERSION = process.env.REACT_APP_API_VERSION
+
+// GET DASHBOARD GRAPHS AND TILES
+export const getDashboardGraphAndTiles = async (params) => {
+    return await ticketApi.get(`/${API_VERSION}/dashboard/graph-and-tiles`,{params});
 }
 
-export const getDashbaordData = async (params) => {
-    return await instance.get('/v1/dashboard/graphs', {
-        params
-    });
+// GET DASHBOARD GRAPHS AND TILES
+export const getClaimsandComplaints = async (params) => {
+    return await ticketApi.get(`/${API_VERSION}/dashboard/claim-and-complaints`,{params});
 }
 
-export const handleGetCompany = async (id) => {
-    return await instance.get(`/v1/companies`);
+// DOWNLOAD CLAIM AND COMPLAINTS
+export const downloadClaimAndComplaints = async (params) => {
+    return await ticketApi.get(`/${API_VERSION}/dashboard/claim-and-complaints/download`,{ params, responseType: 'arraybuffer' });
 }
-
-export const handleGetStates = async (params) => {
-    return await instance.get('/v1/state/list', {
-        params
-    });
-}
-
-export const handleGetFinancialYear = async () => {
-    return await instance.get(`/v1/financial-years/list`);
-}
-
-export const handleGetMinistryDashboardCompanies = async () => {
-    return await instance.get(`/v1/ministry-dashboard-companies`);
-}
-
-

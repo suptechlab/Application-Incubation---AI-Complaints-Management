@@ -6,7 +6,7 @@ const msg = getValidationMessages();
 
 export const BasicInfoFormSchema = yup.object({
 
-  identification: yup
+  identificacion: yup
     .string()
     .required(msg.nationalIDRequired),
 
