@@ -120,4 +120,4 @@ google:
     verify-url: ENC(${seps.google.recaptcha.verify.url})
 
 website:
-  chatbot-base-url: https://adminapi-suptechdev.seps.gob.ec/chatbot
+  chatbot-base-url: https://api-stg-suptech.seps.gob.ec/chatbot
