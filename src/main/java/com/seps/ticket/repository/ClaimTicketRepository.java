@@ -1,10 +1,7 @@
 package com.seps.ticket.repository;
 
 import com.seps.ticket.domain.ClaimTicket;
-import com.seps.ticket.enums.ClaimTicketStatusEnum;
-import com.seps.ticket.enums.ClosedStatusEnum;
-import com.seps.ticket.enums.InstanceTypeEnum;
-import com.seps.ticket.enums.RejectedStatusEnum;
+import com.seps.ticket.enums.*;
 import com.seps.ticket.service.projection.ClaimStatusCountProjection;
 import com.seps.ticket.service.projection.CloseClaimStatusCountProjection;
 import com.seps.ticket.service.projection.SlaAdherenceDataProjection;

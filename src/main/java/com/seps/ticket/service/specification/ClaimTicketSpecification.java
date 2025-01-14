@@ -278,6 +278,7 @@ public class ClaimTicketSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            addSearchFilter(filterRequest, root, criteriaBuilder, predicates);
             addDateRangeFilter(filterRequest, root, criteriaBuilder, predicates);
             addOrganizationFilter(filterRequest, root, criteriaBuilder, predicates);
             addClaimTypeFilter(filterRequest, root, criteriaBuilder, predicates);
