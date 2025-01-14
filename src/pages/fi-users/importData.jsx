@@ -2,7 +2,7 @@ import { Formik, Form as FormikForm } from "formik";
 import React, { useState } from "react";
 import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import { MdOutlineSimCardDownload } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next";
 const ImportFIUser = () => {
 
   const [loading, setLoading] = useState(false)
+
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const [initialValue, setInitialValues] = useState({
     browseFile: "",
@@ -52,6 +54,7 @@ const ImportFIUser = () => {
     handleImportFiUsersApi(formData)
       .then((response) => {
         if (response?.data?.status === 200) {
+          navigate('/fi-users')
           toast.success(response?.data?.message);
         } else {
           toast.error(response?.data?.message || t("Unexpected error occurred during file upload."));
