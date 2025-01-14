@@ -126,6 +126,9 @@ public class MasterDataService {
         // Adding localized data for ChannelOfEntryEnum enum
         masterData.put("channelOfEntry", enumUtil.enumToLocalizedMap(ChannelOfEntryEnum.class, locale));
 
+        // Adding localized data for SlaComplianceEnum enum
+        masterData.put("SlaCompliance", enumUtil.enumToLocalizedMap(SlaComplianceEnum.class, locale));
+
         return masterData;
     }
 

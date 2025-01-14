@@ -3,6 +3,7 @@ package com.seps.ticket.web.rest.v1;
 import com.seps.ticket.aop.permission.PermissionCheck;
 import com.seps.ticket.service.ReportService;
 import com.seps.ticket.service.dto.ClaimTicketListDTO;
+import com.seps.ticket.service.dto.SLAComplianceDTO;
 import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -78,4 +79,46 @@ public class ReportsResource {
         }
     }
 
+    @Operation(
+        summary = "Retrieve SLA Compliance Report",
+        description = "Fetch a paginated list of SLA Compliance claim tickets based on various filters provided in the request.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved sla compliance report",
+                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClaimTicketListDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden: User does not have permission"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+        }
+    )
+    @GetMapping("/sla-report")
+    @PermissionCheck({"SLA_COMPLIANCE"})
+    public ResponseEntity<List<SLAComplianceDTO>> getSlaReport(Pageable pageable,
+                                                                           @ModelAttribute ClaimTicketFilterRequest filterRequest) {
+        Page<SLAComplianceDTO> page = reportService.listSlaComplianceData(pageable, filterRequest);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @Operation(
+        summary = "Download SLA Compliance Report",
+        description = "Generates and downloads the sla compliance claim report in Excel format.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successfully generated and downloaded the report",
+                content = @Content(mediaType = "application/octet-stream")),
+            @ApiResponse(responseCode = "403", description = "Forbidden: User does not have permission"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+        }
+    )
+    @GetMapping("/sla-report/download")
+    @PermissionCheck({"SLA_COMPLIANCE"})
+    public ResponseEntity<byte[]> getSlaReportDownload(@ModelAttribute ClaimTicketFilterRequest filterRequest) throws IOException {
+        ByteArrayInputStream in = reportService.getDownloadSlaComplianceData(filterRequest);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=sla_compliance_report.xlsx");
+        try(in) {
+            return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(in.readAllBytes());
+        }
+    }
 }
