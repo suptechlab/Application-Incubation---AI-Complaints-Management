@@ -76,8 +76,8 @@ public class TemplateVariableMappingService {
         // Dates
         variableMap.put("assignedDate", DateUtil.formatDate(claimTicketDTO.getAssignedAt(), sendToUser.getLangKey()));
         variableMap.put("createdDate", DateUtil.formatDate(claimTicketDTO.getCreatedAt(), sendToUser.getLangKey()));
-        variableMap.put("secondInstanceFiledDate", DateUtil.formatDate(claimTicketDTO.getSecondInstanceFiledAt(), sendToUser.getLangKey()));
-        variableMap.put("complaintFiledDate", DateUtil.formatDate(claimTicketDTO.getComplaintFiledAt(), sendToUser.getLangKey()));
+        variableMap.put("secondInstanceFiledDate", DateUtil.formatDate(claimTicketDTO.getCreatedAt(), sendToUser.getLangKey()));
+        variableMap.put("complaintFiledDate", DateUtil.formatDate(claimTicketDTO.getCreatedAt(), sendToUser.getLangKey()));
         variableMap.put("resolveOnDate", DateUtil.formatDate(claimTicketDTO.getResolvedOn(), sendToUser.getLangKey()));
         variableMap.put("slaBreachDate", DateUtil.formatDate(claimTicketDTO.getSlaBreachDate(), sendToUser.getLangKey()));
         variableMap.put("slaRemainingDays", DateUtil.getSlaBreachStatus(claimTicketDTO.getSlaBreachDate(), sendToUser.getLangKey()));

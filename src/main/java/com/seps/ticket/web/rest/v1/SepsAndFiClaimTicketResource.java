@@ -2,14 +2,14 @@ package com.seps.ticket.web.rest.v1;
 
 import com.seps.ticket.aop.permission.PermissionCheck;
 import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.domain.ClaimTicketOTP;
 import com.seps.ticket.enums.ClaimTicketPriorityEnum;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
-import com.seps.ticket.service.ClaimTicketActivityLogService;
-import com.seps.ticket.service.ClaimTicketService;
-import com.seps.ticket.service.SepsAndFiClaimTicketService;
+import com.seps.ticket.service.*;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.dto.ResponseStatus;
 import com.seps.ticket.suptech.service.DocumentService;
+import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.*;
@@ -21,6 +21,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -39,24 +41,31 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
+
 @Tag(name = "SEPS and FI Claim Ticket Management", description = "APIs for SEPS and FI to manage their Claim Tickets")
 @RestController
 @RequestMapping("/api/v1/seps-fi/claim-tickets")
 public class SepsAndFiClaimTicketResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SepsAndFiClaimTicketResource.class);
 
     private final SepsAndFiClaimTicketService sepsAndFiClaimTicketService;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
     private final MessageSource messageSource;
     private final DocumentService documentService;
     private final ClaimTicketService claimTicketService;
+    private final ClaimTicketOTPService claimTicketOTPService;
+    private final MailService mailService;
 
     public SepsAndFiClaimTicketResource(SepsAndFiClaimTicketService sepsAndFiClaimTicketService, ClaimTicketActivityLogService claimTicketActivityLogService,
-                                        MessageSource messageSource, DocumentService documentService, ClaimTicketService claimTicketService) {
+                                        MessageSource messageSource, DocumentService documentService, ClaimTicketService claimTicketService, ClaimTicketOTPService claimTicketOTPService, MailService mailService) {
         this.sepsAndFiClaimTicketService = sepsAndFiClaimTicketService;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
         this.documentService = documentService;
         this.claimTicketService = claimTicketService;
+        this.claimTicketOTPService = claimTicketOTPService;
+        this.mailService = mailService;
     }
 
     @Operation(summary = "List all Claim Ticket", description = "Retrieve a paginated list of all claim tickets")
@@ -371,6 +380,97 @@ public class SepsAndFiClaimTicketResource {
         return ResponseEntity.ok(claimTicketService.getAgentListForTagging(ticketId));
     }
 
+    @Operation(
+        summary = "Validate user identificacion for claim ticket",
+        description = "Checks if the provided user identificacion is valid for creating a claim ticket."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Identificacion validation result.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = PersonInfoDTO.class)
+            )
+        )
+    })
+    @GetMapping("/validate-identificacion")
+    public ResponseEntity<PersonInfoDTO> validateClaimTicketIdentificacion(@RequestParam(name = "identificacion") String identificacion) {
+        return ResponseEntity.ok(claimTicketService.validateClaimTicketIdentificacion(identificacion));
+    }
+
+
+    @Operation(
+        summary = "Validate user email for claim ticket",
+        description = "Checks if the provided user email is valid for creating a claim ticket."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Email validation result.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Boolean.class)
+            )
+        )
+    })
+    @PostMapping("/validate-user-email")
+    public ResponseEntity<Boolean> validateClaimTicketUserEmail(@Valid @RequestBody EmailRequest emailRequest) {
+        String email = emailRequest.getEmail();
+        return ResponseEntity.ok(claimTicketService.validateClaimTicketUserEmail(email));
+    }
+
+    @Operation(
+        summary = "Generate and send OTP for claim ticket",
+        description = "Generates a One-Time Password (OTP) for the specified email address and sends it to the user's email. " +
+            "This OTP is required for creating a claim ticket."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "OTP successfully sent to the email address.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ResponseStatus.class)
+            )
+        )
+    })
+    @PostMapping("/request-otp")
+    public ResponseEntity<ResponseStatus> requestOTP(@RequestBody @Valid RequestOTPVM requestOTPVM) {
+        String email = requestOTPVM.getEmail().toLowerCase();
+        ClaimTicketOTP otp = claimTicketOTPService.generateOtp(email);
+        mailService.sendClaimTicketOTPEmail(otp, LocaleContextHolder.getLocale());
+        return new ResponseEntity<>(new ResponseStatus(
+            messageSource.getMessage("otp.sent.to.email", new Object[]{email}, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        ), HttpStatus.OK);
+    }
+
+
+    @Operation(
+        summary = "Verify OTP for claim ticket",
+        description = "Validates the provided One-Time Password (OTP) for the specified email address. " +
+            "If the OTP is valid, it indicates successful verification; otherwise, an error is returned."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "OTP successfully verified."
+        )
+    })
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Void> verifyOTP(@Valid @RequestBody VerifyOTPVM verifyOTPVM) {
+        String email = verifyOTPVM.getEmail().toLowerCase();
+        String otpCode = verifyOTPVM.getOtpCode();
+        Boolean isVerified = claimTicketOTPService.verifyOtp(email, otpCode);
+        if (!isVerified) {
+            LOG.error("Invalid OTP code for token: {}", otpCode);
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 
     @Operation(summary = "Create a new claim", description = "A new claim created by Either SEPS or FI User")
     @ApiResponses(value = {
@@ -386,7 +486,12 @@ public class SepsAndFiClaimTicketResource {
     @PostMapping
     public ResponseEntity<ClaimTicketResponseDTO> createClaimTicket(@ModelAttribute @Valid CreateClaimTicketRequest claimTicketRequest,
                                                                     HttpServletRequest request) {
-        ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, request);
+        RequestInfo requestInfo = new RequestInfo(request);
+        ClaimTicketResponseDTO claimTicketResponseDTO = claimTicketService.createClaimTicket(claimTicketRequest, requestInfo);
+        if (claimTicketResponseDTO.getNewId() != null) {
+            UserClaimTicketDTO userClaimTicketDTO = claimTicketService.getUserClaimTicketById(claimTicketResponseDTO.getNewId());
+            mailService.sendClaimTicketCreationEmail(userClaimTicketDTO);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(claimTicketResponseDTO);
     }
 
@@ -396,10 +501,38 @@ public class SepsAndFiClaimTicketResource {
             schema = @Schema(implementation = ClaimTicketDTO.class)))
     @GetMapping("/for-tagged-users")
     public ResponseEntity<List<ClaimTicketListDTO>> listSepsFiClaimTicketsForTaggedUser(Pageable pageable,
-                                                                           @ModelAttribute ClaimTicketFilterRequest filterRequest) {
+                                                                                        @ModelAttribute ClaimTicketFilterRequest filterRequest) {
         Page<ClaimTicketListDTO> page = claimTicketService.listSepsAndFiClaimTicketsForTaggedUser(pageable, filterRequest);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    @Operation(
+        summary = "Save SLA comment",
+        description = "Saves an SLA comment for the specified claim ticket."
+    )
+    @PostMapping("/{ticketId}/sla-comment")
+    public ResponseEntity<ResponseStatus> slaCommentSave(@PathVariable Long ticketId,
+                                               @Valid @RequestBody ClaimTicketSlaCommentRequest claimTicketSlaCommentRequest,
+                                               HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        claimTicketService.saveSlaComment(ticketId, claimTicketSlaCommentRequest,requestInfo);
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.sla.commented.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
+
+    @Operation(
+        summary = "Dismiss SLA popup",
+        description = "Dismisses the SLA popup for the specified claim ticket."
+    )
+    @PatchMapping("/{ticketId}/dismiss-sla-popup")
+    public ResponseEntity<Void> dismissalSLAPopup(@PathVariable Long ticketId) {
+        claimTicketService.dismissalSLACommentPopup(ticketId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

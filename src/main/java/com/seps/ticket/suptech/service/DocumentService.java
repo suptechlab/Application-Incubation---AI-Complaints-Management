@@ -11,4 +11,6 @@ public interface DocumentService {
     String generateUniqueFileName(String originalFileName);
 
     String fitFileNameToMaxLength(String originalFileName);
+
+    String downloadAndUploadDocument(String documentId, String claimTicketId, String fileName);
 }

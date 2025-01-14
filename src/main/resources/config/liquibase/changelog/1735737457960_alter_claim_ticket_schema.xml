@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+  <changeSet id="1735737457960" author="matellio">
+    <addColumn tableName="claim_ticket">
+      <!-- Indicates the source of the claim ticket creation -->
+      <column name="source" type="int" defaultValue="0" remarks="Source of claim creation">
+        <constraints nullable="false"/>
+      </column>
+      <!-- Indicates the channel of entry used for claim ticket creation -->
+      <column name="channel_of_entry" type="int" remarks="Channel of entry for claim creation">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="1736163625797" author="matellio">
+    <addColumn tableName="claim_ticket">
+      <!-- Indicates the channel of entry used for claim ticket creation -->
+      <column name="sla_popup" type="boolean"  remarks="SLA popup show or not when claim detail view">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Indicates the sla comment of the claim ticket creation -->
+      <column name="sla_comment" type="text" remarks="SLA Comment of claim breach">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the SLA comment was saved -->
+      <column name="sla_commented_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <!-- User who SLA commented the ticket -->
+      <column name="sla_commented_by" type="bigint" remarks="User who SLA Commented when Popup is open">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Indicates the sla comment of the second instance claim ticket creation -->
+      <column name="second_instance_sla_comment" type="text" remarks="SLA Comment of Second Instance claim breach">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the SLA comment was saved for second instance-->
+      <column name="second_instance_sla_commented_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <!-- User who SLA commented the second instance ticket -->
+      <column name="second_instance_sla_commented_by" type="bigint" remarks="User who SLA Commented when Popup is open on Second Instance">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Indicates the sla comment of the complaint claim ticket creation -->
+      <column name="complaint_sla_comment" type="text" remarks="SLA Comment of complaint claim breach">
+        <constraints nullable="true"/>
+      </column>
+      <!-- Timestamp when the SLA comment was saved for complaint-->
+      <column name="complaint_sla_commented_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+      <!-- User who SLA commented the complaint ticket -->
+      <column name="complaint_sla_commented_by" type="bigint" remarks="User who SLA Commented when Popup is open on complaint">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="1736419093179" author="matellio">
+    <!-- Add previous_ticket_id column to claim_ticket table -->
+    <addColumn tableName="claim_ticket">
+      <column name="previous_ticket_id" type="bigint" remarks="Reference of Previous Claim Ticket">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <!-- Add Foreign Key constraint for previous_ticket_id linking to the claim_ticket table -->
+    <addForeignKeyConstraint
+      baseColumnNames="previous_ticket_id"
+      baseTableName="claim_ticket"
+      constraintName="fk_claim_ticket_previous_ticket_id"
+      referencedColumnNames="id"
+      referencedTableName="claim_ticket"
+      onDelete="SET NULL" />
+
+    <createIndex tableName="claim_ticket" indexName="idx_claim_ticket_previous_ticket_id">
+      <column name="previous_ticket_id"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet id="1736493876347" author="matellio">
+    <!-- Add previous_ticket_id column to claim_ticket table -->
+    <addColumn tableName="claim_ticket">
+      <column name="can_create_instance" type="boolean" defaultValueBoolean="true" remarks="is true means user can file a claim else can not file">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+</databaseChangeLog>

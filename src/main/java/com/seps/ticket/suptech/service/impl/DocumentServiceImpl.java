@@ -202,4 +202,57 @@ public class DocumentServiceImpl implements DocumentService {
         return originalFileName + fileExtension;
     }
 
+    @Override
+    public String downloadAndUploadDocument(String documentId, String claimTicketId, String fileName) {
+        try {
+            // Step 1: Download the document
+            ResponseEntity<byte[]> downloadResponse = downloadDocument(documentId);
+
+            if (downloadResponse.getStatusCode() != HttpStatus.OK) {
+                String errorMessage = messageSource.getMessage(
+                    "error.download.file",
+                    new Object[]{documentId},
+                    LocaleContextHolder.getLocale()
+                );
+                throw new FileStorageException(errorMessage);
+            }
+
+            // Extract file data and headers
+            byte[] fileBytes = downloadResponse.getBody();
+            String contentDisposition = downloadResponse.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
+            if (contentDisposition == null || fileBytes == null) {
+                String errorMessage = messageSource.getMessage(
+                    "error.missing.file.data",
+                    null,
+                    LocaleContextHolder.getLocale()
+                );
+                throw new IllegalArgumentException(errorMessage);
+            }
+
+            // Extract file name from Content-Disposition header
+            //String fileName = contentDisposition.replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
+
+            // Step 2: Upload the document to the new location
+            //String uniqueFileName = "Copy_" + fileName; // Adjust naming logic as needed
+            return uploadDocument(fileBytes, claimTicketId, fileName).getBody();
+
+        } catch (FileStorageException ex) {
+            LOG.error("Error during file transfer: {}", ex.getMessage(), ex);
+            String errorMessage = messageSource.getMessage(
+                "error.upload.file",
+                new Object[]{ex.getMessage()},
+                LocaleContextHolder.getLocale()
+            );
+            throw new FileStorageException(errorMessage, ex);
+        } catch (Exception ex) {
+            LOG.error("Unexpected error during file transfer: {}", ex.getMessage(), ex);
+            String errorMessage = messageSource.getMessage(
+                "error.invalid.response",
+                new Object[]{ex.getMessage()},
+                LocaleContextHolder.getLocale()
+            );
+            throw new RuntimeException(errorMessage, ex);
+        }
+    }
+
 }

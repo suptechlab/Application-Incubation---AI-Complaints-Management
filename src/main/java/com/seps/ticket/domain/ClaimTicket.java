@@ -130,7 +130,7 @@ public class ClaimTicket {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+        private Instant createdAt;
 
     @Column(name = "updated_by", nullable = false, insertable = false, updatable = false)
     private Long updatedBy;
@@ -173,4 +173,65 @@ public class ClaimTicket {
     @JoinColumn(name = "ticket_id")
     private List<ClaimTicketTaggedUser> claimTicketTaggedUsers = new ArrayList<>();
 
+    @Column(name = "source")
+    private SourceEnum source;
+
+    @Column(name = "channel_of_entry")
+    private ChannelOfEntryEnum channelOfEntry;
+
+    @Column(name = "sla_popup")
+    private Boolean slaPopup;
+
+    @Column(name = "sla_comment")
+    private String slaComment;
+
+    @Column(name = "sla_commented_at")
+    private Instant slaCommentedAt;
+
+    @Column(name = "sla_commented_by", insertable = false, updatable = false)
+    private Long slaCommentedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "sla_commented_by")
+    private User slaCommentedByUser;
+
+    @Column(name = "second_instance_sla_comment")
+    private String secondInstanceSlaComment;
+
+    @Column(name = "second_instance_sla_commented_at")
+    private Instant secondInstanceSlaCommentedAt;
+
+    @Column(name = "second_instance_sla_commented_by", insertable = false, updatable = false)
+    private Long secondInstanceSlaCommentedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "second_instance_sla_commented_by")
+    private User secondInstanceSlaCommentedByUser;
+
+    @Column(name = "complaint_sla_comment")
+    private String complaintSlaComment;
+
+    @Column(name = "complaint_sla_commented_at")
+    private Instant complaintSlaCommentedAt;
+
+    @Column(name = "complaint_sla_commented_by", insertable = false, updatable = false)
+    private Long complaintSlaCommentedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "complaint_sla_commented_by")
+    private User complaintSlaCommentedByUser;
+
+    @Column(name = "previous_ticket_id")
+    private Long previousTicketId;
+
+    @ManyToOne
+    @JoinColumn(name = "previous_ticket_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private ClaimTicket previousTicket;
+
+    @OneToMany(mappedBy = "previousTicket", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<ClaimTicket> subsequentTickets = new ArrayList<>();
+
+    @Column(name = "can_create_instance")
+    private Boolean canCreateInstance;
 }

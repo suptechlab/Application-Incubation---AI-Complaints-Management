@@ -286,7 +286,8 @@ public class CronService {
             String reasonCloseTicket = messageSource.getMessage("claim.ticket.closed.due.to.sla.breach", null, Locale.forLanguageTag(Constants.DEFAULT_LANGUAGE));
             ClaimTicketActivityLog activityLog = createClosedClaimActivityLog(ticket, reasonCloseTicket);
             ticket.setStatus(ClaimTicketStatusEnum.CLOSED);
-            ticket.setClosedStatus(ClosedStatusEnum.CLOSE_WITH_SLA_BREACHED);
+            ticket.setClosedStatus(ClosedStatusEnum.CLOSE_WITH_EXPIRED);
+            ticket.setSlaPopup(null);
             ticket.setStatusComment(reasonCloseTicket);
 
             // Save the updated ticket
@@ -297,7 +298,7 @@ public class CronService {
             ClaimTicketStatusLog claimTicketStatusLog = new ClaimTicketStatusLog();
             claimTicketStatusLog.setTicketId(ticket.getId());
             claimTicketStatusLog.setStatus(ClaimTicketStatusEnum.CLOSED);
-            claimTicketStatusLog.setSubStatus(ClosedStatusEnum.CLOSE_WITH_SLA_BREACHED.ordinal());
+            claimTicketStatusLog.setSubStatus(ClosedStatusEnum.CLOSE_WITH_EXPIRED.ordinal());
             claimTicketStatusLog.setCreatedBy(SYSTEM_ADMIN);
             claimTicketStatusLog.setInstanceType(ticket.getInstanceType());
             if(claimTicketWorkFlowDTO != null){
@@ -318,7 +319,7 @@ public class CronService {
             entityData.put(Constants.OLD_DATA, oldData);
             entityData.put(Constants.NEW_DATA, newData);
             Map<String, Object> req = new HashMap<>();
-            req.put("closeSubStatus", ClosedStatusEnum.CLOSE_WITH_SLA_BREACHED.name());
+            req.put("closeSubStatus", ClosedStatusEnum.CLOSE_WITH_EXPIRED.name());
             req.put("reason", reasonCloseTicket);
             String requestBody = gson.toJson(req);
             RequestInfo requestInfo = RequestInfo.createForCronJob();
@@ -340,7 +341,7 @@ public class CronService {
             String messageAudit = messageSource.getMessage("ticket.activity.log.ticket.closed",
                 new Object[]{Constants.SYSTEM}, Locale.forLanguageTag(language.getCode()));
             activityTitle.put(language.getCode(), messageAudit);
-            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(ClosedStatusEnum.CLOSE_WITH_SLA_BREACHED, Locale.forLanguageTag(language.getCode())));
+            subStatus.put(language.getCode(), enumUtil.getLocalizedEnumValue(ClosedStatusEnum.CLOSE_WITH_EXPIRED, Locale.forLanguageTag(language.getCode())));
         });
         activityDetail.put("subStatus", subStatus);
         activityDetail.put(Constants.PERFORM_BY, Constants.SYSTEM);
@@ -528,4 +529,21 @@ public class CronService {
         }
         return result;
     }
+
+    @Scheduled(cron = "0 0 * * * ?") // Runs every hour
+    public void processSlaPopupFlags() {
+        List<ClaimTicket> claimTickets = claimTicketRepository.findEligibleTicketsForSlaPopup(ClaimTicketStatusEnum.CLOSED, ClaimTicketStatusEnum.REJECTED);
+
+        for (ClaimTicket claimTicket : claimTickets) {
+            LocalDate slaBreachDate = claimTicket.getSlaBreachDate();
+            LocalDate twoDaysBefore = slaBreachDate.minusDays(Constants.SLA_POPUP_OPEN_DAYS);
+
+            if (claimTicket.getSlaComment() == null && claimTicket.getSlaPopup() == null &&
+                (twoDaysBefore.isBefore(LocalDate.now()) || twoDaysBefore.equals(LocalDate.now()))) {
+                claimTicket.setSlaPopup(true);
+                claimTicketRepository.save(claimTicket);
+            }
+        }
+    }
+
 }

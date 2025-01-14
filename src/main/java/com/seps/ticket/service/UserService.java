@@ -9,6 +9,8 @@ import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.security.SecurityUtils;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
@@ -19,6 +21,8 @@ import java.util.Set;
 
 @Service
 public class UserService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
@@ -105,6 +109,4 @@ public class UserService {
         return userRepository.findOneByIdAndAuthoritiesInAndStatusIn(id, authorities, statuses)
             .orElse(null);
     }
-
-
 }

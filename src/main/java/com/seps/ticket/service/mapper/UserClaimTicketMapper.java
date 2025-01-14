@@ -20,6 +20,7 @@ public interface UserClaimTicketMapper {
     @Mapping(source = "createdByUser", target = "createdByUser")
     @Mapping(source = "updatedByUser", target = "updatedByUser")
     @Mapping(source = "claimTicketDocuments", target = "claimTicketDocuments")
+    @Mapping(source = "previousTicket", target = "previousTicket") // Map the previous ticket
     UserClaimTicketDTO toUserClaimTicketDTO(ClaimTicket claimTicket);
 
     // Map User to UserDTO

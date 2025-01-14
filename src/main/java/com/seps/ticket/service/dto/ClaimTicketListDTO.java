@@ -47,4 +47,11 @@ public class ClaimTicketListDTO {
     private Long sepsAgentId;
     private UserDTO sepsAgent;
     private Instant secondInstanceFiledAt;
+    private String secondInstanceComment;
+    private String complaintPrecedents;
+    private String complaintSpecificPetition;
+    private Instant complaintFiledAt;
+    private SourceEnum source;
+    private ChannelOfEntryEnum channelOfEntry;
+    private Boolean slaPopup;
 }

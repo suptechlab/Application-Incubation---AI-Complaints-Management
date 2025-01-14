@@ -89,9 +89,10 @@ deployment:
   
   ## Virtual Route        
   virtualRoute:
-    enabled: false
-    host: seps.local 
-    path: /a
+    enabled: true
+    host: adminapi-suptechdev.seps.gob.ec
+    path: ~^/ticket(/|$)(.*)
+    rewritePath: /$2
 
   resources:
     # We usually recommend not to specify default resources and to leave this as a conscious

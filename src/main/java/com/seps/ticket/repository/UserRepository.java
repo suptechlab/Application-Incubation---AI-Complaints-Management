@@ -39,23 +39,34 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findOneByIdAndStatusIn(Long id, Set<UserStatusEnum> statuses);
 
     @Query("""
-        SELECT u
-        FROM User u
-        JOIN u.authorities a
-        WHERE a.name = :role
-        AND u.activated = true
-        AND u.organizationId = :organizationId
-    """)
+            SELECT u
+            FROM User u
+            JOIN u.authorities a
+            WHERE a.name = :role
+            AND u.activated = true
+            AND u.organizationId = :organizationId
+        """)
     List<User> findUsersFIByRole(@Param("organizationId") Long organizationId, @Param("role") String role);
 
 
     @Query("""
-        SELECT u
-        FROM User u
-        JOIN u.authorities a
-        WHERE a.name = :role
-          AND u.activated = true
-    """)
+            SELECT u
+            FROM User u
+            JOIN u.authorities a
+            WHERE a.name = :role
+              AND u.activated = true
+        """)
     List<User> findUsersSEPSByRole(@Param("role") String role);
+
+    boolean existsByEmailIgnoreCaseAndAuthoritiesNotContaining(String email, Authority authority);
+
+    @EntityGraph(attributePaths = "authorities")
+    Optional<User> findOneByEmailIgnoreCaseAndAuthoritiesIn(String email, Set<Authority> authorities);
+
+    // Check if a user exists with the given identificacion, authorities
+    Optional<User> findOneByIdentificacionAndAuthoritiesIn(String identificacion, Set<Authority> authorities);
+
+    Optional<User> findOneByEmailIgnoreCase(String email);
+
 
 }

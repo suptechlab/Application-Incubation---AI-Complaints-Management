@@ -205,17 +205,17 @@ public class SepsAndFiClaimTicketService {
         if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganization().getId();
         }
+        ClaimTicket claimTicket;
         if (organizationId != null) {
-            return claimTicketRepository.findByIdAndOrganizationId(id, organizationId)
-                .map(claimTicketMapper::toDTO)
+            claimTicket = claimTicketRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{id.toString()}, null));
         } else {
-            return claimTicketRepository.findById(id)
-                .map(claimTicketMapper::toDTO)
+            claimTicket = claimTicketRepository.findById(id)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{id.toString()}, null));
         }
+        return claimTicketMapper.toDTO(claimTicket);
     }
 
     /**
@@ -547,6 +547,7 @@ public class SepsAndFiClaimTicketService {
         claimTicketPriorityLog.setTicketId(ticket.getId());
         claimTicketPriorityLog.setCreatedBy(currentUser.getId());
         claimTicketPriorityLog.setPriority(priority);
+        claimTicketPriorityLog.setInstanceType(ticket.getInstanceType());
         claimTicketPriorityLogRepository.save(claimTicketPriorityLog);
 
         Map<String, String> auditMessageMap = new HashMap<>();
@@ -823,6 +824,7 @@ public class SepsAndFiClaimTicketService {
         ticket.setClosedStatus(claimTicketClosedRequest.getCloseSubStatus());
         ticket.setStatusComment(claimTicketClosedRequest.getReason());
         ticket.setResolvedOn(Instant.now());
+        ticket.setSlaPopup(null);
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -1040,6 +1042,7 @@ public class SepsAndFiClaimTicketService {
         ticket.setStatus(ClaimTicketStatusEnum.REJECTED);
         ticket.setRejectedStatus(claimTicketRejectRequest.getRejectedStatus());
         ticket.setStatusComment(claimTicketRejectRequest.getReason());
+        ticket.setSlaPopup(null);
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket

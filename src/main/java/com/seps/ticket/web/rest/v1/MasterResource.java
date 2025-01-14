@@ -50,6 +50,7 @@ public class MasterResource {
     @GetMapping("/cron-hit-test")
     public ResponseEntity<String> cronHitTesting() {
         cronService.processSLAWorkflows();
+        cronService.processSlaPopupFlags();
         return ResponseEntity.ok("Cron executed");
     }
 

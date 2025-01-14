@@ -23,6 +23,10 @@ public final class Constants {
     public static final String RIGHTS_SEPS_ANALYTIC_AGENT = "seps-analytic-agent";
     public static final String PERFORM_BY = "performBy";
     public static final String TICKET_ID = "ticketId";
+    public static final Integer SECOND_INSTANCE_SLA_BREACH_DAYS = 30;
+    public static final Integer COMPLAINT_SLA_BREACH_DAYS = 45;
+    public static final Integer SLA_POPUP_OPEN_DAYS = 2;
+
     private Constants() {
     }
 }
