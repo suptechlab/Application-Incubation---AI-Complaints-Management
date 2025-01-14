@@ -393,7 +393,7 @@ const TicketsView = () => {
     const createInstanceFields = (instanceData, instanceType,position) => [
       {
         label: t("TICKET_ID"),
-        value: instanceData?.ticketId,
+        value: <Link  target='_blank' to={`/tickets/view/${instanceData?.id}`} className=''>#{instanceData?.ticketId}</Link>,
         colProps: { xs: 6, className: "py-2" },
       },
       ...createCommonFields(instanceData, true),
@@ -778,8 +778,6 @@ const TicketsView = () => {
     setCurrentInstance(instance_type)
     setAttachmentsModalShow(true)
     setAttachmentPosition(position)
-
-
   }
 
   return (
@@ -787,7 +785,7 @@ const TicketsView = () => {
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         {loading !== true && <TicketViewHeader
-          title={"#" + ticketData?.ticketId ?? ''}
+          title={"#" + ticketData?.ticketId && ticketData?.ticketId!== undefined ? ticketData?.ticketId :  ''}
           ticketData={ticketData}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
           getTicketData={getTicketDetails}

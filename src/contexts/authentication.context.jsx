@@ -173,10 +173,10 @@ export default function AuthenticationProvider({ children }) {
                     setCurrentUser('SYSTEM_ADMIN')
                 }
 
-                // if(data?.externalDocumentId){
-                //     handleImageDownload()
-                // }
-                handleImageDownload()
+                if(data?.externalDocumentId){
+                    handleImageDownload()
+                }
+                // handleImageDownload()
             })
             .catch((error) => {
                 console.log(error)

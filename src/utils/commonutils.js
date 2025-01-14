@@ -31,19 +31,19 @@ export const timeRemaining = (date) => {
 
 // CALCULATE DIFFERENCE
 export const calculateDaysDifference = (date) => {
-
   const now = moment();
   const targetDate = moment(date);
-
-  // Check if the target date is in the past
+  
+  // Check if the target date is in the future
   if (targetDate.isAfter(now, 'day')) {
     // Calculate the difference in days
-    const daysDifference = now.diff(targetDate, 'days');
+    const daysDifference = targetDate.diff(now, 'days'); // Use targetDate.diff to get positive value
     return `${daysDifference}`;
   }
-
-  // Return 0 or a message if the date is not in the past
+  
+  // Return 0 if the date is in the past or today
   return '0';
+  
   // const now = moment();
   // const targetDate = moment(date);
 
