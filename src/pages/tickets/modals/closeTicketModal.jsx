@@ -11,7 +11,7 @@ import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticket
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
 import { validateFile } from "../../../utils/commonutils";
-const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs }) => {
+const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs,getTicketData }) => {
 
     const { t } = useTranslation();
     // const [fileName, setFileName] = useState("");
@@ -56,6 +56,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
             .then((response) => {
                 setSelectedStatus('CLOSED');
                 setIsGetAcitivityLogs((prev) => !prev)
+                getTicketData()
                 toast.success(response?.data?.message);
                 toggle()
             })

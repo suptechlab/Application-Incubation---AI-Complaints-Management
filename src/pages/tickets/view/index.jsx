@@ -27,6 +27,12 @@ const TicketsView = () => {
 
   const { masterData } = useContext(MasterDataContext);
 
+  const [topSectionData, setTopSectionData] = useState([])
+
+  const [middleSectionData, setMiddleSectionData] = useState([])
+
+  const [bottomSectionData, setBottomSectionData] = useState([])
+
   // PERMISSIONS work
 
   const [permissionsState, setPermissionsState] = React.useState({
@@ -185,6 +191,560 @@ const TicketsView = () => {
     getTicketDetails()
   }, [id])
 
+
+  const formatDate = (date, format) => (date ? moment(date).format(format) : 'N/A');
+
+
+  // COMMON FIELDS
+  const createCommonFields = (commonData, isPrevData) => [
+    {
+      label: t("CREATED_ON"),
+      value: formatDate(commonData?.createdAt, "DD-MM-YYYY | hh:mm:a"),
+      colProps: { sm: 6 },
+    },
+    {
+      label: t("DUE_DATE"),
+      value: formatDate(commonData?.slaBreachDate, "DD-MM-YYYY"),
+      colProps: { sm: 6 },
+    },
+    {
+      label: t("CLAIM_FILED_BY"),
+      value: (
+        <Link onClick={handleUserInfoClick} className="text-decoration-none">
+          {commonData?.createdByUser?.name}
+        </Link>
+      ),
+      colProps: { sm: 6 },
+    },
+    {
+      label: t("PRIORITY"),
+      value: (
+        <Stack direction="horizontal" gap={1}>
+          {(permissionsState?.priorityPermission && !isPrevData) &&
+            !["CLOSED", "REJECTED"].includes(commonData?.status) ? (
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="link"
+                id="filter-dropdown"
+                className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
+              >
+                <AppTooltip title={t("CHANGE_PRIORITY")} placement="top">
+                  <span>
+                    <span
+                      className={`custom-min-width-50 fw-bold ${getPriorityClass(
+                        selectedPriority
+                      )}`}
+                    >
+                      {masterData?.claimTicketPriority[selectedPriority]}
+                    </span>{" "}
+                    <MdArrowDropDown size={14} />
+                  </span>
+                </AppTooltip>
+              </Dropdown.Toggle>
+              <Dropdown.Menu
+                align="end"
+                className="shadow-lg rounded-3 border-0 mt-1"
+              >
+                {priorityOptions?.map((priority) => (
+                  <Dropdown.Item
+                    key={priority}
+                    className={`small ${selectedPriority === priority ? "active" : ""
+                      }`}
+                    onClick={() => handlePriorityChange(priority)}
+                  >
+                    {masterData?.claimTicketPriority[priority]}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          ) : (
+            <span
+              className={`custom-min-width-50 fw-bold ${getPriorityClass(
+                selectedPriority
+              )}`}
+            >
+              {selectedPriority}
+            </span>
+          )}
+        </Stack>
+      ),
+      colProps: { sm: 6 },
+    },
+
+    ...(!isPrevData ? [
+      {
+        label: t("CLAIM TYPE"),
+        value: commonData?.claimType?.name,
+        colProps: { sm: 6 },
+      }
+    ] : [])
+    ,
+    ...(!isPrevData ? [{
+      label: t("CLAIM_SUB_TYPE"),
+      value: commonData?.claimSubType?.name,
+      colProps: { sm: 6 },
+    }] : []),
+    {
+      label: t("AGENT"),
+      value: commonData?.instanceType === 'FIRST_INSTANCE' ? commonData?.fiAgent?.name ?? "N/A" : commonData?.sepsAgent?.name ?? 'N/A',
+      colProps: { sm: 6 },
+    },
+    {
+      label: t("SOURCE"),
+      value: commonData?.source,
+      colProps: { sm: 6 },
+    },
+    {
+      label: t("CHANNEL_OF_ENTRY"),
+      value: commonData?.channelOfEntry,
+      colProps: { sm: 6 },
+    },
+  ];
+
+  useEffect(() => {
+    if (!ticketData) return;
+
+    const addConditionalFields = (fields) => {
+      if (ticketData?.slaPopup !== null) {
+        fields.push({
+          value: (
+            <Link
+              onClick={(event) => {
+                setShowReminderModal(true);
+                event.preventDefault();
+              }}
+              className="text-decoration-none"
+            >
+              {t("PROVIDE_SLA_COMMENT")}
+            </Link>
+          ),
+          colProps: { sm: 6 },
+        });
+      }
+
+      if (ticketData?.createdByUser?.id !== ticketData?.user?.id) {
+        fields.push({
+          label: t("CONSUMER_INFO"),
+          value: (
+            <Link
+              onClick={handleConsumerInfoClick}
+              className="text-decoration-none"
+            >
+              {ticketData?.user?.name}
+            </Link>
+          ),
+          colProps: { sm: 6 },
+        });
+      }
+
+      if (ticketData?.team) {
+        fields.push({
+          label: t("TEAM"),
+          value: ticketData?.team ?? "N/A",
+          colProps: { sm: 6 },
+        });
+      }
+
+      if (ticketData?.slaComment !== null) {
+        fields.push({
+          label: t("SLA_COMMENT"),
+          value: (
+            <p className="text-decoration-none text-secondary fw-bold">
+              {ticketData?.slaComment}
+            </p>
+          ),
+          colProps: { sm: 6 },
+        });
+      }
+
+      if (ticketData?.secondInstanceSlaComment) {
+        fields.push({
+          label: t("SLA_COMMENT"),
+          value: (
+            <p className="text-decoration-none text-secondary fw-bold">
+              {ticketData?.secondInstanceSlaComment}
+            </p>
+          ),
+          colProps: { sm: 6 },
+        });
+      }
+
+      return fields;
+    };
+
+    const createAttachmentField = (instanceType) => ({
+      value: (
+        <Stack direction="horizontal" gap={1}>
+          <span>
+            <MdAttachFile size={16} />
+          </span>
+          <button
+            onClick={() => handleAttachmentsClick(instanceType)}
+            className="fw-semibold text-decoration-none text-info btn p-0"
+          >
+            {t("ATTACHMENTS")}
+          </button>
+        </Stack>
+      ),
+      colProps: { sm: 6 },
+    });
+
+    const createInstanceFields = (instanceData, instanceType) => [
+      {
+        label: t("TICKET_ID"),
+        value: instanceData?.ticketId,
+        colProps: { xs: 6, className: "py-2" },
+      },
+      ...createCommonFields(instanceData, true),
+      createAttachmentField(instanceType),
+      {
+        label: t("PRECEDENTS"),
+        value: instanceData?.precedents,
+        colProps: { xs: 12, className: "py-2" },
+      },
+      {
+        label: t("SPECIFIC_PETITION"),
+        value: instanceData?.specificPetition ?? "N/A",
+        colProps: { xs: 12 },
+      },
+    ];
+
+    const buildSections = () => {
+      const topFields = addConditionalFields(createCommonFields(ticketData, false));
+
+      if (ticketData?.instanceType === "FIRST_INSTANCE") {
+        setTopSectionData([
+          ...topFields,
+          createAttachmentField("FIRST_INSTANCE"),
+          {
+            label: t("PRECEDENTS"),
+            value: ticketData?.precedents,
+            colProps: { xs: 12, className: "py-2" },
+          },
+          {
+            label: t("SPECIFIC_PETITION"),
+            value: ticketData?.specificPetition ?? "N/A",
+            colProps: { xs: 12 },
+          },
+        ]);
+      } else if (ticketData?.instanceType === "SECOND_INSTANCE") {
+        setTopSectionData([
+          ...topFields,
+          createAttachmentField("SECOND_INSTANCE"),
+          {
+            label: t("COMMENT"),
+            value: ticketData?.secondInstanceComment,
+            colProps: { xs: 12, className: "py-2" },
+          },
+        ]);
+
+        if (ticketData?.previousTicket) {
+          setMiddleSectionData(createInstanceFields(ticketData?.previousTicket, "FIRST_INSTANCE"));
+        }
+      } else if (ticketData?.instanceType === "COMPLAINT") {
+        setTopSectionData([
+          ...topFields,
+          createAttachmentField("COMPLAINT"),
+          {
+            label: t("PRECEDENTS"),
+            value: ticketData?.precedents,
+            colProps: { xs: 12, className: "py-2" },
+          },
+          {
+            label: t("SPECIFIC_PETITION"),
+            value: ticketData?.specificPetition ?? "N/A",
+            colProps: { xs: 12 },
+          },
+        ]);
+
+        if (ticketData?.previousTicket) {
+          setMiddleSectionData(createInstanceFields(ticketData?.previousTicket, "SECOND_INSTANCE"));
+
+          if (ticketData?.previousTicket?.previousTicket) {
+            setBottomSectionData(createInstanceFields(ticketData?.previousTicket?.previousTicket, "FIRST_INSTANCE"));
+          }
+        }
+      }
+    };
+
+    buildSections();
+  }, [ticketData]);
+
+
+
+  // useEffect(() => {
+  //   if (!ticketData) return;
+
+  //   const addConditionalFields = (fields) => {
+  //     if (ticketData?.slaPopup !== null) {
+  //       fields.push({
+  //         value: (
+  //           <Link
+  //             onClick={(event) => {
+  //               setShowReminderModal(true);
+  //               event.preventDefault();
+  //             }}
+  //             className="text-decoration-none"
+  //           >
+  //             {("PROVIDE_SLA_COMMENT")}
+  //           </Link>
+  //         ),
+  //         colProps: { sm: 6 },
+  //       });
+  //     }
+
+  //     if (ticketData?.createdByUser?.id !== ticketData?.user?.id) {
+  //       fields.push({
+  //         label: t("CONSUMER_INFO"),
+  //         value: (
+  //           <Link
+  //             onClick={handleConsumerInfoClick}
+  //             className="text-decoration-none"
+  //           >
+  //             {ticketData?.user?.name}
+  //           </Link>
+  //         ),
+  //         colProps: { sm: 6 },
+  //       });
+  //     }
+
+  //     if (ticketData?.team) {
+  //       fields.push({
+  //         label: t("TEAM"),
+  //         value: ticketData?.team ?? "N/A",
+  //         colProps: { sm: 6 },
+  //       })
+  //     }
+
+  //     if (ticketData?.slaComment !== null) {
+  //       fields.push({
+  //         label: t("SLA_COMMENT"),
+  //         value: (
+  //           <p className="text-decoration-none text-secondary fw-bold">
+  //             {ticketData?.slaComment}
+  //           </p>
+  //         ),
+  //         colProps: { sm: 6 },
+  //       });
+  //     }
+
+  //     if (ticketData?.secondInstanceSlaComment) {
+  //       fields.push({
+  //         label: t("SLA_COMMENT"),
+  //         value: <p className='text-decoration-none text-secondary fw-bold'> {ticketData?.secondInstanceSlaComment}</p>,
+  //         colProps: { sm: 6 },
+  //       });
+  //     }
+
+  //     return fields;
+  //   };
+
+
+  //   const topCommonFields = createCommonFields(ticketData, false);
+  //   let middleCommonFields = []
+  //   let bottomCommonFields = []
+
+  //   if (ticketData?.instanceType === "FIRST_INSTANCE") {
+  //     setTopSectionData(
+  //       addConditionalFields([
+  //         ...topCommonFields,
+  //         {
+  //           value: (
+  //             <Stack direction="horizontal" gap={1}>
+  //               <span>
+  //                 <MdAttachFile size={16} />
+  //               </span>
+  //               <button
+  //                 onClick={() => handleAttachmentsClick("FIRST_INSTANCE")}
+  //                 className="fw-semibold text-decoration-none text-info btn p-0"
+  //               >
+  //                 {t("ATTACHMENTS")}
+  //               </button>
+  //             </Stack>
+  //           ),
+  //           colProps: { sm: 6 },
+  //         },
+  //         {
+  //           label: t("PRECEDENTS"),
+  //           value: ticketData?.precedents,
+  //           colProps: { xs: 12, className: "py-2" },
+  //         },
+  //         {
+  //           label: t("SPECIFIC_PETITION"),
+  //           value: ticketData?.specificPetition ?? "N/A",
+  //           colProps: { xs: 12 },
+  //         },
+  //       ])
+  //     );
+  //   }
+  //   else if (ticketData?.instanceType === "SECOND_INSTANCE") {
+  //     setTopSectionData(
+  //       addConditionalFields([
+  //         ...topCommonFields,
+  //         {
+  //           value: (
+  //             <Stack direction="horizontal" gap={1}>
+  //               <span>
+  //                 <MdAttachFile size={16} />
+  //               </span>
+  //               <button
+  //                 onClick={() => handleAttachmentsClick("SECOND_INSTANCE")}
+  //                 className="fw-semibold text-decoration-none text-info btn p-0"
+  //               >
+  //                 {t("ATTACHMENTS")}
+  //               </button>
+  //             </Stack>
+  //           ),
+  //           colProps: { sm: 6 },
+  //         },
+  //         {
+  //           label: t("COMMENT"),
+  //           value: ticketData?.secondInstanceComment,
+  //           colProps: { xs: 12, className: "py-2" },
+  //         },
+  //       ])
+  //     );
+  //     if (ticketData?.previousTicket) {
+  //       middleCommonFields = createCommonFields(ticketData?.previousTicket, true)
+  //       setMiddleSectionData([{
+  //         label: t("TICKET_ID"),
+  //         value: ticketData?.previousTicket?.ticketId,
+  //         colProps: { xs: 12, className: "py-2" },
+  //       },
+  //       ...middleCommonFields,
+  //       {
+  //         value: (
+  //           <Stack direction="horizontal" gap={1}>
+  //             <span>
+  //               <MdAttachFile size={16} />
+  //             </span>
+  //             <button
+  //               onClick={() => handleAttachmentsClick("FIRST_INSTANCE")}
+  //               className="fw-semibold text-decoration-none text-info btn p-0"
+  //             >
+  //               {t("ATTACHMENTS")}
+  //             </button>
+  //           </Stack>
+  //         ),
+  //         colProps: { sm: 6 },
+  //       },
+  //       {
+  //         label: t("PRECEDENTS"),
+  //         value: ticketData?.previousTicket?.precedents,
+  //         colProps: { xs: 12, className: "py-2" },
+  //       },
+  //       {
+  //         label: t("SPECIFIC_PETITION"),
+  //         value: ticketData?.previousTicket?.specificPetition ?? "N/A",
+  //         colProps: { xs: 12 },
+  //       },])
+  //     }
+  //   } else if (ticketData?.instanceType === 'COMPLAINT') {
+  //     setTopSectionData(
+  //       addConditionalFields([
+  //         ...topCommonFields,
+  //         {
+  //           value: (
+  //             <Stack direction="horizontal" gap={1}>
+  //               <span>
+  //                 <MdAttachFile size={16} />
+  //               </span>
+  //               <button
+  //                 onClick={() => handleAttachmentsClick("COMPLAINT")}
+  //                 className="fw-semibold text-decoration-none text-info btn p-0"
+  //               >
+  //                 {t("ATTACHMENTS")}
+  //               </button>
+  //             </Stack>
+  //           ),
+  //           colProps: { sm: 6 },
+  //         },
+  //         {
+  //           label: t("PRECEDENTS"),
+  //           value: ticketData?.precedents,
+  //           colProps: { xs: 12, className: "py-2" },
+  //         },
+  //         {
+  //           label: t("SPECIFIC_PETITION"),
+  //           value: ticketData?.specificPetition ?? "N/A",
+  //           colProps: { xs: 12 },
+  //         }
+  //       ])
+  //     );
+
+  //     // SECOND INSTANCE
+  //     if (ticketData?.previousTicket) {
+
+  //       middleCommonFields = createCommonFields(ticketData?.previousTicket, true)
+  //       setMiddleSectionData([{
+  //         label: t("TICKET_ID"),
+  //         value: ticketData?.previousTicket?.ticketId,
+  //         colProps: { xs: 12, className: "py-2" },
+  //       },
+  //       ...middleCommonFields,
+  //       {
+  //         value: (
+  //           <Stack direction="horizontal" gap={1}>
+  //             <span>
+  //               <MdAttachFile size={16} />
+  //             </span>
+  //             <button
+  //               onClick={() => handleAttachmentsClick("FIRST_INSTANCE")}
+  //               className="fw-semibold text-decoration-none text-info btn p-0"
+  //             >
+  //               {t("ATTACHMENTS")}
+  //             </button>
+  //           </Stack>
+  //         ),
+  //         colProps: { sm: 6 },
+  //       },
+  //       {
+  //         label: t("COMMENT"),
+  //         value: ticketData?.previousTicket?.secondInstanceComment,
+  //         colProps: { xs: 12, className: "py-2" },
+  //       },
+  //       ])
+  //       if (ticketData?.previousTicket?.previousTicket) {
+  //         const firstInstanceData = ticketData?.previousTicket?.previousTicket
+  //         bottomCommonFields = createCommonFields(firstInstanceData, true)
+  //         setBottomSectionData([{
+  //           label: t("TICKET_ID"),
+  //           value: firstInstanceData?.ticketId,
+  //           colProps: { xs: 12, className: "py-2" },
+  //         },
+  //         ...bottomCommonFields,
+  //         {
+  //           value: (
+  //             <Stack direction="horizontal" gap={1}>
+  //               <span>
+  //                 <MdAttachFile size={16} />
+  //               </span>
+  //               <button
+  //                 onClick={() => handleAttachmentsClick("FIRST_INSTANCE")}
+  //                 className="fw-semibold text-decoration-none text-info btn p-0"
+  //               >
+  //                 {t("ATTACHMENTS")}
+  //               </button>
+  //             </Stack>
+  //           ),
+  //           colProps: { sm: 6 },
+  //         },
+  //         {
+  //           label: t("PRECEDENTS"),
+  //           value: firstInstanceData?.precedents,
+  //           colProps: { xs: 12, className: "py-2" },
+  //         },
+  //         {
+  //           label: t("SPECIFIC_PETITION"),
+  //           value: firstInstanceData?.specificPetition ?? "N/A",
+  //           colProps: { xs: 12 },
+  //         },])
+  //       }
+  //     }
+  //   }
+  // }, [ticketData]);
+
+
   // The color class based on the priority level
   const priorityOptions = ['LOW', 'MEDIUM', 'HIGH'];
   const getPriorityClass = (priority) => {
@@ -217,204 +777,6 @@ const TicketsView = () => {
     setCurrentInstance(instance_type)
     setAttachmentsModalShow(true)
   }
-  // VIEW TOP DATA
-  const viewTopData = [
-    {
-      label: t("CREATED_ON"),
-      value: ticketData?.createdAt ? moment(ticketData?.createdAt).format("DD-MM-YYYY | hh:mm:a") : '',
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("DUE_DATE"),
-      value: ticketData?.slaBreachDate ? moment(ticketData?.slaBreachDate).format("DD-MM-YYYY") : 'N/A',
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("CLAIM_FILED_BY"),
-      value: <Link onClick={handleUserInfoClick} className='text-decoration-none'>{ticketData?.createdByUser?.name}</Link>,
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("PRIORITY"),
-      value: (<Stack direction='horizontal' gap={1}>
-        {
-          (permissionsState?.priorityPermission === true && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) ?
-            <Dropdown>
-              <Dropdown.Toggle
-                variant="link"
-                id="filter-dropdown"
-                className="link-dark p-1 ms-n1 hide-dropdown-arrow lh-1 text-decoration-none"
-              >
-                <AppTooltip title={t("CHANGE_PRIORITY")} placement="top">
-                  <span>
-                    <span className={`custom-min-width-50 fw-bold  ${getPriorityClass(selectedPriority)}`}>
-                      {masterData?.claimTicketPriority[selectedPriority]}
-                    </span> <MdArrowDropDown size={14} /></span>
-                </AppTooltip>
-              </Dropdown.Toggle>
-              <Dropdown.Menu align="end" className="shadow-lg rounded-3 border-0 mt-1">
-                {priorityOptions?.map((priority) => (
-                  <Dropdown.Item
-                    key={priority}
-                    className={`small ${selectedPriority === priority ? 'active' : ''}`}
-                    onClick={() => handlePriorityChange(priority)}
-                  >
-                    {masterData?.claimTicketPriority[priority]}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown> :
-            <span className={`custom-min-width-50 fw-bold ${getPriorityClass(selectedPriority)}`}>{selectedPriority}</span>
-        }
-      </Stack>),
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("CLAIM TYPE"),
-      value: ticketData?.claimType?.name,
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("CLAIM_SUB_TYPE"),
-      value: ticketData?.claimSubType?.name,
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("AGENT"),
-      value: ticketData?.fiAgent?.name ?? "N/A",
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("TEAM"),
-      value: ticketData?.team ?? "N/A",
-      colProps: { sm: 6 }
-    },
-    ...(ticketData?.slaPopup !== null
-      ? [
-        {
-          // label: t("CONSUMER_INFO"),
-          value: <Link onClick={(event) => { setShowReminderModal(true); event.preventDefault() }} className='text-decoration-none'>Provide SLA Comment</Link>,
-          colProps: { sm: 6 },
-        },
-      ]
-      : []),
-    ...(ticketData?.createdByUser?.id !== ticketData?.user?.id
-      ? [
-        {
-          label: t("CONSUMER_INFO"),
-          value: <Link onClick={handleConsumerInfoClick} className='text-decoration-none'>{ticketData?.user?.name}</Link>,
-          colProps: { sm: 6 },
-        },
-      ]
-      : []),
-    // {
-    //   label: t("CONSUMER_INFO"),
-    //   value: <Link onClick={handleConsumerInfoClick} className='text-decoration-none'>{ticketData?.user?.name}</Link>,
-    //   colProps: { sm: 6 }
-    // },
-    // ...(ticketData?.claimTicketDocuments !== ticketData?.claimTicketDocuments?.length > 0
-    //   ? [{
-    //     value: (<Stack direction='horizontal' gap={1}>
-    //       <span><MdAttachFile size={16} /></span>
-    //       <Link onClick={handleAttachmentsClick} className='fw-semibold text-decoration-none'>{t("ATTACHMENTS")}</Link>
-    //     </Stack>),
-    //     colProps: { sm: 6 }
-    //   }] :[]),
-    {
-      value: (<Stack direction='horizontal' gap={1}>
-        <span><MdAttachFile size={16} /></span>
-        <button onClick={() => handleAttachmentsClick("FIRST_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
-      </Stack>),
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("PRECEDENTS"),
-      value: ticketData?.precedents,
-      colProps: { xs: 12, className: "py-2" }
-    },
-    {
-      label: t("SPECIFIC_PETITION"),
-      value: ticketData?.specificPetition ?? 'N/A',
-      colProps: { xs: 12 }
-    },
-    ...(ticketData?.slaComment !== null
-      ? [
-        {
-          label: t("SLA_COMMENT"),
-          value: <p className='text-decoration-none text-secondary fw-bold'> {ticketData?.slaComment}</p>,
-          colProps: { sm: 6 },
-        },
-      ]
-      : [])
-  ];
-  // VIEW BOTTOM DATA
-  const viewSecondInstanceData = [
-    {
-      label: t("CREATED_ON"),
-      value: ticketData?.secondInstanceFiledAt ? moment(ticketData?.secondInstanceFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
-      colProps: { sm: 6 }
-    },
-    {
-      label: t("AGENT"),
-      value: ticketData?.sepsAgent?.name ?? 'N/A',
-      colProps: { sm: 6 }
-    },
-    {
-      value: (<Stack direction='horizontal' gap={1}>
-        <span><MdAttachFile size={16} /></span>
-        <button onClick={() => handleAttachmentsClick("SECOND_INSTANCE")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
-      </Stack>),
-      colProps: { xs: 12 }
-    },
-    {
-      label: t("COMMENT"),
-      value: ticketData?.secondInstanceComment ?? 'N/A',
-      colProps: { xs: 12 }
-    },
-    ...(ticketData?.secondInstanceSlaComment !== null
-      ? [
-        {
-          label: t("SLA_COMMENT"),
-          value: <p className='text-decoration-none text-secondary fw-bold'> {ticketData?.secondInstanceSlaComment}</p>,
-          colProps: { sm: 6 },
-        },
-      ]
-      : [])
-  ];
-
-  const viewComplaintData = [
-    {
-      label: t("CREATED_ON"),
-      value: ticketData?.complaintFiledAt ? moment(ticketData?.complaintFiledAt).format("DD-MM-YYYY | hh:mm:a") : '',
-      colProps: { sm: 6 }
-    },
-    // {
-    //   label: t("AGENT"),
-    //   value: ticketData?.sepsAgent?.name ?? 'N/A',
-    //   colProps: { sm: 6 }
-    // },
-    {
-      value: (<Stack direction='horizontal' gap={1}>
-        <span><MdAttachFile size={16} /></span>
-        <button onClick={() => handleAttachmentsClick("COMPLAINT")} className='fw-semibold text-decoration-none text-info btn p-0'>{t("ATTACHMENTS")}</button>
-      </Stack>),
-      colProps: { xs: 12 }
-    },
-    {
-      label: t("PRECEDENTS"),
-      value: ticketData?.complaintPrecedents ?? 'N/A',
-      colProps: { xs: 12 }
-    },
-    ...(ticketData?.complaintSlaComment !== null
-      ? [
-        {
-          label: t("SLA_COMMENT"),
-          value: <p className='text-decoration-none text-secondary fw-bold'> {ticketData?.complaintSlaComment}</p>,
-          colProps: { sm: 6 },
-        },
-      ]
-      : [])
-  ];
 
   return (
     <React.Fragment>
@@ -433,7 +795,7 @@ const TicketsView = () => {
               <Card className="border-0 shadow h-100 custom-min-height-200 overflow-auto">
                 <Card.Body>
                   <Row>
-                    {viewTopData?.map((item, index) => (
+                    {topSectionData?.map((item, index) => (
                       <Col key={"data_view_" + index} {...item.colProps}>
                         <CommonViewData label={item.label} value={item.value} />
                       </Col>
@@ -443,12 +805,20 @@ const TicketsView = () => {
               </Card>
               {/* SECOND INSTANCE DETAILS */}
               {
-                (ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
+                (ticketData?.previousTicket) &&
                 <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                   <Card.Body className='mh-100'>
-                    <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5>
+                    {
+                      ticketData?.previousTicket?.instanceType === 'FIRST_INSTANCE' ?
+                        <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("FIRST_INSTANCE_CLAIM_DETAILS")}</h5> :
+
+                        ticketData?.previousTicket?.instanceType === 'SECOND_INSTANCE' ?
+                          <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5> :
+                          <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("COMPLAINT_DETAILS")}</h5>
+                    }
+
                     <Row>
-                      {viewSecondInstanceData?.map((item, index) => (
+                      {middleSectionData?.map((item, index) => (
                         <Col key={"data_view_" + index} {...item.colProps}>
                           <CommonViewData label={item.label} value={item.value} />
                         </Col>
@@ -459,12 +829,12 @@ const TicketsView = () => {
               }
               {/* COMPLAINT DETAILS */}
               {
-                ticketData?.instanceType === 'COMPLAINT' &&
+                (bottomSectionData && bottomSectionData?.length > 0) &&
                 <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                   <Card.Body className='mh-100'>
-                    <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("COMPLAINT")}</h5>
+                    <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("FIRST_INSTANCE_CLAIM_DETAILS")}</h5>
                     <Row>
-                      {viewComplaintData?.map((item, index) => (
+                      {bottomSectionData?.map((item, index) => (
                         <Col key={"data_view_" + index} {...item.colProps}>
                           <CommonViewData label={item.label} value={item.value} />
                         </Col>

@@ -326,6 +326,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
                 setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                getTicketData={getTicketData}
             />
             <RejectTicketModal
                 ticketId={ticketData?.id}
@@ -333,6 +334,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
                 setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                getTicketData={getTicketData}
             />
         </React.Fragment>
     );

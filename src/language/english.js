@@ -312,9 +312,6 @@ export const englishLang = {
     "CLAIM_AND_COMPLAINTS": "Claims & Complaints",
     "FI_ENTITY": "FI Entity",
     "SLA ADHERENCE": "SLA Adherence",
-    "SELECT_ORGANIZATION_ID_MSG": "Please select organization id.",
-    "CONSUMER_NAME": "Consumer Name",
-    "ALL_ENTITIES": "All Entities",
     "CLAIM_OVERVIEW_REPORT": "Claim Overview Report",
     "CLAIM_OVERVIEW_FILTERS": "Claim Overview filters",
     "ORGANIZATION": "Organization",
@@ -323,11 +320,12 @@ export const englishLang = {
     "CLOSE_SUB_STATUS": "Close Sub Status",
     "REJECT_SUB_STATUS": "Reject Sub Status",
     "SOURCE": "Source",
-    "CHANNEL_OF_ENTRY": "Channel of entry",
     "APPLY": "Apply",
     "WEB": "Web",
     "CHATBOT": "Chatbot",
     "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE": "Allowed image file extensions are .jpg, .jpeg and .png.",
-    "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "Image size must not exceed 2.5 MB."
-
+    "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "Image size must not exceed 2.5 MB.",
+    "PROVIDE_SLA_COMMENT":"Provide SLA Comment",
+    "FIRST_INSTANCE_CLAIM_DETAILS" :"First Instance claim details",
+    "COMPLAINT_DETAILS" : "Complaint Details"
 }

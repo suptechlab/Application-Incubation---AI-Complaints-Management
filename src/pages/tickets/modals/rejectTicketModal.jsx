@@ -10,7 +10,7 @@ import { convertToLabelValue, ticketCloseStatus, ticketRejectStatus } from "../.
 import { ticketRejectValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
 import { validateFile } from "../../../utils/commonutils";
-const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGetAcitivityLogs }) => {
+const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGetAcitivityLogs,getTicketData }) => {
     const { t } = useTranslation();
     const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
 
@@ -52,6 +52,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId,  setSelectedStatus,setIsGe
             .then((response) => {
                 setSelectedStatus('REJECTED');
                 setIsGetAcitivityLogs((prev)=> !prev)
+                getTicketData()
                 toast.success(response?.data?.message);
                 toggle()
             })

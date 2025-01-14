@@ -311,6 +311,7 @@ export const spanishLang = {
     "CLAIM_OVERVIEW_REPORT": "Informe general de reclamaciones",
     "CLAIM_OVERVIEW_FILTERS": "Claim Overview filters",
     "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE": "Las extensiones de archivo de imagen permitidas son .jpg, .jpeg y .png.",
-    "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB."
-
+    "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB.",
+    "PROVIDE_SLA_COMMENT": "Proporcionar comentario de SLA",
+    "FIRST_INSTANCE_CLAIM_DETAILS" :"Detalles del reclamo de primera instancia"
 }
