@@ -45,11 +45,9 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
         const logData = response?.data?.map((activity, index) => {
           const text = activity?.activityDetails?.text || ""; // Safely extract text
           const containsHTML = isHTML(text);
-
-
           const attachments = activity?.attachmentUrl?.attachments?.length ? activity.attachmentUrl.attachments : [];
 
-          const imageUrl = activity?.performedBy === userData?.id ? profileImage :defaultAvatar
+          const imageUrl = activity?.performedBy == userData?.id ? profileImage ?? defaultAvatar :defaultAvatar
           return {
             id: index,
             // name: activity?.activityDetails?.performBy?.name ? getPerformerName(activity?.activityDetails?.performBy?.name, activity?.activityType) : "",

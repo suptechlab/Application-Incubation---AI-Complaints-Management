@@ -23,7 +23,7 @@ import SlaReminderModal from '../modals/slaReminderModal';
 
 const TicketsView = () => {
 
-  const { currentUser, permissions = {} ,profileImage} = useContext(AuthenticationContext);
+  const { currentUser, permissions = {}, profileImage } = useContext(AuthenticationContext);
 
   const { masterData } = useContext(MasterDataContext);
 
@@ -118,6 +118,7 @@ const TicketsView = () => {
   const [consumerInfoModalShow, setConsumerInfoModalShow] = useState(false);
   const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
   const [currentInstance, setCurrentInstance] = useState('')
+  const [attachmentPosition , setAttachmentPosition] = useState('')
 
   const [loading, setLoading] = useState(false)
 
@@ -372,14 +373,14 @@ const TicketsView = () => {
       return fields;
     };
 
-    const createAttachmentField = (instanceType) => ({
+    const createAttachmentField = (instanceType , position) => ({
       value: (
         <Stack direction="horizontal" gap={1}>
           <span>
             <MdAttachFile size={16} />
           </span>
           <button
-            onClick={() => handleAttachmentsClick(instanceType)}
+            onClick={() => handleAttachmentsClick(instanceType,position)}
             className="fw-semibold text-decoration-none text-info btn p-0"
           >
             {t("ATTACHMENTS")}
@@ -389,14 +390,14 @@ const TicketsView = () => {
       colProps: { sm: 6 },
     });
 
-    const createInstanceFields = (instanceData, instanceType) => [
+    const createInstanceFields = (instanceData, instanceType,position) => [
       {
         label: t("TICKET_ID"),
         value: instanceData?.ticketId,
         colProps: { xs: 6, className: "py-2" },
       },
       ...createCommonFields(instanceData, true),
-      createAttachmentField(instanceType),
+      createAttachmentField(instanceType,position),
       {
         label: t("PRECEDENTS"),
         value: instanceData?.precedents,
@@ -415,7 +416,7 @@ const TicketsView = () => {
       if (ticketData?.instanceType === "FIRST_INSTANCE") {
         setTopSectionData([
           ...topFields,
-          createAttachmentField("FIRST_INSTANCE"),
+          createAttachmentField("FIRST_INSTANCE",'TOP'),
           {
             label: t("PRECEDENTS"),
             value: ticketData?.precedents,
@@ -430,7 +431,7 @@ const TicketsView = () => {
       } else if (ticketData?.instanceType === "SECOND_INSTANCE") {
         setTopSectionData([
           ...topFields,
-          createAttachmentField("SECOND_INSTANCE"),
+          createAttachmentField("SECOND_INSTANCE","TOP"),
           {
             label: t("COMMENT"),
             value: ticketData?.secondInstanceComment,
@@ -439,12 +440,12 @@ const TicketsView = () => {
         ]);
 
         if (ticketData?.previousTicket) {
-          setMiddleSectionData(createInstanceFields(ticketData?.previousTicket, "FIRST_INSTANCE"));
+          setMiddleSectionData(createInstanceFields(ticketData?.previousTicket, "FIRST_INSTANCE","MIDDLE"));
         }
       } else if (ticketData?.instanceType === "COMPLAINT") {
         setTopSectionData([
           ...topFields,
-          createAttachmentField("COMPLAINT"),
+          createAttachmentField("COMPLAINT","TOP"),
           {
             label: t("PRECEDENTS"),
             value: ticketData?.precedents,
@@ -458,10 +459,10 @@ const TicketsView = () => {
         ]);
 
         if (ticketData?.previousTicket) {
-          setMiddleSectionData(createInstanceFields(ticketData?.previousTicket, "SECOND_INSTANCE"));
+          setMiddleSectionData(createInstanceFields(ticketData?.previousTicket, "SECOND_INSTANCE","MIDDLE"));
 
           if (ticketData?.previousTicket?.previousTicket) {
-            setBottomSectionData(createInstanceFields(ticketData?.previousTicket?.previousTicket, "FIRST_INSTANCE"));
+            setBottomSectionData(createInstanceFields(ticketData?.previousTicket?.previousTicket, "FIRST_INSTANCE","BOTTOM"));
           }
         }
       }
@@ -773,9 +774,12 @@ const TicketsView = () => {
   }
 
   // Handle Attachments Button
-  const handleAttachmentsClick = (instance_type) => {
+  const handleAttachmentsClick = (instance_type,position) => {
     setCurrentInstance(instance_type)
     setAttachmentsModalShow(true)
+    setAttachmentPosition(position)
+
+
   }
 
   return (
@@ -783,7 +787,7 @@ const TicketsView = () => {
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         {loading !== true && <TicketViewHeader
-          title={"#" + ticketData?.ticketId}
+          title={"#" + ticketData?.ticketId ?? ''}
           ticketData={ticketData}
           setIsGetAcitivityLogs={setIsGetAcitivityLogs}
           getTicketData={getTicketDetails}
@@ -808,14 +812,12 @@ const TicketsView = () => {
                 (ticketData?.previousTicket) &&
                 <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
                   <Card.Body className='mh-100'>
-                    {
-                      ticketData?.previousTicket?.instanceType === 'FIRST_INSTANCE' ?
-                        <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("FIRST_INSTANCE_CLAIM_DETAILS")}</h5> :
-
-                        ticketData?.previousTicket?.instanceType === 'SECOND_INSTANCE' ?
-                          <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("SECOND_INSTANCE_CLAIM_DETAILS")}</h5> :
-                          <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("COMPLAINT_DETAILS")}</h5>
-                    }
+                    <h5 className='custom-font-size-18 fw-semibold mb-3'>
+                      {t({
+                        FIRST_INSTANCE: "FIRST_INSTANCE_CLAIM_DETAILS",
+                        SECOND_INSTANCE: "SECOND_INSTANCE_CLAIM_DETAILS",
+                      }[ticketData?.previousTicket?.instanceType] || "COMPLAINT_DETAILS")}
+                    </h5>
 
                     <Row>
                       {middleSectionData?.map((item, index) => (
@@ -923,6 +925,7 @@ const TicketsView = () => {
         currentInstance={currentInstance}
         ticketData={ticketData}
         permissionState={permissionsState}
+        attachmentPosition={attachmentPosition}
       />
       {
         ticketData?.slaPopup !== null &&
