@@ -1,6 +1,8 @@
 package com.seps.ticket.service.specification;
 
 import com.seps.ticket.domain.ClaimTicket;
+import com.seps.ticket.enums.ClaimTicketStatusEnum;
+import com.seps.ticket.enums.SlaComplianceEnum;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
@@ -87,11 +89,11 @@ public class ClaimTicketSpecification {
             );
 
             // Concatenate firstName and lastName, then filter by the concatenated value
-            Join<Object, Object> user = root.join("user", JoinType.INNER);
+            Join<Object, Object> user = root.join("user", JoinType.LEFT);
             Predicate userNamePredicate = criteriaBuilder.like(
                 criteriaBuilder.lower(
                     criteriaBuilder.concat(
-                        criteriaBuilder.concat(user.get("firstName"), criteriaBuilder.literal(" ")),
+                        criteriaBuilder.concat(user.get("firstName"), criteriaBuilder.literal("")),
                         user.get("lastName")
                     )
                 ),
@@ -272,4 +274,27 @@ public class ClaimTicketSpecification {
         }
     }
 
+    public static Specification<ClaimTicket> getSlaComplianceReport(ClaimTicketFilterRequest filterRequest) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            addDateRangeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addOrganizationFilter(filterRequest, root, criteriaBuilder, predicates);
+            addClaimTypeFilter(filterRequest, root, criteriaBuilder, predicates);
+            addPriorityFilter(filterRequest, root, criteriaBuilder, predicates);
+            addClaimSubTypeIdFilter(filterRequest, root, criteriaBuilder, predicates);
+            addInstanceTypeFilter(filterRequest, root, criteriaBuilder, predicates);
+
+            // SLA Compliance filter
+            if (filterRequest.getSlaCompliance() != null) {
+                if(SlaComplianceEnum.COMPLIANT.equals(filterRequest.getSlaCompliance())){
+                    predicates.add(root.get("resolvedOn").isNotNull());
+                } else {
+                    predicates.add(root.get("resolvedOn").isNull());
+                }
+            }
+            predicates.add(criteriaBuilder.equal(root.get("status"), ClaimTicketStatusEnum.CLOSED));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 }

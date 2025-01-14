@@ -24,5 +24,6 @@ public class ClaimTicketFilterRequest {
     private RejectedStatusEnum rejectedStatus;
     private SourceEnum source;
     private ChannelOfEntryEnum channelOfEntry;
+    private SlaComplianceEnum slaCompliance;
 }
 
