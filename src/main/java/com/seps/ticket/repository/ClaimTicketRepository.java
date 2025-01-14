@@ -68,8 +68,8 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
     @Query("SELECT c FROM ClaimTicket c WHERE c.user.id = :userId " +
         "AND c.instanceType = :instanceType " +
         "AND c.canCreateInstance = true " +
-        "AND ((c.status = :closedStatus AND c.closedStatus <> :excludedClosedStatus) " +
-        "OR (c.status = :rejectedStatus AND c.rejectedStatus <> :excludedRejectedStatus))")
+        "AND ((c.status = :closedStatus) " +
+        "OR (c.status = :rejectedStatus))")
     List<ClaimTicket> findValidClaimTickets(@Param("userId") Long userId,
                                             @Param("instanceType") InstanceTypeEnum instanceType,
                                             @Param("closedStatus") ClaimTicketStatusEnum closedStatus,
