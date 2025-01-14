@@ -2,6 +2,7 @@ package com.seps.ticket.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.seps.ticket.component.CommonHelper;
 import com.seps.ticket.component.DateUtil;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
@@ -612,6 +613,7 @@ public class ClaimTicketService {
                 row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName():"");
                 row.createCell(ExcelHeaderClaimTicketEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
                 row.createCell(ExcelHeaderClaimTicketEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+                row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_AMOUNT.ordinal()).setCellValue(CommonHelper.formatAmount(data.getClaimAmount()));
 
             }
             // Auto-size columns

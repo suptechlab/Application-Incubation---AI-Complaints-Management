@@ -1,11 +1,13 @@
 package com.seps.ticket.service;
 
+import com.seps.ticket.component.CommonHelper;
 import com.seps.ticket.component.DateUtil;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.enums.SlaComplianceEnum;
+import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketEnum;
 import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketReportEnum;
 import com.seps.ticket.enums.excel.header.ExcelHeaderSlaComplianceReportEnum;
 import com.seps.ticket.repository.*;
@@ -34,6 +36,7 @@ import org.zalando.problem.Status;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -186,6 +189,8 @@ public class ReportService {
         row.createCell(ExcelHeaderClaimTicketReportEnum.SECOND_INSTANCE_COMMENT.ordinal()).setCellValue(data.getSecondInstanceComment() != null ? data.getSecondInstanceComment() : "");
         row.createCell(ExcelHeaderClaimTicketReportEnum.SOURCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getSource(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.CHANNEL_OF_ENTRY.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getChannelOfEntry(), LocaleContextHolder.getLocale()));
+        row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_AMOUNT.ordinal())
+            .setCellValue(CommonHelper.formatAmount(data.getClaimAmount()));
     }
 
 
@@ -418,6 +423,5 @@ public class ReportService {
         // Calculate the average resolution time
         return resolvedTicketsCount > 0 ? totalResolutionTimeInDays / resolvedTicketsCount : 0.0;
     }
-
 
 }

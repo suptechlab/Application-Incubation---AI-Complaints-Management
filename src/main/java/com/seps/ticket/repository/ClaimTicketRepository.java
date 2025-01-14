@@ -68,14 +68,13 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
     @Query("SELECT c FROM ClaimTicket c WHERE c.user.id = :userId " +
         "AND c.instanceType = :instanceType " +
         "AND c.canCreateInstance = true " +
-        "AND ((c.status = :closedStatus) " +
-        "OR (c.status = :rejectedStatus))")
+        "AND (c.status = :closedStatus " +
+        "OR c.status = :rejectedStatus) ")
     List<ClaimTicket> findValidClaimTickets(@Param("userId") Long userId,
                                             @Param("instanceType") InstanceTypeEnum instanceType,
                                             @Param("closedStatus") ClaimTicketStatusEnum closedStatus,
-                                            @Param("excludedClosedStatus") ClosedStatusEnum excludedClosedStatus,
-                                            @Param("rejectedStatus") ClaimTicketStatusEnum rejectedStatus,
-                                            @Param("excludedRejectedStatus") RejectedStatusEnum excludedRejectedStatus);
+                                            @Param("rejectedStatus") ClaimTicketStatusEnum rejectedStatus
+                                            );
 
 
     @Query("SELECT new com.seps.ticket.service.projection.ClaimStatusCountProjection(ct.status, COUNT(ct)) " +

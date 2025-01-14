@@ -16,7 +16,8 @@ public enum ExcelHeaderClaimTicketEnum implements EnumWithDescription {
     INSTANCE_TYPE("excel.header.instanceType"),
     CREATED_AT("excel.header.createdAt"),
     SECOND_INSTANCE_CREATED_AT("excel.header.secondInstanceCreatedAt"),
-    COMPLAINT_CREATED_AT("excel.header.complaintCreatedAt");
+    COMPLAINT_CREATED_AT("excel.header.complaintCreatedAt"),
+    CLAIM_AMOUNT("excel.header.claim.amount");
 
     private final String key;
 

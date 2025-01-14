@@ -55,4 +55,5 @@ public class SLAComplianceDTO {
     private long actualResolutionDays;
     private String slaCompliance;
     private String slaBreachReason;
+    private Double claimAmount;
 }
