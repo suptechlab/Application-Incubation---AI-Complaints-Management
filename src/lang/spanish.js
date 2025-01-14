@@ -152,6 +152,8 @@ export const spanishLang = {
   "UPDATE": "Actualizar",
   "BROWSE_IMAGE": "Explorar imagen",
   "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE": "Las extensiones de archivo de imagen permitidas son .jpg, .jpeg y .png.",
-  "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB."
-
+  "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB.",
+  "CLAIM_SUB_STATUS": "Subestado de reclamación",
+  "FIRST_INSTANCE_CLAIM_ID":"ID de reclamo de primera instancia",
+  "SECOND_INSTANCE_CLAIM_ID":"ID de reclamo de segunda instancia"
 }

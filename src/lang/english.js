@@ -151,5 +151,8 @@ export const englishLang = {
   "UPDATE":"Update",
   "BROWSE_IMAGE":"Browse Image",
   "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE" :"Allowed image file extensions are .jpg, .jpeg and .png.",
-  "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE" : "Image size must not exceed 2.5 MB."
+  "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE" : "Image size must not exceed 2.5 MB.",
+  "CLAIM_SUB_STATUS":"Claim sub status",
+  "FIRST_INSTANCE_CLAIM_ID":"1st Instance claim id",
+  "SECOND_INSTANCE_CLAIM_ID":"2nd Instance claim id"
 }

@@ -306,73 +306,78 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
                             }
                             <div ref={messagesEndRef} />
                         </Modal.Body>
-                        <Modal.Footer className="border-top py-0 flex-column">
-                            <Stack
-                                direction='horizontal'
-                                gap={2}
-                                className='flex-fill'
-                            >
-                                <div className="overflow-hidden position-relative z-1 flex-shrink-0">
-                                    <AppTooltip title="Add Attachments">
-                                        <label
-                                            htmlFor="attachments"
-                                            className="link-primary cursor-pointer"
-                                            aria-label='Add Attachments'
-                                        >
-                                            <MdAttachFile size={24} />
-                                        </label>
-                                    </AppTooltip>
+                        {
+                            !['CLOSED', 'REJECTED'].includes(selectedRow?.status) &&
+                            <Modal.Footer className="border-top py-0 flex-column">
+                                <Stack
+                                    direction='horizontal'
+                                    gap={2}
+                                    className='flex-fill'
+                                >
+                                    <div className="overflow-hidden position-relative z-1 flex-shrink-0">
+                                        <AppTooltip title="Add Attachments">
+                                            <label
+                                                htmlFor="attachments"
+                                                className="link-primary cursor-pointer"
+                                                aria-label='Add Attachments'
+                                            >
+                                                <MdAttachFile size={24} />
+                                            </label>
+                                        </AppTooltip>
 
-                                    <input
-                                        name="attachments"
-                                        id="attachments"
-                                        // accept="image/png, image/jpeg, image/jpg"
-                                        accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
-                                        className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                                        type="file"
-                                        onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
-                                    />
-                                </div>
-                                <FormInputBox
-                                    wrapperClassName='mb-0 flex-fill'
-                                    inputClassName="border-0 shadow-none px-1 py-3"
-                                    id="message"
-                                    placeholder={t("ASK_OR_REPLY...")}
-                                    name="message"
-                                    error={formikProps.errors.message}
-                                    onBlur={formikProps.handleBlur}
-                                    onChange={formikProps.handleChange}
-                                    touched={formikProps.touched.message}
-                                    type="text"
-                                    value={formikProps.values.message || ""}
-                                    autoComplete="off"
-                                    disabled={formikProps?.isSubmitting ?? false}
-                                />
-                                <AppTooltip title="Send">
-                                    <Button
-                                        type="submit"
-                                        variant="link"
-                                        className='p-2 link-primary me-n2'
-                                        aria-label='Send Message'
+                                        <input
+                                            name="attachments"
+                                            id="attachments"
+                                            // accept="image/png, image/jpeg, image/jpg"
+                                            accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                            className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                            type="file"
+                                            disabled={formikProps?.isSubmitting ?? false}
+                                            onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
+                                        />
+                                    </div>
+                                    <FormInputBox
+                                        wrapperClassName='mb-0 flex-fill'
+                                        inputClassName="border-0 shadow-none px-1 py-3"
+                                        id="message"
+                                        placeholder={t("ASK_OR_REPLY...")}
+                                        name="message"
+                                        error={formikProps.errors.message}
+                                        onBlur={formikProps.handleBlur}
+                                        onChange={formikProps.handleChange}
+                                        touched={formikProps.touched.message}
+                                        type="text"
+                                        value={formikProps.values.message || ""}
+                                        autoComplete="off"
                                         disabled={formikProps?.isSubmitting ?? false}
-                                    >
-                                        <MdSend size={24} />
-                                    </Button>
-                                </AppTooltip>
-                            </Stack>
+                                    />
+                                    <AppTooltip title="Send">
+                                        <Button
+                                            type="submit"
+                                            variant="link"
+                                            className='p-2 link-primary me-n2'
+                                            aria-label='Send Message'
+                                            disabled={formikProps?.isSubmitting ?? false}
+                                        >
+                                            <MdSend size={24} />
+                                        </Button>
+                                    </AppTooltip>
+                                </Stack>
 
-                            {fileName && (
-                                <div className='me-auto'>
-                                    <Badge
-                                        pill
-                                        bg='info-subtle'
-                                        className='text-info'
-                                    >
-                                        {fileName}
-                                    </Badge>
-                                </div>
-                            )}
-                        </Modal.Footer>
+                                {fileName && (
+                                    <div className='me-auto'>
+                                        <Badge
+                                            pill
+                                            bg='info-subtle'
+                                            className='text-info'
+                                        >
+                                            {fileName}
+                                        </Badge>
+                                    </div>
+                                )}
+                            </Modal.Footer>
+                        }
+
                     </React.Fragment>
                 )}
             </CommonFormikComponent>

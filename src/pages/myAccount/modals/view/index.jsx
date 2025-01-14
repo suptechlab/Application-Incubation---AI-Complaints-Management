@@ -15,10 +15,11 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
     const { t } = useTranslation();
     const dispatch = useDispatch();
+
+    const { instance_types, masterData} = useSelector((state) => state?.masterSlice);
     const [loading, setLoading] = useState(false);
     const [claimTicketData, setClaimTicketData] = useState([]);
     const [instanceTypeTranslated, setInstanceTypeTranslated] = useState("");
-    const { instance_types } = useSelector((state) => state?.masterSlice);
     const [roleUserDocuments, setRoleUserDocuments] = useState([]);
     const [roleFiUserDocuments, setRoleFiUserDocuments] = useState([]);
     const [roleSepsUserDocuments, setRoleSepsUserDocuments] = useState([]);
@@ -167,15 +168,51 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 : t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
+        ...(claimTicketData?.instanceType === "SECOND_INSTANCE" ? [ {
+            label: t('FIRST_INSTANCE_CLAIM_ID'),
+            value: (
+                <span className={`fw-semibold`}>
+                    #{claimTicketData?.previousTicket?.ticketId}
+                </span>
+            ),
+            colProps: { sm: 6, lg: 3 },
+        }]:[]),
+        ...(claimTicketData?.instanceType === "COMPLAINT" ? [ {
+            label: t('SECOND_INSTANCE_CLAIM_ID'),
+            value: (
+                <span className={`fw-semibold`}>
+                    #{claimTicketData?.previousTicket?.ticketId}
+                </span>
+            ),
+            colProps: { sm: 6, lg: 3 },
+        }]:[]),
+
         {
             label: t('CLAIM_STATUS'),
             value: (
                 <span className={`${getStatusTextClass(claimTicketData?.status)} fw-semibold`}>
-                    {claimTicketData?.status ?? t('N/A')}
+                    {masterData?.claimTicketStatus[claimTicketData?.status] ?? t('N/A')}
                 </span>
             ),
             colProps: { sm: 6, lg: 3 }
-        }
+        },
+       
+        ...(claimTicketData?.status === "CLOSED" || claimTicketData?.status === "REJECTED" ? [
+            {
+                label: t('CLAIM_SUB_STATUS'),
+                value: (
+                    <span className={`fw-semibold`}>
+                        {
+                            claimTicketData?.status === 'CLOSED' && masterData?.closedStatus[claimTicketData?.closedStatus]
+                        }
+                        {
+                            claimTicketData?.status === 'REJECTED' && masterData?.rejectedStatus[claimTicketData?.rejectedStatus]
+                        }
+                    </span>
+                ),
+                colProps: { sm: 6, lg: 3 }
+            }
+        ] : []),
     ];
 
     // Accordion Items
@@ -204,13 +241,13 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     const viewBottomData = [
         {
             label: t('PRECEDENTS'),
-            value: claimTicketData?.instanceType === 'FIRST_INSTANCE' ? (claimTicketData?.precedents ?? t('N/A')) : (claimTicketData?.complaintPrecedents ?? t('N/A')),
+            value: claimTicketData?.instanceType !== 'SECOND_INSTANCE' ? claimTicketData?.precedents ?? t('N/A') : '',
             colProps: { xs: 12 },
             condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE'
         },
         {
             label: t('SPECIFIC_PETITION'),
-            value: claimTicketData?.instanceType === 'FIRST_INSTANCE' ? (claimTicketData?.specificPetition ?? t('N/A')) : (claimTicketData?.complaintSpecificPetition ?? t('N/A')),
+            value: claimTicketData?.instanceType !== 'SECOND_INSTANCE' ? claimTicketData?.specificPetition ?? t('N/A') : '',
             colProps: { xs: 12 },
             condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE'
         },
