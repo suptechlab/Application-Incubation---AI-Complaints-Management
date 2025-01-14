@@ -91,11 +91,11 @@ public class ClaimTicketSpecification {
             // Concatenate firstName and lastName, then filter by the concatenated value
             Join<Object, Object> user = root.join("user", JoinType.LEFT);
             Predicate userNamePredicate = criteriaBuilder.like(
-                criteriaBuilder.lower(
-                    criteriaBuilder.concat(
-                        criteriaBuilder.concat(user.get("firstName"), criteriaBuilder.literal("")),
-                        user.get("lastName")
-                    )
+                criteriaBuilder.lower(user.get("firstName")
+//                    criteriaBuilder.concat(
+//                        criteriaBuilder.concat(user.get("firstName"), criteriaBuilder.literal("")),
+//                        user.get("lastName")
+//                    )
                 ),
                 "%" + filterRequest.getSearch().toLowerCase() + "%"
             );
