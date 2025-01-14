@@ -79,10 +79,13 @@ public class AdminUserDTO implements Serializable {
 
     private String department;
 
+    private String externalDocumentId;
+
 
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
     }
+
 
     public AdminUserDTO(User user) {
         this.id = user.getId();
@@ -109,6 +112,7 @@ public class AdminUserDTO implements Serializable {
             this.organization = new OrganizationDTO(user.getOrganization());
         }
         this.department = user.getDepartment();
+        this.externalDocumentId = user.getExternalDocumentId();
     }
 
     public Long getId() {
@@ -294,6 +298,15 @@ public class AdminUserDTO implements Serializable {
     public void setDepartment(String department) {
         this.department = department;
     }
+
+    public String getExternalDocumentId() {
+        return externalDocumentId;
+    }
+
+    public void setExternalDocumentId(String externalDocumentId) {
+        this.externalDocumentId = externalDocumentId;
+    }
+
 
     // prettier-ignore
     @Override
