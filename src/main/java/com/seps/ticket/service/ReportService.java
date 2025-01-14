@@ -4,6 +4,7 @@ import com.seps.ticket.component.DateUtil;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.*;
+import com.seps.ticket.enums.ClaimTicketStatusEnum;
 import com.seps.ticket.enums.SlaComplianceEnum;
 import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketReportEnum;
 import com.seps.ticket.enums.excel.header.ExcelHeaderSlaComplianceReportEnum;
@@ -12,6 +13,8 @@ import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.specification.ClaimTicketSpecification;
+import com.seps.ticket.web.rest.errors.CustomException;
+import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -25,14 +28,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.zalando.problem.Status;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -365,4 +369,55 @@ public class ReportService {
             row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_BREACH_REASON.ordinal()).setCellValue(data.getStatusComment());
         }
     }
+
+    /**
+     * Service class to calculate average resolution time for claim tickets.
+     * Retrieves the average resolution time for claim tickets based on the provided filters.
+     *
+     * @param filterRequest the filter request containing criteria to filter claim tickets.
+     *                      If null, a default filter request will be initialized.
+     * @return a map containing the average resolution time under the key "averageResolutionTime".
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getAverageResolutionTimeData(ClaimTicketFilterRequest filterRequest) {
+        // If no filterRequest is provided, initialize a default object
+        filterRequest = getClaimTicketFilterRequest(filterRequest);
+
+        List<ClaimTicket>slaComplianceList = claimTicketRepository.findAll(ClaimTicketSpecification.getSlaComplianceReport(filterRequest)).stream().toList();
+        Double avgTime = calculateAverageResolutionTime(slaComplianceList);
+        Map<String, Object> data = new HashMap<>();
+        data.put("averageResolutionTime", avgTime);
+        return data;
+    }
+
+    /**
+     * Calculates the average resolution time for a list of claim tickets.
+     *
+     * @param slaComplianceList a list of {@link ClaimTicket} objects to calculate resolution time.
+     * @return the average resolution time in days as a double value. If the list is empty or contains no resolved tickets,
+     *         the method returns 0.0.
+     */
+    public double calculateAverageResolutionTime(List<ClaimTicket> slaComplianceList) {
+        if (slaComplianceList == null || slaComplianceList.isEmpty()) {
+            return 0.0; // Return 0 if the list is empty
+        }
+
+        double totalResolutionTimeInDays = 0.0;
+        int resolvedTicketsCount = 0;
+
+        for (ClaimTicket ticket : slaComplianceList) {
+            // Ensure resolution date is available
+            if (ticket.getResolvedOn() != null && ticket.getCreatedAt() != null) {
+                long resolutionTimeInHours = ChronoUnit.HOURS.between(ticket.getCreatedAt(), ticket.getResolvedOn());
+                double resolutionTimeInDays = resolutionTimeInHours / 24.0;
+                totalResolutionTimeInDays += resolutionTimeInDays;
+                resolvedTicketsCount++;
+            }
+        }
+
+        // Calculate the average resolution time
+        return resolvedTicketsCount > 0 ? totalResolutionTimeInDays / resolvedTicketsCount : 0.0;
+    }
+
+
 }

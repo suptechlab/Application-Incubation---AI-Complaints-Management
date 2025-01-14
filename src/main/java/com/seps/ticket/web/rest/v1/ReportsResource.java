@@ -23,6 +23,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/report")
@@ -121,4 +122,26 @@ public class ReportsResource {
                 .body(in.readAllBytes());
         }
     }
+
+    @Operation(
+        summary = "Calculate Average Resolution Time",
+        description = "Calculate the average resolution time for claim tickets based on the provided filters.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Successfully calculated the average resolution time.",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Map.class, description = "A map containing average resolution time and related data.")
+                )
+            )
+        }
+    )
+    @GetMapping("/sla-report/average-resolution-time")
+    @PermissionCheck({"SLA_COMPLIANCE"})
+    public ResponseEntity<Map<String, Object>> getAverageResolutionTime(@ModelAttribute ClaimTicketFilterRequest filterRequest) {
+        Map<String, Object> data = reportService.getAverageResolutionTimeData(filterRequest);
+        return ResponseEntity.ok(data);
+    }
+
 }
