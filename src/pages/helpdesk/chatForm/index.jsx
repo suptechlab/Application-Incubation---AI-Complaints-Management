@@ -523,8 +523,8 @@ const ChatBotForm = () => {
                                 //     }
                                 //   }
                                 setFieldValue('attachments', '')
-                                console.log({ here: { message: 'Please process these documents', metadata } })
-                                handleSendQuery({ message: 'Please process these documents', metadata })
+                                // console.log({ here: { message: 'Please process these documents', metadata } })
+                                handleSendQuery({ message: 'Quiero subir un archivo', metadata })
                                 // sendQuery(result?.payload)
 
 
