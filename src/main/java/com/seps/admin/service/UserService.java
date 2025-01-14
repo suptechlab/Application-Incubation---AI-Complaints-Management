@@ -1,7 +1,9 @@
 package com.seps.admin.service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.seps.admin.config.Constants;
+import com.seps.admin.config.InstantTypeAdapter;
 import com.seps.admin.domain.*;
 import com.seps.admin.enums.*;
 import com.seps.admin.repository.AuthorityRepository;
@@ -12,28 +14,30 @@ import com.seps.admin.security.SecurityUtils;
 import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.FIUserDTO;
 import com.seps.admin.service.dto.RequestInfo;
-import com.seps.admin.suptech.service.LdapSearchService;
-import com.seps.admin.suptech.service.UserNotFoundException;
+import com.seps.admin.suptech.service.*;
 import com.seps.admin.suptech.service.dto.PersonInfoDTO;
 import com.seps.admin.service.dto.SEPSUserDTO;
 import com.seps.admin.service.mapper.UserMapper;
 import com.seps.admin.service.specification.UserSpecification;
-import com.seps.admin.suptech.service.ExternalAPIService;
-import com.seps.admin.suptech.service.PersonNotFoundException;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
+import com.seps.admin.web.rest.vm.ProfileVM;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -54,14 +58,16 @@ public class UserService {
     private final MessageSource messageSource;
     private final Gson gson;
     private final LdapSearchService ldapSearchService;
+    private final DocumentService documentService;
     private static final String DISPLAY_NAME = "displayName";
     private static final String DEPARTMENT = "department";
     private static final String TITLE = "title";
+    private static final String CN = "cn";
 
     public UserService(UserRepository userRepository, AuthorityRepository authorityRepository,
                        PasswordEncoder passwordEncoder, UserMapper userMapper, ExternalAPIService externalAPIService,
                        RoleRepository roleRepository, OrganizationService organizationService, AuditLogService auditLogService,
-                       MessageSource messageSource, Gson gson, LdapSearchService ldapSearchService) {
+                       MessageSource messageSource, Gson gson, LdapSearchService ldapSearchService, DocumentService documentService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
@@ -71,8 +77,11 @@ public class UserService {
         this.organizationService = organizationService;
         this.auditLogService = auditLogService;
         this.messageSource = messageSource;
-        this.gson = gson;
+        this.gson = new GsonBuilder()
+            .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+            .create();
         this.ldapSearchService = ldapSearchService;
+        this.documentService = documentService;
     }
 
     @Transactional
@@ -90,7 +99,7 @@ public class UserService {
      * </p>
      *
      * @param userDTO     the data transfer object containing user details (name, email, etc.)
-     * @param requestInfo   the request information for logging
+     * @param requestInfo the request information for logging
      * @return the created {@link User} entity
      */
     @Transactional
@@ -160,7 +169,7 @@ public class UserService {
      *
      * @param id          the ID of the user to be updated
      * @param userDTO     the data transfer object containing updated user details
-     * @param requestInfo   the request information for logging
+     * @param requestInfo the request information for logging
      * @throws CustomException if the user is not found or lacks SEPS authority
      */
     @Transactional
@@ -403,14 +412,12 @@ public class UserService {
      */
     @Transactional
     public FIUserDTO getFIUserById(Long id) {
-        User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(
-            () -> new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND,
-                new String[]{id.toString()}, null));
+        User entity = userRepository.findOneWithAuthoritiesById(id).orElseThrow(() ->
+            new CustomException(Status.NOT_FOUND, SepsStatusCode.USER_NOT_FOUND, new String[]{id.toString()}, null));
         List<String> authorityList = entity.getAuthorities().stream().map(Authority::getName).toList();
         if (!authorityList.contains(AuthoritiesConstants.FI)) {
             LOG.warn("FI User not found with id:{} for detail", id);
-            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_NOT_FOUND,
-                new String[]{id.toString()}, null);
+            throw new CustomException(Status.NOT_FOUND, SepsStatusCode.FI_USER_NOT_FOUND, new String[]{id.toString()}, null);
         }
         return userMapper.userToFIUserDTO(entity);
     }
@@ -570,6 +577,9 @@ public class UserService {
             if (ldapDetails.containsKey(TITLE)) {
                 userDetails.put(TITLE, ldapDetails.get(TITLE));
             }
+            if (ldapDetails.containsKey(CN)) {
+                userDetails.put(CN, ldapDetails.get(CN));
+            }
         } catch (UserNotFoundException e) {
             throw new CustomException(Status.NOT_FOUND, SepsStatusCode.SEPS_USER_VERIFICATION_FAILED, e.getMessage());
         } catch (Exception e) {
@@ -596,8 +606,8 @@ public class UserService {
      * @param organizationId the ID of the organization to filter agents by;
      *                       can be null if filtering is based on the user's role.
      * @return a list of {@link DropdownListDTO} objects representing the active agents
-     *         with their IDs and names. If an agent's first name is null, the name will
-     *         be set to an empty string.
+     * with their IDs and names. If an agent's first name is null, the name will
+     * be set to an empty string.
      * @throws IllegalStateException if the current user is not authenticated or has no roles assigned.
      * @see UserSpecification#byFilterWorkFlow(List, Long)
      */
@@ -611,10 +621,10 @@ public class UserService {
         if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganizationId();
             authorities.add(AuthoritiesConstants.FI);
-        }else{
-            if(organizationId!=null){
+        } else {
+            if (organizationId != null) {
                 authorities.add(AuthoritiesConstants.FI);
-            }else {
+            } else {
                 authorities.add(AuthoritiesConstants.SEPS);
             }
         }
@@ -627,4 +637,38 @@ public class UserService {
             })
             .toList();
     }
+
+    public void editAccount(@Valid ProfileVM profileVM) {
+        User currentUser = getCurrentUser();
+        MultipartFile file = profileVM.getProfilePicture();
+        if (file != null) {
+            try {
+                String uniqueFileName = documentService.generateUniqueFileName(file.getOriginalFilename());
+                // Upload the document and get the external document ID
+                ResponseEntity<String> response = documentService.upload(file.getBytes(), uniqueFileName);
+                String externalDocumentId = response.getBody();  // Assuming the response body contains the externalDocumentId
+                currentUser.setExternalDocumentId(externalDocumentId);
+            } catch (FileStorageException e) {
+                LOG.error("Exception while uploadDocument:{}", e.getMessage());
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FILE_STORAGE_ERROR, e.getMessage());
+            } catch (IOException e) {
+                LOG.error("IOException while uploadDocument:{}", e.getMessage());
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FILE_STORAGE_ERROR, e.getMessage());
+            } catch (Exception e) {
+                String errorMessage = messageSource.getMessage("error.file.upload.unexpected", null, LocaleContextHolder.getLocale());
+                // Catch any other unexpected exceptions
+                throw new CustomException(Status.INTERNAL_SERVER_ERROR, SepsStatusCode.FILE_STORAGE_ERROR, errorMessage);
+            }
+            userRepository.save(currentUser);
+        }
+    }
+
+    public ResponseEntity<byte[]> downloadProfilePicture() {
+        User currentUser = getCurrentUser();
+        if (currentUser.getExternalDocumentId() != null) {
+            return documentService.downloadDocument(currentUser.getExternalDocumentId());
+        }
+        return null;
+    }
+
 }

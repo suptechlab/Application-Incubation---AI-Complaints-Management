@@ -136,7 +136,7 @@ public class MailService {
         mailDTO.setTemplateKey("SEPS_USER_CREATION");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, user.getFirstName());
-        dataVariables.put(URL, jHipsterProperties.getMail().getBaseUrl() + "/reset-password?key=" + user.getResetKey());
+        dataVariables.put(URL, jHipsterProperties.getMail().getBaseUrl());
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
     }
@@ -199,7 +199,7 @@ public class MailService {
         TemplateMaster template = templateMasterRepository.findByTemplateKeyIgnoreCaseAndStatus(mailDTO.getTemplateKey(), true)
             .orElse(null);
 
-        if(template != null) {
+        if (template != null) {
             // Prepare dynamic content
             String subject = replacePlaceholders(template.getSubject(), mailDTO.getDataVariables());
             String content = replacePlaceholders(template.getContent(), mailDTO.getDataVariables());
@@ -209,11 +209,11 @@ public class MailService {
 
             // Send email
             Boolean isSent = externalAPIService.sendEmailViaApi(mailDTO, subject, renderedContent);
-            if(Boolean.FALSE.equals(isSent)) {
+            if (Boolean.FALSE.equals(isSent)) {
                 LOG.debug("External API Not working trying to test email service now...");
                 this.sendEmailSync(mailDTO.getTo(), subject, renderedContent, false, true);
             }
-        }else {
+        } else {
             LOG.debug("Template with key '{}' not found or inactive. Using default content.", mailDTO.getTemplateKey());
         }
     }

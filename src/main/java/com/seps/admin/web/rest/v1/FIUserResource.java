@@ -4,12 +4,15 @@ import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.UserStatusEnum;
 import com.seps.admin.repository.UserRepository;
+import com.seps.admin.service.ImportUserService;
 import com.seps.admin.service.MailService;
 import com.seps.admin.service.UserService;
 import com.seps.admin.service.dto.FIUserDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.ResponseStatus;
 import com.seps.admin.suptech.service.dto.PersonInfoDTO;
+import com.seps.admin.web.rest.vm.ImportUserResponseVM;
+import com.seps.admin.web.rest.vm.ImportUserVM;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,9 +35,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Locale;
 
 @Tag(name = "FI User Management", description = "APIs for managing FI users")
 @RestController
@@ -44,14 +50,14 @@ public class FIUserResource {
     private static final Logger LOG = LoggerFactory.getLogger(FIUserResource.class);
     private final UserService userService;
     private final MessageSource messageSource;
-    private final UserRepository userRepository;
     private final MailService mailService;
+    private final ImportUserService importUserService;
 
-    public FIUserResource(UserService userService, MessageSource messageSource, UserRepository userRepository, MailService mailService) {
+    public FIUserResource(UserService userService, MessageSource messageSource, MailService mailService, ImportUserService importUserService) {
         this.userService = userService;
         this.messageSource = messageSource;
-        this.userRepository = userRepository;
         this.mailService = mailService;
+        this.importUserService = importUserService;
     }
 
     @Operation(summary = "GET the person information", description = "GET the person information by identification number.")
@@ -79,7 +85,7 @@ public class FIUserResource {
         )
     })
     @PostMapping
-    @PermissionCheck({"FI_USER_CREATE_BY_SEPS","FI_USER_CREATE_BY_FI"})
+    @PermissionCheck({"FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI"})
     public ResponseEntity<ResponseStatus> addFIUser(@Valid @RequestBody FIUserDTO dto, HttpServletRequest request)
         throws URISyntaxException {
         LOG.info("Attempting to create a new FI user with email: {}", dto.getEmail());
@@ -100,7 +106,7 @@ public class FIUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = FIUserDTO.class)))
     @GetMapping("/{id}")
-    @PermissionCheck({"FI_UPDATE_CREATE_BY_SEPS","FI_UPDATE_CREATE_BY_FI"})
+    @PermissionCheck({"FI_UPDATE_CREATE_BY_SEPS", "FI_UPDATE_CREATE_BY_FI"})
     public ResponseEntity<FIUserDTO> getFIUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getFIUserById(id));
     }
@@ -110,7 +116,7 @@ public class FIUserResource {
         content = @Content(mediaType = "application/json",
             schema = @Schema(implementation = FIUserDTO.class)))
     @GetMapping
-    @PermissionCheck({"FI_USER_CREATE_BY_SEPS","FI_USER_CREATE_BY_FI","FI_UPDATE_CREATE_BY_SEPS","FI_UPDATE_CREATE_BY_FI","FI_STATUS_CHANGE_CREATE_BY_SEPS","FI_STATUS_CHANGE_CREATE_BY_FI"})
+    @PermissionCheck({"FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI", "FI_UPDATE_CREATE_BY_SEPS", "FI_UPDATE_CREATE_BY_FI", "FI_STATUS_CHANGE_CREATE_BY_SEPS", "FI_STATUS_CHANGE_CREATE_BY_FI"})
     public ResponseEntity<List<FIUserDTO>> listFIUsers(Pageable pageable,
                                                        @RequestParam(value = "search", required = false) String search,
                                                        @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
@@ -127,7 +133,7 @@ public class FIUserResource {
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseStatus.class))
     )
     @PutMapping("/{id}")
-    @PermissionCheck({"FI_UPDATE_CREATE_BY_SEPS","FI_UPDATE_CREATE_BY_FI"})
+    @PermissionCheck({"FI_UPDATE_CREATE_BY_SEPS", "FI_UPDATE_CREATE_BY_FI"})
     public ResponseEntity<ResponseStatus> editFIUser(@PathVariable Long id, @Valid @RequestBody FIUserDTO dto,
                                                      HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
@@ -143,7 +149,7 @@ public class FIUserResource {
     @Operation(summary = "Change the status of a FI User", description = "Update the status of a FI User (ACTIVE/BLOCKED).")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/{status}")
-    @PermissionCheck({"FI_STATUS_CHANGE_CREATE_BY_SEPS","FI_STATUS_CHANGE_CREATE_BY_FI"})
+    @PermissionCheck({"FI_STATUS_CHANGE_CREATE_BY_SEPS", "FI_STATUS_CHANGE_CREATE_BY_FI"})
     public ResponseEntity<Void> changeStatus(@PathVariable Long id, @PathVariable(name = "status") UserStatusEnum status,
                                              HttpServletRequest request) {
         // Perform the status update
@@ -152,4 +158,29 @@ public class FIUserResource {
         return ResponseEntity.noContent().build();
     }
 
+
+    @PostMapping("/import")
+    public ResponseEntity<?> importFIUser(@ModelAttribute @Valid ImportUserVM importUserVM, Locale locale, HttpServletRequest request)
+        throws IOException {
+        RequestInfo requestInfo = new RequestInfo(request);
+        InputStream fileInputStream = importUserVM.getBrowseFile().getInputStream();
+        ImportUserResponseVM importUserResponseVM = importUserService.importFIUser(fileInputStream, locale, requestInfo);
+        if (!importUserResponseVM.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(importUserResponseVM.getErrors());
+        }
+
+        //SEND email to newly created FI Users
+        if (!importUserResponseVM.getNewUserList().isEmpty()) {
+            for (User newUser : importUserResponseVM.getNewUserList()) {
+                mailService.sendFIUserCreationEmail(newUser);
+            }
+        }
+
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("fi.user.imported.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
+    }
 }

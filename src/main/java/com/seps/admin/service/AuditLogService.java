@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Map;
 
 public interface AuditLogService {
@@ -21,4 +23,6 @@ public interface AuditLogService {
     Page<AuditListDTO> listAuditLogs(Pageable pageable, String search, ActivityTypeEnum activityType, String startDate, String endDate);
 
     AuditLog getAuditLogById(Long id);
+
+    ByteArrayInputStream downloadAuditLogs(String search, ActivityTypeEnum activityType, String startDate, String endDate) throws IOException;
 }

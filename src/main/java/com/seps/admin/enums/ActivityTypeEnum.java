@@ -1,5 +1,8 @@
 package com.seps.admin.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ActivityTypeEnum {
     DATA_ENTRY("Data Entry"),
     MODIFICATION("Modification"),
@@ -12,7 +15,4 @@ public enum ActivityTypeEnum {
         this.description = description;
     }
 
-    public String getDescription() {
-        return description;
-    }
 }

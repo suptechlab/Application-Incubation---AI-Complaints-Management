@@ -80,7 +80,7 @@ deployment:
       - host: api-stg-suptech.seps.gob.ec
         paths:
           - path: /admin(/|$)(.*)
-            pathType: ImplementationSpecific         
+            pathType: ImplementationSpecific
     tls:
       - secretName: seps-cert
         hosts:
@@ -174,10 +174,10 @@ deployment:
           SPRING_MAIL_PASSWORD:
             envVarName: SPRING_MAIL_PASSWORD
           GOOGLE_RECAPTCHA_SECRET:
-            envVarName: GOOGLE_RECAPTCHA_SECRET            
+            envVarName: GOOGLE_RECAPTCHA_SECRET
 #          LDAP_PASSWORD:
 #            envVarName: LDAP_PASSWORD
-            
+
       # Mount a file id_rsa to connect a ftp server
   #      volume: # Items set like file in volume
   #        mountPath: /home/.ssh/

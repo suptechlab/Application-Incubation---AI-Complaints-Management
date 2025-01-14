@@ -91,4 +91,53 @@ public class LdapSearchService {
         return userDetails;
     }
 
+    public boolean authenticate(String email, String password) {
+        LOG.debug("Authenticating user with email: {}", email);
+        DirContext ctx = null;
+        try {
+            // Fetch user details to get the distinguished name (DN)
+            Map<String, String> userDetails = searchByEmail(email);
+            String distinguishedName = userDetails.get("distinguishedName"); // Ensure your LDAP contains this attribute
+
+            if (distinguishedName == null) {
+                LOG.warn("Distinguished name not found for email: {}", email);
+                return false; // Cannot authenticate without DN
+            }
+
+            // Set up the environment for LDAP authentication
+            Hashtable<String, String> env = new Hashtable<>();
+            env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+            env.put(Context.PROVIDER_URL, ldapConfig.getUrl());
+            env.put(Context.SECURITY_PRINCIPAL, distinguishedName); // Use DN for authentication
+            env.put(Context.SECURITY_CREDENTIALS, password);
+            env.put(Context.SECURITY_AUTHENTICATION, "simple");
+
+            // Attempt to establish a connection
+            ctx = new InitialDirContext(env);
+            LOG.info("Authentication successful for email: {}", email);
+            return true; // Authentication succeeded
+        } catch (AuthenticationException e) {
+            LOG.warn("Authentication failed for email: {}", email);
+            return false; // Authentication failed
+        } catch (UserNotFoundException e) {
+            LOG.warn("User not found for email: {}", email);
+            return false; // User does not exist
+        } catch (Exception e) {
+            LOG.error("Error during authentication for email: {}. Message: {}", email, e.getMessage());
+            throw new RuntimeException(
+                messageSource.getMessage("ldap.auth.problem", null, LocaleContextHolder.getLocale())
+            );
+        } finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (NamingException e) {
+                    LOG.error("Failed to close the LDAP context: {}", e.getMessage());
+                }
+            }
+        }
+    }
+
+
+
 }
