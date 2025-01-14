@@ -8,11 +8,13 @@ import com.seps.auth.domain.LoginLog;
 import com.seps.auth.domain.User;
 import com.seps.auth.enums.UserStatusEnum;
 import com.seps.auth.repository.LoginLogRepository;
+import com.seps.auth.security.AuthoritiesConstants;
 import com.seps.auth.service.MailService;
 import com.seps.auth.service.RecaptchaService;
 import com.seps.auth.service.UserService;
 import com.seps.auth.service.dto.*;
 import com.seps.auth.service.dto.ResponseStatus;
+import com.seps.auth.suptech.service.LdapSearchService;
 import com.seps.auth.web.rest.errors.CustomException;
 import com.seps.auth.web.rest.errors.SepsStatusCode;
 import com.seps.auth.web.rest.vm.LoginVM;
@@ -76,14 +78,18 @@ public class AuthenticateController {
 
     private final MessageSource messageSource;
 
+    private final LdapSearchService ldapSearchService;
+
 
     public AuthenticateController(JwtEncoder jwtEncoder, AuthenticationManagerBuilder authenticationManagerBuilder,
-                                  UserService userService, MailService mailService, MessageSource messageSource) {
+                                  UserService userService, MailService mailService, MessageSource messageSource,
+                                  LdapSearchService ldapSearchService) {
         this.jwtEncoder = jwtEncoder;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userService = userService;
         this.mailService = mailService;
         this.messageSource = messageSource;
+        this.ldapSearchService = ldapSearchService;
     }
 
     @PostMapping("/authenticate")
@@ -164,36 +170,36 @@ public class AuthenticateController {
      * @return ResponseEntity containing an OtpResponse with the OTP token and expiration time if authentication is successful.
      * @throws CustomException if recaptcha verification fails or if authentication fails.
      */
-    @PostMapping("/login")
-    public ResponseEntity<OtpResponse> login(@Valid @RequestBody LoginVM loginVM, HttpServletRequest request) {
-        String clientIp = request.getRemoteAddr();
-        // Verify reCAPTCHA
-        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
-            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
-            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
-        }
-        try {
-            // Authenticate user credentials
-            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(
-                new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword())
-            );
-            // Retrieve user, update OTP, and send via email
-            User user = userService.updateUserOtpInfo(loginVM.getUsername());
-            mailService.sendLoginOtpEmail(user);
-            // Log the successful login attempt
-            userService.saveLoginLog(user,UserService.INITIATED, clientIp);
-            // Return OTP response
-            return new ResponseEntity<>(new OtpResponse(user.getOtpToken(), user.getOtpTokenExpirationTime()), HttpStatus.OK);
-        } catch (AuthenticationException e) {
-            // Handle failed authentication, log with user ID if found
-            Optional<User> optionalUser = userService.getUserWithAuthoritiesByLogin(loginVM.getUsername());
-            optionalUser.ifPresent(user -> {
-                userService.saveLoginLog(user,UserService.FAILED, clientIp);
-            });
-            LOG.error("Authentication failed for user: {}", loginVM.getUsername(), e);
-            throw e;
-        }
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<OtpResponse> login(@Valid @RequestBody LoginVM loginVM, HttpServletRequest request) {
+//        String clientIp = request.getRemoteAddr();
+//        // Verify reCAPTCHA
+//        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
+//            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
+//            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+//        }
+//        try {
+//            // Authenticate user credentials
+//            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(
+//                new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword())
+//            );
+//            // Retrieve user, update OTP, and send via email
+//            User user = userService.updateUserOtpInfo(loginVM.getUsername());
+//            mailService.sendLoginOtpEmail(user);
+//            // Log the successful login attempt
+//            userService.saveLoginLog(user,UserService.INITIATED, clientIp);
+//            // Return OTP response
+//            return new ResponseEntity<>(new OtpResponse(user.getOtpToken(), user.getOtpTokenExpirationTime()), HttpStatus.OK);
+//        } catch (AuthenticationException e) {
+//            // Handle failed authentication, log with user ID if found
+//            Optional<User> optionalUser = userService.getUserWithAuthoritiesByLogin(loginVM.getUsername());
+//            optionalUser.ifPresent(user -> {
+//                userService.saveLoginLog(user,UserService.FAILED, clientIp);
+//            });
+//            LOG.error("Authentication failed for user: {}", loginVM.getUsername(), e);
+//            throw e;
+//        }
+//    }
 
 
     /**
@@ -358,4 +364,71 @@ public class AuthenticateController {
         // Return OTP response
         return new ResponseEntity<>(new OtpResponse(user.getOtpToken(), user.getOtpTokenExpirationTime()), HttpStatus.OK);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<OtpResponse> login(@Valid @RequestBody LoginVM loginVM, HttpServletRequest request) {
+        String clientIp = request.getRemoteAddr();
+        // Verify reCAPTCHA
+        if (!userService.isRecaptchaValid(loginVM.getRecaptchaToken())) {
+            LOG.error("Recaptcha verification failed for token: {}", loginVM.getRecaptchaToken());
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.RECAPTCHA_FAILED, null, null);
+        }
+
+        User user = userService.getUserWithAuthoritiesByLogin(loginVM.getUsername())
+            .orElseThrow(() -> new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USERNAME_PASSWORD_INVALID, null, null));
+
+        try {
+            // Determine authentication method based on user authorities
+            if (hasSEPSAuthority(user)) {
+                performLdapAuthentication(loginVM.getUsername(), loginVM.getPassword());
+            } else {
+                performDefaultAuthentication(loginVM.getUsername(), loginVM.getPassword());
+            }
+
+            userService.validateAccount(user);
+            // Update user OTP and send email
+            User user1=userService.updateUserOtpInfo(user.getLogin());
+            mailService.sendLoginOtpEmail(user1);
+            // Log successful login attempt
+            userService.saveLoginLog(user1, UserService.INITIATED, clientIp);
+            // Return OTP response
+            return ResponseEntity.ok(new OtpResponse(user1.getOtpToken(), user1.getOtpTokenExpirationTime()));
+
+        } catch (AuthenticationException | CustomException e) {
+            handleAuthenticationFailure(user, clientIp, e);
+            throw e;
+        }
+    }
+
+
+    private boolean hasSEPSAuthority(User user) {
+        return user.getAuthorities().stream()
+            .anyMatch(auth -> AuthoritiesConstants.SEPS.equalsIgnoreCase(auth.getName()));
+    }
+
+
+    private void performDefaultAuthentication(String username, String password) {
+        LOG.debug("Performing default authentication for username: {}", username);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(
+            new UsernamePasswordAuthenticationToken(username, password)
+        );
+        LOG.info("Default authentication successful for username: {}", username);
+    }
+
+    private void performLdapAuthentication(String email, String password) {
+        LOG.debug("Performing LDAP authentication for email: {}", email);
+        boolean isAuthenticated = ldapSearchService.authenticate(email, password);
+        if (!isAuthenticated) {
+            LOG.warn("LDAP authentication failed for email: {}", email);
+            throw new CustomException(Status.UNAUTHORIZED, SepsStatusCode.USERNAME_PASSWORD_INVALID, null, null);
+        }
+        LOG.info("LDAP authentication successful for email: {}", email);
+    }
+
+
+    private void handleAuthenticationFailure(User user, String clientIp, Exception exception) {
+        LOG.error("Authentication failed for user: {}. Reason: {}", user.getLogin(), exception.getMessage());
+        userService.saveLoginLog(user, UserService.FAILED, clientIp);
+    }
+
 }
