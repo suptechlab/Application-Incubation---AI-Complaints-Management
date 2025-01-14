@@ -79,7 +79,7 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
 
   useEffect(() => {
     getTicketActivityLogs()
-  }, [ticketId, isGetActivityLogs])
+  }, [ticketId, isGetActivityLogs,profileImage])
 
 
   //Chat Reply Data

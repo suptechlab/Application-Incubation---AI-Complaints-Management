@@ -1,7 +1,7 @@
 import moment from "moment/moment";
 import { MdPictureAsPdf } from "react-icons/md";
-import { FiImage ,FiFileText} from "react-icons/fi";
-import { FaRegFile,FaFileWord,FaFileAlt } from "react-icons/fa";
+import { FiImage, FiFileText } from "react-icons/fi";
+import { FaRegFile, FaFileWord, FaFileAlt } from "react-icons/fa";
 import { getValidationMessages } from "../services/Validation.service";
 
 const msg = getValidationMessages();
@@ -31,13 +31,26 @@ export const timeRemaining = (date) => {
 
 // CALCULATE DIFFERENCE
 export const calculateDaysDifference = (date) => {
+
   const now = moment();
   const targetDate = moment(date);
 
-  // Calculate the absolute difference in days
-  const daysDifference = Math.abs(targetDate.diff(now, 'days'));
+  // Check if the target date is in the past
+  if (targetDate.isAfter(now, 'day')) {
+    // Calculate the difference in days
+    const daysDifference = now.diff(targetDate, 'days');
+    return `${daysDifference}`;
+  }
 
-  return `${daysDifference}`;
+  // Return 0 or a message if the date is not in the past
+  return '0';
+  // const now = moment();
+  // const targetDate = moment(date);
+
+  // // Calculate the absolute difference in days
+  // const daysDifference = Math.abs(targetDate.diff(now, 'days'));
+
+  // return `${daysDifference}`;
 };
 
 // FILE UPLOAD
@@ -45,7 +58,7 @@ export const calculateDaysDifference = (date) => {
 // export const validateFile = (file) => {
 
 
- 
+
 //   const MAX_FILE_SIZE_MB = 1;
 
 //   if (!file) {
@@ -99,48 +112,48 @@ export const isHTML = (data) => {
 
 // DOWNLOAD FUNCTION
 
-export function downloadFile(response, attachmentData,fileName) {
+export function downloadFile(response, attachmentData, fileName) {
   return new Promise((resolve, reject) => {
-      try {
-          // Create the Blob object based on response data
-          const blob = new Blob([response?.data], { type: response.headers['content-type'] });
-          const blobUrl = window.URL.createObjectURL(blob);
+    try {
+      // Create the Blob object based on response data
+      const blob = new Blob([response?.data], { type: response.headers['content-type'] });
+      const blobUrl = window.URL.createObjectURL(blob);
 
-          // Create a temporary link element
-          const tempLink = document.createElement('a');
-          tempLink.href = blobUrl;
-          tempLink.setAttribute('download', fileName || attachmentData?.originalTitle || 'download');
+      // Create a temporary link element
+      const tempLink = document.createElement('a');
+      tempLink.href = blobUrl;
+      tempLink.setAttribute('download', fileName || attachmentData?.originalTitle || 'download');
 
-          // Append the link to the document body
-          document.body.appendChild(tempLink);
+      // Append the link to the document body
+      document.body.appendChild(tempLink);
 
-          // Trigger the download by clicking the link
-          tempLink.click();
+      // Trigger the download by clicking the link
+      tempLink.click();
 
-          // Clean up by revoking the Blob URL and removing the link
-          window.URL.revokeObjectURL(blobUrl);
-          document.body.removeChild(tempLink);
+      // Clean up by revoking the Blob URL and removing the link
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(tempLink);
 
-          // Success: Resolve the promise and display success message
-          // toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" });
-          resolve();
-      } catch (error) {
-          // Handle any errors during the download process
-          console.error("Error downloading the file:", error);
-          reject(error);
-      }
+      // Success: Resolve the promise and display success message
+      // toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" });
+      resolve();
+    } catch (error) {
+      // Handle any errors during the download process
+      console.error("Error downloading the file:", error);
+      reject(error);
+    }
   });
 }
 
 const EXTENSION_ICON_MAP = {
   "jpeg": <FiImage size={24} />,
-  "jpg": <FiImage size={24}/>,
-  "png": <FiImage size={24}/>,
-  "pdf": <MdPictureAsPdf size={24}/>,
-  "txt": <FiFileText size={24}/>,
-  "doc": <FaFileWord size={24}/>,
-  "docx": <FaFileWord size={24}/>,
-  "rtf": <FaFileAlt size={24}/>,
+  "jpg": <FiImage size={24} />,
+  "png": <FiImage size={24} />,
+  "pdf": <MdPictureAsPdf size={24} />,
+  "txt": <FiFileText size={24} />,
+  "doc": <FaFileWord size={24} />,
+  "docx": <FaFileWord size={24} />,
+  "rtf": <FaFileAlt size={24} />,
 };
 
 const getFileExtension = (originalTitle) => {
@@ -150,5 +163,5 @@ const getFileExtension = (originalTitle) => {
 };
 export const getIconForFile = (originalTitle) => {
   const extension = getFileExtension(originalTitle);
-  return extension && EXTENSION_ICON_MAP[extension] ? EXTENSION_ICON_MAP[extension] : <FaRegFile size={24}/>;
+  return extension && EXTENSION_ICON_MAP[extension] ? EXTENSION_ICON_MAP[extension] : <FaRegFile size={24} />;
 };

@@ -469,7 +469,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
                                     <Col xs={12}>
                                         <FormCheckbox
-                                            wrapperClassName="mb-0"
+                                            // wrapperClassName="mb-0"
                                             className='fs-6 fw-medium'
                                             id="agreeDeclarations"
                                             checked={formikProps.values.agreeDeclarations}
