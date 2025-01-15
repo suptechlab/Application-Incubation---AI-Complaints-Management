@@ -22,7 +22,7 @@ export const AuthenticationContext = createContext({
 export default function AuthenticationProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [isDownloadingImg, setIsDownloadingImg] = useState(true);
+    const [isDownloadingImg, setIsDownloadingImg] = useState(false);
     const [userData, setUserData] = useState({})
     const [currentUser, setCurrentUser] = useState(null)
     const [permissions, setPermissions] = useState([])
@@ -175,6 +175,8 @@ export default function AuthenticationProvider({ children }) {
 
                 if(data?.externalDocumentId){
                     handleImageDownload()
+                }else{
+                    setIsDownloadingImg(false)
                 }
                 // handleImageDownload()
             })
