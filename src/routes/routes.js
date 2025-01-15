@@ -190,6 +190,7 @@ const routes = [
     element: <ChangePassword />,
     isPrivate: true,
     layoutType: "Auth",
+    module : 'change_password'
   },
   {
     path: "/profile",
