@@ -1,25 +1,33 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import ListingSearchForm from "./ListingSearchForm";
-import { downloadSLAComplianceReportApi, slaComplianceReportApi } from "../../services/reports.services";
+import { averageResolutionTimeApi, downloadSLAComplianceReportApi, slaComplianceReportApi } from "../../services/reports.services";
+import { calculateDaysDifference } from "../../utils/commonutils";
+import moment from "moment";
+import AppTooltip from "../../components/tooltip";
+import { MasterDataContext } from "../../contexts/masters.context";
 
 const SLAComplianceReport = () => {
 
   const location = useLocation();
   const queryClient = useQueryClient();
 
+  const {masterData}  = useContext(MasterDataContext)
+
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
   const [isLoading, setLoading] = useState(false)
   const [isDownloading, setDownloading] = useState(false)
+
+  const [averageResolutionTime, setAverageResolutionTime] = useState([])
 
   const { t } = useTranslation()
 
@@ -33,52 +41,35 @@ const SLAComplianceReport = () => {
   });
 
 
-  // Dummy Data for SLAComplianceReport
-  const dummyData = {
-    data: {
-      totalPages: 5,
-      totalItems: 50,
-      data: Array.from({ length: 10 }, (_, index) => ({
-        ticketId: `TICK-${index + 1}`,
-        name: `Claim Type ${index + 1}`,
-        claimSubType: { name: `Sub Type ${index + 1}` },
-        createdAt: new Date().toISOString(),
-        slaDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-        slaBreachDays: index % 3 === 0 ? index : 0, // Breach days for every 3rd item
-        status: index % 2 === 0 ? "Active" : "Inactive", // Alternating status
-      })),
+  // DATA QUERY
+  const dataQuery = useQuery({
+    queryKey: ["data", pagination, sorting, filter],
+    queryFn: () => {
+      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+      Object.keys(filterObj).forEach(
+        (key) => filterObj[key] === "" && delete filterObj[key]
+      );
+
+      if (sorting.length === 0) {
+        return slaComplianceReportApi({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          ...filterObj,
+        });
+      } else {
+        return slaComplianceReportApi({
+          page: pagination.pageIndex,
+          size: pagination.pageSize,
+          sort: sorting
+            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
+            .join(","),
+          ...filterObj,
+        });
+      }
     },
-  };
-
- // DATA QUERY
- const dataQuery = useQuery({
-  queryKey: ["data", pagination, sorting, filter],
-  queryFn: () => {
-    const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-    Object.keys(filterObj).forEach(
-      (key) => filterObj[key] === "" && delete filterObj[key]
-    );
-
-    if (sorting.length === 0) {
-      return slaComplianceReportApi({
-        page: pagination.pageIndex,
-        size: pagination.pageSize,
-        ...filterObj,
-      });
-    } else {
-      return slaComplianceReportApi({
-        page: pagination.pageIndex,
-        size: pagination.pageSize,
-        sort: sorting
-          .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-          .join(","),
-        ...filterObj,
-      });
-    }
-  },
-  staleTime: 0, // Data is always stale, so it refetches
-  cacheTime: 0, // Cache expires immediately
-});
+    staleTime: 0, // Data is always stale, so it refetches
+    cacheTime: 0, // Cache expires immediately
+  });
 
 
 
@@ -126,6 +117,46 @@ const SLAComplianceReport = () => {
     });
   }
 
+
+  // The color class based on the status
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'CLOSED':
+        return 'bg-success text-success';
+      case 'IN_PROGRESS':
+        return 'bg-custom-info text-custom-info';
+      case 'NEW':
+        return 'bg-custom-primary text-custom-primary';
+      case 'ASSIGNED':
+        return 'bg-custom-warning text-custom-warning';
+      case 'REJECTED':
+        return 'bg-custom-danger text-custom-danger';
+      default:
+        return 'bg-body text-body';
+    }
+  };
+
+
+  // GET AVERAGE RESOLUTION TIME
+  const getAverageResolutionTime = () => {
+    averageResolutionTimeApi().then((response) => {
+      console.log()
+      setAverageResolutionTime(response?.data?.averageResolutionTime.toFixed(2))
+      // setAverageResolutionTime()
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    })
+  }
+
+
+  useEffect(() => {
+    getAverageResolutionTime()
+  }, [])
+
   useEffect(() => {
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
       setPagination({
@@ -141,13 +172,27 @@ const SLAComplianceReport = () => {
         accessorFn: (row) => row?.ticketId,
         id: "ticketId",
         header: () => t("TICKET_ID"),
-        enableSorting: true
+        enableSorting: true,
+        cell: ({ row }) => (<Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
+          {"#" + row?.original?.ticketId}
+        </Link>)
       },
       {
-        accessorFn: (row) => row?.name,
-        id: "name",
+        accessorFn: (row) => row?.createdAt,
+        id: "createdAt",
+        header: () => t("CREATION_DATE"),
+        enableSorting: true,
+        cell: ({ row }) => (
+          row?.original?.createdAt
+            ? moment(row?.original?.createdAt).format("DD-MM-YYYY")
+            : ''
+        ),
+      },
+      {
+        accessorFn: (row) => row?.claimType?.name,
+        id: "claimType",
         header: () => t("CLAIM TYPE"),
-        enableSorting: true
+        enableSorting: true,
       },
       {
         accessorFn: (row) => row?.claimSubType?.name,
@@ -156,31 +201,47 @@ const SLAComplianceReport = () => {
         enableSorting: true,
       },
       {
-        accessorFn: (row) => row?.createdAt,
-        id: "createdAt",
-        header: () => t("CREATION DATE"),
-        enableSorting: true,
-      },
-      {
         accessorFn: (row) => row?.slaDueDate,
         id: "slaDueDate",
         header: () => t("SLA DUE DATE"),
         enableSorting: true,
+        cell: ({ row }) => (
+          row?.original?.slaBreachDate
+            ? moment(row?.original?.slaBreachDate).format("DD-MM-YYYY")
+            : ''
+        ),
       },
       {
         accessorFn: (row) => row?.slaBreachDays,
         id: "slaBreachDays",
         header: () => t("SLA BREACH DAYS"),
         enableSorting: true,
+        cell: (({ row }) => (
+          <span>{row?.original?.slaBreachDays + " " + t("DAYS")}</span>
+        )),
+
       },
       {
         accessorFn: (row) => row?.status,
         id: "status",
         header: () => t("STATUS"),
-        enableSorting: true,
+        size: "100",
+        cell: (rowData) => (
+          rowData?.row?.original?.status === 'CLOSED' ? <AppTooltip title={masterData?.closedStatus[rowData?.row?.original?.closedStatus]}>
+            <span
+              className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+            >
+              {masterData?.claimTicketStatus[rowData.row.original.status]}
+            </span>
+          </AppTooltip> : <span
+            className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
+          >
+            {masterData?.claimTicketStatus[rowData.row.original.status]}
+          </span>
+        ),
       },
     ],
-    []
+    [masterData]
   );
 
   useEffect(() => {
@@ -188,7 +249,7 @@ const SLAComplianceReport = () => {
       pageIndex: 0,
       pageSize: 10,
     });
-  }, []);
+  }, [filter]);
   // filter
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
   useEffect(() => {
@@ -202,6 +263,7 @@ const SLAComplianceReport = () => {
     <Loader isLoading={isLoading} />
     <PageHeader
       title={t("SLA_COMPLIANCE_REPORT")}
+      averageResolutionTime={averageResolutionTime ?? ''}
       actions={[
         { label: t("EXPORT TO EXCEL"), onClick: handleDownload, variant: "warning", disabled: isDownloading },
         // { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
