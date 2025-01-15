@@ -300,7 +300,7 @@ const TemplateMaster = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
-        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+        toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -328,7 +328,7 @@ const TemplateMaster = () => {
             <PageHeader
               title={t("TEMPLATE MASTER")}
               actions={[
-                { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+                { label: t("EXPORT TO EXCEL"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
                 { label: t("ADD NEW"), to: "/template-master/add", variant: "warning", disabled: false },
               ]}
             /> : ''

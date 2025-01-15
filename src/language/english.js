@@ -56,7 +56,7 @@ export const englishLang = {
     "EDIT TEMPLATE MASTER": "Edit Template Master",
     "NAME OF TEMPLATE MASTER": "Name of Template Master",
     "SUBJECT": "Subject",
-    "EXPORT TO CSV": "Export To CSV",
+    "EXPORT TO EXCEL": "Export To EXCEL",
     "SUB-CLAIM": "Sub-claim",
     // Authentication
     "CHANGE_PASSWORD": "Change Password",
@@ -112,7 +112,7 @@ export const englishLang = {
     "STATUS UPDATED": "Status updated successfully.",
     "STATUS UPDATE ERROR": "Error in  updating status",
     "EXPORT IN PROGRESS": "Export in progress... Please wait.",
-    "CSV DOWNLOADED": "CSV file downloaded successfully.",
+    "DOWNLOAD_SUCCESSFUL": "Excel file downloaded successfully.",
     "EMPTY RESPONSE": "Response data is empty.",
     "SOMETHING WENT WRONG": "Something went wrong. Please try again",
     "OLD PASSWORD": "Old Password",
@@ -303,5 +303,7 @@ export const englishLang = {
     "CHANNEL_OF_ENTRY":"Channel of entry",
     "APPLY":"Apply",
     "WEB":"Web",
-    "CHATBOT":"Chatbot"
+    "CHATBOT":"Chatbot",
+    "SLA_COMPLIANCE_FILTERS" :"SLA Compliance Filters",
+    "SLA_COMPLIANCE_REPORT":"SLA Compliance Report"
 }

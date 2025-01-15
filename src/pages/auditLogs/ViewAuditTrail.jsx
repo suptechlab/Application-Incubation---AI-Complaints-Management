@@ -68,7 +68,6 @@ const ViewAuditTrail = () => {
               />
             </Col>
           </Row>
-
           <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
             <Stack
               direction="horizontal"

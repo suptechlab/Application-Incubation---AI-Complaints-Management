@@ -11,7 +11,7 @@ import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import { handleGetAuditLogs } from "../../services/reports.services";
+import { downloadAuditReportApi, handleGetAuditLogs } from "../../services/reports.services";
 import { downloadClaimTypes } from "../../services/claimType.service";
 import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
 import SearchForm from "./SearchForm";
@@ -40,45 +40,7 @@ const AuditLogs = () => {
     search: "",
   });
 
-  const toggle = () => setModal(!modal);
-
-  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
-
-  const permission = useRef({
-    addModule: false,
-    editModule: false,
-    deleteModule: false,
-  });
-
-  useEffect(() => {
-    isAdminUser()
-      .then((response) => {
-        if (response) {
-          permission.current.addModule = true;
-          permission.current.editModule = true;
-          permission.current.deleteModule = true;
-        } else {
-          getModulePermissions("Master management")
-            .then((response) => {
-              if (response.includes("CLAIM_TYPE_CREATE")) {
-                permission.current.addModule = true;
-              }
-              if (response.includes("CLAIM_TYPE_UPDATE")) {
-                permission.current.editModule = true;
-              }
-              if (response.includes("CLAIM_TYPE_DELETE")) {
-                permission.current.deleteModule = true;
-              }
-            })
-            .catch((error) => {
-              console.error("Error fetching permissions:", error);
-            });
-        }
-      })
-      .catch((error) => {
-        console.error("Error get during to fetch User Type", error);
-      });
-  }, []);
+ 
 
   // DATA QUERY
   const dataQuery = useQuery({
@@ -117,7 +79,7 @@ const AuditLogs = () => {
       id: "downloading",
       isLoading: isDownloading,
     });
-    downloadClaimTypes({ search: filter?.search ?? "" })
+    downloadAuditReportApi({...filter , search: filter?.search ?? "" })
       .then((response) => {
         if (response?.data) {
           const blob = new Blob([response.data], {
@@ -125,11 +87,11 @@ const AuditLogs = () => {
           });
           const blobUrl = window.URL.createObjectURL(blob);
 
-          toast.success(t("CSV DOWNLOADED"), { id: "downloading" });
+          toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" });
 
           const tempLink = document.createElement("a");
           tempLink.href = blobUrl;
-          tempLink.setAttribute("download", "claim-types.xlsx");
+          tempLink.setAttribute("download", "audit_logs.xlsx");
 
           // Append the link to the document body before clicking it
           document.body.appendChild(tempLink);
@@ -248,10 +210,10 @@ const AuditLogs = () => {
         title={t("AUDIT TRAIL REPORT")}
         actions={[
           {
-            label: t("EXPORT TO CSV"),
+            label: t("EXPORT TO EXCEL"),
             onClick: handleDownload,
             variant: "warning",
-            disabled: true,
+            // disabled: true,
           },
         ]}
       />

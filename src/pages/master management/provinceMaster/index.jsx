@@ -244,7 +244,7 @@ const ProvinceMaster = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
-        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+        toast.success(t("DOWNLOAD_SUCCESSFUL"),{id: "downloading"})
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -270,7 +270,7 @@ const ProvinceMaster = () => {
     <PageHeader
       title={t("PROVINCE MASTER")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
+        { label: t("EXPORT TO EXCEL"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ?? false },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]}
     />

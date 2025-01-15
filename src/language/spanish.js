@@ -72,7 +72,7 @@ export const spanishLang = {
     "SEPS ACCOUNT LOG IN": "Inicio de Sesión en Cuenta SEPS",
     "REMEMBER ME": "Recuérdame",
     "SEND": "Enviar",
-    "EXPORT TO CSV": "Exportar a CSV",
+    "EXPORT TO EXCEL": "Exportar un EXCEL",
     // Mensajes
     "STATUS UPDATE ERROR": "Error al Actualizar el Estado",
     "SUB-CLAIM": "Subreclamación",
@@ -102,7 +102,7 @@ export const spanishLang = {
     "UNCHANGED": "Sin cambios",
     // Mensajes
     "EXPORT IN PROGRESS": "Exportación en curso... Por favor, espere.",
-    "CSV DOWNLOADED": "Archivo CSV descargado con éxito.",
+    "DOWNLOAD_SUCCESSFUL": "Archivo excel descargado con éxito.",
     "EMPTY RESPONSE": "Los datos de la respuesta están vacíos.",
     "SOMETHING WENT WRONG": "Algo salió mal. Inténtelo de nuevo",
     "UPDATE": "Actualizar",
@@ -290,5 +290,7 @@ export const spanishLang = {
     "CONSUMER_NAME": "Nombre del consumidor",
     "ALL_ENTITIES": "Todas las entidades",
     "CLAIM_OVERVIEW_REPORT": "Informe general de reclamaciones",
-    "CLAIM_OVERVIEW_FILTERS": "Claim Overview filters"
+    "CLAIM_OVERVIEW_FILTERS": "Claim Overview filters",
+    "SLA_COMPLIANCE_FILTERS": "Filtros de cumplimiento de SLA",
+    "SLA_COMPLIANCE_REPORT": "Informe de cumplimiento de SLA"
 }

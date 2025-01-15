@@ -168,7 +168,7 @@ const InquiryType = () => {
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
 
-        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+        toast.success(t("DOWNLOAD_SUCCESSFUL"),{id: "downloading"})
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -277,7 +277,7 @@ const InquiryType = () => {
         ?
     <PageHeader title={t("INQUIRY TYPE")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" ,disabled : isDownloading },
+        { label: t("EXPORT TO EXCEL"), onClick: handleDownload, variant: "outline-dark" ,disabled : isDownloading },
         { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
       ]} />
       : ''}
