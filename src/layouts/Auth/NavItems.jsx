@@ -165,7 +165,7 @@ export const NavItems = () => {
           menuName: t("SLA COMPLIANCE"),
           path: "/reports/sla-compliance",
           moduleName: "Reports",
-          disabled: false,
+          disabled: true,
         },
         {
           id: 73,

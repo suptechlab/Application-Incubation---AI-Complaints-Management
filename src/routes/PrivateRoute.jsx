@@ -15,7 +15,7 @@ const PrivateRoute = ({ element, moduleName = "", route_permissions = [] }) => {
     // Bypass permission check for SYSTEM_ADMIN
     const isSuperAdmin = currentUser === "SYSTEM_ADMIN";
     // Bypass profile page without authentication or permission check
-    if (moduleName === "profile") {
+    if (moduleName === "profile" || moduleName === 'change_password') {
         return element; // Allow access to profile page regardless of authentication or permissions
     }
     if (!isAuthenticated) {
