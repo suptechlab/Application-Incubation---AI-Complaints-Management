@@ -188,10 +188,18 @@ export default function UserList() {
         enableSorting: false,
       },
       {
-        accessorFn: (row) => row?.roles.length !== 0 ? row?.roles[0]?.name : 'N/A',
+        accessorFn: (row) => row?.roles,
         id: "role",
         header: () => t('ROLE'),
         enableSorting: false,
+        cell :(info)=>{
+          return <span>
+          {
+            info?.row?.original?.roles && info?.row?.original?.roles?.length > 0 ? info?.row?.original?.roles[0]?.name : ''
+          }
+      
+          </span>
+        }
       },
       {
         accessorFn: (row) => row?.email,
