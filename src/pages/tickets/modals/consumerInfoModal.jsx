@@ -24,7 +24,7 @@ const ConsumerInfoModal = ({ userData, modal, toggle,masterData }) => {
         },
         {
           label: t("PHONE"),
-          value: userData?.user?.countryCode + " " + userData?.user?.phoneNumber,
+          value:userData?.user?.phoneNumber && userData?.user?.countryCode + " " + userData?.user?.phoneNumber,
           colProps: { sm: 6, lg: 4 },
         },
         {
