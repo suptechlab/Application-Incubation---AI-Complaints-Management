@@ -79,7 +79,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             setIsLoading(false)
         } else {
             setIsLoading(false)
-            console.error('Sub types error:', response.error.message);
         }
     }
 

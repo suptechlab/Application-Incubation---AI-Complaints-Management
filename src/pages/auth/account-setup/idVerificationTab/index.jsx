@@ -37,11 +37,10 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData, newAccountData }) =
                 setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
                 setIsFormSubmitted(true)
             } else {
-                toast.error("Fingerprint not verified.")
+                toast.error(t("FINGERPRINT_NOT_REQUIRED"))
             }
             actions.setSubmitting(false);
         } else {
-            console.log("ARE YOU IN ELSE PART NA")
             setIsFormSubmitted(false)
             actions.setSubmitting(false);
         }
@@ -62,7 +61,6 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData, newAccountData }) =
                     setNewAccountData((prev) => ({ ...prev, identificacion: value }))
                     setVerifying(false)
                 } else {
-                    console.error('Verification error:', result.error.message);
                     setVerifying(false)
                 }
             } else {
@@ -154,7 +152,7 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData, newAccountData }) =
                                 disabled={formikProps?.isSubmitting || isFormSubmitted || !isIdVerified}
                             >
                                 {isFormSubmitted ? t('VERIFIED_BUTTON') : isVeifying ? <><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Verifying... </> : t('VERIFY_BUTTON')}
+                                    {t('VERIFYING')}... </> : t('VERIFY_BUTTON')}
                             </Button>
                         </Col>
                     </Row>

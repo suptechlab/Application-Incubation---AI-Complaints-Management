@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { countryCodes } from '../../constants/CountryCodes';
 import ReactSelect from '../../components/ReactSelect';
 import { updateUserInfo } from '../../redux/slice/authSlice';
+import { profileFormValidationSchema } from './validation';
 
 const ProfileModal = ({ handleShow, handleClose }) => {
 
@@ -132,6 +133,7 @@ const ProfileModal = ({ handleShow, handleClose }) => {
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
                 enableReinitialize={true}
+                validationSchema={profileFormValidationSchema}
             >
                 {(formikProps) => (
                     <React.Fragment>

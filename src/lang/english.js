@@ -112,7 +112,7 @@ export const englishLang = {
   "RAISE_A_SECOND_INSTANCE_CLAIM": "Raise a 2nd Instance Claim",
   "FIRST_INSTANCE_COMPLAINT_TICKET": "1st Instance Complaint Ticket",
   "ATTACH_NEW_EVIDENCE": "Attach the new evidence",
-  "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Multiple attachment can be uploaded.",
+  "MULTIPLE_ATTACHMENTS_UPLOADED_MSG": "Maximum of 3 attachments allowed, each up to 1 MB.",
   "CANCEL": "Cancel",
   "SUBMIT": "Submit",
   "CLAIM": "Claim",
@@ -154,5 +154,7 @@ export const englishLang = {
   "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE" : "Image size must not exceed 2.5 MB.",
   "CLAIM_SUB_STATUS":"Claim sub status",
   "FIRST_INSTANCE_CLAIM_ID":"1st Instance claim id",
-  "SECOND_INSTANCE_CLAIM_ID":"2nd Instance claim id"
+  "SECOND_INSTANCE_CLAIM_ID":"2nd Instance claim id",
+  "FINGERPRINT_NOT_VERIFIED" : "Fingerprint not verified.",
+  "VERIFYING":"Verifying"
 }

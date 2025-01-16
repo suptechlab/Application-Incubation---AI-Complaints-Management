@@ -32,7 +32,8 @@ export const PersonalInfoTabSchema = yup.object({
     .required(msg.countryCodeRequired),
   phoneNumber: yup
     .string()
-    .matches(/^[1-9][\s-]?\d{9,14}$/, msg.phoneNumberMustBeValid)
+    .matches(/^\d{10}$/, msg?.phoneNumberMustBeDigits)
+    // .matches(/^[1-9][\s-]?\d{9,14}$/, msg.phoneNumberMustBeValid)
     .required(msg.phoneNumberRequired),
   email: yup
     .string()
