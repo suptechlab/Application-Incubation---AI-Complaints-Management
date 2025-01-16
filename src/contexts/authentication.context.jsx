@@ -56,6 +56,11 @@ export default function AuthenticationProvider({ children }) {
         removeLocalStorage("refresh_token")
         setIsAuthenticated(false)
         removeLocalStorage("profileImage")
+        setUserData({})
+        setPermissions([])
+        setAuthorities([])
+        setModules([])
+        navigate('/login')
     }
 
     const login = async (data) => {
