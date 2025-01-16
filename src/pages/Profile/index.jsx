@@ -13,9 +13,11 @@ import { handleAccount } from "../../services/authentication.service";
 import { validationSchema } from "../../validations/profile.validation";
 
 export default function AccountProfile() {
-  const { userData, profileImage, isDownloadingImg, isLoading, currentUser,handleAccountDetails } = useContext(AuthenticationContext);
+  const { userData, profileImage, isDownloadingImg, isLoading, currentUser, handleAccountDetails } = useContext(AuthenticationContext);
   const { t } = useTranslation(); // use the translation hook
   const [profileImg, setProfileImg] = useState("");
+
+  const [loading, setLoading] = useState(false)
 
 
   const [initialValues, setInitialValues] = useState({
@@ -59,6 +61,7 @@ export default function AccountProfile() {
   };
 
   const onSubmit = async (values, actions) => {
+    setLoading(true)
     actions.setSubmitting(true)
 
     const formData = new FormData()
@@ -69,8 +72,8 @@ export default function AccountProfile() {
 
     handleAccount(formData)
       .then((response) => {
-        handleAccountDetails()
         toast.success(response?.data?.message);
+        handleAccountDetails()
       })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -79,6 +82,7 @@ export default function AccountProfile() {
           toast.error(error?.message);
         }
       }).finally(() => {
+        setLoading(false)
         actions.setSubmitting(false)
       });
   };
@@ -162,7 +166,8 @@ export default function AccountProfile() {
                               onChange={(event) => handleFileChange(event, setFieldValue)}
                             />
                           </div>
-                          <span> {values?.profile ? values?.profile?.fileName : ''} </span>
+
+                          <span> {values?.profile ? values?.profile?.name : ''} </span>
                           {touched?.profile && errors?.profile && <small className="form-text text-danger">{errors?.profile}</small>}
                         </div>
                       </Stack>
@@ -237,15 +242,16 @@ export default function AccountProfile() {
                         type="submit"
                         variant="warning"
                         className="custom-min-width-85"
-                        disabled={isSubmitting}
+                        disabled={(isSubmitting || loading) ?? false}
                         onClick={handleSubmit}
                       >
-                        {isSubmitting ? (
+                        {(isSubmitting === true || loading === true)? (
                           <Spinner
                             size="sm"
                             animation="border"
                             role="output"
                             className="align-middle me-1"
+
                           >
                             <span className="visually-hidden">{t('LOADING')}...</span>
                           </Spinner>

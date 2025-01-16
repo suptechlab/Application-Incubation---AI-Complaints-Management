@@ -332,5 +332,6 @@ export const englishLang = {
     "DOWNLOAD_SAMPLE_USER_TEMPLATE": "Download sample user template",
     "ERROR_DETAILS": "Error Details",
     "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Please select a file to upload.",
-    "IMPORT_SEPS_USERS":"Import SEPS Users"
+    "IMPORT_SEPS_USERS":"Import SEPS Users",
+    "BROWSE_IMAGE" :"Browse Image"
 }
