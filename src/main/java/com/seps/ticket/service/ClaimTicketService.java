@@ -22,7 +22,6 @@ import com.seps.ticket.service.dto.*;
 import com.seps.ticket.service.mapper.ClaimTicketMapper;
 import com.seps.ticket.service.mapper.UserClaimTicketMapper;
 import com.seps.ticket.service.specification.ClaimTicketSpecification;
-import com.seps.ticket.suptech.service.DocumentService;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
 import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
@@ -608,9 +607,9 @@ public class ClaimTicketService {
                 row.createCell(ExcelHeaderClaimTicketEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
                 row.createCell(ExcelHeaderClaimTicketEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
                 row.createCell(ExcelHeaderClaimTicketEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
-                row.createCell(ExcelHeaderClaimTicketEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() !=null ? data.getUser().getName():"");
-                row.createCell(ExcelHeaderClaimTicketEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName():"");
-                row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName():"");
+                row.createCell(ExcelHeaderClaimTicketEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() != null ? data.getUser().getName() : "");
+                row.createCell(ExcelHeaderClaimTicketEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName() : "");
+                row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName() : "");
                 row.createCell(ExcelHeaderClaimTicketEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
                 row.createCell(ExcelHeaderClaimTicketEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
                 row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_AMOUNT.ordinal()).setCellValue(CommonHelper.formatAmount(data.getClaimAmount()));
@@ -638,9 +637,9 @@ public class ClaimTicketService {
      * Second Instance, or Complaint) and updates the corresponding SLA comment fields. It also clears the SLA
      * popup flag and logs the activity in the audit log.
      *
-     * @param ticketId the ID of the claim ticket
+     * @param ticketId                     the ID of the claim ticket
      * @param claimTicketSlaCommentRequest the request body containing the SLA comment
-     * @param requestInfo the request information including headers and metadata
+     * @param requestInfo                  the request information including headers and metadata
      * @throws CustomException if the claim ticket is not found, the user does not have permission,
      *                         or the SLA popup flag is null
      */
@@ -664,7 +663,7 @@ public class ClaimTicketService {
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if(ticket.getSlaPopup()==null){
+        if (ticket.getSlaPopup() == null) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
         }
         Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
@@ -721,4 +720,58 @@ public class ClaimTicketService {
         claimTicketRepository.save(ticket);
     }
 
+    @Transactional
+    public void updateClaimTicketDetails(Long ticketId, @Valid ClaimTicketUpdateRequest claimTicketUpdateRequest, RequestInfo requestInfo) {
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        // Find the ticket by ID
+        ClaimTicket ticket;
+
+        InstanceTypeEnum instanceType = InstanceTypeEnum.FIRST_INSTANCE;
+        List<ClaimTicketStatusEnum> statusList = new ArrayList<>();
+        statusList.add(ClaimTicketStatusEnum.CLOSED);
+        statusList.add(ClaimTicketStatusEnum.REJECTED);
+
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationIdAndInstanceTypeAndStatusNotIn(ticketId, organizationId, instanceType, statusList)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        } else {
+            ticket = claimTicketRepository.findByIdAndInstanceTypeAndStatusNotIn(ticketId, instanceType, statusList)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+
+        ClaimType claimType = userClaimTicketService.findClaimType(claimTicketUpdateRequest.getClaimTypeId());
+        ClaimSubType claimSubType = userClaimTicketService.findClaimSubType(claimTicketUpdateRequest.getClaimSubTypeId(), claimTicketUpdateRequest.getClaimTypeId());
+
+        Map<String, Object> oldData = convertEntityToMap(this.getSepsFiClaimTicketById(ticketId));
+
+        ticket.setClaimType(claimType);
+        ticket.setClaimSubType(claimSubType);
+        ticket.setPriorityCareGroup(claimTicketUpdateRequest.getPriorityCareGroup());
+        ticket.setCustomerType(claimTicketUpdateRequest.getCustomerType());
+        ticket.setUpdatedByUser(currentUser);
+
+        ClaimTicket savedTicket = claimTicketRepository.save(ticket);
+
+        Map<String, String> auditMessageMap = new HashMap<>();
+        Arrays.stream(LanguageEnum.values()).forEach(language -> {
+            String messageAudit = messageSource.getMessage("audit.log.claim.ticket.update",
+                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId())}, Locale.forLanguageTag(language.getCode()));
+            auditMessageMap.put(language.getCode(), messageAudit);
+        });
+
+        Map<String, Object> entityData = new HashMap<>();
+        Map<String, Object> newData = convertEntityToMap(this.getSepsFiClaimTicketById(savedTicket.getId()));
+        entityData.put(Constants.OLD_DATA, oldData);
+        entityData.put(Constants.NEW_DATA, newData);
+        String requestBody = gson.toJson(claimTicketUpdateRequest);
+        auditLogService.logActivity(null, currentUser.getId(), requestInfo, "updateClaimTicketDetails", ActionTypeEnum.CLAIM_TICKET_UPDATE.name(),
+            savedTicket.getId(), ClaimTicket.class.getSimpleName(), null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
+
+    }
 }

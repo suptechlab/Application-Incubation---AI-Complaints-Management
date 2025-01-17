@@ -513,10 +513,10 @@ public class SepsAndFiClaimTicketResource {
     )
     @PostMapping("/{ticketId}/sla-comment")
     public ResponseEntity<ResponseStatus> slaCommentSave(@PathVariable Long ticketId,
-                                               @Valid @RequestBody ClaimTicketSlaCommentRequest claimTicketSlaCommentRequest,
-                                               HttpServletRequest request) {
+                                                         @Valid @RequestBody ClaimTicketSlaCommentRequest claimTicketSlaCommentRequest,
+                                                         HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
-        claimTicketService.saveSlaComment(ticketId, claimTicketSlaCommentRequest,requestInfo);
+        claimTicketService.saveSlaComment(ticketId, claimTicketSlaCommentRequest, requestInfo);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.sla.commented.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -533,6 +533,26 @@ public class SepsAndFiClaimTicketResource {
     public ResponseEntity<Void> dismissalSLAPopup(@PathVariable Long ticketId) {
         claimTicketService.dismissalSLACommentPopup(ticketId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(
+        summary = "Update Claim Ticket",
+        description = "Update the claim ticket for the specified claim ticket."
+    )
+    @PutMapping("/{ticketId}/update")
+    public ResponseEntity<ResponseStatus> updateClaimTicketDetails(@PathVariable Long ticketId,
+                                                                   @Valid @RequestBody ClaimTicketUpdateRequest claimTicketUpdateRequest,
+                                                                   HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+        // Update ticket details
+        claimTicketService.updateClaimTicketDetails(ticketId, claimTicketUpdateRequest, requestInfo);
+        // Create success response
+        ResponseStatus responseStatus = new ResponseStatus(
+            messageSource.getMessage("claim.ticket.updated.successfully", null, LocaleContextHolder.getLocale()),
+            HttpStatus.OK.value(),
+            System.currentTimeMillis()
+        );
+        return ResponseEntity.ok(responseStatus);
     }
 
 }

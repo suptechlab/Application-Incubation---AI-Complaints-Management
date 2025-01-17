@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 @Tag(name = "Transcripts", description = "Operations related to Transcripts APIs.")
 public class TranscriptResource {
 
-    public static final String RECIPIENT = "hanwant0@gmail.com";
+    public static final String RECIPIENT = "seps-operator@yopmail.com";
     private final MailService mailService;
     private final MessageSource messageSource;
 
@@ -43,9 +43,9 @@ public class TranscriptResource {
         mailService.sendTranscriptEmail(RECIPIENT, transcript, timestamp);
         // Create response status
         ResponseStatus responseStatus = new ResponseStatus(
-            messageSource.getMessage("transcript.email.sent.successfully", null, LocaleContextHolder.getLocale()),
-            HttpStatus.OK.value(),
-            System.currentTimeMillis()
+                messageSource.getMessage("transcript.email.sent.successfully", null, LocaleContextHolder.getLocale()),
+                HttpStatus.OK.value(),
+                System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
     }
