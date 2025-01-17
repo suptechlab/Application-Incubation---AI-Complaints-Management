@@ -40,7 +40,7 @@ export default function MyAccount() {
   const [showTicketModal, setTicketModal] = useState(false);
   const [instanceModalShow, setInstanceModalShow] = useState(false);
   const [raisedComplaintModalShow, setRaisedComplaintModalShow] = useState(false);
-  const { instance_types,masterData } = useSelector((state) => state?.masterSlice);
+  const { instance_types, masterData } = useSelector((state) => state?.masterSlice);
 
 
   const handleShowModal = (row) => {
@@ -185,24 +185,23 @@ export default function MyAccount() {
               {t(label)}
             </Button>
           );
-
           let tooltipTitle = '';
-          const instanceButton = (info.row.original.instanceType === "FIRST_INSTANCE")
+          const instanceButton = (info.row.original.instanceType === "FIRST_INSTANCE" &&
+            (info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED") &&
+            info?.row?.original?.canCreateInstance)
             ? renderButton({
               label: "FILE_SECOND_INSTANCE",
               onClickHandler: () => instanceClickHandler(info.row.original),
               ariaLabel: t("FILE_SECOND_INSTANCE"),
-              disabled: !((info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED" )&&(info?.row?.original?.canCreateInstance))
             })
-            : info.row.original.instanceType === "SECOND_INSTANCE"
-              ? renderButton({
-                label: "RAISE_COMPLAINT",
-                onClickHandler: () => raisedComplaintClickHandler(info.row.original),
-                ariaLabel: t("RAISE_COMPLAINT"),
-                disabled: !((info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED" )&&(info?.row?.original?.canCreateInstance))
-              })
-              : null;
-
+            : info.row.original.instanceType === "SECOND_INSTANCE" &&
+            (info.row.original.status === "CLOSED" || info.row.original.status === "REJECTED") &&
+            info?.row?.original?.canCreateInstance &&
+            renderButton({
+              label: "RAISE_COMPLAINT",
+              onClickHandler: () => raisedComplaintClickHandler(info.row.original),
+              ariaLabel: t("RAISE_COMPLAINT"),
+            });
           return (
             <Stack direction='horizontal' gap={3}>
               <AppTooltip title={t("VIEW")}>
@@ -221,7 +220,7 @@ export default function MyAccount() {
                   onClick={() => handleTicketModal(info.row.original)}
                   className='p-0 border-0 lh-sm text-body position-relative'
                   aria-label={t("CHAT")}
-                  // disabled={['CLOSED', 'REJECTED'].includes(info?.row?.original?.status)}
+                // disabled={['CLOSED', 'REJECTED'].includes(info?.row?.original?.status)}
                 >
                   <MdChatBubbleOutline size={24} />
                   {/* <Badge

@@ -156,6 +156,6 @@ export const spanishLang = {
   "CLAIM_SUB_STATUS": "Subestado de reclamación",
   "FIRST_INSTANCE_CLAIM_ID": "ID de reclamo de primera instancia",
   "SECOND_INSTANCE_CLAIM_ID": "ID de reclamo de segunda instancia",
-  "FINGERPRINT_NOT_VERIFIED": "Huella digital no verificada.",
-   "VERIFYING":"Verificando"
+  "FINGERPRINT_NOT_VERIFIED": "código de huella dactilar erróneo.",
+  "VERIFYING": "Verificando"
 }

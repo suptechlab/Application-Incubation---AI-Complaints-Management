@@ -221,19 +221,19 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             eventKey: '0',
             header: t('ATTACHMENTS'),
             body: roleUserDocuments,
-            condition: true,
+            condition: (roleUserDocuments && roleUserDocuments?.length > 0),
         },
         {
             eventKey: '1',
             header: t('ATTACHMENTS_SENT_BY_ENTITY'),
             body: roleFiUserDocuments,
-            condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE' && claimTicketData?.instanceType !== 'COMPLAINT',
+            condition: (claimTicketData?.instanceType === 'FIRST_INSTANCE' && roleFiUserDocuments &&  roleFiUserDocuments?.length > 0),
         },
         {
             eventKey: '2',
             header: t('ATTACHMENTS_SENT_BY_SEPS'),
             body: roleSepsUserDocuments,
-            condition: claimTicketData?.instanceType === 'SECOND_INSTANCE' || claimTicketData?.instanceType === 'COMPLAINT',
+            condition: (claimTicketData?.instanceType!== 'FIRST_INSTANCE' && roleSepsUserDocuments && roleSepsUserDocuments?.length > 0),
         },
     ];
 
