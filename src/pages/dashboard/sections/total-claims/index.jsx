@@ -11,7 +11,7 @@ import CustomDateRangePicker from '../../../../components/CustomDateRangePicker'
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 
-const TotalClaimsSection = ({setLoading}) => {
+const TotalClaimsSection = ({ setLoading }) => {
 
 
     const [dashboardData, setDashboardData] = useState({})
@@ -20,7 +20,7 @@ const TotalClaimsSection = ({setLoading}) => {
 
     const [filters, setFilters] = useState({})
 
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
     const handleDateFilterChange = ([newStartDate, newEndDate]) => {
@@ -73,7 +73,7 @@ const TotalClaimsSection = ({setLoading}) => {
                     value: data?.id
                 }
             })
-            setOrgList([{label:t('SELECT'),value:''},...orgListData])
+            setOrgList([{ label: t('SELECT'), value: '' }, ...orgListData])
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);
@@ -102,7 +102,8 @@ const TotalClaimsSection = ({setLoading}) => {
                         className="flex-wrap me-auto"
                     >
                         <div className="fw-semibold fs-4 mb-0">
-                            {t("TOTAL_CLAIMS")} <span className="fs-14 fw-normal">({t('SUBMITTED_ACROSS_ALL_FIS')})</span>
+                            {t("TOTAL_CLAIMS")}
+                            {/* <span className="fs-14 fw-normal">({t('SUBMITTED_ACROSS_ALL_FIS')})</span> */}
                         </div>
                         <div className="bg-primary bg-opacity-10 p-2 small rounded"><span className="me-2">{t("AVERAGE_RESOLUTION_TIME")}:</span> <span className="fw-semibold">{dashboardData?.averageResolutionTime} {t("DAYS")}</span></div>
                     </Stack>

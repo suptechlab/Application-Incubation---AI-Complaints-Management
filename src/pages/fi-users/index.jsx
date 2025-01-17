@@ -17,6 +17,7 @@ import Toggle from "../../components/Toggle";
 import { AuthenticationContext } from "../../contexts/authentication.context";
 import { handleFIUsersStatusChange, handleGetFIusersList } from "../../services/fiusers.services";
 import SearchForm from "./SearchForm";
+import { capitalizeFirstLetter } from "../../utils/commonutils";
 
 export default function FIUserList() {
 
@@ -167,6 +168,13 @@ export default function FIUserList() {
         accessorFn: (row) => row.name,
         id: "firstName",
         header: () => t("NAME"),
+        cell: (info) => {
+          return (
+            <span>
+              {info.row.original.name ?capitalizeFirstLetter(info?.row?.original?.name) : "N/A"}
+            </span>
+          );
+        },
       },
       {
         accessorFn: (row) => row.email,
@@ -194,7 +202,7 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info.row.original.organization?.razonSocial ?? "N/A"}
+              {info.row.original.organization?.razonSocial ? capitalizeFirstLetter(info?.row?.original?.organization?.razonSocial) :  "N/A"}
             </span>
           );
         },

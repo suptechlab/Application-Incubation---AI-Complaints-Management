@@ -14,6 +14,7 @@ import { getOrganizationInfo, getPersonalInfo, handleAddFIUsers, handleEditFIUse
 import { getRolesDropdownData } from "../../services/rolerights.service";
 import { validationSchema } from "../../validations/fiUsers.validation";
 import { AuthenticationContext } from "../../contexts/authentication.context";
+import { capitalizeFirstLetter } from "../../utils/commonutils";
 
 export default function FIUserAddEdit() {
 
@@ -54,13 +55,13 @@ export default function FIUserAddEdit() {
       handleGetFIuserById(id).then((response) => {
         setInitialValues({
           identification: response.data?.identificacion ? response.data?.identificacion : "",
-          name: response.data?.name ? response.data?.name : "",
+          name: response.data?.name ? capitalizeFirstLetter(response.data?.name ?? "") : "",
           email: response.data?.email ? response.data?.email : "",
           countryCode: response?.data?.countryCode ?? "+593",
           phoneNumber: response?.data?.phoneNumber ? response?.data?.phoneNumber : "",
           ruc: response?.data?.organization?.ruc ? response?.data?.organization?.ruc : "",
-          entityName: response?.data?.organization?.razonSocial ? response?.data?.organization?.razonSocial : "",
-          entityType: response.data?.organization?.tipoOrganizacion ? response.data?.organization?.tipoOrganizacion : "",
+          entityName: response?.data?.organization?.razonSocial ? capitalizeFirstLetter(response?.data?.organization?.razonSocial ?? "") : "",
+          entityType: response.data?.organization?.tipoOrganizacion ? capitalizeFirstLetter(response.data?.organization?.tipoOrganizacion ?? "") : "",
           roleId: response.data?.roleId ? response.data?.roleId : "",
         })
         setLoading(false);
@@ -101,16 +102,15 @@ export default function FIUserAddEdit() {
   }, [])
 
   // FETCH USER PERSONAL INFO BY ID
-  const fetchUserData = async (identification) => {
+  const fetchUserData = async (identification, setFieldValue) => {
     setLoadingInfo(true)
     getPersonalInfo(identification).then((response) => {
       setLoadingInfo(false)
       if (response?.data?.nombreCompleto) {
-        setInitialValues({ ...initialValue, identification: identification, name: response?.data?.nombreCompleto })
+        setFieldValue("name", capitalizeFirstLetter(response?.data?.nombreCompleto ?? ''))
       } else {
-        setInitialValues({ ...initialValue, identification: identification, name: '' })
+        setFieldValue("name", "")
       }
-
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -118,23 +118,29 @@ export default function FIUserAddEdit() {
         } else {
           toast.error(error?.message);
         }
-        setInitialValues({ ...initialValue, identification: identification, name: '' })
+        setFieldValue("name", "")
       }).finally(() => {
         setLoadingInfo(false)
       })
   };
 
   // TAX ID 
-  const fetchOrganizationData = async (ruc) => {
+  const fetchOrganizationData = async (ruc, setFieldValue) => {
     setLoadingInfo(true)
     getOrganizationInfo(ruc).then((response) => {
       setLoadingInfo(false)
       if (response?.data?.razonSocial) {
-        setInitialValues({ ...initialValue, ruc: ruc, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
+        // setInitialValues({
+        //   ...initialValue, ruc: ruc,
+        //   entityName: capitalizeFirstLetter(response?.data?.razonSocial ?? ''),
+        //   entityType: capitalizeFirstLetter(response?.data?.tipoOrganizacion ?? '')
+        // })
+        setFieldValue('entityName', capitalizeFirstLetter(response?.data?.razonSocial ?? ''))
+        setFieldValue('entityType', capitalizeFirstLetter(response?.data?.tipoOrganizacion ?? ''))
       } else {
-        setInitialValues({ ...initialValue, ruc: ruc, entityName: '', entityType: '' })
+        setFieldValue('entityName', '')
+        setFieldValue('entityType', '')
       }
-
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -142,24 +148,25 @@ export default function FIUserAddEdit() {
         } else {
           toast.error(error?.message);
         }
-        setInitialValues({ ...initialValue, ruc: ruc, entityName: '', entityType: '' })
+        setFieldValue('entityName', '')
+        setFieldValue('entityType', '')
       }).finally(() => {
         setLoadingInfo(false)
       })
   }
   // HANDLE IDENTIFICATION
-  const handleIdentificationBlur = (event) => {
+  const handleIdentificationBlur = (event, setFieldValue) => {
     const identification = event.target.value;
     if (identification && identification !== "") {
-      fetchUserData(identification) // Call the API function
+      fetchUserData(identification, setFieldValue) // Call the API function
     }
   };
 
   // HANDLE TAX ID BLUR
-  const handleTaxIdBlur = (event) => {
+  const handleTaxIdBlur = (event, setFieldValue) => {
     const ruc = event.target.value;
     if (ruc && ruc !== "") {
-      fetchOrganizationData(ruc) // Call the API function
+      fetchOrganizationData(ruc, setFieldValue) // Call the API function
     }
   }
 
@@ -224,8 +231,8 @@ export default function FIUserAddEdit() {
       setInitialValues({
         ...initialValue,
         ruc: userData?.organization?.ruc,
-        entityName: userData?.organization?.razonSocial,
-        entityType: userData?.organization?.tipoOrganizacion
+        entityName: capitalizeFirstLetter(userData?.organization?.razonSocial ?? ''),
+        entityType: capitalizeFirstLetter(userData?.organization?.tipoOrganizacion ?? '')
       })
     }
   }, [currentUser])
@@ -271,7 +278,7 @@ export default function FIUserAddEdit() {
                         key={"identification"}
                         label={t("ID")}
                         name="identification"
-                        onBlur={handleIdentificationBlur}
+                        onBlur={(event) => handleIdentificationBlur(event, setFieldValue)}
                         onChange={handleChange}
                         touched={touched?.identification}
                         type="number"
@@ -359,7 +366,7 @@ export default function FIUserAddEdit() {
                         key={"ruc"}
                         label={t("ENTITY'S TAX ID (RUC)")}
                         name="ruc"
-                        onBlur={handleTaxIdBlur}
+                        onBlur={(event) => handleTaxIdBlur(event, setFieldValue)}
                         onChange={(option) => {
                           setFieldValue("ruc", option?.target?.value ?? "");
                         }}
