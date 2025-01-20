@@ -11,7 +11,7 @@ import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticket
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import toast from "react-hot-toast";
 import { validateFile } from "../../../utils/commonutils";
-const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs,getTicketData }) => {
+const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
     // const [fileName, setFileName] = useState("");
@@ -56,7 +56,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
             .then((response) => {
                 setSelectedStatus('CLOSED');
                 setIsGetAcitivityLogs((prev) => !prev)
-                getTicketData()
+                if (values.attachments) {
+                    getTicketData()
+                }
                 toast.success(response?.data?.message);
                 toggle()
             })
@@ -162,22 +164,22 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                                             onChange={handleFileChange}
                                         /> */}
                                         <input
-                                        id="attachments"
-                                        name="attachments"
-                                        accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
-                                        className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                                        type="file"
-                                        onChange={(event) => {
-                                            const file = event.currentTarget.files[0];
-                                            const isValidated = validateFile(file)
-                                            if (isValidated === true) {
-                                                setFieldValue("attachments", file);
-                                            } else {
-                                                toast.error(isValidated)
-                                            }
-                                            // Update Formik's state with the file
-                                        }}
-                                    />
+                                            id="attachments"
+                                            name="attachments"
+                                            accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                            className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                            type="file"
+                                            onChange={(event) => {
+                                                const file = event.currentTarget.files[0];
+                                                const isValidated = validateFile(file)
+                                                if (isValidated === true) {
+                                                    setFieldValue("attachments", file);
+                                                } else {
+                                                    toast.error(isValidated)
+                                                }
+                                                // Update Formik's state with the file
+                                            }}
+                                        />
                                     </div>
                                     {values?.attachments && (
                                         <span

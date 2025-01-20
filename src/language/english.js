@@ -336,5 +336,6 @@ export const englishLang = {
     "EMAIL_VERIFIED" : "Email Verified",
 
     "VERIFYING_USER" : "Verifying User",
-    "USING_SEPS_ACTIVE_DIRECTORY":"Using SEPS Active Directory"
+    "USING_SEPS_ACTIVE_DIRECTORY":"Using SEPS Active Directory",
+    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"You are not allowed to assign tickets."
 }

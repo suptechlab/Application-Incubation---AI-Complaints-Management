@@ -309,6 +309,12 @@ export default function TicketsList() {
                 enableSorting: true,
             },
             {
+                accessorFn: (row) => row?.organization?.razonSocial,
+                id: "entity",
+                header: () => t("ENTITY NAME"),
+                enableSorting: false,
+            },
+            {
                 accessorFn: (row) => row?.user?.name,
                 id: "consumerName",
                 header: () => t("CONSUMER_NAME"),
@@ -435,26 +441,26 @@ export default function TicketsList() {
 
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
-
+        // "consumerName", name of consumer
         switch (currentUser) {
             case 'FI_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
 

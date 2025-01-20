@@ -320,5 +320,6 @@ export const spanishLang = {
     "ERROR_DETAILS": "Detalles del error",
     "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Por favor seleccione un archivo para cargar",
     "IMPORT_SEPS_USERS":"Importar usuarios de SEPS",
-    "EMAIL_VERIFIED":"Correo electrónico verificado"
+    "EMAIL_VERIFIED":"Correo electrónico verificado",
+    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"No está permitido asignar entradas."
 } 
