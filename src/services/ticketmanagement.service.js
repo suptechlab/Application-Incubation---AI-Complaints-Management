@@ -103,3 +103,8 @@ export const handleGetTaggedTicketList = async (params) => {
     params
   });
 }
+
+// AGENT LIST FOR TAGGING 
+export const getAgentsListForTagging = ()=>{
+  // v1/seps-fi/claim-tickets/:id/agents-for-tag
+}

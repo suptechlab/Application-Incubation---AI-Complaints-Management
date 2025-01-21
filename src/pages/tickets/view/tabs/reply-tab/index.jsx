@@ -14,8 +14,9 @@ import {
 import toast from "react-hot-toast";
 import { validateFile } from "../../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
+import MentionEditor from "../../../../../components/MentionEditor";
 
-const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, currentTab,permissionState }) => {
+const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, currentTab, permissionState }) => {
 
     const { t } = useTranslation()
 
@@ -83,7 +84,8 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                 errors,
             }) => (
                 <Form>
-                    <SunEditorReact
+                    <MentionEditor />
+                    {/* <SunEditorReact
                         wrapperClassName="mb-0 editor-for-tab-view overflow-hidden"
                         id="message"
                         name="message"
@@ -99,7 +101,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                                 setFieldValue("message", value);
                             }
                         }}
-                    />
+                    /> */}
                     {values.attachment && (
                         <div className="px-3 py-1">
                             <span
