@@ -14,6 +14,7 @@ export const englishLang = {
     "ADD NEW": "Add New",
     "SEARCH": "Search",
     "ALL STATUS": "All Status",
+    "ALL ROLES" :"All Roles",
     "INACTIVE": "Inactive",
     "ACTIVE": "Active",
     "DESCRIPTION": "Description",
@@ -133,7 +134,6 @@ export const englishLang = {
     "UNIDAD ORGANIZACIONAL": "Unidad Organizacional",
 
     "ROLE & RIGHTS": "Roles & Rights",
-    "SEPS Users": "SEPS Users",
     "User Management": "User Management",
     "ENTITY NAME": "Entity Name",
     "FI USERS": "FI Users",
@@ -333,5 +333,10 @@ export const englishLang = {
     "ERROR_DETAILS": "Error Details",
     "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Please select a file to upload.",
     "IMPORT_SEPS_USERS":"Import SEPS Users",
-    "BROWSE_IMAGE" :"Browse Image"
+    "BROWSE_IMAGE" :"Browse Image",
+    "EMAIL_VERIFIED" : "Email Verified",
+
+    "VERIFYING_USER" : "Verifying User",
+    "USING_SEPS_ACTIVE_DIRECTORY":"Using SEPS Active Directory",
+    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"You are not allowed to assign tickets."
 }

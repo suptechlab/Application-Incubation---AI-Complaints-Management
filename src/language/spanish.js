@@ -14,6 +14,7 @@ export const spanishLang = {
     "ADD NEW": "Agregar Nuevo",
     "SEARCH": "Buscar",
     "ALL STATUS": "Todos los Estados",
+    "ALL_ROLES":"Todos los roles",
     "INACTIVE": "Inactivo",
     "ACTIVE": "Activo",
     "DESCRIPTION": "Descripción",
@@ -210,7 +211,7 @@ export const spanishLang = {
     "IN_PROGRESS": "En Progreso",
     "REJECTED": "Rechazado",
     "CLOSED": "Cerrado",
-    "SELECT_DATE_RANGE": "Seleccionar Rango de Fechas",
+    "SELECT_DATE_RANGE": "Seleccionar Fecha",
     "FILTERS": "Filtros",
     "SLA": "SLA",
     "CREATED_ON": "Creado el",
@@ -309,17 +310,17 @@ export const spanishLang = {
     "FI_ENTITY": "Entidad FI",
     "SLA ADHERENCE": "Cumplimiento del SLA",
     "CLAIM_OVERVIEW_REPORT": "Informe general de reclamaciones",
-    "CLAIM_OVERVIEW_FILTERS": "Claim Overview filters",
+    "CLAIM_OVERVIEW_FILTERS": "Filtros de descripción general de reclamos",
     "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE": "Las extensiones de archivo de imagen permitidas son .jpg, .jpeg y .png.",
     "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB.",
     "PROVIDE_SLA_COMMENT": "Proporcionar comentario de SLA",
     "FIRST_INSTANCE_CLAIM_DETAILS" :"Detalles del reclamo de primera instancia",
-
-    "CLAIM_OVERVIEW_FILTERS": "Filtros de descripción general de reclamos",
     "DATA_FILE": "Archivo de datos",
     "DOWNLOAD_SAMPLE_USER_TEMPLATE": "Descargar plantilla de usuario de muestra",
     "ERROR_DETAILS": "Detalles del error",
     "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Por favor seleccione un archivo para cargar",
     "IMPORT_SEPS_USERS":"Importar usuarios de SEPS",
-    "BROWSE_IMAGE" :"Explorar imagen"
+    "BROWSE_IMAGE" :"Explorar imagen",
+    "EMAIL_VERIFIED":"Correo electrónico verificado",
+    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"No está permitido asignar entradas."
 } 

@@ -17,6 +17,7 @@ import Toggle from "../../components/Toggle";
 import { AuthenticationContext } from "../../contexts/authentication.context";
 import { handleFIUsersStatusChange, handleGetFIusersList } from "../../services/fiusers.services";
 import SearchForm from "./SearchForm";
+import { capitalizeFirstLetter } from "../../utils/commonutils";
 
 export default function FIUserList() {
 
@@ -167,6 +168,13 @@ export default function FIUserList() {
         accessorFn: (row) => row.name,
         id: "firstName",
         header: () => t("NAME"),
+        cell: (info) => {
+          return (
+            <span>
+              {info.row.original.name ?capitalizeFirstLetter(info?.row?.original?.name) : "N/A"}
+            </span>
+          );
+        },
       },
       {
         accessorFn: (row) => row.email,
@@ -180,10 +188,11 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info.row.original.countryCode} {info.row.original.phoneNumber}
+              {info.row.original.phoneNumber ? `${info.row.original.countryCode}  ${info.row.original.phoneNumber}` : ''}
             </span>
           );
         },
+        size: "120",
       },
       {
         accessorFn: (row) => row?.entityName,
@@ -193,7 +202,7 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info.row.original.organization?.razonSocial ?? "N/A"}
+              {info.row.original.organization?.razonSocial ? capitalizeFirstLetter(info?.row?.original?.organization?.razonSocial) :  "N/A"}
             </span>
           );
         },
@@ -313,10 +322,10 @@ export default function FIUserList() {
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-          <PageHeader
-            title={t("FI USERS")}
-            actions={actions}
-          />
+        <PageHeader
+          title={t("FI USERS")}
+          actions={actions}
+        />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
             <SearchForm filter={filter} setFilter={setFilter} />

@@ -47,7 +47,9 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                     setSendReplyModalShow(false); // Close modal after success
                 }
                 actions.resetForm()
-                getTicketData()
+                if (values.attachment){
+                    getTicketData()
+                }
                 setIsGetAcitivityLogs((prev) => !prev)
                 toast.success(response?.data?.message)
             })

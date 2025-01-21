@@ -18,6 +18,7 @@ import {
 } from "../../services/user.service";
 import { validationSchema } from "../../validations/user.validation";
 import UserLoader from "../../components/UserLoader";
+import { capitalizeFirstLetter } from "../../utils/commonutils";
 
 export default function AddStatePage() {
 
@@ -27,16 +28,8 @@ export default function AddStatePage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
-
-  const [companyOptions, setCompanyOptions] = useState([]);
   const [rolesOptions, setRolesOptions] = useState([]);
 
-  const [countryCodeData, setCountryCodeData] = useState([
-    { label: "+91", value: "+91" },
-    { label: "+593", value: "+593" },
-  ]);
-  const [userData, setUserData] = useState([]);
-  const [isImageSet, setIsImageSet] = useState(false);
   const [emailDisabled, setEmailDisabled] = useState(false);
   const { t } = useTranslation();
   const [initialValues, setInitialValues] = useState({
@@ -53,7 +46,7 @@ export default function AddStatePage() {
   useEffect(() => {
     const userType = 'SEPS_USER';
     handleGetRole(userType).then((response) => {
-      let roleList = [{ value: "", label: "Select role" }];
+      let roleList = [{ value: "", label: t("SELECT") }];
       if (response.data?.length > 0) {
         response.data?.forEach((roles) => {
           roleList.push({ value: roles?.id, label: roles?.name });
@@ -68,18 +61,14 @@ export default function AddStatePage() {
     if (isEdit) {
       setLoading(true);
       handleGetUserById(id).then((response) => {
-        setUserData(response.data);
+        // setUserData(response.data);
         setEmailDisabled(response.data?.email == "" ? false : true);
 
         setInitialValues({
-          name: response.data?.name ? response.data?.name : "",
+          name: response.data?.name ? capitalizeFirstLetter(response.data?.name ?? "") : "",
           email: response.data?.email ? response.data?.email : "",
           roleId: response.data?.roleId ?? "",
-          department: response.data?.department ? response.data?.department : "",
-          // activated: response.data?.status == 'ACTIVE' ? true : false,
-          //mobileCode: "+91",
-          // activated: userData?.activated ? userData?.activated : false,
-          // profileImage: userData?.imageUrl ? userData?.imageUrl : "",
+          department: response.data?.department ? capitalizeFirstLetter(response.data?.department ?? "") : "",
         });
         setLoading(false);
       });
@@ -98,11 +87,11 @@ export default function AddStatePage() {
       const response = await handleSEPSUserVerification(data);
       if (response.data) {
         const { displayName, department } = response.data;
-        toast.success("Email verified successfully.");
+        toast.success(t("EMAIL_VERIFIED"));
 
         // Update the Formik fields with the response data
-        setFieldValue("name", displayName || "");
-        setFieldValue("department", department || "");
+        setFieldValue("name", capitalizeFirstLetter(displayName || ""));
+        setFieldValue("department", capitalizeFirstLetter(department || ""));
       } else {
         toast.error(response.data.errorDescription);
       }
@@ -116,11 +105,11 @@ export default function AddStatePage() {
   const onSubmit = async (values, actions) => {
     setUserLoading(true);
     const payload = { ...values, langKey: "es" };
-  
+
     const handleAction = isEdit
       ? () => handleUpdateUser(id, payload)
       : () => handleAddUser(payload);
-  
+
     try {
       await handleAction()
         .then((response) => {
@@ -140,7 +129,7 @@ export default function AddStatePage() {
       toast.error(t('SOMETHING WENT WRONG'));
     }
   };
-  
+
 
 
   return (
@@ -148,8 +137,8 @@ export default function AddStatePage() {
       <Loader isLoading={loading} />
       <UserLoader
         isLoading={userLoading}
-        title="Verifying User..."
-        subTitle="Using SEPS Active Directory"
+        title={t("VERIFYING_USER") + "..."}
+        subTitle={t("USING_SEPS_ACTIVE_DIRECTORY")}
       />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader title={`${isEdit ? t('EDIT SEPS') : t('ADD SEPS')}  `} />
