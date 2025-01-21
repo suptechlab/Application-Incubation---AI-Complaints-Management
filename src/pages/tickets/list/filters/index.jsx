@@ -27,7 +27,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
 
     const [statusDropdownData, setStatusDropdownData] = useState([])
     const [priorityDropdwonData, setPriorityDropdownData] = useState([])
-
+    const [instanceTypeDropdown, setInstanceTypeDropdown] = useState([])
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
 
@@ -97,10 +97,12 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
 
 
     useEffect(()=>{
-        if(masterData?.claimTicketStatus && masterData?.claimTicketPriority){
+        if(masterData?.claimTicketStatus ){
             setStatusDropdownData([{ select: '', label: t('ALL STATUS') }, ...convertToLabelValue(masterData?.claimTicketStatus)])
             setPriorityDropdownData([{ select: '', label: t('ALL_PRIORITY') }, ...convertToLabelValue(masterData?.claimTicketPriority)])
+            setInstanceTypeDropdown([{ select: '', label: t('ALL_INSTANCE') }, ...convertToLabelValue(masterData?.instanceType)])
         }
+      
        
     },[masterData])
 
@@ -215,6 +217,23 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                         />
                     </div>
                 }
+                <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                        <ReactSelect
+                            wrapperClassName="mb-0"
+                            class="form-select "
+                            placeholder={t("INSTANCT_TYPE")}
+                            id="floatingSelect"
+                            size="sm"
+                            options={instanceTypeDropdown ?? []}
+                            onChange={(e) => {
+                                setFilter({
+                                    ...filter,
+                                    instanceType: e.target.value,
+                                });
+                            }}
+                            value={filter?.instanceType}
+                        />
+                    </div>
 
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect

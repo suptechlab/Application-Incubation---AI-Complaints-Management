@@ -38,4 +38,8 @@ export const reminderFormValidation = Yup.object({
     .required(msg.commentRequired),
 });
 
+export const ticketEditValidation = Yup.object({
+  
+})
+
 export { validationSchema };

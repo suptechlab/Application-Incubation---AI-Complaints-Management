@@ -125,7 +125,6 @@ export default function TicketsList() {
                     </Tab.Content>
                 </Tab.Container>
             </div>
-
         </React.Fragment>
     );
 }

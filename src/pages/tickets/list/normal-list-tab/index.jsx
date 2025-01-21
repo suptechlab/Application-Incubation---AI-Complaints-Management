@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Card, Form, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdAttachFile } from "react-icons/md";
+import { MdAttachFile, MdEdit } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import CommonDataTable from "../../../../components/CommonDataTable";
 import InfoCards from "../../../../components/infoCards";
@@ -18,6 +18,8 @@ import { calculateDaysDifference } from "../../../../utils/commonutils";
 import AttachmentsModal from "../../modals/attachmentsModal";
 import TicketsListFilters from "../filters/index";
 import { TbBellRingingFilled } from "react-icons/tb";
+import DataGridActions from "../../../../components/DataGridActions";
+import EditTicketModal from "../../modals/editTicketModal";
 
 const TicketsNormalList = ({ selectedTab }) => {
 
@@ -25,6 +27,10 @@ const TicketsNormalList = ({ selectedTab }) => {
     const { currentUser, permissions = {} } = useContext(AuthenticationContext);
     const { masterData } = useContext(MasterDataContext);
 
+      const [editModal, setEditModal] = useState({ row: {}, open: false })
+
+
+    const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
     // PERMISSIONS work
     const [permissionsState, setPermissionsState] = React.useState({
         addModule: false,
@@ -352,6 +358,33 @@ const TicketsNormalList = ({ selectedTab }) => {
                 ),
             },
             {
+                accessorFn: (row) => row?.action,
+                id: "action",
+                header: () => t("ACTION"),
+                enableSorting: false,
+                cell: (rowData) => (
+                    <div className="pointer">
+                    {
+                        (rowData?.row?.original?.instanceType === 'FIRST_INSTANCE' && rowData?.row?.original?.status !=='CLOSED' && rowData?.row?.original?.status!=='REJECTED') && 
+                        <DataGridActions
+                            controlId="tickets"
+                            rowData={rowData}
+                            customButtons={[
+                                {
+                                    name: "edit",
+                                    enabled: true,
+                                    type: "button",
+                                    title: "Edit",
+                                    icon: <MdEdit size={18} />,
+                                    handler: () => editClaimType(rowData?.row?.original),
+                                },
+                            ]}
+                        />
+                    }  
+                    </div>
+                ),
+            },
+            {
                 accessorFn: (row) => row?.status,
                 id: "status",
                 header: () => t("STATUS"),
@@ -431,25 +464,29 @@ const TicketsNormalList = ({ selectedTab }) => {
         }
     }, [selectedTab])
 
+    // EDIT CLAIM TYPE
+    const editClaimType = async (row) => {
+        setEditModal({ row: row, open: !editModal?.open })
+    };
 
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
         // "consumerName", name of consumer
         switch (currentUser) {
             case 'FI_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status","action"];
                 break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status","action"];
                 break;
             case 'SEPS_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status","action"];
                 break;
             case 'SEPS_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status","action"];
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status","action"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
@@ -522,6 +559,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                 toggle={() => setAttachmentsModalShow(false)}
             />
 
+            <EditTicketModal modal={editModal?.open} dataQuery={dataQuery} toggle={editToggle} rowData={editModal?.row} />
         </React.Fragment>
     );
 }
