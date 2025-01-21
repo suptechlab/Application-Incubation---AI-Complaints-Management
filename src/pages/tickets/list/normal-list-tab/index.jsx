@@ -17,6 +17,7 @@ import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTicketList, tick
 import { calculateDaysDifference } from "../../../../utils/commonutils";
 import AttachmentsModal from "../../modals/attachmentsModal";
 import TicketsListFilters from "../filters/index";
+import { TbBellRingingFilled } from "react-icons/tb";
 
 const TicketsNormalList = ({ selectedTab }) => {
 
@@ -252,6 +253,10 @@ const TicketsNormalList = ({ selectedTab }) => {
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
+                        {
+                            (row?.original?.slaPopup && row?.original?.slaPopup !== null) &&
+                            <TbBellRingingFilled className="ring text-primary" size={18} />
+                        }
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
                             {"#" + row?.original?.ticketId}
                         </Link>
@@ -278,7 +283,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                 enableSorting: true,
                 cell: ({ row }) => (
                     row?.original?.createdAt
-                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY | hh:mm:a")
+                        ? moment(row?.original?.createdAt).format("DD-MM-YYYY")
                         : ''
                 ),
             },
@@ -293,6 +298,12 @@ const TicketsNormalList = ({ selectedTab }) => {
                 id: "claimFiledBy",
                 header: () => t("CLAIM_FILED_BY"),
                 enableSorting: true,
+            },
+            {
+                accessorFn: (row) => row?.organization?.razonSocial,
+                id: "entity",
+                header: () => t("ENTITY NAME"),
+                enableSorting: false,
             },
             {
                 accessorFn: (row) => row?.user?.name,
@@ -364,6 +375,7 @@ const TicketsNormalList = ({ selectedTab }) => {
         // Filter and reorder the columns based on the input array
         return columnsArray.map((colId) => allColumns.find((col) => col.id === colId)).filter(Boolean);
     };
+
     const handleTicketAssignment = (agentId) => {
         // agentTicketToSEPSagent
         if (agentId && agentId !== '') {
@@ -422,26 +434,26 @@ const TicketsNormalList = ({ selectedTab }) => {
 
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
-
+        // "consumerName", name of consumer
         switch (currentUser) {
             case 'FI_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break; // Use `break` to avoid executing further cases
             case 'FI_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SEPS_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
 

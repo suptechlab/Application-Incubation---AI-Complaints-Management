@@ -68,7 +68,7 @@ export default function TicketsList() {
     ];
 
     const actions = permissionsState?.addModule ?
-        [{ label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: true }] : []
+        [{ label: t('ADD_NEW_CLAIM'), onClick: addNewClickHanlder, variant: 'warning', disabled: false }] : []
 
     return (
         <React.Fragment>
