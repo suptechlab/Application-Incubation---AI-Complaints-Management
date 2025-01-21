@@ -96,3 +96,10 @@ export const convertToLabelValue = (obj) => {
 export const ticketStatusChange = async (ticketId, status) => {
   return await ticketApi.patch(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/change-status?status=${status}`);
 }
+
+// GET TAGGED TICKET LISTING
+export const handleGetTaggedTicketList = async (params) => {
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/for-tagged-users`, {
+    params
+  });
+}
