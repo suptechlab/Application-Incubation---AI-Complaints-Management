@@ -15,7 +15,7 @@ const SearchForm = ({ filter, setFilter }) => {
   const fetchRolesDropdownData = () => {
     getRolesDropdownData('FI_USER').then((response) => {
       const mappedData = [
-        { label: "All Roles", value: "" },
+        { label: t("ALL_ROLES"), value: "" },
         ...(response?.data?.map(item => ({
           value: item.id,
           label: item.name
@@ -102,18 +102,18 @@ const SearchForm = ({ filter, setFilter }) => {
                   label: t("ACTIVE"),
                   value: "ACTIVE",
                 },
-                {
-                  label: t("PENDING"),
-                  value: "PENDING",
-                },
+                // {
+                //   label: t("PENDING"),
+                //   value: "PENDING",
+                // },
                 {
                   label: t("BLOCKED"),
                   value: "BLOCKED",
                 },
-                {
-                  label: t("DELETED"),
-                  value: "DELETED",
-                },
+                // {
+                //   label: t("DELETED"),
+                //   value: "DELETED",
+                // },
               ]}
               onChange={(e) => {
                 setFilter({

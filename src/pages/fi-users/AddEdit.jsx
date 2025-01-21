@@ -1,5 +1,5 @@
 import { Formik, Form as FormikForm } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -13,8 +13,13 @@ import { countryCodes } from "../../constants/CountryCodes";
 import { getOrganizationInfo, getPersonalInfo, handleAddFIUsers, handleEditFIUsers, handleGetFIuserById } from "../../services/fiusers.services";
 import { getRolesDropdownData } from "../../services/rolerights.service";
 import { validationSchema } from "../../validations/fiUsers.validation";
+import { AuthenticationContext } from "../../contexts/authentication.context";
+import { capitalizeFirstLetter } from "../../utils/commonutils";
 
 export default function FIUserAddEdit() {
+
+  const { currentUser, userData } = useContext(AuthenticationContext)
+
   const [loading, setLoading] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const navigate = useNavigate();
@@ -36,7 +41,7 @@ export default function FIUserAddEdit() {
     identification: "",
     name: "",
     email: "",
-    countryCode: "+1",
+    countryCode: "+593",
     phoneNumber: "",
     ruc: "",
     entityName: "",
@@ -50,27 +55,27 @@ export default function FIUserAddEdit() {
       handleGetFIuserById(id).then((response) => {
         setInitialValues({
           identification: response.data?.identificacion ? response.data?.identificacion : "",
-          name: response.data?.name ? response.data?.name : "",
+          name: response.data?.name ? capitalizeFirstLetter(response.data?.name ?? "") : "",
           email: response.data?.email ? response.data?.email : "",
-          countryCode: response?.data?.countryCode ?? "+1",
+          countryCode: response?.data?.countryCode ?? "+593",
           phoneNumber: response?.data?.phoneNumber ? response?.data?.phoneNumber : "",
           ruc: response?.data?.organization?.ruc ? response?.data?.organization?.ruc : "",
-          entityName: response?.data?.organization?.razonSocial ? response?.data?.organization?.razonSocial : "",
-          entityType: response.data?.organization?.tipoOrganizacion ? response.data?.organization?.tipoOrganizacion : "",
+          entityName: response?.data?.organization?.razonSocial ? capitalizeFirstLetter(response?.data?.organization?.razonSocial ?? "") : "",
+          entityType: response.data?.organization?.tipoOrganizacion ? capitalizeFirstLetter(response.data?.organization?.tipoOrganizacion ?? "") : "",
           roleId: response.data?.roleId ? response.data?.roleId : "",
         })
         setLoading(false);
-      }).catch((error)=>{
+      }).catch((error) => {
         if (error?.response?.data?.errorDescription) {
           toast.error(error?.response?.data?.errorDescription);
         } else {
           toast.error(error?.message);
         }
-      }).finally(()=>{
+      }).finally(() => {
         setLoading(false)
       });
     } else {
-        setLoading(false);
+      setLoading(false);
     }
   }, [id, isEdit]);
 
@@ -97,16 +102,15 @@ export default function FIUserAddEdit() {
   }, [])
 
   // FETCH USER PERSONAL INFO BY ID
-  const fetchUserData = async (identification) => {
+  const fetchUserData = async (identification, setFieldValue) => {
     setLoadingInfo(true)
     getPersonalInfo(identification).then((response) => {
       setLoadingInfo(false)
-      if(response?.data?.nombreCompleto){
-        setInitialValues({ ...initialValue, identification: identification, name: response?.data?.nombreCompleto })
-      }else{
-        setInitialValues({ ...initialValue, identification: identification, name: '' })
+      if (response?.data?.nombreCompleto) {
+        setFieldValue("name", capitalizeFirstLetter(response?.data?.nombreCompleto ?? ''))
+      } else {
+        setFieldValue("name", "")
       }
-     
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -114,23 +118,29 @@ export default function FIUserAddEdit() {
         } else {
           toast.error(error?.message);
         }
-        setInitialValues({ ...initialValue, identification: identification, name: '' })
+        setFieldValue("name", "")
       }).finally(() => {
         setLoadingInfo(false)
       })
   };
 
   // TAX ID 
-  const fetchOrganizationData = async (ruc) => {
+  const fetchOrganizationData = async (ruc, setFieldValue) => {
     setLoadingInfo(true)
     getOrganizationInfo(ruc).then((response) => {
       setLoadingInfo(false)
-      if(response?.data?.razonSocial){
-        setInitialValues({ ...initialValue, ruc: ruc, entityName: response?.data?.razonSocial, entityType: response?.data?.tipoOrganizacion })
-      }else{
-        setInitialValues({ ...initialValue, ruc: ruc, entityName: '', entityType: '' })
+      if (response?.data?.razonSocial) {
+        // setInitialValues({
+        //   ...initialValue, ruc: ruc,
+        //   entityName: capitalizeFirstLetter(response?.data?.razonSocial ?? ''),
+        //   entityType: capitalizeFirstLetter(response?.data?.tipoOrganizacion ?? '')
+        // })
+        setFieldValue('entityName', capitalizeFirstLetter(response?.data?.razonSocial ?? ''))
+        setFieldValue('entityType', capitalizeFirstLetter(response?.data?.tipoOrganizacion ?? ''))
+      } else {
+        setFieldValue('entityName', '')
+        setFieldValue('entityType', '')
       }
-     
     })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -138,24 +148,25 @@ export default function FIUserAddEdit() {
         } else {
           toast.error(error?.message);
         }
-        setInitialValues({ ...initialValue, ruc: ruc, entityName: '', entityType: '' })
+        setFieldValue('entityName', '')
+        setFieldValue('entityType', '')
       }).finally(() => {
         setLoadingInfo(false)
       })
   }
   // HANDLE IDENTIFICATION
-  const handleIdentificationBlur = (event) => {
+  const handleIdentificationBlur = (event, setFieldValue) => {
     const identification = event.target.value;
     if (identification && identification !== "") {
-      fetchUserData(identification) // Call the API function
+      fetchUserData(identification, setFieldValue) // Call the API function
     }
   };
 
   // HANDLE TAX ID BLUR
-  const handleTaxIdBlur = (event) => {
+  const handleTaxIdBlur = (event, setFieldValue) => {
     const ruc = event.target.value;
     if (ruc && ruc !== "") {
-      fetchOrganizationData(ruc) // Call the API function
+      fetchOrganizationData(ruc, setFieldValue) // Call the API function
     }
   }
 
@@ -214,6 +225,18 @@ export default function FIUserAddEdit() {
     }
   };
 
+
+  useEffect(() => {
+    if (currentUser === 'FI_USER') {
+      setInitialValues({
+        ...initialValue,
+        ruc: userData?.organization?.ruc,
+        entityName: capitalizeFirstLetter(userData?.organization?.razonSocial ?? ''),
+        entityType: capitalizeFirstLetter(userData?.organization?.tipoOrganizacion ?? '')
+      })
+    }
+  }, [currentUser])
+
   return (
     <React.Fragment>
       <Loader isLoading={loading || loadingInfo} />
@@ -255,7 +278,7 @@ export default function FIUserAddEdit() {
                         key={"identification"}
                         label={t("ID")}
                         name="identification"
-                        onBlur={handleIdentificationBlur}
+                        onBlur={(event) => handleIdentificationBlur(event, setFieldValue)}
                         onChange={handleChange}
                         touched={touched?.identification}
                         type="number"
@@ -343,7 +366,7 @@ export default function FIUserAddEdit() {
                         key={"ruc"}
                         label={t("ENTITY'S TAX ID (RUC)")}
                         name="ruc"
-                        onBlur={handleTaxIdBlur}
+                        onBlur={(event) => handleTaxIdBlur(event, setFieldValue)}
                         onChange={(option) => {
                           setFieldValue("ruc", option?.target?.value ?? "");
                         }}
@@ -351,6 +374,7 @@ export default function FIUserAddEdit() {
                         type="number"
                         value={values?.ruc || ""}
                         readOnly={isEdit ? true : false}
+                        disabled={currentUser === 'FI_USER' ? true : false}
                       />
                     </Col>
                     <Col sm={6} md={6} lg={4}>

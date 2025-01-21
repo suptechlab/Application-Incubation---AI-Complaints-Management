@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Card, Col, Row, Stack, Table } from "react-bootstrap";
 import moment from "moment";
-import { getAuditLogsById } from "../../services/auditlogs.services";
+import { getAuditLogsById } from "../../services/reports.services";
 import PageHeader from "../../components/PageHeader";
 import { useTranslation } from "react-i18next";
 import AuditTable from "./AuditTable";

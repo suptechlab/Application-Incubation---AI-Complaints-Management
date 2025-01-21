@@ -16,7 +16,7 @@ import RejectTicketModal from '../../modals/rejectTicketModal';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import Loader from '../../../../components/Loader';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData, permissionState }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData, permissionState, loading, setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -31,7 +31,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
     const [closeTicketModalShow, setCloseTicketModalShow] = useState(false)
     const [rejectTicketModalShow, setRejectTicketModalShow] = useState(false)
 
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
     const handleSelect = (status) => {
         const actions = {
@@ -48,7 +48,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
     const statusOptions = [
-        ...(permissionState?.closePermission === true ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),    
+        ...(permissionState?.closePermission === true ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
         ...(permissionState?.rejectPermission === true ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
         { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
         { label: t('PENDING'), value: 'PENDING' }];
@@ -83,16 +83,18 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
 
     //Handle Ticket Status Change
     const handleTicketStatusChange = async (status) => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const response = await ticketStatusChange(ticketData?.id, status);
             toast.success(response.data.message);
-            await getTicketData();
+            setIsGetAcitivityLogs((prev)=>!prev)
+            setSelectedStatus(status)
+            // await getTicketData();
         } catch (error) {
             const errorMessage = error?.response?.data?.errorDescription || "An unexpected error occurred.";
             toast.error(errorMessage);
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
     };
 
@@ -109,6 +111,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 agentTicketToSEPSagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setSelectedAgent(null)
+                    getTicketData()
                 }).catch((error) => {
                     if (error?.response?.data?.errorDescription) {
                         toast.error(error?.response?.data?.errorDescription);
@@ -173,31 +176,36 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
 
     return (
         <React.Fragment>
-            <Loader isLoading={loading} />
+            {/* <Loader isLoading={loading} /> */}
             <div className="pb-3">
                 <Stack
                     direction="horizontal"
                     gap={2}
                     className="flex-wrap custom-min-height-38"
                 >
-                    <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
-                        {title ?? ""}
-                        {isSlaBreachDateValid && (
-                            daysDifference > 2
-                                ? renderBadge("custom-info", "custom-info", `${daysDifference} ${t("DAYS_REMAINING")}`)
-                                : renderBadge("custom-danger", "custom-danger", `${daysDifference} ${t("DAYS_REMAINING")}`)
-                        )}
-                        {
-                            ticketData?.instanceType === "FIRST_INSTANCE" ?
-                                <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
-                                </Badge>
-                                :
-                                <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
-                                </Badge>
-                        }
-                    </h1>
+
+                    {/* {loading === true ? <h1 className="placeholder-glow h-100 w-25 mb-0 me-auto d-inline-flex align-items-center gap-2">
+                        <div className="placeholder" style={{ width: '100%', height: '100%' }}></div>
+                    </h1> : */}
+                        <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
+
+                            {title ?? ""}
+                            {isSlaBreachDateValid && (
+                                daysDifference > 2
+                                    ? renderBadge("custom-info", "custom-info", `${daysDifference} ${t("DAYS_REMAINING")}`)
+                                    : renderBadge("custom-danger", "custom-danger", `${daysDifference} ${t("DAYS_REMAINING")}`)
+                            )}
+                            {
+                                ticketData?.instanceType === "FIRST_INSTANCE" ?
+                                    <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                        <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                    </Badge>
+                                    :
+                                    <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                        <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                    </Badge>
+                            }
+                        </h1>
                     <Stack direction="horizontal" gap={2} className='flex-wrap'>
                         <Link
                             to={"/tickets"}
@@ -215,7 +223,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
 
                         {
 
-                            permissionState?.assignPermission === true && 
+                            permissionState?.assignPermission === true &&
                             ((currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
                                 ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') && ticketData?.instanceType === 'SECOND_INSTANCE') &&
                                 (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&

@@ -2,7 +2,7 @@ import { Formik, Form as FormikForm } from "formik";
 import React, { useState } from "react";
 import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import { MdOutlineSimCardDownload } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
@@ -11,14 +11,13 @@ import fiUserFile from "../../assets/samplefiles/FI_USERS.xlsx"
 import { handleImportFiUsersApi } from "../../services/fiusers.services";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { handleImportSepsUsersApi } from "../../services/user.service";
 
-const ImportFIUser = () => {
+const ImportSEPSUser = () => {
 
   const [loading, setLoading] = useState(false)
-
-  const navigate = useNavigate()
   const { t } = useTranslation()
-  const [initialValue, setInitialValues] = useState({
+  const [initialValue,setInitialValues] = useState({
     browseFile: "",
     description: "",
   });
@@ -26,20 +25,20 @@ const ImportFIUser = () => {
   const [fileName, setFileName] = useState("");
 
   //Handle File Change
-  const handleFileChange = (event, setFieldValue) => {
+  const handleFileChange = (event,setFieldValue) => {
 
     const file = event.target.files[0];
 
     if (file) {
       setFileName(file.name);
-      setFieldValue('browseFile', file)
+      setFieldValue('browseFile',file)
     } else {
       setFileName("");
     }
   };
 
   //Sumbit Handler
-  const handleSubmit = (values, actions) => {
+  const handleSubmit = (values,actions) => {
 
     if (!values.browseFile) {
       toast.error(t("PLEASE_SELECT_A_FILE_TO_UPLOAD"));
@@ -51,29 +50,26 @@ const ImportFIUser = () => {
 
     setLoading(true); // Set loading to true while the API call is in progress
     actions.setSubmitting(true)
-    handleImportFiUsersApi(formData)
+    handleImportSepsUsersApi(formData)
       .then((response) => {
-        if (response?.data?.status === 200) {
-          navigate('/fi-users')
+        if (response?.status === 200) {
           toast.success(response?.data?.message);
-        } else {
+        } else if(response?.status === 400) {
+
+          const errorData = response?.data?.data?.join('\n')
+          setInitialValues({browseFileerrorData:'',description:errorData})
+        }else{
           toast.error(response?.data?.message || t("Unexpected error occurred during file upload."));
         }
       })
       .catch((error) => {
-        if (error?.response?.status === 400) {
-
-          const errorData = error?.response?.data?.join('\n')
-          setInitialValues({ browseFileerrorData: '', description: errorData })
-        }
-        else if (error?.response?.data?.errorDescription) {
+        if (error?.response?.data?.errorDescription) {
           toast.error(error.response.data.errorDescription);
         } else {
           toast.error(error?.message || t("STATUS UPDATE ERROR"));
         }
       })
       .finally(() => {
-        console.log("are you  here.....")
         actions.setSubmitting(false)
         setLoading(false); // Reset loading state after the API call
       });
@@ -83,7 +79,7 @@ const ImportFIUser = () => {
   const handleSampleFileDownload = () => {
     // Define the URL of the sample file
     const fileUrl = fiUserFile; // Replace with your file URL
-    const fileName = "FI_USERS.xlsx"; // Replace with the desired file name
+    const fileName = "SEPS_USERS.xlsx"; // Replace with the desired file name
 
     // Create an anchor element
     const link = document.createElement("a");
@@ -97,14 +93,12 @@ const ImportFIUser = () => {
     // Clean up
     document.body.removeChild(link);
   };
-
-  console.log({ initialValue })
   return (
     <React.Fragment>
       <Loader isLoading={false} />
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
-          title={t("FI USERS")}
+          title={t("SEPS USERS")}
           actions={[
             {
               label: t("DOWNLOAD_SAMPLE_USER_TEMPLATE"),
@@ -153,7 +147,7 @@ const ImportFIUser = () => {
                             className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                             type="file"
                             name="browseFile"
-                            onChange={(event) => handleFileChange(event, setFieldValue)}
+                            onChange={(event)=>handleFileChange(event , setFieldValue)}
                           />
 
                         </div>
@@ -184,7 +178,6 @@ const ImportFIUser = () => {
                         touched={touched?.description}
                         rows={7}
                         type="text"
-                        disabled={true}
                         value={values?.description || ""}
                       />
                     </Col>
@@ -208,7 +201,7 @@ const ImportFIUser = () => {
                         className="custom-min-width-85"
                         disabled={isSubmitting ?? false}
                       >
-                        {t('SUBMIT')}
+                         {t('SUBMIT')}
                       </Button>
                     </Stack>
                   </div>
@@ -222,4 +215,4 @@ const ImportFIUser = () => {
   );
 };
 
-export default ImportFIUser;
+export default ImportSEPSUser;

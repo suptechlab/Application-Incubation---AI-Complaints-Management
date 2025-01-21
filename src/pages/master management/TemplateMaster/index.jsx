@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -11,20 +11,15 @@ import DataGridActions from "../../../components/DataGridActions";
 
 import PageHeader from "../../../components/PageHeader";
 import Toggle from "../../../components/Toggle";
-import {
-  getModulePermissions,
-  isAdminUser,
-} from "../../../utils/authorisedmodule";
-import Add from "./Add";
-import Edit from "./Edit";
-import ListingSearchForm from "./ListingSearchForm";
-import {
-  handleGetTemplateMaster,
-  changeTemplateMaster,
-  downloadTemplateList,
-} from "../../../services/templateMaster.service";
+
 import Loader from "../../../components/Loader";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
+import {
+  changeTemplateMaster,
+  downloadTemplateList,
+  handleGetTemplateMaster,
+} from "../../../services/templateMaster.service";
+import ListingSearchForm from "./ListingSearchForm";
 
 const TemplateMaster = () => {
   const { t } = useTranslation();
@@ -114,11 +109,11 @@ const TemplateMaster = () => {
       }
 
       if (["CLAIM_TYPE_STATUS_CHANGE", "CLAIM_TYPE_STATUS_CHANGE_FI"].some(permission => permissionArr.includes(permission))) {
-        updatedPermissions.editModule = true;
+        updatedPermissions.statusModule = true;
       }
 
       if (["CLAIM_TYPE_UPDATE", "CLAIM_TYPE_UPDATE_FI"].some(permission => permissionArr.includes(permission))) {
-        updatedPermissions.statusModule = true;
+        updatedPermissions.editModule = true;
       }
 
     }
@@ -217,55 +212,59 @@ const TemplateMaster = () => {
         id: "userType",
         header: () => t("USER TYPE"),
       },
-      {
-        // accessorFn: (row) => row.status ? "Active" : "Inactive",
-        cell: (info) => {
-          return (
-            permissionsState.statusModule ?
-              <Toggle
-                id={`status-${info?.row?.original?.id}`}
-                key={"status"}
-                // label="Status"
-                name="status"
-                value={info?.row?.original?.status}
-                checked={info?.row?.original?.status}
-                onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-                tooltip="Active"
+      ...(permissionsState?.statusModule
+        ? [{
+          // accessorFn: (row) => row.status ? "Active" : "Inactive",
+          cell: (info) => {
+            return (
+              permissionsState.statusModule ?
+                <Toggle
+                  id={`status-${info?.row?.original?.id}`}
+                  key={"status"}
+                  // label="Status"
+                  name="status"
+                  value={info?.row?.original?.status}
+                  checked={info?.row?.original?.status}
+                  onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+                  tooltip="Active"
+                />
+                : ''
+            )
+          },
+          id: "status",
+          header: () => t("STATUS"),
+          size: '90',
+        }] : [])
+      ,
+      ...(permissionsState?.editModule
+        ? [{
+          id: "actions",
+          isAction: true,
+          cell: (rowData) => (
+            permissionsState.editModule ?
+              <DataGridActions
+                controlId="role-rights"
+                rowData={rowData}
+                customButtons={[
+                  {
+                    name: "edit",
+                    enabled: true,
+                    type: "button",
+                    title: "Edit",
+                    icon: <MdEdit size={18} />,
+                    handler: () => editTemplateMaster(rowData?.row?.original),
+                  },
+                ]}
               />
               : ''
-          )
-        },
-        id: "status",
-        header: () => t("STATUS"),
-        size: '90',
-      },
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          permissionsState.editModule ?
-            <DataGridActions
-              controlId="role-rights"
-              rowData={rowData}
-              customButtons={[
-                {
-                  name: "edit",
-                  enabled: true,
-                  type: "button",
-                  title: "Edit",
-                  icon: <MdEdit size={18} />,
-                  handler: () => editTemplateMaster(rowData?.row?.original),
-                },
-              ]}
-            />
-            : ''
-        ),
-        header: () => (
-          <div className="text-center">{t("ACTIONS")}</div>
-        ),
-        enableSorting: false,
-        size: "80",
-      },
+          ),
+          header: () => (
+            <div className="text-center">{t("ACTIONS")}</div>
+          ),
+          enableSorting: false,
+          size: "80",
+        }] : [])
+      ,
     ],
     [permissionsState]
   );
@@ -347,8 +346,8 @@ const TemplateMaster = () => {
             />
           </Card.Body>
         </Card>
-        <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
-        <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} />
+        {/* <Add modal={modal} dataQuery={dataQuery} toggle={toggle} />
+        <Edit modal={editModal?.open} dataQuery={dataQuery} rowData={editModal?.row} toggle={editToggle} /> */}
       </div>
     </React.Fragment>
   );

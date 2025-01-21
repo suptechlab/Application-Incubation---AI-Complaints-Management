@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
-import React, { useContext, useEffect,  useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -16,12 +16,11 @@ import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
 import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
-import GenericModal from "../../components/GenericModal";
-import ListingSearchFormUsers from "./ListingSearchFormUsers";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import Toggle from "../../components/Toggle";
 import { AuthenticationContext } from "../../contexts/authentication.context";
+import ListingSearchFormUsers from "./ListingSearchFormUsers";
 
 export default function UserList() {
 
@@ -80,56 +79,12 @@ export default function UserList() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [selectedRow, setSelectedRow] = useState();
-  const [deleteShow, setDeleteShow] = useState(false);
-  const [deleteId, setDeleteId] = useState();
-
-  // const dataQuery = useQuery({
-  //   queryKey: ["data", pagination, sorting, filter],
-  //   queryFn: async() => {
-  //     setLoading(true);
-  //     try {
-  //       const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-  //       Object.keys(filterObj).forEach(
-  //         (key) => filterObj[key] === "" && delete filterObj[key]
-  //       );
-
-  //       let response;
-  //       if (sorting.length === 0) {
-  //         response = await handleGetUsers({
-  //           page: pagination.pageIndex,
-  //           size: pagination.pageSize,
-  //           ...filterObj,
-  //         });
-  //       } else {
-  //         response = await handleGetUsers({
-  //           page: pagination.pageIndex,
-  //           size: pagination.pageSize,
-  //           sort: sorting
-  //             .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-  //             .join(","),
-  //           ...filterObj,
-  //         });
-  //       }
-  //       return response;
-  //     } catch (error) {
-  //     } finally {
-  //       setLoading(false); // Start loading
-  //     }
-  //   },
-  //   // onError: () => setLoading(false), // Ensure loading state is reset on error
-  //   staleTime: 0, // Data is always stale, so it refetches
-  //   cacheTime: 0, // Cache expires immediately
-  //   refetchOnWindowFocus: false, // Disable refetching on window focus
-  //   refetchOnMount: false, // Prevent refetching on component remount
-  //   retry: 0, //Disable retry on failure
-  // });
 
   //handle last page deletion item
-  
+
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: async  () => {
+    queryFn: async () => {
       // Set loading state to true before the request starts
       setLoading(true);
 
@@ -174,7 +129,7 @@ export default function UserList() {
     refetchOnMount: true, // Prevent refetching on component remount
     retry: 0, //Disable retry on failure
   });
-  
+
   useEffect(() => {
 
     if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
@@ -200,26 +155,6 @@ export default function UserList() {
 
 
 
-  //Handle Delete
-  const deleteAction = (rowData) => {
-    setSelectedRow(rowData);
-    setDeleteId(rowData.id);
-    setDeleteShow(true);
-  };
-
-  const recordDelete = async (deleteId) => {
-    setLoading(true);
-    try {
-      await handleDeleteUser(deleteId);
-      toast.success("Your data has been deleted successfully");
-      dataQuery.refetch();
-      setDeleteShow(false);
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const columns = React.useMemo(
     () => [
       {
@@ -229,10 +164,18 @@ export default function UserList() {
         enableSorting: false,
       },
       {
-        accessorFn: (row) => row?.roles.length !== 0 ? row?.roles[0]?.name : 'N/A',
+        accessorFn: (row) => row?.roles,
         id: "role",
         header: () => t('ROLE'),
         enableSorting: false,
+        cell: (info) => {
+          return <span>
+            {
+              info?.row?.original?.roles && info?.row?.original?.roles?.length > 0 ? info?.row?.original?.roles[0]?.name : ''
+            }
+
+          </span>
+        }
       },
       {
         accessorFn: (row) => row?.email,
@@ -242,7 +185,7 @@ export default function UserList() {
       {
         accessorFn: (row) => row?.createdDate,
         id: "createdDate",
-        header: () => "Fecha de creación",
+        header: () => t("CREATION DATE"),
         cell: (info) => {
           return <span>{moment(info.row?.original.createdDate).format("l")}</span>;
         },
@@ -320,8 +263,16 @@ export default function UserList() {
   }, [queryClient]);
 
   const actions = permissionsState?.addModule
-  ? [{ label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
-  : [];
+    ? [
+      //   {
+      //   label: t("IMPORT_SEPS_USERS"),
+      //   to: "/users/import",
+      //   variant: "outline-dark",
+      //   disabled: false
+      // }
+      // ,
+      { label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
+    : [];
 
   return (
     <React.Fragment>
@@ -329,7 +280,7 @@ export default function UserList() {
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         {permissionsState?.addModule ?
           <PageHeader
-            title="Usuarios de SEPS"
+            title={t("SEPS USERS")}
             actions={actions}
           />
           : ''}
@@ -349,7 +300,7 @@ export default function UserList() {
       </div>
 
       {/* Delete Modal */}
-      <GenericModal
+      {/* <GenericModal
         show={deleteShow}
         handleClose={() => setDeleteShow(false)}
         modalHeaderTitle={`Delete SEPS User`}
@@ -357,7 +308,7 @@ export default function UserList() {
         handleAction={() => recordDelete(deleteId)}
         buttonName="Delete"
         ActionButtonVariant="danger"
-      />
+      /> */}
     </React.Fragment>
   );
 }

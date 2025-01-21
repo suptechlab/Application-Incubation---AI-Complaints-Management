@@ -233,11 +233,11 @@ const ClaimSubType = () => {
         header: () => t("DESCRIPTION"),
         enableSorting: true,
       },
-      {
-        cell: (info) => {
-          return (
-            <div className="d-flex items-center gap-2 pointer">
-              {permissionsState.statusModule ?
+      ...(permissionsState?.statusModule
+        ? [{
+          cell: (info) => {
+            return (
+              <div className="d-flex items-center gap-2 pointer">
                 <Toggle
                   tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
                   id={`status-${info?.row?.original?.id}`}
@@ -247,42 +247,42 @@ const ClaimSubType = () => {
                   checked={info?.row?.original?.status}
                   onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
                 />
-                : ''}
-            </div>
-          )
-        },
-        id: "status",
-        header: () => t("STATUS"),
-        size: '80',
-        enableSorting: true
-      },
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          <div>
-            {permissionsState.editModule ?
-              <DataGridActions
-                controlId="province-master"
-                rowData={rowData}
-                customButtons={[
-                  {
-                    name: "edit",
-                    enabled: permissionsState.editModule,
-                    type: "button",
-                    title: t("EDIT"),
-                    icon: <MdEdit size={18} />,
-                    handler: () => editClaimSubType(rowData?.row?.original),
-                  },
-                ]}
-              />
-              : ''}
-          </div>
-        ),
-        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-        enableSorting: false,
-        size: '80',
-      },
+              </div>
+            )
+          },
+          id: "status",
+          header: () => t("STATUS"),
+          size: '80',
+          enableSorting: true
+        }] : []),
+
+      ...(permissionsState?.editModule
+        ? [
+          {
+            id: "actions",
+            isAction: true,
+            cell: (rowData) => (
+              <div>
+                <DataGridActions
+                  controlId="province-master"
+                  rowData={rowData}
+                  customButtons={[
+                    {
+                      name: "edit",
+                      enabled: permissionsState.editModule,
+                      type: "button",
+                      title: t("EDIT"),
+                      icon: <MdEdit size={18} />,
+                      handler: () => editClaimSubType(rowData?.row?.original),
+                    },
+                  ]}
+                />
+              </div>
+            ),
+            header: () => <div className="text-center">{t("ACTIONS")}</div>,
+            enableSorting: false,
+            size: '80',
+          }] : []),
     ],
     [permissionsState]
   );

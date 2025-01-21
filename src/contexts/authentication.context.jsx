@@ -2,28 +2,34 @@ import { createContext, useEffect, useState } from "react";
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { handleLogin, handleRefreshToken, handleVerifyOtp, handleGetAccountDetail } from "../services/authentication.service";
+import { handleLogin, handleRefreshToken, handleVerifyOtp, handleGetAccountDetail, downloadProfileImage } from "../services/authentication.service";
 import { getLocalStorage, removeLocalStorage, setLocalStorage } from "../utils/storage";
 
 export const AuthenticationContext = createContext({
     isAuthenticated: false,
     isLoading: true,
+    isDownloadingImg :false,
     userData: {},
     currentUser: {},
     permissions: [],
     modules: [],
     setUserData: () => { },
+    profileImage: '',
+    handleAccountDetails : ()=>{}
 });
 
 
 export default function AuthenticationProvider({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isDownloadingImg, setIsDownloadingImg] = useState(false);
     const [userData, setUserData] = useState({})
     const [currentUser, setCurrentUser] = useState(null)
     const [permissions, setPermissions] = useState([])
     const [authorities, setAuthorities] = useState([])
     const [modules, setModules] = useState([])
+
+    const [profileImage , setProfileImage] = useState('')
 
     const navigate = useNavigate()
     const location = useLocation()
@@ -49,6 +55,12 @@ export default function AuthenticationProvider({ children }) {
         removeLocalStorage("access_token")
         removeLocalStorage("refresh_token")
         setIsAuthenticated(false)
+        removeLocalStorage("profileImage")
+        setUserData({})
+        setPermissions([])
+        setAuthorities([])
+        setModules([])
+        navigate('/login')
     }
 
     const login = async (data) => {
@@ -165,6 +177,13 @@ export default function AuthenticationProvider({ children }) {
                 } else {
                     setCurrentUser('SYSTEM_ADMIN')
                 }
+
+                if(data?.externalDocumentId){
+                    handleImageDownload()
+                }else{
+                    setIsDownloadingImg(false)
+                }
+                // handleImageDownload()
             })
             .catch((error) => {
                 console.log(error)
@@ -175,9 +194,33 @@ export default function AuthenticationProvider({ children }) {
                     logout();
                 }
 
-            }).finally(()=>{
+            }).finally(() => {
                 setIsLoading(false)
             });
+    }
+
+    // HANDLE IMAGE DOWNLOAD AND SAVE IT IN LOCAL STORAGE
+    const handleImageDownload = () => {
+        setIsDownloadingImg(true)
+        downloadProfileImage().then(async (response) => {
+            const reader = new FileReader();
+            const blob = response.data;
+
+            const base64Url = await new Promise((resolve, reject) => {
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+
+            // Store the base64 URL in localStorage
+            localStorage.setItem('profileImage', base64Url);
+            setProfileImage(base64Url)
+            //  base64Url; // Return the base64 URL
+        }).catch((error)=>{
+            console.error('ERROR IN DOWNLOAD PROFILE',error)
+        }).finally(()=>{
+            setIsDownloadingImg(false)
+        })
     }
 
 
@@ -203,7 +246,10 @@ export default function AuthenticationProvider({ children }) {
                 currentUser,
                 permissions,
                 authorities,
-                modules
+                modules,
+                profileImage,
+                isDownloadingImg,
+                handleAccountDetails
             }}>
             {children}
         </AuthenticationContext.Provider>

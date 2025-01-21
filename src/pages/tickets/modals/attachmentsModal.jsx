@@ -9,43 +9,52 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { downloadFile } from "../../../utils/commonutils";
 
-const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissionState }) => {
+const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissionState, attachmentPosition }) => {
     const [AttachmentsModalData, setAttachmentModalData] = useState(ticketData?.claimTicketDocuments ?? [])
     const [isDownloading, setDownloading] = useState(false)
 
     const { t } = useTranslation()
 
-    useEffect(() => {
-        // setAttachmentModalData(ticketData?.claimTicketDocuments ?? [])
-        setAttachmentModalData(() => {
-            if (currentInstance === "FIRST_INSTANCE") {
-                return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "FIRST_INSTANCE") ?? [];
-            } else if (currentInstance === "SECOND_INSTANCE") {
-                return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "SECOND_INSTANCE") ?? [];
-            }
-            else if (currentInstance === "COMPLAINT") {
-                return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "COMPLAINT") ?? [];
-            } else {
-                return []; // Return empty if no valid instanceType
-            }
-        });
-    }, [ticketData?.claimTicketDocuments, currentInstance])
+    // useEffect(() => {
+    //     // setAttachmentModalData(ticketData?.claimTicketDocuments ?? [])
+    //     setAttachmentModalData(() => {
+    //         if (currentInstance === "FIRST_INSTANCE") {
+    //             return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "FIRST_INSTANCE") ?? [];
+    //         } else if (currentInstance === "SECOND_INSTANCE") {
+    //             return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "SECOND_INSTANCE") ?? [];
+    //         }
+    //         else if (currentInstance === "COMPLAINT") {
+    //             return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "COMPLAINT") ?? [];
+    //         } else {
+    //             return []; // Return empty if no valid instanceType
+    //         }
+    //     });
+    // }, [ticketData?.claimTicketDocuments, currentInstance])
 
-    // Modal Data
-    // const AttachmentsModalData = [
-    //     {
-    //         title: "Document 1.docx",
-    //         dowlnloadUrl: "/",
-    //     },
-    //     {
-    //         title: "Document 2.xlsx",
-    //         dowlnloadUrl: "/",
-    //     },
-    //     {
-    //         title: "Document 3.pdf",
-    //         dowlnloadUrl: "/",
-    //     },
-    // ];
+    useEffect(() => {
+        const getDocuments = () => {
+            switch (attachmentPosition) {
+                case 'TOP':
+                    return ticketData?.claimTicketDocuments ?? [];
+                case 'MIDDLE':
+                    return ticketData?.previousTicket?.claimTicketDocuments ?? [];
+                case 'BOTTOM':
+                    console.log(ticketData?.previousTicket?.previousTicket?.claimTicketDocuments)
+                    return ticketData?.previousTicket?.previousTicket?.claimTicketDocuments ?? [];
+                default:
+                    return [];
+            }
+        };
+
+        setAttachmentModalData(() => {
+            const documents = getDocuments();
+            if (currentInstance) {
+                return documents.filter(doc => doc.instanceType === currentInstance);
+            }
+            return [];
+        });
+    }, [ticketData, currentInstance, attachmentPosition]);
+
 
     // HANDLE ATTACHMENT DOWNLOAD
     const handleAttachmentDownload = (attachmentData) => {

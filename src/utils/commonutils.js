@@ -1,7 +1,7 @@
 import moment from "moment/moment";
 import { MdPictureAsPdf } from "react-icons/md";
-import { FiImage ,FiFileText} from "react-icons/fi";
-import { FaRegFile,FaFileWord,FaFileAlt } from "react-icons/fa";
+import { FiImage, FiFileText } from "react-icons/fi";
+import { FaRegFile, FaFileWord, FaFileAlt } from "react-icons/fa";
 import { getValidationMessages } from "../services/Validation.service";
 
 const msg = getValidationMessages();
@@ -33,39 +33,27 @@ export const timeRemaining = (date) => {
 export const calculateDaysDifference = (date) => {
   const now = moment();
   const targetDate = moment(date);
-
-  // Calculate the absolute difference in days
-  const daysDifference = Math.abs(targetDate.diff(now, 'days'));
-
-  return `${daysDifference}`;
+  
+  // Check if the target date is in the future
+  if (targetDate.isAfter(now, 'day')) {
+    // Calculate the difference in days
+    const daysDifference = targetDate.diff(now, 'days'); // Use targetDate.diff to get positive value
+    return `${daysDifference}`;
+  }
+  
+  // Return 0 if the date is in the past or today
+  return '0';
 };
-
-// FILE UPLOAD
-
-// export const validateFile = (file) => {
-
-
- 
-//   const MAX_FILE_SIZE_MB = 1;
-
-//   if (!file) {
-//     return "No file selected.";
-//   }
-
-//   // Validate MIME type
-//   if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-//     return "Invalid file type. Please upload an allowed file.";
-//   }
-
-//   // Validate file size
-//   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-//     return `File size exceeds ${MAX_FILE_SIZE_MB} MB. Please upload a smaller file.`;
-//   }
-
-//   // If all validations pass
-//   return true;
-// };
-
+// CAPITALIZE FIRST LETTER
+export const capitalizeFirstLetter =(str = '') => {
+  if (!str) return ''; // Handle empty or null input
+  return str
+    .toLowerCase() // Convert the entire string to lowercase
+    .split(' ') // Split the string into words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(' '); // Join the words back into a single string
+}
+// VALIDATE FILE
 export const validateFile = (file) => {
   const MAX_FILE_SIZE_MB = 1;
 
@@ -99,48 +87,48 @@ export const isHTML = (data) => {
 
 // DOWNLOAD FUNCTION
 
-export function downloadFile(response, attachmentData,fileName) {
+export function downloadFile(response, attachmentData, fileName) {
   return new Promise((resolve, reject) => {
-      try {
-          // Create the Blob object based on response data
-          const blob = new Blob([response?.data], { type: response.headers['content-type'] });
-          const blobUrl = window.URL.createObjectURL(blob);
+    try {
+      // Create the Blob object based on response data
+      const blob = new Blob([response?.data], { type: response.headers['content-type'] });
+      const blobUrl = window.URL.createObjectURL(blob);
 
-          // Create a temporary link element
-          const tempLink = document.createElement('a');
-          tempLink.href = blobUrl;
-          tempLink.setAttribute('download', fileName || attachmentData?.originalTitle || 'download');
+      // Create a temporary link element
+      const tempLink = document.createElement('a');
+      tempLink.href = blobUrl;
+      tempLink.setAttribute('download', fileName || attachmentData?.originalTitle || 'download');
 
-          // Append the link to the document body
-          document.body.appendChild(tempLink);
+      // Append the link to the document body
+      document.body.appendChild(tempLink);
 
-          // Trigger the download by clicking the link
-          tempLink.click();
+      // Trigger the download by clicking the link
+      tempLink.click();
 
-          // Clean up by revoking the Blob URL and removing the link
-          window.URL.revokeObjectURL(blobUrl);
-          document.body.removeChild(tempLink);
+      // Clean up by revoking the Blob URL and removing the link
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(tempLink);
 
-          // Success: Resolve the promise and display success message
-          // toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" });
-          resolve();
-      } catch (error) {
-          // Handle any errors during the download process
-          console.error("Error downloading the file:", error);
-          reject(error);
-      }
+      // Success: Resolve the promise and display success message
+      // toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" });
+      resolve();
+    } catch (error) {
+      // Handle any errors during the download process
+      console.error("Error downloading the file:", error);
+      reject(error);
+    }
   });
 }
 
 const EXTENSION_ICON_MAP = {
   "jpeg": <FiImage size={24} />,
-  "jpg": <FiImage size={24}/>,
-  "png": <FiImage size={24}/>,
-  "pdf": <MdPictureAsPdf size={24}/>,
-  "txt": <FiFileText size={24}/>,
-  "doc": <FaFileWord size={24}/>,
-  "docx": <FaFileWord size={24}/>,
-  "rtf": <FaFileAlt size={24}/>,
+  "jpg": <FiImage size={24} />,
+  "png": <FiImage size={24} />,
+  "pdf": <MdPictureAsPdf size={24} />,
+  "txt": <FiFileText size={24} />,
+  "doc": <FaFileWord size={24} />,
+  "docx": <FaFileWord size={24} />,
+  "rtf": <FaFileAlt size={24} />,
 };
 
 const getFileExtension = (originalTitle) => {
@@ -150,5 +138,5 @@ const getFileExtension = (originalTitle) => {
 };
 export const getIconForFile = (originalTitle) => {
   const extension = getFileExtension(originalTitle);
-  return extension && EXTENSION_ICON_MAP[extension] ? EXTENSION_ICON_MAP[extension] : <FaRegFile size={24}/>;
+  return extension && EXTENSION_ICON_MAP[extension] ? EXTENSION_ICON_MAP[extension] : <FaRegFile size={24} />;
 };

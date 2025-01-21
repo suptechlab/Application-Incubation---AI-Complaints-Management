@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Dropdown, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { MdOutlineFilterAlt } from "react-icons/md";
@@ -8,14 +8,15 @@ import CustomDateRangePicker from "../../components/CustomDateRangePicker";
 import FormInput from "../../components/FormInput";
 import ReactSelect from "../../components/ReactSelect";
 import AppTooltip from "../../components/tooltip";
-import { claimTypesDropdownList } from "../../services/claimSubType.service";
-import toast from "react-hot-toast";
-import { agentListingApi } from "../../services/ticketmanagement.service";
+import FilterModal from "./FilterModal";
 
-const ListFilters = ({ filter, setFilter,    }) => {
+const ListFilters = ({ filter, setFilter, }) => {
     const { t } = useTranslation();
-    const [claimTypes, setClaimTypes] = useState([])
-    const [agentList, setAgentListing] = useState([])
+
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+
+    const toggleFilterModal = () => { setIsFilterModalOpen(!isFilterModalOpen) }
+
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
 
@@ -31,49 +32,8 @@ const ListFilters = ({ filter, setFilter,    }) => {
         }
     };
 
-    // GET CLAIM TYPE DROPDOWN LIST
-    const getClaimTypeDropdownList = () => {
-        claimTypesDropdownList().then(response => {
-            if (response?.data && response?.data?.length > 0) {
-                const dropdownData = response?.data.map(item => ({
-                    value: item.id,
-                    label: item.name
-                }));
-                setClaimTypes(dropdownData)
-            }
-        }).catch((error) => {
-            if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription);
-            } else {
-                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
-            }
-        })
-    }
 
-    // GET AGENT DROPDOWN LISTING
-    const getAgentDropdownListing = () => {
-        agentListingApi().then(response => {
-            console.log({ agent: response })
-            if (response?.data && response?.data?.length > 0) {
-                const dropdownData = response?.data.map(item => ({
-                    value: item.id,
-                    label: item.name
-                }));
-                setAgentListing(dropdownData)
-            }
-        }).catch((error) => {
-            if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription);
-            } else {
-                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
-            }
-        })
-    }
 
-    useEffect(() => {
-        getClaimTypeDropdownList()
-        getAgentDropdownListing()
-    }, [])
 
 
     return (
@@ -135,7 +95,7 @@ const ListFilters = ({ filter, setFilter,    }) => {
                         value={filter?.claimTypeId}
                     />
                 </div> */}
-             
+
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect
                         wrapperClassName="mb-0"
@@ -234,7 +194,18 @@ const ListFilters = ({ filter, setFilter,    }) => {
                     </div>
 
                     {/* Dropdown FILTER */}
-                    <Dropdown>
+
+                    <Button
+                        variant="link"
+                        id="filter-dropdown"
+                        className="link-dark p-1 ms-n1 hide-dropdown-arrow"
+                        onClick={toggleFilterModal}
+                    >
+                        <AppTooltip title="Filters" placement="top">
+                            <span><MdOutlineFilterAlt size={20} /></span>
+                        </AppTooltip>
+                    </Button>
+                    {/* <Dropdown>
                         <Dropdown.Toggle
                             variant="link"
                             id="filter-dropdown"
@@ -244,17 +215,18 @@ const ListFilters = ({ filter, setFilter,    }) => {
                                 <span><MdOutlineFilterAlt size={20} /></span>
                             </AppTooltip>
                         </Dropdown.Toggle>
-                        {/* <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
-                            <Dropdown.Item className="small" as={Link} onClick={filterByClaimFill}>
+                        <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
+                            <Dropdown.Item className="small" as={Link} >
                                 Claim Filled By
                             </Dropdown.Item>
-                            <Dropdown.Item className="small" as={Link} onClick={filterBySla}>
+                            <Dropdown.Item className="small" as={Link}>
                                 SLA
                             </Dropdown.Item>
-                        </Dropdown.Menu> */}
-                    </Dropdown>
+                        </Dropdown.Menu>
+                    </Dropdown> */}
                 </Stack>
             </Stack>
+            <FilterModal modal={isFilterModalOpen} toggle={toggleFilterModal} filter={filter} setFilter={setFilter} />
         </div>
     );
 };

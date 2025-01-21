@@ -50,3 +50,7 @@ export const handleUserResetPassword = async (id)=>{
     return await adminApi.get(`/${API_VERSION}/admin/users/reset-password/${id}`)
 }
 
+// IMPORT SEPS USERS API 
+export const handleImportSepsUsersApi = async (data)=>{
+    return await adminApi.post(`/${API_VERSION}/users/import`,data);
+  }

@@ -51,6 +51,9 @@
 @include custom-class('width', 218);
 @include custom-class('min-width', 240);
 @include custom-class('width', 250);
+@include custom-class('width', 134);
+@include custom-class('height', 134);
+@include custom-class('width', 280);
 @include custom-class('max-width', 320);
 @include generate-color-classes($custom-colors);
 
@@ -320,4 +323,10 @@ input:-webkit-autofill:active {
 
 .variable-list {
     list-style: none;
+}
+
+.chart-container{
+    canvas{
+        height: 250px;
+    }
 }

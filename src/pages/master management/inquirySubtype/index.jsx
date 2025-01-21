@@ -24,7 +24,7 @@ const InquirySubType = () => {
   const location = useLocation();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
   const [isLoading, setIsLoading] = useState(false)
-  const [isDownloading , setIsDownloading] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
   const queryClient = useQueryClient();
   const { t } = useTranslation()
 
@@ -160,7 +160,7 @@ const InquirySubType = () => {
   // HANDLE INQUIRY SUB TYPES CSV DOWNLOAD
   const handleDownload = () => {
     setIsDownloading(true)
-    toast.loading( t("EXPORT IN PROGRESS") , {id: "downloading" , isLoading : isDownloading})
+    toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading })
     downloadInquirySubTypes({ search: filter?.search ?? "" }).then(response => {
       if (response?.data) {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -180,7 +180,7 @@ const InquirySubType = () => {
 
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
-        toast.success(t("CSV DOWNLOADED"),{id: "downloading"})
+        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -217,52 +217,55 @@ const InquirySubType = () => {
         header: () => t("DESCRIPTION"),
         enableSorting: true,
       },
-      {
-        // accessorFn: (row) => row.status ? "Active" : "Inactive",
-        cell: (info) => {
-          return (
-            permissionsState.statusModule ?
-            <Toggle
-              tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
-              id={`status-${info?.row?.original?.id}`}
-              key={"status"}
-              // label="Status"
-              name="status"
-              value={info?.row?.original?.status}
-              checked={info?.row?.original?.status}
-              onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
-            /> 
-            : ''
-          )
-        },
-        id: "status",
-        header: () => t("STATUS"),
-        size: '80',
-      },
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          permissionsState.editModule ?
-          <DataGridActions
-            controlId="province-master"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: permissionsState.editModule,
-                type: "button",
-                title:t("EDIT"),
-                icon: <MdEdit size={18} />,
-                handler: () => editInquiryType(rowData?.row?.original),
-              },
-            ]}
-          /> : ''
-        ),
-        header: () => <div className="text-center">{t("ACTIONS")}</div>,
-        enableSorting: false,
-        size: '80',
-      },
+
+      ...(permissionsState?.statusModule
+        ? [{
+          // accessorFn: (row) => row.status ? "Active" : "Inactive",
+          cell: (info) => {
+            return (
+              <Toggle
+                tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
+                id={`status-${info?.row?.original?.id}`}
+                key={"status"}
+                // label="Status"
+                name="status"
+                value={info?.row?.original?.status}
+                checked={info?.row?.original?.status}
+                onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+              />
+            )
+          },
+          id: "status",
+          header: () => t("STATUS"),
+          size: '80',
+        }] : [])
+      ,
+
+      ...(permissionsState?.editModule
+        ? [{
+          id: "actions",
+          isAction: true,
+          cell: (rowData) => (
+            permissionsState.editModule ?
+              <DataGridActions
+                controlId="province-master"
+                rowData={rowData}
+                customButtons={[
+                  {
+                    name: "edit",
+                    enabled: permissionsState.editModule,
+                    type: "button",
+                    title: t("EDIT"),
+                    icon: <MdEdit size={18} />,
+                    handler: () => editInquiryType(rowData?.row?.original),
+                  },
+                ]}
+              /> : ''
+          ),
+          header: () => <div className="text-center">{t("ACTIONS")}</div>,
+          enableSorting: false,
+          size: '80',
+        }] : []),
     ],
     [permissionsState]
   );
@@ -309,12 +312,12 @@ const InquirySubType = () => {
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
     <Loader isLoading={isLoading} />
     {permissionsState.addModule
-        ?
-    <PageHeader title={t("INQUIRY SUB TYPE")}
-      actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" ,disabled : isDownloading },
-        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
-      ]} /> 
+      ?
+      <PageHeader title={t("INQUIRY SUB TYPE")}
+        actions={[
+          { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
+          { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
+        ]} />
       : ''}
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">

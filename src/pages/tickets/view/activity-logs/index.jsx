@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card, Col, Image, ListGroup, Row, Stack } from "react-bootstrap";
 import { MdCalendarToday } from "react-icons/md";
 import { Link } from "react-router-dom";
@@ -8,11 +8,15 @@ import toast from "react-hot-toast";
 import moment from "moment";
 import { downloadFile, getIconForFile, isHTML } from "../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
-const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState }) => {
+import { AuthenticationContext } from "../../../../contexts/authentication.context";
+const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState,activityLoading, setActivityLoading }) => {
 
   const [ticketActivity, setTicketActivity] = useState([])
 
+
   const [isDownloading, setDownloading] = useState(false)
+
+  const { userData, profileImage } = useContext(AuthenticationContext)
 
   const { t } = useTranslation()
 
@@ -35,18 +39,15 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
 
   // GET TICKET DETAILS
   const getTicketActivityLogs = () => {
-    setLoading(true)
+    setActivityLoading(true)
     const params = { sort: 'performedAt,desc' }
     ticketActivityLogs(ticketId, params).then(response => {
       if (response?.data) {
         const logData = response?.data?.map((activity, index) => {
           const text = activity?.activityDetails?.text || ""; // Safely extract text
           const containsHTML = isHTML(text);
-
-
           const attachments = activity?.attachmentUrl?.attachments?.length ? activity.attachmentUrl.attachments : [];
-
-
+          const imageUrl = activity?.performedBy == userData?.id ? profileImage ?? defaultAvatar : defaultAvatar
           return {
             id: index,
             // name: activity?.activityDetails?.performBy?.name ? getPerformerName(activity?.activityDetails?.performBy?.name, activity?.activityType) : "",
@@ -57,7 +58,7 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
             ) : (
               <p className="text-justify">{text}</p>
             )}</>,
-            avatar: activity?.user?.imageUrl ?? defaultAvatar,
+            avatar: imageUrl,
             variant: activity?.activityType ?? '',
             attachments: attachments && attachments?.length > 0 ? attachments : []
           }
@@ -72,14 +73,14 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
         toast.error(error?.message ?? "FAILED TO FETCH TICKET DETAILS");
       }
     }).finally(() => {
-      setLoading(false)
+      setActivityLoading(false)
     })
   }
 
 
   useEffect(() => {
-    getTicketActivityLogs()
-  }, [ticketId, isGetActivityLogs])
+      getTicketActivityLogs()
+  }, [ticketId, isGetActivityLogs, profileImage])
 
 
   //Chat Reply Data
@@ -183,67 +184,73 @@ const ActivityLogs = ({ setLoading, ticketId, isGetActivityLogs,permissionState 
   }
 
   return <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
-    <Card.Body className='py-0'>
-      <ListGroup variant="flush">
-        {ticketActivity.map((reply) => (
-          <ListGroup.Item key={reply.id} className='py-3'>
-            <Row className='g-2'>
-              <Col xs="auto">
-                <Image
-                  className="object-fit-cover rounded-circle"
-                  src={reply.avatar}
-                  width={36}
-                  height={36}
-                  alt={reply?.name}
-                />
-              </Col>
-              <Col xs className='small lh-sm'>
-                <div className='fw-bold'>{reply?.name} <span className='fw-normal'>{reply.action}</span></div>
-                <Stack direction='horizontal' gap={2} className='text-secondary'>
-                  <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
-                  <span>{reply.date}</span>
-                </Stack>
-                <p className={`mt-2 mb-0 bg-opacity-25 ${getReplyStatusClass(reply.variant)}`}>{reply.message}</p>
-                {reply?.attachments && reply?.attachments?.length > 0 && (
-                  <Stack
-                    direction="horizontal"
-                    gap={3}
-                    className="flex-wrap mt-2"
-                  >
-                    {reply?.attachments?.map((actionItem, index) => {
-                      const { originalTitle } = actionItem;
 
-                      if(permissionState?.downloadPermission === true){
-                        return (
-                        <button
-                          type="button"
-                          key={index + 1}
-                          onClick={() => handleAttachmentDownload(actionItem)}
-                          className='btn fw-semibold text-decoration-none link-primary m-0 p-0'
-                        >
-                          <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
-                        </button>
-                      )
-                      }else{
-                        return (
-                        <p
-                          key={index + 1}
-                          className=' fw-semibold text-decoration-none link-primary m-0 p-0'
-                        >
-                          <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
-                        </p>
-                      )
-                      }
-                    
-                    })}
+    {
+      activityLoading && activityLoading === true ? <div className="placeholder-glow h-100">
+        <div className="placeholder" style={{ width: '100%', height: '100%' }}></div>
+      </div> : <Card.Body className='py-0'>
+        <ListGroup variant="flush">
+          {ticketActivity.map((reply) => (
+            <ListGroup.Item key={reply.id} className='py-3'>
+              <Row className='g-2'>
+                <Col xs="auto">
+                  <Image
+                    className="object-fit-cover rounded-circle"
+                    src={reply.avatar}
+                    width={36}
+                    height={36}
+                    alt={reply?.name}
+                  />
+                </Col>
+                <Col xs className='small lh-sm'>
+                  <div className='fw-bold'>{reply?.name} <span className='fw-normal'>{reply.action}</span></div>
+                  <Stack direction='horizontal' gap={2} className='text-secondary'>
+                    <span className='d-inline-flex'><MdCalendarToday size={12} /></span>
+                    <span>{reply.date}</span>
                   </Stack>
-                )}
-              </Col>
-            </Row>
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
-    </Card.Body>
+                  <p className={`mt-2 mb-0 bg-opacity-25 ${getReplyStatusClass(reply.variant)}`}>{reply.message}</p>
+                  {reply?.attachments && reply?.attachments?.length > 0 && (
+                    <Stack
+                      direction="horizontal"
+                      gap={3}
+                      className="flex-wrap mt-2"
+                    >
+                      {reply?.attachments?.map((actionItem, index) => {
+                        const { originalTitle } = actionItem;
+
+                        if (permissionState?.downloadPermission === true) {
+                          return (
+                            <button
+                              type="button"
+                              key={index + 1}
+                              onClick={() => handleAttachmentDownload(actionItem)}
+                              className='btn fw-semibold text-decoration-none link-primary m-0 p-0'
+                            >
+                              <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
+                            </button>
+                          )
+                        } else {
+                          return (
+                            <p
+                              key={index + 1}
+                              className=' fw-semibold text-decoration-none link-primary m-0 p-0'
+                            >
+                              <span className='me-2 '> {getIconForFile(originalTitle)}</span>{originalTitle}
+                            </p>
+                          )
+                        }
+                      })}
+                    </Stack>
+                  )}
+                </Col>
+              </Row>
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+      </Card.Body>
+    }
+
+
   </Card>;
 };
 
