@@ -84,7 +84,17 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                 errors,
             }) => (
                 <Form>
-                    <MentionEditor />
+                    <MentionEditor
+                        id="message"
+                        name="message"
+                        height="100"
+                        ticketId={ticketId}
+                        value ={values?.message ?? ''}
+                        error ={errors?.message}
+                        touched={touched?.message}
+                        handleBlur={handleBlur}
+                        handleChange={(event)=>{setFieldValue("message",event.target.value)}}
+                    />
                     {/* <SunEditorReact
                         wrapperClassName="mb-0 editor-for-tab-view overflow-hidden"
                         id="message"

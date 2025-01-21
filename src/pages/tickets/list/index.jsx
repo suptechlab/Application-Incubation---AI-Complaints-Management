@@ -5,12 +5,6 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
-import { calculateDaysDifference } from "../../../utils/commonutils";
-import moment from "moment/moment";
-import { MdAttachFile } from "react-icons/md";
-import { MasterDataContext } from "../../../contexts/masters.context";
-import AppTooltip from "../../../components/tooltip";
-import { TbBellRingingFilled } from "react-icons/tb";
 
 import TicketsNormalList from "./normal-list-tab";
 import TicketsTaggedList from "./tagged-list-tab";

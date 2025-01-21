@@ -105,6 +105,6 @@ export const handleGetTaggedTicketList = async (params) => {
 }
 
 // AGENT LIST FOR TAGGING 
-export const getAgentsListForTagging = ()=>{
-  // v1/seps-fi/claim-tickets/:id/agents-for-tag
+export const getAgentsListForTagging =async (ticketId)=>{
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/agents-for-tag`);
 }

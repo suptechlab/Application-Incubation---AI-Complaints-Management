@@ -321,22 +321,3 @@ input:-webkit-autofill:active {
 .variable-list {
     list-style: none;
 }
-
-.mention-editor {
-
-    .mentions__control {
-        height: 100px;
-
-        .mentions__highlighter,
-        textarea {
-            height: 100%;
-        }
-
-        textarea {
-            border: none;
-            outline: none;
-            padding:10px 15px;
-        }
-    }
-
-}
