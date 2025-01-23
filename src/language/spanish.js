@@ -324,5 +324,6 @@ export const spanishLang = {
     "IMPORT_SEPS_USERS":"Importar usuarios de SEPS",
     "BROWSE_IMAGE" :"Explorar imagen",
     "EMAIL_VERIFIED":"Correo electrónico verificado",
-    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"No está permitido asignar entradas."
+    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"No está permitido asignar entradas.",
+    "CLAIM_AMOUNT":"Monto del reclamo"
 } 

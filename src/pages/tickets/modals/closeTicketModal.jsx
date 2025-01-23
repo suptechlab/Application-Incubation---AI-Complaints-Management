@@ -29,6 +29,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
         }
     }, [masterData])
 
+
+    console.log(subStatus)
+
     //Handle File Change
     // const handleFileChange = (event) => {
     //     const file = event.currentTarget.files[0];
@@ -93,7 +96,8 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                 initialValues={{
                     reason: "",
                     closeSubStatus: "",
-                    attachments: null
+                    attachments: null,
+                    claimAmount:''
                 }}
                 validationSchema={ticketCloseValidation}
                 onSubmit={handleSubmit}
@@ -110,6 +114,12 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                     errors,
                 }) => (
                     <Form>
+                    {
+                        console.log(errors)
+                    }
+                    {
+                        console.log(values)
+                    }
                         <Modal.Body className="text-break py-0">
                             <FormInput
                                 label={t("COMMENT")}
@@ -146,6 +156,24 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                                 onBlur={handleBlur}
                                 touched={touched.closeSubStatus}
                             />
+
+                            {
+                               (values?.closeSubStatus === 'CLOSED_IN_FAVOR_OF_CONSUMER' || values?.closeSubStatus === 'CLOSED_IN_PARTIAL_FAVOR_OF_CONSUMER') &&
+                               <FormInput
+                                label={t("CLAIM_AMOUNT")}
+                                id="claimAmount"
+                                name="claimAmount"
+                                type="number"
+                                
+                                rows={5}
+                                onBlur={handleBlur}
+                                value={values?.claimAmount}
+                                onChange={handleChange}
+                                error={errors?.claimAmount}
+                                touched={touched?.claimAmount}
+                            />
+
+                            } 
                             <Col xs={12} className="mb-3 pb-1">
                                 <div className="mb-1 fs-14">{t("ATTACHMENT")}</div>
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">

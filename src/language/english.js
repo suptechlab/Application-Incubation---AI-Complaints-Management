@@ -340,5 +340,6 @@ export const englishLang = {
 
     "VERIFYING_USER" : "Verifying User",
     "USING_SEPS_ACTIVE_DIRECTORY":"Using SEPS Active Directory",
-    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"You are not allowed to assign tickets."
+    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"You are not allowed to assign tickets.",
+    "CLAIM_AMOUNT":"Claim Amount"
 }

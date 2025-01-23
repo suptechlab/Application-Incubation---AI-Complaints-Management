@@ -89,7 +89,8 @@ export const messages = {
     fieldRequired: "This field is required.",
     userTypeRequired: 'User Type is required.',
     profileRequired: 'Profile image is required.',
-    fileRequired: 'File is required.'
+    fileRequired: 'File is required.',
+    amountRequired :'Claim amount is required.'
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -181,6 +182,7 @@ export const messages = {
     fieldRequired: "Este campo es obligatorio.",
     userTypeRequired: "El tipo de usuario es obligatorio.",
     profileRequired: 'Se requiere imagen de perfil.',
-    fileRequired: 'Se requiere archivo.'
+    fileRequired: 'Se requiere archivo.',
+    amountRequired:'Se requiere el monto del reclamo.'
   }
 };

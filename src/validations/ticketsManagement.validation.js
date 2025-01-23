@@ -20,7 +20,16 @@ export const ticketCloseValidation = Yup.object({
   closeSubStatus: Yup.string()
     .required(msg.closeSubStatusRequired),
   reason: Yup.string()
-  .required(msg.reasonRequired),
+    .required(msg.reasonRequired),
+  // claimAmount: Yup.number()
+  //   .required(msg.reasonRequired),
+
+  claimAmount: Yup.number()
+    .when('closeSubStatus', {
+      is: (value) => value === 'CLOSED_IN_FAVOR_OF_CONSUMER' || value === 'CLOSED_IN_PARTIAL_FAVOR_OF_CONSUMER',  // Check if 'CLOSED' is part of the string
+      then:(schema) => schema.required(msg.amountRequired),
+      otherwise:(schema)=> schema.notRequired(),
+    }),
 });
 
 // TICKET REJECT STATUS
@@ -28,7 +37,7 @@ export const ticketRejectValidation = Yup.object({
   rejectedStatus: Yup.string()
     .required(msg.rejectSubStatusRequired),
   reason: Yup.string()
-  .required(msg.reasonRequired),
+    .required(msg.reasonRequired),
 });
 
 
@@ -39,7 +48,7 @@ export const reminderFormValidation = Yup.object({
 });
 
 export const ticketEditValidation = Yup.object({
-  
+
 })
 
 export { validationSchema };
