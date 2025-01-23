@@ -4,18 +4,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { handleLogin, handleRefreshToken, handleVerifyOtp, handleGetAccountDetail, downloadProfileImage } from "../services/authentication.service";
 import { getLocalStorage, removeLocalStorage, setLocalStorage } from "../utils/storage";
+import { useTranslation } from "react-i18next";
 
 export const AuthenticationContext = createContext({
     isAuthenticated: false,
     isLoading: true,
-    isDownloadingImg :false,
+    isDownloadingImg: false,
     userData: {},
     currentUser: {},
     permissions: [],
     modules: [],
     setUserData: () => { },
     profileImage: '',
-    handleAccountDetails : ()=>{}
+    handleAccountDetails: () => { }
 });
 
 
@@ -29,17 +30,13 @@ export default function AuthenticationProvider({ children }) {
     const [authorities, setAuthorities] = useState([])
     const [modules, setModules] = useState([])
 
-    const [profileImage , setProfileImage] = useState('')
+    const [profileImage, setProfileImage] = useState('')
 
     const navigate = useNavigate()
     const location = useLocation()
 
-    // useEffect(() => {
-    //     const localStorageRefreshToken = getLocalStorage("refresh_token")
-    //     if (!!localStorageRefreshToken) {
-    //         refreshToken(localStorageRefreshToken)
-    //     }
-    // }, [])
+    const { t } = useTranslation()
+
 
     useEffect(() => {
         if (!!getLocalStorage("access_token")) {
@@ -64,15 +61,14 @@ export default function AuthenticationProvider({ children }) {
             const otpToken = response?.data?.otpToken;
             navigate("/otp", { state: { username, otpToken } })
         }).catch((error) => {
-            console.log('error 53->', error)
             toast.error(error.response.data.errorDescription);
         })
     }
 
     const OtpVerify = async (data) => {
 
-        return handleVerifyOtp(data).then((response) => {
-            if (response.data.id_token) {
+        handleVerifyOtp(data).then((response) => {
+            if (response?.data?.id_token) {
                 setLocalStorage("access_token", response.data.id_token);
                 setLocalStorage("refresh_token", response.data.id_token);
                 setIsAuthenticated(true);
@@ -81,50 +77,17 @@ export default function AuthenticationProvider({ children }) {
                 navigate("/dashboard");
 
             } else {
-                toast.error('Tokens are missing in the response');
+                toast.error(response?.data?.message);
             }
 
+
+
         }).catch((error) => {
-            toast.error(error.response.data.errorDescription);
-            //navigate("/login"); 
+            toast.error(error?.response?.data?.errorDescription ?? error?.message);
         })
     }
 
-    const refreshToken = async (localStorageRefreshToken) => {
-        return handleRefreshToken(localStorageRefreshToken).then((response) => {
-            if (response.data.data.jwt) {
-                // setLocalStorage("langKey", 'es');
-                setLocalStorage("access_token", response.data.data.jwt.accessToken);
-                setLocalStorage("refresh_token", response.data.data.jwt.refreshToken);
-                setIsAuthenticated(true);
-                handleGetAccountDetail().then((accountResponse) => {
-                    const authorities = accountResponse.data.data.authorities;
-                    const role = accountResponse.data.data.role;
-                    setLocalStorage("user_type", authorities);
-                    if (!authorities.includes("ROLE_ADMIN")) {
-                        const roleMap = role.modules.reduce((acc, module) => {
-                            acc[module.name] = module.permissions.map(permission => permission.name);
-                            return acc;
-                        }, {});
-                        setLocalStorage("user_roles", roleMap);
-                    }
 
-                }).catch((error) => {
-                    toast.error(error);
-                });
-                navigate(location.pathname)
-            } else {
-                console.error('JWT tokens are missing in the response');
-                toast.error('JWT tokens are missing in the response');
-            }
-        }).catch((error) => {
-            // Temp stoping refresh token work
-            // removeLocalStorage("access_token")
-            // removeLocalStorage("refresh_token")
-            // setIsAuthenticated(false)
-        })
-
-    }
 
     useEffect(() => {
     }, [isAuthenticated])
@@ -144,24 +107,23 @@ export default function AuthenticationProvider({ children }) {
                 const roles = data?.roles || [];
                 if (!authorities.includes("ROLE_ADMIN")) {
                     if (roles?.length > 0) {
-                        // const roleMap = {
-                        //     'fi-admin': 'FI_USER',
-                        //     'fi-agent': 'FI_USER',
-                        //     'seps-admin': 'SEPS_USER',
-                        //     'seps-agent': 'SEPS_USER',
-                        // };
                         const roleName = roles[0]?.userType;
                         setCurrentUser(roleName || 'SYSTEM_ADMIN');
 
+                        const extractPermissions = (module) => {
+                            return module.permissions.map((permission) => permission.name);
+                        };
+
+                        const addModulePermissions = (acc, module) => {
+                            acc[module.name] = extractPermissions(module);
+                            return acc;
+                        };
+
                         const rolePermissionMap = roles.reduce((acc, role) => {
                             const modules = role.modules || [];
-                            modules.forEach((module) => {
-                                acc[module.name] = module.permissions.map(
-                                    (permission) => permission.name
-                                );
-                            });
-                            return acc;
+                            return modules.reduce(addModulePermissions, acc);
                         }, {});
+
                         setModules(roles[0]?.modules);
                         setPermissions(rolePermissionMap);
                     } else {
@@ -173,19 +135,17 @@ export default function AuthenticationProvider({ children }) {
                     setCurrentUser('SYSTEM_ADMIN')
                 }
 
-                if(data?.externalDocumentId){
+                if (data?.externalDocumentId) {
                     handleImageDownload()
-                }else{
+                } else {
                     setIsDownloadingImg(false)
                 }
                 // handleImageDownload()
             })
             .catch((error) => {
-                console.log(error)
                 console.error("Error fetching account details:", error);
-
                 if (error?.response?.status === '401') {
-                    toast.error("Session expired. Please log in again.");
+                    toast.error(t("SESSION_EXPIRED"));
                     logout();
                 }
 
@@ -211,9 +171,9 @@ export default function AuthenticationProvider({ children }) {
             localStorage.setItem('profileImage', base64Url);
             setProfileImage(base64Url)
             //  base64Url; // Return the base64 URL
-        }).catch((error)=>{
-            console.error('ERROR IN DOWNLOAD PROFILE',error)
-        }).finally(()=>{
+        }).catch((error) => {
+            console.error('ERROR IN DOWNLOAD PROFILE', error)
+        }).finally(() => {
             setIsDownloadingImg(false)
         })
     }

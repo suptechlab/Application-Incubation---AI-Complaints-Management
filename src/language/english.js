@@ -334,8 +334,15 @@ export const englishLang = {
     "PLEASE_SELECT_A_FILE_TO_UPLOAD": "Please select a file to upload.",
     "IMPORT_SEPS_USERS":"Import SEPS Users",
     "EMAIL_VERIFIED" : "Email Verified",
-
+    "FAILED_TO_VERIFY":"Failed to verify email",
     "VERIFYING_USER" : "Verifying User",
     "USING_SEPS_ACTIVE_DIRECTORY":"Using SEPS Active Directory",
-    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"You are not allowed to assign tickets."
+    "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"You are not allowed to assign tickets.",
+    "SESSION_EXPIRED":"Session expired. Please log in again.",
+    "RESET_PASSWORD":"Reset Password",
+    "ENTER_NEW_PASSWORD" : "Enter New Password",
+    "OTP_VERIFIED":"OTP Verified",
+    "OTP_RESEND_SUCCESS":"OTP has been resent successfully.",
+    "OTP_SEND_SUCCESS":"OTP has been sent successfully.",
+    "ENTER_CAPTCHA":"Please enter the captcha."
 }

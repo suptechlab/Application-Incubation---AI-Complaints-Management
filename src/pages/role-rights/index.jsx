@@ -88,15 +88,6 @@ export default function RoleRightsList() {
     }
   }, [dataQuery.data?.data?.totalPages]);
 
-  const changeStatus = async (id, currentStatus) => {
-    try {
-      await handleStatusChangeState(id, !currentStatus);
-      toast.success("State status updated successfully");
-      dataQuery.refetch();
-    } catch (error) {
-      toast.error("Error updating state status");
-    }
-  };
 
   const columns = React.useMemo(
     () => [
@@ -167,7 +158,6 @@ export default function RoleRightsList() {
   );
 
   useEffect(() => {
-    console.log('203: set pagnination called')
     setPagination({
       pageIndex: 0,
       pageSize: 10,

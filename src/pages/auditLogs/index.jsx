@@ -144,7 +144,6 @@ const AuditLogs = () => {
         } else {
           throw new Error(t("EMPTY RESPONSE"));
         }
-        // toast.success(t("STATUS UPDATED"));
       })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -155,8 +154,6 @@ const AuditLogs = () => {
         toast.dismiss("downloading");
       })
       .finally(() => {
-        // Ensure the loading toast is dismissed
-        // toast.dismiss("downloading");
         setDownloading(false);
       });
   };

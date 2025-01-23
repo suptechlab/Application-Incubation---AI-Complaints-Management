@@ -74,7 +74,6 @@ const EditTemplate = () => {
       actions.setSubmitting(false)
       navigate('/template-master')
     }).catch((error) => {
-      // console.log('error', error)
       toast.error(error?.response?.data?.errorDescription ?? error?.message);
     }).finally(() => {
       setLoading(false);

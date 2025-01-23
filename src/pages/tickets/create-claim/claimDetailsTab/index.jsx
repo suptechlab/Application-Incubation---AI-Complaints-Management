@@ -97,7 +97,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
         requestOTPApi({ email: userEmail }).then((response) => {
             setOptSendStatus(true);
-            toast.success("OTP has been resent successfully.");
+            toast.success(t("OTP_RESEND_SUCCESS"));
         })
             .catch((error) => {
                 if (error?.response?.data?.errorDescription) {
@@ -110,13 +110,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             })
 
 
-        // const isOtpSent = await sendOTP(email);
-        // if (isOtpSent) {
-        //   setOptSendStatus(false);
-        //   toast.success("OTP has been resent successfully.");
-        // } else {
-        //   setOptSendStatus(false);
-        // }
     };
 
     // HANDLE SEND OTP BUTTON
@@ -125,7 +118,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         requestOTPApi({ email: userEmail }).then((response) => {
             setOptSendStatus(true);
             setIsOTPFormSubitted(true)
-            toast.success("OTP has been sent successfully.");
+            toast.success(t("OTP_SEND_SUCCESS"));
             // AFTER 5 MINUTES OTP SCREEN WILL BE HIDE
             setTimeout(() => {
                 setOptSendStatus(false);
@@ -151,14 +144,10 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         }
         verifyOTPApi(formData).then((response) => {
             setIsOTPVerified(true)
-            toast.success("OTP Verified.");
+            toast.success(t("OTP_VERIFIED"));
         })
             .catch((error) => {
-                if (error?.response?.data?.errorDescription) {
-                    toast.error(error?.response?.data?.errorDescription);
-                } else {
-                    toast.error(error?.message);
-                }
+                toast.error(error?.response?.data?.errorDescription ?? error?.description);
             }).finally(() => {
                 setOptSendStatus(false);
             })

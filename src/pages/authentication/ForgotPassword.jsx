@@ -20,7 +20,7 @@ export default function ForgotPassword() {
 
     const onSubmit = async (values, actions) => {
         if (captcha === "") {
-            toast.error("Please enter the captcha");
+            toast.error(t("ENTER_CAPTCHA"));
             return;
         }
         values.recaptchaToken = captcha != '' ? captcha : ''

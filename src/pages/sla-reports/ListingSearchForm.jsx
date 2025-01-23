@@ -39,7 +39,6 @@ const ListingSearchForm = ({ filter, setFilter }) => {
     try {
       const response = await claimTypesDropdownList(claimTypeId);
 
-      console.log(response?.data?.length > 0)
       if (response?.data?.length > 0) {
         const dropdownData = response.data.map((item) => ({
           value: item.id,
@@ -68,7 +67,6 @@ const ListingSearchForm = ({ filter, setFilter }) => {
     const claimTypeId = selectedOption?.target?.value ?? "";
     updateFilter("claimTypeId", claimTypeId);
     updateFilter("claimSubTypeId", ""); // Clear sub-type filter when claim type changes
-    console.log({ claimType: claimTypeId })
     if (claimTypeId) {
       fetchClaimSubTypes(claimTypeId);
     } else {

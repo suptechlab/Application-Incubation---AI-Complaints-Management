@@ -54,37 +54,6 @@ const CityMaster = () => {
 
   const editToggle = () => setEditModal({ id: "", open: !editModal?.open });
 
-  // Permissoin work
-  // const permission = useRef({ addModule: false, editModule: false, deleteModule: false, statusModule: false, });
-  // useEffect(() => {
-  //     isAdminUser().then(response => {
-  //         if (response) {
-  //             permission.current.statusModule = true;
-  //             permission.current.addModule = true;
-  //             permission.current.editModule = true;
-  //             permission.current.deleteModule = true;
-  //         } else {
-  //             getModulePermissions("City Master").then(response => {
-  //                 console.log('response',response)
-  //                 if (response.includes("CITY_CREATE")) {
-  //                     permission.current.addModule = true;
-  //                 }
-  //                 if (response.includes("CITY_UPDATE")) {
-  //                     permission.current.editModule = true;
-  //                 }
-  //                 if (response.includes("CITY_STATUS_CHANGE")) {
-  //                     permission.current.statusModule = true;
-  //                 }
-  //             }).catch(error => {
-  //                 console.error("Error fetching permissions:", error);
-  //             });
-  //         }
-  //     }).catch(error => {
-  //         console.error("Error get during to fetch User Type", error);
-  //     })
-
-  // }, []);
-
   const { currentUser, permissions = {} } = useContext(AuthenticationContext)
   // PERMISSIONS work
 

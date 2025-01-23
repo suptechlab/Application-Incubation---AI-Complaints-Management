@@ -1,50 +1,44 @@
-import { Form as FormikForm, Formik } from "formik";
-import React, { useContext, useRef, useState, useEffect } from "react";
+import { Formik, Form as FormikForm } from "formik";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Col, Form, Image, Row, Spinner, Stack } from "react-bootstrap";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import OtpInput from 'react-otp-input';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AuthBanner from "../../assets/images/banner.png";
+import Logo from "../../assets/images/logo.svg";
 import { AuthenticationContext } from "../../contexts/authentication.context";
 import { handleResendOTP } from '../../services/authentication.service';
-import { OtpValidationSchema } from "../../validations/login.validation";
-import toast from "react-hot-toast";
-import { Stack, Form, Image, Button, Col, Row, Spinner } from "react-bootstrap";
-import Logo from "../../assets/images/logo.svg"
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import OtpInput from 'react-otp-input';
-import { IoIosArrowRoundBack } from "react-icons/io";
-import { useTranslation } from "react-i18next";
 import { getLocalStorage } from "../../utils/storage";
+import { OtpValidationSchema } from "../../validations/login.validation";
 
 export default function Otp() {
     const { t } = useTranslation(); // use the translation hook
     const location = useLocation();
-    const { login, OtpVerify } = useContext(AuthenticationContext);
-    const reCaptchaRef = useRef(true);
+    const { OtpVerify } = useContext(AuthenticationContext);
+
     const navigate = useNavigate();
-    const [username, setUsername] = useState(location?.state?.username ? location?.state?.username : 'admin@yopmail.com');
-    const [otpToken, setOtpToken] = useState(location?.state?.otpToken ? location?.state?.otpToken : '');
+    const [otpToken] = useState(location?.state?.otpToken ? location?.state?.otpToken : '');
 
-
+    // HANDLE OTP SUBMIT
     const onSubmit = async (values, actions) => {
-        //values.username = username;
         values.otpToken = otpToken;
-        console.log('param', values)
-        //values.otp = otp;
         await OtpVerify({ ...values });
         actions.setSubmitting(false);
     };
 
     // handle resend otp 
     const handleResend = async () => {
-        try {
-            let data = {
-                'otpToken': otpToken
-            }
-
-            let res = await handleResendOTP(data);
-            toast.success("OTP enviado con éxito.");
-        } catch (error) {
-            toast.error(error.response.data.errorDescription ?? "No se pudo reenviar el OTP. Inténtalo nuevamente.");
-            navigate("/login")
+        let data = {
+            'otpToken': otpToken
         }
+        handleResendOTP(data).then((response) => {
+            toast.success(response?.data?.message)
+        }).catch((error) => {
+            toast.error(error?.response?.data?.errorDescription);
+            navigate("/login")
+        });
     }
 
     useEffect(() => {
@@ -82,7 +76,10 @@ export default function Otp() {
                                         otpCode: ''
                                     }}
                                     validationSchema={OtpValidationSchema}
-                                    onSubmit={onSubmit}
+                                    onSubmit={(values, actions) => {
+                                        actions.setSubmitting(true)
+                                        onSubmit(values, actions)
+                                    }}
                                 >
                                     {({
                                         errors,
@@ -98,7 +95,6 @@ export default function Otp() {
                                             <Form.Group className="mb-4 pb-2">
                                                 <OtpInput
                                                     value={values.otpCode}
-                                                    //onChange={setOtp()}
                                                     numInputs={6}
                                                     inputStyle={{
                                                         width: "42px",
@@ -111,14 +107,11 @@ export default function Otp() {
                                                         <input {...props} className="form-control" />
                                                     )}
 
-                                                    // errorsField={errors?.otp}
-                                                    // touched={touched?.otp}
-                                                    // handleChange={(event) => { setFieldValue("otp", event?.target?.value) }}
                                                     onChange={(event) => { setFieldValue("otpCode", event) }}
                                                 />
-                                                {errors.otpCode && touched.otpCode && (
+                                                {errors?.otpCode && touched?.otpCode && (
                                                     <div className="invalid-feedback d-block">
-                                                        {errors.otpCode}
+                                                        {errors?.otpCode}
                                                     </div>
                                                 )}
                                             </Form.Group>

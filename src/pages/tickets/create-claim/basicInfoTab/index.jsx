@@ -158,9 +158,9 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
             setLoadingInfo(false)
 
             if (response?.data === true) {
-                toast.success("Email verified!")
+                toast.success(t("EMAIL_VERIFIED"))
             } else {
-                toast.success("Failed to verify email!")
+                toast.success(t("FAILED_TO_VERIFY"))
             }
 
         })

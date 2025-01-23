@@ -136,7 +136,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 })
             }
         } else {
-            toast.error("You are not allowed to assign tickets.")
+            toast.error(t('YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS'))
         }
     }
     // GET AGENT DROPDOWN LISTING

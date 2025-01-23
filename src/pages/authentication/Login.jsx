@@ -23,11 +23,9 @@ export default function Login() {
 
     const onSubmit = async (values, actions) => {
         if (captcha === "") {
-            toast.error("Please enter the captcha");
+            toast.error(t("ENTER_CAPTCHA"));
             return;
         }
-
-        localStorage.setItem("langKey", "es");
         if (values.rememberMe) {
             values.rememberMe = true;
             localStorage.setItem("email", values.email);
@@ -36,7 +34,6 @@ export default function Login() {
             values.rememberMe = false;
             localStorage.removeItem("email");
             localStorage.removeItem("password");
-            // localStorage.removeItem("langKey","es");
         }
 
         values.username = values.email

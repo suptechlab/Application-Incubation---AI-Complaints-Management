@@ -73,7 +73,6 @@ const ImportFIUser = () => {
         }
       })
       .finally(() => {
-        console.log("are you  here.....")
         actions.setSubmitting(false)
         setLoading(false); // Reset loading state after the API call
       });
@@ -97,8 +96,6 @@ const ImportFIUser = () => {
     // Clean up
     document.body.removeChild(link);
   };
-
-  console.log({ initialValue })
   return (
     <React.Fragment>
       <Loader isLoading={false} />

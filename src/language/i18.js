@@ -8,9 +8,7 @@ import { getLocalStorage } from '../utils/storage';
 
 
 const userLanguage = getLocalStorage('lang')  ? getLocalStorage('lang') : 'es';
-// const userLanguage = "es";
 
-// console.log(userLanguage)
 
 
 i18n
