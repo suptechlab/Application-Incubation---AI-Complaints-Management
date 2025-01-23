@@ -157,5 +157,6 @@ export const spanishLang = {
   "FIRST_INSTANCE_CLAIM_ID": "ID de reclamo de primera instancia",
   "SECOND_INSTANCE_CLAIM_ID": "ID de reclamo de segunda instancia",
   "FINGERPRINT_NOT_VERIFIED": "código de huella dactilar erróneo.",
-  "VERIFYING": "Verificando"
+  "VERIFYING": "Verificando",
+  "UPLOAD_ATTACHMENTS": "Subir archivos adjuntos"
 }

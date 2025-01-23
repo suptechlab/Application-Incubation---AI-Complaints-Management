@@ -500,7 +500,6 @@ const ChatBotForm = () => {
 
                                 const metadata = {};
 
-                                console.log(typeof(filesId))
                                 // Check if `filesId` is a single ID or a comma-separated string
                                 if (filesId.includes(',')) {
                                     // Split and process multiple IDs
@@ -553,7 +552,7 @@ const ChatBotForm = () => {
         <React.Fragment>
             <Offcanvas.Header closeButton className='align-items-start pb-1'></Offcanvas.Header>
             <CommonFormikComponent
-                // validationSchema={ChatBotFormSchema}
+                 validationSchema={ChatBotFormSchema}
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
             >
@@ -682,7 +681,7 @@ const ChatBotForm = () => {
                                             disabled={isLoading}
                                         >
                                             <IoCloudUploadOutline size={24} className='me-2' />
-                                            Upload files
+                                            {t('UPLOAD_ATTACHMENTS')}
                                         </Button>
                                     </AppTooltip>
 
@@ -701,8 +700,8 @@ const ChatBotForm = () => {
                                     <div className='position-relative'>
 
                                         <FormInputBox
-                                            inputClassName="pe-4"
-                                            wrapperClassName='mb-0 pe-2'
+                                            inputClassName="custom-padding-right-42"
+                                            wrapperClassName='mb-0'
                                             id="message"
                                             placeholder="Type a message"
                                             name="message"
@@ -714,6 +713,8 @@ const ChatBotForm = () => {
                                             value={formikProps.values.message || ""}
                                             autoComplete="off"
                                             readOnly={isLoading}
+                                            // isTextarea={true}
+                                            // rows={1}
                                         />
                                         {/* <div className="overflow-hidden position-absolute top-0 z-1 flex-shrink-0  p-2 d-block h-100">
                                                 <AppTooltip title="Add Attachments">

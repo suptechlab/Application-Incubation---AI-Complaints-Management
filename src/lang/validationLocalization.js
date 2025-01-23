@@ -2,6 +2,7 @@ export const messages = {
   en: {
     agreePrivacy: 'You must accept the privacy policy',
     messageRequired: 'Message is required',
+    maxLengthExceeded: "Message must not exceed 1024 characters.",
     emailMustBeValid: 'Email must be valid',
     emailRequired: 'Email is required',
     emailMustValid: 'Email must be a valid email address',
@@ -40,6 +41,7 @@ export const messages = {
   es: {
     agreePrivacy: 'Debes aceptar la política de privacidad',
     messageRequired: 'El mensaje es obligatorio',
+    maxLengthExceeded: "El mensaje no debe exceder los 1024 caracteres.",
     nameRequired: 'El nombre es obligatorio',
     nationalIdRequired: 'El número de identificación es obligatorio',
     emailMustBeValid: 'El correo electrónico debe ser válido',

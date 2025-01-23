@@ -14,7 +14,7 @@ export default function FormInputBox({ label, touched, error, isTextarea, wrappe
 
             {isTextarea ? (
                 <TextArea
-                    className={`form-control ${touched && error ? "is-invalid" : ""}`}
+                    className={`form-control  ${inputClassName || ''} ${touched && error ? "is-invalid" : ""}`}
                     {...rest}
                 />
             ) : (

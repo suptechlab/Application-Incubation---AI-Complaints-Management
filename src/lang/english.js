@@ -156,5 +156,6 @@ export const englishLang = {
   "FIRST_INSTANCE_CLAIM_ID":"1st Instance claim id",
   "SECOND_INSTANCE_CLAIM_ID":"2nd Instance claim id",
   "FINGERPRINT_NOT_VERIFIED" : "Fingerprint not verified.",
-  "VERIFYING":"Verifying"
+  "VERIFYING":"Verifying",
+  "UPLOAD_ATTACHMENTS":"Upload attachments"
 }
