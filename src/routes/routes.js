@@ -235,14 +235,14 @@ const routes = [
     module: "SEPS User",
     permissions: ["SEPS_USER_UPDATE_BY_SEPS"]
   },
-  // {
-  //   path: "/users/import",
-  //   element: <ImportSEPSUser isEdit={false} />,
-  //   isPrivate: true,
-  //   module: "SEPS User",
-  //   layoutType: "Auth",
-  //   permissions: ["SEPS_USER_CREATE_BY_SEPS"]
-  // },
+  {
+    path: "/users/import",
+    element: <ImportSEPSUser isEdit={false} />,
+    isPrivate: true,
+    module: "SEPS User",
+    layoutType: "Auth",
+    permissions: ["SEPS_USER_CREATE_BY_SEPS"]
+  },
   {
     path: "/states/edit/:id",
     element: <AddEditState isEdit={true} />,
