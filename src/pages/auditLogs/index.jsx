@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -12,21 +12,18 @@ import DataGridActions from "../../components/DataGridActions";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import { downloadAuditReportApi, handleGetAuditLogs } from "../../services/reports.services";
-import { downloadClaimTypes } from "../../services/claimType.service";
-import { handleGetAuditLogs } from "../../services/reports.services";
-import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
 import SearchForm from "./SearchForm";
 
 const AuditLogs = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const [isLoading] = useState(false);
+  const [isLoading,setLoading] = useState(false);
   const [isDownloading, setDownloading] = useState(false);
   const { t } = useTranslation();
 
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [sorting, setSorting] = useState([
@@ -39,36 +36,54 @@ const AuditLogs = () => {
     search: "",
   });
 
-
-  // DATA QUERY
-  const dataQuery = useQuery({
-    queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
-
-      if (sorting.length === 0) {
-        return handleGetAuditLogs({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetAuditLogs({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
-      }
-    },
-    staleTime: 0, // Data is always stale, so it refetches
-    cacheTime: 0, // Cache expires immediately
-  });
+    const dataQuery = useQuery({
+      queryKey: ["data", pagination, sorting, filter],
+      queryFn: async () => {
+        // Set loading state to true before the request starts
+        setLoading(true);
+  
+        try {
+          const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+          Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+  
+          // Make the API request based on sorting
+          let response;
+          if (sorting.length === 0) {
+            response = await handleGetAuditLogs({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              ...filterObj,
+            });
+          } else {
+            response = await handleGetAuditLogs({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              sort: sorting
+                .map(
+                  (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                )
+                .join(","),
+              ...filterObj,
+            });
+          }
+  
+          // Return the API response data
+          return response;
+        } catch (error) {
+          console.error("Error fetching data", error);
+          // Optionally, handle errors here
+        } finally {
+          // Set loading state to false when the request finishes (whether successful or not)
+          setLoading(false);
+        }
+      },
+      staleTime: 0, // Data is always stale, so it refetches
+      cacheTime: 0, // Cache expires immediately
+      refetchOnWindowFocus: false, // Disable refetching on window focus
+      refetchOnMount: false, // Prevent refetching on component remount
+      retry: 0, //Disable retry on failure
+    });
+  
 
   // DOWNLOAD AUDIT LOGS LIST
   const handleDownload = () => {

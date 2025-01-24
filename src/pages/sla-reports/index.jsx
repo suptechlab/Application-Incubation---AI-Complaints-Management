@@ -19,7 +19,7 @@ const SLAComplianceReport = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
 
-  const {masterData}  = useContext(MasterDataContext)
+  const { masterData } = useContext(MasterDataContext)
 
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
 
@@ -31,9 +31,11 @@ const SLAComplianceReport = () => {
   const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
+
+  console.log(pagination)
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
@@ -43,33 +45,51 @@ const SLAComplianceReport = () => {
   // DATA QUERY
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
+    queryFn: async () => {
+      // Set loading state to true before the request starts
+      setLoading(true);
 
-      if (sorting.length === 0) {
-        return slaComplianceReportApi({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return slaComplianceReportApi({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
+      try {
+        const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+        Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+
+        // Make the API request based on sorting
+        let response;
+        if (sorting.length === 0) {
+          response = await slaComplianceReportApi({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            ...filterObj,
+          });
+        } else {
+          response = await slaComplianceReportApi({
+            page: pagination.pageIndex,
+            size: pagination.pageSize,
+            sort: sorting
+              .map(
+                (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+              )
+              .join(","),
+            ...filterObj,
+          });
+        }
+
+        // Return the API response data
+        return response;
+      } catch (error) {
+        console.error("Error fetching data", error);
+        // Optionally, handle errors here
+      } finally {
+        // Set loading state to false when the request finishes (whether successful or not)
+        setLoading(false);
       }
     },
     staleTime: 0, // Data is always stale, so it refetches
     cacheTime: 0, // Cache expires immediately
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    refetchOnMount: false, // Prevent refetching on component remount
+    retry: 0, //Disable retry on failure
   });
-
 
 
   // DOWNLOAD CLAIM TYPES LIST
@@ -156,14 +176,31 @@ const SLAComplianceReport = () => {
     getAverageResolutionTime()
   }, [])
 
+  // useEffect(() => {
+  //   if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
+  //     setPagination({
+  //       pageIndex: dataQuery.data?.data?.totalPages - 1,
+  //       pageSize: 10,
+  //     });
+  //   }
+  // }, [dataQuery.data?.data?.totalPages]);
+
+
   useEffect(() => {
-    if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
+    if (Object.values(filter).some(value => value)) {
       setPagination({
-        pageIndex: dataQuery.data?.data?.totalPages - 1,
+        pageIndex: 0,
         pageSize: 10,
       });
     }
-  }, [dataQuery.data?.data?.totalPages]);
+  }, [filter]);
+  // filter
+  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries("data");
+    };
+  }, [queryClient]);
 
   const columns = React.useMemo(
     () => [
@@ -202,7 +239,7 @@ const SLAComplianceReport = () => {
       {
         accessorFn: (row) => row?.slaDueDate,
         id: "slaDueDate",
-        header: () => t("SLA DUE DATE"),
+        header: () => t("SLA_DUE_DATE"),
         enableSorting: true,
         cell: ({ row }) => (
           row?.original?.slaBreachDate
@@ -213,7 +250,7 @@ const SLAComplianceReport = () => {
       {
         accessorFn: (row) => row?.slaBreachDays,
         id: "slaBreachDays",
-        header: () => t("SLA BREACH DAYS"),
+        header: () => t("SLA_BREACH_DAYS"),
         enableSorting: true,
         cell: (({ row }) => (
           <span>{row?.original?.slaBreachDays + " " + t("DAYS")}</span>
@@ -243,21 +280,6 @@ const SLAComplianceReport = () => {
     [masterData]
   );
 
-  useEffect(() => {
-    if (Object.values(filter).some(value => value)) {
-      setPagination({
-          pageIndex: 0,
-          pageSize: 10,
-      });
-  }
-  }, [filter]);
-  // filter
-  // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
-  useEffect(() => {
-    return () => {
-      queryClient.removeQueries("data");
-    };
-  }, [queryClient]);
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">

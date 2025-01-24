@@ -368,5 +368,9 @@ export const englishLang = {
     "CLAIM_SUCCESS_EMAIL": "Your claim has been successfully filed. Details have been sent to your email",
     "SORT_ASCENDING":"Sort ascending",
     "SORT_DESCENDING":"Sort descending",
-    "CLEAR_SORT":"Clear sort"
+    "CLEAR_SORT":"Clear sort",
+    "SLA_DUE_DATE":"SLA Due Date",
+    "SLA_BREACH_DAYS":"SLA Breach Days",
+    "ALL_COMPLIANCES":"ALL Compliances",
+    "NON_COMPLAINT":"Non Complaint"
 }

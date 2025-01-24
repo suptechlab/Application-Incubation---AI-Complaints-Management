@@ -31,14 +31,14 @@ const ClaimOverviewReport = () => {
   const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [sorting, setSorting] = useState([
-    // {
-    //   "id": "slaBreachDate",
-    //   "asc": true
-    // }
+    {
+      "id": "slaBreachDate",
+      "asc": true
+    }
   ]);
   const [filter, setFilter] = useState({
     search: "",

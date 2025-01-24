@@ -326,7 +326,7 @@ export const spanishLang = {
     "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "El tamaño de la imagen no debe exceder los 2.5 MB.",
     "PROVIDE_SLA_COMMENT": "Proporcionar comentario de SLA",
     "FIRST_INSTANCE_CLAIM_DETAILS": "Detalles del reclamo de primera instancia",
-    "COMPLAINT_DETAILS" : "Detalles de la Queja",
+    "COMPLAINT_DETAILS": "Detalles de la Queja",
     "DATA_FILE": "Archivo de datos",
     "DOWNLOAD_SAMPLE_USER_TEMPLATE": "Descargar plantilla de usuario de muestra",
     "ERROR_DETAILS": "Detalles del error",
@@ -363,5 +363,9 @@ export const spanishLang = {
     "CLAIM_SUCCESS_EMAIL": "Su reclamación se ha presentado con éxito. Los detalles se han enviado a su correo electrónico",
     "SORT_ASCENDING": "Orden ascendente",
     "SORT_DESCENDING": "Orden descendente",
-    "CLEAR_SORT":"Borrar clasificación"
+    "CLEAR_SORT": "Borrar clasificación",
+    "SLA_DUE_DATE": "Fecha de Vencimiento del SLA",
+    "SLA_BREACH_DAYS": "Días de Incumplimiento del SLA",
+    "ALL_COMPLIANCES": "Todas las Conformidades",
+    "NON_COMPLAINT": "No Conforme"
 } 

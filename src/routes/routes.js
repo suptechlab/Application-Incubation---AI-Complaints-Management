@@ -228,18 +228,7 @@ const routes = [
     layoutType: "Auth",
     permissions: ["SEPS_USER_CREATE_BY_SEPS"]
   },
-  {
-    path: "/states/edit/:id",
-    element: <AddEditState isEdit={true} />,
-    isPrivate: true,
-    layoutType: "Auth",
-  },
-  {
-    path: "/settings",
-    element: <Settings />,
-    isPrivate: true,
-    layoutType: "Auth",
-  },
+  
   // {
   //   path: "/users/import",
   //   element: <ImportSEPSUser isEdit={false} />,

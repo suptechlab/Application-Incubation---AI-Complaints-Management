@@ -127,7 +127,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
               placeholder={t("SLA COMPLIANCE")}
               size="sm"
               options={[
-                { label: t("ALL COMPLIANCES"), value: "" },
+                { label: t("ALL_COMPLIANCES"), value: "" },
                 { label: t("COMPLAINT"), value: "COMPLAINT" },
                 { label: t("NON_COMPLAINT"), value: "NON_COMPLIANT" },
               ]}
