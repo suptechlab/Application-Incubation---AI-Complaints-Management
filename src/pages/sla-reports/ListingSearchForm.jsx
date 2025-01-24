@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import FormInput from "../../components/FormInput";
 import ReactSelect from "../../components/ReactSelect";
 import moment from "moment/moment";
 import CustomDateRangePicker from "../../components/CustomDateRangePicker";
-import { claimTypesDropdownList, getClaimSubTypeById } from "../../services/claimSubType.service";
+import { claimSubTypeDropdownList, claimTypesDropdownList, getClaimSubTypeById } from "../../services/claimSubType.service";
 import toast from "react-hot-toast";
+import FilterModal from "./FilterModal";
+import AppTooltip from "../../components/tooltip";
+import { MdOutlineFilterAlt } from "react-icons/md";
 
 const ListingSearchForm = ({ filter, setFilter }) => {
   const [tempDateRange, setTempDateRange] = useState([null, null]);
@@ -14,6 +17,10 @@ const ListingSearchForm = ({ filter, setFilter }) => {
   const [claimSubTypes, setClaimSubTypes] = useState([]);
 
   const { t } = useTranslation();
+
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+
+  const toggleFilterModal = () => { setIsFilterModalOpen(!isFilterModalOpen) }
 
   // Fetch Claim Types
   const fetchClaimTypes = async () => {
@@ -37,9 +44,8 @@ const ListingSearchForm = ({ filter, setFilter }) => {
   const fetchClaimSubTypes = async (claimTypeId) => {
 
     try {
-      const response = await claimTypesDropdownList(claimTypeId);
+      const response = await claimSubTypeDropdownList(claimTypeId);
 
-      console.log(response?.data?.length > 0)
       if (response?.data?.length > 0) {
         const dropdownData = response.data.map((item) => ({
           value: item.id,
@@ -66,9 +72,10 @@ const ListingSearchForm = ({ filter, setFilter }) => {
 
   const handleClaimTypeChange = (selectedOption) => {
     const claimTypeId = selectedOption?.target?.value ?? "";
+
     updateFilter("claimTypeId", claimTypeId);
     updateFilter("claimSubTypeId", ""); // Clear sub-type filter when claim type changes
-    console.log({ claimType: claimTypeId })
+    setFilter((prevfilter) => ({ ...prevfilter, claimTypeId: claimTypeId }))
     if (claimTypeId) {
       fetchClaimSubTypes(claimTypeId);
     } else {
@@ -97,10 +104,10 @@ const ListingSearchForm = ({ filter, setFilter }) => {
             <ReactSelect
               wrapperClassName="mb-0"
               placeholder={t("CLAIM TYPE")}
-              options={claimTypes}
+              options={[{ label: t('SELECT'), value: '' }, ...claimTypes]}
               size="sm"
               onChange={handleClaimTypeChange}
-              value={claimTypes.find((option) => option.value === filter.claimTypeId) || null}
+              value={filter?.claimTypeId}
             />
           </div>
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
@@ -109,27 +116,23 @@ const ListingSearchForm = ({ filter, setFilter }) => {
               placeholder={t("CLAIM SUB TYPE")}
               options={claimSubTypes}
               size="sm"
-              onChange={(selectedOption) => updateFilter("claimSubTypeId", selectedOption?.value || "")}
-              value={claimSubTypes.find((option) => option.value === filter.claimSubTypeId) || null}
+              onChange={(selectedOption) => updateFilter("claimSubTypeId", selectedOption?.target?.value || "")}
+              value={filter?.claimSubTypeId ?? ''}
               isDisabled={!filter.claimTypeId}
             />
           </div>
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
-              placeholder={t("STATUS")}
+              placeholder={t("SLA COMPLIANCE")}
               size="sm"
               options={[
-                { label: t("ALL STATUS"), value: "" },
-                { label: t("ACTIVE"), value: true },
-                { label: t("INACTIVE"), value: false },
+                { label: t("ALL COMPLIANCES"), value: "" },
+                { label: t("COMPLAINT"), value: "COMPLAINT" },
+                { label: t("NON_COMPLAINT"), value: "NON_COMPLIANT" },
               ]}
-              onChange={(selectedOption) => updateFilter("status", selectedOption?.value || "")}
-              value={[
-                { label: t("ALL STATUS"), value: "" },
-                { label: t("ACTIVE"), value: true },
-                { label: t("INACTIVE"), value: false },
-              ].find((option) => option.value === filter.status) || null}
+              onChange={(selectedOption) => updateFilter("slaCompliance", selectedOption?.target?.value || "")}
+              value={filter?.slaCompliance}
             />
           </div>
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
@@ -151,8 +154,20 @@ const ListingSearchForm = ({ filter, setFilter }) => {
               size="sm"
             />
           </div>
+          <Button
+            variant="link"
+            id="filter-dropdown"
+            className="link-dark p-1 ms-n1 hide-dropdown-arrow"
+            onClick={toggleFilterModal}
+          >
+            <AppTooltip title="Filters" placement="top">
+              <span><MdOutlineFilterAlt size={20} /></span>
+            </AppTooltip>
+          </Button>
         </Stack>
       </Stack>
+
+      <FilterModal modal={isFilterModalOpen} toggle={toggleFilterModal} filter={filter} setFilter={setFilter} />
     </div>
   );
 };

@@ -31,11 +31,6 @@ const ListFilters = ({ filter, setFilter, }) => {
             });
         }
     };
-
-
-
-
-
     return (
         <div className="theme-card-header header-search mb-3">
             <Stack direction="horizontal" gap={2} className="flex-wrap gap-md-3">

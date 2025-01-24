@@ -200,7 +200,7 @@ const ClaimOverviewReport = () => {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const blobUrl = window.URL.createObjectURL(blob);
 
-        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+        toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
 
 
         const tempLink = document.createElement('a');
@@ -302,7 +302,7 @@ const ClaimOverviewReport = () => {
     <PageHeader
       title={t("CLAIM_OVERVIEW_REPORT")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
+        { label: t("EXPORT TO EXCEL"), onClick: handleDownload, variant: "warning", disabled: isDownloading },
       ]}
     />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
