@@ -342,21 +342,7 @@ export const englishLang = {
     "USING_SEPS_ACTIVE_DIRECTORY":"Using SEPS Active Directory",
     "YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS":"You are not allowed to assign tickets.",
     "CLAIM_AMOUNT":"Claim Amount",
-    "SELECT_ORGANIZATION_ID_MSG" : "Please select organization id.",
-    "CONSUMER_NAME" : "Consumer Name",
-    "ALL_ENTITIES" : "All Entities",
-    "CLAIM_OVERVIEW_REPORT":"Claim Overview Report",
-    "CLAIM_OVERVIEW_FILTERS":"Claim Overview filters",
-    "ORGANIZATION":"Organization",
-    "CITY":"City",
-    "SEPS_AGENT" : "SEPS Agent",
-    "CLOSE_SUB_STATUS" :"Close Sub Status",
-    "REJECT_SUB_STATUS":"Reject Sub Status",
-    "SOURCE":"Source",
-    "CHANNEL_OF_ENTRY":"Channel of entry",
-    "APPLY":"Apply",
-    "WEB":"Web",
-    "CHATBOT":"Chatbot",
+
     "SLA_COMPLIANCE_FILTERS" :"SLA Compliance Filters",
     "SLA_COMPLIANCE_REPORT":"SLA Compliance Report"
 }

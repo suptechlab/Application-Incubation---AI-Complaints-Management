@@ -184,6 +184,7 @@ const ImportSEPSUser = () => {
                         onChange={handleChange}
                         touched={touched?.description}
                         rows={7}
+                        disabled={true}
                         type="text"
                         value={values?.description || ""}
                       />
