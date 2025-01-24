@@ -333,8 +333,8 @@ const CityMaster = () => {
         <PageHeader
           title={t("CITY MASTER")}
           actions={[
-            { label: "Export to CSV", onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ? true : false },
-            { label: "Add New", onClick: toggle, variant: "warning" },
+            { label: t("EXPORT TO CSV"), onClick: exportHandler, variant: "outline-dark", disabled: isDownloading ? true : false },
+            { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
           ]}
         /> : ''}
       <Card className="border-0 flex-grow-1 d-flex flex-column shadow">

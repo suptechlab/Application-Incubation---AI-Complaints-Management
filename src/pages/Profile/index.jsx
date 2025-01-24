@@ -139,8 +139,8 @@ export default function AccountProfile() {
                                 alt="User Profile"
                                 width={134}
                                 height={134}
-                              /> : <div class="card-text placeholder-glow custom-width-134 custom-height-134">
-                                <span class="placeholder  d-block h-100" ></span>
+                              /> : <div className="card-text placeholder-glow custom-width-134 custom-height-134">
+                                <span className="placeholder  d-block h-100" ></span>
                               </div>
                           }
                         </div>

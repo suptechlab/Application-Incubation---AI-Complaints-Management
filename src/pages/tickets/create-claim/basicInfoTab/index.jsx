@@ -178,7 +178,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
     useEffect(() => {
         if (masterData) {
-            setChannelOfEntryData([{ label: 'Select', value: '' }, ...convertToLabelValue(masterData.channelOfEntry)]);
+            setChannelOfEntryData([{ label: t('SELECT'), value: '' }, ...convertToLabelValue(masterData.channelOfEntry)]);
         }
     }, [masterData])
 

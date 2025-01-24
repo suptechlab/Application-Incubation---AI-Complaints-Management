@@ -155,27 +155,6 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
                             size="sm"
                         />
                     </div>
-
-                    {/* Dropdown FILTER */}
-                    {/* <Dropdown>
-                        <Dropdown.Toggle
-                            variant="link"
-                            id="filter-dropdown"
-                            className="link-dark p-1 ms-n1 hide-dropdown-arrow"
-                        >
-                            <AppTooltip title="Filters" placement="top">
-                                <span><MdOutlineFilterAlt size={20} /></span>
-                            </AppTooltip>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
-                            <Dropdown.Item className="small" as={Link} onClick={filterByClaimFill}>
-                                Claim Filled By
-                            </Dropdown.Item>
-                            <Dropdown.Item className="small" as={Link} onClick={filterBySla}>
-                                SLA
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown> */}
                 </Stack>
             </Stack>
         </div>

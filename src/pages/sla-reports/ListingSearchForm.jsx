@@ -145,7 +145,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
               startDate={filter.startDate || null}
               endDate={filter.endDate || null}
               selectsRange
-              placeholder="Select Date Range"
+              placeholder={t("SELECT_DATE_RANGE")}
               size="sm"
             />
           </div>

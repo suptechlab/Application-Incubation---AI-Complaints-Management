@@ -323,18 +323,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                 ))}
                                             </Stack>
                                         )}
-
-                                        {/* {fileName && (
-                                            <div className="pt-1">
-                                                <Link
-                                                    target="_blank"
-                                                    to="/fi-users/import"
-                                                    className="text-decoration-none mw-100 text-break"
-                                                >
-                                                    {fileName}
-                                                </Link>
-                                            </div>
-                                        )} */}
                                     </Col>
                                     <Col xs={12}>
                                         <Stack direction="horizontal" gap={2} className="mb-3 flex-wrap">
@@ -436,7 +424,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         className="fw-semibold text-decoration-none p-0 border-0"
                                                         onClick={() => {
                                                             formikProps.setFieldValue("otpCode", "");
-                                                            handleResend(formikProps?.values?.email)
+                                                            handleResend()
                                                         }
                                                         }
                                                     >

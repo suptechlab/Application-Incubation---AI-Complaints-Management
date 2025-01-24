@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { Card } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 
 const ClosedClaimList = ({closedClaimData}) => {
+
+    const {t} = useTranslation()
 
     //Claim Data
     // const claimData = [
@@ -15,7 +18,7 @@ const ClosedClaimList = ({closedClaimData}) => {
     return (
         <Card className='rounded-3 border-custom-gray h-100'>
             <Card.Header className='border-custom-gray'>
-                <div className='custom-font-size-18 fw-semibold py-1'>Closed Claims</div>
+                <div className='custom-font-size-18 fw-semibold py-1'>{t("CLOSED_CLAIMS")}</div>
             </Card.Header>
             <Card.Body className='p-0'>
                 <ul className='list-unstyled mb-0'>

@@ -334,7 +334,7 @@ export default function TeamManagementAddEdit() {
                                                     <Row className="gx-3">
                                                         <Col xs>
                                                             <ReactSelect
-                                                                label="Member Name"
+                                                                label="MEMBER_NAME"
                                                                 error={errors.teamMemberId}
                                                                 options={entityIdArr}
                                                                 value={values.teamMemberId}

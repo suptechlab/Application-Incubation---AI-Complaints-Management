@@ -8,29 +8,11 @@ import { Pie } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const RADIAN = Math.PI / 180;
-
-const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-        return (
-            <div style={{ backgroundColor: 'white', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', width: '150px' }}>
-                <p style={{ margin: 0 }}>{payload[0].name}</p>
-                <p style={{ margin: 0 }}>Value: {payload[0].value}</p>
-            </div>
-        );
-    }
-    return null;
-};
 
 const PieChartComponent = ({ graphData }) => {
 
 
     const { t } = useTranslation()
-    // State to manage hovered sector
-    // Prepare data for the Pie chart
-
-    // Get dynamic colors from the API (backgroundColor)
-    // const HOVER_COLORS = graphData?.datasets?.[0]?.hoverBackgroundColor || ['#D93D2A', '#75B13B']; // Default hover colors if not provided
 
     const data = {
         labels: graphData?.labels || [],
@@ -95,7 +77,6 @@ const PieChartComponent = ({ graphData }) => {
                             </ul>
                         </div> */}
                     </Col>
-
                 </Row>
                 <Row>
                     <Col sm="12 chart-container">
