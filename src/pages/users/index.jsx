@@ -2,10 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
 import React, { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-
+import { useLocation } from "react-router-dom";
 import {
-  handleDeleteUser,
   handleGetUsers,
   handleStatusChangeState,
 } from "../../services/user.service";
@@ -61,7 +59,6 @@ export default function UserList() {
 
 
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation(); // use the translation hook
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
@@ -249,10 +246,12 @@ export default function UserList() {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT

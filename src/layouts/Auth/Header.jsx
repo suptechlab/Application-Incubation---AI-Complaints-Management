@@ -8,6 +8,7 @@ import {
   Nav,
   Navbar,
 } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 import { FaCaretDown, FaTrash } from "react-icons/fa";
 import {
   MdAccountBox,
@@ -15,41 +16,24 @@ import {
   MdLogout,
   MdOutlineNotifications,
 } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import defaultAvatar from "../../assets/images/default-avatar.jpg";
 import Logo from "../../assets/images/logo.svg";
 import AppTooltip from "../../components/tooltip";
 import { AuthenticationContext } from "../../contexts/authentication.context";
-import {
-  handleCountNotifications,
-  handleMarkAllNotifications
-} from "../../services/notification.service";
 import "./header.scss";
-import { useTranslation } from "react-i18next";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
   const { logout, userData, profileImage } = useContext(AuthenticationContext);
   const { t } = useTranslation();
 
 
-  const [notifications, setNotifications] = useState([]);
-  const [notificationsCount, setNotificationsCount] = useState({ count: 0 });
+  const [notifications] = useState([]);
+  const [notificationsCount] = useState({ count: 0 });
 
   // Default values to handle missing user data
   const { imageUrl = '', firstName = '' } = userData || {};
 
-  // const [isAdmin, setIsAdmin] = useState(false);
-
-  // useEffect(() => {
-  //   if (authorities?.length > 0) {
-  //     const adminStatus = authorities.includes("ROLE_ADMIN");
-  //     if (adminStatus !== isAdmin) {
-  //       setIsAdmin(adminStatus);
-  //     }else{
-  //       // FILTER NAV ITEMS HERE
-  //     }
-  //   }
-  // }, [authorities])
 
   return (
     <Navbar

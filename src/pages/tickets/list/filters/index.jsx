@@ -1,20 +1,17 @@
 import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Dropdown, Stack } from "react-bootstrap";
+import { Stack } from "react-bootstrap";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdOutlineFilterAlt } from "react-icons/md";
-import { Link } from "react-router-dom";
 import CustomDateRangePicker from "../../../../components/CustomDateRangePicker";
 import FormInput from "../../../../components/FormInput";
 import ReactSelect from "../../../../components/ReactSelect";
-import AppTooltip from "../../../../components/tooltip";
-import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
-import toast from "react-hot-toast";
-import { agentListingApi, convertToLabelValue } from "../../../../services/ticketmanagement.service";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
 import { MasterDataContext } from "../../../../contexts/masters.context";
+import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
+import { agentListingApi, convertToLabelValue } from "../../../../services/ticketmanagement.service";
 
-const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByClaimFill, filterBySla, handleTicketAssign, ticketArr, clearTableSelection, permissionsState }) => {
+const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, clearTableSelection, permissionsState }) => {
 
     const { currentUser } = useContext(AuthenticationContext);
 
@@ -22,7 +19,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
 
     const { t } = useTranslation();
     const [claimTypes, setClaimTypes] = useState([])
-    const [agentList, setAgentListing] = useState([])
+    const [agentList, setAgentList] = useState([])
     const [selectedAgent, setSelectedAgent] = useState(null)
 
     const [statusDropdownData, setStatusDropdownData] = useState([])
@@ -73,7 +70,7 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                     value: item.id,
                     label: item.name
                 }));
-                setAgentListing(dropdownData)
+                setAgentList(dropdownData)
             }
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
@@ -267,27 +264,6 @@ const TicketsListFilters = ({ filter, setFilter, returnToAdminClick, filterByCla
                             maxDate={new Date()} // Prevent future date selection
                         />
                     </div>
-
-                    {/* Dropdown FILTER */}
-                    {/* <Dropdown>
-                        <Dropdown.Toggle
-                            variant="link"
-                            id="filter-dropdown"
-                            className="link-dark p-1 ms-n1 hide-dropdown-arrow"
-                        >
-                            <AppTooltip title={t("FILTERS")} placement="top">
-                                <span><MdOutlineFilterAlt size={20} /></span>
-                            </AppTooltip>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
-                            <Dropdown.Item className="small" as={Link} onClick={filterByClaimFill}>
-                                {t("CLAIM_FILLED_BY")}
-                            </Dropdown.Item>
-                            <Dropdown.Item className="small" as={Link} onClick={filterBySla}>
-                                {t("SLA")}
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown> */}
                 </Stack>
             </Stack>
         </div>

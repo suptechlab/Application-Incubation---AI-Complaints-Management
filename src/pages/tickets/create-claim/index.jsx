@@ -83,7 +83,6 @@ export default function CreateClaim() {
         Object.entries(combinedData).forEach(([key, value]) => {
             if (key === "files") {
                 value.forEach((file, index) => {
-                    console.log({file})
                     formData.append(`attachments[${index}]`, file);
                 });
             } else {
@@ -135,7 +134,6 @@ export default function CreateClaim() {
         Object.entries(combinedData).forEach(([key, value]) => {
             if (key === "files") {
                 value.forEach((file, index) => {
-                    console.log({file})
                     formData.append(`attachments[${index}]`, file);
                 });
             } else {

@@ -22,7 +22,6 @@ const AddAttachmentsModal = ({ modal, toggle }) => {
     };
 
     const handleSubmit = async (values, actions) => {
-        console.log('values', values)
         actions.setSubmitting(false);
     };
 

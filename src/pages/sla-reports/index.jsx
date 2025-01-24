@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import moment from "moment";
 import qs from "qs";
 import React, { useContext, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
@@ -8,12 +9,10 @@ import { Link, useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import ListingSearchForm from "./ListingSearchForm";
-import { averageResolutionTimeApi, downloadSLAComplianceReportApi, slaComplianceReportApi } from "../../services/reports.services";
-import { calculateDaysDifference } from "../../utils/commonutils";
-import moment from "moment";
 import AppTooltip from "../../components/tooltip";
 import { MasterDataContext } from "../../contexts/masters.context";
+import { averageResolutionTimeApi, downloadSLAComplianceReportApi, slaComplianceReportApi } from "../../services/reports.services";
+import ListingSearchForm from "./ListingSearchForm";
 
 const SLAComplianceReport = () => {
 
@@ -245,10 +244,12 @@ const SLAComplianceReport = () => {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
   // filter
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT

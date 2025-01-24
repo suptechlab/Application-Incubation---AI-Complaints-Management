@@ -88,15 +88,6 @@ export default function RoleRightsList() {
     }
   }, [dataQuery.data?.data?.totalPages]);
 
-  const changeStatus = async (id, currentStatus) => {
-    try {
-      await handleStatusChangeState(id, !currentStatus);
-      toast.success("State status updated successfully");
-      dataQuery.refetch();
-    } catch (error) {
-      toast.error("Error updating state status");
-    }
-  };
 
   const columns = React.useMemo(
     () => [
@@ -118,29 +109,6 @@ export default function RoleRightsList() {
         header: () => t('ROLE & RIGHTS'),
         enableSorting: false,
       },
-      // {
-      //   cell: (info) => {
-      //     return (
-      //       <Toggle
-      //         id={`status-${info?.row?.original?.id}`}
-      //         key={"status"}
-      //         name="status"
-      //         value={info?.row?.original?.status == 'ACTIVE' ? true : false }
-      //         checked={info?.row?.original?.status == 'ACTIVE' ? true : false}
-      //         onChange={() =>
-      //           changeStatus(
-      //             info?.row?.original?.id,
-      //             info?.row?.original?.status == 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
-      //           )
-      //         }
-      //         tooltip="Active"
-      //       />
-      //     );
-      //   },
-      //   id: "status",
-      //   header: () => t('STATUS'),
-      //   size: "90",
-      // },
       {
         id: "actions",
         isAction: true,
@@ -167,11 +135,12 @@ export default function RoleRightsList() {
   );
 
   useEffect(() => {
-    console.log('203: set pagnination called')
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT

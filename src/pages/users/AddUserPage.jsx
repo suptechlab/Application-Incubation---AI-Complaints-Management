@@ -8,7 +8,6 @@ import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import ReactSelect from "../../components/ReactSelect";
-import Toggle from "../../components/Toggle";
 import {
   handleAddUser,
   handleGetRole,
@@ -62,7 +61,7 @@ export default function AddStatePage() {
       setLoading(true);
       handleGetUserById(id).then((response) => {
         // setUserData(response.data);
-        setEmailDisabled(response.data?.email == "" ? false : true);
+        setEmailDisabled(response.data?.email === "" ? false : true);
 
         setInitialValues({
           name: response.data?.name ? capitalizeFirstLetter(response.data?.name ?? "") : "",

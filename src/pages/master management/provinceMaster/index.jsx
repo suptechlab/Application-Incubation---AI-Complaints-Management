@@ -219,10 +219,12 @@ const ProvinceMaster = () => {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // HANDLE PROVINCE MASTER EXPORT

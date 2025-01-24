@@ -607,7 +607,6 @@ export default function TicketWorkFlowAddEdit() {
                 formikProps.setFieldValue(`conditions[${index}].conditionId`, value);
 
                 if (formikProps?.values?.conditions?.[index].conditionCatId) {
-                    console.log("ARE YOU HERE")
                     formikProps.setFieldValue(
                         `conditions[${index}].conditionCatId`,
                         ''

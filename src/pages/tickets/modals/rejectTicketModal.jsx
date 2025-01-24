@@ -1,19 +1,18 @@
 import { Form, Formik } from "formik";
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Col, Modal } from "react-bootstrap";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import ReactSelect from "../../../components/ReactSelect";
 import { MasterDataContext } from "../../../contexts/masters.context";
-import { convertToLabelValue, ticketCloseStatus, ticketRejectStatus } from "../../../services/ticketmanagement.service";
-import { ticketRejectValidation } from "../../../validations/ticketsManagement.validation";
-import toast from "react-hot-toast";
+import { convertToLabelValue, ticketRejectStatus } from "../../../services/ticketmanagement.service";
 import { validateFile } from "../../../utils/commonutils";
-const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs, getTicketData }) => {
-    const { t } = useTranslation();
-    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
+import { ticketRejectValidation } from "../../../validations/ticketsManagement.validation";
+import PropTypes from "prop-types"
 
+const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
+    const { t } = useTranslation();
     const { masterData } = useContext(MasterDataContext)
 
     const [subStatus, setSubStatus] = useState([])
@@ -25,23 +24,8 @@ const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGe
         }
     }, [masterData])
 
-    //Handle File Change
-    // const handleFileChange = (event) => {
-    //     const file = event.currentTarget.files[0];
-    //     if (file) {
-    //         setFileName(file.name);
-    //     } else {
-    //         setFileName("Fi_Users_data.xlsx");
-    //     }
-    // };
-
     const handleSubmit = async (values, actions) => {
-        // actions.setSubmitting(true);
         setLoading(true)
-        // const formData = {
-        //     reason: values?.reason,
-        //     rejectedStatus: values?.rejectedStatus,
-        // };
         const formData = new FormData();
         formData.append("reason", values.reason);
         formData.append("closeSubStatus", values.closeSubStatus);
@@ -51,7 +35,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGe
         ticketRejectStatus(ticketId, formData)
             .then((response) => {
                 setSelectedStatus('REJECTED');
-                setIsGetAcitivityLogs((prev) => !prev)
+                setIsGetActivityLogs((prev) => !prev)
                 if (values.attachments) {
                     getTicketData()
                 }
@@ -153,13 +137,6 @@ const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGe
                                         >
                                             {t("BROWSE")}
                                         </label>
-                                        {/* <input
-                                            id="files"
-                                            accept="image/png, image/jpeg, image/jpg"
-                                            className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                                            type="file"
-                                            onChange={handleFileChange}
-                                        /> */}
                                         <input
                                             id="attachments"
                                             name="attachments"
@@ -180,8 +157,6 @@ const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGe
                                     </div>
                                     {values?.attachments && (
                                         <span
-                                            // target="_blank"
-                                            // to="/fi-users/import"
                                             className="text-decoration-none small mw-100 text-break"
                                         >
                                             {values.attachments.name}
@@ -214,5 +189,14 @@ const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGe
         </Modal>
     );
 };
+
+RejectTicketModal.propTypes = {
+    modal: PropTypes.bool.isRequired, // modal is a boolean (required)
+    toggle: PropTypes.func.isRequired, // toggle is a function (required)
+    ticketId: PropTypes.string.isRequired, // ticketId is a string (required)
+    setSelectedStatus: PropTypes.func.isRequired, // setSelectedStatus is a function (required)
+    setIsGetActivityLogs: PropTypes.func.isRequired, // setIsGetActivityLogs is a function (required)
+    getTicketData: PropTypes.func.isRequired, // getTicketData is a function (required)
+  };
 
 export default RejectTicketModal;

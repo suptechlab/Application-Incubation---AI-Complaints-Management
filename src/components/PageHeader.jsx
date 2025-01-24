@@ -28,7 +28,7 @@ const PageHeader = ({ title = "", averageResolutionTime = "", actions = [] }) =>
                         {actions.map((action, index) =>
                             action.to ? (
                                 <Link
-                                    key={`action-${index}`}
+                                    key={`action-${index +1}`}
                                     to={action.to}
                                     className={`btn btn-${action.variant || 'primary'} ${action.disabled ? 'disabled' : ''}`}
                                     onClick={action.onClick}
@@ -38,7 +38,7 @@ const PageHeader = ({ title = "", averageResolutionTime = "", actions = [] }) =>
                                 </Link>
                             ) : (
                                 <Button
-                                    key={`action-${index}`}
+                                    key={`action-${index + 1}`}
                                     variant={action.variant || 'primary'}
                                     onClick={action.onClick}
                                     disabled={action.disabled}
@@ -66,8 +66,5 @@ PageHeader.propTypes = {
     })),
 };
 
-// PageHeader.defaultProps = {
-//     actions: [],
-// };
 
 export default PageHeader;

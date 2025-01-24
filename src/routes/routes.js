@@ -16,7 +16,6 @@ import AuditLogs from "../pages/auditLogs";
 import ViewAuditTrail from "../pages/auditLogs/ViewAuditTrail";
 import ChangePassword from "../pages/Profile/ChangePassword";
 import RoleRightsList from "../pages/role-rights";
-import StatesList from "../pages/states";
 import UserList from "../pages/users";
 import SLAComplianceReport from "../pages/sla-reports";
 import ClaimOverviewReport from "../pages/clamOverviewReport";
@@ -28,12 +27,9 @@ import EditTemplate from "../pages/master management/TemplateMaster/Edit/index";
 import ImportSEPSUser from "../pages/users/importData";
 
 
-const Settings = React.lazy(() => import("../pages/settings"));
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
 
 // Saving Challenges
-const AddEditState = React.lazy(() => import("../pages/states/StateForm"));
-const AddStatePage = React.lazy(() => import("../pages/states/AddStatePage"));
 const AddUserPage = React.lazy(() => import("../pages/users/AddUserPage"));
 const FIUserList = React.lazy(() => import("../pages/fi-users"));
 const FIUserAddEdit = React.lazy(() => import("../pages/fi-users/AddEdit"));
@@ -207,18 +203,7 @@ const routes = [
     module: "SEPS User",
     permissions: ["SEPS_USER_CREATE_BY_SEPS", "SEPS_USER_UPDATE_BY_SEPS", "SEPS_USER_STATUS_CHANGE_BY_SEPS"]
   },
-  {
-    path: "/states",
-    element: <StatesList />,
-    isPrivate: true,
-    layoutType: "Auth",
-  },
-  {
-    path: "/states/add",
-    element: <AddStatePage isEdit={false} />,
-    isPrivate: true,
-    layoutType: "Auth",
-  },
+ 
   {
     path: "/users/add",
     element: <AddUserPage isEdit={false} />,
@@ -255,6 +240,15 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
   },
+  // {
+  //   path: "/users/import",
+  //   element: <ImportSEPSUser isEdit={false} />,
+  //   isPrivate: true,
+  //   module: "SEPS User",
+  //   layoutType: "Auth",
+  //   permissions: ["SEPS_USER_CREATE_BY_SEPS"]
+  // },
+  
   {
     path: "/role-rights",
     element: <RoleRightsList />,

@@ -20,10 +20,10 @@ export default function ForgotPassword() {
 
     const onSubmit = async (values, actions) => {
         if (captcha === "") {
-            toast.error("Please enter the captcha");
+            toast.error(t("ENTER_CAPTCHA"));
             return;
         }
-        values.recaptchaToken = captcha != '' ? captcha : ''
+        values.recaptchaToken = captcha !== '' ? captcha : ''
         await handleForgotPassword({ ...values }).then((response) => {
             toast.success(response.data.message)
             actions.resetForm()
@@ -120,7 +120,7 @@ export default function ForgotPassword() {
                                             >
                                                 {isSubmitting ? (
                                                     <Spinner size="sm" animation="border" role="output" className="align-middle me-1">
-                                                        <span className="visually-hidden">Loading...</span>
+                                                        <span className="visually-hidden">{t("LOADING")}...</span>
                                                     </Spinner>
                                                 ) : (
                                                      t('SEND')

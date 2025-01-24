@@ -1,22 +1,20 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { Button, Card, Stack } from "react-bootstrap";
-import { MdAttachFile } from "react-icons/md";
-import { Link } from "react-router-dom";
-import SunEditorReact from "../../../../../components/SuneditorReact";
-import { validationSchema } from "../../../../../validations/ticketsManagement.validation";
-import GenericModal from "../../../../../components/GenericModal";
-import {
-    ticketReplyToCustomer,
-    ticketReplyInternal,
-    internalNoteApi,
-} from "../../../../../services/ticketmanagement.service";
 import toast from "react-hot-toast";
-import { validateFile } from "../../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
+import { MdAttachFile } from "react-icons/md";
+import GenericModal from "../../../../../components/GenericModal";
+import SunEditorReact from "../../../../../components/SuneditorReact";
+import {
+    internalNoteApi,
+    ticketReplyInternal,
+    ticketReplyToCustomer,
+} from "../../../../../services/ticketmanagement.service";
+import { validateFile } from "../../../../../utils/commonutils";
+import { validationSchema } from "../../../../../validations/ticketsManagement.validation";
 import MentionEditor from "../../../../../components/MentionEditor";
-
-const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, currentTab, permissionState }) => {
+const ReplyTab = ({ ticketId, setIsGetActivityLogs, ticketData, getTicketData, currentTab,permissionState }) => {
 
     const { t } = useTranslation()
 
@@ -51,7 +49,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                 if (values.attachment){
                     getTicketData()
                 }
-                setIsGetAcitivityLogs((prev) => !prev)
+                setIsGetActivityLogs((prev) => !prev)
                 toast.success(response?.data?.message)
             })
             .catch((error) => {

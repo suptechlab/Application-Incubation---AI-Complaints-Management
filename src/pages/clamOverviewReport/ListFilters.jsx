@@ -1,9 +1,8 @@
 import moment from "moment";
 import React, { useState } from "react";
-import { Button, Dropdown, Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { MdOutlineFilterAlt } from "react-icons/md";
-import { Link } from "react-router-dom";
 import CustomDateRangePicker from "../../components/CustomDateRangePicker";
 import FormInput from "../../components/FormInput";
 import ReactSelect from "../../components/ReactSelect";
@@ -59,38 +58,6 @@ const ListFilters = ({ filter, setFilter, }) => {
                         value={filter.search}
                     />
                 </div>
-                {/* <Button
-                    type="button"
-                    variant="warning"
-                    onClick={returnToAdminClick}
-                    className="flex-grow-1 flex-sm-grow-0"
-                >
-                    Return to Admin
-                </Button> */}
-                {/* <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder="Claim Type"
-                        id="floatingSelect"
-                        size="sm"
-                        options={[
-                            {
-                                label: "Claim Type",
-                                value: "",
-                            },
-                            ...claimTypes
-                        ]}
-                        onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                claimTypeId: e.target.value,
-                            });
-                        }}
-                        value={filter?.claimTypeId}
-                    />
-                </div> */}
-
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect
                         wrapperClassName="mb-0"
@@ -183,7 +150,7 @@ const ListFilters = ({ filter, setFilter, }) => {
                             startDate={filter?.startDate ?? null}
                             endDate={filter?.endDate}
                             selectsRange={true}
-                            placeholder="Select Date Range"
+                            placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
                         />
                     </div>

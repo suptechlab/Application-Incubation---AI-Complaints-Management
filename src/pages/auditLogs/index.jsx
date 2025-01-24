@@ -13,6 +13,7 @@ import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import { downloadAuditReportApi, handleGetAuditLogs } from "../../services/reports.services";
 import { downloadClaimTypes } from "../../services/claimType.service";
+import { handleGetAuditLogs } from "../../services/reports.services";
 import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
 import SearchForm from "./SearchForm";
 
@@ -20,7 +21,7 @@ const AuditLogs = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [isDownloading, setDownloading] = useState(false);
   const { t } = useTranslation();
 
@@ -28,8 +29,6 @@ const AuditLogs = () => {
     pageIndex: params.page ? parseInt(params.page) - 1 : 1,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
-  const [modal, setModal] = useState(false);
-  const [editModal, setEditModal] = useState({ row: {}, open: false });
   const [sorting, setSorting] = useState([
     {
       id: "createdAt",
@@ -40,7 +39,6 @@ const AuditLogs = () => {
     search: "",
   });
 
- 
 
   // DATA QUERY
   const dataQuery = useQuery({
@@ -106,7 +104,6 @@ const AuditLogs = () => {
         } else {
           throw new Error(t("EMPTY RESPONSE"));
         }
-        // toast.success(t("STATUS UPDATED"));
       })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -117,8 +114,6 @@ const AuditLogs = () => {
         toast.dismiss("downloading");
       })
       .finally(() => {
-        // Ensure the loading toast is dismissed
-        // toast.dismiss("downloading");
         setDownloading(false);
       });
   };
@@ -190,10 +185,12 @@ const AuditLogs = () => {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT

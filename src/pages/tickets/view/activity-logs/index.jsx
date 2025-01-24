@@ -84,53 +84,53 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState,activityLoa
 
 
   //Chat Reply Data
-  const chatReplyData = [
-    {
-      id: 1,
-      name: "John Smith",
-      action: <>added Internal Note</>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 2,
-      name: "John Smith",
-      action: <>replied & tagged <Link to="/" className='text-decoration-none fw-bold'>Kyle</Link></>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Thanks i will update <Link to="/" className='text-decoration-none'>@Kyle</Link> about the same.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 3,
-      name: "Carlos P",
-      action: <>replied</>,
-      date: "07-14-24 | 10:00 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
-      avatar: defaultAvatar,
-      variant: '',
-    },
-    {
-      id: 4,
-      name: "Carlos P",
-      action: <>added Resolution Note and mark it Resolved</>,
-      date: "14-07-24 | 9:11 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer.</>,
-      avatar: defaultAvatar,
-      variant: 'Resolved',
-    },
-    {
-      id: 5,
-      name: "Mic Johns",
-      action: <>added Internal Note</>,
-      date: "14-07-24 | 9:10 am",
-      message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.</>,
-      avatar: defaultAvatar,
-      variant: 'In Progress',
-    },
-  ];
+  // const chatReplyData = [
+  //   {
+  //     id: 1,
+  //     name: "John Smith",
+  //     action: <>added Internal Note</>,
+  //     date: "07-14-24 | 10:00 am",
+  //     message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
+  //     avatar: defaultAvatar,
+  //     variant: '',
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "John Smith",
+  //     action: <>replied & tagged <Link to="/" className='text-decoration-none fw-bold'>Kyle</Link></>,
+  //     date: "07-14-24 | 10:00 am",
+  //     message: <>Thanks i will update <Link to="/" className='text-decoration-none'>@Kyle</Link> about the same.</>,
+  //     avatar: defaultAvatar,
+  //     variant: '',
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Carlos P",
+  //     action: <>replied</>,
+  //     date: "07-14-24 | 10:00 am",
+  //     message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</>,
+  //     avatar: defaultAvatar,
+  //     variant: '',
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Carlos P",
+  //     action: <>added Resolution Note and mark it Resolved</>,
+  //     date: "14-07-24 | 9:11 am",
+  //     message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer.</>,
+  //     avatar: defaultAvatar,
+  //     variant: 'Resolved',
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Mic Johns",
+  //     action: <>added Internal Note</>,
+  //     date: "14-07-24 | 9:10 am",
+  //     message: <>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text.</>,
+  //     avatar: defaultAvatar,
+  //     variant: 'In Progress',
+  //   },
+  // ];
 
   // The color class based on the status
   const getReplyStatusClass = (status) => {
