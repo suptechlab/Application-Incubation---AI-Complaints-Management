@@ -264,13 +264,13 @@ export default function UserList() {
 
   const actions = permissionsState?.addModule
     ? [
-      //   {
-      //   label: t("IMPORT_SEPS_USERS"),
-      //   to: "/users/import",
-      //   variant: "outline-dark",
-      //   disabled: false
-      // }
-      // ,
+        {
+        label: t("IMPORT_SEPS_USERS"),
+        to: "/users/import",
+        variant: "outline-dark",
+        disabled: false
+      }
+      ,
       { label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
     : [];
 

@@ -64,7 +64,7 @@ const ImportFIUser = () => {
         if (error?.response?.status === 400) {
 
           const errorData = error?.response?.data?.join('\n')
-          setInitialValues({ browseFileerrorData: '', description: errorData })
+          setInitialValues({ browseFile: '', description: errorData })
         }
         else if (error?.response?.data?.errorDescription) {
           toast.error(error.response.data.errorDescription);
