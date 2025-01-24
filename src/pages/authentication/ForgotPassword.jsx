@@ -23,7 +23,7 @@ export default function ForgotPassword() {
             toast.error(t("ENTER_CAPTCHA"));
             return;
         }
-        values.recaptchaToken = captcha != '' ? captcha : ''
+        values.recaptchaToken = captcha !== '' ? captcha : ''
         await handleForgotPassword({ ...values }).then((response) => {
             toast.success(response.data.message)
             actions.resetForm()

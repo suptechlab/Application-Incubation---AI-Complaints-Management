@@ -360,4 +360,7 @@ export const englishLang = {
     "CLAIM_HAS_BEEN_FILED": "Claim has been filed",
     "TICKET_NO": "Ticket No.",
     "CLAIM_SUCCESS_EMAIL": "Your claim has been successfully filed. Details have been sent to your email",
+    "SORT_ASCENDING":"Sort ascending",
+    "SORT_DESCENDING":"Sort descending",
+    "CLEAR_SORT":"Clear sort"
 }

@@ -1,25 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Card, Col, Dropdown, Image, ListGroup, Row, Stack } from 'react-bootstrap';
+import moment from 'moment/moment';
+import React, { useContext, useEffect, useState } from 'react';
+import { Card, Col, Dropdown, Image, Row, Stack } from 'react-bootstrap';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown, MdAttachFile, MdCalendarToday } from 'react-icons/md';
 import { Link, useParams } from 'react-router-dom';
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import CommonViewData from '../../../components/CommonViewData';
-import Loader from '../../../components/Loader';
 import AppTooltip from '../../../components/tooltip';
-import AttachmentsModal from '../modals/attachmentsModal';
-import UserInfoModal from '../modals/userInfoModal';
-import TicketViewHeader from './header';
-import TicketTabsSection from './tabs';
-import { changeTicketPriority, ticketDetailsApi } from '../../../services/ticketmanagement.service';
-import toast from 'react-hot-toast';
-import moment from 'moment/moment';
-import ActivityLogs from './activity-logs';
-import { useContext } from 'react';
 import { AuthenticationContext } from '../../../contexts/authentication.context';
 import { MasterDataContext } from '../../../contexts/masters.context';
-import { useTranslation } from 'react-i18next';
+import { changeTicketPriority, ticketDetailsApi } from '../../../services/ticketmanagement.service';
+import AttachmentsModal from '../modals/attachmentsModal';
 import ConsumerInfoModal from '../modals/consumerInfoModal';
 import SlaReminderModal from '../modals/slaReminderModal';
+import UserInfoModal from '../modals/userInfoModal';
+import ActivityLogs from './activity-logs';
+import TicketViewHeader from './header';
+import TicketTabsSection from './tabs';
 
 const TicketsView = () => {
 
@@ -111,7 +109,7 @@ const TicketsView = () => {
 
   const { t } = useTranslation()
 
-  const [isGetActivityLogs, setIsGetAcitivityLogs] = useState(true)
+  const [isGetActivityLogs, setIsGetActivityLogs] = useState(true)
 
   const [selectedPriority, setSelectedPriority] = useState('LOW');
   const [userInfoModalShow, setUserInfoModalShow] = useState(false);
@@ -153,7 +151,7 @@ const TicketsView = () => {
     if (priority && priority !== '') {
       changeTicketPriority(id, priority).then(response => {
         setSelectedPriority(priority);
-        setIsGetAcitivityLogs((prev) => !prev)
+        setIsGetActivityLogs((prev) => !prev)
       }).catch((error) => {
         if (error?.response?.data?.errorDescription) {
           toast.error(error?.response?.data?.errorDescription);
@@ -528,7 +526,7 @@ const TicketsView = () => {
         <TicketViewHeader
           title={"#" + ticketData?.ticketId && ticketData?.ticketId !== undefined ? ticketData?.ticketId : ''}
           ticketData={ticketData}
-          setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+          setIsGetActivityLogs={setIsGetActivityLogs}
           getTicketData={getTicketDetails}
           permissionState={permissionsState}
           loading={loading}
@@ -615,7 +613,7 @@ const TicketsView = () => {
                     </Col>
                   </Row>
                 </Card.Header>
-                <TicketTabsSection ticketId={ticketData?.id} setIsGetAcitivityLogs={setIsGetAcitivityLogs} ticketData={ticketData} getTicketData={getTicketDetails} permissionState={permissionsState} />
+                <TicketTabsSection ticketId={ticketData?.id} setIsGetActivityLogs={setIsGetActivityLogs} ticketData={ticketData} getTicketData={getTicketDetails} permissionState={permissionsState} />
               </Card>
               <ActivityLogs ticketId={id} isGetActivityLogs={isGetActivityLogs} permissionState={permissionsState} activityLoading={activityLoading} setActivityLoading={setActivityLoading} />
               {/* <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">

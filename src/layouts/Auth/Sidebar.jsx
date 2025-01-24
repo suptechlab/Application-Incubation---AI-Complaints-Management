@@ -14,7 +14,7 @@ import { filterNavItemsByModules } from "../../utils/permissionUtils";
 
 const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
 
-  const { authorities = [], permissions = [], modules = [], isLoading } = useContext(AuthenticationContext);
+  const { authorities = [], modules = [], isLoading } = useContext(AuthenticationContext);
   const navItemsArr = NavItems();
   const [navItems, setNavItems] = useState([]);
 
@@ -108,11 +108,11 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
               {
                 isLoading &&
 
-                  [...Array(6)].map((element) => (
+                [...Array(6)].map((element) => (
 
-                    <Placeholder.Button key={element} className="w-100 custom-height-42 my-2" xs={4} aria-hidden="true" bg="light" animation="wave" size={'lg'} />
-                  ))
-            }
+                  <Placeholder.Button key={element} className="w-100 custom-height-42 my-2" xs={4} aria-hidden="true" bg="light" animation="wave" size={'lg'} />
+                ))
+              }
 
 
               {navItems?.map((elem) => {

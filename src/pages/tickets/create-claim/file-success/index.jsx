@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import SvgIcons from '../../../../components/SVGIcons'
 import { useTranslation } from 'react-i18next'
 
-const FileSuccesModal = ({ handleShow, handleClose, handleFormSubmit, fileClaimData }) => {
+const FileSuccesModal = ({ handleShow, handleClose, fileClaimData }) => {
 
     const {t} = useTranslation()
     return (

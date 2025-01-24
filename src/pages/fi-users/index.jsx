@@ -171,7 +171,7 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info.row.original.name ?capitalizeFirstLetter(info?.row?.original?.name) : "N/A"}
+              {info.row.original.name ? capitalizeFirstLetter(info?.row?.original?.name) : "N/A"}
             </span>
           );
         },
@@ -202,7 +202,7 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info.row.original.organization?.razonSocial ? capitalizeFirstLetter(info?.row?.original?.organization?.razonSocial) :  "N/A"}
+              {info.row.original.organization?.razonSocial ? capitalizeFirstLetter(info?.row?.original?.organization?.razonSocial) : "N/A"}
             </span>
           );
         },
@@ -296,10 +296,12 @@ export default function FIUserList() {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+        pageIndex: 0,
+        pageSize: 10,
+      });
+    }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT

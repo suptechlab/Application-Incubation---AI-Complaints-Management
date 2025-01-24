@@ -30,7 +30,7 @@ export default function ResetPassword() {
         let data = {
             'key': otpToken,
             'newPassword': values.password,
-            'recaptchaToken': captcha != '' ? captcha : ''
+            'recaptchaToken': captcha !== '' ? captcha : ''
         };
 
         await handleResetPassword(data).then((response) => {

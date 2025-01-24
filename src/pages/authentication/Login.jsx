@@ -37,7 +37,7 @@ export default function Login() {
         }
 
         values.username = values.email
-        values.recaptchaToken = captcha != '' ? captcha : '' 
+        values.recaptchaToken = captcha !== '' ? captcha : '' 
         delete values.email;
 
         await login({ ...values });

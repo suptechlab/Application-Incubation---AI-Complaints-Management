@@ -4,15 +4,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import CommonDataTable from "../../components/CommonDataTable";
-import DataGridActions from "../../components/DataGridActions";
-import ListingSearchForm from "./ListingSearchForm";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import Toggle from "../../components/Toggle";
 import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
+import ListingSearchForm from "./ListingSearchForm";
 
 const SLAComplianceReport = () => {
 
@@ -222,10 +219,12 @@ const dummyData = {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT

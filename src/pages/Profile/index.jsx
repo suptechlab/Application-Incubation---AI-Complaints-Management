@@ -1,9 +1,9 @@
 import { Formik, Form as FormikForm } from "formik";
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Card, Col, Image, Placeholder, Row, Spinner, Stack } from "react-bootstrap";
+import { Button, Card, Col, Image, Row, Spinner, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import profilePlaceholderImg from "../../assets/images/default-avatar.jpg";
 import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";

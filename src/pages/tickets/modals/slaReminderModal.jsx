@@ -16,12 +16,6 @@ const SlaReminderModal = ({ showModal, ticketData ,toggle,getTicketData}) => {
 
   const { t } = useTranslation()
 
-  // const [showModal, setShowModal] = useState(ticketData?.slaPopup)
-
-  // const toggle = () => {
-  //   setShowModal(!showModal)
-  // }
-
   const handleClose = () => {
     slaReminderDismissApi(ticketData?.id).then((response) => {
       toggle()

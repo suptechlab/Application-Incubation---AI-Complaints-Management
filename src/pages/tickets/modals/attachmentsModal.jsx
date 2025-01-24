@@ -119,7 +119,7 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
 
                                     </AppTooltip>}
                             </ListGroup.Item>
-                        )) : <p>There is no attachment included.</p>}
+                        )) : <p>{t("NO_ATTACHMENT")}.</p>}
                     </ListGroup>
                 </Modal.Body>
             </Modal>

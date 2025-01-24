@@ -16,7 +16,7 @@ import RejectTicketModal from '../../modals/rejectTicketModal';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import Loader from '../../../../components/Loader';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData, permissionState, loading, setLoading }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState, loading, setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -87,7 +87,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
         try {
             const response = await ticketStatusChange(ticketData?.id, status);
             toast.success(response.data.message);
-            setIsGetAcitivityLogs((prev)=>!prev)
+            setIsGetActivityLogs((prev) => !prev)
             setSelectedStatus(status)
             // await getTicketData();
         } catch (error) {
@@ -183,29 +183,25 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                     gap={2}
                     className="flex-wrap custom-min-height-38"
                 >
+                    <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
 
-                    {/* {loading === true ? <h1 className="placeholder-glow h-100 w-25 mb-0 me-auto d-inline-flex align-items-center gap-2">
-                        <div className="placeholder" style={{ width: '100%', height: '100%' }}></div>
-                    </h1> : */}
-                        <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
-
-                            {title ?? ""}
-                            {isSlaBreachDateValid && (
-                                daysDifference > 2
-                                    ? renderBadge("custom-info", "custom-info", `${daysDifference} ${t("DAYS_REMAINING")}`)
-                                    : renderBadge("custom-danger", "custom-danger", `${daysDifference} ${t("DAYS_REMAINING")}`)
-                            )}
-                            {
-                                ticketData?.instanceType === "FIRST_INSTANCE" ?
-                                    <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                        <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
-                                    </Badge>
-                                    :
-                                    <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
-                                        <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
-                                    </Badge>
-                            }
-                        </h1>
+                        {title ?? ""}
+                        {isSlaBreachDateValid && (
+                            daysDifference > 2
+                                ? renderBadge("custom-info", "custom-info", `${daysDifference} ${t("DAYS_REMAINING")}`)
+                                : renderBadge("custom-danger", "custom-danger", `${daysDifference} ${t("DAYS_REMAINING")}`)
+                        )}
+                        {
+                            ticketData?.instanceType === "FIRST_INSTANCE" ?
+                                <Badge bg='custom-info' className='fw-semibold px-3 bg-opacity-25 text-custom-info py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                </Badge>
+                                :
+                                <Badge bg='custom-orange' className='fw-semibold px-3 bg-opacity-25 text-custom-orange py-1 px-2 d-inline-flex align-items-center gap-1 rounded-pill'>
+                                    <span className='custom-font-size-13'>{masterData?.instanceType[ticketData?.instanceType]}</span>
+                                </Badge>
+                        }
+                    </h1>
                     <Stack direction="horizontal" gap={2} className='flex-wrap'>
                         <Link
                             to={"/tickets"}
@@ -213,16 +209,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                         >
                             {t("BACK")}
                         </Link>
-                        {/* <Button
-                            type="submit"
-                            variant='outline-dark'
-                        >
-                            Assign To
-                        </Button> */}
-
-
                         {
-
                             permissionState?.assignPermission === true &&
                             ((currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
                                 ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') && ticketData?.instanceType === 'SECOND_INSTANCE') &&
@@ -292,25 +279,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                                     <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
                                 </Button>
                         }
-                        {/* <Dropdown>
-                            <Dropdown.Toggle
-                                variant="link"
-                                id="ticket-detail-filter"
-                                className="link-dark p-1 ms-n2 hide-dropdown-arrow"
-                            >
-                                <AppTooltip title="Filters" placement="top">
-                                    <span><MdMoreVert size={24} /></span>
-                                </AppTooltip>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
-                                <Dropdown.Item className="small" onClick={handleAddAttachmentsClick}>
-                                    Claim Filled By
-                                </Dropdown.Item>
-                                <Dropdown.Item className="small" as={Link} to="">
-                                    SLA
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown> */}
+                      
                     </Stack>
                 </Stack>
             </div>
@@ -333,7 +302,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 modal={closeTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
-                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                setIsGetActivityLogs={setIsGetActivityLogs}
                 getTicketData={getTicketData}
             />
             <RejectTicketModal
@@ -341,7 +310,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 modal={rejectTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
-                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                setIsGetActivityLogs={setIsGetActivityLogs}
                 getTicketData={getTicketData}
             />
         </React.Fragment>

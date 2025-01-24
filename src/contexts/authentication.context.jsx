@@ -1,10 +1,10 @@
 import { createContext, useEffect, useState } from "react";
 import toast from 'react-hot-toast';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import { handleLogin, handleRefreshToken, handleVerifyOtp, handleGetAccountDetail, downloadProfileImage } from "../services/authentication.service";
-import { getLocalStorage, removeLocalStorage, setLocalStorage } from "../utils/storage";
 import { useTranslation } from "react-i18next";
+import { downloadProfileImage, handleGetAccountDetail, handleLogin, handleVerifyOtp } from "../services/authentication.service";
+import { getLocalStorage, removeLocalStorage, setLocalStorage } from "../utils/storage";
 
 export const AuthenticationContext = createContext({
     isAuthenticated: false,
@@ -33,7 +33,6 @@ export default function AuthenticationProvider({ children }) {
     const [profileImage, setProfileImage] = useState('')
 
     const navigate = useNavigate()
-    const location = useLocation()
 
     const { t } = useTranslation()
 
@@ -65,7 +64,7 @@ export default function AuthenticationProvider({ children }) {
         })
     }
 
-    const OtpVerify = async (data) => {
+    const OtpVerify = async (data,actions) => {
 
         handleVerifyOtp(data).then((response) => {
             if (response?.data?.id_token) {
@@ -75,6 +74,7 @@ export default function AuthenticationProvider({ children }) {
                 // GET USER INFO AND SET IT INTO LOCALSTORAGE
                 handleAccountDetails()
                 navigate("/dashboard");
+             
 
             } else {
                 toast.error(response?.data?.message);
@@ -84,6 +84,8 @@ export default function AuthenticationProvider({ children }) {
 
         }).catch((error) => {
             toast.error(error?.response?.data?.errorDescription ?? error?.message);
+        }).finally(()=>{
+            actions.setSubmitting(false)
         })
     }
 

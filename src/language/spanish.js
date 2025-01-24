@@ -345,4 +345,7 @@ export const spanishLang = {
     "CLAIM_HAS_BEEN_FILED": "Se ha presentado la reclamación",
     "TICKET_NO": "Número de Ticket",
     "CLAIM_SUCCESS_EMAIL": "Su reclamación se ha presentado con éxito. Los detalles se han enviado a su correo electrónico",
+    "SORT_ASCENDING": "Orden ascendente",
+    "SORT_DESCENDING": "Orden descendente",
+    "CLEAR_SORT":"Borrar clasificación"
 } 

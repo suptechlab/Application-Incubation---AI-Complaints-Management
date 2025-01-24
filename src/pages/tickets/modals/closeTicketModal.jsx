@@ -1,21 +1,18 @@
 import { Form, Formik } from "formik";
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Col, Modal } from "react-bootstrap";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import ReactSelect from "../../../components/ReactSelect";
-import { validationSchema } from "../../../validations/inquiryType.validation";
 import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticketmanagement.service";
-import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
-import toast from "react-hot-toast";
 import { validateFile } from "../../../utils/commonutils";
-const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs, getTicketData }) => {
+import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
+import PropTypes from "prop-types"
+const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
-    // const [fileName, setFileName] = useState("");
-
     const { masterData } = useContext(MasterDataContext)
 
     const [subStatus, setSubStatus] = useState([])
@@ -55,7 +52,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
         ticketCloseStatus(ticketId, formData)
             .then((response) => {
                 setSelectedStatus('CLOSED');
-                setIsGetAcitivityLogs((prev) => !prev)
+                setIsGetActivityLogs((prev) => !prev)
                 if (values.attachments) {
                     getTicketData()
                 }
@@ -218,4 +215,12 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
     );
 };
 
+CloseTicketModal.propTypes = {
+    modal: PropTypes.bool.isRequired, // modal is a boolean (required)
+    toggle: PropTypes.func.isRequired, // toggle is a function (required)
+    ticketId: PropTypes.string.isRequired, // ticketId is a string (required)
+    setSelectedStatus: PropTypes.func.isRequired, // setSelectedStatus is a function (required)
+    setIsGetActivityLogs: PropTypes.func.isRequired, // setIsGetActivityLogs is a function (required)
+    getTicketData: PropTypes.func.isRequired, // getTicketData is a function (required)
+  };
 export default CloseTicketModal;

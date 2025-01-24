@@ -65,7 +65,6 @@ export const NavItems = () => {
       menuIcon: <MdFolder size={20} />,
       path: '#',
       moduleName: "Master",
-      moduleName: "Master",
       roleName: "admin",
       subMenu: [
         {

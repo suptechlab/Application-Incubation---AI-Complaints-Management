@@ -3,9 +3,9 @@ import { MdArrowDropDown } from "react-icons/md";
 import Select from "react-select";
 import "./ReactSelect.scss";
 import { useTranslation } from "react-i18next";
-
+import PropTypes from 'prop-types';
 const ReactSelect = ({
-  options,
+  options =[],
   value,
   onChange,
   wrapperClassName = "mb-3 pb-1",
@@ -24,19 +24,18 @@ const ReactSelect = ({
   const customStyles = {
 
 
-    control: (base, state) => ({
-      ...base,
-      borderColor: state.isFocused ? "#00549E" : error && touched ? "#FF1418" : "#7F7F7F",
-      boxShadow: state.isFocused ? "0 0 0 .2rem rgba(0,123,255,.25)" : null,
-      "&:hover": {
-        borderColor: state.isFocused
-          ? "#00549E"
-          : error
-          ? "#FF1418"
-          : "#7F7F7F",
-      },
-      minHeight: "42px",
-    }),
+    control: (base, state) => {
+      const errorColor = error && touched ? "#FF1418" : "#7F7F7F";
+      const borderColor = state.isFocused ? "#00549E" :errorColor;
+      return {
+        ...base,
+        borderColor,
+        boxShadow: state.isFocused ? "0 0 0 .2rem rgba(0,123,255,.25)" : null,
+        "&:hover": { borderColor },
+        minHeight: "42px",
+      };
+    },
+    
     menu: (base) => ({
       ...base,
       marginTop: ".25rem",
@@ -83,7 +82,7 @@ const ReactSelect = ({
     isDisabled: option.isDisabled,
   }));
   const selectedOption = formattedOptions.find((opt) => opt.value === value);
-
+ 
   return (
     <div className={wrapperClassName || ""}>
       {label ? ( 
@@ -103,7 +102,7 @@ const ReactSelect = ({
         }
         options={formattedOptions}
         placeholder={placeholder || t('SELECT')}
-        isClearable={selectedOption?.value != ""}
+        isClearable={selectedOption?.value !== ""}
         classNamePrefix="react-select"
         defaultValue={defaultValue}
         className={`react-select-container ${selectedOption ? "has-value" : ""} ${size === 'sm' ? 'react-select-sm' : ''}`}
@@ -122,6 +121,28 @@ const ReactSelect = ({
            {touched && error && <small className="form-text text-danger">{error}</small>}
     </div>
   );
+};
+
+
+ReactSelect.propTypes = {
+  options: PropTypes.array, // options can be an array, and it’s optional
+  value: PropTypes.any, // value can be any type (you can change it to a more specific type if needed)
+  onChange: PropTypes.func, // onChange should be a function
+  wrapperClassName: PropTypes.string, // wrapperClassName is a string
+  size: PropTypes.string, // size can be a string (you can define more specific sizes if needed)
+  name: PropTypes.string, // name should be a string
+  label: PropTypes.string, // label should be a string
+  placeholder: PropTypes.string, // placeholder should be a string
+  error: PropTypes.string, // error should be a string
+  touched: PropTypes.bool, // touched should be a boolean
+  defaultValue: PropTypes.any, // defaultValue can be any type (null is a common default)
+  disabled: PropTypes.bool, // disabled should be a boolean
+};
+
+ReactSelect.defaultProps = {
+  options: [], // Default to an empty array
+  wrapperClassName: "mb-3 pb-1", // Default wrapper class
+  defaultValue: null, // Default value is null
 };
 
 export default ReactSelect;

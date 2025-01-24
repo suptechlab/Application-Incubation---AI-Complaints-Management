@@ -24,8 +24,7 @@ export default function Otp() {
     // HANDLE OTP SUBMIT
     const onSubmit = async (values, actions) => {
         values.otpToken = otpToken;
-        await OtpVerify({ ...values });
-        actions.setSubmitting(false);
+        await OtpVerify({ ...values },actions);
     };
 
     // handle resend otp 
@@ -46,6 +45,7 @@ export default function Otp() {
             navigate('/dashboard');
         }
     }, [])
+
 
     return (
         <React.Fragment>
@@ -93,6 +93,8 @@ export default function Otp() {
                                     }) => (
                                         <FormikForm>
                                             <Form.Group className="mb-4 pb-2">
+
+                                                {console.log(isSubmitting)}
                                                 <OtpInput
                                                     value={values.otpCode}
                                                     numInputs={6}
@@ -125,7 +127,8 @@ export default function Otp() {
                                                     className="custom-min-width-85 text-nowrap"
                                                     variant="warning"
                                                     type="submit"
-                                                    disabled={isSubmitting}
+                                                    // disabled={true}
+                                                    disabled={isSubmitting === true ? true : false}
                                                     onClick={handleSubmit}
                                                 >
                                                     {isSubmitting ? (

@@ -82,7 +82,7 @@ export default function TicketsList() {
 
     const [clearTableSelection, setClearTableSelection] = useState(false)
 
-    const [claimStatsData, setClaimsStatsData] = useState([])
+    const [claimStatsData, setClaimStatsData] = useState([])
 
 
 
@@ -212,15 +212,6 @@ export default function TicketsList() {
                             setTicketIdsArr(allSelectedIds);
                             setClearTableSelection(false);
                         }}
-
-                    // onChange={(e) => {
-                    //     table.toggleAllRowsSelected(e.target.checked);
-                    //     const allSelectedIds = e.target.checked
-                    //         ? table.getRowModel().rows.map((row) => row.original.id)
-                    //         : [];
-                    //     setTicketIdsArr(allSelectedIds);
-                    //     setClearTableSelection(false);
-                    // }}
                     />
                 ),
                 cell: ({ row }) => (
@@ -270,18 +261,6 @@ export default function TicketsList() {
                             {"#" + row?.original?.ticketId}
                         </Link>
                         {row?.original?.haveClaimTicketDocuments && <MdAttachFile size={16} />}
-
-
-                        {/* <AppTooltip title="Attachments">
-                           <Button
-                               variant="link"
-                               className="p-0 border-0 link-dark"
-                               onClick={handleAttachmentsClick}
-                               aria-label="Attachments"
-                           >
-                               <MdAttachFile size={16} />
-                           </Button>                   
-                           </AppTooltip> */}
                     </Stack>
                 ),
             },
@@ -427,10 +406,12 @@ export default function TicketsList() {
         }
     }
     useEffect(() => {
-        setPagination({
-            pageIndex: 0,
-            pageSize: 10,
-        });
+        if (Object.values(filter).some(value => value)) {
+            setPagination({
+                pageIndex: 0,
+                pageSize: 10,
+            });
+        }
     }, [filter]);
 
     //Add New Click Hanlder
@@ -478,7 +459,7 @@ export default function TicketsList() {
     // GET CLAIM TYPE DROPDOWN LIST
     const getClaimTypeStatsData = () => {
         ticketOverviewAPI().then(response => {
-            setClaimsStatsData(response?.data)
+            setClaimStatsData(response?.data)
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);

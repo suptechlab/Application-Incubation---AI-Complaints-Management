@@ -1,24 +1,22 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { svgIconClasses } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Card, Col, Row, Stack } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import FormInputBox from '../../../../components/FormInput';
-import ReactSelect from '../../../../components/ReactSelect';
-import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.validation';
+import { FiInfo } from "react-icons/fi";
+import { MdClose, MdRefresh } from 'react-icons/md';
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormCheckbox from "../../../../components/formCheckbox";
-import { Link } from "react-router-dom";
-import { claimSubTypeDropdownList, claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
+import FormInputBox from '../../../../components/FormInput';
 import FormOtpInputBox from '../../../../components/FormOtpInputBox';
-import { svgIconClasses } from '@mui/material';
-import { MdClose, MdRefresh } from 'react-icons/md';
+import ReactSelect from '../../../../components/ReactSelect';
 import AppTooltip from '../../../../components/tooltip';
-import { FiInfo } from "react-icons/fi";
 import { requestOTPApi, verifyOTPApi } from '../../../../services/claimcreate.services';
-import toast from 'react-hot-toast';
+import { claimSubTypeDropdownList, claimTypesDropdownList } from '../../../../services/claimSubType.service';
+import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.validation';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading, userEmail }) => {
 
-    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
     const { t } = useTranslation();
     const [claimTypes, setClaimTypes] = useState([]);
     const [claimSubTypes, setClaimSubTypes] = useState([]);
@@ -42,15 +40,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         otpCode: ''
     };
 
-    //Handle File Change
-    // const handleFileChange = (event) => {
-    //     const file = event.currentTarget.files[0];
-    //     if (file) {
-    //         setFileName(file.name);
-    //     } else {
-    //         setFileName("");
-    //     }
-    // };
     //Handle File Change
     const handleFileChange = (event) => {
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 5 MB in bytes
@@ -230,7 +219,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                 formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
                                                 if (option?.target?.value !== formikProps?.values?.claimTypeId) {
                                                     formikProps.setFieldValue("claimSubTypeId", "");
-                                                    // getClaimSubTypes(option?.target?.value);
                                                 }
                                             }}
                                             name="claimTypeId"

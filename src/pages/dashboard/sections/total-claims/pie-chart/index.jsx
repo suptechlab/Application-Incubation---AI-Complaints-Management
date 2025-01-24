@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Card, Col, Ratio, Row } from 'react-bootstrap';
+import React from 'react';
+import { Card, Col, Row } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 // import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
