@@ -157,5 +157,6 @@ export const englishLang = {
   "FINGERPRINT_NOT_VERIFIED" : "Fingerprint not verified.",
   "VERIFYING":"Verifying",
   "UPLOAD_ATTACHMENTS":"Upload attachments",
-  "TYPE_A_MESSAGE":"Type a message"
+  "TYPE_A_MESSAGE":"Type a message",
+  "NONE":"None"
 }

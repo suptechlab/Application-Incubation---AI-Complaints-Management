@@ -47,7 +47,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                     label={t("PRIORITY_CARE_GROUP")}
                                     error={formikProps.errors.priorityCareGroup }
                                     options={[
-                                        { label: t("SELECT"), value: "" },
+                                        { label: t("NONE"), value: "" },
                                         ...priority_care_group.map((group) => ({
                                             label: group.label, // Ensure group has a `label` property
                                             value: group.value, // Ensure group has a `value` property

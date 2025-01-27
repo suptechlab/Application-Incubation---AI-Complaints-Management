@@ -158,5 +158,6 @@ export const spanishLang = {
   "FINGERPRINT_NOT_VERIFIED": "código de huella dactilar erróneo.",
   "VERIFYING": "Verificando",
   "UPLOAD_ATTACHMENTS": "Subir archivos adjuntos",
-  "TYPE_A_MESSAGE":"Escribe un mensaje"
+  "TYPE_A_MESSAGE": "Escribe un mensaje",
+  "NONE": "None"
 }

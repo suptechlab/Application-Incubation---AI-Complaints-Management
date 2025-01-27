@@ -71,8 +71,8 @@ export const BasicInfoFormSchema = yup.object({
 
 export const OtherInfoFormSchema = yup.object({
   priorityCareGroup: yup
-    .string()
-    .required(msg.priorityCareGroupRequired),
+    .string().nullable(),
+    // .required(msg.priorityCareGroupRequired),
   customerType: yup
     .string()
     .required(msg.customerTypeRequired),
