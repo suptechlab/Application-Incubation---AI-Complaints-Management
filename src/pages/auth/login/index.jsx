@@ -45,7 +45,6 @@ const LoginModal = ({ handleSignUpClick, handleLoginSucccesSubmit }) => {
             setOTPTokenExpirationTime(result?.payload?.otpTokenExpirationTime)
             actions.setSubmitting(false);
             setIsloginFormSubmitted(true);
-            // toast.success(result?.message ?? "OTP Sent succesfully")
         } else {
             console.error('OTP Send error:', result.error.message);
             actions.setSubmitting(false);

@@ -22,7 +22,7 @@ const HelpDeskBot = ({ handleShow, handleClose }) => {
                 toast.success(data?.payload?.message ?? "")
             }
         }).catch((err) => {
-            console.log(err);
+            console.error("Error in privacy form submit :-" , err?.message);
         }).finally(()=>{
             actions.setSubmitting(false);
         });

@@ -12,8 +12,7 @@ export const createAxiosInstance = (baseURL) => {
   axiosInstance.interceptors.request.use(
     (config) => {
       // Static or dynamically get your token as needed
-      // const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZXBzLXVzZXJAeW9wbWFpbC5jb20iLCJleHAiOjE3MzQwOTA3MzksImF1dGgiOiJST0xFX1VTRVIiLCJpYXQiOjE3MzE0OTg3Mzl9.EEIaYdyKI3lKwLDnpgBp4yK_d1NifU4vJUp0xbMYQMf-rTXAEuaiH8IGlKoAc1GI_YFfgDoVyjpvaYzHdzPMXg"; // Replace this with your token logic
-
+     
       const token = getLocalStorage("id_token")
       
       const userLanguage = 'es'; // Or dynamically determine language preference
@@ -39,6 +38,7 @@ export const createAxiosInstance = (baseURL) => {
     },
     (error) => {
       // Handle request error
+      console.log(error)
       toast.error('Error: Request setup failed');
       return Promise.reject(error); // Reject the promise
     }
@@ -65,7 +65,6 @@ export const createAxiosInstance = (baseURL) => {
       } else if (error.request) {
         toast.error('Error: No response received');
       } else {
-        console.log(error)
         toast.error('Error: Request setup failed');
       }
       return Promise.reject(error); // Reject the promise with the error

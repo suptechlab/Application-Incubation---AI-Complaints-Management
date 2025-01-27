@@ -42,7 +42,6 @@ const ProfileModal = ({ handleShow, handleClose }) => {
         const fileLen = e.target.files.length;
         const file = e.target.files[0];
         if (!file) {
-            console.log("##### handleFileChange #####", file);
             return;
         }
         const sizeofFile = file.size / 1024;

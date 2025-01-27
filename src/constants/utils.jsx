@@ -162,7 +162,6 @@ export const getIconForFile = (originalTitle) => {
 // DOWNLOAD FILE
 export function downloadFile(response, fileName) {
 
-  console.log({fileName : fileName})
 
   return new Promise((resolve, reject) => {
     try {
@@ -185,8 +184,6 @@ export function downloadFile(response, fileName) {
       window.URL.revokeObjectURL(blobUrl);
       document.body.removeChild(tempLink);
 
-      // Success: Resolve the promise and display success message
-      // toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" });
       resolve();
     } catch (error) {
       // Handle any errors during the download process
