@@ -121,7 +121,6 @@ const SLAComplianceReport = () => {
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
-      // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
       if (error?.response?.data?.errorDescription) {
         toast.error(error?.response?.data?.errorDescription);

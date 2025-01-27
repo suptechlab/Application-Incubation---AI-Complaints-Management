@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import ReactSelect from '../../../../components/ReactSelect';
+import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import { MasterDataContext } from '../../../../contexts/masters.context';
 import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent, ticketStatusChange } from '../../../../services/ticketmanagement.service';
 import { calculateDaysDifference } from '../../../../utils/commonutils';
@@ -13,10 +14,8 @@ import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
-import { AuthenticationContext } from '../../../../contexts/authentication.context';
-import Loader from '../../../../components/Loader';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState, loading, setLoading }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState,  setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -76,11 +75,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
         setSelectedStatus(ticketData?.status)
     }, [ticketData?.status])
 
-    // Handle Add Attachments Click
-    const handleAddAttachmentsClick = () => {
-        setAddAttachmentsModalShow(true)
-    }
-
+   
     //Handle Ticket Status Change
     const handleTicketStatusChange = async (status) => {
         // setLoading(true);
@@ -319,17 +314,25 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
 
 TicketViewHeader.propTypes = {
     title: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        label: PropTypes.string.isRequired,
-        onClick: PropTypes.func,
-        to: PropTypes.string, // If present, renders a Link
-        variant: PropTypes.string, // Only for Button
-        disabled: PropTypes.boolean, // Only for Button
-    })),
+    ticketData: PropTypes.object, // Assuming ticketData is an object, adjust based on the actual structure
+    setIsGetActivityLogs: PropTypes.func.isRequired,
+    getTicketData: PropTypes.func.isRequired,
+    permissionState: PropTypes.object, // Adjust based on the actual structure of permissionState
+    setLoading: PropTypes.func.isRequired,
+    // actions: PropTypes.arrayOf(PropTypes.shape({
+    //     label: PropTypes.string.isRequired,
+    //     onClick: PropTypes.func,
+    //     to: PropTypes.string, // If present, renders a Link
+    //     variant: PropTypes.string, // Only for Button
+    //     disabled: PropTypes.bool, // Only for Button
+    // })),
 };
 
 TicketViewHeader.defaultProps = {
-    actions: [],
+    // actions: [],
+    ticketData: null, // Set default value for ticketData if needed
+    permissionState: null, // Set default value for permissionState if needed
+    // setIsGetActivityLogs:null,
 };
 
 export default TicketViewHeader;

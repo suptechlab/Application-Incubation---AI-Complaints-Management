@@ -44,7 +44,7 @@ export default function TicketsList() {
 
     const { t } = useTranslation();
 
-    const [loading, setLoading] = useState(false);
+    const [loading] = useState(false);
 
     //Add New Click Hanlder
     const addNewClickHanlder = () => {

@@ -24,7 +24,7 @@ const ListFilters = ({ filter, setFilter, }) => {
 
         // Update filter state only if both dates are selected
         if (newStartDate && newEndDate) {
-            setFilter({
+            setFilter({...filter,
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
                 endDate: moment(newEndDate).format("YYYY-MM-DD")
             });
