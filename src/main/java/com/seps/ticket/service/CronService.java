@@ -310,7 +310,7 @@ public class CronService {
             Map<String, String> auditMessageMap = new HashMap<>();
             Arrays.stream(LanguageEnum.values()).forEach(language -> {
                 String messageAudit = messageSource.getMessage("audit.log.ticket.closed.by.system",
-                    new Object[]{Constants.SYSTEM, String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(ClosedStatusEnum.CLOSE_WITH_SLA_BREACHED, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                    new Object[]{Constants.SYSTEM, String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(ClosedStatusEnum.CLOSE_WITH_EXPIRED, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
                 auditMessageMap.put(language.getCode(), messageAudit);
             });
 
