@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { MdSchedule } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import ReactSelect from '../../../../components/ReactSelect';
+import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import { MasterDataContext } from '../../../../contexts/masters.context';
 import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent, ticketStatusChange } from '../../../../services/ticketmanagement.service';
 import { calculateDaysDifference } from '../../../../utils/commonutils';
@@ -13,10 +14,8 @@ import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
-import { AuthenticationContext } from '../../../../contexts/authentication.context';
-import Loader from '../../../../components/Loader';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTicketData, permissionState }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState,  setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -31,7 +30,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
     const [closeTicketModalShow, setCloseTicketModalShow] = useState(false)
     const [rejectTicketModalShow, setRejectTicketModalShow] = useState(false)
 
-    const [loading, setLoading] = useState(false)
+    // const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
     const handleSelect = (status) => {
         const actions = {
@@ -48,7 +47,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
     const statusOptions = [
-        ...(permissionState?.closePermission === true ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),    
+        ...((permissionState?.closePermission === true && ticketData?.status==='ASSIGNED') ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
         ...(permissionState?.rejectPermission === true ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
         { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
         { label: t('PENDING'), value: 'PENDING' }];
@@ -76,23 +75,21 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
         setSelectedStatus(ticketData?.status)
     }, [ticketData?.status])
 
-    // Handle Add Attachments Click
-    const handleAddAttachmentsClick = () => {
-        setAddAttachmentsModalShow(true)
-    }
-
+   
     //Handle Ticket Status Change
     const handleTicketStatusChange = async (status) => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const response = await ticketStatusChange(ticketData?.id, status);
             toast.success(response.data.message);
-            await getTicketData();
+            setIsGetActivityLogs((prev) => !prev)
+            setSelectedStatus(status)
+            // await getTicketData();
         } catch (error) {
             const errorMessage = error?.response?.data?.errorDescription || "An unexpected error occurred.";
             toast.error(errorMessage);
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
     };
 
@@ -109,6 +106,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 agentTicketToSEPSagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setSelectedAgent(null)
+                    getTicketData()
                 }).catch((error) => {
                     if (error?.response?.data?.errorDescription) {
                         toast.error(error?.response?.data?.errorDescription);
@@ -133,7 +131,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 })
             }
         } else {
-            toast.error("You are not allowed to assign tickets.")
+            toast.error(t('YOU_ARE_NOT_ALLOWED_TO_ASSIGN_TICKETS'))
         }
     }
     // GET AGENT DROPDOWN LISTING
@@ -173,7 +171,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
 
     return (
         <React.Fragment>
-            <Loader isLoading={loading} />
+            {/* <Loader isLoading={loading} /> */}
             <div className="pb-3">
                 <Stack
                     direction="horizontal"
@@ -181,6 +179,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                     className="flex-wrap custom-min-height-38"
                 >
                     <h1 className="fw-semibold fs-4 mb-0 me-auto d-inline-flex align-items-center gap-2">
+
                         {title ?? ""}
                         {isSlaBreachDateValid && (
                             daysDifference > 2
@@ -205,17 +204,8 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                         >
                             {t("BACK")}
                         </Link>
-                        {/* <Button
-                            type="submit"
-                            variant='outline-dark'
-                        >
-                            Assign To
-                        </Button> */}
-
-
                         {
-
-                            permissionState?.assignPermission === true && 
+                            permissionState?.assignPermission === true &&
                             ((currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
                                 ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') && ticketData?.instanceType === 'SECOND_INSTANCE') &&
                                 (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
@@ -284,25 +274,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                                     <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
                                 </Button>
                         }
-                        {/* <Dropdown>
-                            <Dropdown.Toggle
-                                variant="link"
-                                id="ticket-detail-filter"
-                                className="link-dark p-1 ms-n2 hide-dropdown-arrow"
-                            >
-                                <AppTooltip title="Filters" placement="top">
-                                    <span><MdMoreVert size={24} /></span>
-                                </AppTooltip>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
-                                <Dropdown.Item className="small" onClick={handleAddAttachmentsClick}>
-                                    Claim Filled By
-                                </Dropdown.Item>
-                                <Dropdown.Item className="small" as={Link} to="">
-                                    SLA
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown> */}
+                      
                     </Stack>
                 </Stack>
             </div>
@@ -325,7 +297,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 modal={closeTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
-                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                setIsGetActivityLogs={setIsGetActivityLogs}
                 getTicketData={getTicketData}
             />
             <RejectTicketModal
@@ -333,7 +305,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
                 modal={rejectTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
-                setIsGetAcitivityLogs={setIsGetAcitivityLogs}
+                setIsGetActivityLogs={setIsGetActivityLogs}
                 getTicketData={getTicketData}
             />
         </React.Fragment>
@@ -342,17 +314,25 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetAcitivityLogs, getTi
 
 TicketViewHeader.propTypes = {
     title: PropTypes.string.isRequired,
-    actions: PropTypes.arrayOf(PropTypes.shape({
-        label: PropTypes.string.isRequired,
-        onClick: PropTypes.func,
-        to: PropTypes.string, // If present, renders a Link
-        variant: PropTypes.string, // Only for Button
-        disabled: PropTypes.boolean, // Only for Button
-    })),
+    ticketData: PropTypes.object, // Assuming ticketData is an object, adjust based on the actual structure
+    setIsGetActivityLogs: PropTypes.func.isRequired,
+    getTicketData: PropTypes.func.isRequired,
+    permissionState: PropTypes.object, // Adjust based on the actual structure of permissionState
+    setLoading: PropTypes.func.isRequired,
+    // actions: PropTypes.arrayOf(PropTypes.shape({
+    //     label: PropTypes.string.isRequired,
+    //     onClick: PropTypes.func,
+    //     to: PropTypes.string, // If present, renders a Link
+    //     variant: PropTypes.string, // Only for Button
+    //     disabled: PropTypes.bool, // Only for Button
+    // })),
 };
 
 TicketViewHeader.defaultProps = {
-    actions: [],
+    // actions: [],
+    ticketData: null, // Set default value for ticketData if needed
+    permissionState: null, // Set default value for permissionState if needed
+    // setIsGetActivityLogs:null,
 };
 
 export default TicketViewHeader;

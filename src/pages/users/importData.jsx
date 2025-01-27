@@ -2,7 +2,7 @@ import { Formik, Form as FormikForm } from "formik";
 import React, { useState } from "react";
 import { Button, Card, Col, Row, Stack } from "react-bootstrap";
 import { MdOutlineSimCardDownload } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
@@ -23,6 +23,8 @@ const ImportSEPSUser = () => {
   });
 
   const [fileName, setFileName] = useState("");
+
+  const navigate = useNavigate()
 
   //Handle File Change
   const handleFileChange = (event,setFieldValue) => {
@@ -52,22 +54,27 @@ const ImportSEPSUser = () => {
     actions.setSubmitting(true)
     handleImportSepsUsersApi(formData)
       .then((response) => {
-        if (response?.status === 200) {
+        if (response?.data?.status === 200) {
+          navigate('/users')
           toast.success(response?.data?.message);
-        } else if(response?.status === 400) {
-
-          const errorData = response?.data?.data?.join('\n')
-          setInitialValues({browseFileerrorData:'',description:errorData})
-        }else{
+        } else {
           toast.error(response?.data?.message || t("Unexpected error occurred during file upload."));
         }
+      
       })
       .catch((error) => {
-        if (error?.response?.data?.errorDescription) {
-          toast.error(error.response.data.errorDescription);
+        if (error?.response?.status === 400) {
+
+          const errorData = error?.response?.data?.join('\n')
+          setInitialValues({ browseFile: '', description: errorData })
+          setFileName("");
+        }
+        else if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
         } else {
           toast.error(error?.message || t("STATUS UPDATE ERROR"));
         }
+    
       })
       .finally(() => {
         actions.setSubmitting(false)
@@ -177,6 +184,7 @@ const ImportSEPSUser = () => {
                         onChange={handleChange}
                         touched={touched?.description}
                         rows={7}
+                        disabled={true}
                         type="text"
                         value={values?.description || ""}
                       />

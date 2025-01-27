@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -11,25 +11,21 @@ import CommonDataTable from "../../components/CommonDataTable";
 import DataGridActions from "../../components/DataGridActions";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import { handleGetAuditLogs } from "../../services/reports.services";
-import { downloadClaimTypes } from "../../services/claimType.service";
-import { getModulePermissions, isAdminUser } from "../../utils/authorisedmodule";
+import { downloadAuditReportApi, handleGetAuditLogs } from "../../services/reports.services";
 import SearchForm from "./SearchForm";
 
 const AuditLogs = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const params = qs.parse(location.search, { ignoreQueryPrefix: true });
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading,setLoading] = useState(false);
   const [isDownloading, setDownloading] = useState(false);
   const { t } = useTranslation();
 
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
-  const [modal, setModal] = useState(false);
-  const [editModal, setEditModal] = useState({ row: {}, open: false });
   const [sorting, setSorting] = useState([
     {
       id: "createdAt",
@@ -40,75 +36,54 @@ const AuditLogs = () => {
     search: "",
   });
 
-  const toggle = () => setModal(!modal);
-
-  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
-
-  const permission = useRef({
-    addModule: false,
-    editModule: false,
-    deleteModule: false,
-  });
-
-  useEffect(() => {
-    isAdminUser()
-      .then((response) => {
-        if (response) {
-          permission.current.addModule = true;
-          permission.current.editModule = true;
-          permission.current.deleteModule = true;
-        } else {
-          getModulePermissions("Master management")
-            .then((response) => {
-              if (response.includes("CLAIM_TYPE_CREATE")) {
-                permission.current.addModule = true;
-              }
-              if (response.includes("CLAIM_TYPE_UPDATE")) {
-                permission.current.editModule = true;
-              }
-              if (response.includes("CLAIM_TYPE_DELETE")) {
-                permission.current.deleteModule = true;
-              }
-            })
-            .catch((error) => {
-              console.error("Error fetching permissions:", error);
+    const dataQuery = useQuery({
+      queryKey: ["data", pagination, sorting, filter],
+      queryFn: async () => {
+        // Set loading state to true before the request starts
+        setLoading(true);
+  
+        try {
+          const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
+          Object.keys(filterObj).forEach(key => filterObj[key] === "" && delete filterObj[key]);
+  
+          // Make the API request based on sorting
+          let response;
+          if (sorting.length === 0) {
+            response = await handleGetAuditLogs({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              ...filterObj,
             });
+          } else {
+            response = await handleGetAuditLogs({
+              page: pagination.pageIndex,
+              size: pagination.pageSize,
+              sort: sorting
+                .map(
+                  (sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`
+                )
+                .join(","),
+              ...filterObj,
+            });
+          }
+  
+          // Return the API response data
+          return response;
+        } catch (error) {
+          console.error("Error fetching data", error);
+          // Optionally, handle errors here
+        } finally {
+          // Set loading state to false when the request finishes (whether successful or not)
+          setLoading(false);
         }
-      })
-      .catch((error) => {
-        console.error("Error get during to fetch User Type", error);
-      });
-  }, []);
-
-  // DATA QUERY
-  const dataQuery = useQuery({
-    queryKey: ["data", pagination, sorting, filter],
-    queryFn: () => {
-      const filterObj = qs.parse(qs.stringify(filter, { skipNulls: true }));
-      Object.keys(filterObj).forEach(
-        (key) => filterObj[key] === "" && delete filterObj[key]
-      );
-
-      if (sorting.length === 0) {
-        return handleGetAuditLogs({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          ...filterObj,
-        });
-      } else {
-        return handleGetAuditLogs({
-          page: pagination.pageIndex,
-          size: pagination.pageSize,
-          sort: sorting
-            .map((sort) => `${sort.id},${sort.desc ? "desc" : "asc"}`)
-            .join(","),
-          ...filterObj,
-        });
-      }
-    },
-    staleTime: 0, // Data is always stale, so it refetches
-    cacheTime: 0, // Cache expires immediately
-  });
+      },
+      staleTime: 0, // Data is always stale, so it refetches
+      cacheTime: 0, // Cache expires immediately
+      refetchOnWindowFocus: false, // Disable refetching on window focus
+      refetchOnMount: false, // Prevent refetching on component remount
+      retry: 0, //Disable retry on failure
+    });
+  
 
   // DOWNLOAD AUDIT LOGS LIST
   const handleDownload = () => {
@@ -117,7 +92,7 @@ const AuditLogs = () => {
       id: "downloading",
       isLoading: isDownloading,
     });
-    downloadClaimTypes({ search: filter?.search ?? "" })
+    downloadAuditReportApi({...filter , search: filter?.search ?? "" })
       .then((response) => {
         if (response?.data) {
           const blob = new Blob([response.data], {
@@ -125,11 +100,11 @@ const AuditLogs = () => {
           });
           const blobUrl = window.URL.createObjectURL(blob);
 
-          toast.success(t("CSV DOWNLOADED"), { id: "downloading" });
+          toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" });
 
           const tempLink = document.createElement("a");
           tempLink.href = blobUrl;
-          tempLink.setAttribute("download", "claim-types.xlsx");
+          tempLink.setAttribute("download", "audit_logs.xlsx");
 
           // Append the link to the document body before clicking it
           document.body.appendChild(tempLink);
@@ -144,7 +119,6 @@ const AuditLogs = () => {
         } else {
           throw new Error(t("EMPTY RESPONSE"));
         }
-        // toast.success(t("STATUS UPDATED"));
       })
       .catch((error) => {
         if (error?.response?.data?.errorDescription) {
@@ -155,8 +129,6 @@ const AuditLogs = () => {
         toast.dismiss("downloading");
       })
       .finally(() => {
-        // Ensure the loading toast is dismissed
-        // toast.dismiss("downloading");
         setDownloading(false);
       });
   };
@@ -228,10 +200,12 @@ const AuditLogs = () => {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
@@ -248,10 +222,10 @@ const AuditLogs = () => {
         title={t("AUDIT TRAIL REPORT")}
         actions={[
           {
-            label: t("EXPORT TO CSV"),
+            label: t("EXPORT TO EXCEL"),
             onClick: handleDownload,
             variant: "warning",
-            disabled: true,
+            // disabled: true,
           },
         ]}
       />

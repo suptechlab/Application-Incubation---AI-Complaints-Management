@@ -1,23 +1,16 @@
 import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
-import { Dropdown, Stack } from "react-bootstrap";
-import toast from "react-hot-toast";
+import { Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import { MdOutlineFilterAlt } from "react-icons/md";
-import { Link } from "react-router-dom";
 import CustomDateRangePicker from "../../../../../components/CustomDateRangePicker";
 import FormInput from "../../../../../components/FormInput";
 import ReactSelect from "../../../../../components/ReactSelect";
-import AppTooltip from "../../../../../components/tooltip";
-import { claimTypesDropdownList } from "../../../../../services/claimSubType.service";
-import { agentListingApi, convertToLabelValue } from "../../../../../services/ticketmanagement.service";
 import { MasterDataContext } from "../../../../../contexts/masters.context";
+import { convertToLabelValue } from "../../../../../services/ticketmanagement.service";
 
-const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySla, clearTableSelection }) => {
+const DashboardListFilters = ({ filter, setFilter }) => {
     const { t } = useTranslation();
-    const [claimTypes, setClaimTypes] = useState([])
-    const [agentList, setAgentListing] = useState([])
-    const [selectedAgent, setSelectedAgent] = useState(null)
+ 
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
     const [statusDropdownData, setStatusDropdownData] = useState([])
@@ -35,49 +28,7 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
         }
     };
 
-    // GET CLAIM TYPE DROPDOWN LIST
-    const getClaimTypeDropdownList = () => {
-        claimTypesDropdownList().then(response => {
-            if (response?.data && response?.data?.length > 0) {
-                const dropdownData = response?.data.map(item => ({
-                    value: item.id,
-                    label: item.name
-                }));
-                setClaimTypes(dropdownData)
-            }
-        }).catch((error) => {
-            if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription);
-            } else {
-                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
-            }
-        })
-    }
 
-    // GET AGENT DROPDOWN LISTING
-    const getAgentDropdownListing = () => {
-        agentListingApi().then(response => {
-            if (response?.data && response?.data?.length > 0) {
-                const dropdownData = response?.data.map(item => ({
-                    value: item.id,
-                    label: item.name
-                }));
-                setAgentListing(dropdownData)
-            }
-        }).catch((error) => {
-            if (error?.response?.data?.errorDescription) {
-                toast.error(error?.response?.data?.errorDescription);
-            } else {
-                toast.error(error?.message ?? "FAILED TO FETCH CLAIM TYPE DATA");
-            }
-        })
-    }
-
-    useEffect(() => {
-        getClaimTypeDropdownList()
-        getAgentDropdownListing()
-
-    }, [])
 
     useEffect(()=>{
         if(masterData?.claimTicketStatus){
@@ -87,13 +38,7 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
     },[masterData])
 
 
-    useEffect(() => {
-
-        if (clearTableSelection === true) {
-            setSelectedAgent('')
-        }
-    }, [clearTableSelection])
-
+  
 
     return (
         <div className="theme-card-header header-search mb-3">
@@ -155,27 +100,6 @@ const DashboardListFilters = ({ filter, setFilter, filterByClaimFill, filterBySl
                             size="sm"
                         />
                     </div>
-
-                    {/* Dropdown FILTER */}
-                    {/* <Dropdown>
-                        <Dropdown.Toggle
-                            variant="link"
-                            id="filter-dropdown"
-                            className="link-dark p-1 ms-n1 hide-dropdown-arrow"
-                        >
-                            <AppTooltip title="Filters" placement="top">
-                                <span><MdOutlineFilterAlt size={20} /></span>
-                            </AppTooltip>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu className="shadow-lg rounded-3 border-0 mt-1">
-                            <Dropdown.Item className="small" as={Link} onClick={filterByClaimFill}>
-                                Claim Filled By
-                            </Dropdown.Item>
-                            <Dropdown.Item className="small" as={Link} onClick={filterBySla}>
-                                SLA
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown> */}
                 </Stack>
             </Stack>
         </div>

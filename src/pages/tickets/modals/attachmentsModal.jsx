@@ -15,22 +15,7 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
 
     const { t } = useTranslation()
 
-    // useEffect(() => {
-    //     // setAttachmentModalData(ticketData?.claimTicketDocuments ?? [])
-    //     setAttachmentModalData(() => {
-    //         if (currentInstance === "FIRST_INSTANCE") {
-    //             return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "FIRST_INSTANCE") ?? [];
-    //         } else if (currentInstance === "SECOND_INSTANCE") {
-    //             return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "SECOND_INSTANCE") ?? [];
-    //         }
-    //         else if (currentInstance === "COMPLAINT") {
-    //             return ticketData?.claimTicketDocuments?.filter(doc => doc.instanceType === "COMPLAINT") ?? [];
-    //         } else {
-    //             return []; // Return empty if no valid instanceType
-    //         }
-    //     });
-    // }, [ticketData?.claimTicketDocuments, currentInstance])
-
+    
     useEffect(() => {
         const getDocuments = () => {
             switch (attachmentPosition) {
@@ -39,7 +24,6 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
                 case 'MIDDLE':
                     return ticketData?.previousTicket?.claimTicketDocuments ?? [];
                 case 'BOTTOM':
-                    console.log(ticketData?.previousTicket?.previousTicket?.claimTicketDocuments)
                     return ticketData?.previousTicket?.previousTicket?.claimTicketDocuments ?? [];
                 default:
                     return [];
@@ -65,11 +49,9 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
             if (response) {
                 downloadFile(response, attachmentData, attachmentData?.originalTitle)
                     .then(() => {
-                        console.log(response)
                         toast.success(t("ATTACHMENT DOWNLOADED"), { id: "downloading" })
                     })
                     .catch((error) => {
-                        console.log(error)
                         // Handle any error that occurred during the download
                         toast.error(error?.message ?? t("DOWNLOAD_ERROR"), { id: "downloading" });
                     }).finally(() => {
@@ -87,8 +69,6 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
             }
             toast.dismiss("downloading");
         }).finally(() => {
-            // Ensure the loading toast is dismissed
-            // toast.dismiss("downloading");
             setDownloading(false)
         });
     }
@@ -111,7 +91,6 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
                     <Modal.Title className="fw-semibold mw-1 flex-fill">
                         <Stack direction="horizontal" gap={2} className="justify-content-between pe-lg-2">
                             <span>{t("ATTACHMENTS")}</span>
-                            {/* <Link target="_blank" to="/" className="text-nowrap text-decoration-none link-primary fs-14"><span className="me-2"><MdDownload size={20} /></span>Download All</Link> */}
                         </Stack>
                     </Modal.Title>
                 </Modal.Header>
@@ -140,7 +119,7 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
 
                                     </AppTooltip>}
                             </ListGroup.Item>
-                        )) : <p>There is no attachment included.</p>}
+                        )) : <p>{t("NO_ATTACHMENT")}.</p>}
                     </ListGroup>
                 </Modal.Body>
             </Modal>

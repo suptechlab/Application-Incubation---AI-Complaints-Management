@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Card, Col, Row, Stack, Table } from "react-bootstrap";
+import { Card, Col, Row, Stack } from "react-bootstrap";
 import moment from "moment";
 import { getAuditLogsById } from "../../services/reports.services";
 import PageHeader from "../../components/PageHeader";
@@ -68,7 +68,6 @@ const ViewAuditTrail = () => {
               />
             </Col>
           </Row>
-
           <div className="theme-from-footer mt-auto border-top px-3 mx-n3 pt-3">
             <Stack
               direction="horizontal"

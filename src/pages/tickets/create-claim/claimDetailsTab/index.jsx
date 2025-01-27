@@ -1,24 +1,22 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { svgIconClasses } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, Button, Card, Col, Row, Stack } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import FormInputBox from '../../../../components/FormInput';
-import ReactSelect from '../../../../components/ReactSelect';
-import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.validation';
+import { FiInfo } from "react-icons/fi";
+import { MdClose, MdRefresh } from 'react-icons/md';
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
 import FormCheckbox from "../../../../components/formCheckbox";
-import { Link } from "react-router-dom";
-import { claimSubTypeDropdownList, claimTypesDropdownList, getClaimSubTypeById } from '../../../../services/claimSubType.service';
+import FormInputBox from '../../../../components/FormInput';
 import FormOtpInputBox from '../../../../components/FormOtpInputBox';
-import { svgIconClasses } from '@mui/material';
-import { MdClose, MdRefresh } from 'react-icons/md';
+import ReactSelect from '../../../../components/ReactSelect';
 import AppTooltip from '../../../../components/tooltip';
-import { FiInfo } from "react-icons/fi";
 import { requestOTPApi, verifyOTPApi } from '../../../../services/claimcreate.services';
-import toast from 'react-hot-toast';
+import { claimSubTypeDropdownList, claimTypesDropdownList } from '../../../../services/claimSubType.service';
+import { ClaimDetailsFormSchema } from '../../../../validations/createClaim.validation';
 
 const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading, userEmail }) => {
 
-    const [fileName, setFileName] = useState("Fi_Users_data.xlsx");
     const { t } = useTranslation();
     const [claimTypes, setClaimTypes] = useState([]);
     const [claimSubTypes, setClaimSubTypes] = useState([]);
@@ -42,15 +40,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         otpCode: ''
     };
 
-    //Handle File Change
-    // const handleFileChange = (event) => {
-    //     const file = event.currentTarget.files[0];
-    //     if (file) {
-    //         setFileName(file.name);
-    //     } else {
-    //         setFileName("");
-    //     }
-    // };
     //Handle File Change
     const handleFileChange = (event) => {
         const MAX_FILE_SIZE = 1 * 1024 * 1024; // 5 MB in bytes
@@ -97,7 +86,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
 
         requestOTPApi({ email: userEmail }).then((response) => {
             setOptSendStatus(true);
-            toast.success("OTP has been resent successfully.");
+            toast.success(t("OTP_RESEND_SUCCESS"));
         })
             .catch((error) => {
                 if (error?.response?.data?.errorDescription) {
@@ -110,13 +99,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
             })
 
 
-        // const isOtpSent = await sendOTP(email);
-        // if (isOtpSent) {
-        //   setOptSendStatus(false);
-        //   toast.success("OTP has been resent successfully.");
-        // } else {
-        //   setOptSendStatus(false);
-        // }
     };
 
     // HANDLE SEND OTP BUTTON
@@ -125,7 +107,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         requestOTPApi({ email: userEmail }).then((response) => {
             setOptSendStatus(true);
             setIsOTPFormSubitted(true)
-            toast.success("OTP has been sent successfully.");
+            toast.success(t("OTP_SEND_SUCCESS"));
             // AFTER 5 MINUTES OTP SCREEN WILL BE HIDE
             setTimeout(() => {
                 setOptSendStatus(false);
@@ -151,14 +133,10 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
         }
         verifyOTPApi(formData).then((response) => {
             setIsOTPVerified(true)
-            toast.success("OTP Verified.");
+            toast.success(t("OTP_VERIFIED"));
         })
             .catch((error) => {
-                if (error?.response?.data?.errorDescription) {
-                    toast.error(error?.response?.data?.errorDescription);
-                } else {
-                    toast.error(error?.message);
-                }
+                toast.error(error?.response?.data?.errorDescription ?? error?.description);
             }).finally(() => {
                 setOptSendStatus(false);
             })
@@ -241,7 +219,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                 formikProps.setFieldValue("claimTypeId", option?.target?.value ?? "");
                                                 if (option?.target?.value !== formikProps?.values?.claimTypeId) {
                                                     formikProps.setFieldValue("claimSubTypeId", "");
-                                                    // getClaimSubTypes(option?.target?.value);
                                                 }
                                             }}
                                             name="claimTypeId"
@@ -334,18 +311,6 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                 ))}
                                             </Stack>
                                         )}
-
-                                        {/* {fileName && (
-                                            <div className="pt-1">
-                                                <Link
-                                                    target="_blank"
-                                                    to="/fi-users/import"
-                                                    className="text-decoration-none mw-100 text-break"
-                                                >
-                                                    {fileName}
-                                                </Link>
-                                            </div>
-                                        )} */}
                                     </Col>
                                     <Col xs={12}>
                                         <Stack direction="horizontal" gap={2} className="mb-3 flex-wrap">
@@ -447,7 +412,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                         className="fw-semibold text-decoration-none p-0 border-0"
                                                         onClick={() => {
                                                             formikProps.setFieldValue("otpCode", "");
-                                                            handleResend(formikProps?.values?.email)
+                                                            handleResend()
                                                         }
                                                         }
                                                     >

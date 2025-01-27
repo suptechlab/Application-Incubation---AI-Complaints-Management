@@ -1,8 +1,10 @@
 import React from "react";
-import DatePicker from "react-datepicker";
+import DatePicker,{ registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { MdDateRange, MdOutlineCalendarToday } from "react-icons/md";
 import "./datepicker.scss";
+import { es } from 'date-fns/locale/es';
+registerLocale('es', es)
 
 const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleChange, startDate, endDate, tempDateRange, selectsRange, placeholder, size, disabled,maxDate }) => {
 
@@ -10,6 +12,7 @@ const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleCh
     <div className={wrapperClassName || ''}>
       {label ? <div className='mb-1 fs-14'>{label}</div> : ""}
       <DatePicker
+       locale="es"
         placeholderText={placeholder}
         selected={startDate}
         onChange={handleChange}

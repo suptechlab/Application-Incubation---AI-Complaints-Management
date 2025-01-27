@@ -19,12 +19,10 @@ export default function ChangePassword() {
     delete values.oldPassword;
     await handleChangePassword(values)
       .then((response) => {
-        console.log('response',response)
         toast.success(response.data.message);
         actions.resetForm();
       })
       .catch((error) => {
-        // console.log('error',error.response.data.errorDescription)
         toast.error(error.response.data.errorDescription ?? t('SOMETHING WENT WRONG'))
         actions.resetForm();
       });

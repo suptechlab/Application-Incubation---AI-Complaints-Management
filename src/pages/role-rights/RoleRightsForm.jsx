@@ -77,22 +77,6 @@ const RoleRightsForm = () => {
     });
   }, [userType])
 
-  // const handleCheckboxChange = (e, module, permission, permissionId) => {
-  //     setInitialValues(prevValues => ({
-  //         ...prevValues,
-  //         rights: {
-  //             ...prevValues.rights,
-  //             [module]: {
-  //                 ...prevValues.rights[module],
-  //                 [permission]: {
-  //                     checked: e.target.checked,
-  //                     id: permissionId,
-  //                 },
-  //             },
-  //         },
-  //     }));
-  // };
-
   const handleCheckboxChange = (
     e,
     module,
@@ -233,7 +217,7 @@ const RoleRightsForm = () => {
                             error={errors.name}
                             id="name"
                             key={"name"}
-                            label="Nombre del rol *"
+                            label={t("ROLE_NAME")}
                             name="name"
                             onBlur={handleBlur}
                             onChange={handleChange}
@@ -247,7 +231,7 @@ const RoleRightsForm = () => {
                             error={errors.description}
                             id="description"
                             key={"description"}
-                            label="Descripción"
+                            label={t("DESCRIPTION")}
                             name="description"
                             onBlur={handleBlur}
                             onChange={handleChange}
@@ -260,7 +244,7 @@ const RoleRightsForm = () => {
                       {/* <pre>{JSON.stringify(values.rights,null,2)}</pre> */}
                       <div className="mt-2">
                         <h5 className="fw-semibold border-bottom pb-1 mb-3">
-                          Ceder derechos
+                        {t("USER_RIGHTS")}
                         </h5>
                         {modules.map((module) => (
                           <div key={module.id} className="mb-2 pb-1">
@@ -278,6 +262,7 @@ const RoleRightsForm = () => {
                                     inline
                                     type="checkbox"
                                     label={permission.description}
+                                    id={`checkbox-${module.name}-${permission.id}`}
                                     checked={
                                       values.rights[module.name]?.[
                                         permission.name

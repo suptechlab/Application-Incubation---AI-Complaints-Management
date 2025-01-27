@@ -1,9 +1,9 @@
 import { Formik, Form as FormikForm } from "formik";
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Card, Col, Image, Placeholder, Row, Spinner, Stack } from "react-bootstrap";
+import { Button, Card, Col, Image, Row, Spinner, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import profilePlaceholderImg from "../../assets/images/default-avatar.jpg";
 import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
@@ -36,7 +36,6 @@ export default function AccountProfile() {
     const fileLen = e.target.files.length;
     const file = e.target.files[0];
     if (!file) {
-      console.log("##### handleFileChange #####", file);
       return;
     }
     const sizeofFile = file.size / 1024;
@@ -144,8 +143,8 @@ export default function AccountProfile() {
                                 alt="User Profile"
                                 width={134}
                                 height={134}
-                              /> : <div class="card-text placeholder-glow custom-width-134 custom-height-134">
-                                <span class="placeholder  d-block h-100" ></span>
+                              /> : <div className="card-text placeholder-glow custom-width-134 custom-height-134">
+                                <span className="placeholder  d-block h-100" ></span>
                               </div>
                           }
                         </div>

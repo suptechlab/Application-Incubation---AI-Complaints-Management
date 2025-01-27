@@ -18,9 +18,6 @@ const SearchForm = ({ filter, setFilter }) => {
     value: activity.value
   }));
 
-
-  const [dateFilter, setDateFilter] = useState({ startDate: '', endDate: '' })
-
   // Temporary state to hold the selected dates
   const [tempDateRange, setTempDateRange] = useState([null, null]);
 
@@ -94,7 +91,7 @@ const SearchForm = ({ filter, setFilter }) => {
               startDate={filter?.startDate ?? null}
               endDate={filter?.endDate}
               selectsRange={true}
-              placeholder="Select Date Range"
+              placeholder={t("SELECT_DATE_RANGE")}
               size="sm"
             />
           </div>

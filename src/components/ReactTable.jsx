@@ -10,7 +10,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Table as BTable } from "reactstrap";
 import DataGridPagination from "./Datagridpagination";
 import "./ReactTable.scss";
-import Loader from "./Loader";
+import PropTypes from 'prop-types';
+import { useTranslation } from "react-i18next";
 
 export default function ReactTable({
   columns,
@@ -26,16 +27,18 @@ export default function ReactTable({
   const location = useLocation();
   const defaultData = React.useMemo(() => [], []);
 
+  const {t} = useTranslation()
+
   // Assuming dataQuery contains headers in its response
   const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 0;
 
 
   const { data } = dataQuery;
 
+
   const tableData = React.useMemo(() => data?.data ?? defaultData, [data, defaultData]);
-  // console.log('32 table',dataQuery?.data)
+
   const table = useReactTable({
-    // data: dataQuery.data?.data?.data ?? defaultData,
     data: tableData,
     columns,
     defaultColumn: {
@@ -57,6 +60,26 @@ export default function ReactTable({
   });
 
 
+  // Function to get the sorting title
+  const getSortingTitle = (column) => {
+    if (!column.getCanSort()) return undefined;
+    const nextOrder = column.getNextSortingOrder();
+    const sortingTitles = {
+      asc: t("SORT_ASCENDING"),
+      desc: t("SORT_DESCENDING"),
+    };
+    
+    return sortingTitles[nextOrder] || t("CLEAR_SORT");
+  };
+
+  // Function to get the sorting icon
+  const getSortingIcon = (sortingState) => {
+    const iconMap = {
+      asc: <FiArrowUp size={18} />,
+      desc: <FiArrowDown size={18} />,
+    };
+    return iconMap[sortingState] ?? null;
+  };
 
   React.useEffect(() => {
     if (table && clearTableSelection === true) {
@@ -64,7 +87,7 @@ export default function ReactTable({
 
       if (isAnyRowSelected) {
         table.toggleAllRowsSelected(false); // Clear selection
-        
+
       }
     }
   }, [clearTableSelection])
@@ -99,7 +122,7 @@ export default function ReactTable({
                   <th
                     key={header.id}
                     colSpan={header.colSpan}
-                    style={{ width: header.getSize() &&  header.getSize() !=='NaN'? header.getSize() : '' }}
+                    style={{ width: header.getSize() && header.getSize() != 'NaN' ? header.getSize() : '' }}
                     className={thClassName}
                   >
                     {header.column.getCanSort() ? (
@@ -107,35 +130,12 @@ export default function ReactTable({
                         variant="link"
                         className="align-items-center border-0 cursor-pointer d-flex fs-15 fw-semibold gap-2 link-dark p-0 table-sorting text-decoration-none user-select-none w-100 text-start"
                         onClick={header.column.getToggleSortingHandler()}
-                        title={
-                          header.column.getCanSort()
-                            ? header.column.getNextSortingOrder() === "asc"
-                              ? "Sort ascending"
-                              : header.column.getNextSortingOrder() === "desc"
-                                ? "Sort descending"
-                                : "Clear sort"
-                            : undefined
-                        }
+                        title={getSortingTitle(header.column)}
                       >
-                        {flexRender(
-                          header.column.columnDef.header,
-
-                          header.getContext()
-                        )}
-
-                        {{
-                          asc: (
-                            <span>
-                              <FiArrowUp size={18} />
-                            </span>
-                          ),
-                          desc: (
-                            <span>
-                              <FiArrowDown size={18} />
-                            </span>
-                          ),
-                        }[header.column.getIsSorted()] ?? null}
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {getSortingIcon(header.column.getIsSorted())}
                       </Button>
+
                     ) : (
                       flexRender(
                         header.column.columnDef.header,
@@ -159,7 +159,7 @@ export default function ReactTable({
                   <td
                     key={cell.id}
                     align={cell.column.columnDef.meta?.align}
-                    style={{ width: cell?.column?.getSize() && cell?.column?.getSize()!=='NaN' ? cell?.column?.getSize() : '' }}
+                    style={{ width: cell?.column?.getSize() && cell?.column?.getSize() != 'NaN' ? cell?.column?.getSize() : '' }}
                     className={tdClassName}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -192,3 +192,19 @@ export default function ReactTable({
     </div>
   );
 }
+
+ReactTable.propTypes = {
+  columns: PropTypes.array.isRequired, // Assuming columns is an array
+  dataQuery: PropTypes.string.isRequired, // Assuming dataQuery is a string
+  setPagination: PropTypes.func.isRequired, // setPagination is a function
+  setSorting: PropTypes.func.isRequired, // setSorting is a function
+  pagination: PropTypes.object.isRequired, // pagination is an object (you can define its structure if needed)
+  sorting: PropTypes.object.isRequired, // sorting is an object (you can define its structure if needed)
+  showPagination: PropTypes.bool, // showPagination is a boolean (optional, defaults to true)
+  clearTableSelection: PropTypes.bool, // clearTableSelection is a boolean (optional, defaults to false)
+};
+
+ReactTable.defaultProps = {
+  showPagination: true, // Default value for showPagination
+  clearTableSelection: false, // Default value for clearTableSelection
+};

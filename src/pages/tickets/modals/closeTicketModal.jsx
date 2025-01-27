@@ -1,21 +1,18 @@
 import { Form, Formik } from "formik";
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Col, Modal } from "react-bootstrap";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import FormInput from "../../../components/FormInput";
 import ReactSelect from "../../../components/ReactSelect";
-import { validationSchema } from "../../../validations/inquiryType.validation";
 import { MasterDataContext } from "../../../contexts/masters.context";
 import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticketmanagement.service";
-import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
-import toast from "react-hot-toast";
 import { validateFile } from "../../../utils/commonutils";
-const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetAcitivityLogs,getTicketData }) => {
+import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
+import PropTypes from "prop-types"
+const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
-    // const [fileName, setFileName] = useState("");
-
     const { masterData } = useContext(MasterDataContext)
 
     const [subStatus, setSubStatus] = useState([])
@@ -28,6 +25,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
             setSubStatus(closeStatus)
         }
     }, [masterData])
+
+
+    console.log(subStatus)
 
     //Handle File Change
     // const handleFileChange = (event) => {
@@ -49,14 +49,19 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
         const formData = new FormData();
         formData.append("reason", values.reason);
         formData.append("closeSubStatus", values.closeSubStatus);
+        if (values.claimAmount && values?.claimAmount !==''){
+            formData.append("claimAmount", values.claimAmount);
+        }
         if (values.attachments) {
             formData.append("attachments[0]", values.attachments);
         }
         ticketCloseStatus(ticketId, formData)
             .then((response) => {
                 setSelectedStatus('CLOSED');
-                setIsGetAcitivityLogs((prev) => !prev)
-                getTicketData()
+                setIsGetActivityLogs((prev) => !prev)
+                if (values.attachments) {
+                    getTicketData()
+                }
                 toast.success(response?.data?.message);
                 toggle()
             })
@@ -91,7 +96,8 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                 initialValues={{
                     reason: "",
                     closeSubStatus: "",
-                    attachments: null
+                    attachments: null,
+                    claimAmount: ''
                 }}
                 validationSchema={ticketCloseValidation}
                 onSubmit={handleSubmit}
@@ -108,6 +114,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                     errors,
                 }) => (
                     <Form>
+
                         <Modal.Body className="text-break py-0">
                             <FormInput
                                 label={t("COMMENT")}
@@ -144,6 +151,24 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                                 onBlur={handleBlur}
                                 touched={touched.closeSubStatus}
                             />
+
+                            {
+                                (values?.closeSubStatus === 'CLOSED_IN_FAVOR_OF_CONSUMER' || values?.closeSubStatus === 'CLOSED_IN_PARTIAL_FAVOR_OF_CONSUMER') &&
+                                <FormInput
+                                    label={t("CLAIM_AMOUNT")}
+                                    id="claimAmount"
+                                    name="claimAmount"
+                                    type="number"
+
+                                    rows={5}
+                                    onBlur={handleBlur}
+                                    value={values?.claimAmount}
+                                    onChange={handleChange}
+                                    error={errors?.claimAmount}
+                                    touched={touched?.claimAmount}
+                                />
+
+                            }
                             <Col xs={12} className="mb-3 pb-1">
                                 <div className="mb-1 fs-14">{t("ATTACHMENT")}</div>
                                 <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
@@ -162,22 +187,22 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
                                             onChange={handleFileChange}
                                         /> */}
                                         <input
-                                        id="attachments"
-                                        name="attachments"
-                                        accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
-                                        className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                                        type="file"
-                                        onChange={(event) => {
-                                            const file = event.currentTarget.files[0];
-                                            const isValidated = validateFile(file)
-                                            if (isValidated === true) {
-                                                setFieldValue("attachments", file);
-                                            } else {
-                                                toast.error(isValidated)
-                                            }
-                                            // Update Formik's state with the file
-                                        }}
-                                    />
+                                            id="attachments"
+                                            name="attachments"
+                                            accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                            className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                            type="file"
+                                            onChange={(event) => {
+                                                const file = event.currentTarget.files[0];
+                                                const isValidated = validateFile(file)
+                                                if (isValidated === true) {
+                                                    setFieldValue("attachments", file);
+                                                } else {
+                                                    toast.error(isValidated)
+                                                }
+                                                // Update Formik's state with the file
+                                            }}
+                                        />
                                     </div>
                                     {values?.attachments && (
                                         <span
@@ -216,4 +241,12 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
     );
 };
 
+CloseTicketModal.propTypes = {
+    modal: PropTypes.bool.isRequired, // modal is a boolean (required)
+    toggle: PropTypes.func.isRequired, // toggle is a function (required)
+    ticketId: PropTypes.string.isRequired, // ticketId is a string (required)
+    setSelectedStatus: PropTypes.func.isRequired, // setSelectedStatus is a function (required)
+    setIsGetActivityLogs: PropTypes.func.isRequired, // setIsGetActivityLogs is a function (required)
+    getTicketData: PropTypes.func.isRequired, // getTicketData is a function (required)
+  };
 export default CloseTicketModal;

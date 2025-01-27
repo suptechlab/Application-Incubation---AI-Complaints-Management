@@ -52,5 +52,5 @@ export const handleUserResetPassword = async (id)=>{
 
 // IMPORT SEPS USERS API 
 export const handleImportSepsUsersApi = async (data)=>{
-    return await adminApi.post(`/${API_VERSION}/users/import`,data);
+    return await adminApi.post(`/${API_VERSION}/seps-users/import`,data);
   }

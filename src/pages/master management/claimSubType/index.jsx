@@ -179,7 +179,7 @@ const ClaimSubType = () => {
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
 
-        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+        toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -288,10 +288,12 @@ const ClaimSubType = () => {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // GET CLAIM TYPE DROPDOWN LIST
@@ -323,7 +325,7 @@ const ClaimSubType = () => {
       ?
       <PageHeader title={t("CLAIM SUB TYPE")}
         actions={[
-          { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark" },
+          { label: t("EXPORT TO EXCEL"), onClick: handleDownload, variant: "outline-dark" },
           { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
         ]}
       /> : ''}

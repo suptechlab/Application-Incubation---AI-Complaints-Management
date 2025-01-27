@@ -1,21 +1,20 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { Button, Card, Stack } from "react-bootstrap";
-import { MdAttachFile } from "react-icons/md";
-import { Link } from "react-router-dom";
-import SunEditorReact from "../../../../../components/SuneditorReact";
-import { validationSchema } from "../../../../../validations/ticketsManagement.validation";
-import GenericModal from "../../../../../components/GenericModal";
-import {
-    ticketReplyToCustomer,
-    ticketReplyInternal,
-    internalNoteApi,
-} from "../../../../../services/ticketmanagement.service";
 import toast from "react-hot-toast";
-import { validateFile } from "../../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
-
-const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, currentTab,permissionState }) => {
+import { MdAttachFile } from "react-icons/md";
+import GenericModal from "../../../../../components/GenericModal";
+import SunEditorReact from "../../../../../components/SuneditorReact";
+import {
+    internalNoteApi,
+    ticketReplyInternal,
+    ticketReplyToCustomer,
+} from "../../../../../services/ticketmanagement.service";
+import { validateFile } from "../../../../../utils/commonutils";
+import { validationSchema } from "../../../../../validations/ticketsManagement.validation";
+import MentionEditor from "../../../../../components/MentionEditor";
+const ReplyTab = ({ ticketId, setIsGetActivityLogs, ticketData, getTicketData, currentTab,permissionState }) => {
 
     const { t } = useTranslation()
 
@@ -47,8 +46,10 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                     setSendReplyModalShow(false); // Close modal after success
                 }
                 actions.resetForm()
-                getTicketData()
-                setIsGetAcitivityLogs((prev) => !prev)
+                if (values.attachment){
+                    getTicketData()
+                }
+                setIsGetActivityLogs((prev) => !prev)
                 toast.success(response?.data?.message)
             })
             .catch((error) => {
@@ -83,7 +84,18 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                 errors,
             }) => (
                 <Form>
-                    <SunEditorReact
+                    <MentionEditor
+                        id="message"
+                        name="message"
+                        height="100"
+                        ticketId={ticketId}
+                        value ={values?.message ?? ''}
+                        error ={errors?.message}
+                        touched={touched?.message}
+                        handleBlur={handleBlur}
+                        handleChange={(event)=>{setFieldValue("message",event.target.value)}}
+                    />
+                    {/* <SunEditorReact
                         wrapperClassName="mb-0 editor-for-tab-view overflow-hidden"
                         id="message"
                         name="message"
@@ -99,7 +111,7 @@ const ReplyTab = ({ ticketId, setIsGetAcitivityLogs, ticketData, getTicketData, 
                                 setFieldValue("message", value);
                             }
                         }}
-                    />
+                    /> */}
                     {values.attachment && (
                         <div className="px-3 py-1">
                             <span

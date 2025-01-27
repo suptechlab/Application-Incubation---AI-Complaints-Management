@@ -65,7 +65,6 @@ export const NavItems = () => {
       menuIcon: <MdFolder size={20} />,
       path: '#',
       moduleName: "Master",
-      moduleName: "Master",
       roleName: "admin",
       subMenu: [
         {
@@ -165,7 +164,7 @@ export const NavItems = () => {
           menuName: t("SLA COMPLIANCE"),
           path: "/reports/sla-compliance",
           moduleName: "Reports",
-          disabled: true,
+          disabled: false,
         },
         {
           id: 73,

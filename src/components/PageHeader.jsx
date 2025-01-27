@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 
-const PageHeader = ({ title = "", actions = [] }) => {
+const PageHeader = ({ title = "", averageResolutionTime = "", actions = [] }) => {
     const { t } = useTranslation();
 
     return (
@@ -20,10 +20,15 @@ const PageHeader = ({ title = "", actions = [] }) => {
 
                 {actions?.length > 0 && (
                     <Stack direction="horizontal" gap={2} className='gap-md-3 flex-wrap'>
+                        {
+                            (averageResolutionTime && averageResolutionTime !== "") ?
+                            <div className="bg-primary bg-opacity-10 p-2 small rounded"><span className="me-2">{t('AVERAGE_RESOLUTION_TIME')}:</span> <span className="fw-semibold">{averageResolutionTime} Days</span></div> : ''
+                        }
+
                         {actions.map((action, index) =>
                             action.to ? (
                                 <Link
-                                    key={`action-${index}`}
+                                    key={`action-${index +1}`}
                                     to={action.to}
                                     className={`btn btn-${action.variant || 'primary'} ${action.disabled ? 'disabled' : ''}`}
                                     onClick={action.onClick}
@@ -33,7 +38,7 @@ const PageHeader = ({ title = "", actions = [] }) => {
                                 </Link>
                             ) : (
                                 <Button
-                                    key={`action-${index}`}
+                                    key={`action-${index + 1}`}
                                     variant={action.variant || 'primary'}
                                     onClick={action.onClick}
                                     disabled={action.disabled}
@@ -61,8 +66,5 @@ PageHeader.propTypes = {
     })),
 };
 
-// PageHeader.defaultProps = {
-//     actions: [],
-// };
 
 export default PageHeader;

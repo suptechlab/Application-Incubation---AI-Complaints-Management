@@ -31,14 +31,14 @@ const ClaimOverviewReport = () => {
   const { t } = useTranslation()
 
   const [pagination, setPagination] = useState({
-    pageIndex: params.page ? parseInt(params.page) - 1 : 1,
+    pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
   const [sorting, setSorting] = useState([
-    // {
-    //   "id": "slaBreachDate",
-    //   "asc": true
-    // }
+    {
+      "id": "slaBreachDate",
+      "asc": true
+    }
   ]);
   const [filter, setFilter] = useState({
     search: "",
@@ -200,7 +200,7 @@ const ClaimOverviewReport = () => {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const blobUrl = window.URL.createObjectURL(blob);
 
-        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+        toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
 
 
         const tempLink = document.createElement('a');
@@ -279,10 +279,12 @@ const ClaimOverviewReport = () => {
 
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+        pageIndex: 0,
+        pageSize: 10,
+      });
+    }
   }, [filter]);
 
 
@@ -302,7 +304,7 @@ const ClaimOverviewReport = () => {
     <PageHeader
       title={t("CLAIM_OVERVIEW_REPORT")}
       actions={[
-        { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
+        { label: t("EXPORT TO EXCEL"), onClick: handleDownload, variant: "warning", disabled: isDownloading },
       ]}
     />
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">

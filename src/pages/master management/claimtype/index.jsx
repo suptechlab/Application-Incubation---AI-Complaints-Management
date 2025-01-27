@@ -1,22 +1,21 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import PageHeader from "../../../components/PageHeader";
 import qs from "qs";
-import CommonDataTable from "../../../components/CommonDataTable";
-import ListingSearchForm from "../../../components/ListingSearchForm";
+import React, { useContext, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
+import CommonDataTable from "../../../components/CommonDataTable";
 import DataGridActions from "../../../components/DataGridActions";
+import ListingSearchForm from "../../../components/ListingSearchForm";
+import Loader from "../../../components/Loader";
+import PageHeader from "../../../components/PageHeader";
 import Toggle from "../../../components/Toggle";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 import { changeClaimTypeStatus, downloadClaimTypes, handleGetClaimTypes } from "../../../services/claimType.service";
-import { getModulePermissions, isAdminUser } from "../../../utils/authorisedmodule";
 import Add from "./Add";
 import Edit from "./Edit";
-import Loader from "../../../components/Loader";
-import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 const ClaimType = () => {
 
@@ -147,7 +146,6 @@ const ClaimType = () => {
   // STATUS UPDATE FUNCTION
   const changeStatus = async (id, currentStatus) => {
     setLoading(true)
-    // await handleEditDistricts(id, { status: !currentStatus });
     changeClaimTypeStatus(id, !currentStatus).then(response => {
       toast.success(t("STATUS UPDATED"));
       dataQuery.refetch();
@@ -171,7 +169,7 @@ const ClaimType = () => {
         const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const blobUrl = window.URL.createObjectURL(blob);
 
-        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+        toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
 
 
         const tempLink = document.createElement('a');
@@ -191,7 +189,6 @@ const ClaimType = () => {
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
-      // toast.success(t("STATUS UPDATED"));
     }).catch((error) => {
       if (error?.response?.data?.errorDescription) {
         toast.error(error?.response?.data?.errorDescription);
@@ -280,10 +277,12 @@ const ClaimType = () => {
   );
 
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+        pageIndex: 0,
+        pageSize: 10,
+      });
+    }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
@@ -294,7 +293,7 @@ const ClaimType = () => {
   }, [queryClient]);
 
   const actions = permissionsState?.addModule
-    ? [{ label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
+  ? [  { label: t("EXPORT TO EXCEL"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
     { label: t("ADD NEW"), onClick: toggle, variant: "warning" },]
     : [];
 

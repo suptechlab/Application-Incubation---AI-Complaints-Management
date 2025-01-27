@@ -5,6 +5,7 @@ export const messages = {
     emailInvalid: 'Invalid email',
     emailRequired: 'Email is required',
     phoneNumberInvalid: 'Mobile number must be exactly 10 digits',
+    phoneNumberRequired: 'Phone number is required with country Code!',
     countryCodeRequired: 'Mobile code is required',
     countryCodeInvalid: 'Invalid mobile code',
     rucRequired: "Entity's Tax ID (RUC) is required",
@@ -88,7 +89,8 @@ export const messages = {
     fieldRequired: "This field is required.",
     userTypeRequired: 'User Type is required.',
     profileRequired: 'Profile image is required.',
-    fileRequired: 'File is required.'
+    fileRequired: 'File is required.',
+    amountRequired :'Claim amount is required.'
   },
   es: {
     identificationRequired: 'Se requiere identificación del usuario',
@@ -96,6 +98,7 @@ export const messages = {
     emailInvalid: 'Correo electrónico inválido',
     emailRequired: 'Correo electrónico es requerido',
     phoneNumberInvalid: 'El número de móvil debe tener exactamente 10 dígitos',
+    phoneNumberRequired: '¡Se requiere número de teléfono con código de país',
     countryCodeRequired: 'Se requiere código de móvil',
     countryCodeInvalid: 'Código de móvil inválido',
     rucRequired: 'Se requiere el RUC de la entidad',
@@ -179,6 +182,7 @@ export const messages = {
     fieldRequired: "Este campo es obligatorio.",
     userTypeRequired: "El tipo de usuario es obligatorio.",
     profileRequired: 'Se requiere imagen de perfil.',
-    fileRequired: 'Se requiere archivo.'
+    fileRequired: 'Se requiere archivo.',
+    amountRequired:'Se requiere el monto del reclamo.'
   }
 };

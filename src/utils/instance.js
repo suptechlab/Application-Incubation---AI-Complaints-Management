@@ -2,16 +2,13 @@ import axios from 'axios';
 import { getLocalStorage } from './storage';
 import toast from "react-hot-toast";
 
-// const BASE_URL = process.env.REACT_APP_API_URL;
-// console.log('BASE_URL',BASE_URL)
+
 
 
 const createAxiosInstance = (baseURL) => {
 
-
     const instance = axios.create({
         baseURL: `${baseURL}/`,
-        //baseURL: BASE_URL,
         timeout: 600000, // 10 Mint
     });
 
@@ -49,14 +46,11 @@ const createAxiosInstance = (baseURL) => {
             return response;
         },
         (error) => {
-            console.log(error?.response)
             if (error.response?.status === 401) {
                 toast.error(error.response?.message ?? 'No autorizado');
-                // Force redirect to the login page
-                // const dashboardURL = `${process.env.REACT_APP_BASE_URL}/dashboard`;
-                // window.location.href = dashboardURL;
+             
             }
-            return Promise.reject(error);
+            return Promise.reject(new Error(error?.message ?? ''));
         }
     );
 

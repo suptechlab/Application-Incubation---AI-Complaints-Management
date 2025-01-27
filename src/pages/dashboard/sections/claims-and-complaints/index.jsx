@@ -7,7 +7,6 @@ import { Link, useLocation } from 'react-router-dom'
 import CommonDataTable from '../../../../components/CommonDataTable'
 import ReactSelect from '../../../../components/ReactSelect'
 import AppTooltip from '../../../../components/tooltip'
-import AttachmentsModal from '../../../tickets/modals/attachmentsModal'
 import DashboardListFilters from './filters'
 import { downloadClaimAndComplaints, getClaimsandComplaints } from '../../../../services/dashboard.service'
 import { useTranslation } from 'react-i18next'
@@ -16,6 +15,7 @@ import moment from 'moment'
 import { MasterDataContext } from '../../../../contexts/masters.context'
 import { convertToLabelValue } from '../../../../services/ticketmanagement.service'
 import toast from 'react-hot-toast'
+import PropTypes from "prop-types"
 
 const ClaimsAndComplaints = ({ setLoading }) => {
     const location = useLocation();
@@ -36,8 +36,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
         status: "",
     });
 
-    const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
-    const [clearTableSelection, setClearTableSelection] = useState(false)
+    const [clearTableSelection] = useState(false)
 
     const [instanceType, setInstanceType] = useState([])
 
@@ -56,44 +55,44 @@ const ClaimsAndComplaints = ({ setLoading }) => {
         setDownloading(true)
         toast.loading(t("EXPORT IN PROGRESS"), { id: "downloading", isLoading: isDownloading })
         downloadClaimAndComplaints(filter).then(response => {
-          if (response?.data) {
-            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const blobUrl = window.URL.createObjectURL(blob);
+            if (response?.data) {
+                const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const blobUrl = window.URL.createObjectURL(blob);
 
-            toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+                toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
 
 
-            const tempLink = document.createElement('a');
-            tempLink.href = blobUrl;
-            tempLink.setAttribute('download', 'tickets.xlsx');
+                const tempLink = document.createElement('a');
+                tempLink.href = blobUrl;
+                tempLink.setAttribute('download', 'tickets.xlsx');
 
-            // Append the link to the document body before clicking it
-            document.body.appendChild(tempLink);
+                // Append the link to the document body before clicking it
+                document.body.appendChild(tempLink);
 
-            tempLink.click();
+                tempLink.click();
 
-            // Clean up by revoking the Blob URL
-            window.URL.revokeObjectURL(blobUrl);
+                // Clean up by revoking the Blob URL
+                window.URL.revokeObjectURL(blobUrl);
 
-            // Remove the link from the document body after clicking
-            document.body.removeChild(tempLink);
-          } else {
-            throw new Error(t("EMPTY RESPONSE"));
-          }
-          // toast.success(t("STATUS UPDATED"));
+                // Remove the link from the document body after clicking
+                document.body.removeChild(tempLink);
+            } else {
+                throw new Error(t("EMPTY RESPONSE"));
+            }
+            // toast.success(t("STATUS UPDATED"));
         }).catch((error) => {
-          if (error?.response?.data?.errorDescription) {
-            toast.error(error?.response?.data?.errorDescription);
-          } else {
-            toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-          }
-          toast.dismiss("downloading");
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+            }
+            toast.dismiss("downloading");
         }).finally(() => {
-          // Ensure the loading toast is dismissed
-          // toast.dismiss("downloading");
-          setDownloading(false)
+            // Ensure the loading toast is dismissed
+            // toast.dismiss("downloading");
+            setDownloading(false)
         });
-      }
+    }
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
         queryFn: async () => {
@@ -154,22 +153,12 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 pageIndex: dataQuery.data?.data?.totalPages - 1,
                 pageSize: 10,
             });
-        }
+        } 
     }, [dataQuery.data?.data?.totalPages]);
 
 
 
 
-
-    //handle last page deletion item
-    useEffect(() => {
-        if (dataQuery.data?.data?.totalPages < pagination.pageIndex + 1) {
-            setPagination({
-                pageIndex: dataQuery.data?.data?.totalPages - 1,
-                pageSize: 10,
-            });
-        }
-    }, [dataQuery.data?.data?.totalPages]);
     // The color class based on the status
     const getStatusClass = (status) => {
         switch (status) {
@@ -188,9 +177,9 @@ const ClaimsAndComplaints = ({ setLoading }) => {
         }
     };
     // Handle Attachments Button
-    const handleAttachmentsClick = () => {
-        setAttachmentsModalShow(true)
-    }
+    // const handleAttachmentsClick = () => {
+    //     setAttachmentsModalShow(true)
+    // }
 
     const columns = React.useMemo(
         () => [
@@ -238,13 +227,13 @@ const ClaimsAndComplaints = ({ setLoading }) => {
             },
             {
                 accessorFn: (row) => row?.claimSubType?.name,
-                id: "subClaimType",
+                id: "claimSubType",
                 header: () => t("CLAIM SUB TYPE"),
                 enableSorting: true,
             },
             {
                 accessorFn: (row) => row?.fiAgent?.name,
-                id: "fIEntity",
+                id: "fiAgent",
                 header: () => t("FI_ENTITY"),
                 enableSorting: true,
             },
@@ -261,7 +250,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 accessorFn: (row) => row?.instanceType,
                 id: "instanceType",
                 header: () => t("INSTANCE_TYPE"),
-                enableSorting: false,
+                enableSorting: true,
                 cell: ({ row }) => (
                     <span>{(row?.original?.instanceType && masterData?.instanceType) && masterData?.instanceType[row?.original?.instanceType]}</span>
                 )
@@ -290,10 +279,13 @@ const ClaimsAndComplaints = ({ setLoading }) => {
     );
 
     useEffect(() => {
-        setPagination({
-            pageIndex: 0,
-            pageSize: 10,
-        });
+        if (Object.values(filter).some(value => value)) {
+            setPagination({
+                pageIndex: 0,
+                pageSize: 10,
+            });
+        }
+
     }, [filter]);
 
 
@@ -337,9 +329,9 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                                 size="sm"
                                 className='px-3'
                                 onClick={handleDownload}
-                                disabled= {isDownloading ?? false} 
+                                disabled={isDownloading ?? false}
                             >
-                               { t("EXPORT TO CSV")}
+                                {t("EXPORT TO CSV")}
                             </Button>
                         </Stack>
                     </Stack>
@@ -358,12 +350,17 @@ const ClaimsAndComplaints = ({ setLoading }) => {
             </Card>
 
             {/* Attachments Modals */}
-            <AttachmentsModal
+            {/* <AttachmentsModal
                 modal={attachmentsModalShow}
                 toggle={() => setAttachmentsModalShow(false)}
-            />
+            /> */}
         </React.Fragment>
     )
 }
+
+
+ClaimsAndComplaints.propTypes = {
+    setLoading: PropTypes.func.isRequired, // setLoading is a required function
+};
 
 export default ClaimsAndComplaints

@@ -168,7 +168,7 @@ const InquiryType = () => {
         // Remove the link from the document body after clicking
         document.body.removeChild(tempLink);
 
-        toast.success(t("CSV DOWNLOADED"), { id: "downloading" })
+        toast.success(t("DOWNLOAD_SUCCESSFUL"),{id: "downloading"})
       } else {
         throw new Error(t("EMPTY RESPONSE"));
       }
@@ -259,10 +259,12 @@ const InquiryType = () => {
     [permissionsState]
   );
   useEffect(() => {
-    setPagination({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+    if (Object.values(filter).some(value => value)) {
+      setPagination({
+          pageIndex: 0,
+          pageSize: 10,
+      });
+  }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
@@ -274,14 +276,14 @@ const InquiryType = () => {
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
-    <Loader isLoading={isLoading} />
-    {permissionsState.addModule
-      ?
-      <PageHeader title={t("INQUIRY TYPE")}
-        actions={[
-          { label: t("EXPORT TO CSV"), onClick: handleDownload, variant: "outline-dark", disabled: isDownloading },
-          { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
-        ]} />
+  <Loader isLoading={isLoading}/>
+  {permissionsState.addModule
+        ?
+    <PageHeader title={t("INQUIRY TYPE")}
+      actions={[
+        { label: t("EXPORT TO EXCEL"), onClick: handleDownload, variant: "outline-dark" ,disabled : isDownloading },
+        { label: t("ADD NEW"), onClick: toggle, variant: "warning" },
+      ]} />
       : ''}
     <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
       <Card.Body className="d-flex flex-column">

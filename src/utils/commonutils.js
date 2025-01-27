@@ -43,42 +43,17 @@ export const calculateDaysDifference = (date) => {
   
   // Return 0 if the date is in the past or today
   return '0';
-  
-  // const now = moment();
-  // const targetDate = moment(date);
-
-  // // Calculate the absolute difference in days
-  // const daysDifference = Math.abs(targetDate.diff(now, 'days'));
-
-  // return `${daysDifference}`;
 };
-
-// FILE UPLOAD
-
-// export const validateFile = (file) => {
-
-
-
-//   const MAX_FILE_SIZE_MB = 1;
-
-//   if (!file) {
-//     return "No file selected.";
-//   }
-
-//   // Validate MIME type
-//   if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-//     return "Invalid file type. Please upload an allowed file.";
-//   }
-
-//   // Validate file size
-//   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-//     return `File size exceeds ${MAX_FILE_SIZE_MB} MB. Please upload a smaller file.`;
-//   }
-
-//   // If all validations pass
-//   return true;
-// };
-
+// CAPITALIZE FIRST LETTER
+export const capitalizeFirstLetter =(str = '') => {
+  if (!str) return ''; // Handle empty or null input
+  return str
+    .toLowerCase() // Convert the entire string to lowercase
+    .split(' ') // Split the string into words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(' '); // Join the words back into a single string
+}
+// VALIDATE FILE
 export const validateFile = (file) => {
   const MAX_FILE_SIZE_MB = 1;
 

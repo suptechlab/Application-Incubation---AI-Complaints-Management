@@ -64,7 +64,7 @@ const ImportFIUser = () => {
         if (error?.response?.status === 400) {
 
           const errorData = error?.response?.data?.join('\n')
-          setInitialValues({ browseFileerrorData: '', description: errorData })
+          setInitialValues({ browseFile: '', description: errorData })
         }
         else if (error?.response?.data?.errorDescription) {
           toast.error(error.response.data.errorDescription);
@@ -73,7 +73,6 @@ const ImportFIUser = () => {
         }
       })
       .finally(() => {
-        console.log("are you  here.....")
         actions.setSubmitting(false)
         setLoading(false); // Reset loading state after the API call
       });
@@ -97,8 +96,6 @@ const ImportFIUser = () => {
     // Clean up
     document.body.removeChild(link);
   };
-
-  console.log({ initialValue })
   return (
     <React.Fragment>
       <Loader isLoading={false} />
