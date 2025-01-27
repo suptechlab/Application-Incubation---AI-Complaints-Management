@@ -294,6 +294,7 @@ public class ClaimTicketSpecification {
                     predicates.add(root.get("resolvedOn").isNull());
                 }
             }
+            predicates.add(root.get("slaBreachDate").isNotNull());
             predicates.add(criteriaBuilder.equal(root.get("status"), ClaimTicketStatusEnum.CLOSED));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
