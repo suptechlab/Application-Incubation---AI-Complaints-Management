@@ -56,6 +56,7 @@ export const fetchMasterData = createAsyncThunk(
         instance_types: formatGeneralData(masterDataResponse.data.instanceType)
       };
     } catch (error) {
+      console.log({ ERROR: error })
       return rejectWithValue(
         error.response?.data?.message || error.message || "Failed to fetch master data"
       );

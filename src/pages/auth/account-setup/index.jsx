@@ -28,6 +28,13 @@ const AccountSetupModal = ({ handleBack, handleFormSubmit }) => {
         actions.setSubmitting(false);
     };
 
+    // Handle Personal Info Submit
+    const handlePersonalInfoSubmit = (values, actions) => {
+        console.log('Personal Info values', values)
+        // setIsPersonalInfoSubmitted(true);
+        // actions.setSubmitting(false);
+    };
+
     // Handle Finish Button Click
     const handleFinishClick = () => {
         setIsIdVerificationSubmitted(false);

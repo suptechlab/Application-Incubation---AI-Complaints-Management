@@ -230,6 +230,7 @@ export const downloadDocument = createAsyncThunk(
       if (response.status !== 200) {
         return rejectWithValue('Failed to download!');
       }
+      console.log('response', response)
       return response; // RETURN RESPONSE
     } catch (error) {
 

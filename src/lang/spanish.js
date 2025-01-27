@@ -109,6 +109,7 @@ export const spanishLang = {
   "CLAIMS_REJECTED": "Reclamos Rechazados",
   "WELCOME_TO_THE": "Bienvenido al",
   "SEPS_HELPDESK": "Helpdesk SEPS",
+  "UPLOAD_OPTIONAL_ATTACHMENTS": "Cargar archivos adjuntos opcionales",
   "RAISE_A_SECOND_INSTANCE_CLAIM": "Presentar un reclamo en segunda instancia",
   "FIRST_INSTANCE_COMPLAINT_TICKET": "Boleto de Denuncia de 1ra Instancia",
   "COMMENTS": "Comentarios",
@@ -157,6 +158,5 @@ export const spanishLang = {
   "SECOND_INSTANCE_CLAIM_ID": "ID de reclamo de segunda instancia",
   "FINGERPRINT_NOT_VERIFIED": "código de huella dactilar erróneo.",
   "VERIFYING": "Verificando",
-  "UPLOAD_ATTACHMENTS": "Subir archivos adjuntos",
-  "TYPE_A_MESSAGE":"Escribe un mensaje"
+  "UPLOAD_ATTACHMENTS": "Subir archivos adjuntos"
 }

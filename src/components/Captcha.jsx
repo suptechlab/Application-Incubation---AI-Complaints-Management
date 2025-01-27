@@ -21,7 +21,6 @@ function Captcha({ onChangeCaptchaCode, reCaptchaRef }) {
                 onChange={onChangeCaptchaCode}
                 className='reCaptcha overflow-x-auto overflow-y-hidden'
                 onExpired={onExpired}
-                hl="es"
             />
         </div>
     );

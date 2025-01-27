@@ -42,10 +42,12 @@ const OtpFormSection = ({ otpToken, handleFormSubmit }) => {
             if (resendLoginOTPonEmail.fulfilled.match(result)) {
                 toast.success(result?.payload?.message || "OTP has been resent successfully.");
             } else {
-                toast.error(result?.error?.message);
+                console.error('OTP Send error:', result.error.message);
+                // toast.error("Failed to resend OTP. Please try again.");
             }
         } catch (error) {
-            toast.error(error?.message);
+            console.error("Error during OTP resend:", error);
+            toast.error("An unexpected error occurred. Please try again.");
         } finally {
             setOptSendStatus(false);
         }

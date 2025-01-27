@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Offcanvas, Stack } from 'react-bootstrap';
-import toast from 'react-hot-toast';
+import { Badge, Button, Offcanvas, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
-import { IoCloudUploadOutline } from "react-icons/io5";
-import { MdKeyboardBackspace, MdPerson } from 'react-icons/md';
+import { MdAttachFile, MdKeyboardBackspace, MdPerson } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormInputBox from '../../../components/FormInput';
 import SvgIcons from '../../../components/SVGIcons';
-import AppTooltip from '../../../components/tooltip';
-import { loginAndFetchAccountInfo } from "../../../redux/slice/authSlice";
 import { chatbotFileUpload, sendQuery } from '../../../redux/slice/helpDeskSlice';
+import { getAccountInfo, loginAndFetchAccountInfo, loginUserWithToken } from "../../../redux/slice/authSlice";
+import AppTooltip from '../../../components/tooltip';
+import toast from 'react-hot-toast';
+import { IoCloudUploadOutline } from "react-icons/io5";
 import { ChatBotFormSchema } from '../validations';
+import { setLocalStorage } from '../../../utils/storage';
 const ChatBotForm = () => {
     const { t } = useTranslation()
     const chatEndRef = useRef(null);
@@ -273,8 +274,32 @@ const ChatBotForm = () => {
         }
     };
 
+    // // CALL SEND QUERY FUNCTION
+    // const handleSendQuery = async (msg) => {
+    //     const msgData = { message: msg?.message, metadata };
+    //     if (msg) {
+    //         setLoading(true)
+
+
+    //         // Add sender ID if available
+    //         if (senderId) {
+    //             msgData.sender = senderId;
+    //         }
+
+    //         // Dispatch the API query
+    //         const result = await dispatch(sendQuery(msgData));
+    //         if (sendQuery.fulfilled.match(result)) {
+    //             setChatResponse(result.payload); // Set chat response on success
+    //         } else {
+    //             setChatError(); // Handle API failure
+    //         }
+    //         setLoading(false)
+    //     }
+    // }
+
     // CALL SEND QUERY FUNCTION
     const handleSendQuery = async (msg) => {
+        console.log(msg)
         if (msg) {
             setLoading(true);
 
@@ -487,9 +512,21 @@ const ChatBotForm = () => {
                                     metadata['attachmentsIds[0]'] = filesId;
                                 }
 
+                                // {
+                                //     "sender": "user123",
+                                //     "message": "Please process these documents.",
+                                //     "metadata": {
+                                //       "attachment[0]": "212",    // Document ID for the first file
+                                //       "attachment[1]": "211",    // Document ID for the second file
+                                //       "attachment[2]": "310"     // Document ID for the third file
+                                //     }
+                                //   }
                                 setFieldValue('attachments', '')
+                                // console.log({ here: { message: 'Please process these documents', metadata } })
                                 handleSendQuery({ message: 'Quiero subir un archivo', metadata })
-                              
+                                // sendQuery(result?.payload)
+
+
                                 // SEND RESULT IN SEND QUERY
                             } else {
                                 console.error("Verification error:", result.error.message);
@@ -515,7 +552,7 @@ const ChatBotForm = () => {
         <React.Fragment>
             <Offcanvas.Header closeButton className='align-items-start pb-1'></Offcanvas.Header>
             <CommonFormikComponent
-                validationSchema={ChatBotFormSchema}
+                 validationSchema={ChatBotFormSchema}
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
             >
@@ -666,7 +703,7 @@ const ChatBotForm = () => {
                                             inputClassName="custom-padding-right-42"
                                             wrapperClassName='mb-0'
                                             id="message"
-                                            placeholder={t("TYPE_A_MESSAGE")}
+                                            placeholder="Type a message"
                                             name="message"
                                             error={formikProps.errors.message}
                                             onBlur={formikProps.handleBlur}
@@ -676,8 +713,8 @@ const ChatBotForm = () => {
                                             value={formikProps.values.message || ""}
                                             autoComplete="off"
                                             readOnly={isLoading}
-                                        // isTextarea={true}
-                                        // rows={1}
+                                            // isTextarea={true}
+                                            // rows={1}
                                         />
                                         {/* <div className="overflow-hidden position-absolute top-0 z-1 flex-shrink-0  p-2 d-block h-100">
                                                 <AppTooltip title="Add Attachments">

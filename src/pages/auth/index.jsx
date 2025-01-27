@@ -42,7 +42,7 @@ const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, set
         toast.success(data?.payload?.message ?? "")
       }
     }).catch((err) => {
-      console.error("ERROR IN PRIVACY FORM SUBMIT" , err?.message)
+      console.log(err);
     }).finally(() => {
       actions?.setSubmitting(false)
     });
@@ -77,6 +77,7 @@ const FileClaimMainModal = ({ handleShow, handleClose, isFileClaimModalShow, set
       setSetupSuccesModalShow(true)
       setLoading(false)
       handleCloseReset();
+      // toast.success(result?.message ?? "Account setup success.")
     } else {
       setLoading(false)
       console.error('Registration error:', result.error.message);

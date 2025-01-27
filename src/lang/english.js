@@ -108,6 +108,7 @@ export const englishLang = {
   "CLAIMS_REJECTED": "Claims Rejected",
   "WELCOME_TO_THE": "Welcome to the",
   "SEPS_HELPDESK": "SEPS Helpdesk",
+  "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments",
   "RAISE_A_SECOND_INSTANCE_CLAIM": "Raise a 2nd Instance Claim",
   "FIRST_INSTANCE_COMPLAINT_TICKET": "1st Instance Complaint Ticket",
   "ATTACH_NEW_EVIDENCE": "Attach the new evidence",
@@ -156,6 +157,5 @@ export const englishLang = {
   "SECOND_INSTANCE_CLAIM_ID":"2nd Instance claim id",
   "FINGERPRINT_NOT_VERIFIED" : "Fingerprint not verified.",
   "VERIFYING":"Verifying",
-  "UPLOAD_ATTACHMENTS":"Upload attachments",
-  "TYPE_A_MESSAGE":"Type a message"
+  "UPLOAD_ATTACHMENTS":"Upload attachments"
 }
