@@ -62,7 +62,6 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
 
     // Handle Other Info Submit
     const handleOtherInfoSubmit = (values, actions) => {
-        console.log('Other Info values', values)
         setActiveTab(2)
         setFileClaimValues((prev) => ({ ...prev, ...values }))
         setIsOtherInfoSubmitted(true);

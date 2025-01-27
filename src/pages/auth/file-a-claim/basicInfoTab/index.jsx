@@ -51,7 +51,6 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
             setCityList(response?.payload)
             setIsLoading(false)
         } else {
-            console.error('Sub types error:', response.error.message);
             setIsLoading(false)
         }
     }

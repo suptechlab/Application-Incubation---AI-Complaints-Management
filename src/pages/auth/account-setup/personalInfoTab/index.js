@@ -77,7 +77,6 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setI
     const isOtpSent = await sendOTP(email);
     if (isOtpSent) {
       setOptSendStatus(false);
-      // toast.success("OTP has been resent successfully.");
     } else {
       setOptSendStatus(false);
     }
