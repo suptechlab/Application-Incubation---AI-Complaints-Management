@@ -15,7 +15,6 @@ function App() {
   // Initialize QueryClient
   const queryClient = new QueryClient();
 
-
   const {token} = useSelector((state)=> state?.authSlice)
 
   // CALL ACCOUNT INFO API HERE SO CAN VALIDATE THAT USER TOKEN IS STILL VALID OR NOT
@@ -48,7 +47,6 @@ function App() {
   }, [dispatch]);
 
 
-
   useEffect(()=>{
 
     if(token){
@@ -56,7 +54,6 @@ function App() {
     }
 
   },[token])
-
 
 
   return (
