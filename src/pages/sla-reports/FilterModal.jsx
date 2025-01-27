@@ -53,6 +53,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
   }
 
   const handleSubmit = (values, actions) => {
+    console.log(values)
     // Remove null or empty string values from the filter
     const cleanedValues = Object.fromEntries(
       Object.entries(values).filter(
@@ -186,10 +187,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
                     }, ...priorityOptions
                   ]}
                   onChange={(e) => {
-                    setFilter({
-                      ...filter,
-                      claimTicketPriority: e.target.value,
-                    });
+                    setFieldValue("claimTicketPriority",e.target.value);
                   }}
                   value={values?.claimTicketPriority}
                 />

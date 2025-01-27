@@ -49,6 +49,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
         const formData = new FormData();
         formData.append("reason", values.reason);
         formData.append("closeSubStatus", values.closeSubStatus);
+        if (values.claimAmount && values?.claimAmount !==''){
+            formData.append("claimAmount", values.claimAmount);
+        }
         if (values.attachments) {
             formData.append("attachments[0]", values.attachments);
         }

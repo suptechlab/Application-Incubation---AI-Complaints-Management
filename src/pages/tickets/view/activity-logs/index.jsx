@@ -9,7 +9,7 @@ import moment from "moment";
 import { downloadFile, getIconForFile, isHTML } from "../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
-const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState,activityLoading, setActivityLoading }) => {
+const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState, activityLoading, setActivityLoading }) => {
 
   const [ticketActivity, setTicketActivity] = useState([])
 
@@ -37,6 +37,15 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState,activityLoa
     });
   }
 
+  // Function to replace mentions with <span className='text-primary'>
+  function replaceMentions(text) {
+    return text.replace(/@\[(.*?)\]\((\d+)\)/g, (match, name) => {
+      // Replace the mention with HTML <span> element
+      return `<span class='text-primary'>${name}</span>`;
+    });
+  }
+  
+
   // GET TICKET DETAILS
   const getTicketActivityLogs = () => {
     setActivityLoading(true)
@@ -45,19 +54,30 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState,activityLoa
       if (response?.data) {
         const logData = response?.data?.map((activity, index) => {
           const text = activity?.activityDetails?.text || ""; // Safely extract text
-          const containsHTML = isHTML(text);
+         
           const attachments = activity?.attachmentUrl?.attachments?.length ? activity.attachmentUrl.attachments : [];
           const imageUrl = activity?.performedBy == userData?.id ? profileImage ?? defaultAvatar : defaultAvatar
+
+          // Replace mentions in the text
+          const updatedText = replaceMentions(text);
+          const containsHTML = isHTML(updatedText);
           return {
             id: index,
             // name: activity?.activityDetails?.performBy?.name ? getPerformerName(activity?.activityDetails?.performBy?.name, activity?.activityType) : "",
             action: replaceLinkedUserPlaceholders(activity.activityTitle, activity.linkedUsers),
             date: moment(activity?.performedAt).format("DD-MM-YYYY | hh:mm:a"),
-            message: <> {containsHTML ? (
-              <p className="text-justify" dangerouslySetInnerHTML={{ __html: text }} />
-            ) : (
-              <p className="text-justify">{text}</p>
-            )}</>,
+            message: <>
+              {containsHTML ? (
+                <p className="text-justify" dangerouslySetInnerHTML={{ __html: updatedText }} />
+              ) : (
+                <p className="text-justify">{updatedText}</p>
+              )}
+            </>,
+            // message: <> {containsHTML ? (
+            //   <p className="text-justify" dangerouslySetInnerHTML={{ __html: text }} />
+            // ) : (
+            //   <p className="text-justify">{text}</p>
+            // )}</>,
             avatar: imageUrl,
             variant: activity?.activityType ?? '',
             attachments: attachments && attachments?.length > 0 ? attachments : []
@@ -79,7 +99,7 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState,activityLoa
 
 
   useEffect(() => {
-      getTicketActivityLogs()
+    getTicketActivityLogs()
   }, [ticketId, isGetActivityLogs, profileImage])
 
 

@@ -48,7 +48,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
     const statusOptions = [
-        ...(permissionState?.closePermission === true ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
+        ...((permissionState?.closePermission === true && ticketData?.status==='ASSIGNED') ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
         ...(permissionState?.rejectPermission === true ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
         { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
         { label: t('PENDING'), value: 'PENDING' }];
