@@ -18,15 +18,28 @@ public class RequestInfo {
     private String remoteUser;
     private String remoteHost;
     private Integer remotePort;
+    private String userAgent;
 
     public RequestInfo(HttpServletRequest httpServletRequest) {
         this.method = httpServletRequest.getMethod();
         this.requestURI = httpServletRequest.getRequestURI();
         this.queryString = httpServletRequest.getQueryString();
-        this.remoteAddr = httpServletRequest.getRemoteAddr();
+        // Retrieve the client IP address
+        String clientIP = httpServletRequest.getHeader("X-Forwarded-For");
+        if (clientIP == null || clientIP.isEmpty() || "unknown".equalsIgnoreCase(clientIP)) {
+            clientIP = httpServletRequest.getHeader("X-Real-IP");
+        }
+        if (clientIP == null || clientIP.isEmpty() || "unknown".equalsIgnoreCase(clientIP)) {
+            clientIP = httpServletRequest.getRemoteAddr();
+        }
+        this.remoteAddr = clientIP;
         this.remoteUser = httpServletRequest.getRemoteUser();
         this.remoteHost = httpServletRequest.getRemoteHost();
         this.remotePort = httpServletRequest.getRemotePort();
+        this.userAgent = httpServletRequest.getHeader("user-agent");
+        if (this.userAgent == null) {
+            this.userAgent = "unknown";
+        }
     }
 
     // Factory method for cron jobs
@@ -38,7 +51,8 @@ public class RequestInfo {
             "127.0.0.1", // Localhost as the source IP
             "SYSTEM_USER", // Placeholder for system user
             "localhost", // Placeholder for host
-            0 // No remote port
+            0, // No remote port,
+            ""
         );
     }
 }

@@ -12,7 +12,8 @@ public enum ActionTypeEnum {
     CLAIM_TICKET_WORK_FLOW_ADD("Claim Ticket Work Flow Add"),
     CLAIM_TICKET_WORK_FLOW_EDIT("Claim Ticket Work Flow Edit"),
     CLAIM_TICKET_CHANGED_STATUS("Claim Ticket Status Changed"),
-    CLAIM_TICKET_SLA_COMMENTED("Claim Ticket SLA comment added");
+    CLAIM_TICKET_SLA_COMMENTED("Claim Ticket SLA comment added"),
+    CLAIM_TICKET_UPDATE("Claim Ticket Update");
 
     private final String description;
 

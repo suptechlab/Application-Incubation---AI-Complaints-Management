@@ -7,7 +7,6 @@ import com.seps.ticket.enums.ChannelOfEntryEnum;
 import com.seps.ticket.enums.CustomerTypeEnum;
 import com.seps.ticket.enums.PriorityCareGroupEnum;
 import com.seps.ticket.enums.SourceEnum;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,8 +39,9 @@ public class ClaimTicketRequest {
     private Long provinceId;
     @NotNull
     private Long cityId;
-    @NotNull
-    private PriorityCareGroupEnum priorityCareGroup;
+
+    private PriorityCareGroupEnum priorityCareGroup = PriorityCareGroupEnum.values()[0];
+
     @NotNull
     private CustomerTypeEnum customerType;
     @NotNull

@@ -1,6 +1,7 @@
 package com.seps.ticket.service;
 
 import com.seps.ticket.component.EnumUtil;
+import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.domain.ClaimTicketOTP;
 import com.seps.ticket.domain.TemplateMaster;
@@ -696,7 +697,7 @@ public class MailService {
     @Async
     public void sendClaimTicketOTPEmail(ClaimTicketOTP otp, Locale locale) {
         if (otp.getEmail() == null) {
-            LOG.debug("Email doesn't exist for user while sending register otp email to '{}'", otp.getEmail());
+            LOG.debug("Email doesn't exist for user while sending register otp email");
             return;
         }
         LOG.debug("Sending register otp email to '{}'", otp.getEmail());
@@ -711,6 +712,24 @@ public class MailService {
         dataVariables.put("minutes", String.valueOf(minutesLeft));
         dataVariables.put("otpCode", String.valueOf(otp.getOtpCode()));
         dataVariables.put("consentLink", userBaseUrl + "/terms-and-conditions/claim-ticket-consent");
+        mailDTO.setDataVariables(dataVariables);
+        this.sendDynamicContentEmail(mailDTO);
+    }
+
+    @Async
+    public void sendTranscriptEmail(String recipient, String transcript, String timestamp) {
+        if (recipient == null) {
+            LOG.debug("Email doesn't exist for user while sending transcript email");
+            return;
+        }
+        LOG.debug("Sending transcript email to '{}'", recipient);
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setLocale(Constants.DEFAULT_LANGUAGE);
+        mailDTO.setTo(recipient);
+        mailDTO.setTemplateKey("TRANSCRIPT_MAIL_TO_LIVE_AGENT");
+        Map<String, String> dataVariables = new HashMap<>();
+        dataVariables.put("timestamp", String.valueOf(timestamp));
+        dataVariables.put("transcript", transcript);
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
     }

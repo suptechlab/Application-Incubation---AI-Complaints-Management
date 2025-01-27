@@ -48,6 +48,8 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.seps.ticket.component.CommonHelper.convertEntityToMap;
 
@@ -1278,7 +1280,31 @@ public class SepsAndFiClaimTicketService {
         this.sendReplyEmail(ticket, claimTicketReplyRequest, activityType, currentUser, taggedUserList);
     }
 
-    private List<String> getTaggedUsers(String messageHtml) {
+    private List<String> getTaggedUsers(String message) {
+        // Define the regex pattern to match tagged users in the format @[Name](ID)
+        String regex = "@\\[.*?\\]\\((\\d+)\\)";
+
+        // Create a list to store the extracted user IDs
+        List<String> taggedUserIds = new ArrayList<>();
+
+        // Create a Pattern object
+        Pattern pattern = Pattern.compile(regex);
+
+        // Create a Matcher object
+        Matcher matcher = pattern.matcher(message);
+
+        // Extract all user IDs
+        while (matcher.find()) {
+            // Group 1 contains the user ID
+            taggedUserIds.add(matcher.group(1));
+        }
+
+        return taggedUserIds;
+    }
+
+
+
+    private List<String> getTaggedUsersHtml(String messageHtml) {
         // Parse the HTML message
         Document document = Jsoup.parse(messageHtml);
 
@@ -1374,7 +1400,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> ticketDetail = new HashMap<>();
         ticketDetail.put("ticketNumber", ticket.getTicketId().toString());
         ticketDetail.put("senderName", currentUser.getFirstName());
-        ticketDetail.put("messageContent", claimTicketRejectRequest.getMessage());
+        ticketDetail.put("messageContent", updateMessage(claimTicketRejectRequest.getMessage()));
         ticketDetail.put("id", ticket.getId().toString());
         if (activityType.equals(ClaimTicketActivityEnum.REPLY_CUSTOMER.name())) {
             mailService.sendReplyToCustomerEmail(ticketDetail, claimTicketRejectRequest, ticket.getUser());
@@ -1385,6 +1411,14 @@ public class SepsAndFiClaimTicketService {
             ticketDetail.put("taggedBy", currentUser.getFirstName());
             taggedUserList.forEach(user -> mailService.sendEmailToTaggedUser(ticketDetail, user));
         }
+    }
+
+    private String updateMessage(String message) {
+        // Define the regex pattern to match all tagged users in the format @[Name](ID)
+        String regex = "@\\[(.*?)\\]\\(\\d+\\)";
+
+        // Replace all matches with the captured group (Name)
+        return message.replaceAll(regex, "$1");
     }
 
     @Transactional

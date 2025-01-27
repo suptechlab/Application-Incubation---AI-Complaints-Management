@@ -74,7 +74,7 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
                                             @Param("instanceType") InstanceTypeEnum instanceType,
                                             @Param("closedStatus") ClaimTicketStatusEnum closedStatus,
                                             @Param("rejectedStatus") ClaimTicketStatusEnum rejectedStatus
-                                            );
+    );
 
 
     @Query("SELECT new com.seps.ticket.service.projection.ClaimStatusCountProjection(ct.status, COUNT(ct)) " +
@@ -181,4 +181,9 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
                                                      @Param("rejected") ClaimTicketStatusEnum rejected);
 
     Optional<ClaimTicket> findByInstanceTypeAndPreviousTicketId(InstanceTypeEnum instanceTypeEnum, Long previousTicketId);
+
+    Optional<ClaimTicket> findByIdAndOrganizationIdAndInstanceTypeAndStatusNotIn(Long id, Long organizationId, InstanceTypeEnum instanceType, List<ClaimTicketStatusEnum> status);
+
+    Optional<ClaimTicket> findByIdAndInstanceTypeAndStatusNotIn(Long id, InstanceTypeEnum instanceType, List<ClaimTicketStatusEnum> status);
+
 }

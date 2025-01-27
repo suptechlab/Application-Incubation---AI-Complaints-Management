@@ -201,8 +201,8 @@ public class ReportService {
      * @param filterRequest the filter criteria for fetching SLA compliance data.
      *                      If null, a default filter request is initialized.
      * @return a {@link Page} of {@link SLAComplianceDTO} containing SLA compliance details
-     *         such as SLA duration, actual resolution time, SLA compliance status, and
-     *         breach reasons (if applicable).
+     * such as SLA duration, actual resolution time, SLA compliance status, and
+     * breach reasons (if applicable).
      *
      * <p>The method performs the following operations:
      * <ul>
@@ -213,9 +213,8 @@ public class ReportService {
      *     <li>Determines SLA compliance status based on the calculated duration and resolution time.</li>
      *     <li>Populates the SLA breach reason if the ticket is non-compliant.</li>
      * </ul>
-     *
+     * <p>
      * Transactional (readOnly=true) ensures the method executes within a read-only transactional context.
-     *
      * @see Pageable
      * @see ClaimTicketFilterRequest
      * @see SLAComplianceDTO
@@ -226,7 +225,7 @@ public class ReportService {
         filterRequest = getClaimTicketFilterRequest(filterRequest);
         return claimTicketRepository.findAll(ClaimTicketSpecification.getSlaComplianceReport(filterRequest), pageable)
             .map(claimTicket -> {
-                SLAComplianceDTO slaCompliance =  claimTicketMapper.toListSlaDTO(claimTicket);
+                SLAComplianceDTO slaCompliance = claimTicketMapper.toListSlaDTO(claimTicket);
 
                 LocalDate slaBreachDate = slaCompliance.getSlaBreachDate();
 
@@ -237,7 +236,7 @@ public class ReportService {
                 long slaDurationInDays = ChronoUnit.DAYS.between(creationDate, slaBreachDate);
 
                 LocalDateTime dateOfCreation = LocalDateTime.ofInstant(slaCompliance.getCreatedAt(), zoneId);
-                LocalDateTime dateOfResolution = LocalDateTime.ofInstant(slaCompliance.getResolvedOn() !=null ?slaCompliance.getResolvedOn() : slaCompliance.getUpdatedAt(), zoneId);
+                LocalDateTime dateOfResolution = LocalDateTime.ofInstant(slaCompliance.getResolvedOn() != null ? slaCompliance.getResolvedOn() : slaCompliance.getUpdatedAt(), zoneId);
 
                 // Calculate Actual Resolution Time in days
                 Duration duration = Duration.between(dateOfCreation, dateOfResolution);
@@ -263,27 +262,27 @@ public class ReportService {
      * @return a {@link ByteArrayInputStream} containing the Excel report data.
      * @throws IOException if an error occurs during Excel file generation.
      *
-     * <p>The method performs the following operations:
-     * <ul>
-     *     <li>Initializes the filter request if it is not provided.</li>
-     *     <li>Fetches a list of claim tickets matching the filter criteria using the repository.</li>
-     *     <li>Creates an Excel workbook and sheet, and adds headers based on the {@link ExcelHeaderSlaComplianceReportEnum}.</li>
-     *     <li>Populates rows with SLA compliance data using {@link #createSlaRows(ClaimTicket, Row)}.</li>
-     *     <li>Auto-sizes the columns for better readability.</li>
-     *     <li>Writes the Excel workbook to a {@link ByteArrayOutputStream} and returns it as a {@link ByteArrayInputStream}.</li>
-     * </ul>
-     *
-     * Transactional(readOnly = true) ensures the method executes within a read-only transactional context.
-     *
+     *                     <p>The method performs the following operations:
+     *                     <ul>
+     *                         <li>Initializes the filter request if it is not provided.</li>
+     *                         <li>Fetches a list of claim tickets matching the filter criteria using the repository.</li>
+     *                         <li>Creates an Excel workbook and sheet, and adds headers based on the {@link ExcelHeaderSlaComplianceReportEnum}.</li>
+     *                         <li>Populates rows with SLA compliance data using {@link #createSlaRows(ClaimTicket, Row)}.</li>
+     *                         <li>Auto-sizes the columns for better readability.</li>
+     *                         <li>Writes the Excel workbook to a {@link ByteArrayOutputStream} and returns it as a {@link ByteArrayInputStream}.</li>
+     *                     </ul>
+     *                     <p>
+     *                     Transactional(readOnly = true) ensures the method executes within a read-only transactional context.
      * @see ClaimTicketFilterRequest
      * @see ExcelHeaderSlaComplianceReportEnum
      */
     @Transactional(readOnly = true)
-    public ByteArrayInputStream getDownloadSlaComplianceData(ClaimTicketFilterRequest filterRequest) throws IOException{
+    public ByteArrayInputStream getDownloadSlaComplianceData(ClaimTicketFilterRequest filterRequest) throws IOException {
         // If no filterRequest is provided, initialize a default object
         filterRequest = getClaimTicketFilterRequest(filterRequest);
+        LOG.debug("filterRequest:{}", filterRequest);
 
-        List<ClaimTicket>slaComplianceList = claimTicketRepository.findAll(ClaimTicketSpecification.getSlaComplianceReport(filterRequest)).stream().toList();
+        List<ClaimTicket> slaComplianceList = claimTicketRepository.findAll(ClaimTicketSpecification.getSlaComplianceReport(filterRequest)).stream().toList();
 
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -319,13 +318,12 @@ public class ReportService {
      * @param data the {@link ClaimTicket} containing SLA compliance data.
      * @param row  the Excel {@link Row} to populate with data.
      *
-     * <p>The method performs the following operations:
-     * <ul>
-     *     <li>Sets cell values for fields such as ticket ID, claim type, FI entity, SLA breach date, and status.</li>
-     *     <li>Calculates SLA duration and actual resolution time in days.</li>
-     *     <li>Determines SLA compliance status and populates the SLA breach reason if applicable.</li>
-     * </ul>
-     *
+     *             <p>The method performs the following operations:
+     *             <ul>
+     *                 <li>Sets cell values for fields such as ticket ID, claim type, FI entity, SLA breach date, and status.</li>
+     *                 <li>Calculates SLA duration and actual resolution time in days.</li>
+     *                 <li>Determines SLA compliance status and populates the SLA breach reason if applicable.</li>
+     *             </ul>
      * @see ClaimTicket
      * @see ExcelHeaderSlaComplianceReportEnum
      */
@@ -355,10 +353,11 @@ public class ReportService {
         // Convert Instant to LocalDate
         ZoneId zoneId = ZoneId.systemDefault(); // Use system's default time zone
         LocalDate creationDate = data.getCreatedAt().atZone(zoneId).toLocalDate();
+        LOG.debug("id :{} creationDate:{} slaBreachDate:{} ", data.getId(), creationDate, slaBreachDate);
         long slaDurationInDays = ChronoUnit.DAYS.between(creationDate, slaBreachDate);
 
         LocalDateTime dateOfCreation = LocalDateTime.ofInstant(data.getCreatedAt(), zoneId);
-        LocalDateTime dateOfResolution = LocalDateTime.ofInstant(data.getResolvedOn() !=null ?data.getResolvedOn() : data.getUpdatedAt(), zoneId);
+        LocalDateTime dateOfResolution = LocalDateTime.ofInstant(data.getResolvedOn() != null ? data.getResolvedOn() : data.getUpdatedAt(), zoneId);
 
         // Calculate Actual Resolution Time in days
         Duration duration = Duration.between(dateOfCreation, dateOfResolution);
@@ -388,7 +387,7 @@ public class ReportService {
         // If no filterRequest is provided, initialize a default object
         filterRequest = getClaimTicketFilterRequest(filterRequest);
 
-        List<ClaimTicket>slaComplianceList = claimTicketRepository.findAll(ClaimTicketSpecification.getSlaComplianceReport(filterRequest)).stream().toList();
+        List<ClaimTicket> slaComplianceList = claimTicketRepository.findAll(ClaimTicketSpecification.getSlaComplianceReport(filterRequest)).stream().toList();
         Double avgTime = calculateAverageResolutionTime(slaComplianceList);
         Map<String, Object> data = new HashMap<>();
         data.put("averageResolutionTime", avgTime);
@@ -400,7 +399,7 @@ public class ReportService {
      *
      * @param slaComplianceList a list of {@link ClaimTicket} objects to calculate resolution time.
      * @return the average resolution time in days as a double value. If the list is empty or contains no resolved tickets,
-     *         the method returns 0.0.
+     * the method returns 0.0.
      */
     public double calculateAverageResolutionTime(List<ClaimTicket> slaComplianceList) {
         if (slaComplianceList == null || slaComplianceList.isEmpty()) {
