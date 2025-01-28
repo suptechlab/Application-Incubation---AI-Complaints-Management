@@ -3,6 +3,7 @@ package com.seps.user.enums;
 import com.seps.user.component.EnumWithDescription;
 
 public enum PriorityCareGroupEnum implements EnumWithDescription {
+    NONE("priority.care.none"),
     ADULT("priority.care.adult"),
     CHILD_OR_ADOLESCENT("priority.care.child.or.adolescent"),
     PREGNANT_WOMAN("priority.care.pregnant.woman"),
