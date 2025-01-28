@@ -368,5 +368,7 @@ export const spanishLang = {
     "SLA_BREACH_DAYS": "Días de Incumplimiento del SLA",
     "ALL_COMPLIANCES": "Todas las Conformidades",
     "NON_COMPLAINT": "No Conforme",
-    "NONE": "None"
+    "NONE": "None",
+    "MODULE_NAME": "Nombre del módulo",
+    "PERMISSIONS": "Permisos"
 } 

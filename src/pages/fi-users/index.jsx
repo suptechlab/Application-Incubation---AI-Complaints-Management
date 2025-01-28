@@ -17,7 +17,6 @@ import Toggle from "../../components/Toggle";
 import { AuthenticationContext } from "../../contexts/authentication.context";
 import { handleFIUsersStatusChange, handleGetFIusersList } from "../../services/fiusers.services";
 import SearchForm from "./SearchForm";
-import { capitalizeFirstLetter } from "../../utils/commonutils";
 
 export default function FIUserList() {
 
@@ -171,7 +170,7 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info.row.original.name ? capitalizeFirstLetter(info?.row?.original?.name) : "N/A"}
+              {info.row.original.name ? info?.row?.original?.name : "N/A"}
             </span>
           );
         },
@@ -202,7 +201,7 @@ export default function FIUserList() {
         cell: (info) => {
           return (
             <span>
-              {info.row.original.organization?.razonSocial ? capitalizeFirstLetter(info?.row?.original?.organization?.razonSocial) : "N/A"}
+              {info.row.original.organization?.razonSocial ? info?.row?.original?.organization?.razonSocial : "N/A"}
             </span>
           );
         },
@@ -221,11 +220,11 @@ export default function FIUserList() {
         },
       },
       {
-        accessorFn: (row) => row.createdAt,
-        id: "createdAt",
+        accessorFn: (row) => row.createdDate,
+        id: "createdDate",
         header: () => t("CREATION DATE"),
         cell: (info) => {
-          return <span>{moment(info.row.original.createdAt).format("l")}</span>;
+          return <span>{moment(info.row.original.createdDate).format("l")}</span>;
         },
       },
       ...(permissionsState?.statusModule
