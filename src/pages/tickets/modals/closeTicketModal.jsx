@@ -27,8 +27,6 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
     }, [masterData])
 
 
-    console.log(subStatus)
-
     //Handle File Change
     // const handleFileChange = (event) => {
     //     const file = event.currentTarget.files[0];

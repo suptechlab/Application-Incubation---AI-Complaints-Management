@@ -12,11 +12,11 @@ const MentionEditor = ({ id, name, height,error,touched,value,handleChange,handl
   const [loading, setLoading] = useState(false)
 
   // Example data for mentions
-  const users = [
-    { id: "1", display: "John Doe" },
-    { id: "2", display: "Jane Smith" },
-    { id: "3", display: "Alice Johnson" },
-  ];
+  // const users = [
+  //   { id: "1", display: "John Doe" },
+  //   { id: "2", display: "Jane Smith" },
+  //   { id: "3", display: "Alice Johnson" },
+  // ];
 
   // const handleChange = (event) => {
   //   setValue(event.target.value);
@@ -33,7 +33,7 @@ const MentionEditor = ({ id, name, height,error,touched,value,handleChange,handl
       const transformedData = agentList.map(item => ({
         id: item.id,
         display: item.name,
-        email: item.email
+        // email: item.email
       }));
 
       // console.log(transformedData);
@@ -59,16 +59,19 @@ const MentionEditor = ({ id, name, height,error,touched,value,handleChange,handl
 
   const displayTransformHandler = useCallback(
     (id, display) => {
-      const user = users.find((item) => item.id === id);
-      return `@${user?.firstName || display}`;
+      const agent = agents.find((item) => item.id === id);
+      return `@${agent?.firstName || display}`;
     },
-    [users]
+    [agents]
   );
 
 
   const renderUserSuggestion = useCallback(
     (suggestion, search, highlightedDisplay, index, focused) => {
+      
       const agent = agents[index];
+
+      console.log({agent})
       if (!agent) {
         return suggestion.display;
       }
@@ -81,6 +84,7 @@ const MentionEditor = ({ id, name, height,error,touched,value,handleChange,handl
     },
     [agents]
   );
+
   return (
     <div className="mention-editor">
       <MentionsInput
@@ -95,7 +99,7 @@ const MentionEditor = ({ id, name, height,error,touched,value,handleChange,handl
         <Mention
           trigger="@"
           data={agents}
-          renderSuggestion={renderUserSuggestion}
+          // renderSuggestion={renderUserSuggestion}
           style={{ backgroundColor: "rgba(0, 123, 255, 0.25)" }}
           displayTransform={displayTransformHandler}
         />
