@@ -36,7 +36,7 @@ const InfoCards = ({ filter, setLoading }) => {
   const cardsData = [
     {
       bgColor: 'bg-body border border-orange',
-      iconBg: 'bg-orange-subtle',
+      iconBg: 'bg-orange-subtle text-orange',
       Icon: <MdEditDocument size={30} />,
       title: t('TOTAL_CLAIMS'),
       value: claimStatsData?.totalClaims,
@@ -44,7 +44,7 @@ const InfoCards = ({ filter, setLoading }) => {
     },
     {
       bgColor: 'bg-body border border-primary',
-      iconBg: 'bg-primary',
+      iconBg: 'bg-primary text-primary',
       Icon: <MdAssignmentAdd size={30} />,
       title: t('NEW_CLAIMS'),
       value: claimStatsData?.countsByStatus?.NEW,
@@ -52,7 +52,7 @@ const InfoCards = ({ filter, setLoading }) => {
     },
     {
       bgColor: 'bg-body border border-warning',
-      iconBg: 'bg-warning',
+      iconBg: 'bg-warning text-warning',
       Icon: SvgIcons.fileInfoIcon,
       title: t('PENDING_CLAIMS'),
       value: claimStatsData?.countsByStatus?.PENDING,
@@ -60,7 +60,7 @@ const InfoCards = ({ filter, setLoading }) => {
     },
     {
       bgColor: 'bg-body border border-info',
-      iconBg: 'bg-info',
+      iconBg: 'bg-info text-info',
       Icon: <MdAnalytics size={30} />,
       title: t('CLAIMS_IN_PROGRESS'),
       value: claimStatsData?.countsByStatus?.IN_PROGRESS,
@@ -68,7 +68,7 @@ const InfoCards = ({ filter, setLoading }) => {
     },
     {
       bgColor: 'bg-body border border-success',
-      iconBg: 'bg-success',
+      iconBg: 'bg-success text-success',
       Icon: <MdTask size={30} />,
       title: t('CLAIMS_CLOSED'),
       value: claimStatsData?.countsByStatus?.CLOSED,
@@ -76,7 +76,7 @@ const InfoCards = ({ filter, setLoading }) => {
     },
     {
       bgColor: 'bg-body border border-danger',
-      iconBg: 'bg-danger',
+      iconBg: 'bg-danger text-danger',
       Icon: SvgIcons.fileCloseIcon,
       title: t('CLAIMS_REJECTED'),
       value: claimStatsData?.countsByStatus?.REJECTED,
@@ -89,13 +89,13 @@ const InfoCards = ({ filter, setLoading }) => {
       {cardsData.map((card, index) => (
         <Col key={index} {...card.colProps}>
           <Stack
-            gap={2}
-            className={`align-items-center p-3  rounded-3 h-100 ${card.bgColor || 'bg-primary'}`}
+            gap={1}
+            className={`align-items-center p-2  rounded-3 h-100 ${card.bgColor || 'bg-primary'}`}
           >
-            <span className={`custom-width-64 custom-height-64 flex-shrink-0 d-flex align-items-center justify-content-center ${card.iconBg} bg-opacity-25 rounded-pill mt-1`}>
+            <span className={`custom-width-48 custom-height-48 flex-shrink-0 d-flex align-items-center justify-content-center ${card.iconBg} bg-opacity-25 rounded-pill mt-1`}>
               {card.Icon}
             </span>
-            <div className="custom-font-size-30 lh-sm">{card.value}</div>
+            <div className="fs-4 lh-sm ">{card.value}</div>
             <div className="lh-sm fw-semibold text-center">{card.title}</div>
           </Stack>
         </Col>
