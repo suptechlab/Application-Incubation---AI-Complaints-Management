@@ -26,7 +26,7 @@ import org.zalando.problem.Status;
 import java.util.*;
 
 import static com.seps.admin.component.CommonHelper.convertEntityToMap;
-
+import static com.seps.admin.component.CommonHelper.capitalizeCustom;
 @Service
 public class OrganizationService {
 
@@ -128,7 +128,7 @@ public class OrganizationService {
             .map(org->{
                 DropdownListDTO orgDto = new DropdownListDTO();
                 orgDto.setId(org.getId());
-                orgDto.setName(org.getRazonSocial() + " (" + org.getRuc() + ")" );
+                orgDto.setName(capitalizeCustom(org.getRazonSocial()) + " (" + org.getRuc() + ")" );
                 return orgDto;
             })
             .toList();
