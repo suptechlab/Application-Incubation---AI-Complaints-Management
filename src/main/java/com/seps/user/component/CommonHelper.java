@@ -11,6 +11,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.time.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,5 +72,17 @@ public class CommonHelper {
         return map;
     }
 
+    // Helper method for capitalization
+    public static String capitalizeCustom(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        // Split the string into words, capitalize each word, and join them back
+        return String.join(" ",
+            Arrays.stream(value.toLowerCase().split("\\s+"))
+                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
+                .toArray(String[]::new)
+        );
+    }
 
 }
