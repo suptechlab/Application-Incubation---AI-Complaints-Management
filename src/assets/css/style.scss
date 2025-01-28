@@ -325,8 +325,17 @@ input:-webkit-autofill:active {
     list-style: none;
 }
 
-.chart-container{
-    canvas{
+.chart-container {
+    canvas {
         height: 250px;
+    }
+}
+
+.table {
+    --bs-border-width: 0px;
+
+    &.table-white {
+        --bs-table-bg: var(--bs-white);
+        --bs-border-width: 1px;
     }
 }

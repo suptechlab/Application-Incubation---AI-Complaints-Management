@@ -347,5 +347,7 @@ export const spanishLang = {
     "CLAIM_SUCCESS_EMAIL": "Su reclamación se ha presentado con éxito. Los detalles se han enviado a su correo electrónico",
     "SORT_ASCENDING": "Orden ascendente",
     "SORT_DESCENDING": "Orden descendente",
-    "CLEAR_SORT":"Borrar clasificación"
+    "CLEAR_SORT": "Borrar clasificación",
+    "MODULE_NAME": "Nombre del módulo",
+    "PERMISSIONS": "Permisos"
 } 
