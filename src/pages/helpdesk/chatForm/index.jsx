@@ -359,6 +359,10 @@ const ChatBotForm = () => {
                     setIsFileUpload(true)
                     return null
                 }
+                else if (item?.custom?.redirect) {
+                    window.open(item.custom.redirect, "_blank");
+                    return null
+                }
                 else {
                     setIsFileUpload(false)
                     return {
@@ -489,7 +493,7 @@ const ChatBotForm = () => {
 
                                 setFieldValue('attachments', '')
                                 handleSendQuery({ message: 'Quiero subir un archivo', metadata })
-                              
+
                                 // SEND RESULT IN SEND QUERY
                             } else {
                                 console.error("Verification error:", result.error.message);
