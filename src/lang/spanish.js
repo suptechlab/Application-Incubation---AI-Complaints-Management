@@ -159,5 +159,7 @@ export const spanishLang = {
   "VERIFYING": "Verificando",
   "UPLOAD_ATTACHMENTS": "Subir archivos adjuntos",
   "TYPE_A_MESSAGE": "Escribe un mensaje",
-  "NONE": "None"
+  "NONE": "None",
+  "NEW_CLAIMS": "Nuevas Reclamaciones",
+  "PENDING_CLAIMS": "Reclamaciones pendientes"
 }
