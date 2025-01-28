@@ -13,6 +13,7 @@ export const NavItems = () => {
       menuIcon: <MdDashboard size={20} />,
       path: "/dashboard",
       moduleName: "Dashboard",
+      default:true,
       disabled: false,
     },
     {

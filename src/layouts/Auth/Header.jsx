@@ -166,7 +166,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 </span>
                 <span className="align-middle">{t('CHANGE_PASSWORD')}</span>
               </Dropdown.Item>
-              <Dropdown.Item as={Link} onClick={logout}>
+              <Dropdown.Item as={Button} onClick={logout}>
                 <span className="me-2">
                   <MdLogout size={18} />
                 </span>
