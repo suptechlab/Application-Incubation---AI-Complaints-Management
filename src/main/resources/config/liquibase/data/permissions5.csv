@@ -1,0 +1,4 @@
+id,module_id,name,description,description_es
+87,8,SEPS_USER_IMPORT_BY_SEPS,Import SEPS User,Importar usuario de SEPS
+88,9,FI_USER_IMPORT_BY_SEPS,Import FI User,Importar usuario de FI
+89,15,FI_USER_IMPORT_BY_FI,Import FI User,Importar usuario de FI

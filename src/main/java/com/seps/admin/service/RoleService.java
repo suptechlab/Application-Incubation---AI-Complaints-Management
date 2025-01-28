@@ -232,9 +232,9 @@ public class RoleService {
                     RoleDTO.ModuleDTO moduleDTO = new RoleDTO.ModuleDTO();
                     moduleDTO.setId(module.getId());
                     if(LocaleContextHolder.getLocale().equals(Locale.forLanguageTag(Constants.DEFAULT_LANGUAGE))) {
-                        moduleDTO.setName(module.getName());
-                    }else{
                         moduleDTO.setName(module.getNameEs());
+                    }else{
+                        moduleDTO.setName(module.getName());
                     }
 
                     List<RoleDTO.PermissionDTO> permissionDTOs = module.getPermissions().stream()
@@ -243,9 +243,9 @@ public class RoleService {
                         permissionDTO.setId(permission.getId());
                         permissionDTO.setName(permission.getName());
                         if(LocaleContextHolder.getLocale().equals(Locale.forLanguageTag(Constants.DEFAULT_LANGUAGE))) {
-                            permissionDTO.setDescription(permission.getDescription());
-                        }else{
                             permissionDTO.setDescription(permission.getDescriptionEs());
+                        }else{
+                            permissionDTO.setDescription(permission.getDescription());
                         }
 
                         boolean isChecked = role.getRolePermissions().stream()
@@ -275,20 +275,20 @@ public class RoleService {
                 ModuleDTO moduleDTO = new ModuleDTO();
                 moduleDTO.setId(module.getId());
                 if(LocaleContextHolder.getLocale().equals(Locale.forLanguageTag(Constants.DEFAULT_LANGUAGE))) {
-                    moduleDTO.setName(module.getName());
-                    moduleDTO.setDescription(module.getDescription());
-                }else{
                     moduleDTO.setName(module.getNameEs());
                     moduleDTO.setDescription(module.getDescriptionEs());
+                }else{
+                    moduleDTO.setName(module.getName());
+                    moduleDTO.setDescription(module.getDescription());
                 }
                 moduleDTO.setPermissions(module.getPermissions().stream().sorted(Comparator.comparing(Permission::getId)).map(permission -> {
                     PermissionDTO permissionDTO = new PermissionDTO();
                     permissionDTO.setId(permission.getId());
                     permissionDTO.setName(permission.getName());
                     if(LocaleContextHolder.getLocale().equals(Locale.forLanguageTag(Constants.DEFAULT_LANGUAGE))) {
-                        permissionDTO.setDescription(permission.getDescription());
-                    }else{
                         permissionDTO.setDescription(permission.getDescriptionEs());
+                    }else{
+                        permissionDTO.setDescription(permission.getDescription());
                     }
                     permissionDTO.setChecked(false);
                     return permissionDTO;
