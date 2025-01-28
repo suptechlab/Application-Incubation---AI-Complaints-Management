@@ -4,6 +4,8 @@ import lombok.Data;
 
 import java.time.Instant;
 
+import static com.seps.user.component.CommonHelper.capitalizeCustom;
+
 @Data
 public class OrganizationDTO {
     private Long id;
@@ -15,4 +17,9 @@ public class OrganizationDTO {
     private Instant createdAt;
     private Long updatedBy;
     private Instant updatedAt;
+
+    // Custom setter for `razonSocial`
+    public void setRazonSocial(String razonSocial) {
+        this.razonSocial = capitalizeCustom(razonSocial);
+    }
 }
