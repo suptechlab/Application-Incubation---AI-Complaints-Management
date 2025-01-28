@@ -13,8 +13,9 @@ const PermissionsTable = ({ modules, values, handleCheckboxChange, setFieldValue
         </tr>
       </thead>
       <tbody>
-        {modules.map((module) => (
-          <tr key={module.name}>
+        {modules.map((module) => {
+          if(module?.permissions?.length>0){
+            return <tr key={module.name}>
             <td className="fw-semibold">{module.name}</td>
             <td>
               {module.permissions.map((permission) => (
@@ -42,7 +43,11 @@ const PermissionsTable = ({ modules, values, handleCheckboxChange, setFieldValue
               ))}
             </td>
           </tr>
-        ))}
+          }else{
+            return ''
+          }
+         
+        })}
       </tbody>
     </table>
   );
