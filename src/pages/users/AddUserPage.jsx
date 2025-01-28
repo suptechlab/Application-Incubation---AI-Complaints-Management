@@ -17,8 +17,6 @@ import {
 } from "../../services/user.service";
 import { validationSchema } from "../../validations/user.validation";
 import UserLoader from "../../components/UserLoader";
-import { capitalizeFirstLetter } from "../../utils/commonutils";
-
 export default function AddStatePage() {
 
 
@@ -64,10 +62,10 @@ export default function AddStatePage() {
         setEmailDisabled(response.data?.email === "" ? false : true);
 
         setInitialValues({
-          name: response.data?.name ? capitalizeFirstLetter(response.data?.name ?? "") : "",
+          name: response.data?.name ? response.data?.name: "",
           email: response.data?.email ? response.data?.email : "",
           roleId: response.data?.roleId ?? "",
-          department: response.data?.department ? capitalizeFirstLetter(response.data?.department ?? "") : "",
+          department: response.data?.department ? response.data?.department  : "",
         });
         setLoading(false);
       });
@@ -89,8 +87,8 @@ export default function AddStatePage() {
         toast.success(t("EMAIL_VERIFIED"));
 
         // Update the Formik fields with the response data
-        setFieldValue("name", capitalizeFirstLetter(displayName || ""));
-        setFieldValue("department", capitalizeFirstLetter(department || ""));
+        setFieldValue("name",displayName || "");
+        setFieldValue("department", department || "");
       } else {
         toast.error(response.data.errorDescription);
       }

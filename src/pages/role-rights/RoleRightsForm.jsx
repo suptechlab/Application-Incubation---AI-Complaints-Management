@@ -14,6 +14,7 @@ import {
   handleGetRoleRightById,
 } from "../../services/rolerights.service";
 import { validationSchema } from "../../validations/rolerights.validation";
+import PermissionsTable from "./PermissionTable";
 
 const RoleRightsForm = () => {
 
@@ -243,10 +244,15 @@ const RoleRightsForm = () => {
                       </Row>
                       {/* <pre>{JSON.stringify(values.rights,null,2)}</pre> */}
                       <div className="mt-2">
-                        <h5 className="fw-semibold border-bottom pb-1 mb-3">
-                        {t("USER_RIGHTS")}
+                        <h5 className="fw-semibold pb-1 mb-3">
+                          {t("USER_RIGHTS")}
                         </h5>
-                        {modules.map((module) => (
+                        <PermissionsTable
+                          modules={modules}
+                          values={values}
+                          handleCheckboxChange={handleCheckboxChange}
+                          setFieldValue={setFieldValue} />
+                        {/* {modules.map((module) => (
                           <div key={module.id} className="mb-2 pb-1">
                             <Row>
                               <Col
@@ -285,7 +291,7 @@ const RoleRightsForm = () => {
                               </Col>
                             </Row>
                           </div>
-                        ))}
+                        ))} */}
                       </div>
                     </Col>
                   </Row>

@@ -10,7 +10,7 @@ import { convertToLabelValue } from "../../../../../services/ticketmanagement.se
 
 const DashboardListFilters = ({ filter, setFilter }) => {
     const { t } = useTranslation();
- 
+
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
     const [statusDropdownData, setStatusDropdownData] = useState([])
@@ -30,15 +30,15 @@ const DashboardListFilters = ({ filter, setFilter }) => {
 
 
 
-    useEffect(()=>{
-        if(masterData?.claimTicketStatus){
+    useEffect(() => {
+        if (masterData?.claimTicketStatus) {
             setStatusDropdownData([{ select: '', label: t('ALL STATUS') }, ...convertToLabelValue(masterData?.claimTicketStatus)])
         }
-       
-    },[masterData])
+
+    }, [masterData])
 
 
-  
+
 
     return (
         <div className="theme-card-header header-search mb-3">
@@ -70,7 +70,7 @@ const DashboardListFilters = ({ filter, setFilter }) => {
                 </div>
 
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                <ReactSelect
+                    <ReactSelect
                         wrapperClassName="mb-0"
                         class="form-select "
                         placeholder={t("ALL STATUS")}
@@ -98,6 +98,7 @@ const DashboardListFilters = ({ filter, setFilter }) => {
                             selectsRange={true}
                             placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
+                            maxDate={new Date()} // Prevent future date selection
                         />
                     </div>
                 </Stack>

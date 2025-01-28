@@ -93,8 +93,6 @@ export default function Otp() {
                                     }) => (
                                         <FormikForm>
                                             <Form.Group className="mb-4 pb-2">
-
-                                                {console.log(isSubmitting)}
                                                 <OtpInput
                                                     value={values.otpCode}
                                                     numInputs={6}

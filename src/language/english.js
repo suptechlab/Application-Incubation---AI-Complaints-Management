@@ -372,5 +372,8 @@ export const englishLang = {
     "SLA_DUE_DATE":"SLA Due Date",
     "SLA_BREACH_DAYS":"SLA Breach Days",
     "ALL_COMPLIANCES":"ALL Compliances",
-    "NON_COMPLAINT":"Non Complaint"
+    "NON_COMPLAINT":"Non Complaint",
+    "NONE":"None",
+    "MODULE_NAME":"Module Name",
+    "PERMISSIONS":"Permisssions"
 }

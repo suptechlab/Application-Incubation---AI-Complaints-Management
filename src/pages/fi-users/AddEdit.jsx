@@ -14,7 +14,6 @@ import { getOrganizationInfo, getPersonalInfo, handleAddFIUsers, handleEditFIUse
 import { getRolesDropdownData } from "../../services/rolerights.service";
 import { validationSchema } from "../../validations/fiUsers.validation";
 import { AuthenticationContext } from "../../contexts/authentication.context";
-import { capitalizeFirstLetter } from "../../utils/commonutils";
 
 export default function FIUserAddEdit() {
 
@@ -55,13 +54,13 @@ export default function FIUserAddEdit() {
       handleGetFIuserById(id).then((response) => {
         setInitialValues({
           identification: response.data?.identificacion ? response.data?.identificacion : "",
-          name: response.data?.name ? capitalizeFirstLetter(response.data?.name ?? "") : "",
+          name: response.data?.name ? response.data?.name: "",
           email: response.data?.email ? response.data?.email : "",
           countryCode: response?.data?.countryCode ?? "+593",
           phoneNumber: response?.data?.phoneNumber ? response?.data?.phoneNumber : "",
           ruc: response?.data?.organization?.ruc ? response?.data?.organization?.ruc : "",
-          entityName: response?.data?.organization?.razonSocial ? capitalizeFirstLetter(response?.data?.organization?.razonSocial ?? "") : "",
-          entityType: response.data?.organization?.tipoOrganizacion ? capitalizeFirstLetter(response.data?.organization?.tipoOrganizacion ?? "") : "",
+          entityName: response?.data?.organization?.razonSocial ? response?.data?.organization?.razonSocial: "",
+          entityType: response.data?.organization?.tipoOrganizacion ? response.data?.organization?.tipoOrganizacion: "",
           roleId: response.data?.roleId ? response.data?.roleId : "",
         })
         setLoading(false);
@@ -107,7 +106,7 @@ export default function FIUserAddEdit() {
     getPersonalInfo(identification).then((response) => {
       setLoadingInfo(false)
       if (response?.data?.nombreCompleto) {
-        setFieldValue("name", capitalizeFirstLetter(response?.data?.nombreCompleto ?? ''))
+        setFieldValue("name",response?.data?.nombreCompleto ?? '')
       } else {
         setFieldValue("name", "")
       }
@@ -130,13 +129,8 @@ export default function FIUserAddEdit() {
     getOrganizationInfo(ruc).then((response) => {
       setLoadingInfo(false)
       if (response?.data?.razonSocial) {
-        // setInitialValues({
-        //   ...initialValue, ruc: ruc,
-        //   entityName: capitalizeFirstLetter(response?.data?.razonSocial ?? ''),
-        //   entityType: capitalizeFirstLetter(response?.data?.tipoOrganizacion ?? '')
-        // })
-        setFieldValue('entityName', capitalizeFirstLetter(response?.data?.razonSocial ?? ''))
-        setFieldValue('entityType', capitalizeFirstLetter(response?.data?.tipoOrganizacion ?? ''))
+        setFieldValue('entityName', response?.data?.razonSocial ?? '')
+        setFieldValue('entityType', response?.data?.tipoOrganizacion ?? '')
       } else {
         setFieldValue('entityName', '')
         setFieldValue('entityType', '')
@@ -231,8 +225,8 @@ export default function FIUserAddEdit() {
       setInitialValues({
         ...initialValue,
         ruc: userData?.organization?.ruc,
-        entityName: capitalizeFirstLetter(userData?.organization?.razonSocial ?? ''),
-        entityType: capitalizeFirstLetter(userData?.organization?.tipoOrganizacion ?? '')
+        entityName: userData?.organization?.razonSocial ?? '',
+        entityType: userData?.organization?.tipoOrganizacion ?? ''
       })
     }
   }, [currentUser])
