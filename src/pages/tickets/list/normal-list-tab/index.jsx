@@ -33,25 +33,25 @@ const TicketsNormalList = ({ selectedTab }) => {
     const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
     // PERMISSIONS work
     const [permissionsState, setPermissionsState] = React.useState({
-        addModule: false,
-        assignPermission: false
+        assignPermission: false,
+        editModule : false,
     });
 
     useEffect(() => {
         const updatedPermissions = {
-            addModule: false,
-            assignPermission: false
+            assignPermission: false,
+            editModule:false
         };
         if (currentUser === "SYSTEM_ADMIN") {
-            updatedPermissions.addModule = true;
             updatedPermissions.assignPermission = true;
+            updatedPermissions.editModule = true;
         } else {
             const permissionArr = permissions['Ticket'] ?? [];
-            if (["TICKET_CREATED_BY_SEPS", "TICKET_CREATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
-                updatedPermissions.addModule = true;
-            }
             if (["TICKET_ASSIGNED_TO_AGENT_FI", "TICKET_ASSIGNED_TO_AGENT_SEPS"].some(permission => permissionArr.includes(permission))) {
                 updatedPermissions.assignPermission = true;
+            }
+            if (["TICKET_UPDATED_BY_SEPS", "TICKET_UPDATED_BY_FI"].some(permission => permissionArr.includes(permission))) {
+                updatedPermissions.editModule = true;
             }
         }
 
@@ -64,6 +64,7 @@ const TicketsNormalList = ({ selectedTab }) => {
         pageIndex: params.page ? parseInt(params.page) - 1 : 0,
         pageSize: params.limit ? parseInt(params.limit) : 10,
     });
+    const [columns, setColumns] = useState([]);
 
     const [sorting, setSorting] = React.useState([
         {
@@ -84,8 +85,6 @@ const TicketsNormalList = ({ selectedTab }) => {
     const [clearTableSelection, setClearTableSelection] = useState(false)
 
     const [claimStatsData, setClaimsStatsData] = useState([])
-
-
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
@@ -357,7 +356,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                     <span>{row?.original?.fiAgent?.name}</span>
                 ),
             },
-            {
+            ...(permissionsState.editModule ? [ {
                 accessorFn: (row) => row?.action,
                 id: "action",
                 header: () => t("ACTION"),
@@ -383,7 +382,8 @@ const TicketsNormalList = ({ selectedTab }) => {
                     }  
                     </div>
                 ),
-            },
+            },] : []),
+           
             {
                 accessorFn: (row) => row?.status,
                 id: "status",
@@ -501,7 +501,12 @@ const TicketsNormalList = ({ selectedTab }) => {
     };
 
     // Inside your component, dynamically decide the columns
-    const columns = getColumnsForUser(currentUser);
+    // const columns = getColumnsForUser(currentUser);
+    useEffect(() => {
+        // Call the function whenever permissionState changes
+        const updatedColumns = getColumnsForUser(currentUser);
+        setColumns(updatedColumns);
+      }, [permissionsState, currentUser]); // Add permissionState and currentUser as dependencies
 
     // Info Cards Data
 
