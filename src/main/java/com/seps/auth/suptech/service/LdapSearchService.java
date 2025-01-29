@@ -90,13 +90,13 @@ public class LdapSearchService {
         DirContext ctx = null;
         try {
             // Fetch user details to get the distinguished name (DN)
-            //Map<String, String> userDetails = searchByEmail(email);
-//            String distinguishedName = userDetails.get("distinguishedName"); // Ensure your LDAP contains this attribute
-//            if (distinguishedName == null) {
-//                LOG.warn("Distinguished name not found for email: {}", email);
-//                return false; // Cannot authenticate without DN
-//            }
-            String distinguishedName = "CN=singh hanwant,OU=Cambrigde,DC=SEPS,DC=local";
+            Map<String, String> userDetails = searchByEmail(email);
+            String distinguishedName = userDetails.get("distinguishedName"); // Ensure your LDAP contains this attribute
+            if (distinguishedName == null) {
+                LOG.warn("Distinguished name not found for email: {}", email);
+                return false; // Cannot authenticate without DN
+            }
+            //String distinguishedName = "CN=singh hanwant,OU=Cambrigde,DC=SEPS,DC=local";
             // Set up the environment for LDAP authentication
             Hashtable<String, String> env = new Hashtable<>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
