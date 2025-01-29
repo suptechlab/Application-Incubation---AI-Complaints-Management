@@ -10,7 +10,7 @@ COPY . .
 # ENV SEPS_MAVEN_PASSWORD=$SEPS_MAVEN_PASSWORD_ARG
 
 RUN chmod +x ./mvnw
-RUN ./mvnw -Pprod clean verify -DskipTests -Dmodernizer.skip=true
+RUN ./mvnw -Pdev clean verify -DskipTests -Dmodernizer.skip=true
 
 FROM openjdk:17-alpine
 
