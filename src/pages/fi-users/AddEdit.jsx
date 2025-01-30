@@ -275,7 +275,7 @@ export default function FIUserAddEdit() {
                         onBlur={(event) => handleIdentificationBlur(event, setFieldValue)}
                         onChange={handleChange}
                         touched={touched?.identification}
-                        type="number"
+                        type="integer"
                         value={values?.identification || ""}
                         readOnly={isEdit ? true : false}
                       />
