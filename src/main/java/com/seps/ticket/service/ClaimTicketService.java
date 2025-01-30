@@ -47,6 +47,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.context.Context;
 import org.zalando.problem.Status;
 import tech.jhipster.security.RandomUtil;
 
@@ -87,8 +88,8 @@ public class ClaimTicketService {
     private final UserClaimTicketService userClaimTicketService;
     private final ClaimTicketOTPRepository claimTicketOTPRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder) {
+    private final ClaimTicketActivityLogService claimTicketActivityLogService;
+    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder, ClaimTicketActivityLogService claimTicketActivityLogService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.userClaimTicketMapper = userClaimTicketMapper;
@@ -99,6 +100,7 @@ public class ClaimTicketService {
         this.userClaimTicketService = userClaimTicketService;
         this.claimTicketOTPRepository = claimTicketOTPRepository;
         this.passwordEncoder = passwordEncoder;
+        this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -773,5 +775,133 @@ public class ClaimTicketService {
         auditLogService.logActivity(null, currentUser.getId(), requestInfo, "updateClaimTicketDetails", ActionTypeEnum.CLAIM_TICKET_UPDATE.name(),
             savedTicket.getId(), ClaimTicket.class.getSimpleName(), null, auditMessageMap, entityData, ActivityTypeEnum.MODIFICATION.name(), requestBody);
 
+    }
+
+    @Transactional
+    public Context getTicketDetailContext(Long ticketId, RequestInfo requestInfo) {
+        User currentUser = userService.getCurrentUser();
+
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+
+        // Find the ticket by ID
+        ClaimTicket ticket;
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            Long organizationId = currentUser.getOrganization().getId();
+            ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        } else {
+            ticket = claimTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                    new String[]{ticketId.toString()}, null));
+        }
+        Context context = new Context(LocaleContextHolder.getLocale());
+        ClaimTicketDTO claim = claimTicketMapper.toDTO(ticket);
+
+        ClaimTicketDTO firstClaim = null;
+        ClaimTicketDTO secondClaim = null;
+        ClaimTicketDTO complaintClaim = null;
+        Map<String, Object> firstInstance = new HashMap<>();
+        Map<String, Object> secondInstance = new HashMap<>();
+        Map<String, Object> complaint = new HashMap<>();
+
+        context.setVariable("ticket", claim);
+
+        if (claim.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+            firstClaim = claim;
+        } else if (claim.getInstanceType().equals(InstanceTypeEnum.SECOND_INSTANCE)) {
+            secondClaim = claim;
+            if (claim.getPreviousTicket() != null) {
+                firstClaim = claim.getPreviousTicket();
+            }
+        } else if (claim.getInstanceType().equals(InstanceTypeEnum.COMPLAINT)) {
+            complaintClaim = claim;
+            if (claim.getPreviousTicket() != null) {
+                secondClaim = claim.getPreviousTicket();
+                if (secondClaim.getPreviousTicket() != null) {
+                    firstClaim = secondClaim.getPreviousTicket();
+                }
+            }
+        }
+
+        if (firstClaim != null) {
+            firstInstance.put("claimId", firstClaim.getTicketId());
+            firstInstance.put("createdDate", DateUtil.formatDate(firstClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+            firstInstance.put("resolveOnDate", DateUtil.formatDate(firstClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
+            firstInstance.put("instanceType", enumUtil.getLocalizedEnumValue(firstClaim.getInstanceType(), LocaleContextHolder.getLocale()));
+            firstInstance.put("closedStatus", enumUtil.getLocalizedEnumValue(firstClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
+            firstInstance.put("statusComment", firstClaim.getStatusComment() != null ? firstClaim.getStatusComment() : "");
+            List<HashMap<String, Object>> firstClaimConversion = getConversionActivity(firstClaim);
+            firstInstance.put("conversation", firstClaimConversion);
+        }
+
+        if (secondClaim != null) {
+            secondInstance.put("claimId", secondClaim.getTicketId());
+            secondInstance.put("createdDate", DateUtil.formatDate(secondClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+            secondInstance.put("resolveOnDate", DateUtil.formatDate(secondClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
+            secondInstance.put("instanceType", enumUtil.getLocalizedEnumValue(secondClaim.getInstanceType(), LocaleContextHolder.getLocale()));
+            secondInstance.put("closedStatus", enumUtil.getLocalizedEnumValue(secondClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
+            secondInstance.put("previousTicket", secondClaim.getPreviousTicket() != null ? "#"+secondClaim.getPreviousTicket().getTicketId(): "");
+            secondInstance.put("statusComment", secondClaim.getStatusComment() != null ? secondClaim.getStatusComment() : "");
+            List<HashMap<String, Object>> secondClaimConversion = getConversionActivity(secondClaim);
+            secondInstance.put("conversation", secondClaimConversion);
+        }
+
+        if (complaintClaim != null) {
+            complaint.put("claimId", complaintClaim.getTicketId());
+            complaint.put("createdDate", DateUtil.formatDate(complaintClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+            complaint.put("resolveOnDate", DateUtil.formatDate(complaintClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
+            complaint.put("instanceType", enumUtil.getLocalizedEnumValue(complaintClaim.getInstanceType(), LocaleContextHolder.getLocale()));
+            complaint.put("closedStatus", enumUtil.getLocalizedEnumValue(complaintClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
+            complaint.put("previousTicket", complaintClaim.getPreviousTicket() != null ? "#"+complaintClaim.getPreviousTicket().getTicketId(): "");
+            complaint.put("statusComment", complaintClaim.getStatusComment() != null ? complaintClaim.getStatusComment() : "");
+            List<HashMap<String, Object>> complaintClaimConversion = getConversionActivity(complaintClaim);
+            complaint.put("conversation", complaintClaimConversion);
+        }
+        context.setVariable("firstClaim", firstClaim);
+        context.setVariable("secondClaim", secondClaim);
+        context.setVariable("complaintClaim", complaintClaim);
+
+        context.setVariable("firstInstance", firstInstance);
+        context.setVariable("secondInstance", secondInstance);
+        context.setVariable("complaint", complaint);
+
+        return context;
+
+    }
+
+    private List<HashMap<String, Object>> getConversionActivity(ClaimTicketDTO ticket) {
+        List<ClaimTicketActivityLogDTO> activity = claimTicketActivityLogService.getAllActivities(ticket.getId());
+        List<HashMap<String,Object>> complaintClaimConversion = new ArrayList<>();
+        if(!activity.isEmpty()){
+            activity.forEach(data->{
+                LOG.debug("data======{}", data);
+                HashMap<String, Object> chat = new HashMap<>();
+                String activityTitle = data.getActivityTitle();
+                Map<String, String> linkedUsers = data.getLinkedUsers();
+
+                if (linkedUsers != null && activityTitle != null) {
+                    for (Map.Entry<String, String> entry : linkedUsers.entrySet()) {
+                        activityTitle = activityTitle.replace("@" + entry.getKey(), "<strong>" + entry.getValue() + "</strong>");
+                    }
+                }
+                chat.put("title", activityTitle);
+                chat.put("date",DateUtil.formatDate(data.getPerformedAt(), LocaleContextHolder.getLocale().getLanguage()));
+                String rawMessage = data.getActivityDetails().get("text") != null ? data.getActivityDetails().get("text").toString() : "";
+                chat.put("message", updateMessage(rawMessage.replaceAll("<[^>]+>", "")));
+                complaintClaimConversion.add(chat);
+            });
+        }
+        return complaintClaimConversion;
+    }
+
+    private String updateMessage(String message) {
+        // Define the regex pattern to match all tagged users in the format @[Name](ID)
+        String regex = "@\\[(.*?)\\]\\(\\d+\\)";
+
+        // Replace all matches with the captured group (Name)
+        return message.replaceAll(regex, "<strong>$1</strong>");
     }
 }

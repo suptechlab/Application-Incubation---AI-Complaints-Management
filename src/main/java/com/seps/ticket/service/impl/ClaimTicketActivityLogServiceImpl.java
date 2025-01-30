@@ -42,6 +42,13 @@ public class ClaimTicketActivityLogServiceImpl implements ClaimTicketActivityLog
             .map(activity -> mapToDTO(activity, locale));
     }
 
+    @Override
+    public List<ClaimTicketActivityLogDTO> getAllActivities(Long ticketId) {
+        Locale locale = LocaleContextHolder.getLocale();
+        return repository.findAllByTicketId(ticketId)
+            .stream().map(activity -> mapToDTO(activity, locale)).toList();
+    }
+
     private ClaimTicketActivityLogDTO mapToDTO(ClaimTicketActivityLog activity, Locale locale) {
         String activityTitle = activity.getActivityTitle().getOrDefault(locale.getLanguage(), "Title not available");
 

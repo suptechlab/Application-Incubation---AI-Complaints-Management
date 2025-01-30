@@ -49,7 +49,8 @@ public enum SepsStatusCode implements StatusType {
     INVALID_OTP_CODE(40030, "invalid.otp.code"),
     EMAIL_NOT_VERIFIED(40031, "email.not.verified"),
     SECOND_INSTANCE_CLAIM_TICKET_ALREADY_CREATED(40032, "second.instance.claim.ticket.already.created"),
-    COMPLAINT_CLAIM_TICKET_ALREADY_CREATED(40033, "complaint.claim.ticket.already.created");
+    COMPLAINT_CLAIM_TICKET_ALREADY_CREATED(40033, "complaint.claim.ticket.already.created"),
+    PDF_GENERATE_ERROR(40034,"pdf.generate.error");
 
     private final int code;
 

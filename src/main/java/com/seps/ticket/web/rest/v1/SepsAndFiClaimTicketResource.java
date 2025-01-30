@@ -29,11 +29,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.thymeleaf.context.Context;
 import org.zalando.problem.Status;
 import tech.jhipster.web.util.PaginationUtil;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -56,9 +59,9 @@ public class SepsAndFiClaimTicketResource {
     private final ClaimTicketService claimTicketService;
     private final ClaimTicketOTPService claimTicketOTPService;
     private final MailService mailService;
-
+    private final PdfService pdfService;
     public SepsAndFiClaimTicketResource(SepsAndFiClaimTicketService sepsAndFiClaimTicketService, ClaimTicketActivityLogService claimTicketActivityLogService,
-                                        MessageSource messageSource, DocumentService documentService, ClaimTicketService claimTicketService, ClaimTicketOTPService claimTicketOTPService, MailService mailService) {
+                                        MessageSource messageSource, DocumentService documentService, ClaimTicketService claimTicketService, ClaimTicketOTPService claimTicketOTPService, MailService mailService, PdfService pdfService) {
         this.sepsAndFiClaimTicketService = sepsAndFiClaimTicketService;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
@@ -66,6 +69,7 @@ public class SepsAndFiClaimTicketResource {
         this.claimTicketService = claimTicketService;
         this.claimTicketOTPService = claimTicketOTPService;
         this.mailService = mailService;
+        this.pdfService = pdfService;
     }
 
     @Operation(summary = "List all Claim Ticket", description = "Retrieve a paginated list of all claim tickets")
@@ -555,6 +559,23 @@ public class SepsAndFiClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @GetMapping("/{ticketId}/pdf-download")
+    @PermissionCheck({"TICKET_DOWNLOAD_PDF_SEPS", "TICKET_DOWNLOAD_PDF_FI"})
+    public ResponseEntity<byte[]> downloadClaimTicketDetails(@PathVariable Long ticketId,
+                                                                   HttpServletRequest request) {
+        RequestInfo requestInfo = new RequestInfo(request);
+
+        Context context = claimTicketService.getTicketDetailContext(ticketId, requestInfo);
+        // Generate PDF
+        byte[] pdfBytes = pdfService.generatePdf("ticket", context);
+
+        // Return as PDF download
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ticket_detail.pdf")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdfBytes);
     }
 
 }
