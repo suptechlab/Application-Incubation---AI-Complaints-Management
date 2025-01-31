@@ -370,5 +370,6 @@ export const spanishLang = {
     "NON_COMPLAINT": "No Conforme",
     "NONE": "None",
     "MODULE_NAME": "Nombre del módulo",
-    "PERMISSIONS": "Permisos"
+    "PERMISSIONS": "Permisos",
+    "TICKETS ASSIGNED":"Entradas asignadas"
 } 

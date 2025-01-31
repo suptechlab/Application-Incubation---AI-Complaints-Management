@@ -47,7 +47,7 @@ const createAxiosInstance = (baseURL) => {
         },
         (error) => {
             if (error.response?.status === 401) {
-                toast.error(error.response?.message ?? 'No autorizado');
+                // toast.error(error.response?.message ?? 'No autorizado');
              
             }
             return Promise.reject(error);

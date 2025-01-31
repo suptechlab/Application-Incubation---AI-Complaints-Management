@@ -103,7 +103,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                                         <ReactSelect
                                             label={t("PRIORITY_CARE_GROUP")}
                                             error={formikProps.errors.priorityCareGroup}
-                                            options={[{value:"",label:t("NONE")},pcGroupList]}
+                                            options={pcGroupList}
                                             value={formikProps.values.priorityCareGroup}
                                             onChange={(option) => {
                                                 formikProps.setFieldValue(
