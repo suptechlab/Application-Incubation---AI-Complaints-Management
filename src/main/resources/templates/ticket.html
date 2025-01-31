@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+<head>
+  <title th:text="#{ticket.pdf.title}">Claim History</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900;display=swap;"
+        rel="stylesheet"/>
+  <style>
+    * {
+      font-feature-settings: "lnum" 1;
+      font-variant-numeric: lining-nums;
+      -webkit-font-feature-settings: "lnum" 1;
+      -moz-font-feature-settings: "lnum" 1;
+      -ms-font-feature-settings: "lnum" 1;
+    }
+    @page {
+      size: A4; /* Set page size to A4 */
+      margin: 3mm 3mm 3mm 3mm; /* Top, Right, Bottom, Left */
+    }
+
+    body {
+      font-size: 14px;
+    }
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+<table style="width: 100%; font-family:'Raleway',sans-serif; border-collapse: collapse; ">
+  <tr>
+    <td>
+      <table style="width: 100%;  font-family:'Raleway',sans-serif; border-collapse: collapse; ">
+        <tr>
+          <td style="padding-bottom: 24px;">
+            <img alt="Superintendencia logo" th:src="${logo}" style="width: 257px;" />
+          </td>
+          <td>
+            <h1 style="font-size: 36px; margin: 0; text-align: right;" th:text="#{ticket.pdf.title}">Claim History</h1>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left; font-size: 24px; padding-bottom: 8px;">
+            <p style="margin: 0; padding-bottom: 8px; font-weight: 700;" th:text="${ticket.user.name}">Veronica Andres</p>
+            <p style="margin: 0; padding-bottom: 8px; font-size: 16px;"><strong th:text="#{ticket.pdf.national.id}">National ID:</strong> <span th:text="${ticket.user.identificacion}">Abc4578428745</span></p>
+          </td>
+          <td style="text-align: right; font-size: 16px;">
+            <p style="margin: 0; padding-bottom: 8px;"><strong th:text="#{ticket.pdf.email}"> Email:</strong> <span th:text="${ticket.user.email}">veronica@google.com</span></p>
+            <p style="margin: 0; padding-bottom: 8px;"><strong th:text="#{ticket.pdf.cell.phone}"> Cell Phone: </strong> <span th:text="${ticket.user.countryCode != null ? ticket.user.countryCode + ' ' : ''} +${ticket.user.phoneNumber != null ? ticket.user.phoneNumber : 'N/A'}">+XX XXX XXXX</span></p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr th:if="${complaintClaim != null}" class="page-break">
+    <td style="padding-bottom: 15px;">
+      <table style="width: 100%; font-family:'Raleway',sans-serif; border-collapse: collapse; border-bottom: 3px solid #1A202C;">
+        <tr>
+          <td>
+            <table style="width: 100%; font-family:'Raleway',sans-serif; border-collapse: collapse; background-color: #FFEDED; padding: 20px; border-radius: 5px; ">
+              <tr>
+                <td colspan="4" style="padding: 20px; padding-bottom: 0;">
+                  <h2 style="font-size: 24px; font-weight: 700; margin: 0 0 0px 0;">
+                    <span style="vertical-align: middle; padding-right: 12px; " th:text="#{ticket.pdf.claim.id('#' + ${complaint.claimId})}">Claim ID: #52541</span>
+                    <span style="display: inline-block; border-radius: 25px ;  padding: 5px 10px;  font-size: 12px; color: #FF0000; background-color: #ffbebe;" th:text="${complaint.instanceType}">Complaint</span>
+                  </h2>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.created.on}">Created on</span>
+                  <br />
+                  <span th:text="${complaint.createdDate}">07-28-24 | 11:17 am</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.entity}">Entity</span>
+                  <br />
+                  <span th:text="${ticket.organization.razonSocial}">SEPS</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.type}">Claim Type</span>
+                  <br />
+                  <span th:text="${ticket.claimType.name}">Credit Portfolio</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.sub.type}">Claim Sub Type</span>
+                  <br />
+                  <span th:text="${ticket.claimSubType.name}">Refinancing Request</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 25%; padding: 20px; padding-bottom: 35px;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.resolve.on}">Resolved on</span>
+                  <br />
+                  <span th:text="${complaint.resolveOnDate}">08-10-24 | 04:10 pm</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 35px;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.second.instance.ticket.id}">2nd Instance Claim ID</span>
+                  <br />
+                  <span style="text-decoration: underline; color: #0088FF;" th:text="${complaint.previousTicket}">#52541</span>
+                </td>
+                <td colspan="2" style=" padding: 20px; padding-bottom: 35px;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.status}">Claim Status</span><br />
+                  <span style="color: #34A853; font-weight: 600;" th:text="${complaint.closedStatus}">Closed and in favor</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px 0px; ">
+            <strong th:text="#{ticket.pdf.seps.response}">SEPS's Response -</strong>
+            (<span th:text="${complaint.instanceType}">Complaint</span>)
+            <p style="margin: 0;" th:text="${complaint.statusComment}">
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+              industry's
+              standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to
+              make a type specimen book.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-top: 20px;  border-top :1px solid #717D96;">&nbsp;</td>
+        </tr>
+
+        <tr>
+          <td style="padding-bottom: 20px;  ">
+            <h3 style="font-size: 24px; margin: 0; ">
+              <span th:text="#{ticket.pdf.conversation.details}">Conversation Details</span> <span style="font-weight: normal;" th:text="${'('+complaint.instanceType+')'}">(Complaint)</span>
+            </h3>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <table style="width: 100%; border-collapse: collapse; font-family:'Raleway',sans-serif;">
+              <tbody th:each="item : ${complaint.conversation}">
+              <tr style="padding-top: 15px;">
+                <td style="padding-bottom: 8px;" th:utext="${item.title}">
+                  <strong class="username" >Monica</strong> added final resolution on behalf of SEPS
+                </td>
+                <td style="text-align: right; color: #6C757D; font-size: 14px; margin-top: 8px;">
+                <span>
+                    <img alt='date &amp; time' th:src="${calenderPath}" style="width: 12px;" />
+                </span>
+                  <span th:text="${item.date}">07-25-24 | 06:10 pm</span>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-bottom: 20px;">
+                  <p style="color: #000; margin: 0;" th:utext="${item.message}">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style=" border-top :1px solid #E1E3E1;">&nbsp;</td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+
+
+      </table>
+    </td>
+  </tr>
+
+  <tr th:if="${secondClaim != null}" class="page-break">
+    <td style="padding-bottom: 15px;">
+      <table style="width: 100%; font-family:'Raleway',sans-serif; border-collapse: collapse; border-bottom: 3px solid #1A202C;">
+        <tr>
+          <td>
+            <table
+              style="width: 100%; font-family:'Raleway',sans-serif; border-collapse: collapse; background-color: #FFF1E5; padding: 20px; border-radius: 5px; ">
+              <tr>
+                <td colspan="4" style="padding: 20px; padding-bottom: 0;">
+                  <h2 style="font-size: 24px; font-weight: 700; margin: 0 0 0px 0;">
+                    <span style="vertical-align: middle; padding-right:12px;" th:text="#{ticket.pdf.claim.id('#' + ${secondInstance.claimId})}">Claim ID: #52541</span>
+                    <span
+                      style="display: inline-block; border-radius: 25px; padding: 5px 10px;  font-size: 12px; color: #FF7600; background-color: #FCD6B6;" th:text="${secondInstance.instanceType}">
+                        Second Instance
+                      </span>
+                  </h2>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.created.on}">
+                      Created on
+                    </span>
+                  <br />
+                  <span th:text="${secondInstance.createdDate}">07-28-24 | 11:17 am</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.entity}">
+                      Entity
+                    </span>
+                  <br />
+                  <span th:text="${ticket.organization.razonSocial}">
+                      SEPS
+                    </span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.type}">
+                      Claim Type
+                    </span>
+                  <br />
+                  <span th:text="${ticket.claimType.name}">
+                      Credit Portfolio
+                    </span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.sub.type}">
+                      Claim Sub Type
+                    </span>
+                  <br />
+                  <span th:text="${ticket.claimSubType.name}">
+                      Refinancing Request
+                    </span>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 25%; padding: 20px; padding-bottom: 35px;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.resolve.on}">
+                      Resolved on
+                    </span>
+                  <br />
+                  <span th:text="${secondInstance.resolveOnDate}">08-10-24 | 04:10 pm</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 35px;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.first.instance.ticket.id}">
+                      1st Instance Claim ID
+                    </span>
+                  <br />
+                  <span style="text-decoration: underline; color: #0088FF;" th:text="${secondInstance.previousTicket}">
+                      #52541
+                    </span>
+                </td>
+                <td colspan="2" style=" padding: 20px; padding-bottom: 35px;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.status}">
+                      Claim Status
+                    </span>
+                  <br />
+                  <span style="color: #34A853; font-weight: 600;" th:text="${secondInstance.closedStatus}">
+                      Closed and in favor
+                    </span>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px 0px; ">
+            <strong th:text="#{ticket.pdf.seps.response}">
+              SEPS's Response -
+            </strong>
+            (<span th:text="${secondInstance.instanceType}">2nd Instance</span>)
+            <p style="margin: 0;" th:text="${secondInstance.statusComment}">
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+              industry's
+              standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to
+              make
+              a type specimen book.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-top: 20px;  border-top :1px solid #717D96;">&nbsp;</td>
+        </tr>
+
+        <tr>
+          <td style="padding-bottom: 20px;  ">
+            <h3 style="font-size: 24px; margin: 0; ">
+              <span th:text="#{ticket.pdf.conversation.details}">Conversation Details</span> (<span style="font-weight: normal;" th:text="${secondInstance.instanceType}">(2nd Instance)</span>)
+            </h3>
+          </td>
+        </tr>
+
+        <tr>
+          <td >
+            <table style="width: 100%; border-collapse: collapse; font-family:'Raleway',sans-serif;">
+              <tbody th:each="item : ${secondInstance.conversation}">
+              <tr style="padding-top: 15px;">
+                <td style="padding-bottom: 8px;" th:utext="${item.title}">
+                  <strong class="username" >Monica</strong> added final resolution on behalf of SEPS
+                </td>
+                <td style="text-align: right; color: #6C757D; font-size: 14px; margin-top: 8px;">
+                <span>
+                    <img alt='date &amp; time' th:src="${calenderPath}" style="width: 12px;" />
+                </span>
+                  <span th:text="${item.date}">07-25-24 | 06:10 pm</span>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-bottom: 20px;">
+                  <p style="color: #000; margin: 0;" th:utext="${item.message}">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style=" border-top :1px solid #E1E3E1;">&nbsp;</td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+
+
+      </table>
+    </td>
+  </tr>
+
+  <tr th:if="${firstClaim != null}">
+    <td style="padding-bottom: 15px;">
+      <table style="width: 100%; font-family:'Raleway',sans-serif; border-collapse: collapse; border-bottom: 3px solid #1A202C;">
+        <tr>
+          <td>
+            <table
+              style="width: 100%; font-family:'Raleway',sans-serif; border-collapse: collapse; background-color: #EDFEEC; padding: 20px; border-radius: 5px; ">
+              <tr>
+                <td colspan="4" style="padding: 20px; padding-bottom: 0;">
+                  <h2 style="font-size: 24px; font-weight: 700; margin: 0 0 0px 0;">
+                    <span style="vertical-align: middle; padding-right: 12px;" th:text="#{ticket.pdf.claim.id('#' + ${firstInstance.claimId})}">Claim ID: #52541</span>
+                    <span
+                      style="display: inline-block; border-radius: 25px;  padding: 5px 10px;  font-size: 12px; color: #13941C; background-color: #c2f5c2;" th:text="${firstInstance.instanceType}">
+                        First Instance
+                      </span>
+                  </h2>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                    <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.created.on}">
+                      Created on
+                    </span>
+                  <br />
+                  <span th:text="${firstInstance.createdDate}">07-28-24 | 11:17 am</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.entity}">Entity</span>
+                  <br />
+                  <span th:text="${ticket.organization.razonSocial}">SEPS</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.type}">Claim Type</span>
+                  <br />
+                  <span th:text="${ticket.claimType.name}">Credit Portfolio</span>
+                </td>
+                <td style="width: 25%; padding: 20px; padding-bottom: 0;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.sub.type}">Claim Sub Type</span>
+                  <br />
+                  <span th:text="${ticket.claimSubType.name}">Refinancing Request</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 25%; padding: 20px; padding-bottom: 35px;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.resolve.on}">Resolved on</span>
+                  <br />
+                  <span th:text="${firstInstance.resolveOnDate}">08-10-24 | 04:10 pm</span>
+                </td>
+                <td colspan="3" style=" padding: 20px; padding-bottom: 35px;">
+                  <span style="font-weight: 700; line-height: 24px;" th:text="#{ticket.pdf.claim.status}">Claim Status</span>
+                  <br />
+                  <span style="color: #34A853; font-weight: 600;" th:text="${firstInstance.closedStatus}">Closed and in favor</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px 0px; ">
+            <strong th:text="#{ticket.pdf.seps.response}">
+              SEPS's Response -
+            </strong>
+            (<span th:text="${firstInstance.instanceType}">Complaint</span>)
+            <p style="margin: 0;" th:text="${firstInstance.statusComment}">
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+              industry's
+              standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to
+              make
+              a type specimen book.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-top: 20px;  border-top :1px solid #717D96;">&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="padding-bottom: 20px;  ">
+            <h3 style="font-size: 24px; margin: 0; ">
+              <span th:text="#{ticket.pdf.conversation.details}">Conversation Details</span> (<span style="font-weight: normal;" th:text="${firstInstance.instanceType}">Complaint</span>)
+            </h3>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table style="width: 100%; border-collapse: collapse; font-family:'Raleway',sans-serif;">
+              <tbody th:each="item : ${firstInstance.conversation}">
+              <tr style="padding-top: 15px;">
+                <td style="padding-bottom: 8px;" th:utext="${item.title}">
+                  <strong class="username" >Monica</strong> added final resolution on behalf of SEPS
+                </td>
+                <td style="text-align: right; color: #6C757D; font-size: 14px; margin-top: 8px;">
+                <span>
+                    <img alt='date &amp; time' th:src="${calenderPath}" style="width: 12px;" />
+                </span>
+                  <span th:text="${item.date}">07-25-24 | 06:10 pm</span>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-bottom: 20px;">
+                  <p style="color: #000; margin: 0;" th:utext="${item.message}">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style=" border-top :1px solid #E1E3E1;">&nbsp;</td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

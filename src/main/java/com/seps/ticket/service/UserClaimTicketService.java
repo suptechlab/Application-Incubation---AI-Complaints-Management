@@ -2,6 +2,7 @@ package com.seps.ticket.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.seps.ticket.component.DateUtil;
 import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.config.InstantTypeAdapter;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.context.Context;
 import org.zalando.problem.Status;
 
 import java.io.IOException;
@@ -1554,5 +1557,115 @@ public class UserClaimTicketService {
                 .stream().map(claimTicketMapper::toListDTO).toList();
         }
         return claimTicketList;
+    }
+
+    @Transactional
+    public Context getTicketDetailContext(Long ticketId, RequestInfo requestInfo) throws IOException {
+        User currentUser = userService.getCurrentUser();
+
+        ClaimTicket ticket = claimTicketRepository.findByIdAndUserId(ticketId, currentUser.getId())
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{ticketId.toString()}, null));
+
+        Context context = new Context(LocaleContextHolder.getLocale());
+        ClaimTicketDTO claim = claimTicketMapper.toDTO(ticket);
+
+        ClaimTicketDTO firstClaim = null;
+        ClaimTicketDTO secondClaim = null;
+        ClaimTicketDTO complaintClaim = null;
+        Map<String, Object> firstInstance = new HashMap<>();
+        Map<String, Object> secondInstance = new HashMap<>();
+        Map<String, Object> complaint = new HashMap<>();
+
+        context.setVariable("ticket", claim);
+
+        if (claim.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+            firstClaim = claim;
+        } else if (claim.getInstanceType().equals(InstanceTypeEnum.SECOND_INSTANCE)) {
+            secondClaim = claim;
+            if (claim.getPreviousTicket() != null) {
+                firstClaim = claim.getPreviousTicket();
+            }
+        } else if (claim.getInstanceType().equals(InstanceTypeEnum.COMPLAINT)) {
+            complaintClaim = claim;
+            if (claim.getPreviousTicket() != null) {
+                secondClaim = claim.getPreviousTicket();
+                if (secondClaim.getPreviousTicket() != null) {
+                    firstClaim = secondClaim.getPreviousTicket();
+                }
+            }
+        }
+
+        if (firstClaim != null) {
+            setTicketDataForPDF(firstInstance, firstClaim);
+        }
+        if (secondClaim != null) {
+            setTicketDataForPDF(secondInstance, secondClaim);
+        }
+        if (complaintClaim != null) {
+            setTicketDataForPDF(complaint, complaintClaim);
+        }
+        context.setVariable("firstClaim", firstClaim);
+        context.setVariable("secondClaim", secondClaim);
+        context.setVariable("complaintClaim", complaintClaim);
+
+        context.setVariable("firstInstance", firstInstance);
+        context.setVariable("secondInstance", secondInstance);
+        context.setVariable("complaint", complaint);
+
+        ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
+        String imagePath = imageResource.getFile().toURI().toString(); // Ensure absolute path
+        context.setVariable("logo", imagePath);
+
+        ClassPathResource calendarLogo = new ClassPathResource("static/images/calendar_today.png");
+        String calenderPath = calendarLogo.getFile().toURI().toString(); // Ensure absolute path
+        context.setVariable("calenderPath", calenderPath);
+
+        return context;
+
+    }
+
+    private void setTicketDataForPDF(Map<String, Object> complaint, ClaimTicketDTO complaintClaim) {
+        complaint.put("claimId", complaintClaim.getTicketId());
+        complaint.put("createdDate", DateUtil.formatDate(complaintClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+        complaint.put("resolveOnDate", DateUtil.formatDate(complaintClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
+        complaint.put("instanceType", enumUtil.getLocalizedEnumValue(complaintClaim.getInstanceType(), LocaleContextHolder.getLocale()));
+        complaint.put("closedStatus", enumUtil.getLocalizedEnumValue(complaintClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
+        complaint.put("previousTicket", complaintClaim.getPreviousTicket() != null ? "#"+ complaintClaim.getPreviousTicket().getTicketId(): "");
+        complaint.put("statusComment", complaintClaim.getStatusComment() != null ? complaintClaim.getStatusComment() : "");
+        List<HashMap<String, Object>> complaintClaimConversion = getConversionActivity(complaintClaim);
+        complaint.put("conversation", complaintClaimConversion);
+    }
+
+    private List<HashMap<String, Object>> getConversionActivity(ClaimTicketDTO ticket) {
+        List<ClaimTicketActivityLogDTO> activity = claimTicketActivityLogService.getAllConversation(ticket.getId());
+        List<HashMap<String,Object>> complaintClaimConversion = new ArrayList<>();
+        if(!activity.isEmpty()){
+            activity.forEach(data->{
+                HashMap<String, Object> chat = new HashMap<>();
+                String activityTitle = data.getActivityTitle();
+                Map<String, String> linkedUsers = data.getLinkedUsers();
+
+                if (linkedUsers != null && activityTitle != null) {
+                    for (Map.Entry<String, String> entry : linkedUsers.entrySet()) {
+                        activityTitle = activityTitle.replace("@" + entry.getKey(), "<strong>" + entry.getValue() + "</strong>");
+                    }
+                }
+                chat.put("title", activityTitle!=null? activityTitle.replace("&", "&amp;"):"");
+                chat.put("date",DateUtil.formatDate(data.getPerformedAt(), LocaleContextHolder.getLocale().getLanguage()));
+                String rawMessage = data.getActivityDetails().get("text") != null ? data.getActivityDetails().get("text").toString() : "";
+                chat.put("message", updateMessage(rawMessage.replaceAll("<[^>]+>", "")));
+                complaintClaimConversion.add(chat);
+            });
+        }
+        return complaintClaimConversion;
+    }
+
+    private String updateMessage(String message) {
+        // Define the regex pattern to match all tagged users in the format @[Name](ID)
+        String regex = "@\\[(.*?)\\]\\(\\d+\\)";
+
+        // Replace all matches with the captured group (Name)
+        return message.replaceAll(regex, "<strong>$1</strong>");
     }
 }
