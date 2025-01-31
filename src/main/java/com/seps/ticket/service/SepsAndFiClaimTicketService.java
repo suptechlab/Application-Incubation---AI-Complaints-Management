@@ -471,6 +471,7 @@ public class SepsAndFiClaimTicketService {
             ticket.setSepsAgentId(agent.getId());
             ticket.setSepsAgent(agent);
             ticket.setAssignedAt(Instant.now());
+            ticket.setStatus(ClaimTicketStatusEnum.ASSIGNED);
             activityLogList.add(activityLog);
 
             //Save ClaimTicketAssignLog table

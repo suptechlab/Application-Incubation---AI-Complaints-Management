@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -778,7 +779,7 @@ public class ClaimTicketService {
     }
 
     @Transactional
-    public Context getTicketDetailContext(Long ticketId, RequestInfo requestInfo) {
+    public Context getTicketDetailContext(Long ticketId, RequestInfo requestInfo) throws IOException {
         User currentUser = userService.getCurrentUser();
 
         List<String> authority = currentUser.getAuthorities().stream()
@@ -827,38 +828,13 @@ public class ClaimTicketService {
         }
 
         if (firstClaim != null) {
-            firstInstance.put("claimId", firstClaim.getTicketId());
-            firstInstance.put("createdDate", DateUtil.formatDate(firstClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
-            firstInstance.put("resolveOnDate", DateUtil.formatDate(firstClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
-            firstInstance.put("instanceType", enumUtil.getLocalizedEnumValue(firstClaim.getInstanceType(), LocaleContextHolder.getLocale()));
-            firstInstance.put("closedStatus", enumUtil.getLocalizedEnumValue(firstClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
-            firstInstance.put("statusComment", firstClaim.getStatusComment() != null ? firstClaim.getStatusComment() : "");
-            List<HashMap<String, Object>> firstClaimConversion = getConversionActivity(firstClaim);
-            firstInstance.put("conversation", firstClaimConversion);
+            setTicketDataForPDF(firstInstance, firstClaim);
         }
-
         if (secondClaim != null) {
-            secondInstance.put("claimId", secondClaim.getTicketId());
-            secondInstance.put("createdDate", DateUtil.formatDate(secondClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
-            secondInstance.put("resolveOnDate", DateUtil.formatDate(secondClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
-            secondInstance.put("instanceType", enumUtil.getLocalizedEnumValue(secondClaim.getInstanceType(), LocaleContextHolder.getLocale()));
-            secondInstance.put("closedStatus", enumUtil.getLocalizedEnumValue(secondClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
-            secondInstance.put("previousTicket", secondClaim.getPreviousTicket() != null ? "#"+secondClaim.getPreviousTicket().getTicketId(): "");
-            secondInstance.put("statusComment", secondClaim.getStatusComment() != null ? secondClaim.getStatusComment() : "");
-            List<HashMap<String, Object>> secondClaimConversion = getConversionActivity(secondClaim);
-            secondInstance.put("conversation", secondClaimConversion);
+            setTicketDataForPDF(secondInstance, secondClaim);
         }
-
         if (complaintClaim != null) {
-            complaint.put("claimId", complaintClaim.getTicketId());
-            complaint.put("createdDate", DateUtil.formatDate(complaintClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
-            complaint.put("resolveOnDate", DateUtil.formatDate(complaintClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
-            complaint.put("instanceType", enumUtil.getLocalizedEnumValue(complaintClaim.getInstanceType(), LocaleContextHolder.getLocale()));
-            complaint.put("closedStatus", enumUtil.getLocalizedEnumValue(complaintClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
-            complaint.put("previousTicket", complaintClaim.getPreviousTicket() != null ? "#"+complaintClaim.getPreviousTicket().getTicketId(): "");
-            complaint.put("statusComment", complaintClaim.getStatusComment() != null ? complaintClaim.getStatusComment() : "");
-            List<HashMap<String, Object>> complaintClaimConversion = getConversionActivity(complaintClaim);
-            complaint.put("conversation", complaintClaimConversion);
+            setTicketDataForPDF(complaint, complaintClaim);
         }
         context.setVariable("firstClaim", firstClaim);
         context.setVariable("secondClaim", secondClaim);
@@ -868,8 +844,28 @@ public class ClaimTicketService {
         context.setVariable("secondInstance", secondInstance);
         context.setVariable("complaint", complaint);
 
+        ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
+        String imagePath = imageResource.getFile().toURI().toString(); // Ensure absolute path
+        context.setVariable("logo", imagePath);
+
+        ClassPathResource calendarLogo = new ClassPathResource("static/images/calendar_today.png");
+        String calenderPath = calendarLogo.getFile().toURI().toString(); // Ensure absolute path
+        context.setVariable("calenderPath", calenderPath);
+
         return context;
 
+    }
+
+    private void setTicketDataForPDF(Map<String, Object> complaint, ClaimTicketDTO complaintClaim) {
+        complaint.put("claimId", complaintClaim.getTicketId());
+        complaint.put("createdDate", DateUtil.formatDate(complaintClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+        complaint.put("resolveOnDate", DateUtil.formatDate(complaintClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
+        complaint.put("instanceType", enumUtil.getLocalizedEnumValue(complaintClaim.getInstanceType(), LocaleContextHolder.getLocale()));
+        complaint.put("closedStatus", enumUtil.getLocalizedEnumValue(complaintClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
+        complaint.put("previousTicket", complaintClaim.getPreviousTicket() != null ? "#"+ complaintClaim.getPreviousTicket().getTicketId(): "");
+        complaint.put("statusComment", complaintClaim.getStatusComment() != null ? complaintClaim.getStatusComment() : "");
+        List<HashMap<String, Object>> complaintClaimConversion = getConversionActivity(complaintClaim);
+        complaint.put("conversation", complaintClaimConversion);
     }
 
     private List<HashMap<String, Object>> getConversionActivity(ClaimTicketDTO ticket) {
@@ -877,7 +873,6 @@ public class ClaimTicketService {
         List<HashMap<String,Object>> complaintClaimConversion = new ArrayList<>();
         if(!activity.isEmpty()){
             activity.forEach(data->{
-                LOG.debug("data======{}", data);
                 HashMap<String, Object> chat = new HashMap<>();
                 String activityTitle = data.getActivityTitle();
                 Map<String, String> linkedUsers = data.getLinkedUsers();
@@ -887,7 +882,7 @@ public class ClaimTicketService {
                         activityTitle = activityTitle.replace("@" + entry.getKey(), "<strong>" + entry.getValue() + "</strong>");
                     }
                 }
-                chat.put("title", activityTitle);
+                chat.put("title", activityTitle!=null? activityTitle.replace("&", "&amp;"):"");
                 chat.put("date",DateUtil.formatDate(data.getPerformedAt(), LocaleContextHolder.getLocale().getLanguage()));
                 String rawMessage = data.getActivityDetails().get("text") != null ? data.getActivityDetails().get("text").toString() : "";
                 chat.put("message", updateMessage(rawMessage.replaceAll("<[^>]+>", "")));

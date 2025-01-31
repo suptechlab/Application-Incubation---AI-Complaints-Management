@@ -38,6 +38,7 @@ import org.zalando.problem.Status;
 import tech.jhipster.web.util.PaginationUtil;
 
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -564,7 +565,7 @@ public class SepsAndFiClaimTicketResource {
     @GetMapping("/{ticketId}/pdf-download")
     @PermissionCheck({"TICKET_DOWNLOAD_PDF_SEPS", "TICKET_DOWNLOAD_PDF_FI"})
     public ResponseEntity<byte[]> downloadClaimTicketDetails(@PathVariable Long ticketId,
-                                                                   HttpServletRequest request) {
+                                                                   HttpServletRequest request) throws IOException {
         RequestInfo requestInfo = new RequestInfo(request);
 
         Context context = claimTicketService.getTicketDetailContext(ticketId, requestInfo);

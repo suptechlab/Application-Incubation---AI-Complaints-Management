@@ -19,5 +19,7 @@ public interface ClaimTicketActivityLogRepository extends JpaRepository<ClaimTic
 
     Page<ClaimTicketActivityLog> findAllByTicketIdAndActivityTypeIn(Long ticketId, List<String> activityTypes, Pageable pageable);
 
+    List<ClaimTicketActivityLog> findAllByTicketIdAndActivityTypeIn(Long ticketId, List<String> activityTypes);
+
     Optional<ClaimTicketActivityLog> findFirstByTicketIdAndActivityTypeOrderByPerformedAtDesc(Long ticketId, String activityTpe);
 }

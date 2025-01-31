@@ -15,4 +15,6 @@ public interface ClaimTicketActivityLogService {
     Page<ClaimTicketActivityLogDTO> getAllConversation(Long ticketId, Pageable pageable);
 
     List<ClaimTicketActivityLogDTO> getAllActivities(Long ticketId);
+
+    List<ClaimTicketActivityLogDTO> getAllConversation(Long ticketId);
 }
