@@ -349,5 +349,6 @@ export const spanishLang = {
     "SORT_DESCENDING": "Orden descendente",
     "CLEAR_SORT": "Borrar clasificación",
     "MODULE_NAME": "Nombre del módulo",
-    "PERMISSIONS": "Permisos"
+    "PERMISSIONS": "Permisos",
+    "TICKETS ASSIGNED":"Entradas asignadas"
 } 

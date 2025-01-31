@@ -249,7 +249,7 @@ export default function FIUserList() {
                       info?.row?.original?.status
                     )
                   }
-                  tooltip={info?.row?.original?.status ? t("ACTIVE") : t("BLOCKED")}
+                  tooltip={info?.row?.original?.status!=="ACTIVE" ? t("ACTIVE") : t("INACTIVE")}
                 />
 
               );
