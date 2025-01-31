@@ -3,6 +3,8 @@ package com.seps.user.component;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,9 +46,12 @@ public class EnumUtil {
      */
     public <E extends Enum<E> & EnumWithDescription> Map<String, String> enumToLocalizedMap(Class<E> enumClass, Locale locale) {
         return Stream.of(enumClass.getEnumConstants())
+            .sorted(Comparator.comparing(Enum::ordinal)) // Sort by enum name
             .collect(Collectors.toMap(
                 Enum::name,
-                e -> messageSource.getMessage(e.getDescription(), null, locale)
+                e -> messageSource.getMessage(e.getDescription(), null, locale),
+                (existing, replacement) -> existing, // Merge function for duplicate keys
+                LinkedHashMap::new // Preserve order
             ));
     }
 }
