@@ -22,12 +22,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.thymeleaf.context.Context;
 import tech.jhipster.web.util.PaginationUtil;
 
+import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "User Claim Ticket Management", description = "APIs for Users to manage their Claim Tickets")
@@ -41,15 +44,17 @@ public class UserClaimTicketResource {
     private final MessageSource messageSource;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
     private final TempDocumentService tempDocumentService;
+    private final PdfService pdfService;
 
     public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService, MessageSource messageSource,
-                                   ClaimTicketActivityLogService claimTicketActivityLogService, TempDocumentService tempDocumentService) {
+                                   ClaimTicketActivityLogService claimTicketActivityLogService, TempDocumentService tempDocumentService, PdfService pdfService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.documentService = documentService;
         this.messageSource = messageSource;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.tempDocumentService = tempDocumentService;
+        this.pdfService = pdfService;
     }
 
 
@@ -270,4 +275,20 @@ public class UserClaimTicketResource {
         return tempDocumentService.uploadDocument(request);
     }
 
+    @GetMapping("/{id}/pdf-download")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<byte[]> downloadClaimTicketPdf(@PathVariable Long id,
+                                                             HttpServletRequest request) throws IOException {
+        RequestInfo requestInfo = new RequestInfo(request);
+
+        Context context = userClaimTicketService.getTicketDetailContext(id, requestInfo);
+        // Generate PDF
+        byte[] pdfBytes = pdfService.generatePdf("ticket", context);
+
+        // Return as PDF download
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ticket_detail.pdf")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdfBytes);
+    }
 }

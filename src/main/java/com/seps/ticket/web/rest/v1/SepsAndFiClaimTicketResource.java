@@ -29,12 +29,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.thymeleaf.context.Context;
 import org.zalando.problem.Status;
 import tech.jhipster.web.util.PaginationUtil;
 
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -56,9 +60,9 @@ public class SepsAndFiClaimTicketResource {
     private final ClaimTicketService claimTicketService;
     private final ClaimTicketOTPService claimTicketOTPService;
     private final MailService mailService;
-
+    private final PdfService pdfService;
     public SepsAndFiClaimTicketResource(SepsAndFiClaimTicketService sepsAndFiClaimTicketService, ClaimTicketActivityLogService claimTicketActivityLogService,
-                                        MessageSource messageSource, DocumentService documentService, ClaimTicketService claimTicketService, ClaimTicketOTPService claimTicketOTPService, MailService mailService) {
+                                        MessageSource messageSource, DocumentService documentService, ClaimTicketService claimTicketService, ClaimTicketOTPService claimTicketOTPService, MailService mailService, PdfService pdfService) {
         this.sepsAndFiClaimTicketService = sepsAndFiClaimTicketService;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.messageSource = messageSource;
@@ -66,6 +70,7 @@ public class SepsAndFiClaimTicketResource {
         this.claimTicketService = claimTicketService;
         this.claimTicketOTPService = claimTicketOTPService;
         this.mailService = mailService;
+        this.pdfService = pdfService;
     }
 
     @Operation(summary = "List all Claim Ticket", description = "Retrieve a paginated list of all claim tickets")
@@ -464,7 +469,7 @@ public class SepsAndFiClaimTicketResource {
         String email = verifyOTPVM.getEmail().toLowerCase();
         String otpCode = verifyOTPVM.getOtpCode();
         Boolean isVerified = claimTicketOTPService.verifyOtp(email, otpCode);
-        if (!isVerified) {
+        if (Boolean.FALSE.equals(isVerified)) {
             LOG.error("Invalid OTP code for token: {}", otpCode);
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.INVALID_OTP_CODE, null, null);
         }
@@ -484,6 +489,7 @@ public class SepsAndFiClaimTicketResource {
         )
     })
     @PostMapping
+    @PermissionCheck({"TICKET_CREATED_BY_SEPS", "TICKET_CREATED_BY_FI"})
     public ResponseEntity<ClaimTicketResponseDTO> createClaimTicket(@ModelAttribute @Valid CreateClaimTicketRequest claimTicketRequest,
                                                                     HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
@@ -540,6 +546,7 @@ public class SepsAndFiClaimTicketResource {
         description = "Update the claim ticket for the specified claim ticket."
     )
     @PutMapping("/{ticketId}/update")
+    @PermissionCheck({"TICKET_UPDATED_BY_SEPS", "TICKET_UPDATED_BY_FI"})
     public ResponseEntity<ResponseStatus> updateClaimTicketDetails(@PathVariable Long ticketId,
                                                                    @Valid @RequestBody ClaimTicketUpdateRequest claimTicketUpdateRequest,
                                                                    HttpServletRequest request) {
@@ -553,6 +560,23 @@ public class SepsAndFiClaimTicketResource {
             System.currentTimeMillis()
         );
         return ResponseEntity.ok(responseStatus);
+    }
+
+    @GetMapping("/{ticketId}/pdf-download")
+    @PermissionCheck({"TICKET_DOWNLOAD_PDF_SEPS", "TICKET_DOWNLOAD_PDF_FI"})
+    public ResponseEntity<byte[]> downloadClaimTicketDetails(@PathVariable Long ticketId,
+                                                                   HttpServletRequest request) throws IOException {
+        RequestInfo requestInfo = new RequestInfo(request);
+
+        Context context = claimTicketService.getTicketDetailContext(ticketId, requestInfo);
+        // Generate PDF
+        byte[] pdfBytes = pdfService.generatePdf("ticket", context);
+
+        // Return as PDF download
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ticket_detail.pdf")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdfBytes);
     }
 
 }
