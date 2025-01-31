@@ -45,15 +45,22 @@ public class ClaimTicketActivityLogServiceImpl implements ClaimTicketActivityLog
     @Override
     public List<ClaimTicketActivityLogDTO> getAllActivities(Long ticketId) {
         Locale locale = LocaleContextHolder.getLocale();
-        return repository.findAllByTicketId(ticketId)
+        return repository.findAllByTicketIdOrderByPerformedAtDesc(ticketId)
             .stream().map(activity -> mapToDTO(activity, locale)).toList();
     }
 
     @Override
     public List<ClaimTicketActivityLogDTO> getAllConversation(Long ticketId) {
         Locale locale = LocaleContextHolder.getLocale();
-        List<String> activityTypes = List.of(ClaimTicketActivityEnum.CUSTOMER_REPLY.name(), ClaimTicketActivityEnum.REPLY_CUSTOMER.name());
-        return repository.findAllByTicketIdAndActivityTypeIn(ticketId, activityTypes).stream()
+        List<String> activityTypes = List.of(ClaimTicketActivityEnum.CUSTOMER_REPLY.name(),
+            ClaimTicketActivityEnum.REPLY_CUSTOMER.name(),
+            ClaimTicketActivityEnum.ASSIGNED.name(),
+            ClaimTicketActivityEnum.REASSIGNED.name(),
+            ClaimTicketActivityEnum.CHANGED_PRIORITY.name(),
+            ClaimTicketActivityEnum.DATE_EXTENDED.name(),
+            ClaimTicketActivityEnum.REJECTED.name(),
+            ClaimTicketActivityEnum.STATUS_CHANGED.name());
+        return repository.findAllByTicketIdAndActivityTypeInOrderByPerformedAtDesc(ticketId, activityTypes).stream()
             .map(activity -> mapToDTO(activity, locale)).toList();
     }
 

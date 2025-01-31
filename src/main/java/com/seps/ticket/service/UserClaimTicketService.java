@@ -25,7 +25,6 @@ import com.seps.ticket.web.rest.vm.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ClassPathResource;
@@ -77,7 +76,6 @@ public class UserClaimTicketService {
     private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
     private final UserRepository userRepository;
     private final ClaimTicketAssignLogRepository claimTicketAssignLogRepository;
-    private final TempDocumentRepository tempDocumentRepository;
     private final TempDocumentService tempDocumentService;
 
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
@@ -88,7 +86,7 @@ public class UserClaimTicketService {
                                   ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository,
                                   ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                   EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, MailService mailService,
-                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, TempDocumentRepository tempDocumentRepository, TempDocumentService tempDocumentService) {
+                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, TempDocumentService tempDocumentService) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -98,7 +96,6 @@ public class UserClaimTicketService {
         this.userService = userService;
         this.userClaimTicketMapper = userClaimTicketMapper;
         this.auditLogService = auditLogService;
-        this.tempDocumentRepository = tempDocumentRepository;
         this.tempDocumentService = tempDocumentService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
@@ -1471,7 +1468,7 @@ public class UserClaimTicketService {
         // Perform additional logging and auditing actions
         logActivityAndAuditOfComplaint(complaintTicket, activityData, auditData, complaintRequest, requestInfo, currentUser);
 
-        LOG.info("Complaint filed for claim ticket {} by user {}", originalClaimId, currentUserId);
+        LOG.info("Complaint with chatbot attachment filed for claim ticket {} by user {}", originalClaimId, currentUserId);
 
         return claimTicketWorkFlowDTO;
     }
