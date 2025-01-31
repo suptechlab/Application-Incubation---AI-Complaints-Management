@@ -107,7 +107,7 @@ const SearchForm = ({ filter, setFilter }) => {
                 //   value: "PENDING",
                 // },
                 {
-                  label: t("BLOCKED"),
+                  label: t("INACTIVE"),
                   value: "BLOCKED",
                 },
                 // {
