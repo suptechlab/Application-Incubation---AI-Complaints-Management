@@ -47,7 +47,7 @@ public class TeamService {
     private final Gson gson;
     private final TeamMapper teamMapper;
     private final MailService mailService;
-
+    private final NotificationService notificationService;
     /**
      * Service class responsible for handling operations related to teams and team members.
      * This service provides methods to manage teams, their members, and the interactions between them,
@@ -84,7 +84,7 @@ public class TeamService {
     @Autowired
     public TeamService(TeamRepository teamRepository, TeamMemberRepository teamMemberRepository, OrganizationService organizationService,
                        UserRepository userRepository, UserMapper userMapper, AuditLogService auditLogService, UserService userService, MessageSource messageSource,
-                       Gson gson, TeamMapper teamMapper, MailService mailService) {
+                       Gson gson, TeamMapper teamMapper, MailService mailService, NotificationService notificationService) {
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
         this.userService = userService;
@@ -96,6 +96,7 @@ public class TeamService {
         this.gson = gson;
         this.teamMapper = teamMapper;
         this.mailService = mailService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -467,11 +468,16 @@ public class TeamService {
         teamMemberRepository.saveAll(newTeamMembers);
 
         log.debug("userIdsToAssign: {}",userIdsToAssign);
+        Map<String, String> variables = new HashMap<>();
+        variables.put("team_name",team.getTeamName());
+
         // Send emails to new members
         userIdsToAssign.forEach(userId -> {
             log.debug("userId: {}",userId);
             User newUser = userService.getUserById(userId);
             mailService.sendWelcomeToTeamEmail(newUser, team.getTeamName());
+            variables.put("member_name",newUser.getFirstName());
+            notificationService.sendNotification("NEW_MEMBER_ADDED_TO_TEAM_NOTIFICATION",null, alreadyAssignedUserIds, variables);
         });
 
         // Notify existing team members
@@ -479,7 +485,7 @@ public class TeamService {
             User existingUser = userService.getUserById(userId);
             mailService.sendNewMemberAddedNotification(existingUser, team.getTeamName(), userIdsToAssign);
         });
-
+        notificationService.sendNotification("TEAM_WELCOME_NOTIFICATION",null,userIdsToAssign, variables);
         return userIdsToAssign;
     }
     public void assignMembersToTeamLoad(Map<String, Object> oldData, Long teamId,List<Long> userIdsToAssign, AssignMembersRequestDTO requestDto, RequestInfo requestInfo){
