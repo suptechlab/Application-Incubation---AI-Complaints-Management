@@ -15,11 +15,11 @@ import java.util.Optional;
 public interface ClaimTicketActivityLogRepository extends JpaRepository<ClaimTicketActivityLog, Long> {
     Page<ClaimTicketActivityLog> findAllByTicketId(Long ticketId, Pageable pageable);
 
-    List<ClaimTicketActivityLog> findAllByTicketId(Long ticketId);
+    List<ClaimTicketActivityLog> findAllByTicketIdOrderByPerformedAtDesc(Long ticketId);
 
     Page<ClaimTicketActivityLog> findAllByTicketIdAndActivityTypeIn(Long ticketId, List<String> activityTypes, Pageable pageable);
 
-    List<ClaimTicketActivityLog> findAllByTicketIdAndActivityTypeIn(Long ticketId, List<String> activityTypes);
+    List<ClaimTicketActivityLog> findAllByTicketIdAndActivityTypeInOrderByPerformedAtDesc(Long ticketId, List<String> activityTypes);
 
     Optional<ClaimTicketActivityLog> findFirstByTicketIdAndActivityTypeOrderByPerformedAtDesc(Long ticketId, String activityTpe);
 }
