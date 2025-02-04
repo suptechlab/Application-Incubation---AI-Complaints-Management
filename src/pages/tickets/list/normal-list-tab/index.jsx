@@ -74,8 +74,13 @@ const TicketsNormalList = ({ selectedTab }) => {
     ]);
     const [filter, setFilter] = React.useState({
         search: "",
-        subscription: "",
         status: "",
+        claimTypeId: "",
+        instanceType:"",
+        claimTicketPriority:"",
+        claimTicketStatus:"",
+        startDate:null,
+        endDate :null
     });
 
     const [loading, setLoading] = useState(false);

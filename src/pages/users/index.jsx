@@ -71,7 +71,8 @@ export default function UserList() {
 
   const [filter, setFilter] = React.useState({
     search: "",
-    status: ""
+    status: "",
+    roleId: ""
   });
 
   const [loading, setLoading] = useState(false);

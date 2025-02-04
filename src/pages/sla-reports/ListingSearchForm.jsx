@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import FilterModal from "./FilterModal";
 import AppTooltip from "../../components/tooltip";
 import { MdOutlineFilterAlt } from "react-icons/md";
+import { LuFilterX } from "react-icons/lu";
 
 const ListingSearchForm = ({ filter, setFilter }) => {
   const [tempDateRange, setTempDateRange] = useState([null, null]);
@@ -72,7 +73,6 @@ const ListingSearchForm = ({ filter, setFilter }) => {
 
   const handleClaimTypeChange = (selectedOption) => {
     const claimTypeId = selectedOption?.target?.value ?? "";
-
     updateFilter("claimTypeId", claimTypeId);
     updateFilter("claimSubTypeId", ""); // Clear sub-type filter when claim type changes
     setFilter((prevfilter) => ({ ...prevfilter, claimTypeId: claimTypeId }))
@@ -100,6 +100,22 @@ const ListingSearchForm = ({ filter, setFilter }) => {
         </div>
 
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
+          <Button size="sm" type="button" variant="warning" onClick={() => {
+            setFilter({
+              search: "",
+              status: "",
+              claimTypeId: "",
+              claimSubTypeId: "",
+              slaCompliance: "",
+              startDate: null,
+              endDate: null,
+              instanceType: "",
+              organizationId: "",
+              claimTicketPriority: ""
+            })
+          }}>
+            <LuFilterX size={18} />  {t("RESET")}
+          </Button>
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"

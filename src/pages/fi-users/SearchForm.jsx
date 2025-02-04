@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import FormInput from "../../components/FormInput";
 import ReactSelect from "../../components/ReactSelect";
 import { getRolesDropdownData } from "../../services/rolerights.service";
 import toast from "react-hot-toast";
+import { LuFilterX } from "react-icons/lu";
 
 const SearchForm = ({ filter, setFilter }) => {
   const { t } = useTranslation();
@@ -66,6 +67,15 @@ const SearchForm = ({ filter, setFilter }) => {
           />
         </div>
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
+          <Button size="sm" type="button" variant="warning" onClick={() => {
+            setFilter({
+              search: "",
+              status: "",
+              roleId: ""
+            })
+          }}>
+            <LuFilterX size={18} />  {t("RESET")}
+          </Button>
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
@@ -83,8 +93,7 @@ const SearchForm = ({ filter, setFilter }) => {
               value={filter?.roleId}
             />
           </div>
-        </Stack>
-        <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
+
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"

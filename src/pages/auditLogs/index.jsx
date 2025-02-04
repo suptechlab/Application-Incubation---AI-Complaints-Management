@@ -34,6 +34,9 @@ const AuditLogs = () => {
   ]);
   const [filter, setFilter] = useState({
     search: "",
+    activityType: "",
+    startDate:null,
+    endDate:null
   });
 
     const dataQuery = useQuery({

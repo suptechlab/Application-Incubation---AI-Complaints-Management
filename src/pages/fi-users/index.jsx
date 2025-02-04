@@ -33,6 +33,8 @@ export default function FIUserList() {
 
   const [filter, setFilter] = React.useState({
     search: "",
+    status: "",
+    roleId: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -249,7 +251,7 @@ export default function FIUserList() {
                       info?.row?.original?.status
                     )
                   }
-                  tooltip={info?.row?.original?.status!=="ACTIVE" ? t("ACTIVE") : t("INACTIVE")}
+                  tooltip={info?.row?.original?.status !== "ACTIVE" ? t("ACTIVE") : t("INACTIVE")}
                 />
 
               );

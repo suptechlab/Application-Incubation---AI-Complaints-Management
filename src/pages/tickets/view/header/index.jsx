@@ -215,7 +215,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                                     class="form-select "
                                     placeholder={t("ASSIGN_REASSIGN")}
                                     id="floatingSelect"
-                                    // size="sm"
+                                    size="md"
                                     options={[
                                         {
                                             label: t("ASSIGN_REASSIGN"),

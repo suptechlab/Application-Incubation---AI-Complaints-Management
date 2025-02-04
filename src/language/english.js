@@ -377,5 +377,5 @@ export const englishLang = {
     "MODULE_NAME":"Module Name",
     "PERMISSIONS":"Permisssions",
     "TICKETS ASSIGNED":"Tickets Assigned",
-    "RESET_FILTERS":"Reset Filters"
+    "RESET":"Reset"
 }

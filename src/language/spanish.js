@@ -372,5 +372,5 @@ export const spanishLang = {
     "MODULE_NAME": "Nombre del módulo",
     "PERMISSIONS": "Permisos",
     "TICKETS ASSIGNED":"Entradas asignadas",
-    "RESET_FILTERS":"Restablecer filtros"
+    "RESET":"Restablecer"
 } 

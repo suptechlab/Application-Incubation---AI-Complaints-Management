@@ -62,11 +62,20 @@ const ListingSearchFormUsers = ({ filter, setFilter }) => {
                 search: event.target.value,
               });
             }}
-            value={filter.search}
+            value={filter?.search}
           />
         </div>
 
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
+          <Button size="sm" type="button" variant="warning" onClick={() => {
+            setFilter({
+              search: "",
+              status: "",
+              roleId: ""
+            })
+          }}>
+            <LuFilterX size={18} />  {t("RESET")}
+          </Button>
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
@@ -84,8 +93,6 @@ const ListingSearchFormUsers = ({ filter, setFilter }) => {
               value={filter?.roleId}
             />
           </div>
-        </Stack>
-        <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
@@ -117,18 +124,6 @@ const ListingSearchFormUsers = ({ filter, setFilter }) => {
               value={filter.status}
             />
           </div>
-        </Stack>
-        <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
-          <AppTooltip title={t("RESET_FILTERS")} placement="top">
-            <Button type="button" className="custom-height-32" variant="outline-primary" aria-label={t("RESET_FILTERS")} onClick={() => {
-              setFilter({
-                search: "",
-                status : ""
-              })
-            }}>
-              <LuFilterX size={18} />
-            </Button>
-          </AppTooltip>
         </Stack>
       </Stack>
     </div>

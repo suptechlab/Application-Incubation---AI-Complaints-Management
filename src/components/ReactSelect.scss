@@ -5,7 +5,7 @@
 }
 
 .react-select-container {
-    &.react-select-sm {
+    &.react-select-sm,&.react-select-md  {
         .react-select__control {
             min-height: 32px;
             font-size: .875rem;
@@ -21,6 +21,11 @@
                     margin-right: .25rem !important;
                 }
             }
+        }
+    }
+    &.react-select-md {
+        .react-select__control {
+            min-height: 38px;
         }
     }
 }

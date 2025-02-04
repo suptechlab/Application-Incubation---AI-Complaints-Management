@@ -8,6 +8,7 @@ import FormInput from "../../components/FormInput";
 import ReactSelect from "../../components/ReactSelect";
 import AppTooltip from "../../components/tooltip";
 import FilterModal from "./FilterModal";
+import { LuFilterX } from "react-icons/lu";
 
 const ListFilters = ({ filter, setFilter, }) => {
     const { t } = useTranslation();
@@ -24,7 +25,8 @@ const ListFilters = ({ filter, setFilter, }) => {
 
         // Update filter state only if both dates are selected
         if (newStartDate && newEndDate) {
-            setFilter({...filter,
+            setFilter({
+                ...filter,
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
                 endDate: moment(newEndDate).format("YYYY-MM-DD")
             });
@@ -58,7 +60,33 @@ const ListFilters = ({ filter, setFilter, }) => {
                         value={filter.search}
                     />
                 </div>
+                <Button size="sm" type="button" variant="warning" onClick={() => {
+                    setFilter({
+                        search: "",
+                        status: "",
+                        claimTicketPriority: "",
+                        startDate: null,
+                        endDate: null,
+                        instanceType: "",
+                        organizationId: "",
+                        fiAgentId: "",
+                        sepsAgentId: "",
+                        claimTypeId: "",
+                        claimSubTypeId: "",
+                        closedStatus: "",
+                        rejectedStatus: "",
+                        provinceId: "",
+                        cityId: "",
+                        customerType: "",
+                        priorityCareGroup: "",
+                        source: "",
+                        channelOfEntry: ""
+                    })
+                }}>
+                    <LuFilterX size={18} />  {t("RESET")}
+                </Button>
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+
                     <ReactSelect
                         wrapperClassName="mb-0"
                         class="form-select "
