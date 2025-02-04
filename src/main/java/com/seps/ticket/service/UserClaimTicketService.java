@@ -39,7 +39,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
 import org.zalando.problem.Status;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
@@ -1610,13 +1612,21 @@ public class UserClaimTicketService {
         context.setVariable("secondInstance", secondInstance);
         context.setVariable("complaint", complaint);
 
-        ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
-        String imagePath = imageResource.getFile().toURI().toString(); // Ensure absolute path
-        context.setVariable("logo", imagePath);
+//        ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
+//        String imagePath = imageResource.getFile().toURI().toString(); // Ensure absolute path
+//        context.setVariable("logo", imagePath);
+//
+//        ClassPathResource calendarLogo = new ClassPathResource("static/images/calendar_today.png");
+//        String calenderPath = calendarLogo.getFile().toURI().toString(); // Ensure absolute path
+//        context.setVariable("calenderPath", calenderPath);
 
-        ClassPathResource calendarLogo = new ClassPathResource("static/images/calendar_today.png");
-        String calenderPath = calendarLogo.getFile().toURI().toString(); // Ensure absolute path
-        context.setVariable("calenderPath", calenderPath);
+        // Convert logo.png to Base64
+        String imagePath = encodeImageToBase64("static/images/logo.png");
+        context.setVariable("logo", "data:image/png;base64," + imagePath);
+
+        // Convert calendar_today.png to Base64
+        String calenderPath = encodeImageToBase64("static/images/calendar_today.png");
+        context.setVariable("calenderPath", "data:image/png;base64," + calenderPath);
 
         return context;
 
@@ -1664,5 +1674,18 @@ public class UserClaimTicketService {
 
         // Replace all matches with the captured group (Name)
         return message.replaceAll(regex, "<strong>$1</strong>");
+    }
+
+    private String encodeImageToBase64(String imagePath) throws IOException {
+        ClassPathResource resource = new ClassPathResource(imagePath);
+        try (InputStream inputStream = resource.getInputStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            return Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        }
     }
 }
