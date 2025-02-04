@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import tech.jhipster.web.util.PaginationUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -198,8 +200,10 @@ public class MasterResource {
     @Operation(summary = "GET the organization list", description = "GET the organization list.")
     @ApiResponse(responseCode = "200", description = "Organization list fetched successfully")
     @GetMapping("/organization-list")
-    public ResponseEntity<List<OrganizationDTO>> getOrganizationInfoInfoList() {
-        List<OrganizationDTO> orgList = organizationService.fetchOrganizationList();
-        return ResponseEntity.ok(orgList);
+    public ResponseEntity<List<OrganizationDTO>> getOrganizationInfoInfoList(Pageable pageable,
+                                                                             @RequestParam(value = "search", required = false) String search) {
+        Page<OrganizationDTO> orgList = organizationService.fetchOrganizationList(search, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), orgList);
+        return ResponseEntity.ok().headers(headers).body(orgList.getContent());
     }
 }
