@@ -375,5 +375,6 @@ export const englishLang = {
     "NON_COMPLAINT":"Non Complaint",
     "NONE":"None",
     "MODULE_NAME":"Module Name",
-    "PERMISSIONS":"Permisssions"
+    "PERMISSIONS":"Permisssions",
+    "DOWNLOAD_TICKET_DETAILS":"Download Ticket Details",
 }
