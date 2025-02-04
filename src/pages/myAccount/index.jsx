@@ -9,7 +9,7 @@ import qs from "qs";
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../../components/Loader';
 import AppTooltip from '../../components/tooltip';
-import { fileClaimList } from '../../redux/slice/fileClaimSlice';
+import { downloadTicketDetails, fileClaimList } from '../../redux/slice/fileClaimSlice';
 import InfoCards from './cards';
 import PageHeader from './header';
 import ViewClaim from './modals/view';
@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import ClaimChat from './modals/chat';
 import InstanceModal from './modals/instance';
 import RaisedComplaintModal from './modals/raised-complaint';
-
+import { FiDownload } from "react-icons/fi";
 export default function MyAccount() {
 
   const { t } = useTranslation()
@@ -40,6 +40,7 @@ export default function MyAccount() {
   const [showTicketModal, setTicketModal] = useState(false);
   const [instanceModalShow, setInstanceModalShow] = useState(false);
   const [raisedComplaintModalShow, setRaisedComplaintModalShow] = useState(false);
+  const [isDownloading , setDownloading] = useState(false)
   const { instance_types, masterData } = useSelector((state) => state?.masterSlice);
 
 
@@ -86,6 +87,17 @@ export default function MyAccount() {
     setSelectedRow(row);
     setRaisedComplaintModalShow(true);
   }
+
+  const downloadTicketData = async (id) => {
+    setDownloading(true);
+    const result = await dispatch(downloadTicketDetails(id));
+    if (downloadTicketDetails.fulfilled.match(result)) {
+      setDownloading(false)
+    } else {
+      setDownloading(false);
+    }
+  }
+
   // The color class based on the status
   const getStatusClass = (status) => {
     switch (status) {
@@ -204,6 +216,16 @@ export default function MyAccount() {
             });
           return (
             <Stack direction='horizontal' gap={3}>
+              <AppTooltip title={t("DOWNLOAD")}>
+                <Button
+                  variant="link"
+                  onClick={() => downloadTicketData(info?.row?.original?.id)}
+                  className='p-0 border-0 lh-sm text-body'
+                  aria-label={t("DOWNLOAD")}
+                >
+                  <FiDownload size={24} />
+                </Button>
+              </AppTooltip>
               <AppTooltip title={t("VIEW")}>
                 <Button
                   variant="link"
