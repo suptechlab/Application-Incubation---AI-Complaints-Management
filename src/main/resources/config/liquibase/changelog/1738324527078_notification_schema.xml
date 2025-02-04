@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <!-- ======================================== -->
+  <!-- CREATE NOTIFICATIONS TABLE -->
+  <!-- ======================================== -->
+  <changeSet id="1738324626560" author="matellio">
+    <createTable tableName="notifications">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="template_id" type="bigint">
+        <constraints nullable="true" foreignKeyName="fk_notifications_template_master"
+                     references="template_master(id)"/>
+      </column>
+      <column name="title" type="varchar(255)"/>
+      <column name="message" type="text"/>
+      <column name="type" type="varchar(50)"/>
+      <column name="redirect_url" type="varchar(500)"/>
+      <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+    </createTable>
+  </changeSet>
+
+  <!-- ======================================== -->
+  <!-- CREATE USER NOTIFICATIONS TABLE -->
+  <!-- ======================================== -->
+  <changeSet id="1738324637190" author="matellio">
+    <createTable tableName="user_notifications">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="notification_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_user_notifications_notifications"
+                     references="notifications(id)"/>
+      </column>
+      <column name="user_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_user_notifications_users"
+                     references="jhi_user(id)"/>
+      </column>
+      <column name="is_read" type="boolean" defaultValue="false"/>
+      <column name="read_at" type="timestamp" />
+    </createTable>
+  </changeSet>
+
+</databaseChangeLog>
