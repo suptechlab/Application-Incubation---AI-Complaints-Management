@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import FormInput from "../../components/FormInput";
 import ReactSelect from "../../components/ReactSelect";
 import { getRolesDropdownData } from "../../services/rolerights.service";
 import toast from "react-hot-toast";
-
+import { LuFilterX } from "react-icons/lu";
+import AppTooltip from "../../components/tooltip";
 const ListingSearchFormUsers = ({ filter, setFilter }) => {
   const { t } = useTranslation();
 
@@ -83,7 +84,7 @@ const ListingSearchFormUsers = ({ filter, setFilter }) => {
               value={filter?.roleId}
             />
           </div>
-        </Stack>    
+        </Stack>
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
@@ -116,6 +117,18 @@ const ListingSearchFormUsers = ({ filter, setFilter }) => {
               value={filter.status}
             />
           </div>
+        </Stack>
+        <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
+          <AppTooltip title={t("RESET_FILTERS")} placement="top">
+            <Button type="button" className="custom-height-32" variant="outline-primary" aria-label={t("RESET_FILTERS")} onClick={() => {
+              setFilter({
+                search: "",
+                status : ""
+              })
+            }}>
+              <LuFilterX size={18} />
+            </Button>
+          </AppTooltip>
         </Stack>
       </Stack>
     </div>

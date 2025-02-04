@@ -71,8 +71,7 @@ export default function UserList() {
 
   const [filter, setFilter] = React.useState({
     search: "",
-    subscription: "",
-    status: "",
+    status: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -248,10 +247,10 @@ export default function UserList() {
   useEffect(() => {
     if (Object.values(filter).some(value => value)) {
       setPagination({
-          pageIndex: 0,
-          pageSize: 10,
+        pageIndex: 0,
+        pageSize: 10,
       });
-  }
+    }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
@@ -263,7 +262,7 @@ export default function UserList() {
 
   const actions = permissionsState?.addModule
     ? [
-        {
+      {
         label: t("IMPORT_SEPS_USERS"),
         to: "/users/import",
         variant: "outline-dark",
