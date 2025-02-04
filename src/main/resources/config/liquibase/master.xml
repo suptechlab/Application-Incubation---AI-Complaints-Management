@@ -29,6 +29,7 @@
     <include file="config/liquibase/changelog/1731668673199_teams_and_team_members_schema.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1732683140858_load_and_block_static_roles.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1738324527078_notification_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1738647732706_notification_template_master_load.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
