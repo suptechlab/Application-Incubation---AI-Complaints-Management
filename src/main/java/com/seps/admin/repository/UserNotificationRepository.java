@@ -21,4 +21,6 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
     @Modifying
     @Query("DELETE FROM UserNotification n WHERE n.user.id = :userId")
     void deleteByUserId(@Param("userId") Long userId);
+
+    long countByUserIdAndIsReadFalse(Long userId);
 }

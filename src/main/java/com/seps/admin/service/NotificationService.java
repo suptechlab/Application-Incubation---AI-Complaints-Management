@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,5 +122,15 @@ public class NotificationService {
     public void deleteAllNotifications() {
         User currentUser = userService.getCurrentUser(); // Get the logged-in user
         userNotificationRepository.deleteByUserId(currentUser.getId());
+    }
+
+    public Map<String, String> countAllNotifications() {
+        User currentUser = userService.getCurrentUser(); // Get the logged-in user
+        long unreadCount = userNotificationRepository.countByUserIdAndIsReadFalse(currentUser.getId());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("unreadCount", String.valueOf(unreadCount));
+
+        return response;
     }
 }
