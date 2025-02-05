@@ -6,12 +6,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ClaimTypeRepository extends JpaRepository<ClaimTypeEntity, Long>, JpaSpecificationExecutor<ClaimTypeEntity> {
-    Optional<ClaimTypeEntity> findByNameIgnoreCase(String name);
-
     List<ClaimTypeEntity> findAllByStatus(boolean status);
 }
 
