@@ -253,10 +253,9 @@ const ChatBotForm = () => {
         },
     ]
     // Action Button Handler
-    const actionButtonHandler = async (event, msgData) => {
-        event.preventDefault();
+    const actionButtonHandler = async ( msgData) => {
         setLoading(true);
-
+        
         try {
             // Send the message to the API
             const result = await dispatch(sendQuery(msgData));
@@ -522,6 +521,8 @@ const ChatBotForm = () => {
                 validationSchema={ChatBotFormSchema}
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
+                validateOnBlur={false}  // Disable validation on blur
+                validateOnChange={false}  // Disable validation on change
             >
                 {(formikProps) => (
                     <Offcanvas.Body className="text-break d-flex flex-column small p-0">
@@ -568,7 +569,7 @@ const ChatBotForm = () => {
                                                                     variant={positive ? "success" : "light"}
                                                                     disabled={!isLastMessage || isLoading}
                                                                     className={`bot-tag-btns text-start border-opacity-50 border-primary fs-6 lh-sm py-2 ${positive ? "text-white" : "text-body"}`}
-                                                                    onClick={(event) => actionButtonHandler(event, { message: payload, sender: recipient_id })}
+                                                                    onClick={(event) => actionButtonHandler({ message: payload, sender: recipient_id })}
                                                                 >
                                                                     {suggestion}
                                                                 </Button>

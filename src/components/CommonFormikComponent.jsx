@@ -6,7 +6,9 @@ const CommonFormikComponent = ({
   initialValues,
   onSubmit,
   children,
-  innerRef
+  innerRef,
+  validateOnBlur=true, // Disable validation on blur
+  validateOnChange=true
 }) => {
   return (
     <Formik
@@ -15,6 +17,8 @@ const CommonFormikComponent = ({
       validationSchema={validationSchema}
       initialValues={initialValues}
       onSubmit={onSubmit}
+      validateOnBlur={validateOnBlur}  // Disable validation on blur
+      validateOnChange={validateOnChange}  // Disable validation on change
     >
       {(formikProps) => {
         const scrollToError = () => {
