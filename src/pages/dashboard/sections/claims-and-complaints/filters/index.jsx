@@ -1,12 +1,13 @@
 import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import CustomDateRangePicker from "../../../../../components/CustomDateRangePicker";
 import FormInput from "../../../../../components/FormInput";
 import ReactSelect from "../../../../../components/ReactSelect";
 import { MasterDataContext } from "../../../../../contexts/masters.context";
 import { convertToLabelValue } from "../../../../../services/ticketmanagement.service";
+import { LuFilterX } from "react-icons/lu";
 
 const DashboardListFilters = ({ filter, setFilter }) => {
     const { t } = useTranslation();
@@ -68,8 +69,19 @@ const DashboardListFilters = ({ filter, setFilter }) => {
                         value={filter.search}
                     />
                 </div>
-
+                <Button size="sm" type="button" variant="warning" onClick={() => {
+                        setFilter({
+                            search: "",
+                            claimTicketStatus: "",
+                            instanceType:"",
+                            startDate: null,
+                            endDate: null
+                        })
+                    }}>
+                        <LuFilterX size={18} />  {t("RESET")}
+                    </Button>
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                  
                     <ReactSelect
                         wrapperClassName="mb-0"
                         class="form-select "
