@@ -70,9 +70,13 @@ nav {
 
         .theme-notification-menu {
             ul {
-                width: 280px;
-                max-height: 306px;
+                width: 380px;
+                max-width: 100%;
+                max-height: 380px;
 
+                @include below-sm() {
+                    width: 280px;
+                }
                 @include below-xsm() {
                     width: 220px;
                 }

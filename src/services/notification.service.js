@@ -1,31 +1,28 @@
-import {adminApi} from "../utils/instance";
+import { adminApi } from "../utils/instance";
+const API_VERSION = process.env.REACT_APP_API_VERSION
 
-
-export const handleGetNotifications = async (params) => {
-    return await adminApi.get('/v1/notifications', {
-        params
-    });
+// GET ALL NOTIFICATIONS API
+export const handleGetNotifications = async () => {
+    return await adminApi.get(`/${API_VERSION}/notifications`);
 }
-
-export const handleMarkNotificationById = async (id) => {
-    return await adminApi.get(`/v1/notifications/${id}`);
+// READ NOTIFICATION BY ID
+export const handleMarkNotificationById = async (notificationId) => {
+    return await adminApi.post(`/${API_VERSION}/notifications/${notificationId}/mark-as-read`);
 }
-
-export const handleMarkAllNotifications = async (params) => {
-    return await adminApi.post('/v1/notifications/mark-all-read', {
-        params
-    });
+// MARK READ ALL NOTIFICATION
+export const handleMarkAllNotifications = async () => {
+    return await adminApi.post(`/${API_VERSION}/notifications/mark-as-read-all`);
 }
-
-export const handleDeleteNotification = async (id) => {
-    return await adminApi.delete(`/v1/notifications/${id}`);
+// DELETE NOTIFICATION BY ID
+export const handleDeleteNotification = async (notificationId) => {
+    return await adminApi.delete(`/${API_VERSION}/notifications/${notificationId}`);
 }
-
-export const handleDeleteAllNotification = async (params) => {
-    return await adminApi.delete(`/v1/notifications`);
+// DELETE ALL NOTIFICATIONS API
+export const handleDeleteAllNotification = async () => {
+    return await adminApi.delete(`/${API_VERSION}/notifications/delete/all`);
 }
-
+// API FOR NOTIFICATION COUNT
 export const handleCountNotifications = async () => {
-    return await adminApi.get(`/v1/notifications/count`);
+    return await adminApi.get(`/${API_VERSION}/notifications/count`);
 }
 
