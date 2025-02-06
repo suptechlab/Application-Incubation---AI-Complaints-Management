@@ -186,4 +186,5 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
 
     Optional<ClaimTicket> findByIdAndInstanceTypeAndStatusNotIn(Long id, InstanceTypeEnum instanceType, List<ClaimTicketStatusEnum> status);
 
+    Optional<ClaimTicket> findByTicketIdAndUserId(Long ticketId, Long userId);
 }

@@ -114,6 +114,7 @@ public class SepsAndFiClaimTicketResource {
     ) {
         List<ClaimTicket> ticketList = sepsAndFiClaimTicketService.assignTicketsToFiAgent(agentId, assignTicketRequestDTO);
         sepsAndFiClaimTicketService.sendAssignmentEmails(ticketList, agentId);
+        claimTicketService.sendAssignmentNotification(ticketList, agentId);
         return ResponseEntity.ok().build();
     }
 
@@ -127,6 +128,7 @@ public class SepsAndFiClaimTicketResource {
     ) {
         List<ClaimTicket> ticketList = sepsAndFiClaimTicketService.assignTicketsToSepsAgent(agentId, assignTicketRequestDTO);
         sepsAndFiClaimTicketService.sendAssignmentEmails(ticketList, agentId);
+        claimTicketService.sendAssignmentNotification(ticketList, agentId);
         return ResponseEntity.ok().build();
     }
 
@@ -142,6 +144,7 @@ public class SepsAndFiClaimTicketResource {
         RequestInfo requestInfo = new RequestInfo(request);
         sepsAndFiClaimTicketService.updatePriority(ticketId, priority, requestInfo);
         sepsAndFiClaimTicketService.triggerPriorityWorkflow(ticketId);
+        claimTicketService.sendPriorityChangeNotification(ticketId);
         return ResponseEntity.ok().build();
     }
 

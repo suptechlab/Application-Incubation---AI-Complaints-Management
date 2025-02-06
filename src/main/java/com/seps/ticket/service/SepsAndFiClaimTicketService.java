@@ -1251,6 +1251,9 @@ public class SepsAndFiClaimTicketService {
         if (activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE_ADDED.name())) {
             msgOne = "ticket.activity.log.internal.note.added.with.attachment";
             msgTwo = "ticket.activity.log.internal.note.added";
+        }else if (activityType.equals(ClaimTicketActivityEnum.INTERNAL_NOTE.name())) {
+            msgOne = "ticket.activity.log.customer.replied.with.attachment";
+            msgTwo = "ticket.activity.log.customer.replied";
         }
         if (!claimTicketDocuments.isEmpty()) {
             final String messageOne = msgOne;
