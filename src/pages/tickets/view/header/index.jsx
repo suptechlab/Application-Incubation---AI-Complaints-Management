@@ -47,7 +47,10 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
     const statusOptions = [
-        ...((permissionState?.closePermission === true && ticketData?.status==='ASSIGNED') ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
+        ...((permissionState?.closePermission === true && 
+            ((ticketData?.instanceType==='FIRST_INSTANCE' && ticketData?.fiAgentId !==null)||
+            ((ticketData?.instanceType==='SECOND_INSTANCE' ||ticketData?.instanceType==='COMPLAINT' ) && ticketData?.sepsAgentId !==null)))
+            ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
         ...(permissionState?.rejectPermission === true ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
         { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
         { label: t('PENDING'), value: 'PENDING' }];
@@ -120,6 +123,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                 agentTicketToFIagent(agentId, { ticketIds: [ticketData?.id] }).then(response => {
                     toast.success(t("TICKETS ASSIGNED"));
                     setSelectedAgent(null)
+                    getTicketData()
                 }).catch((error) => {
                     if (error?.response?.data?.errorDescription) {
                         toast.error(error?.response?.data?.errorDescription);
