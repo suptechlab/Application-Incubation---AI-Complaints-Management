@@ -44,6 +44,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +92,10 @@ public class ClaimTicketService {
     private final ClaimTicketOTPRepository claimTicketOTPRepository;
     private final PasswordEncoder passwordEncoder;
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
-    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder, ClaimTicketActivityLogService claimTicketActivityLogService) {
+    private final NotificationService notificationService;
+    private final TemplateVariableMappingService templateVariableMappingService;
+
+    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder, ClaimTicketActivityLogService claimTicketActivityLogService, NotificationService notificationService, TemplateVariableMappingService templateVariableMappingService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.userClaimTicketMapper = userClaimTicketMapper;
@@ -103,6 +107,8 @@ public class ClaimTicketService {
         this.claimTicketOTPRepository = claimTicketOTPRepository;
         this.passwordEncoder = passwordEncoder;
         this.claimTicketActivityLogService = claimTicketActivityLogService;
+        this.notificationService = notificationService;
+        this.templateVariableMappingService = templateVariableMappingService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -845,14 +851,6 @@ public class ClaimTicketService {
         context.setVariable("secondInstance", secondInstance);
         context.setVariable("complaint", complaint);
 
-//        ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
-//        String imagePath = imageResource.getFile().toURI().toString(); // Ensure absolute path
-//        context.setVariable("logo", imagePath);
-//
-//        ClassPathResource calendarLogo = new ClassPathResource("static/images/calendar_today.png");
-//        String calenderPath = calendarLogo.getFile().toURI().toString(); // Ensure absolute path
-//        context.setVariable("calenderPath", calenderPath);
-        // Convert logo.png to Base64
         String imagePath = encodeImageToBase64("static/images/logo.png");
         context.setVariable("logo", "data:image/png;base64," + imagePath);
 
@@ -918,6 +916,41 @@ public class ClaimTicketService {
                 outputStream.write(buffer, 0, bytesRead);
             }
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        }
+    }
+
+    @Transactional
+    public void sendAssignmentNotification(List<ClaimTicket> tickets, Long agentId) {
+        User agent = userService.getUserById(agentId);
+        tickets.forEach(ticket -> {
+            Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, agent);
+            // Send notification to the customer
+            notificationService.sendNotification("TICKET_ASSIGNED_CUSTOMER_NOTIFICATION", variables.get("userTicketUrl"), List.of(ticket.getUserId()), variables);
+            // Send email to the FI agent
+            notificationService.sendNotification("TICKET_ASSIGNED_AGENT_NOTIFICATION",variables.get("adminTicketUrl"), List.of(agentId), variables);
+        });
+    }
+
+    @Transactional
+    public void sendPriorityChangeNotification(Long ticketId) {
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId)
+            .orElse(null);
+        if(ticket!=null) {
+            // Send email to the FI agent
+            if (ticket.getFiAgentId() != null && ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                User fiAgent = userService.getUserById(ticket.getFiAgentId());
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, fiAgent);
+                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_AGENT_NOTIFICATION", variables.get("adminTicketUrl"), List.of(fiAgent.getId()), variables);
+            } else if (ticket.getSepsAgentId() != null) { // Send email to the SEPS agent
+                User sepsAgent = userService.getUserById(ticket.getSepsAgentId());
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, sepsAgent);
+                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_AGENT_NOTIFICATION", variables.get("adminTicketUrl"), List.of(sepsAgent.getId()), variables);
+            }
+            if(ticket.getUserId()!=null){
+                User customer = userService.getUserById(ticket.getUserId());
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, customer);
+                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_CUSTOMER_NOTIFICATION", variables.get("userTicketUrl"), List.of(ticket.getUserId()), variables);
+            }
         }
     }
 }

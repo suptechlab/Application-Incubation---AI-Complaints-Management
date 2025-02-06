@@ -422,6 +422,7 @@ public class UserClaimTicketService {
         User currentUser = userService.getCurrentUser();
         Long userId = currentUser.getId();
         return claimTicketRepository.findByIdAndUserId(id, userId)
+            .or(() -> claimTicketRepository.findByTicketIdAndUserId(id, userId)) // Try another query if first fails
             .map(userClaimTicketMapper::toUserClaimTicketDTO)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                 new String[]{id.toString()}, null));
@@ -738,7 +739,7 @@ public class UserClaimTicketService {
     }
 
     @Transactional
-    public ClaimTicketWorkFlowDTO fileSecondInstanceClaim(SecondInstanceRequest secondInstanceRequest, RequestInfo requestInfo) {
+    public ClaimTicketResponseDTO fileSecondInstanceClaim(SecondInstanceRequest secondInstanceRequest, RequestInfo requestInfo) {
         Long originalClaimId = secondInstanceRequest.getId();
         User currentUser = userService.getCurrentUser();
         Long currentUserId = currentUser.getId();
@@ -869,9 +870,13 @@ public class UserClaimTicketService {
         // Perform additional logging and auditing actions
         logActivityAndAuditOfSecondInstance(newClaimTicket, activityData, auditData, secondInstanceRequest, requestInfo, currentUser);
 
-        LOG.info("Second instance claim filed for claim ticket {} by user {}", originalClaimId, currentUserId);
-
-        return claimTicketWorkFlowDTO;
+        LOG.info("New method Second instance claim filed for claim ticket {} by user {}", originalClaimId, currentUserId);
+        ClaimTicketResponseDTO responseDTO = new ClaimTicketResponseDTO();
+        responseDTO.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO!=null? claimTicketWorkFlowDTO.getId():null);
+        responseDTO.setNewTicketId(newClaimTicket.getTicketId());
+        responseDTO.setNewId(newClaimTicket.getId());
+        responseDTO.setEmail(newClaimTicket.getUser().getEmail());
+        return responseDTO;
     }
 
     private void logClaimTicketDetails(ClaimTicket claimTicket, ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO, UserDTO userDTO,
@@ -1336,7 +1341,7 @@ public class UserClaimTicketService {
     }
 
     @Transactional
-    public ClaimTicketWorkFlowDTO fileComplaint(ComplaintRequest complaintRequest, RequestInfo requestInfo) {
+    public ClaimTicketResponseDTO fileComplaint(ComplaintRequest complaintRequest, RequestInfo requestInfo) {
         Long originalClaimId = complaintRequest.getId();
         User currentUser = userService.getCurrentUser();
         Long currentUserId = currentUser.getId();
@@ -1472,7 +1477,12 @@ public class UserClaimTicketService {
 
         LOG.info("Complaint with chatbot attachment filed for claim ticket {} by user {}", originalClaimId, currentUserId);
 
-        return claimTicketWorkFlowDTO;
+        ClaimTicketResponseDTO responseDTO = new ClaimTicketResponseDTO();
+        responseDTO.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO !=null ? claimTicketWorkFlowDTO.getId():null);
+        responseDTO.setNewTicketId(complaintTicket.getTicketId());
+        responseDTO.setNewId(complaintTicket.getId());
+        responseDTO.setEmail(complaintTicket.getUser().getEmail());
+        return responseDTO;
     }
 
 
@@ -1565,6 +1575,11 @@ public class UserClaimTicketService {
         ClaimTicket ticket = claimTicketRepository.findByIdAndUserId(ticketId, currentUser.getId())
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                 new String[]{ticketId.toString()}, null));
+        return getTicketDetail(ticket, requestInfo);
+    }
+
+    public Context getTicketDetail(ClaimTicket ticket, RequestInfo requestInfo) throws IOException {
+
 
         Context context = new Context(LocaleContextHolder.getLocale());
         ClaimTicketDTO claim = claimTicketMapper.toDTO(ticket);
@@ -1687,5 +1702,13 @@ public class UserClaimTicketService {
             }
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
         }
+    }
+
+    @Transactional
+    public Context getTicketDetailContextPublic(String ticketId, RequestInfo requestInfo) throws IOException{
+        ClaimTicket ticket = claimTicketRepository.findByTicketId(Long.valueOf(ticketId))
+            .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
+                new String[]{ticketId}, null));
+        return getTicketDetail(ticket, requestInfo);
     }
 }
