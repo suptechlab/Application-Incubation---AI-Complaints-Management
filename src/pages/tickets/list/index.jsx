@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Nav, Stack, Tab } from 'react-bootstrap';
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Loader from "../../../components/Loader";
 import PageHeader from "../../../components/PageHeader";
 import { AuthenticationContext } from "../../../contexts/authentication.context";
@@ -15,16 +15,37 @@ export default function TicketsList() {
     const [permissionsState, setPermissionsState] = React.useState({
         addModule: false
     });
-    const [activeTab, setActiveTab] = useState('allTickets');
 
-    //Handle Dropdown Select
-    const handleDropdownSelect = (eventKey) => {
-        for (const tab of ticketsTabsData) {
-            if (eventKey === tab?.id) {
-                setActiveTab(eventKey)
-            }
+    const [searchParams, setSearchParams] = useSearchParams();
+    const defaultTab = "allTickets";
+    
+    // Get activeTab from URL, fallback to default
+    const urlTab = searchParams.get("tab") || defaultTab;
+    const [activeTab, setActiveTab] = useState(urlTab);
+
+    useEffect(() => {
+        // Sync state when URL param changes
+        setActiveTab(urlTab);
+    }, [urlTab]);
+
+    const handleTabSelect = (eventKey) => {
+        const isValidTab = ticketsTabsData.some(tab => tab.id === eventKey);
+        if (isValidTab) {
+            setActiveTab(eventKey);
+            setSearchParams({ tab: eventKey }); // Update URL
         }
     };
+
+    // const [activeTab, setActiveTab] = useState('allTickets');
+
+    // //Handle Dropdown Select
+    // const handleTabSelect = (eventKey) => {
+    //     for (const tab of ticketsTabsData) {
+    //         if (eventKey === tab?.id) {
+    //             setActiveTab(eventKey)
+    //         }
+    //     }
+    // };
 
     useEffect(() => {
         const updatedPermissions = {
@@ -81,7 +102,7 @@ export default function TicketsList() {
                 <Tab.Container
                     id="tickets-tabs"
                     activeKey={activeTab}
-                    onSelect={handleDropdownSelect}
+                    onSelect={handleTabSelect}
                     unmountOnExit={true}
                 >
                     <Nav

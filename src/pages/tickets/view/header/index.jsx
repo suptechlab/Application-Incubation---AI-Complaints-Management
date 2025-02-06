@@ -4,7 +4,7 @@ import { Badge, Button, Dropdown, Stack } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { MdSchedule } from "react-icons/md";
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ReactSelect from '../../../../components/ReactSelect';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import { MasterDataContext } from '../../../../contexts/masters.context';
@@ -21,6 +21,8 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
 
     const { masterData } = useContext(MasterDataContext)
     const { currentUser } = useContext(AuthenticationContext);
+
+    const navigate = useNavigate()
 
     const [agentList, setAgentListing] = useState([])
     const [selectedStatus, setSelectedStatus] = useState(ticketData?.status);
@@ -202,16 +204,19 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                         }
                     </h1>
                     <Stack direction="horizontal" gap={2} className='flex-wrap'>
-                        <Link
-                            to={"/tickets"}
+                        <button
+                            onClick={()=>navigate(-1)}
+                            // to={"/tickets"}
                             className="btn btn-outline-dark custom-min-width-85"
                         >
                             {t("BACK")}
-                        </Link>
+                        </button>
                         {
                             permissionState?.assignPermission === true &&
-                            ((currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
-                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') && ticketData?.instanceType === 'SECOND_INSTANCE') &&
+                            (
+                            (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                            ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                            (( ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT' ))) &&
                                 (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
