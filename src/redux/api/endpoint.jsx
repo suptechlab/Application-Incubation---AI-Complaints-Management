@@ -30,6 +30,7 @@ const EndPoint = {
   CLAIM_STATS:`/${version}/user/claim-tickets/count-by-status`,
   FILE_CLAIM_SECOND_INSTANCE: `/${version}/user/claim-tickets/file-second-instance-claim`,
   DOWNLOAD_DOCUMENT: `/${version}/user/claim-tickets/download`,
+  DOWNLOAD_TICKET_DETAILS: `/${version}/user/claim-tickets`,
   TICKET_CHAT:`/${version}/user/claim-tickets`,
   FILE_COMPLAINT: `/${version}/user/claim-tickets/file-complaint`
 };

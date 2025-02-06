@@ -54,7 +54,7 @@ export const createAxiosInstance = (baseURL) => {
         const statusCode = error.response.status;
         switch (Math.floor(statusCode / 100)) {
           case 4:
-            toast.error(`${error?.response?.data?.errorDescription ?? error?.response?.data?.message}`);
+            toast.error(`${error?.response?.data?.errorDescription ?? error?.message}`);
             break;
           case 5:
             toast.error(`Server error ${statusCode}: ${error.response.statusText}`);

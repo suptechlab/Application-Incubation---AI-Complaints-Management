@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import EndPoint from "../api/endpoint";
-import { ticketsApi } from "../api/axios";
+import { ticketsApi, userApi } from "../api/axios";
 
 const initialState = {
   loading: false,
@@ -201,6 +201,18 @@ const fileClaimSlice = createSlice({
       .addCase(downloadDocument.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Something went wrong";
+      })
+      // DOWNLOAD TICKET DETAILS
+      .addCase(downloadTicketDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(downloadTicketDetails.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(downloadTicketDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
       });
     ;
   },
@@ -227,6 +239,21 @@ export const downloadDocument = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await ticketsApi.get(`${EndPoint.DOWNLOAD_DOCUMENT}/${id}`,{ responseType: 'arraybuffer' });
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to download!');
+      }
+      return response; // RETURN RESPONSE
+    } catch (error) {
+
+    }
+  }
+);
+// DOWNLOAD DOCUMENT
+export const downloadTicketDetails = createAsyncThunk(
+  'downloadTicketDetails',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await ticketsApi.get(`${EndPoint.DOWNLOAD_TICKET_DETAILS}/${id}/pdf-download`,{ responseType: 'arraybuffer' });
       if (response.status !== 200) {
         return rejectWithValue('Failed to download!');
       }
