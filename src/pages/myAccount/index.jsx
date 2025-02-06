@@ -110,9 +110,9 @@ export default function MyAccount() {
       case 'REJECTED':
         return 'bg-danger bg-opacity-25 text-danger';
       case 'ASSIGNED':
-        return 'bg-orange-25 text-orange';
+        return 'bg-orange bg-opacity-25 text-orange';
       default:
-        return 'bg-body bg-opacity-25 text-body';
+        return 'bg-body bg-opacity-25 text-warning';
     }
   };
 

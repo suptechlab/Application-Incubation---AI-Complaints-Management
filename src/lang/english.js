@@ -158,5 +158,7 @@ export const englishLang = {
   "VERIFYING":"Verifying",
   "UPLOAD_ATTACHMENTS":"Upload attachments",
   "TYPE_A_MESSAGE":"Type a message",
-  "NONE":"None"
+  "NONE":"None",
+  "NEW_CLAIMS":"New Claims",
+  "PENDING_CLAIMS":"Pending Claims"
 }
