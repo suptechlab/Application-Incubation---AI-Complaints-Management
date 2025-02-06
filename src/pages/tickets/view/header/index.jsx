@@ -8,14 +8,15 @@ import { useNavigate } from 'react-router-dom';
 import ReactSelect from '../../../../components/ReactSelect';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import { MasterDataContext } from '../../../../contexts/masters.context';
-import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent, ticketStatusChange } from '../../../../services/ticketmanagement.service';
+import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent, downloadTicketDetails, ticketStatusChange } from '../../../../services/ticketmanagement.service';
 import { calculateDaysDifference } from '../../../../utils/commonutils';
 import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
+import { IoMdDownload } from "react-icons/io";
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState,  setLoading }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState, setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -31,6 +32,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
     const [selectedAgent, setSelectedAgent] = useState(null)
     const [closeTicketModalShow, setCloseTicketModalShow] = useState(false)
     const [rejectTicketModalShow, setRejectTicketModalShow] = useState(false)
+    const [isDownloading,setDownloading] = useState(false)
 
     // const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
@@ -56,9 +58,6 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
         ...(permissionState?.rejectPermission === true ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
         { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
         { label: t('PENDING'), value: 'PENDING' }];
-    // if (selectedStatus === 'NEW') {
-    //     statusOptions.push({ label: t('IN_PROGRESS'), value: 'IN_PROGRESS' });
-    //   }
     const getStatusClass = (status) => {
         switch (status) {
             case 'CLOSED':
@@ -80,7 +79,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
         setSelectedStatus(ticketData?.status)
     }, [ticketData?.status])
 
-   
+
     //Handle Ticket Status Change
     const handleTicketStatusChange = async (status) => {
         // setLoading(true);
@@ -173,7 +172,48 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
             <span className="custom-font-size-13 fw-normal">{message}</span>
         </Badge>
     );
+    // DOWNLOAD CLAIM TYPES LIST
+     const handleTicketDetailsDownload = () => {
+        setDownloading(true)
+        toast.loading(t("DOWNLOAD_IN_PROGRESS"), { id: "downloading", isLoading: isDownloading })
+        downloadTicketDetails(ticketData?.id).then(response => {
+          if (response?.data) {
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const blobUrl = window.URL.createObjectURL(blob);
 
+            toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
+
+
+            const tempLink = document.createElement('a');
+            tempLink.href = blobUrl;
+            tempLink.setAttribute('download', 'ticket_details.pdf');
+
+            // Append the link to the document body before clicking it
+            document.body.appendChild(tempLink);
+
+            tempLink.click();
+
+            // Clean up by revoking the Blob URL
+            window.URL.revokeObjectURL(blobUrl);
+
+            // Remove the link from the document body after clicking
+            document.body.removeChild(tempLink);
+          } else {
+            throw new Error(t("EMPTY RESPONSE"));
+          }
+        }).catch((error) => {
+          if (error?.response?.data?.errorDescription) {
+            toast.error(error?.response?.data?.errorDescription);
+          } else {
+            toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+          }
+          toast.dismiss("downloading");
+        }).finally(() => {
+          // Ensure the loading toast is dismissed
+          // toast.dismiss("downloading");
+          setDownloading(false)
+        });
+      }
 
     return (
         <React.Fragment>
@@ -211,6 +251,14 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                         >
                             {t("BACK")}
                         </button>
+                        <Button
+                            type="button"
+                            variant='outline-primary'
+                            onClick={handleTicketDetailsDownload}
+                            className="btn btn-outline-dark"
+                        >
+                           <IoMdDownload size={18}/> {t("DOWNLOAD_TICKET_DETAILS")}
+                        </Button>
                         {
                             permissionState?.assignPermission === true &&
                             (
@@ -221,7 +269,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
                                     wrapperClassName="mb-0"
-                                    class="form-select "
+                                    className="form-select"
                                     placeholder={t("ASSIGN_REASSIGN")}
                                     id="floatingSelect"
                                     size="md"
@@ -250,7 +298,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                                     {t("DATE_EXTENSION")}
                                 </Button> : ""
                         }
-
+                       
                         {
                             (permissionState?.statusModule === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
                                 <Dropdown>
@@ -283,7 +331,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                                     <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
                                 </Button>
                         }
-                      
+
                     </Stack>
                 </Stack>
             </div>

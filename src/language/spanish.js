@@ -372,5 +372,6 @@ export const spanishLang = {
     "MODULE_NAME": "Nombre del módulo",
     "PERMISSIONS": "Permisos",
     "TICKETS ASSIGNED":"Entradas asignadas",
-    "RESET":"Restablecer"
+    "RESET":"Restablecer",
+    "DOWNLOAD_TICKET_DETAILS": "Descargar detalles del boleto"
 } 

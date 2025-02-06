@@ -113,3 +113,8 @@ export const getAgentsListForTagging =async (ticketId)=>{
 export const editTicketDataApi =async (ticketId,data)=>{
   return await ticketApi.put(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/update`,data);
 }
+
+// DOWNLOAD TICKET DETAILS API
+export const downloadTicketDetails = async (ticketId)=>{
+  return await ticketApi.get(`/${API_VERSION}/seps-fi/claim-tickets/${ticketId}/pdf-download`,{responseType:'arraybuffer'});
+}
