@@ -158,5 +158,10 @@ export const spanishLang = {
   "TYPE_A_MESSAGE": "Escribe un mensaje",
   "NONE": "None",
   "NEW_CLAIMS": "Nuevas Reclamaciones",
-  "PENDING_CLAIMS": "Reclamaciones pendientes"
+  "PENDING_CLAIMS": "Reclamaciones pendientes",
+  "NO_NOTIFICATION": "Sin notificaciones",
+  "UNREAD_NOTIFICATIONS": "Notificaciones no leídas",
+  "MARK_ALL_AS_READ": "Marcar todo como leído",
+  "CLEAR_ALL": "Borrar todo",
+  "CLEAR": "despejado"
 }

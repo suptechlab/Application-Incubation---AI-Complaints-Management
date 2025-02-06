@@ -22,4 +22,38 @@
             }
         }
     }
+
+    .notificationDropdown {
+
+        .dropdown-toggle {
+            .customBadge {
+                line-height: 0.572;
+                margin-left: -1.1rem;
+            }
+
+            &::after {
+                display: none;
+            }
+        }
+
+        .theme-notification-menu {
+            ul {
+                width: 380px;
+                max-width: 100%;
+                max-height: 380px;
+
+                @include below-sm() {
+                    width: 280px;
+                }
+
+                @include below-xsm() {
+                    width: 220px;
+                }
+
+                @include maxheight400() {
+                    max-height: calc(80vh - $theme-header-height);
+                }
+            }
+        }
+    }
 }
