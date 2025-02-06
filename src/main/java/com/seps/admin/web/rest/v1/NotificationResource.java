@@ -54,7 +54,6 @@ public class NotificationResource {
     }
 
     @GetMapping("/count")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<Map<String,String>> countNotificationAll() {
         Map<String, String> count = notificationService.countAllNotifications();
         return ResponseEntity.ok(count);
