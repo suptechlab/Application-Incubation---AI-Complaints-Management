@@ -131,8 +131,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     })
   }
 
-
   useEffect(() => {
+    noticationCountApi()
     getAllNotifications()
   }, [])
 
