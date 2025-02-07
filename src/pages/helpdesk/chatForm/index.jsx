@@ -18,6 +18,10 @@ const ChatBotForm = () => {
     const [isLoading, setLoading] = useState(false)
 
 
+
+    const {token} = useSelector(state=> state?.authSlice)
+
+
     const [uploadedFiles, setUploadedFiles] = useState([])
 
     const [isFileUpload, setIsFileUpload] = useState(false)
@@ -256,9 +260,18 @@ const ChatBotForm = () => {
     const actionButtonHandler = async ( msgData) => {
         setLoading(true);
         
+        
         try {
+
+          
+
+            const messageData = {...msgData , metadata : {}}
+
+            if(token){
+                messageData.metadata.token = token 
+            }
             // Send the message to the API
-            const result = await dispatch(sendQuery(msgData));
+            const result = await dispatch(sendQuery(messageData));
             if (sendQuery.fulfilled.match(result)) {
                 setChatResponse(result.payload); // Handle successful response
             } else {
@@ -271,7 +284,7 @@ const ChatBotForm = () => {
             setLoading(false); // Ensure loading is turned off
         }
     };
-
+    
     // CALL SEND QUERY FUNCTION
     const handleSendQuery = async (msg) => {
         if (msg) {
@@ -280,13 +293,17 @@ const ChatBotForm = () => {
             // Prepare the message data
             const msgData = {
                 message: msg?.message || msg, // If `msg` is an object, use `msg.message`, otherwise use `msg` directly
+                metadata : {}
             };
-
             // Add metadata if it exists
             if (msg?.metadata) {
                 msgData.metadata = msg.metadata;
             }
 
+            if(token){
+                msgData.metadata.token = token 
+            }
+         
             // Add sender ID if available
             if (senderId) {
                 msgData.sender = senderId;
