@@ -40,6 +40,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/v1/chatbot/query")).permitAll()
                     .requestMatchers(mvc.pattern("/api/v1/masters/**")).permitAll()
                     .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers(mvc.pattern("/api/v1/notifications/**")).hasAuthority(AuthoritiesConstants.USER)
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()
                     .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll() //.hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
