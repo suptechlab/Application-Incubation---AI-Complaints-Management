@@ -26,7 +26,8 @@ public final class Constants {
     public static final Integer SECOND_INSTANCE_SLA_BREACH_DAYS = 30;
     public static final Integer COMPLAINT_SLA_BREACH_DAYS = 45;
     public static final Integer SLA_POPUP_OPEN_DAYS = 2;
-
+    public static final String ADMIN_TICKET_URL_TEXT = "adminTicketUrl";
+    public static final String CUSTOMER_TICKET_URL_TEXT = "userTicketUrl";
     private Constants() {
     }
 }
