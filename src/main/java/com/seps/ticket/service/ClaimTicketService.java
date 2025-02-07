@@ -24,13 +24,10 @@ import com.seps.ticket.service.mapper.UserClaimTicketMapper;
 import com.seps.ticket.service.specification.ClaimTicketSpecification;
 import com.seps.ticket.web.rest.errors.CustomException;
 import com.seps.ticket.web.rest.errors.SepsStatusCode;
-import com.seps.ticket.web.rest.vm.ClaimTicketFilterRequest;
+import com.seps.ticket.web.rest.vm.*;
 import com.seps.ticket.suptech.service.ExternalAPIService;
 import com.seps.ticket.suptech.service.PersonNotFoundException;
 import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
-import com.seps.ticket.web.rest.vm.ClaimTicketSlaCommentRequest;
-import com.seps.ticket.web.rest.vm.CreateClaimTicketRequest;
-import com.seps.ticket.web.rest.vm.CreateClaimTicketRequestForJson;
 import jakarta.validation.Valid;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -44,7 +41,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +55,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.HashSet;
 import java.util.Optional;
@@ -925,9 +923,9 @@ public class ClaimTicketService {
         tickets.forEach(ticket -> {
             Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, agent);
             // Send notification to the customer
-            notificationService.sendNotification("TICKET_ASSIGNED_CUSTOMER_NOTIFICATION", variables.get("userTicketUrl"), List.of(ticket.getUserId()), variables);
+            notificationService.sendNotification("TICKET_ASSIGNED_CUSTOMER_NOTIFICATION", variables.get(Constants.CUSTOMER_TICKET_URL_TEXT), List.of(ticket.getUserId()), variables);
             // Send email to the FI agent
-            notificationService.sendNotification("TICKET_ASSIGNED_AGENT_NOTIFICATION",variables.get("adminTicketUrl"), List.of(agentId), variables);
+            notificationService.sendNotification("TICKET_ASSIGNED_AGENT_NOTIFICATION",variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(agentId), variables);
         });
     }
 
@@ -936,21 +934,178 @@ public class ClaimTicketService {
         ClaimTicket ticket = claimTicketRepository.findById(ticketId)
             .orElse(null);
         if(ticket!=null) {
-            // Send email to the FI agent
+            // Send notification to the FI agent
             if (ticket.getFiAgentId() != null && ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
                 User fiAgent = userService.getUserById(ticket.getFiAgentId());
                 Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, fiAgent);
-                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_AGENT_NOTIFICATION", variables.get("adminTicketUrl"), List.of(fiAgent.getId()), variables);
+                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(fiAgent.getId()), variables);
             } else if (ticket.getSepsAgentId() != null) { // Send email to the SEPS agent
                 User sepsAgent = userService.getUserById(ticket.getSepsAgentId());
                 Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, sepsAgent);
-                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_AGENT_NOTIFICATION", variables.get("adminTicketUrl"), List.of(sepsAgent.getId()), variables);
+                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(sepsAgent.getId()), variables);
             }
             if(ticket.getUserId()!=null){
                 User customer = userService.getUserById(ticket.getUserId());
                 Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, customer);
-                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_CUSTOMER_NOTIFICATION", variables.get("userTicketUrl"), List.of(ticket.getUserId()), variables);
+                notificationService.sendNotification("TICKET_PRIORITY_CHANGE_CUSTOMER_NOTIFICATION", variables.get(Constants.CUSTOMER_TICKET_URL_TEXT), List.of(ticket.getUserId()), variables);
             }
         }
+    }
+
+    @Transactional
+    public void sendDateExtensionNotification(Long ticketId) {
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId)
+            .orElse(null);
+        if(ticket!=null) {
+            // Send notification to the FI agent
+            User receiverUser = null;
+            if (ticket.getFiAgentId() != null && ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                receiverUser = userService.getUserById(ticket.getFiAgentId());
+            } else if (ticket.getSepsAgentId() != null) { // Send email to the SEPS agent
+                receiverUser = userService.getUserById(ticket.getSepsAgentId());
+            }
+            if(receiverUser != null) {
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, receiverUser);
+                notificationService.sendNotification("SLA_DATE_EXTENDED_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(receiverUser.getId()), variables);
+            }
+        }
+    }
+
+    @Transactional
+    public void sendCloseTicketNotification(Long ticketId) {
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId)
+            .orElse(null);
+        if(ticket == null) {
+            return;
+        }
+        if(ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)){
+            List<User> fiAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
+            // Send email to FI Admin
+            if (!fiAdmin.isEmpty()) {
+                fiAdmin.forEach(fiAdminUser -> {
+                    Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, fiAdminUser);
+                    notificationService.sendNotification("TICKET_CLOSED_ADMIN_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(fiAdminUser.getId()), variables);
+                });
+            }
+            // Send email to the FI agent
+            if (ticket.getFiAgentId() != null) {
+                User fiAgent = userService.getUserById(ticket.getFiAgentId());
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, fiAgent);
+                notificationService.sendNotification("TICKET_CLOSED_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(fiAgent.getId()), variables);
+            }
+        }else{
+            List<User> sepsAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_SEPS_ADMIN);
+            // Send email to SEPS Admin
+            if (!sepsAdmin.isEmpty()) {
+                sepsAdmin.forEach(sepsAdminUser -> {
+                    Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, sepsAdminUser);
+                    notificationService.sendNotification("TICKET_CLOSED_ADMIN_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(sepsAdminUser.getId()), variables);
+                });
+            }
+            // Send email to the FI agent
+            if (ticket.getSepsAgentId() != null) {
+                User sepsAgent = userService.getUserById(ticket.getSepsAgentId());
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, sepsAgent);
+                notificationService.sendNotification("TICKET_CLOSED_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(sepsAgent.getId()), variables);
+            }
+        }
+        User customer = userService.getUserById(ticket.getUserId());
+        Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, customer);
+        notificationService.sendNotification("TICKET_CLOSED_CUSTOMER_NOTIFICATION", variables.get(Constants.CUSTOMER_TICKET_URL_TEXT), List.of(customer.getId()), variables);
+
+    }
+
+    @Transactional
+    public void sendRejectTicketNotification(Long ticketId) {
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId)
+            .orElse(null);
+        if(ticket == null) {
+            return;
+        }
+        if(ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)){
+            List<User> fiAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
+            // Send email to FI Admin
+            if (!fiAdmin.isEmpty()) {
+                fiAdmin.forEach(fiAdminUser -> sendNotificationToAgent(ticket,fiAdminUser));
+            }
+            // Send email to the FI agent
+            if (ticket.getFiAgentId() != null) {
+                User fiAgent = userService.getUserById(ticket.getFiAgentId());
+                sendNotificationToAgent(ticket,fiAgent);
+            }
+        }else{
+            List<User> sepsAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_SEPS_ADMIN);
+            // Send email to SEPS Admin
+            if (!sepsAdmin.isEmpty()) {
+                sepsAdmin.forEach(sepsAdminUser -> sendNotificationToAgent(ticket,sepsAdminUser));
+            }
+            // Send email to the FI agent
+            if (ticket.getSepsAgentId() != null) {
+                User sepsAgent = userService.getUserById(ticket.getSepsAgentId());
+                sendNotificationToAgent(ticket,sepsAgent);
+            }
+        }
+        User customer = userService.getUserById(ticket.getUserId());
+        Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, customer);
+        notificationService.sendNotification("TICKET_REJECTED_CUSTOMER_NOTIFICATION", variables.get(Constants.CUSTOMER_TICKET_URL_TEXT), List.of(customer.getId()), variables);
+    }
+
+    private void sendNotificationToAgent(ClaimTicket ticket, User user){
+        Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, user);
+        notificationService.sendNotification("TICKET_REJECTED_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(user.getId()), variables);
+    }
+
+    @Transactional
+    public void sendReplyToCustomerNotification(Long ticketId) {
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId)
+            .orElse(null);
+        if(ticket == null) {
+            return;
+        }
+        User customer = userService.getUserById(ticket.getUserId());
+        Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, customer);
+        notificationService.sendNotification("AGENT_REPLY_CUSTOMER_NOTIFICATION", variables.get(Constants.CUSTOMER_TICKET_URL_TEXT), List.of(customer.getId()), variables);
+    }
+
+    @Transactional
+    public void sendTaggedUserNotification(Long ticketId, @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId)
+            .orElse(null);
+        if(ticket == null) {
+            return;
+        }
+        // getTagged User list
+        List<String> taggedUsers = getTaggedUsers(claimTicketReplyRequest.getMessage());
+        if(!taggedUsers.isEmpty()){
+            taggedUsers.forEach(taggedUser->{
+                User tagUser = userService.findUserById(Long.valueOf(taggedUser));
+                if(tagUser!=null) {
+                    Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, tagUser);
+                    notificationService.sendNotification("TAGGED_USER_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(tagUser.getId()), variables);
+                }
+            });
+        }
+    }
+
+    private List<String> getTaggedUsers(String message) {
+        // Define the regex pattern to match tagged users in the format @[Name](ID)
+        String regex = "@\\[.*?\\]\\((\\d+)\\)";
+
+        // Create a list to store the extracted user IDs
+        List<String> taggedUserIds = new ArrayList<>();
+
+        // Create a Pattern object
+        Pattern pattern = Pattern.compile(regex);
+
+        // Create a Matcher object
+        Matcher matcher = pattern.matcher(message);
+
+        // Extract all user IDs
+        while (matcher.find()) {
+            // Group 1 contains the user ID
+            taggedUserIds.add(matcher.group(1));
+        }
+
+        return taggedUserIds;
     }
 }

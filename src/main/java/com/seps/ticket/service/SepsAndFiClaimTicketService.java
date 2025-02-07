@@ -1886,7 +1886,6 @@ public class SepsAndFiClaimTicketService {
      * @param claimTicketId the ID of the claim ticket to close.
      * @param claimTicketClosedRequest the request object containing additional details for closing the ticket.
      */
-    @Async
     @Transactional
     public void triggerCloseClaimTicketWorkflow(Long claimTicketId, ClaimTicketClosedRequest claimTicketClosedRequest){
         ClaimTicket claimTicket = claimTicketRepository.findById(claimTicketId).orElse(null);

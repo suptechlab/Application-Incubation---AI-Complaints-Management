@@ -85,7 +85,11 @@ public class TemplateVariableMappingService {
         // Agent names
         variableMap.put("fiAgentName", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getName() : "N/A");
         variableMap.put("sepsAgentName", claimTicketDTO.getSepsAgent() != null ? claimTicketDTO.getSepsAgent().getName() : "N/A");
-
+        if(claimTicketDTO.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+            variableMap.put("agentName", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getName() : "N/A");
+        }else {
+            variableMap.put("agentName", claimTicketDTO.getSepsAgent() != null ? claimTicketDTO.getSepsAgent().getName() : "N/A");
+        }
         // URLs
         variableMap.put("userTicketUrl", this.userBaseUrl + "/my-account?ticketId=" + claimTicketDTO.getTicketId());
         variableMap.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/tickets/view/" + claimTicketDTO.getId());
@@ -182,8 +186,8 @@ public class TemplateVariableMappingService {
         }
 
         // URLs
-        variableMap.put("userTicketUrl", this.userBaseUrl + "/my-account?ticketId=" + claimTicketDTO.getTicketId());
-        variableMap.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/tickets/view/" + claimTicketDTO.getId());
+        variableMap.put("userTicketUrl", "my-account?ticketId=" + claimTicketDTO.getTicketId());
+        variableMap.put("adminTicketUrl", "tickets/view/" + claimTicketDTO.getId());
 
         // Audit details
         variableMap.put("createdBy", claimTicketDTO.getCreatedByUser() != null ? claimTicketDTO.getCreatedByUser().getFirstName() : "System");

@@ -1,14 +1,15 @@
 package com.seps.ticket.service;
 
-import com.seps.ticket.domain.Notification;
-import com.seps.ticket.domain.TemplateMaster;
-import com.seps.ticket.domain.User;
-import com.seps.ticket.domain.UserNotification;
+import com.seps.ticket.config.Constants;
+import com.seps.ticket.domain.*;
+import com.seps.ticket.enums.InstanceTypeEnum;
+import com.seps.ticket.repository.ClaimTicketRepository;
 import com.seps.ticket.repository.NotificationRepository;
 import com.seps.ticket.repository.TemplateMasterRepository;
 import com.seps.ticket.repository.UserNotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +23,8 @@ public class NotificationService {
     private final UserNotificationRepository userNotificationRepository;
     private final TemplateMasterRepository templateMasterRepository;
     private final UserService userService;
+    private final ClaimTicketRepository claimTicketRepository;
+    private final TemplateVariableMappingService templateVariableMappingService;
 
     public void createNotification(String templateId, String title, String message, String redirectUrl, List<Long> userIds, Map<String, String> variables) {
         TemplateMaster template = null;
@@ -75,5 +78,24 @@ public class NotificationService {
         }
 
         return content;
+    }
+
+    @Transactional
+    public void sendCustomerReplyToAgentNotification(Long ticketId) {
+        ClaimTicket ticket = claimTicketRepository.findById(ticketId)
+                .orElse(null);
+        if(ticket == null) {
+            return;
+        }
+        User agent = null;
+        if(ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE) && ticket.getFiAgentId() != null) {
+            agent = userService.getUserById(ticket.getFiAgentId());
+        }else if(ticket.getSepsAgentId() != null){
+            agent = userService.getUserById(ticket.getSepsAgentId());
+        }
+        if(agent!=null) {
+            Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, agent);
+            this.sendNotification("CUSTOMER_REPLY_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(agent.getId()), variables);
+        }
     }
 }

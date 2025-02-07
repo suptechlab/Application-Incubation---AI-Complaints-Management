@@ -45,9 +45,9 @@ public class UserClaimTicketResource {
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
     private final TempDocumentService tempDocumentService;
     private final PdfService pdfService;
-
+    private final NotificationService notificationService;
     public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService, MessageSource messageSource,
-                                   ClaimTicketActivityLogService claimTicketActivityLogService, TempDocumentService tempDocumentService, PdfService pdfService) {
+                                   ClaimTicketActivityLogService claimTicketActivityLogService, TempDocumentService tempDocumentService, PdfService pdfService, NotificationService notificationService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.documentService = documentService;
@@ -55,6 +55,7 @@ public class UserClaimTicketResource {
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.tempDocumentService = tempDocumentService;
         this.pdfService = pdfService;
+        this.notificationService = notificationService;
     }
 
 
@@ -201,6 +202,7 @@ public class UserClaimTicketResource {
         // Call service method to handle the reply
         userClaimTicketService.replyOnTicket(id, claimTicketReplyRequest);
         userClaimTicketService.sendCustomerReplyEmail(id, claimTicketReplyRequest);
+        notificationService.sendCustomerReplyToAgentNotification(id);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.replied.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
