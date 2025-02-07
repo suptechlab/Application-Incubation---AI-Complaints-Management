@@ -374,7 +374,8 @@ export default function MyAccount() {
 
       {/* CLIAM DETAILS MODAL */}
       <ViewClaim
-        handleShow={showViewModal}
+        claimModalView={showViewModal}
+        handleShow={setShowViewModal}
         selectedRow={selectedRow}
         handleClose={handleCloseModal}
       />

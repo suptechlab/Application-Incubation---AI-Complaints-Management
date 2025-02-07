@@ -24,7 +24,6 @@ import { resetDPAState } from "../../../redux/slice/helpDeskSlice";
 import AppTooltip from "../../tooltip";
 import "./header.scss";
 import { deleteAllNotification, deleteSingleNotification, notificationCountApi, notificationListApi, readAllNotifications, readSingleNotification } from "../../../redux/slice/notificationSlice";
-import toast from "react-hot-toast";
 
 const Header = ({ layout }) => {
   const [profileModalShow, setProfileModalShow] = useState(false);
@@ -33,10 +32,7 @@ const Header = ({ layout }) => {
 
 
   const [notifications, setNotifications] = useState([]);
-  const [notificationsCount, setNotificationCount] = useState({ count: 0 });
-
-  const [loadingNotification, setLoadingNotification] = useState(true)
-
+  const [notificationsCount, setNotificationCount] = useState(0);
 
   const { isLoggedIn, user, profilePicture } = useSelector((state) => state?.authSlice)
 
@@ -82,8 +78,32 @@ const Header = ({ layout }) => {
   }
 
   // READ SINGLE NOTIFICATION
-  const handleReadSingleNotification = (notificationId) => {
-    dispatch(readSingleNotification(notificationId))
+  const handleReadSingleNotification = (notificationData) => {
+    const { id, notification } = notificationData
+
+
+
+    const updatedNotifications = notifications.map(notification =>
+      notification.id === id
+        ? { ...notification, isRead: true }
+        : notification
+    );
+
+    if (notification?.redirectUrl) {
+      console.log(notification?.redirectUrl)
+      navigate("/"+notification?.redirectUrl)
+    }
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+
+    // Update the notification count: subtract 1 if there's any unread notification
+    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    setNotificationCount(unreadCount);
+
+
+    if(notification?.isRead === false){
+      dispatch(readSingleNotification(id))
       .then(result => {
         if (readSingleNotification.fulfilled.match(result)) {
           getAllNotifications()
@@ -94,14 +114,27 @@ const Header = ({ layout }) => {
       .catch(error => {
         console.error("Error during file claim submission:", error);
       });
+    }
+   
   }
 
   // READ ALL NOTIFICATIONS
   const handleReadAllNotifications = () => {
+
+    const updatedNotifications = notifications.map(notification => ({
+      ...notification,
+      isRead: true
+    }));
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+    setNotificationCount(0)
+
+
     dispatch(readAllNotifications())
       .then(result => {
         if (readAllNotifications.fulfilled.match(result)) {
-          getAllNotifications()
+          // getAllNotifications()
         } else {
           console.error("Verification error:", result.error.message);
         }
@@ -111,8 +144,18 @@ const Header = ({ layout }) => {
       });
   }
 
-  // READ SINGLE NOTIFICATION
+  // DELETE SINGLE NOTIFICATION
   const handleDeleteSingleNotification = (notificationId) => {
+    // Remove the notification with the specified id
+    const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+
+    // Update the notification count based on remaining unread notifications
+    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    setNotificationCount(unreadCount);
+
     dispatch(deleteSingleNotification(notificationId))
       .then(result => {
         if (deleteSingleNotification.fulfilled.match(result)) {
@@ -128,6 +171,11 @@ const Header = ({ layout }) => {
 
   // READ ALL NOTIFICATIONS
   const handleDeleteAllNotifications = () => {
+
+    // Update the notifications state
+    setNotifications([]);
+    setNotificationCount(0)
+
     dispatch(deleteAllNotification())
       .then(result => {
         if (deleteAllNotification.fulfilled.match(result)) {
@@ -163,15 +211,13 @@ const Header = ({ layout }) => {
   useEffect(() => {
     getNotificationCount();
     getAllNotifications();
-
     const intervalId = setInterval(() => {
       getNotificationCount();
     }, 60000); // Run every 1 minute
-
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
 
-  
+
   return (
     <header className="theme-header">
       <Navbar key={expand} expand={expand} className="bg-body-tertiary py-0">
@@ -218,16 +264,16 @@ const Header = ({ layout }) => {
                 <span>
                   <MdOutlineNotifications
                     size={24}
-                    className={notificationsCount.count > 0 ? "ring" : ""}
+                    className={notificationsCount > 0 ? "ring" : ""}
                   />
                 </span>
               </AppTooltip>
-              {notificationsCount.count > 0 && (
+              {notificationsCount > 0 && (
                 <Badge
                   bg="dark"
                   className="border border-white fw-semibold rounded-pill notification-count position-absolute top-0 start-100 translate-middle mt-2 ms-n1"
                 >
-                  {notificationsCount.count}
+                  {notificationsCount}
                   <span className="visually-hidden">{t("UNREAD_NOTIFICATIONS")}</span>
                 </Badge>
               )}
@@ -238,19 +284,22 @@ const Header = ({ layout }) => {
             >
               <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0">
                 <li className="fs-14 d-flex align-items-center justify-content-between px-3 py-1 border-bottom mb-1 pb-2 border-secondary border-opacity-25 ">
-                  {notificationsCount.count > 0 ? (
+                  {notifications?.length > 0 ? (
                     <>
-                      <Button
-                        onClick={handleReadAllNotifications}
-                        variant="link"
-                        className="link-primary text-decoration-none p-0 border-0 fw-semibold"
-                      >
-                        {t("MARK_ALL_AS_READ")}
-                      </Button>
+                      {
+                        notificationsCount > 0 ? <Button
+                          onClick={handleReadAllNotifications}
+                          variant="link"
+                          className="link-primary text-decoration-none p-0 border-0 fw-semibold"
+                        >
+                          {t("MARK_ALL_AS_READ")}
+                        </Button> : ''
+                      }
+
                       <Button
                         onClick={handleDeleteAllNotifications}
                         variant="link"
-                        className="link-primary text-decoration-none p-0 border-0 fw-semibold"
+                        className="link-primary text-decoration-none p-0 border-0 fw-semibold ms-auto"
                       >
                         {t("CLEAR_ALL")}
                       </Button>
@@ -264,67 +313,36 @@ const Header = ({ layout }) => {
                   notifications.map((notification) => (
                     <li key={notification?.notification?.id} className='my-1'
                     >
-                      {
-                        !notification?.isRead ?
-                          <button
-                            className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
-                            type="button"
-                            onClick={() => {
-                              handleReadSingleNotification(notification?.id)
-                            }}>
-                            <Stack direction="horizontal" gap={2} className="w-100">
-                              <div className={`fs-14 fw-semibold mb-1 me-auto position-relative  text-primary`}>
-                                {notification?.notification?.title}
-                              </div>
-                              <AppTooltip title={t("CLEAR")}>
-                                <Button variant="link" className="link-danger p-0 border-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Prevent parent click event
-                                    handleDeleteSingleNotification(notification.id);
-                                  }}>
-                                  <MdClose
-                                    size={20}
-                                    className="ms-2"
-                                  />
-                                </Button>
-                              </AppTooltip>
-                            </Stack>
-                            <p className={`fs-14 mb-0 lh-sm ${notification?.isRead && 'text-secondary'}`}>{notification?.notification?.message}</p>
-                            <small className="text-muted">{moment(notification?.notification?.createdAt).fromNow()}</small>
-                          </button>
-                          :
-                          <div
-                            className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
-                          >
-                            <Stack direction="horizontal" gap={2} className="w-100">
-                              <div className={`fs-14 fw-semibold mb-1 me-auto position-relative text-secondary}`}>
-                                {notification?.notification?.title}
-                              </div>
-                              <AppTooltip title={t("CLEAR")}>
-                                <Button variant="link" className="link-danger p-0 border-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // Prevent parent click event
-                                    deleteSingleNotification(notification.id);
-                                  }}>
-                                  <MdClose
-                                    size={20}
-                                    className="ms-2"
-                                  />
-                                </Button>
-                              </AppTooltip>
-                            </Stack>
-                            <p className={`fs-14 mb-0 lh-sm ${notification?.isRead && 'text-secondary'}`}>{notification?.notification?.message}</p>
-                            <small className="text-muted">{moment(notification?.notification?.createdAt).fromNow()}</small>
+                      <button
+                        className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
+                        type="button"
+                        onClick={() => {
+                          handleReadSingleNotification(notification)
+                        }}>
+                        <Stack direction="horizontal" gap={2} className="w-100">
+                          <div className={`fs-14 fw-semibold mb-1 me-auto position-relative ${notification?.isRead ? 'text-secondary' : 'text-primary'}`}>
+                            {notification?.notification?.title}
                           </div>
-                      }
+                          <AppTooltip title={t("CLEAR")}>
+                            <Button variant="link" className="link-danger p-0 border-0"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent parent click event
+                                handleDeleteSingleNotification(notification.id);
+                              }}>
+                              <MdClose
+                                size={20}
+                                className="ms-2"
+                              />
+                            </Button>
+                          </AppTooltip>
+                        </Stack>
+                        <p className={`fs-14 mb-0 lh-sm ${notification?.isRead && 'text-secondary'}`}>{notification?.notification?.message}</p>
+                        <small className="text-muted">{moment(notification?.notification?.createdAt).fromNow()}</small>
+                      </button>
 
                     </li>
                   ))
                 }
-
-
-                {/* {
-               } */}
               </ul>
             </Dropdown.Menu>
           </Dropdown>
