@@ -45,9 +45,9 @@ public class UserClaimTicketResource {
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
     private final TempDocumentService tempDocumentService;
     private final PdfService pdfService;
-
+    private final NotificationService notificationService;
     public UserClaimTicketResource(UserClaimTicketService userClaimTicketService, MailService mailService, DocumentService documentService, MessageSource messageSource,
-                                   ClaimTicketActivityLogService claimTicketActivityLogService, TempDocumentService tempDocumentService, PdfService pdfService) {
+                                   ClaimTicketActivityLogService claimTicketActivityLogService, TempDocumentService tempDocumentService, PdfService pdfService, NotificationService notificationService) {
         this.userClaimTicketService = userClaimTicketService;
         this.mailService = mailService;
         this.documentService = documentService;
@@ -55,6 +55,7 @@ public class UserClaimTicketResource {
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.tempDocumentService = tempDocumentService;
         this.pdfService = pdfService;
+        this.notificationService = notificationService;
     }
 
 
@@ -161,26 +162,21 @@ public class UserClaimTicketResource {
     })
     @PostMapping("/file-second-instance-claim")
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<ResponseStatus> fileSecondInstanceClaim(@ModelAttribute @Valid SecondInstanceRequest secondInstanceRequest,
+    public ResponseEntity<ClaimTicketResponseDTO> fileSecondInstanceClaim(@ModelAttribute @Valid SecondInstanceRequest secondInstanceRequest,
                                                                   HttpServletRequest httpServletRequest) {
         Long id = secondInstanceRequest.getId();
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
         // File the claim
-        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
-        if(claimTicketWorkFlowDTO == null) {
+        ClaimTicketResponseDTO responseDTO = userClaimTicketService.fileSecondInstanceClaim(secondInstanceRequest, requestInfo);
+        if(responseDTO.getClaimTicketWorkFlowId() == null) {
             // Retrieve the claim ticket
             ClaimTicketDTO claimTicketDTO = userClaimTicketService.getClaimTicketById(id);
             // Send an email notification
             mailService.sendSecondInstanceClaimEmail(claimTicketDTO);
         }else{
-            mailService.handleWorkflowFileClaimTicket(id, claimTicketWorkFlowDTO.getId());
+            mailService.handleWorkflowFileClaimTicket(id, responseDTO.getClaimTicketWorkFlowId());
         }
-        ResponseStatus responseStatus = new ResponseStatus(
-            messageSource.getMessage("second.instance.filed.successfully", null, LocaleContextHolder.getLocale()),
-            HttpStatus.OK.value(),
-            System.currentTimeMillis()
-        );
-        return ResponseEntity.ok(responseStatus);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
 
@@ -206,6 +202,7 @@ public class UserClaimTicketResource {
         // Call service method to handle the reply
         userClaimTicketService.replyOnTicket(id, claimTicketReplyRequest);
         userClaimTicketService.sendCustomerReplyEmail(id, claimTicketReplyRequest);
+        notificationService.sendCustomerReplyToAgentNotification(id);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.replied.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -239,26 +236,21 @@ public class UserClaimTicketResource {
 
     @PostMapping("/file-complaint")
     @PreAuthorize("hasAuthority('ROLE_USER')")
-    public ResponseEntity<ResponseStatus> fileComplaint(@ModelAttribute @Valid ComplaintRequest complaintRequest,
+    public ResponseEntity<ClaimTicketResponseDTO> fileComplaint(@ModelAttribute @Valid ComplaintRequest complaintRequest,
                                                         HttpServletRequest httpServletRequest) {
         Long id = complaintRequest.getId();
         RequestInfo requestInfo = new RequestInfo(httpServletRequest);
         // Raise the complaint
-        ClaimTicketWorkFlowDTO claimTicketWorkFlowDTO = userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
-        if(claimTicketWorkFlowDTO==null) {
+        ClaimTicketResponseDTO responseDTO = userClaimTicketService.fileComplaint(complaintRequest, requestInfo);
+        if(responseDTO.getClaimTicketWorkFlowId()==null) {
             // Retrieve the claim ticket
             ClaimTicketDTO claimTicketDTO = userClaimTicketService.getClaimTicketById(id);
             // Send an email notification
             mailService.sendComplaintEmail(claimTicketDTO);
         }else{
-            mailService.handleWorkflowFileClaimTicket(id,claimTicketWorkFlowDTO.getId());
+            mailService.handleWorkflowFileClaimTicket(id,responseDTO.getClaimTicketWorkFlowId());
         }
-        ResponseStatus responseStatus = new ResponseStatus(
-            messageSource.getMessage("complaint.raised.successfully", null, LocaleContextHolder.getLocale()),
-            HttpStatus.OK.value(),
-            System.currentTimeMillis()
-        );
-        return ResponseEntity.ok(responseStatus);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 
     @GetMapping("/list-for-file-second-instance-or-complaint/{instanceType}")
@@ -282,6 +274,22 @@ public class UserClaimTicketResource {
         RequestInfo requestInfo = new RequestInfo(request);
 
         Context context = userClaimTicketService.getTicketDetailContext(id, requestInfo);
+        // Generate PDF
+        byte[] pdfBytes = pdfService.generatePdf("ticket", context);
+
+        // Return as PDF download
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ticket_detail.pdf")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdfBytes);
+    }
+
+    @GetMapping("/{ticketId}/ticket-detail-pdf-download")
+    public ResponseEntity<byte[]> downloadClaimTicketPdf(@PathVariable String ticketId,
+                                                         HttpServletRequest request) throws IOException {
+        RequestInfo requestInfo = new RequestInfo(request);
+
+        Context context = userClaimTicketService.getTicketDetailContextPublic(ticketId, requestInfo);
         // Generate PDF
         byte[] pdfBytes = pdfService.generatePdf("ticket", context);
 

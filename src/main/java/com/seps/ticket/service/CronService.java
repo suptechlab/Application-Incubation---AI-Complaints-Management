@@ -59,6 +59,8 @@ public class CronService {
     private final EnumUtil enumUtil;
     private final Gson gson;
     private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
+    private final TemplateVariableMappingService templateVariableMappingService;
 
     private static final Long SYSTEM_ADMIN = 1L;
 
@@ -79,7 +81,7 @@ public class CronService {
      * @param enumUtil Utility class for managing enums.
      * @param auditLogService Service for managing audit logs.
      */
-    public CronService(ClaimTicketWorkFlowRepository claimTicketWorkFlowRepository, ClaimTicketRepository claimTicketRepository, ClaimTicketWorkFlowMapper claimTicketWorkFlowMapper, ClaimTicketWorkFlowService claimTicketWorkFlowService, UserService userService, TemplateMasterRepository templateMasterRepository, ClaimTicketMapper claimTicketMapper, MailService mailService, MessageSource messageSource, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, EnumUtil enumUtil, AuditLogService auditLogService) {
+    public CronService(ClaimTicketWorkFlowRepository claimTicketWorkFlowRepository, ClaimTicketRepository claimTicketRepository, ClaimTicketWorkFlowMapper claimTicketWorkFlowMapper, ClaimTicketWorkFlowService claimTicketWorkFlowService, UserService userService, TemplateMasterRepository templateMasterRepository, ClaimTicketMapper claimTicketMapper, MailService mailService, MessageSource messageSource, ClaimTicketActivityLogService claimTicketActivityLogService, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, EnumUtil enumUtil, AuditLogService auditLogService, NotificationService notificationService, TemplateVariableMappingService templateVariableMappingService) {
         this.claimTicketWorkFlowRepository = claimTicketWorkFlowRepository;
         this.claimTicketRepository = claimTicketRepository;
         this.claimTicketWorkFlowMapper = claimTicketWorkFlowMapper;
@@ -93,6 +95,8 @@ public class CronService {
         this.claimTicketStatusLogRepository = claimTicketStatusLogRepository;
         this.enumUtil = enumUtil;
         this.auditLogService = auditLogService;
+        this.notificationService = notificationService;
+        this.templateVariableMappingService = templateVariableMappingService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -199,6 +203,7 @@ public class CronService {
         if (workflow.getEvent() == TicketWorkflowEventEnum.SLA_BREACH && today.isAfter(slaBreachDate)) {
             this.closedTicket(ticket, workflow);
             triggerSlaBreachActions(workflow, ticket.getId());
+            this.sendSLABreachNotification(ticket.getId());
         }
 
     }
@@ -241,6 +246,7 @@ public class CronService {
         if (today.isAfter(slaBreachDate)) {
             this.closedTicket(ticket, null);
             this.sendDefaultSlaBreachMail(ticket.getId());
+            this.sendSLABreachNotification(ticket.getId());
         }
     }
 
@@ -275,6 +281,49 @@ public class CronService {
                 if (user != null)
                     mailService.sendSLABreachedToSEPSEmail(ticket, user);
             }
+        }
+    }
+
+    private void sendSLABreachNotification(Long ticketId){
+
+        ClaimTicket cTicket = claimTicketRepository.findById(ticketId)
+            .orElse(null);
+        if (cTicket== null) {
+            return;
+        }
+        if(cTicket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)){
+            List<User> fiAdmin = userService.getUserListByRoleSlug(cTicket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
+            // Send email to FI Admin
+            if (!fiAdmin.isEmpty()) {
+                fiAdmin.forEach(fiAdminUser -> {
+                    Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(cTicket, fiAdminUser);
+                    notificationService.sendNotification("SLA_BREACH_ADMIN_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(fiAdminUser.getId()), variables);
+                });
+            }
+            if(cTicket.getFiAgentId()!=null){
+                User fiAgent = userService.getUserById(cTicket.getFiAgentId());
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(cTicket, fiAgent);
+                notificationService.sendNotification("SLA_BREACH_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(fiAgent.getId()), variables);
+            }
+        }else {
+            List<User> sepsAdmin = userService.getUserListByRoleSlug(Constants.RIGHTS_SEPS_ADMIN);
+            // Send email to SEPS Admin
+            if (!sepsAdmin.isEmpty()) {
+                sepsAdmin.forEach(sepsAdminUser -> {
+                    Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(cTicket, sepsAdminUser);
+                    notificationService.sendNotification("SLA_BREACH_ADMIN_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(sepsAdminUser.getId()), variables);
+                });
+            }
+            if(cTicket.getSepsAgentId()!=null){
+                User sepsAgent = userService.getUserById(cTicket.getSepsAgentId());
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(cTicket, sepsAgent);
+                notificationService.sendNotification("SLA_BREACH_AGENT_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(sepsAgent.getId()), variables);
+            }
+        }
+        if(cTicket.getUserId()!=null){
+            User customer = userService.getUserById(cTicket.getUserId());
+            Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(cTicket, customer);
+            notificationService.sendNotification("SLA_BREACH_CUSTOMER_NOTIFICATION", variables.get(Constants.CUSTOMER_TICKET_URL_TEXT), List.of(customer.getId()), variables);
         }
     }
 
@@ -358,7 +407,10 @@ public class CronService {
             List<User> fiAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
             // Send email to FI Admin
             if (!fiAdmin.isEmpty()) {
-                fiAdmin.forEach(fiAdminUser -> mailService.sendSLAReminderToFIEmail(ticket, fiAdminUser));
+                fiAdmin.forEach(fiAdminUser -> {
+                    mailService.sendSLAReminderToFIEmail(ticket, fiAdminUser);
+                    sendSLAReminderNotification(ticket.getId(), fiAdminUser);
+                });
             }
             if (ticket.getFiAgentId() != null) {
                 this.sendReminderMailToAdmin(ticket, ticket.getFiAgentId(), UserTypeEnum.FI_USER);
@@ -367,7 +419,10 @@ public class CronService {
             List<User> sepsAdmin = userService.getUserListByRoleSlug(Constants.RIGHTS_SEPS_ADMIN);
             // Send email to SEPS Admin
             if (!sepsAdmin.isEmpty()) {
-                sepsAdmin.forEach(sepsAdminUser -> mailService.sendSLAReminderToSEPSEmail(ticket, sepsAdminUser));
+                sepsAdmin.forEach(sepsAdminUser -> {
+                    mailService.sendSLAReminderToSEPSEmail(ticket, sepsAdminUser);
+                    sendSLAReminderNotification(ticket.getId(), sepsAdminUser);
+                });
             }
             if (ticket.getSepsAgentId() != null) {
                 this.sendReminderMailToAdmin(ticket, ticket.getSepsAgentId(), UserTypeEnum.SEPS_USER);
@@ -378,11 +433,26 @@ public class CronService {
     private void sendReminderMailToAdmin(ClaimTicketDTO ticket, Long userId, UserTypeEnum userType){
         User user = userService.findActiveUser(userId);
         if(userType.equals(UserTypeEnum.FI_USER)){
-            if (user != null)
+            if (user != null) {
                 mailService.sendSLAReminderToFIEmail(ticket, user);
+                sendSLAReminderNotification(ticket.getId(), user);
+            }
         }else {
-            if (user != null)
+            if (user != null) {
                 mailService.sendSLAReminderToSEPSEmail(ticket, user);
+                sendSLAReminderNotification(ticket.getId(), user);
+            }
+        }
+    }
+
+    private void sendSLAReminderNotification(Long ticketId, User user){
+        if(user!=null) {
+            ClaimTicket cTicket = claimTicketRepository.findById(ticketId)
+                .orElse(null);
+            if (cTicket != null) {
+                Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(cTicket, user);
+                notificationService.sendNotification("SLA_REMINDER_NOTIFICATION", variables.get(Constants.ADMIN_TICKET_URL_TEXT), List.of(user.getId()), variables);
+            }
         }
     }
 
@@ -405,12 +475,14 @@ public class CronService {
                     break;
                 case MAIL_TO_FI_AGENT:
                     user = findAgent(claimTicketDTO.getFiAgentId(), claimTicketWorkFlowDTO, action.getAction().name(), UserTypeEnum.FI_USER);
+                    sendSLAReminderNotification(claimTicketDTO.getId(),user);
                     break;
                 case MAIL_TO_SEPS_TEAM:
                     user = findAgent(agentId, claimTicketWorkFlowDTO, action.getAction().name(), UserTypeEnum.SEPS_USER);
                     break;
                 case MAIL_TO_SEPS_AGENT:
                     user = findAgent(claimTicketDTO.getSepsAgentId(), claimTicketWorkFlowDTO, action.getAction().name(), UserTypeEnum.SEPS_USER);
+                    sendSLAReminderNotification(claimTicketDTO.getId(),user);
                     break;
                 // Add other cases if needed
                 default:

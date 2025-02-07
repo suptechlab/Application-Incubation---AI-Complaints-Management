@@ -114,6 +114,7 @@ public class SepsAndFiClaimTicketResource {
     ) {
         List<ClaimTicket> ticketList = sepsAndFiClaimTicketService.assignTicketsToFiAgent(agentId, assignTicketRequestDTO);
         sepsAndFiClaimTicketService.sendAssignmentEmails(ticketList, agentId);
+        claimTicketService.sendAssignmentNotification(ticketList, agentId);
         return ResponseEntity.ok().build();
     }
 
@@ -127,6 +128,7 @@ public class SepsAndFiClaimTicketResource {
     ) {
         List<ClaimTicket> ticketList = sepsAndFiClaimTicketService.assignTicketsToSepsAgent(agentId, assignTicketRequestDTO);
         sepsAndFiClaimTicketService.sendAssignmentEmails(ticketList, agentId);
+        claimTicketService.sendAssignmentNotification(ticketList, agentId);
         return ResponseEntity.ok().build();
     }
 
@@ -142,6 +144,7 @@ public class SepsAndFiClaimTicketResource {
         RequestInfo requestInfo = new RequestInfo(request);
         sepsAndFiClaimTicketService.updatePriority(ticketId, priority, requestInfo);
         sepsAndFiClaimTicketService.triggerPriorityWorkflow(ticketId);
+        claimTicketService.sendPriorityChangeNotification(ticketId);
         return ResponseEntity.ok().build();
     }
 
@@ -168,6 +171,7 @@ public class SepsAndFiClaimTicketResource {
             RequestInfo requestInfo = new RequestInfo(request);
             sepsAndFiClaimTicketService.extendSlaDate(ticketId, newSlaDate, reason, requestInfo);
             sepsAndFiClaimTicketService.triggerDateExtensionWorkflow(ticketId);
+            claimTicketService.sendDateExtensionNotification(ticketId);
             ResponseStatus responseStatus = new ResponseStatus(
                 messageSource.getMessage("claim.ticket.sla.extended.successfully", null, LocaleContextHolder.getLocale()),
                 HttpStatus.OK.value(),
@@ -216,6 +220,7 @@ public class SepsAndFiClaimTicketResource {
         // Delegate to service
         sepsAndFiClaimTicketService.closedClaimTicket(ticketId, claimTicketClosedRequest, requestInfo);
         sepsAndFiClaimTicketService.triggerCloseClaimTicketWorkflow(ticketId, claimTicketClosedRequest);
+        claimTicketService.sendCloseTicketNotification(ticketId);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.closed.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -247,6 +252,7 @@ public class SepsAndFiClaimTicketResource {
         RequestInfo requestInfo = new RequestInfo(request);
         sepsAndFiClaimTicketService.rejectClaimTicket(ticketId, claimTicketRejectRequest, requestInfo);
         sepsAndFiClaimTicketService.triggerRejectClaimTicketWorkflow(ticketId, claimTicketRejectRequest);
+        claimTicketService.sendRejectTicketNotification(ticketId);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.rejected.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -276,6 +282,8 @@ public class SepsAndFiClaimTicketResource {
                                                           @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
         sepsAndFiClaimTicketService.replyToCustomer(ticketId, claimTicketReplyRequest);
+        claimTicketService.sendReplyToCustomerNotification(ticketId);
+        claimTicketService.sendTaggedUserNotification(ticketId, claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.replied.to.customer.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -304,6 +312,7 @@ public class SepsAndFiClaimTicketResource {
                                                           @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
         sepsAndFiClaimTicketService.replyToInternal(ticketId, claimTicketReplyRequest);
+        claimTicketService.sendTaggedUserNotification(ticketId, claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.replied.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),
@@ -337,6 +346,7 @@ public class SepsAndFiClaimTicketResource {
                                                               @ModelAttribute @Valid ClaimTicketReplyRequest claimTicketReplyRequest) {
         // Call service method to handle the reply
         sepsAndFiClaimTicketService.replyToInternalNote(ticketId, claimTicketReplyRequest);
+        claimTicketService.sendTaggedUserNotification(ticketId, claimTicketReplyRequest);
         ResponseStatus responseStatus = new ResponseStatus(
             messageSource.getMessage("claim.ticket.internal.note.added.successfully", null, LocaleContextHolder.getLocale()),
             HttpStatus.OK.value(),

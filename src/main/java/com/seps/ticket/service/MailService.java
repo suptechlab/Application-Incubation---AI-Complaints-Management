@@ -246,7 +246,7 @@ public class MailService {
         if (template == null || variables == null) return template;
 
         // Filter variables to include only supported ones
-        variables.keySet().retainAll(supportedVariables);
+        //variables.keySet().retainAll(supportedVariables);
 
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             template = template.replace("{{" + entry.getKey() + "}}", entry.getValue());
