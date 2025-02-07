@@ -110,7 +110,7 @@ export default function MyAccount() {
       case 'REJECTED':
         return 'bg-danger bg-opacity-25 text-danger';
       case 'ASSIGNED':
-        return 'bg-orange bg-opacity-25 text-orange';
+        return 'bg-orange bg-orange-subtle text-orange';
       default:
         return 'bg-body bg-opacity-25 text-warning';
     }
@@ -216,7 +216,7 @@ export default function MyAccount() {
             });
           return (
             <Stack direction='horizontal' gap={3}>
-              <AppTooltip title={t("DOWNLOAD")}>
+              {/* <AppTooltip title={t("DOWNLOAD")}>
                 <Button
                   variant="link"
                   onClick={() => downloadTicketData(info?.row?.original?.id)}
@@ -225,7 +225,7 @@ export default function MyAccount() {
                 >
                   <FiDownload size={24} />
                 </Button>
-              </AppTooltip>
+              </AppTooltip> */}
               <AppTooltip title={t("VIEW")}>
                 <Button
                   variant="link"

@@ -11,7 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { MdAccountBox, MdAccountCircle, MdKey, MdLogout } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../../assets/images/default-avatar.jpg";
 import Logo from "../../../assets/images/logo.svg";
 import FileClaimMainModal from "../../../pages/auth";
