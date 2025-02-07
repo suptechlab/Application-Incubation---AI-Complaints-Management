@@ -186,8 +186,8 @@ public class TemplateVariableMappingService {
         }
 
         // URLs
-        variableMap.put("userTicketUrl", this.userBaseUrl + "/my-account?ticketId=" + claimTicketDTO.getTicketId());
-        variableMap.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/tickets/view/" + claimTicketDTO.getId());
+        variableMap.put("userTicketUrl", "my-account?ticketId=" + claimTicketDTO.getTicketId());
+        variableMap.put("adminTicketUrl", "tickets/view/" + claimTicketDTO.getId());
 
         // Audit details
         variableMap.put("createdBy", claimTicketDTO.getCreatedByUser() != null ? claimTicketDTO.getCreatedByUser().getFirstName() : "System");
