@@ -56,7 +56,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
 
   // READ SINGLE NOTIFICATION
   const readSingleNotification = (notificationData) => {
-    const { id, redirectUrl } = notificationData
+    const { id, notification } = notificationData
 
 
     const updatedNotifications = notifications.map(notification =>
@@ -66,8 +66,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     );
 
 
-    if (redirectUrl) {
-      navigate(redirectUrl)
+    if (notification?.redirectUrl) {
+      navigate("/"+notification?.redirectUrl)
     }
 
     // Update the notifications state
@@ -76,15 +76,19 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     // Update the notification count: subtract 1 if there's any unread notification
     const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
     setNotificationCount(unreadCount);
-    handleMarkNotificationById(id).then(response => {
-      getAllNotifications()
-    }).catch((error) => {
-      if (error?.response?.data?.errorDescription) {
-        toast.error(error?.response?.data?.errorDescription);
-      } else {
-        toast.error(error?.message);
-      }
-    })
+
+
+    if(notification?.isRead === false){
+      handleMarkNotificationById(id).then(response => {
+        getAllNotifications()
+      }).catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+    }
   }
 
   // READ ALL NOTIFICATIONS
