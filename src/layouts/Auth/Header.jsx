@@ -19,7 +19,7 @@ import {
   MdLogout,
   MdOutlineNotifications,
 } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/images/default-avatar.jpg";
 import Logo from "../../assets/images/logo.svg";
 import AppTooltip from "../../components/tooltip";
@@ -32,11 +32,10 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
   const { logout, userData, profileImage } = useContext(AuthenticationContext);
   const { t } = useTranslation();
 
+  const navigate = useNavigate()
 
   const [notifications, setNotifications] = useState([]);
-  const [notificationsCount, setNotificationCount] = useState({ count: 1 });
-
-  const [loadingNotification, setLoadingNotification] = useState(true)
+  const [notificationsCount, setNotificationCount] = useState(0);
 
 
   // Default values to handle missing user data
@@ -44,7 +43,6 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
 
   // GET ALL NOTIFICATIONS
   const getAllNotifications = () => {
-    setLoadingNotification(true)
     handleGetNotifications().then(response => {
       setNotifications(response?.data)
     }).catch((error) => {
@@ -53,15 +51,32 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
       } else {
         toast.error(error?.message);
       }
-    }).finally(() => {
-      setLoadingNotification(false)
     })
   }
 
   // READ SINGLE NOTIFICATION
-  const readSingleNotification = (notificationId) => {
-    setLoadingNotification(true)
-    handleMarkNotificationById(notificationId).then(response => {
+  const readSingleNotification = (notificationData) => {
+    const { id, redirectUrl } = notificationData
+
+
+    const updatedNotifications = notifications.map(notification =>
+      notification.id === id
+        ? { ...notification, isRead: true }
+        : notification
+    );
+
+
+    if (redirectUrl) {
+      navigate(redirectUrl)
+    }
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+
+    // Update the notification count: subtract 1 if there's any unread notification
+    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    setNotificationCount(unreadCount);
+    handleMarkNotificationById(id).then(response => {
       getAllNotifications()
     }).catch((error) => {
       if (error?.response?.data?.errorDescription) {
@@ -69,13 +84,20 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
       } else {
         toast.error(error?.message);
       }
-      setLoadingNotification(false)
     })
   }
 
   // READ ALL NOTIFICATIONS
   const readAllNotifications = () => {
-    setLoadingNotification(true)
+    const updatedNotifications = notifications.map(notification => ({
+      ...notification,
+      isRead: true
+    }));
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+    setNotificationCount(0)
+
     handleMarkAllNotifications().then(response => {
       getAllNotifications()
     }).catch((error) => {
@@ -84,13 +106,21 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
       } else {
         toast.error(error?.message);
       }
-      setLoadingNotification(false)
     })
   }
 
   // READ SINGLE NOTIFICATION
   const deleteSingleNotification = (notificationId) => {
-    setLoadingNotification(true)
+    // Remove the notification with the specified id
+    const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+
+    // Update the notification count based on remaining unread notifications
+    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    setNotificationCount(unreadCount);
+
     handleDeleteNotification(notificationId).then(response => {
       getAllNotifications()
     }).catch((error) => {
@@ -99,13 +129,16 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
       } else {
         toast.error(error?.message);
       }
-      setLoadingNotification(false)
     })
   }
 
   // READ ALL NOTIFICATIONS
   const deleteAllNotifications = () => {
-    setLoadingNotification(true)
+    // Update the notifications state
+    setNotifications([]);
+    setNotificationCount(0)
+
+
     handleDeleteAllNotification().then(response => {
       getAllNotifications()
     }).catch((error) => {
@@ -114,14 +147,17 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
       } else {
         toast.error(error?.message);
       }
-      setLoadingNotification(false)
     })
   }
 
   // READ ALL NOTIFICATIONS
   const noticationCountApi = () => {
     handleCountNotifications().then(response => {
-      setNotificationCount(response?.data)
+      const newCount = parseInt(response?.data?.unreadCount, 10);
+      if (newCount !== notificationsCount) {
+        setNotificationCount(newCount);
+        getAllNotifications(); // Call if count changes
+      }
     }).catch((error) => {
       if (error?.response?.data?.errorDescription) {
         toast.error(error?.response?.data?.errorDescription);
@@ -134,6 +170,10 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
   useEffect(() => {
     noticationCountApi()
     getAllNotifications()
+    const intervalId = setInterval(() => {
+      noticationCountApi();
+    }, 60000); // Run every 1 minute
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, [])
 
   return (
@@ -169,16 +209,16 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 <span>
                   <MdOutlineNotifications
                     size={24}
-                    className={notificationsCount.count > 0 ? "ring" : ""}
+                    className={notificationsCount > 0 ? "ring" : ""}
                   />
                 </span>
               </AppTooltip>
-              {notificationsCount.count > 0 && (
+              {notificationsCount > 0 && (
                 <Badge
                   bg="dark"
                   className="border border-white fw-semibold rounded-pill notification-count position-absolute top-0 start-100 translate-middle mt-2 ms-n1"
                 >
-                  {notificationsCount.count}
+                  {notificationsCount}
                   <span className="visually-hidden">{t("UNREAD_NOTIFICATIONS")}</span>
                 </Badge>
               )}
@@ -189,15 +229,17 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
             >
               <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0">
                 <li className="fs-14 d-flex align-items-center justify-content-between px-3 py-1 border-bottom mb-1 pb-2 border-secondary border-opacity-25 ">
-                  {notificationsCount.count > 0 ? (
+                  {notifications?.length > 0 ? (
                     <>
-                      <Button
-                        onClick={readAllNotifications}
-                        variant="link"
-                        className="link-primary text-decoration-none p-0 border-0 fw-semibold"
-                      >
-                        {t("MARK_ALL_AS_READ")}
-                      </Button>
+                      {
+                        notificationsCount > 0 && <Button
+                          onClick={readAllNotifications}
+                          variant="link"
+                          className="link-primary text-decoration-none p-0 border-0 fw-semibold"
+                        >
+                          {t("MARK_ALL_AS_READ")}
+                        </Button>
+                      }
                       <Button
                         onClick={deleteAllNotifications}
                         variant="link"
@@ -221,7 +263,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                             className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
                             type="button"
                             onClick={() => {
-                              readSingleNotification(notification?.id)
+                              readSingleNotification(notification)
                             }}>
                             <Stack direction="horizontal" gap={2} className="w-100">
                               <div className={`fs-14 fw-semibold mb-1 me-auto position-relative  text-primary`}>
