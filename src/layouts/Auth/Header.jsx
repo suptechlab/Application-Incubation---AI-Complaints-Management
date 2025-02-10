@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Badge,
   Button,
@@ -7,33 +7,178 @@ import {
   Image,
   Nav,
   Navbar,
+  Stack,
 } from "react-bootstrap";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { FaCaretDown, FaTrash } from "react-icons/fa";
+import { FaCaretDown } from "react-icons/fa";
 import {
   MdAccountBox,
+  MdClose,
   MdKey,
   MdLogout,
   MdOutlineNotifications,
 } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/images/default-avatar.jpg";
 import Logo from "../../assets/images/logo.svg";
 import AppTooltip from "../../components/tooltip";
 import { AuthenticationContext } from "../../contexts/authentication.context";
+import { handleCountNotifications, handleDeleteAllNotification, handleDeleteNotification, handleGetNotifications, handleMarkAllNotifications, handleMarkNotificationById } from "../../services/notification.service";
 import "./header.scss";
+import moment from "moment/moment";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
   const { logout, userData, profileImage } = useContext(AuthenticationContext);
   const { t } = useTranslation();
 
+  const navigate = useNavigate()
 
-  const [notifications] = useState([]);
-  const [notificationsCount] = useState({ count: 0 });
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsCount, setNotificationCount] = useState(0);
+
 
   // Default values to handle missing user data
   const { imageUrl = '', firstName = '' } = userData || {};
 
+  // GET ALL NOTIFICATIONS
+  const getAllNotifications = () => {
+    handleGetNotifications().then(response => {
+      setNotifications(response?.data)
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message);
+      }
+    })
+  }
+
+  // READ SINGLE NOTIFICATION
+  const readSingleNotification = (notificationData) => {
+    const { id, notification } = notificationData
+
+
+    const updatedNotifications = notifications.map(notification =>
+      notification.id === id
+        ? { ...notification, isRead: true }
+        : notification
+    );
+
+
+    if (notification?.redirectUrl) {
+      navigate("/"+notification?.redirectUrl)
+    }
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+
+    // Update the notification count: subtract 1 if there's any unread notification
+    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    setNotificationCount(unreadCount);
+
+
+    if(notification?.isRead === false){
+      handleMarkNotificationById(id).then(response => {
+        getAllNotifications()
+      }).catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      })
+    }
+  }
+
+  // READ ALL NOTIFICATIONS
+  const readAllNotifications = () => {
+    const updatedNotifications = notifications.map(notification => ({
+      ...notification,
+      isRead: true
+    }));
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+    setNotificationCount(0)
+
+    handleMarkAllNotifications().then(response => {
+      getAllNotifications()
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message);
+      }
+    })
+  }
+
+  // READ SINGLE NOTIFICATION
+  const deleteSingleNotification = (notificationId) => {
+    // Remove the notification with the specified id
+    const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
+
+    // Update the notifications state
+    setNotifications(updatedNotifications);
+
+    // Update the notification count based on remaining unread notifications
+    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    setNotificationCount(unreadCount);
+
+    handleDeleteNotification(notificationId).then(response => {
+      getAllNotifications()
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message);
+      }
+    })
+  }
+
+  // READ ALL NOTIFICATIONS
+  const deleteAllNotifications = () => {
+    // Update the notifications state
+    setNotifications([]);
+    setNotificationCount(0)
+
+
+    handleDeleteAllNotification().then(response => {
+      getAllNotifications()
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message);
+      }
+    })
+  }
+
+  // READ ALL NOTIFICATIONS
+  const noticationCountApi = () => {
+    handleCountNotifications().then(response => {
+      const newCount = parseInt(response?.data?.unreadCount, 10);
+      if (newCount !== notificationsCount) {
+        setNotificationCount(newCount);
+        getAllNotifications(); // Call if count changes
+      }
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message);
+      }
+    })
+  }
+
+  useEffect(() => {
+    noticationCountApi()
+    getAllNotifications()
+    const intervalId = setInterval(() => {
+      noticationCountApi();
+    }, 60000); // Run every 1 minute
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [])
 
   return (
     <Navbar
@@ -68,17 +213,17 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                 <span>
                   <MdOutlineNotifications
                     size={24}
-                    className={notificationsCount.count > 0 ? "ring" : ""}
+                    className={notificationsCount > 0 ? "ring" : ""}
                   />
                 </span>
               </AppTooltip>
-              {notificationsCount.count > 0 && (
+              {notificationsCount > 0 && (
                 <Badge
                   bg="dark"
                   className="border border-white fw-semibold rounded-pill notification-count position-absolute top-0 start-100 translate-middle mt-2 ms-n1"
                 >
-                  {notificationsCount.count}
-                  <span className="visually-hidden">Unread Notifications</span>
+                  {notificationsCount}
+                  <span className="visually-hidden">{t("UNREAD_NOTIFICATIONS")}</span>
                 </Badge>
               )}
             </Dropdown.Toggle>
@@ -87,43 +232,99 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
               className="shadow-lg rounded-3 border-0 mt-3 theme-notification-menu"
             >
               <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0">
-                <li className="fs-14 text-center px-3 py-1">
-                  {notificationsCount.count > 0 ? (
-                    <Link
-                      // onClick={markAllAsRead}
-                      className="text-decoration-none"
-                    >
-                      Mark As Read
-                    </Link>
+                <li className="fs-14 d-flex align-items-center justify-content-between px-3 py-1 border-bottom mb-1 pb-2 border-secondary border-opacity-25 ">
+                  {notifications?.length > 0 ? (
+                    <>
+                      {
+                        notificationsCount > 0 && <Button
+                          onClick={readAllNotifications}
+                          variant="link"
+                          className="link-primary text-decoration-none p-0 border-0 fw-semibold"
+                        >
+                          {t("MARK_ALL_AS_READ")}
+                        </Button>
+                      }
+                      <Button
+                        onClick={deleteAllNotifications}
+                        variant="link"
+                        className="link-primary text-decoration-none p-0 border-0 fw-semibold"
+                      >
+                        {t("CLEAR_ALL")}
+                      </Button>
+                    </>
                   ) : (
-                    "No se encontró ninguna notificación"
+                    t("NO_NOTIFICATION")
                   )}
                 </li>
-                {notifications.map((notification) => (
-                  <li key={notification.id}>
-                    <Dropdown.Item as={Link} to="/">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <div className="fs-14 fw-semibold">
-                            {notification.title}
-                          </div>
-                          <p className="fs-14 mb-0">{notification.message}</p>
-                        </div>
 
-                        <div>
-                          <FaTrash
-                            className="text-primary ms-2 "
-                          // onClick={() => deleteNotification(notification.id)}
-                          />
-                        </div>
-                      </div>
-                    </Dropdown.Item>
-                  </li>
-                ))}
+                {
+                  notifications.map((notification) => (
+                    <li key={notification?.notification?.id} className='my-1'
+                    >
+                      {
+                        !notification?.isRead ?
+                          <button
+                            className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
+                            type="button"
+                            onClick={() => {
+                              readSingleNotification(notification)
+                            }}>
+                            <Stack direction="horizontal" gap={2} className="w-100">
+                              <div className={`fs-14 fw-semibold mb-1 me-auto position-relative  text-primary`}>
+                                {notification?.notification?.title}
+                              </div>
+                              <AppTooltip title={t("CLEAR")}>
+                                <Button variant="link" className="link-danger p-0 border-0"
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // Prevent parent click event
+                                    deleteSingleNotification(notification.id);
+                                  }}>
+                                  <MdClose
+                                    size={20}
+                                    className="ms-2"
+                                  />
+                                </Button>
+                              </AppTooltip>
+                            </Stack>
+                            <p className={`fs-14 mb-0 lh-sm ${notification?.isRead && 'text-secondary'}`}>{notification?.notification?.message}</p>
+                            <small className="text-muted">{moment(notification?.notification?.createdAt).fromNow()}</small>
+                          </button>
+                          :
+                          <div
+                            className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
+                          >
+                            <Stack direction="horizontal" gap={2} className="w-100">
+                              <div className={`fs-14 fw-semibold mb-1 me-auto position-relative text-secondary}`}>
+                                {notification?.notification?.title}
+                              </div>
+                              <AppTooltip title={t("CLEAR")}>
+                                <Button variant="link" className="link-danger p-0 border-0"
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // Prevent parent click event
+                                    deleteSingleNotification(notification.id);
+                                  }}>
+                                  <MdClose
+                                    size={20}
+                                    className="ms-2"
+                                  />
+                                </Button>
+                              </AppTooltip>
+                            </Stack>
+                            <p className={`fs-14 mb-0 lh-sm ${notification?.isRead && 'text-secondary'}`}>{notification?.notification?.message}</p>
+                            <small className="text-muted">{moment(notification?.notification?.createdAt).fromNow()}</small>
+                          </div>
+                      }
+
+                    </li>
+                  ))
+                }
+
+
+                {/* {
+               } */}
               </ul>
             </Dropdown.Menu>
           </Dropdown>
-
           <Dropdown className="profileDropdown ms-3 ms-sm-4">
             <Dropdown.Toggle
               variant="link"

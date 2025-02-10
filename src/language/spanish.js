@@ -373,5 +373,11 @@ export const spanishLang = {
     "PERMISSIONS": "Permisos",
     "TICKETS ASSIGNED":"Entradas asignadas",
     "RESET":"Restablecer",
-    "DOWNLOAD_TICKET_DETAILS": "Descargar detalles del boleto"
+    "DOWNLOAD_TICKET_DETAILS": "Descargar detalles del boleto",
+    "TICKETS ASSIGNED": "Entradas asignadas",
+    "NO_NOTIFICATION": "Sin notificaciones",
+    "UNREAD_NOTIFICATIONS": "Notificaciones no leídas",
+    "MARK_ALL_AS_READ": "Marcar todo como leído",
+    "CLEAR_ALL": "Borrar todo",
+    "CLEAR": "despejado"
 } 

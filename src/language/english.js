@@ -379,4 +379,9 @@ export const englishLang = {
     "TICKETS ASSIGNED":"Tickets Assigned",
     "RESET":"Reset",
     "DOWNLOAD_TICKET_DETAILS":"Download Ticket Details",
+    "NO_NOTIFICATION":"No notifications",
+    "UNREAD_NOTIFICATIONS":"Unread Notifications",
+    "MARK_ALL_AS_READ" :"Mark all as read",
+    "CLEAR_ALL" : "Clear all",
+    "CLEAR":"Clear"
 }
