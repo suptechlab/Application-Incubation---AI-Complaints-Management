@@ -12,11 +12,14 @@ import { useDispatch } from 'react-redux';
 import Loader from '../../../../components/Loader';
 import { MdClose } from 'react-icons/md';
 import AppTooltip from '../../../../components/tooltip';
+import FileSuccesModal from '../../../auth/file-a-claim/file-success';
 
 const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
 
     const [loading, setLoading] = useState(false)
     const [files, setFiles] = useState([]);
+    const [fileSuccesModalShow, setFileSuccesModalShow] = useState(false);
+    const [fileClaimResponse, setFileClaimResponse] = useState({})
     const { t } = useTranslation();
     const dispatch = useDispatch();
 
@@ -78,6 +81,8 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
         if (fileClaimSecondInstanceForm.fulfilled.match(result)) {
             toast.success(t('SECOND_CLAIM_SUCCESS'));
             setLoading(false);
+            setFileSuccesModalShow(true)
+            setFileClaimResponse(result?.payload?.data)
             handleCloseModal();
             actions.setSubmitting(false);
         } else {
@@ -92,7 +97,10 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
         handleClose();
         setFiles([]);
     }
-
+    // Handle File Succes Click
+    const handleFileSuccesClick = () => {
+        setFileSuccesModalShow()
+    };
     return (
         <React.Fragment>
             <Loader isLoading={loading} />
@@ -228,6 +236,15 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
                     )}
                 </CommonFormikComponent>
             </Modal>
+            {/* FILE A CLAIM ALERT MODAL IF DUPLICATE FOUND */}
+
+            {/* FILE A CLAIM SUCCESS */}
+            <FileSuccesModal
+                handleShow={fileSuccesModalShow}
+                handleClose={() => setFileSuccesModalShow(false)}
+                handleFormSubmit={handleFileSuccesClick}
+                fileClaimData={fileClaimResponse}
+            />
         </React.Fragment>
 
     )

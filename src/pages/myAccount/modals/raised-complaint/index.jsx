@@ -13,12 +13,16 @@ import { MdClose } from 'react-icons/md';
 import { fileRaiseComplaintForm } from '../../../../redux/slice/fileClaimSlice';
 import { useDispatch } from 'react-redux';
 import Loader from '../../../../components/Loader';
+import FileSuccesModal from '../../../auth/file-a-claim/file-success';
 
 const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
 
     const [loading, setLoading] = useState(false)
     const { t } = useTranslation();
     const [files, setFiles] = useState([]);
+
+    const [fileSuccesModalShow, setFileSuccesModalShow] = useState(false);
+    const [fileClaimResponse, setFileClaimResponse] = useState({})
     const dispatch = useDispatch();
 
     // Initial Values
@@ -81,6 +85,7 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
         if (fileRaiseComplaintForm.fulfilled.match(result)) {
             toast.success(t('COMPLAINT_RAISED_SUCCES'));
             setLoading(false);
+            setFileSuccesModalShow(true)
             handleCloseModal();
             actions.setSubmitting(false);
         } else {
@@ -95,6 +100,10 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
         handleClose();
         setFiles([]);
     }
+
+    const handleFileSuccesClick = () => {
+        setFileSuccesModalShow()
+    };
 
     return (
         <React.Fragment>
@@ -246,6 +255,12 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
                     )}
                 </CommonFormikComponent>
             </Modal>
+            <FileSuccesModal
+                handleShow={fileSuccesModalShow}
+                handleClose={() => setFileSuccesModalShow(false)}
+                handleFormSubmit={handleFileSuccesClick}
+                fileClaimData={fileClaimResponse}
+            />
         </React.Fragment>
     )
 }
