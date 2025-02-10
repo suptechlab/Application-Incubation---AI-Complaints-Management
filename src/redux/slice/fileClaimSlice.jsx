@@ -263,6 +263,22 @@ export const downloadTicketDetails = createAsyncThunk(
     }
   }
 );
+
+// DOWNLOAD DOCUMENT
+export const downloadTicketDetailsPublicApi = createAsyncThunk(
+  'downloadTicketDetailsPublicApi',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await ticketsApi.get(`${EndPoint.TICKET_DETAIL_DOWNLOAD_PDF}/${id}/ticket-detail-pdf-download`,{ responseType: 'arraybuffer' });
+      if (response.status !== 200) {
+        return rejectWithValue('Failed to download!');
+      }
+      return response; // RETURN RESPONSE
+    } catch (error) {
+
+    }
+  }
+);
 // SUBMIT FILE CLAIM SECOND INSTANCE FORM
 export const fileRaiseComplaintForm = createAsyncThunk(
   'fileRaiseComplaintForm',

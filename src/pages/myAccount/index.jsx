@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import ClaimChat from './modals/chat';
 import InstanceModal from './modals/instance';
 import RaisedComplaintModal from './modals/raised-complaint';
-import { FiDownload } from "react-icons/fi";
+import { FiDownload } from 'react-icons/fi';
 export default function MyAccount() {
 
   const { t } = useTranslation()
@@ -216,7 +216,7 @@ export default function MyAccount() {
             });
           return (
             <Stack direction='horizontal' gap={3}>
-              {/* <AppTooltip title={t("DOWNLOAD")}>
+              <AppTooltip title={t("DOWNLOAD")}>
                 <Button
                   variant="link"
                   onClick={() => downloadTicketData(info?.row?.original?.id)}
@@ -225,7 +225,7 @@ export default function MyAccount() {
                 >
                   <FiDownload size={24} />
                 </Button>
-              </AppTooltip> */}
+              </AppTooltip>
               <AppTooltip title={t("VIEW")}>
                 <Button
                   variant="link"

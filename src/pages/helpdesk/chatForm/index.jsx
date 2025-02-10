@@ -3,7 +3,7 @@ import { Button, Offcanvas, Stack } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { MdKeyboardBackspace, MdPerson } from 'react-icons/md';
+import { MdAttachFile, MdKeyboardBackspace, MdPerson } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import CommonFormikComponent from '../../../components/CommonFormikComponent';
 import FormInputBox from '../../../components/FormInput';
@@ -12,6 +12,7 @@ import AppTooltip from '../../../components/tooltip';
 import { loginAndFetchAccountInfo } from "../../../redux/slice/authSlice";
 import { chatbotFileUpload, sendQuery } from '../../../redux/slice/helpDeskSlice';
 import { ChatBotFormSchema } from '../validations';
+import ReactSelect from '../../../components/ReactSelect';
 const ChatBotForm = () => {
     const { t } = useTranslation()
     const chatEndRef = useRef(null);
@@ -19,10 +20,11 @@ const ChatBotForm = () => {
 
 
 
-    const {token} = useSelector(state=> state?.authSlice)
+    const { token } = useSelector(state => state?.authSlice)
 
 
     const [uploadedFiles, setUploadedFiles] = useState([])
+
 
     const [isFileUpload, setIsFileUpload] = useState(false)
 
@@ -42,7 +44,7 @@ const ChatBotForm = () => {
     const { queryError } = useSelector((state) => state.helpDeskSlice);
     const [chatEnded, setChatEnded] = useState(false)
 
-
+    const [botSuggestion, setBotSuggestions] = useState([])
     const [chatData, setChatData] = useState([{
         id: 1,
         message: <>{t("CHATBOT_INITIAL_TEXT")}</>,
@@ -257,18 +259,13 @@ const ChatBotForm = () => {
         },
     ]
     // Action Button Handler
-    const actionButtonHandler = async ( msgData) => {
+    const actionButtonHandler = async (msgData) => {
         setLoading(true);
-        
-        
         try {
+            const messageData = { ...msgData, metadata: {} }
 
-          
-
-            const messageData = {...msgData , metadata : {}}
-
-            if(token){
-                messageData.metadata.token = token 
+            if (token) {
+                messageData.metadata.token = token
             }
             // Send the message to the API
             const result = await dispatch(sendQuery(messageData));
@@ -284,7 +281,7 @@ const ChatBotForm = () => {
             setLoading(false); // Ensure loading is turned off
         }
     };
-    
+
     // CALL SEND QUERY FUNCTION
     const handleSendQuery = async (msg) => {
         if (msg) {
@@ -293,17 +290,17 @@ const ChatBotForm = () => {
             // Prepare the message data
             const msgData = {
                 message: msg?.message || msg, // If `msg` is an object, use `msg.message`, otherwise use `msg` directly
-                metadata : {}
+                metadata: {}
             };
             // Add metadata if it exists
             if (msg?.metadata) {
                 msgData.metadata = msg.metadata;
             }
 
-            if(token){
-                msgData.metadata.token = token 
+            if (token) {
+                msgData.metadata.token = token
             }
-         
+
             // Add sender ID if available
             if (senderId) {
                 msgData.sender = senderId;
@@ -359,60 +356,121 @@ const ChatBotForm = () => {
     };
 
     // SET CHAT RESPONSE IN STATE
+    // const setChatResponse = (chatResponse) => {
+    //     setChatData((prevChatData) => {
+    //         // Map through the apiResponse to create new chat data
+    //         const newChatData = chatResponse?.map((item, index) => {
+    //             const hasButtons = item.buttons && item.buttons.length > 0;
+
+    //             if (item?.custom?.id_token) {
+    //                 setIsFileUpload(false)
+
+    //                 dispatch(loginAndFetchAccountInfo({ id_token: item?.custom?.id_token }));
+    //                 return null
+    //             }
+    //             else if (item?.custom?.file_upload_required === true) {
+    //                 setIsFileUpload(true)
+    //                 return null
+    //             }
+    //             else if (item?.custom?.redirect) {
+    //                 window.open(item.custom.redirect, "_blank");
+    //                 return null
+    //             }
+    //             else {
+    //                 setIsFileUpload(false)
+    //                 return {
+    //                     id: prevChatData.length + index + 1,
+    //                     message: <>{item.text}</>,
+    //                     userMode: false,
+    //                     botViewMode: true,
+    //                     recipient_id: item.recipient_id,
+    //                     botReview: hasButtons
+    //                         ? item.buttons.map((btn, idx) => ({
+    //                             id: idx + 1,
+    //                             suggestion: btn.title,
+    //                             // positive: idx === 0, // Assuming the first button is positive
+    //                             positive: (item.buttons?.length === 2 && idx === 0),
+    //                             payload: btn.payload,
+    //                         }))
+    //                         : [],
+    //                     // botSuggestion: [],
+    //                 };
+    //             }
+
+
+
+    //         }).filter((item) => item !== null); // Filter out null values;
+
+
+
+    //         // Return the new chat data
+    //         return [...prevChatData, ...newChatData];
+    //     });
+
+    //     const lastRecipientId = chatResponse.at(-1)?.recipient_id;
+    //     if (lastRecipientId) setSenderId(lastRecipientId);
+    // }
     const setChatResponse = (chatResponse) => {
         setChatData((prevChatData) => {
-            // Map through the apiResponse to create new chat data
             const newChatData = chatResponse?.map((item, index) => {
                 const hasButtons = item.buttons && item.buttons.length > 0;
 
                 if (item?.custom?.id_token) {
-                    setIsFileUpload(false)
-
+                    setIsFileUpload(false);
                     dispatch(loginAndFetchAccountInfo({ id_token: item?.custom?.id_token }));
-                    return null
-                }
-                else if (item?.custom?.file_upload_required === true) {
-                    setIsFileUpload(true)
-                    return null
-                }
-                else if (item?.custom?.redirect) {
+                    return null;
+                } else if (item?.custom?.file_upload_required === true) {
+                    setIsFileUpload(true);
+                    return null;
+                } else if (item?.custom?.redirect) {
                     window.open(item.custom.redirect, "_blank");
-                    return null
-                }
-                else {
-                    setIsFileUpload(false)
+                    return null;
+                } else {
+                    setIsFileUpload(false);
+
+                    let botReview = [];
+                    let botSuggestion = [];
+
+                    if (hasButtons) {
+                        if (item.buttons.length > 5) {
+                            // Store dropdown options in botSuggestion
+                            botSuggestion = item.buttons.map((btn, idx) => ({
+                                id: idx + 1,
+                                label: btn.title,
+                                value: btn.payload,
+                            }));
+
+                        } else {
+                            // Store normal buttons in botReview
+                            botReview = item.buttons.map((btn, idx) => ({
+                                id: idx + 1,
+                                suggestion: btn.title,
+                                positive: item.buttons.length === 2 && idx === 0,
+                                payload: btn.payload,
+                            }));
+                        }
+                    }
+                    setBotSuggestions(botSuggestion)
                     return {
                         id: prevChatData.length + index + 1,
                         message: <>{item.text}</>,
                         userMode: false,
                         botViewMode: true,
                         recipient_id: item.recipient_id,
-                        botReview: hasButtons
-                            ? item.buttons.map((btn, idx) => ({
-                                id: idx + 1,
-                                suggestion: btn.title,
-                                // positive: idx === 0, // Assuming the first button is positive
-                                positive: (item.buttons?.length === 2 && idx === 0),
-                                payload: btn.payload,
-                            }))
-                            : [],
-                        // botSuggestion: [],
+                        botReview, // Buttons (up to 5)
+                        // botSuggestion, // Dropdown options (if more than 5)
+                        hasButtons: hasButtons,
+                        hasDropdown: botSuggestion.length > 0, // Flag for dropdown
                     };
                 }
+            }).filter((item) => item !== null); // Remove null values
 
-
-
-            }).filter((item) => item !== null); // Filter out null values;
-
-
-
-            // Return the new chat data
             return [...prevChatData, ...newChatData];
         });
 
         const lastRecipientId = chatResponse.at(-1)?.recipient_id;
         if (lastRecipientId) setSenderId(lastRecipientId);
-    }
+    };
 
 
     const setChatError = () => {
@@ -527,10 +585,43 @@ const ChatBotForm = () => {
         }
     };
 
+    const handleSuggestionSelect = (value, selectedLabel, setFieldValue) => {
+
+        setLoading(true)
+        try {
+            // Prepare user message
+            const userMessage = {
+                id: chatData.length + 1,
+                message: selectedLabel,
+                userMode: true,
+                botViewMode: false,
+                botReview: [], // buttons
+                botSuggestion: [],
+            };
+
+
+
+            // Update chat data with the new user message
+            setChatData([...chatData, userMessage]);
+            setFieldValue('message', '')
+            // Proceed only if the message is valid
+          
+            if (value) {
+                handleSendQuery({ message: value })
+               
+            }
+        } catch (error) {
+            setChatError(); // Handle unexpected errors
+            console.error("Error in handleSubmit:", error);
+        } finally {
+            setLoading(false)
+          
+        }
+    }
+
     const removeFile = (indexToRemove) => {
         setUploadedFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
     };
-
     return (
         <React.Fragment>
             <Offcanvas.Header closeButton className='align-items-start pb-1'></Offcanvas.Header>
@@ -547,7 +638,7 @@ const ChatBotForm = () => {
                         <div className='chatbot-body d-flex flex-column flex-grow-1 overflow-auto px-3'>
                             {/* Message Repeater Section */}
                             {chatData?.map((messageItem, msgIndex) => {
-                                const { message, userMode, botViewMode, botSuggestion, botReview, recipient_id, error } = messageItem;
+                                const { message, userMode, botViewMode, botSuggestion, hasButtons, botReview, recipient_id, error } = messageItem;
 
                                 const isLastMessage = msgIndex === chatData?.length - 1;
                                 return (
@@ -571,7 +662,7 @@ const ChatBotForm = () => {
                                                 className={`fw-medium my-auto rounded ${userMode ? 'bg-body-tertiary text-start' : 'bg-warning bg-opacity-10'} ${botViewMode ? 'bg-white' : 'p-2'}`}
                                             >
                                                 {message}
-                                                {botReview && botReview.length > 0 && (
+                                                {hasButtons && botReview && botReview.length > 0 && (
                                                     <Stack
                                                         direction="horizontal"
                                                         gap={2}
@@ -683,55 +774,77 @@ const ChatBotForm = () => {
                                 </div> :
 
                                     <div className='position-relative'>
-
-                                        <FormInputBox
-                                            inputClassName="custom-padding-right-42"
-                                            wrapperClassName='mb-0'
-                                            id="message"
-                                            placeholder={t("TYPE_A_MESSAGE")}
-                                            name="message"
-                                            error={formikProps.errors.message}
-                                            onBlur={formikProps.handleBlur}
-                                            onChange={formikProps.handleChange}
-                                            touched={formikProps.touched.message}
-                                            type="text"
-                                            value={formikProps.values.message || ""}
-                                            autoComplete="off"
-                                            readOnly={isLoading}
-                                        // isTextarea={true}
-                                        // rows={1}
-                                        />
-                                        {/* <div className="overflow-hidden position-absolute top-0 z-1 flex-shrink-0  p-2 d-block h-100">
-                                                <AppTooltip title="Add Attachments">
-                                                    <label
-                                                        htmlFor="attachments"
-                                                        className="link-primary cursor-pointer"
-                                                        aria-label='Add Attachments'
+                                        {
+                                            botSuggestion?.length > 0 ?
+                                                <ReactSelect
+                                                    error={formikProps.errors.message}
+                                                    options={[{label:t('SELECT'),value:''},...botSuggestion] ?? []}
+                                                    value={formikProps.values.message}
+                                                    onChange={(option) => {
+                                                        formikProps.setFieldValue(
+                                                            "message",
+                                                            option?.target?.value ?? ""
+                                                        );
+                                                        handleSuggestionSelect(option?.target?.value, option?.target?.label, formikProps?.setFieldValue)
+                                                    }}
+                                                    name="message"
+                                                    className={formikProps.touched.message && formikProps.errors.message ? "is-invalid" : ""}
+                                                    onBlur={formikProps.handleBlur}
+                                                    touched={formikProps.touched.message}
+                                                    readOnly={isLoading}
+                                                /> :
+                                                <>
+                                                    <FormInputBox
+                                                        inputClassName="custom-padding-right-42"
+                                                        wrapperClassName='mb-0'
+                                                        id="message"
+                                                        placeholder={t("TYPE_A_MESSAGE")}
+                                                        name="message"
+                                                        error={formikProps.errors.message}
+                                                        onBlur={formikProps.handleBlur}
+                                                        onChange={formikProps.handleChange}
+                                                        touched={formikProps.touched.message}
+                                                        type="text"
+                                                        value={formikProps.values.message || ""}
+                                                        autoComplete="off"
+                                                        readOnly={isLoading}
+                                                    // isTextarea={true}
+                                                    // rows={1}
+                                                    />
+                                                    <Button
+                                                        type="submit"
+                                                        variant="link"
+                                                        aria-label='Send Message'
+                                                        className='p-2 theme-flip-x link-dark position-absolute top-0 end-0 z-1'
+                                                        readOnly={isLoading}
                                                     >
-                                                        <MdAttachFile size={24} />
-                                                    </label>
-                                                </AppTooltip>
+                                                        <MdKeyboardBackspace size={24} />
+                                                    </Button>
+                                                </>
+                                        }
+                                        {/* <div className="overflow-hidden position-absolute top-0 z-1 flex-shrink-0  p-2 d-block h-100">
+                                            <AppTooltip title="Add Attachments">
+                                                <label
+                                                    htmlFor="attachments"
+                                                    className="link-primary cursor-pointer"
+                                                    aria-label='Add Attachments'
+                                                >
+                                                    <MdAttachFile size={24} />
+                                                </label>
+                                            </AppTooltip>
 
-                                                <input
-                                                    name="attachments"
-                                                    id="attachments"
-                                                    accept="image/png, image/jpeg, image/jpg"
-                                                    // accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
-                                                    className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
-                                                    type="file"
-                                                    multiple={true}
-                                                    onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
-                                                />
-                                            </div> */}
-                                        <Button
-                                            type="submit"
-                                            variant="link"
-                                            aria-label='Send Message'
-                                            className='p-2 theme-flip-x link-dark position-absolute top-0 end-0 z-1'
-                                            readOnly={isLoading}
-                                        >
-                                            <MdKeyboardBackspace size={24} />
-                                        </Button>
+                                            <input
+                                                name="attachments"
+                                                id="attachments"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                // accept="image/jpeg, image/jpg, image/png, application/pdf, text/plain, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/rtf"
+                                                className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
+                                                type="file"
+                                                multiple={true}
+                                                onChange={(event) => handleFileChange(event, formikProps?.setFieldValue)}
+                                            />
+                                        </div> */}
+
                                     </div>
                             }
 

@@ -32,7 +32,8 @@ const EndPoint = {
   DOWNLOAD_DOCUMENT: `/${version}/user/claim-tickets/download`,
   DOWNLOAD_TICKET_DETAILS: `/${version}/user/claim-tickets`,
   TICKET_CHAT:`/${version}/user/claim-tickets`,
-  FILE_COMPLAINT: `/${version}/user/claim-tickets/file-complaint`
+  FILE_COMPLAINT: `/${version}/user/claim-tickets/file-complaint`,
+  TICKET_DETAIL_DOWNLOAD_PDF :`/${version}/user/claim-tickets` 
 };
 
 export default EndPoint;

@@ -93,7 +93,7 @@ const ReactSelect = ({
         name={name}
         value={selectedOption}
         onChange={(option) =>
-          onChange({ target: { name, value: option ? option.value : "" } })
+          onChange({ target: { name, value: option ? option.value : "",label :option.label} })
         }
         isDisabled={readOnly ?? false}
         options={formattedOptions}
