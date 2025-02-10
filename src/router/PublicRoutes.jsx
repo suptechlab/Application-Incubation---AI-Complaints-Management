@@ -13,7 +13,7 @@ export const PublicRoutes = [
         element: <Home />,
       },
       {
-        path: "/download-ticket-pdf",
+        path: "/download-ticket-pdf/:id",
         element: <DownloadPdf />,
       },
       {
