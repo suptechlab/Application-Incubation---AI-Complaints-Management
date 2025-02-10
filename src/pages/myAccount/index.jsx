@@ -19,6 +19,7 @@ import ClaimChat from './modals/chat';
 import InstanceModal from './modals/instance';
 import RaisedComplaintModal from './modals/raised-complaint';
 import { FiDownload } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 export default function MyAccount() {
 
   const { t } = useTranslation()
@@ -40,7 +41,7 @@ export default function MyAccount() {
   const [showTicketModal, setTicketModal] = useState(false);
   const [instanceModalShow, setInstanceModalShow] = useState(false);
   const [raisedComplaintModalShow, setRaisedComplaintModalShow] = useState(false);
-  const [isDownloading , setDownloading] = useState(false)
+  const [isDownloading, setDownloading] = useState(false)
   const { instance_types, masterData } = useSelector((state) => state?.masterSlice);
 
 
@@ -92,10 +93,32 @@ export default function MyAccount() {
     setDownloading(true);
     const result = await dispatch(downloadTicketDetails(id));
     if (downloadTicketDetails.fulfilled.match(result)) {
-      setDownloading(false)
-    } else {
-      setDownloading(false);
+      if (result?.payload?.data) {
+        const blob = new Blob([result?.payload?.data], { type: 'application/pdf' });
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
+
+
+        const tempLink = document.createElement('a');
+        tempLink.href = blobUrl;
+        tempLink.setAttribute('download', 'ticket_details.pdf');
+
+        // Append the link to the document body before clicking it
+        document.body.appendChild(tempLink);
+
+        tempLink.click();
+
+        // Clean up by revoking the Blob URL
+        window.URL.revokeObjectURL(blobUrl);
+
+        // Remove the link from the document body after clicking
+        document.body.removeChild(tempLink);
+      } else {
+        throw new Error(t("EMPTY RESPONSE"));
+      }
     }
+    setDownloading(false);
   }
 
   // The color class based on the status
