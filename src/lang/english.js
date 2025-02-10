@@ -160,5 +160,10 @@ export const englishLang = {
   "TYPE_A_MESSAGE":"Type a message",
   "NONE":"None",
   "NEW_CLAIMS":"New Claims",
-  "PENDING_CLAIMS":"Pending Claims"
+  "PENDING_CLAIMS":"Pending Claims",
+  "NO_NOTIFICATION":"No notifications",
+  "UNREAD_NOTIFICATIONS":"Unread Notifications",
+  "MARK_ALL_AS_READ" :"Mark all as read",
+  "CLEAR_ALL" : "Clear all",
+  "CLEAR":"Clear"
 }

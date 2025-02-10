@@ -33,7 +33,13 @@ const EndPoint = {
   DOWNLOAD_TICKET_DETAILS: `/${version}/user/claim-tickets`,
   TICKET_CHAT:`/${version}/user/claim-tickets`,
   FILE_COMPLAINT: `/${version}/user/claim-tickets/file-complaint`,
-  TICKET_DETAIL_DOWNLOAD_PDF :`/${version}/user/claim-tickets` 
+  TICKET_DETAIL_DOWNLOAD_PDF :`/${version}/user/claim-tickets`,
+  NOTIFICATION_LIST : `/${version}/notifications`,
+  READ_SINGLE_NOTIFICATION : `/${version}/notifications`,
+  READ_ALL_NOTIFICATIONS : `/${version}/notifications/mark-as-read-all`,
+  DELETE_SINGLE_NOTIFICATION : `/${version}/notifications`,
+  DELETE_ALL_NOTIFICATIONS : `/${version}/notifications/delete/all`,
+  NOTIFICATION_COUNT : `/${version}/notifications/count`,
 };
 
 export default EndPoint;

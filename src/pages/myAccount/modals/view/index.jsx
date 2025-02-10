@@ -10,20 +10,24 @@ import { MdAttachFile, MdDownload } from 'react-icons/md';
 import AppTooltip from '../../../../components/tooltip';
 import { downloadDocument } from '../../../../redux/slice/fileClaimSlice';
 import { downloadFile } from '../../../../constants/utils';
+import { useNavigate, useSearchParams } from "react-router-dom"
 
-const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
-
+const ViewClaim = ({ claimModalView, handleShow, handleClose, selectedRow }) => {
+    const [searchParams] = useSearchParams();
     const { t } = useTranslation();
     const dispatch = useDispatch();
 
-    const { instance_types, masterData} = useSelector((state) => state?.masterSlice);
-    const [loading, setLoading] = useState(false);
+    const { instance_types, masterData } = useSelector((state) => state?.masterSlice);
+    const [loading, setLoading] = useState(true);
     const [claimTicketData, setClaimTicketData] = useState([]);
     const [instanceTypeTranslated, setInstanceTypeTranslated] = useState("");
     const [roleUserDocuments, setRoleUserDocuments] = useState([]);
     const [roleFiUserDocuments, setRoleFiUserDocuments] = useState([]);
     const [roleSepsUserDocuments, setRoleSepsUserDocuments] = useState([]);
 
+    const [isDownloading, setIsDownloading] = useState(false)
+
+    const navigate = useNavigate()
 
     const fetchClaimDetails = async (row) => {
         setLoading(true);
@@ -74,7 +78,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
     };
 
     const downloadAttachment = async (id, attachmentData) => {
-        setLoading(true);
+        setIsDownloading(true);
         const result = await dispatch(downloadDocument(id));
         if (downloadDocument.fulfilled.match(result)) {
             downloadFile(result?.payload, attachmentData?.file_name).then(() => {
@@ -82,20 +86,46 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             }).catch((error) => {
 
             }).finally(() => {
-                setLoading(false)
+                setIsDownloading(false)
             })
         } else {
-            setLoading(false);
+            setIsDownloading(false);
         }
     }
 
+    // useEffect(() => {
+    //     if (selectedRow?.id) {
+    //         fetchClaimDetails(selectedRow);
+    //     } else {
+    //         setClaimTicketData([])
+    //     }
+    // }, [selectedRow]);
+
+
+    const handleModalClose = ()=>{
+        const ticketId = searchParams.get("ticketId");
+
+        if(ticketId){
+            navigate('/my-account')
+        }
+        handleClose()
+    }
+
     useEffect(() => {
+        const ticketId = searchParams.get("ticketId");
+
+
+        console.log({"HELLO": ticketId})
+
         if (selectedRow?.id) {
             fetchClaimDetails(selectedRow);
+        } else if (ticketId) {
+            handleShow(true)
+            fetchClaimDetails({ id: ticketId }); // Fetch data using ticketId from URL
         } else {
-            setClaimTicketData([])
+            setClaimTicketData([]);
         }
-    }, [selectedRow]);
+    }, [selectedRow, searchParams]);
 
     // The color class based on the status
     const getStatusClass = (status) => {
@@ -168,7 +198,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 : t('N/A'),
             colProps: { sm: 6, lg: 3 }
         },
-        ...(claimTicketData?.instanceType === "SECOND_INSTANCE" ? [ {
+        ...(claimTicketData?.instanceType === "SECOND_INSTANCE" ? [{
             label: t('FIRST_INSTANCE_CLAIM_ID'),
             value: (
                 <span className={`fw-semibold`}>
@@ -176,8 +206,8 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 </span>
             ),
             colProps: { sm: 6, lg: 3 },
-        }]:[]),
-        ...(claimTicketData?.instanceType === "COMPLAINT" ? [ {
+        }] : []),
+        ...(claimTicketData?.instanceType === "COMPLAINT" ? [{
             label: t('SECOND_INSTANCE_CLAIM_ID'),
             value: (
                 <span className={`fw-semibold`}>
@@ -185,7 +215,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 </span>
             ),
             colProps: { sm: 6, lg: 3 },
-        }]:[]),
+        }] : []),
 
         {
             label: t('CLAIM_STATUS'),
@@ -196,7 +226,7 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             ),
             colProps: { sm: 6, lg: 3 }
         },
-       
+
         ...(claimTicketData?.status === "CLOSED" || claimTicketData?.status === "REJECTED" ? [
             {
                 label: t('CLAIM_SUB_STATUS'),
@@ -227,13 +257,13 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
             eventKey: '1',
             header: t('ATTACHMENTS_SENT_BY_ENTITY'),
             body: roleFiUserDocuments,
-            condition: (claimTicketData?.instanceType === 'FIRST_INSTANCE' && roleFiUserDocuments &&  roleFiUserDocuments?.length > 0),
+            condition: (claimTicketData?.instanceType === 'FIRST_INSTANCE' && roleFiUserDocuments && roleFiUserDocuments?.length > 0),
         },
         {
             eventKey: '2',
             header: t('ATTACHMENTS_SENT_BY_SEPS'),
             body: roleSepsUserDocuments,
-            condition: (claimTicketData?.instanceType!== 'FIRST_INSTANCE' && roleSepsUserDocuments && roleSepsUserDocuments?.length > 0),
+            condition: (claimTicketData?.instanceType !== 'FIRST_INSTANCE' && roleSepsUserDocuments && roleSepsUserDocuments?.length > 0),
         },
     ];
 
@@ -266,10 +296,10 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
 
     return (
         <React.Fragment>
-            <Loader isLoading={loading} />
+            <Loader isLoading={isDownloading} />
             <Modal
-                show={handleShow}
-                onHide={handleClose}
+                show={claimModalView}
+                onHide={handleModalClose}
                 backdrop="static"
                 keyboard={false}
                 centered={true}
@@ -278,80 +308,135 @@ const ViewClaim = ({ handleShow, handleClose, selectedRow }) => {
                 className="theme-modal"
                 enforceFocus={false}
             >
-                <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
-                    <Modal.Title as="h4" className="fw-bold d-inline-flex align-items-center flex-wrap gap-2">
-                        {t("CLAIM")} ID: #{claimTicketData?.ticketId}{" "}
-                        <span
-                            className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass(
-                                claimTicketData?.instanceType
-                            )}`}
-                        >
-                            {instanceTypeTranslated}
-                        </span>
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="text-break small">
-                    {/* View Top Data */}
-                    <Row>
-                        {viewTopData?.map((item, index) => (
-                            <Col key={"data_view_" + index} {...item.colProps}>
-                                <CommonViewData label={item.label} value={item.value} />
-                            </Col>
-                        ))}
-                    </Row>
-                    {/* Accordion Items */}
-                    <Accordion flush className="custom-accordion">
-                        {accordionItems
-                            .filter(item => item.condition) // Only include items where condition is true
-                            .map(item => (
-                                <Accordion.Item eventKey={item.eventKey} className="mb-4" key={item.eventKey}>
-                                    <Accordion.Header>
-                                        <span className="text-info me-2"><MdAttachFile size={24} /></span>
-                                        {item.header}
-                                    </Accordion.Header>
-                                    <Accordion.Body className="py-0">
-                                        <ListGroup variant="flush">
-                                            {item.body?.length > 0 ? (
-                                                item.body.map((doc, index) => (
-                                                    <ListGroup.Item
-                                                        key={"data_body_view_" + index}
-                                                        className="px-1 d-flex gap-2 justify-content-between align-items-start"
-                                                    >
-                                                        <span className="me-auto py-1">{doc.file_name}</span>
-                                                        <AppTooltip title={t("DOWNLOAD")} placement="left">
-                                                            <Button
-                                                                variant="link"
-                                                                className="text-decoration-none"
-                                                                aria-label={t("DOWNLOAD")}
-                                                                onClick={() => downloadAttachment(doc?.externalDocumentId, doc)}
-                                                            >
-                                                                <MdDownload size={20} />
-                                                            </Button>
-                                                        </AppTooltip>
-                                                    </ListGroup.Item>
-                                                ))
-                                            ) : (
-                                                <ListGroup.Item className="px-1 text-muted">
-                                                    {t("NO_ATTACHMENTS_AVAILABLE")}
-                                                </ListGroup.Item>
-                                            )}
-                                        </ListGroup>
-                                    </Accordion.Body>
-                                </Accordion.Item>
-                            ))}
-                    </Accordion>
+                {
+                    loading ?
 
-                    {/* View Bottom Data */}
-                    <Row>
-                        {viewBottomData
-                            .filter(item => item.condition)
-                            .map((item, index) => (
-                                <Col key={"data_view_bottom_" + index} {...item.colProps}>
-                                    <CommonViewData label={item.label} value={item.value} />
-                                </Col>
-                            ))}
-                    </Row>
-                </Modal.Body>
+
+                        <>
+                            <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
+
+                                <h5 className="card-title placeholder-glow pb-2 pt-3 w-50">
+                                    <span className="placeholder col-7"></span>
+                                </h5>
+
+                            </Modal.Header>
+
+                            <Modal.Body>
+
+
+                                <div className="row card-title placeholder-glow pb-2 pt-3 mb-3 g-3">
+                                    {
+                                        [...Array(6)].map((_, index) => (
+                                            <div key={index} className="col-sm-6 col-lg-3">
+                                                <div className="placeholder w-100 custom-height-42"></div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                                <div className="row card-title placeholder-glow pb-2 pt-3 mb-3 g-3">
+                                    {
+                                        [...Array(2)].map((_, index) => (
+                                            <div key={index} className="col-12">
+                                                <div className="placeholder w-100 custom-height-42"></div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                                <div className="row card-title placeholder-glow pb-2 pt-3 mb-3 g-3">
+                                    {
+                                        [...Array(2)].map((_, index) => (
+                                            <div key={index} className="col-12 ">
+                                                <div className="placeholder w-25 "></div>
+                                                <div className="placeholder w-100 custom-height-48"></div>
+                                            </div>
+                                        ))
+                                    }
+
+
+                                </div>
+                            </Modal.Body>  </> :
+                        <>
+                            <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
+
+                                <Modal.Title as="h4" className="fw-bold d-inline-flex align-items-center flex-wrap gap-2">
+                                    {t("CLAIM")} ID: #{claimTicketData?.ticketId}{" "}
+                                    <span
+                                        className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass(
+                                            claimTicketData?.instanceType
+                                        )}`}
+                                    >
+                                        {instanceTypeTranslated}
+                                    </span>
+
+                                </Modal.Title>
+
+                            </Modal.Header>
+
+                            <Modal.Body className="text-break small">
+
+                                {/* View Top Data */}
+                                <Row>
+                                    {viewTopData?.map((item, index) => (
+                                        <Col key={"data_view_" + index} {...item.colProps}>
+                                            <CommonViewData label={item.label} value={item.value} />
+                                        </Col>
+                                    ))}
+                                </Row>
+                                {/* Accordion Items */}
+                                <Accordion flush className="custom-accordion">
+                                    {accordionItems
+                                        .filter(item => item.condition) // Only include items where condition is true
+                                        .map(item => (
+                                            <Accordion.Item eventKey={item.eventKey} className="mb-4" key={item.eventKey}>
+                                                <Accordion.Header>
+                                                    <span className="text-info me-2"><MdAttachFile size={24} /></span>
+                                                    {item.header}
+                                                </Accordion.Header>
+                                                <Accordion.Body className="py-0">
+                                                    <ListGroup variant="flush">
+                                                        {item.body?.length > 0 ? (
+                                                            item.body.map((doc, index) => (
+                                                                <ListGroup.Item
+                                                                    key={"data_body_view_" + index}
+                                                                    className="px-1 d-flex gap-2 justify-content-between align-items-start"
+                                                                >
+                                                                    <span className="me-auto py-1">{doc.file_name}</span>
+                                                                    <AppTooltip title={t("DOWNLOAD")} placement="left">
+                                                                        <Button
+                                                                            variant="link"
+                                                                            className="text-decoration-none"
+                                                                            aria-label={t("DOWNLOAD")}
+                                                                            onClick={() => downloadAttachment(doc?.externalDocumentId, doc)}
+                                                                        >
+                                                                            <MdDownload size={20} />
+                                                                        </Button>
+                                                                    </AppTooltip>
+                                                                </ListGroup.Item>
+                                                            ))
+                                                        ) : (
+                                                            <ListGroup.Item className="px-1 text-muted">
+                                                                {t("NO_ATTACHMENTS_AVAILABLE")}
+                                                            </ListGroup.Item>
+                                                        )}
+                                                    </ListGroup>
+                                                </Accordion.Body>
+                                            </Accordion.Item>
+                                        ))}
+                                </Accordion>
+
+                                {/* View Bottom Data */}
+                                <Row>
+                                    {viewBottomData
+                                        .filter(item => item.condition)
+                                        .map((item, index) => (
+                                            <Col key={"data_view_bottom_" + index} {...item.colProps}>
+                                                <CommonViewData label={item.label} value={item.value} />
+                                            </Col>
+                                        ))}
+                                </Row>
+                            </Modal.Body>
+                        </>
+                }
             </Modal>
         </React.Fragment>
     );
