@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
@@ -202,8 +203,13 @@ public class MasterResource {
     @GetMapping("/organization-list")
     public ResponseEntity<List<OrganizationDTO>> getOrganizationInfoInfoList(Pageable pageable,
                                                                              @RequestParam(value = "search", required = false) String search) {
-        Page<OrganizationDTO> orgList = organizationService.fetchOrganizationList(search, pageable);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), orgList);
-        return ResponseEntity.ok().headers(headers).body(orgList.getContent());
+        if ((search == null || search.isEmpty()) && !StringUtils.hasText(search)) {
+            List<OrganizationDTO> orgList = organizationService.fetchOrganizationList();
+            return ResponseEntity.ok().body(orgList);
+        }else {
+            Page<OrganizationDTO> orgList = organizationService.fetchOrganizationList(search, pageable);
+            HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), orgList);
+            return ResponseEntity.ok().headers(headers).body(orgList.getContent());
+        }
     }
 }

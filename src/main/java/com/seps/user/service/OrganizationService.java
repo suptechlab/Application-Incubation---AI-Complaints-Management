@@ -31,4 +31,9 @@ public class OrganizationService {
         return organizationRepository.findAll(spec, pageable)
             .map(organizationMapper::toDTO);
     }
+
+    public List<OrganizationDTO> fetchOrganizationList() {
+        return organizationRepository.findAll().stream()
+            .map(organizationMapper::toDTO).toList();
+    }
 }
