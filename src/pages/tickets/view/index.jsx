@@ -221,8 +221,12 @@ const TicketsView = () => {
       label: t("PRIORITY"),
       value: (
         <Stack direction="horizontal" gap={1}>
-          {(permissionsState?.priorityPermission && !isPrevData) &&
-            !["CLOSED", "REJECTED"].includes(commonData?.status) ? (
+          {(permissionsState?.priorityPermission && !isPrevData &&
+            (
+            (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+            ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') && (ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
+       
+            !["CLOSED", "REJECTED"].includes(commonData?.status)) ? (
             <Dropdown>
               <Dropdown.Toggle
                 variant="link"
@@ -261,10 +265,10 @@ const TicketsView = () => {
           ) : (
             <span
               className={`custom-min-width-50 fw-bold ${getPriorityClass(
-                selectedPriority
+                commonData?.priority
               )}`}
             >
-              {selectedPriority}
+              {masterData?.claimTicketPriority[commonData?.priority]}
             </span>
           )}
         </Stack>
