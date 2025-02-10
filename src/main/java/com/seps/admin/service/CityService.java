@@ -17,10 +17,7 @@ import com.seps.admin.service.mapper.CityMapper;
 import com.seps.admin.service.specification.CitySpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -239,7 +236,7 @@ public class CityService {
 
             // Header
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Id", "Name", "Province", "Status"};
+            String[] headers = {"Id", "Name", "Province", "Poverty Range Start", "Poverty Range End", "Rurality Range Start", "Rurality Range End", "Status"};
 
             for (int col = 0; col < headers.length; col++) {
                 Cell cell = headerRow.createCell(col);
@@ -247,13 +244,34 @@ public class CityService {
             }
 
             // Data
+            // Create a CellStyle for the range columns
+            CellStyle rangeStyle = workbook.createCellStyle();
+            rangeStyle.setDataFormat(workbook.createDataFormat().getFormat("0.00")); // Format as decimal (adjust as needed)
+
             int rowIdx = 1;
             for (CityEntity data : dataList) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(data.getId());
                 row.createCell(1).setCellValue(data.getName());
                 row.createCell(2).setCellValue(data.getProvince().getName());
-                row.createCell(3).setCellValue(data.getStatus().equals(true) ? Constants.ACTIVE : Constants.INACTIVE);
+
+                Cell povertyStartCell = row.createCell(3);
+                povertyStartCell.setCellValue(data.getPovertyRangeStart());
+                povertyStartCell.setCellStyle(rangeStyle);
+
+                Cell povertyEndCell = row.createCell(4);
+                povertyEndCell.setCellValue(data.getPovertyRangeEnd());
+                povertyEndCell.setCellStyle(rangeStyle);
+
+                Cell ruralityStartCell = row.createCell(5);
+                ruralityStartCell.setCellValue(data.getRuralityRangeStart());
+                ruralityStartCell.setCellStyle(rangeStyle);
+
+                Cell ruralityEndCell = row.createCell(6);
+                ruralityEndCell.setCellValue(data.getRuralityRangeEnd());
+                ruralityEndCell.setCellStyle(rangeStyle);
+
+                row.createCell(7).setCellValue(data.getStatus().equals(true) ? Constants.ACTIVE : Constants.INACTIVE);
             }
 
             // Auto-size columns
