@@ -15,7 +15,7 @@ import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState,  setLoading }) => {
+const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState, setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -49,11 +49,16 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
     const statusOptions = [
-        ...((permissionState?.closePermission === true && 
-            ((ticketData?.instanceType==='FIRST_INSTANCE' && ticketData?.fiAgentId !==null)||
-            ((ticketData?.instanceType==='SECOND_INSTANCE' ||ticketData?.instanceType==='COMPLAINT' ) && ticketData?.sepsAgentId !==null)))
+        ...((permissionState?.closePermission === true &&
+            ((ticketData?.instanceType === 'FIRST_INSTANCE' && ticketData?.fiAgentId !== null && currentUser === 'FI_USER') ||
+                (((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
+                    (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN')) && ticketData?.sepsAgentId !== null)))
             ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
-        ...(permissionState?.rejectPermission === true ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
+        ...((permissionState?.rejectPermission === true &&
+            (ticketData?.instanceType === 'FIRST_INSTANCE' && currentUser === 'FI_USER') ||
+            ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
+                (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN'))
+        ) ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
         { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
         { label: t('PENDING'), value: 'PENDING' }];
     // if (selectedStatus === 'NEW') {
@@ -80,7 +85,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
         setSelectedStatus(ticketData?.status)
     }, [ticketData?.status])
 
-   
+
     //Handle Ticket Status Change
     const handleTicketStatusChange = async (status) => {
         // setLoading(true);
@@ -205,7 +210,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                     </h1>
                     <Stack direction="horizontal" gap={2} className='flex-wrap'>
                         <button
-                            onClick={()=>navigate(-1)}
+                            onClick={() => navigate(-1)}
                             // to={"/tickets"}
                             className="btn btn-outline-dark custom-min-width-85"
                         >
@@ -214,9 +219,9 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                         {
                             permissionState?.assignPermission === true &&
                             (
-                            (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
-                            ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
-                            (( ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT' ))) &&
+                                (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
                                 (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
@@ -283,7 +288,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                                     <span className='me-2'>{masterData?.claimTicketStatus[selectedStatus]}</span>
                                 </Button>
                         }
-                      
+
                     </Stack>
                 </Stack>
             </div>

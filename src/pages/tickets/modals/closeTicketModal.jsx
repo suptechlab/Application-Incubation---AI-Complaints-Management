@@ -10,6 +10,8 @@ import { convertToLabelValue, ticketCloseStatus } from "../../../services/ticket
 import { validateFile } from "../../../utils/commonutils";
 import { ticketCloseValidation } from "../../../validations/ticketsManagement.validation";
 import PropTypes from "prop-types"
+import { MdOutlineMailOutline } from "react-icons/md";
+
 const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
@@ -88,7 +90,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
             enforceFocus={false}
         >
             <Modal.Header className="pb-3">
-                <Modal.Title as="h4" className="fw-semibold">{t("TICKET_CLOSE_STATUS")}</Modal.Title>
+                <Modal.Title as="h4" className="fw-semibold"><MdOutlineMailOutline className="text-primary" size={20}/> {t("TICKET_CLOSE_STATUS")}  </Modal.Title>
             </Modal.Header>
             <Formik
                 initialValues={{
