@@ -16,7 +16,7 @@ public class CityEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne
@@ -28,6 +28,18 @@ public class CityEntity {
 
     @Column(name = "status", nullable = false)
     private Boolean status;
+
+    @Column(name = "poverty_range_start")
+    private Double povertyRangeStart;
+
+    @Column(name = "poverty_range_end")
+    private Double povertyRangeEnd;
+
+    @Column(name = "rurality_range_start")
+    private Double ruralityRangeStart;
+
+    @Column(name = "rurality_range_end")
+    private Double ruralityRangeEnd;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

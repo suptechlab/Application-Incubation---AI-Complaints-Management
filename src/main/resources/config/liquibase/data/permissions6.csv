@@ -1,0 +1,6 @@
+id,module_id,name,description,description_es
+90,25,ROLE_AND_RIGHT_CREATE_BY_SEPS,Create,Crear
+91,25,ROLE_AND_RIGHT_UPDATE_BY_SEPS,Update,Actualizar
+92,25,ROLE_AND_RIGHT_STATUS_CHANGE_BY_SEPS,Status Change,Cambio de estado
+93,17,CLAIM_OVERVIEW_REPORT_BY_FI,Claim Overview Report,Resumen de la reclamación
+94,17,SLA_COMPLIANCE_BY_FI,SLA Compliance,Cumplimiento de SLA

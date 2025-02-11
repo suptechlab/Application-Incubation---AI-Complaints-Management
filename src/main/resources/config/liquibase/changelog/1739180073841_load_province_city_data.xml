@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1739180516800" author="matellio" labels="data">
+
+    <!-- Truncate tables before loading data -->
+    <sql>
+      TRUNCATE TABLE city CASCADE;
+      TRUNCATE TABLE province CASCADE;
+    </sql>
+
+    <!-- Reset sequences -->
+    <sql>
+      ALTER SEQUENCE province_id_seq RESTART WITH 1;
+      ALTER SEQUENCE city_id_seq RESTART WITH 1;
+    </sql>
+
+    <dropUniqueConstraint tableName="city" constraintName="city_name_key"/>
+
+    <addColumn tableName="city">
+      <column name="poverty_range_start" type="decimal(5,2)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="poverty_range_end" type="decimal(5,2)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="rurality_range_start" type="decimal(5,2)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="rurality_range_end" type="decimal(5,2)">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <!-- Load data into tables -->
+    <loadData
+      file="config/liquibase/data/province_data.csv"
+      separator=","
+      tableName="province">
+      <column name="id" type="numeric"/>
+      <column name="name" type="string"/>
+      <column name="status" type="boolean"/>
+      <column name="created_at" type="timestamp"/>
+      <column name="updated_at" type="timestamp"/>
+    </loadData>
+
+    <loadData
+      file="config/liquibase/data/city_data.csv"
+      separator=","
+      tableName="city">
+      <column name="id" type="numeric"/>
+      <column name="name" type="string"/>
+      <column name="province_id" type="numeric"/>
+      <column name="status" type="boolean"/>
+      <column name="poverty_range_start" type="numeric"/>
+      <column name="poverty_range_end" type="numeric"/>
+      <column name="rurality_range_start" type="numeric"/>
+      <column name="rurality_range_end" type="numeric"/>
+      <column name="created_at" type="timestamp"/>
+      <column name="updated_at" type="timestamp"/>
+    </loadData>
+
+    <!-- Update sequences based on current max ID -->
+    <sql>
+      SELECT setval('province_id_seq', (SELECT MAX(id) FROM province), true);
+      SELECT setval('city_id_seq', (SELECT MAX(id) FROM city), true);
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>
