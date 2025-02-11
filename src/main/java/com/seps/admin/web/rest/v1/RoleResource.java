@@ -1,7 +1,7 @@
 package com.seps.admin.web.rest.v1;
 
+import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.enums.UserTypeEnum;
-import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.service.RoleService;
 import com.seps.admin.service.dto.*;
 import com.seps.admin.service.dto.ResponseStatus;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.PaginationUtil;
@@ -27,8 +26,6 @@ import tech.jhipster.web.util.PaginationUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/roles")
@@ -47,7 +44,7 @@ public class RoleResource {
 
     @Operation(tags = {"Role Management"}, summary = "Create a new role", description = "Add a new role to the system")
     @PostMapping
-    //@PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PermissionCheck({"ROLE_AND_RIGHT_CREATE_BY_SEPS"})
     public ResponseEntity<ResponseStatus> createRole(@Valid @RequestBody RoleDTO roleDTO, HttpServletRequest request) throws URISyntaxException {
         log.debug("REST request to save Role : {}", roleDTO);
         RequestInfo requestInfo = new RequestInfo(request);
@@ -63,7 +60,7 @@ public class RoleResource {
 
     @Operation(tags = {"Role Management"}, summary = "Update an existing role", description = "Update an existing role in the system")
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PermissionCheck({"ROLE_AND_RIGHT_UPDATE_BY_SEPS"})
     public ResponseEntity<ResponseStatus> updateRole(@Valid @PathVariable Long id, @RequestBody RoleDTO roleDTO, HttpServletRequest request) {
         log.debug("REST request to update Role : {}", roleDTO);
         RequestInfo requestInfo = new RequestInfo(request);
@@ -136,6 +133,7 @@ public class RoleResource {
     @Operation(summary = "Change the status of a Role", description = "Update the status of a role (active/inactive).")
     @ApiResponse(responseCode = "204", description = "Status changed successfully")
     @PatchMapping("/{id}/status")
+    @PermissionCheck({"ROLE_AND_RIGHT_STATUS_CHANGE_BY_SEPS"})
     public ResponseEntity<Void> roleChangeStatus(@PathVariable Long id, @RequestParam Boolean status, HttpServletRequest request) {
         RequestInfo requestInfo = new RequestInfo(request);
         roleService.changeStatus(id, status, requestInfo);
