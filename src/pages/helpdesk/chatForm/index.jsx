@@ -39,6 +39,7 @@ const ChatBotForm = () => {
     // Initial Values
     const initialValues = {
         message: '',
+        suggestion:''
     };
 
     const { queryError } = useSelector((state) => state.helpDeskSlice);
@@ -328,24 +329,27 @@ const ChatBotForm = () => {
         actions.setSubmitting(true); // Set submitting state
         // setLoading(true)
         try {
-            // Prepare user message
-            const userMessage = {
-                id: chatData.length + 1,
-                message: values.message,
-                userMode: true,
-                botViewMode: false,
-                botReview: [], // buttons
-                botSuggestion: [],
-            };
+            if (values?.message && values?.message !== "") {
+                // Prepare user message
+                const userMessage = {
+                    id: chatData.length + 1,
+                    message: values.message,
+                    userMode: true,
+                    botViewMode: false,
+                    botReview: [], // buttons
+                    botSuggestion: [],
+                };
 
-            // Update chat data with the new user message
-            setChatData([...chatData, userMessage]);
-            actions.resetForm(); // Reset the form
+                // Update chat data with the new user message
+                setChatData([...chatData, userMessage]);
+                actions.resetForm(); // Reset the form
 
-            // Proceed only if the message is valid
-            if (values?.message) {
+
                 handleSendQuery({ message: values?.message })
+                // Proceed only if the message is valid
             }
+
+
         } catch (error) {
             setChatError(); // Handle unexpected errors
             console.error("Error in handleSubmit:", error);
@@ -355,61 +359,7 @@ const ChatBotForm = () => {
         }
     };
 
-    // SET CHAT RESPONSE IN STATE
-    // const setChatResponse = (chatResponse) => {
-    //     setChatData((prevChatData) => {
-    //         // Map through the apiResponse to create new chat data
-    //         const newChatData = chatResponse?.map((item, index) => {
-    //             const hasButtons = item.buttons && item.buttons.length > 0;
-
-    //             if (item?.custom?.id_token) {
-    //                 setIsFileUpload(false)
-
-    //                 dispatch(loginAndFetchAccountInfo({ id_token: item?.custom?.id_token }));
-    //                 return null
-    //             }
-    //             else if (item?.custom?.file_upload_required === true) {
-    //                 setIsFileUpload(true)
-    //                 return null
-    //             }
-    //             else if (item?.custom?.redirect) {
-    //                 window.open(item.custom.redirect, "_blank");
-    //                 return null
-    //             }
-    //             else {
-    //                 setIsFileUpload(false)
-    //                 return {
-    //                     id: prevChatData.length + index + 1,
-    //                     message: <>{item.text}</>,
-    //                     userMode: false,
-    //                     botViewMode: true,
-    //                     recipient_id: item.recipient_id,
-    //                     botReview: hasButtons
-    //                         ? item.buttons.map((btn, idx) => ({
-    //                             id: idx + 1,
-    //                             suggestion: btn.title,
-    //                             // positive: idx === 0, // Assuming the first button is positive
-    //                             positive: (item.buttons?.length === 2 && idx === 0),
-    //                             payload: btn.payload,
-    //                         }))
-    //                         : [],
-    //                     // botSuggestion: [],
-    //                 };
-    //             }
-
-
-
-    //         }).filter((item) => item !== null); // Filter out null values;
-
-
-
-    //         // Return the new chat data
-    //         return [...prevChatData, ...newChatData];
-    //     });
-
-    //     const lastRecipientId = chatResponse.at(-1)?.recipient_id;
-    //     if (lastRecipientId) setSenderId(lastRecipientId);
-    // }
+    // SET CHAT RESPONSE DATA
     const setChatResponse = (chatResponse) => {
         setChatData((prevChatData) => {
             const newChatData = chatResponse?.map((item, index) => {
@@ -603,19 +553,19 @@ const ChatBotForm = () => {
 
             // Update chat data with the new user message
             setChatData([...chatData, userMessage]);
-            setFieldValue('message', '')
+
             // Proceed only if the message is valid
-          
+
             if (value) {
                 handleSendQuery({ message: value })
-               
+                setFieldValue('suggestion', '')
             }
         } catch (error) {
             setChatError(); // Handle unexpected errors
             console.error("Error in handleSubmit:", error);
         } finally {
             setLoading(false)
-          
+
         }
     }
 
@@ -630,7 +580,7 @@ const ChatBotForm = () => {
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
                 validateOnBlur={false}  // Disable validation on blur
-                validateOnChange={false}  // Disable validation on change
+            // validateOnChange={false}  // Disable validation on change
             >
                 {(formikProps) => (
                     <Offcanvas.Body className="text-break d-flex flex-column small p-0">
@@ -777,20 +727,23 @@ const ChatBotForm = () => {
                                         {
                                             botSuggestion?.length > 0 ?
                                                 <ReactSelect
-                                                    error={formikProps.errors.message}
-                                                    options={[{label:t('SELECT'),value:''},...botSuggestion] ?? []}
-                                                    value={formikProps.values.message}
+                                                    error={formikProps.errors.suggestion}
+                                                    options={[{ label: t('SELECT'), value: '' }, ...botSuggestion] ?? []}
+                                                    value={formikProps.values.suggestion}
                                                     onChange={(option) => {
                                                         formikProps.setFieldValue(
-                                                            "message",
+                                                            "suggestion",
                                                             option?.target?.value ?? ""
                                                         );
-                                                        handleSuggestionSelect(option?.target?.value, option?.target?.label, formikProps?.setFieldValue)
+                                                        if (option?.target?.value && option?.target?.value !== "") {
+                                                            handleSuggestionSelect(option?.target?.value, option?.target?.label, formikProps?.setFieldValue, formikProps?.setFieldError)
+                                                        }
+
                                                     }}
-                                                    name="message"
-                                                    className={formikProps.touched.message && formikProps.errors.message ? "is-invalid" : ""}
+                                                    name="suggestion"
+                                                    // className={formikProps.touched.suggestion && formikProps.errors.suggestion ? "is-invalid" : ""}
                                                     onBlur={formikProps.handleBlur}
-                                                    touched={formikProps.touched.message}
+                                                    // touched={formikProps.touched.suggestion}
                                                     readOnly={isLoading}
                                                 /> :
                                                 <>
