@@ -1,8 +1,9 @@
 import React from "react";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import FormInput from "../../../../components/FormInput";
 import ReactSelect from "../../../../components/ReactSelect";
+import { LuFilterX } from "react-icons/lu";
 
 const ListingSearchForm = ({ filter, setFilter, hideFilter }) => {
   const { t } = useTranslation();
@@ -36,6 +37,15 @@ const ListingSearchForm = ({ filter, setFilter, hideFilter }) => {
         </div>
         {!hideFilter &&
           <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
+            <Button size="sm" type="button" variant="warning" onClick={() => {
+              setFilter({
+                search: "",
+                status: "",
+                templateType:""
+              })
+            }}>
+              <LuFilterX size={18} />  {t("RESET")}
+            </Button>
             <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
               <ReactSelect
                 wrapperClassName="mb-0"

@@ -5,7 +5,7 @@ import "./ReactSelect.scss";
 import { useTranslation } from "react-i18next";
 import PropTypes from 'prop-types';
 const ReactSelect = ({
-  options =[],
+  options = [],
   value,
   onChange,
   wrapperClassName = "mb-3 pb-1",
@@ -20,13 +20,13 @@ const ReactSelect = ({
 }) => {
 
 
-  const {t} = useTranslation()
+  const { t } = useTranslation()
   const customStyles = {
 
 
     control: (base, state) => {
       const errorColor = error && touched ? "#FF1418" : "#7F7F7F";
-      const borderColor = state.isFocused ? "#00549E" :errorColor;
+      const borderColor = state.isFocused ? "#00549E" : errorColor;
       return {
         ...base,
         borderColor,
@@ -35,7 +35,7 @@ const ReactSelect = ({
         minHeight: "42px",
       };
     },
-    
+
     menu: (base) => ({
       ...base,
       marginTop: ".25rem",
@@ -82,10 +82,19 @@ const ReactSelect = ({
     isDisabled: option.isDisabled,
   }));
   const selectedOption = formattedOptions.find((opt) => opt.value === value);
- 
+
+  let sizeClass = "";
+  if (size === "sm") {
+    sizeClass = "react-select-sm";
+  } else if (size === "md") {
+    sizeClass = "react-select-md";
+  }
+
+  const containerClass = `react-select-container ${selectedOption ? "has-value" : ""} ${sizeClass}`;
+
   return (
     <div className={wrapperClassName || ""}>
-      {label ? ( 
+      {label ? (
         <label className="mb-1 fs-14" htmlFor={name}>
           {label}
         </label>
@@ -105,7 +114,7 @@ const ReactSelect = ({
         isClearable={selectedOption?.value !== ""}
         classNamePrefix="react-select"
         defaultValue={defaultValue}
-        className={`react-select-container ${selectedOption ? "has-value" : ""} ${size === 'sm' ? 'react-select-sm' : ''}`}
+        className={containerClass}
         menuPortalTarget={document.body}
         components={{
           ClearIndicator: () => null,
@@ -116,9 +125,9 @@ const ReactSelect = ({
         }}
         isDisabled={disabled}
         menuPlacement="auto"
-        // menuIsOpen={true}
+      // menuIsOpen={true}
       />
-           {touched && error && <small className="form-text text-danger">{error}</small>}
+      {touched && error && <small className="form-text text-danger">{error}</small>}
     </div>
   );
 };

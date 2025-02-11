@@ -92,20 +92,40 @@ export default function ReactTable({
     }
   }, [clearTableSelection])
 
+  // React.useEffect(() => {
+  //   let path = "";
+
+  //   if (sorting.length === 0) {
+  //     path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
+  //       }`;
+  //   } else {
+  //     path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
+  //       }&sortBy=${sorting
+  //         .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
+  //         .join(",")}`;
+  //   }
+
+  //   navigate(path);
+  // }, [sorting, pagination]);
   React.useEffect(() => {
-    let path = "";
-
-    if (sorting.length === 0) {
-      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
-        }`;
+    let params = new URLSearchParams(location.search);
+  
+    // Always update page and limit
+    params.set("page", pagination.pageIndex + 1);
+    params.set("limit", pagination.pageSize);
+  
+    // Update sorting if available
+    if (sorting.length > 0) {
+      const sortParams = sorting
+        .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
+        .join(",");
+      params.set("sortBy", sortParams);
     } else {
-      path = `${location.pathname}?page=${pagination.pageIndex + 1}&limit=${pagination.pageSize
-        }&sortBy=${sorting
-          .map((sort) => `${sort.id}:${sort.desc ? "desc" : "asc"}`)
-          .join(",")}`;
+      params.delete("sortBy"); // Remove if no sorting
     }
-
-    navigate(path);
+  
+    // Navigate with updated params
+    navigate(`${location.pathname}?${params.toString()}`);
   }, [sorting, pagination]);
 
 

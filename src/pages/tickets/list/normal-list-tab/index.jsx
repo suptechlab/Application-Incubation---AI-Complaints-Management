@@ -24,7 +24,7 @@ import EditTicketModal from "../../modals/editTicketModal";
 const TicketsNormalList = ({ selectedTab }) => {
 
     const location = useLocation();
-    const { currentUser, permissions = {} } = useContext(AuthenticationContext);
+    const { currentUser, permissions = {},userData } = useContext(AuthenticationContext);
     const { masterData } = useContext(MasterDataContext);
 
       const [editModal, setEditModal] = useState({ row: {}, open: false })
@@ -68,14 +68,19 @@ const TicketsNormalList = ({ selectedTab }) => {
 
     const [sorting, setSorting] = React.useState([
         {
-            "id": "slaBreachDate",
-            "asc": true
+            "id": "createdAt",
+            "desc": true
         }
     ]);
     const [filter, setFilter] = React.useState({
         search: "",
-        subscription: "",
         status: "",
+        claimTypeId: "",
+        instanceType:"",
+        claimTicketPriority:"",
+        claimTicketStatus:"",
+        startDate:null,
+        endDate :null
     });
 
     const [loading, setLoading] = useState(false);
@@ -181,8 +186,8 @@ const TicketsNormalList = ({ selectedTab }) => {
         setAttachmentsModalShow(true)
     }
 
-
     const getFilteredColumns = (columnsArray) => {
+        console.log((currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN"))
         // All available column definitions
         const allColumns = [
             {
@@ -194,12 +199,13 @@ const TicketsNormalList = ({ selectedTab }) => {
                         indeterminate={table.getIsSomeRowsSelected()}
                         onChange={(e) => {
                             table.toggleAllRowsSelected(e.target.checked);
-
+                           
                             // Filter rows based on status and only include rows that are not "CLOSED" or "REJECTED"
                             const allSelectedIds = e.target.checked
                                 ? table.getRowModel().rows
                                     .filter((row) => (
-                                        (currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE' && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED")
+                                    ((currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") && 
+                                        (row?.original?.instanceType === 'SECOND_INSTANCE' || row?.original?.instanceType === 'COMPLAINT')) && row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED")
                                         ||
                                         (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && currentUser !== "SEPS_USER" && currentUser !== "SYSTEM_ADMIN"))
                                     .map((row) => row.original.id)
@@ -209,6 +215,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                             setClearTableSelection(false);
                         }}
 
+                           
                     // onChange={(e) => {
                     //     table.toggleAllRowsSelected(e.target.checked);
                     //     const allSelectedIds = e.target.checked
@@ -222,7 +229,8 @@ const TicketsNormalList = ({ selectedTab }) => {
                 cell: ({ row }) => (
 
                     (row?.original?.status !== "CLOSED" && row?.original?.status !== "REJECTED" && (
-                        ((currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") && row?.original?.instanceType === 'SECOND_INSTANCE') ||
+                        ((currentUser === "SEPS_USER" || currentUser === "SYSTEM_ADMIN") && 
+                        (row?.original?.instanceType === 'SECOND_INSTANCE' || row?.original?.instanceType === 'COMPLAINT')) ||
                         (currentUser === "FI_USER" && row?.original?.instanceType === 'FIRST_INSTANCE')
 
 
@@ -349,11 +357,11 @@ const TicketsNormalList = ({ selectedTab }) => {
             },
             {
                 accessorFn: (row) => row?.fiAgent,
-                id: "fiAgent",
-                header: () => t("FI_AGENT"),
+                id: "agentName",
+                header: () => t("AGENT"),
                 enableSorting: false,
                 cell: ({ row }) => (
-                    <span>{row?.original?.fiAgent?.name}</span>
+                    <span>{ row?.original?.instanceType==="FIRST_INSTANCE" ? row?.original?.fiAgent?.name :row?.original?.sepsAgent?.name}</span>
                 ),
             },
             ...(permissionsState.editModule ? [ {
@@ -474,23 +482,27 @@ const TicketsNormalList = ({ selectedTab }) => {
         // "consumerName", name of consumer
         switch (currentUser) {
             case 'FI_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status","action"];
+                if(userData?.roles[0]?.name === 'Fi Admin'){
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                }else{ // FI AGENT
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
+                }
+               
                 break; // Use `break` to avoid executing further cases
-            case 'FI_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status","action"];
-                break;
+           
             case 'SEPS_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status","action"];
-                break;
-            case 'SEPS_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status","action"];
+                if(userData?.roles[0]?.name === 'Seps Admin'){
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
+                }else{
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
+                }
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "slaBreachDate", "instanceType", "priority", "status","action"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName" , "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "entity", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
 

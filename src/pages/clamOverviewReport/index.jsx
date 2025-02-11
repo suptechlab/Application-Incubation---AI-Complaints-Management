@@ -42,6 +42,24 @@ const ClaimOverviewReport = () => {
   ]);
   const [filter, setFilter] = useState({
     search: "",
+    status: "",
+    claimTicketPriority: "",
+    startDate: null,
+    endDate: null,
+    instanceType: "",
+    organizationId: "",
+    fiAgentId: "",
+    sepsAgentId: "",
+    claimTypeId: "",
+    claimSubTypeId: "",
+    closedStatus: "",
+    rejectedStatus: "",
+    provinceId: "",
+    cityId: "",
+    customerType: "",
+    priorityCareGroup: "",
+    source: "",
+    channelOfEntry: ""
   });
 
   // COLUMNS FOR CLAIM REPORT TABLE

@@ -105,7 +105,7 @@ const MentionEditor = ({ id, name, height,error,touched,value,handleChange,handl
         />
       </MentionsInput>
       {touched && error && (
-        <small className="form-text text-danger">{error}</small>
+        <div className="form-text text-danger px-2 py-1">{error}</div>
       )}
     </div>
   );

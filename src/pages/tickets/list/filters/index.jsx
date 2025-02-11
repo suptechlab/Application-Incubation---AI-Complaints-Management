@@ -1,6 +1,6 @@
 import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import CustomDateRangePicker from "../../../../components/CustomDateRangePicker";
@@ -10,6 +10,7 @@ import { AuthenticationContext } from "../../../../contexts/authentication.conte
 import { MasterDataContext } from "../../../../contexts/masters.context";
 import { claimTypesDropdownList } from "../../../../services/claimSubType.service";
 import { agentListingApi, convertToLabelValue } from "../../../../services/ticketmanagement.service";
+import { LuFilterX } from "react-icons/lu";
 
 const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, clearTableSelection, permissionsState }) => {
 
@@ -93,15 +94,15 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
     }, [clearTableSelection])
 
 
-    useEffect(()=>{
-        if(masterData?.claimTicketStatus ){
-            setStatusDropdownData([{ select: '', label: t('ALL STATUS') }, ...convertToLabelValue(masterData?.claimTicketStatus)])
-            setPriorityDropdownData([{ select: '', label: t('ALL_PRIORITY') }, ...convertToLabelValue(masterData?.claimTicketPriority)])
-            setInstanceTypeDropdown([{ select: '', label: t('ALL_INSTANCE') }, ...convertToLabelValue(masterData?.instanceType)])
+    useEffect(() => {
+        if (masterData?.claimTicketStatus) {
+            setStatusDropdownData([{ value: '', label: t('ALL STATUS') }, ...convertToLabelValue(masterData?.claimTicketStatus)])
+            setPriorityDropdownData([{ value: '', label: t('ALL_PRIORITY') }, ...convertToLabelValue(masterData?.claimTicketPriority)])
+            setInstanceTypeDropdown([{ value: '', label: t('ALL_INSTANCE') }, ...convertToLabelValue(masterData?.instanceType)])
         }
-      
-       
-    },[masterData])
+
+
+    }, [masterData])
 
 
     return (
@@ -132,6 +133,21 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                         value={filter?.search}
                     />
                 </div>
+
+                <Button size="sm" type="button" variant="warning" onClick={() => {
+                    setFilter({
+                        search: "",
+                        status: "",
+                        claimTypeId: "",
+                        instanceType:"",
+                        claimTicketPriority:"",
+                        claimTicketStatus:"",
+                        startDate:null,
+                        endDate :null
+                    })
+                }}>
+                    <LuFilterX size={18} />  {t("RESET")}
+                </Button>
                 {
                     permissionsState?.assignPermission === true ?
                         <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
@@ -215,22 +231,22 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                     </div>
                 }
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                        <ReactSelect
-                            wrapperClassName="mb-0"
-                            class="form-select "
-                            placeholder={t("INSTANCT_TYPE")}
-                            id="floatingSelect"
-                            size="sm"
-                            options={instanceTypeDropdown ?? []}
-                            onChange={(e) => {
-                                setFilter({
-                                    ...filter,
-                                    instanceType: e.target.value,
-                                });
-                            }}
-                            value={filter?.instanceType}
-                        />
-                    </div>
+                    <ReactSelect
+                        wrapperClassName="mb-0"
+                        class="form-select "
+                        placeholder={t("INSTANCE_TYPE")}
+                        id="floatingSelect"
+                        size="sm"
+                        options={instanceTypeDropdown ?? []}
+                        onChange={(e) => {
+                            setFilter({
+                                ...filter,
+                                instanceType: e.target.value,
+                            });
+                        }}
+                        value={filter?.instanceType}
+                    />
+                </div>
 
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect

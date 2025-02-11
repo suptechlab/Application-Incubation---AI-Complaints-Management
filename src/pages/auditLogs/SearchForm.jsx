@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Stack } from "react-bootstrap";
+import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import FormInput from "../../components/FormInput";
 import ReactSelect from "../../components/ReactSelect";
 import { AUDIT_TRAIL_ACTIVITY } from "../../constants/dropdownData";
 import CustomDateRangePicker from "../../components/CustomDateRangePicker";
 import moment from "moment";
+import { LuFilterX } from "react-icons/lu";
 
 
 const SearchForm = ({ filter, setFilter }) => {
@@ -64,6 +65,16 @@ const SearchForm = ({ filter, setFilter }) => {
 
         <Stack direction="horizontal" gap={2} className="gap-md-3 flex-wrap flex-grow-1 flex-sm-grow-0">
           {/* ACTIVITY FILTER DROPDOWN */}
+          <Button size="sm" type="button" variant="warning" onClick={() => {
+            setFilter({
+              search: "",
+              activityType: "",
+              startDate:null,
+              endDate:null
+            })
+          }}>
+            <LuFilterX size={18} />  {t("RESET")}
+          </Button>
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"

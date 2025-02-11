@@ -32,8 +32,10 @@ const ClaimsAndComplaints = ({ setLoading }) => {
     const [sorting, setSorting] = React.useState([]);
     const [filter, setFilter] = React.useState({
         search: "",
-        subscription: "",
-        status: "",
+        claimTicketStatus: "",
+        instanceType:"",
+        startDate: null,
+        endDate: null
     });
 
     const [clearTableSelection] = useState(false)
@@ -153,7 +155,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 pageIndex: dataQuery.data?.data?.totalPages - 1,
                 pageSize: 10,
             });
-        } 
+        }
     }, [dataQuery.data?.data?.totalPages]);
 
 

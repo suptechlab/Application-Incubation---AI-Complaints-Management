@@ -375,5 +375,13 @@ export const englishLang = {
     "NON_COMPLAINT":"Non Complaint",
     "NONE":"None",
     "MODULE_NAME":"Module Name",
-    "PERMISSIONS":"Permisssions"
+    "PERMISSIONS":"Permisssions",
+    "TICKETS ASSIGNED":"Tickets Assigned",
+    "RESET":"Reset",
+    "DOWNLOAD_TICKET_DETAILS":"Download Ticket Details",
+    "NO_NOTIFICATION":"No notifications",
+    "UNREAD_NOTIFICATIONS":"Unread Notifications",
+    "MARK_ALL_AS_READ" :"Mark all as read",
+    "CLEAR_ALL" : "Clear all",
+    "CLEAR":"Clear"
 }

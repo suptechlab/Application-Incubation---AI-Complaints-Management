@@ -19,7 +19,7 @@ import TicketsListFilters from "../filters/index";
 
 const TicketsTaggedList = ({ selectedTab }) => {
     const location = useLocation();
-    const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+    const { currentUser, permissions = {}, userData } = useContext(AuthenticationContext)
     const { masterData } = useContext(MasterDataContext)
     // PERMISSIONS work
     const [permissionsState, setPermissionsState] = React.useState({
@@ -64,8 +64,13 @@ const TicketsTaggedList = ({ selectedTab }) => {
     ]);
     const [filter, setFilter] = React.useState({
         search: "",
-        subscription: "",
         status: "",
+        claimTypeId: "",
+        instanceType: "",
+        claimTicketPriority: "",
+        claimTicketStatus: "",
+        startDate: null,
+        endDate: null
     });
     const [loading, setLoading] = useState(false);
     const [attachmentsModalShow, setAttachmentsModalShow] = useState(false);
@@ -319,11 +324,11 @@ const TicketsTaggedList = ({ selectedTab }) => {
             },
             {
                 accessorFn: (row) => row?.fiAgent,
-                id: "fiAgent",
-                header: () => t("FI_AGENT"),
+                id: "agentName",
+                header: () => t("AGENT"),
                 enableSorting: false,
                 cell: ({ row }) => (
-                    <span>{row?.original?.fiAgent?.name}</span>
+                    <span>{row?.original?.instanceType === "FIRST_INSTANCE" ? row?.original?.fiAgent?.name : row?.original?.sepsAgent?.name}</span>
                 ),
             },
             {
@@ -402,34 +407,39 @@ const TicketsTaggedList = ({ selectedTab }) => {
         }
     }, [selectedTab])
 
+
     const getColumnsForUser = (currentUser) => {
         let selectedColumns = []; // Declare `selectedColumns` once in the parent scope
-
+        // userData?.roles[0]?.name
         switch (currentUser) {
             case 'FI_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                if (userData?.roles[0]?.name === 'Fi Admin') {
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                } else { // FI AGENT
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                }
+
                 break; // Use `break` to avoid executing further cases
-            case 'FI_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
-                break;
+
             case 'SEPS_USER':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
-                break;
-            case 'SEPS_AGENT':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                if (userData?.roles[0]?.name === 'Seps Admin') {
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                } else {
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                }
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "consumerName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["ticketId", "createdAt", "claimType", "fiAgent", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
 
-        if (permissionsState?.assignPermission === true) {
-            selectedColumns.unshift("select-col"); // Adds "select-col" to the beginning of the array
-        }
+        // if (permissionsState?.assignPermission === true) {
+        //     selectedColumns.unshift("select-col"); // Adds "select-col" to the beginning of the array
+        // }
         return getFilteredColumns(selectedColumns); // Call `getFilteredColumns` with the selected columns
     };
 

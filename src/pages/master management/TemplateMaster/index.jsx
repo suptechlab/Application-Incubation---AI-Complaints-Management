@@ -33,54 +33,12 @@ const TemplateMaster = () => {
     pageIndex: params.page ? parseInt(params.page) - 1 : 0,
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
-  const [modal, setModal] = useState(false);
-  const [editModal, setEditModal] = useState({ row: {}, open: false });
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
+    status: "",
+    templateType: ""
   });
-
-  const toggle = () => setModal(!modal);
-  const editToggle = () => setEditModal({ row: {}, open: !editModal?.open });
-
-  // const permission = useRef({
-  //   addModule: false,
-  //   editModule: false,
-  //   deleteModule: false,
-  //   statusModule: false,
-  // });
-
-  // useEffect(() => {
-  //   isAdminUser()
-  //     .then((response) => {
-  //       if (response) {
-  //         permission.current.addModule = true;
-  //         permission.current.editModule = true;
-  //         permission.current.deleteModule = true;
-  //         permission.current.statusModule = true;
-  //       } else {
-  //         getModulePermissions("Template Master")
-  //           .then((response) => {
-  //             if (response.includes("TEMPLATE_CREATE")) {
-  //               permission.current.addModule = true;
-  //             }
-  //             if (response.includes("TEMPLATE_UPDATE")) {
-  //               permission.current.editModule = true;
-  //             }
-  //             if (response.includes("TEMPLATE_STATUS_CHANGE")) {
-  //               permission.current.statusModule = true;
-  //             }
-  //           })
-  //           .catch((error) => {
-  //             console.error("Error fetching permissions:", error);
-  //           });
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error get during to fetch Province Master", error);
-  //     });
-  // }, []);
-
 
   const { currentUser, permissions = {} } = useContext(AuthenticationContext)
   // PERMISSIONS work
@@ -272,10 +230,10 @@ const TemplateMaster = () => {
   useEffect(() => {
     if (Object.values(filter).some(value => value)) {
       setPagination({
-          pageIndex: 0,
-          pageSize: 10,
+        pageIndex: 0,
+        pageSize: 10,
       });
-  }
+    }
   }, [filter]);
 
   // EXPORT TO CSV CLICK HANDLER

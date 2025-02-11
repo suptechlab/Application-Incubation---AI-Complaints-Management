@@ -39,6 +39,15 @@ const SLAComplianceReport = () => {
   const [sorting, setSorting] = useState([]);
   const [filter, setFilter] = useState({
     search: "",
+    status: "",
+    claimTypeId: "",
+    claimSubTypeId: "",
+    slaCompliance: "",
+    startDate: null,
+    endDate: null,
+    instanceType: "",
+    organizationId: "",
+    claimTicketPriority: ""
   });
 
 

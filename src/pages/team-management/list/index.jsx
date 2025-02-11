@@ -70,13 +70,10 @@ export default function TeamManagementList() {
 
     const [filter, setFilter] = React.useState({
         search: "",
-        subscription: "",
         status: "",
     });
 
     const [loading, setLoading] = useState(false);
-
-
 
     const dataQuery = useQuery({
         queryKey: ["data", pagination, sorting, filter],
