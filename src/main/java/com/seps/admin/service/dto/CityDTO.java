@@ -18,4 +18,12 @@ public class CityDTO {
     private String provinceName;
 
     private Boolean status;
+
+    private Double povertyRangeStart;
+
+    private Double povertyRangeEnd;
+
+    private Double ruralityRangeStart;
+
+    private Double ruralityRangeEnd;
 }
