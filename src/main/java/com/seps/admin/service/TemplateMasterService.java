@@ -4,14 +4,18 @@ import com.google.gson.Gson;
 import com.seps.admin.config.Constants;
 import com.seps.admin.domain.Authority;
 import com.seps.admin.domain.TemplateMaster;
+import com.seps.admin.domain.TemplateVariable;
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.*;
 import com.seps.admin.repository.TemplateMasterRepository;
+import com.seps.admin.repository.TemplateVariableRepository;
 import com.seps.admin.security.AuthoritiesConstants;
 import com.seps.admin.service.dto.DropdownListDTO;
 import com.seps.admin.service.dto.RequestInfo;
 import com.seps.admin.service.dto.TemplateMasterDTO;
+import com.seps.admin.service.dto.TemplateVariableDTO;
 import com.seps.admin.service.mapper.TemplateMasterMapper;
+import com.seps.admin.service.mapper.TemplateVariableMapper;
 import com.seps.admin.service.specification.TemplateMasterSpecification;
 import com.seps.admin.web.rest.errors.CustomException;
 import com.seps.admin.web.rest.errors.SepsStatusCode;
@@ -22,10 +26,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.zalando.problem.Status;
 
 import java.io.ByteArrayInputStream;
@@ -49,7 +55,8 @@ public class TemplateMasterService {
     private final UserService userService;
     private final MessageSource messageSource;
     private final Gson gson;
-
+    private final TemplateVariableRepository templateVariableRepository;
+    private final TemplateVariableMapper templateVariableMapper;
     /**
      * Constructor for TemplateMasterService.
      *
@@ -62,13 +69,15 @@ public class TemplateMasterService {
      */
     public TemplateMasterService(TemplateMasterRepository repository, TemplateMasterMapper templateMasterMapper,
                                  AuditLogService auditLogService, UserService userService,
-                                 MessageSource messageSource, Gson gson) {
+                                 MessageSource messageSource, Gson gson, TemplateVariableRepository templateVariableRepository, TemplateVariableMapper templateVariableMapper) {
         this.repository = repository;
         this.templateMasterMapper = templateMasterMapper;
         this.auditLogService = auditLogService;
         this.userService = userService;
         this.messageSource = messageSource;
         this.gson = gson;
+        this.templateVariableRepository = templateVariableRepository;
+        this.templateVariableMapper = templateVariableMapper;
     }
 
     /**
@@ -305,7 +314,7 @@ public class TemplateMasterService {
 
             // Header
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Id", "Name", "Type", "Subject", "Content", "Created by", "Status", "Crated Date"};
+            String[] headers = {"Id", "Name", "User Type", "Type", "Subject", "Content", "Created by", "Status", "Crated Date"};
 
             for (int col = 0; col < headers.length; col++) {
                 Cell cell = headerRow.createCell(col);
@@ -318,12 +327,13 @@ public class TemplateMasterService {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(data.getId());
                 row.createCell(1).setCellValue(data.getTemplateName());
-                row.createCell(2).setCellValue(data.getTemplateType());
-                row.createCell(3).setCellValue(data.getSubject());
-                row.createCell(4).setCellValue(data.getContent());
-                row.createCell(5).setCellValue(data.getUserCreatedBy().getFirstName());
-                row.createCell(6).setCellValue(data.getStatus().equals(true) ? Constants.ACTIVE : Constants.INACTIVE);
-                row.createCell(7).setCellValue(data.getCreatedAt().toString());
+                row.createCell(2).setCellValue(data.getUserType().toString());
+                row.createCell(3).setCellValue(data.getTemplateType());
+                row.createCell(4).setCellValue(data.getSubject());
+                row.createCell(5).setCellValue(data.getContent());
+                row.createCell(6).setCellValue(data.getUserCreatedBy().getFirstName());
+                row.createCell(7).setCellValue(data.getStatus().equals(true) ? Constants.ACTIVE : Constants.INACTIVE);
+                row.createCell(8).setCellValue(data.getCreatedAt().toString());
             }
 
             // Auto-size columns
@@ -364,6 +374,30 @@ public class TemplateMasterService {
                 return repository.findAll(TemplateMasterSpecification.byFilterWorkflowTemplateList(userType, organizationId, false))
                     .stream().map(templateMasterMapper::toDropDownDTO).toList();
             }
+        }
+    }
+
+    public List<TemplateVariableDTO> listKeywordMapping(Long templateId) {
+        // Ensure language defaults to "es" if not explicitly set
+        String language = StringUtils.hasText(LocaleContextHolder.getLocale().getLanguage())
+            ? LocaleContextHolder.getLocale().getLanguage()
+            : Constants.DEFAULT_LANGUAGE; // Default language
+
+        List<TemplateVariable> templateVariables = templateVariableRepository.findAllByLanguage(language);
+        TemplateMaster template = repository.findById(templateId).orElse(null);
+
+        if (template != null) {
+            String content = template.getContent(); // Get the template content
+
+            return templateVariables.stream().map(variable -> {
+                TemplateVariableDTO dto = templateVariableMapper.toDTO(variable);
+                String formattedKeyword = "{{" + variable.getKeyword() + "}}"; // Format keyword to match template format
+                dto.setIsUse(content.contains(formattedKeyword)); // Check if the formatted keyword exists in content
+                return dto;
+            }).toList();
+
+        } else {
+            return templateVariables.stream().map(templateVariableMapper::toDTO).toList();
         }
     }
 }
