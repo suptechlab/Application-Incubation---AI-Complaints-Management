@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Card, Col, Row, Stack } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import ReactSelect from '../../../../components/ReactSelect';
@@ -10,9 +10,11 @@ import PieChart from './pie-chart';
 import CustomDateRangePicker from '../../../../components/CustomDateRangePicker';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
+import { AuthenticationContext } from '../../../../contexts/authentication.context';
 
 const TotalClaimsSection = ({ setLoading }) => {
 
+    const { currentUser } = useContext(AuthenticationContext);
 
     const [dashboardData, setDashboardData] = useState({})
 
@@ -107,24 +109,30 @@ const TotalClaimsSection = ({ setLoading }) => {
                         </div>
                         <div className="bg-primary bg-opacity-10 p-2 small rounded"><span className="me-2">{t("AVERAGE_RESOLUTION_TIME")}:</span> <span className="fw-semibold">{dashboardData?.averageResolutionTime} {t("DAYS")}</span></div>
                     </Stack>
+
+
                     <Stack
                         direction="horizontal"
                         gap={2}
                         className="flex-wrap "
                     >
-                        <div className="custom-max-width-320 custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                            <ReactSelect
-                                wrapperClassName="mb-0"
-                                className="form-select "
-                                placeholder={t("SELECT")}
-                                id="organizationId"
-                                size="sm"
-                                onChange={(event) => {
-                                    setFilters((prev) => ({ ...prev, organizationId: event?.target?.value }))
-                                }}
-                                options={orgList ?? []}
-                            />
-                        </div>
+                        {
+                            currentUser === "SEPS_USER" &&
+                            <div className="custom-max-width-320 custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                                <ReactSelect
+                                    wrapperClassName="mb-0"
+                                    className="form-select "
+                                    placeholder={t("SELECT")}
+                                    id="organizationId"
+                                    size="sm"
+                                    onChange={(event) => {
+                                        setFilters((prev) => ({ ...prev, organizationId: event?.target?.value }))
+                                    }}
+                                    options={orgList ?? []}
+                                />
+                            </div>
+                        }
+
                         <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                             <CustomDateRangePicker
                                 wrapperClassName="mb-0"
@@ -138,6 +146,7 @@ const TotalClaimsSection = ({ setLoading }) => {
                             />
                         </div>
                     </Stack>
+
                 </Stack>
             </Card.Header>
             <Card.Body>
