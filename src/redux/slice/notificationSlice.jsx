@@ -11,9 +11,9 @@ const initialState = {
 // NOTIFICATION LIST
 export const notificationListApi = createAsyncThunk(
   'notificationListApi',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await userApi.get(`${EndPoint.NOTIFICATION_LIST}`);
+      const response = await userApi.get(`${EndPoint.NOTIFICATION_LIST}`,{params});
       if (response.status !== 200) {
         return rejectWithValue('Failed to send notification!');
       }

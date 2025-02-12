@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Badge,
   Button,
@@ -34,6 +34,14 @@ const Header = ({ layout }) => {
   const [notifications, setNotifications] = useState([]);
   const [notificationsCount, setNotificationCount] = useState(0);
 
+
+  const [totalNotificationCount, setTotalNotificationCount] = useState(0)
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const menuRef = useRef(null);
+
   const { isLoggedIn, user, profilePicture } = useSelector((state) => state?.authSlice)
 
   const { t } = useTranslation()
@@ -64,16 +72,31 @@ const Header = ({ layout }) => {
 
   // GET ALL NOTIFICATIONS
   const getAllNotifications = () => {
-    dispatch(notificationListApi())
+    setLoading(true)
+    const params = {
+      page: currentPage ?? 0,
+      size: 15,
+      sort: 'notification.createdAt,desc'
+    }
+    dispatch(notificationListApi(params))
       .then(result => {
         if (notificationListApi.fulfilled.match(result)) {
-          setNotifications(result?.payload?.data)
+          // setNotifications(result?.payload?.) 
+          setTotalNotificationCount(result?.payload?.headers['x-total-count'])
+        setNotifications((prevNotifications) => {
+          const existingIds = new Set(prevNotifications.map((n) => n.notification.id));
+          const newNotifications = result?.payload?.data?.filter((n) => !existingIds.has(n.notification.id));
+          return [...prevNotifications, ...newNotifications];
+        });
+
         } else {
           console.error("Verification error:", result.error.message);
         }
       })
       .catch(error => {
         console.error("Error during file claim submission:", error);
+      }).finally(()=>{
+        setLoading(false)
       });
   }
 
@@ -208,11 +231,23 @@ const Header = ({ layout }) => {
     }
   };
 
+  console.log({total : totalNotificationCount})
+  console.log({list : notifications.length})
+  const handleScroll = () => {
+    if (menuRef.current) {
+      const bottom = menuRef.current.scrollHeight === menuRef.current.scrollTop + menuRef.current.clientHeight;
+
+      if (bottom && !loading && totalNotificationCount > notifications.length) {
+        // if (bottom && !loading) {
+        setCurrentPage((prevPage) => prevPage + 1);
+      }
+    }
+  };
+
   useEffect(() => {
 
     if (isLoggedIn) {
       getNotificationCount();
-      getAllNotifications();
       const intervalId = setInterval(() => {
         getNotificationCount();
       }, 60000); // Run every 1 minute
@@ -221,6 +256,9 @@ const Header = ({ layout }) => {
 
   }, []);
 
+  useEffect(() => {
+    getAllNotifications()
+  }, [currentPage])
 
   return (
     <header className="theme-header">
@@ -288,7 +326,10 @@ const Header = ({ layout }) => {
                 align="end"
                 className="shadow-lg rounded-3 border-0 mt-3 theme-notification-menu"
               >
-                <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0">
+                <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0"
+                  ref={menuRef}
+                  onScroll={handleScroll}
+                >
                   <li className="fs-14 d-flex align-items-center justify-content-between px-3 py-1 border-bottom mb-1 pb-2 border-secondary border-opacity-25 ">
                     {notifications?.length > 0 ? (
                       <>
@@ -349,6 +390,16 @@ const Header = ({ layout }) => {
                       </li>
                     ))
                   }
+                  {
+                  loading &&
+                  <li  className="list-group-item d-flex align-items-center">
+                  <div className="w-100 px-3 py-1">
+                    <div className="placeholder col-8 bg-secondary"></div>
+                    <div className="placeholder col-11 bg-secondary mt-2"></div>
+                    <div className="placeholder col-6 bg-secondary mt-2"></div>
+                  </div>
+                </li>
+                }
                 </ul>
               </Dropdown.Menu>
             </Dropdown>
