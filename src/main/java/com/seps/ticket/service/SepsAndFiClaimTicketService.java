@@ -88,6 +88,7 @@ public class SepsAndFiClaimTicketService {
     private final ClaimTicketWorkFlowService claimTicketWorkFlowService;
     private final TemplateMasterRepository templateMasterRepository;
     private final ClaimTicketTaggedUserRepository claimTicketTaggedUserRepository;
+    private final RoleService roleService;
     /**
      * Constructs a new {@link SepsAndFiClaimTicketService} instance.
      *
@@ -114,7 +115,7 @@ public class SepsAndFiClaimTicketService {
                                        ClaimTicketAssignLogRepository claimTicketAssignLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                        ClaimTicketStatusLogRepository claimTicketStatusLogRepository, MailService mailService, DocumentService documentService,
                                        ClaimTicketDocumentRepository claimTicketDocumentRepository,
-                                       TemplateVariableMappingService templateVariableMappingService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterRepository templateMasterRepository, ClaimTicketTaggedUserRepository claimTicketTaggedUserRepository) {
+                                       TemplateVariableMappingService templateVariableMappingService, ClaimTicketWorkFlowService claimTicketWorkFlowService, TemplateMasterRepository templateMasterRepository, ClaimTicketTaggedUserRepository claimTicketTaggedUserRepository, RoleService roleService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
@@ -122,6 +123,7 @@ public class SepsAndFiClaimTicketService {
         this.messageSource = messageSource;
         this.enumUtil = enumUtil;
         this.claimTicketTaggedUserRepository = claimTicketTaggedUserRepository;
+        this.roleService = roleService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -173,12 +175,14 @@ public class SepsAndFiClaimTicketService {
         Long fiAgentId = null;
         Long sepsAgentId = null;
         if (authority.contains(AuthoritiesConstants.FI)) {
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_FI");
             filterRequest.setOrganizationId(currentUser.getOrganization().getId());
-            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
+            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) && permissetSet.isEmpty()) {
                 fiAgentId = currentUser.getId();
             }
         } else {
-            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_SEPS");
+            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) && permissetSet.isEmpty()) {
                 sepsAgentId = currentUser.getId();
             }
         }
@@ -556,7 +560,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.priority.changed",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(priority, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), ticket.getFormattedTicketId(), enumUtil.getLocalizedEnumValue(priority, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
         Map<String, Object> entityData = new HashMap<>();
@@ -671,7 +675,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.extend.sla.date",
-                new Object[]{currentUser.getEmail(), newSlaDate.toString(), String.valueOf(ticket.getTicketId())}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), newSlaDate.toString(), ticket.getFormattedTicketId()}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
         Map<String, Object> entityData = new HashMap<>();
@@ -847,7 +851,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.closed",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(), Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), ticket.getFormattedTicketId(), enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(), Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
         // Convert attachments (MultipartFile to filenames)
@@ -1066,7 +1070,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.rejected",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), ticket.getFormattedTicketId(), enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
         // Convert attachments (MultipartFile to filenames)
@@ -1402,7 +1406,8 @@ public class SepsAndFiClaimTicketService {
 
     private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser, List<User> taggedUserList) {
         Map<String, String> ticketDetail = new HashMap<>();
-        ticketDetail.put("ticketNumber", ticket.getTicketId().toString());
+        ticketDetail.put("formatedTicketNumber", ticket.getFormattedTicketId());
+        ticketDetail.put("ticketNumber", ticket.getFormattedTicketId());
         ticketDetail.put("senderName", currentUser.getFirstName());
         ticketDetail.put("messageContent", updateMessage(claimTicketRejectRequest.getMessage()));
         ticketDetail.put("id", ticket.getId().toString());
@@ -1677,7 +1682,7 @@ public class SepsAndFiClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.change.status",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), enumUtil.getLocalizedEnumValue(status, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), ticket.getFormattedTicketId(), enumUtil.getLocalizedEnumValue(status, Locale.forLanguageTag(language.getCode()))}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
 

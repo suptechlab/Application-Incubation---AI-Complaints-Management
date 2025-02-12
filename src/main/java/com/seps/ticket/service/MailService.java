@@ -198,14 +198,14 @@ public class MailService {
             mailDTO.setTemplateKey("CLAIM_TICKET_CREATED");
             Map<String, String> dataVariables = new HashMap<>();
             dataVariables.put(USERNAME, claimTicket.getUser().getName());
-            dataVariables.put(TICKET_NUMBER, claimTicket.getTicketId().toString());
+            dataVariables.put(TICKET_NUMBER, claimTicket.getFormattedTicketId());
             dataVariables.put("claimType", claimTicket.getClaimType().getName());
             dataVariables.put("claimSubType", claimTicket.getClaimSubType().getName());
             dataVariables.put(PRIORITY, enumUtil.getLocalizedEnumValue(claimTicket.getPriority(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
             dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(claimTicket.getStatus(), Locale.forLanguageTag(claimTicket.getUser().getLangKey())));
             dataVariables.put("razonSocial", claimTicket.getOrganization().getRazonSocial());
             dataVariables.put("ruc", claimTicket.getOrganization().getRuc());
-            dataVariables.put(URL, userBaseUrl + "/my-account/" + claimTicket.getTicketId().toString());
+            dataVariables.put(URL, userBaseUrl + "/my-account?ticketId=" + claimTicket.getTicketId().toString());
             mailDTO.setDataVariables(dataVariables);
             this.sendDynamicContentEmail(mailDTO);
 
@@ -283,7 +283,7 @@ public class MailService {
         mailDTO.setTemplateKey("CLAIM_TICKET_CLOSED");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put(TICKET_NUMBER, ticket.getFormattedTicketId());
         dataVariables.put(REASON, claimTicketClosedRequest.getReason());
         dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(claimTicketClosedRequest.getCloseSubStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
         mailDTO.setDataVariables(dataVariables);
@@ -300,7 +300,7 @@ public class MailService {
         mailDTO.setTemplateKey("CLAIM_TICKET_PRIORITY_CHANGE_AGENT");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put(TICKET_NUMBER, ticket.getFormattedTicketId());
         dataVariables.put("ticketPriority", enumUtil.getLocalizedEnumValue(newPriority, Locale.forLanguageTag(currentUser.getLangKey())));
         dataVariables.put("updatedBy", updatedBy);
         dataVariables.put(STATUS, enumUtil.getLocalizedEnumValue(ticket.getStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
@@ -316,7 +316,7 @@ public class MailService {
         mailDTO.setTemplateKey("ASSIGN_TICKET_NOTIFY_AGENT");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put(TICKET_NUMBER, ticket.getFormattedTicketId());
         dataVariables.put(CUSTOMER_NAME, ticket.getUser().getFirstName());
         dataVariables.put("customerEmail", ticket.getUser().getEmail());
         dataVariables.put("assignedDate", ticket.getAssignedAt().toString());
@@ -332,7 +332,7 @@ public class MailService {
         mailDTO.setTemplateKey("ASSIGN_TICKET_NOTIFY_CUSTOMER");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put(TICKET_NUMBER, ticket.getFormattedTicketId());
         dataVariables.put("agentName", agentName);
         dataVariables.put("assignedDate", ticket.getAssignedAt().toString());
         mailDTO.setDataVariables(dataVariables);
@@ -347,7 +347,7 @@ public class MailService {
         mailDTO.setTemplateKey("CLAIM_TICKET_REJECTED_NOTIFY_AGENT");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put(TICKET_NUMBER, ticket.getFormattedTicketId());
         dataVariables.put(REASON, claimTicketRejectRequest.getReason());
         dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
         mailDTO.setDataVariables(dataVariables);
@@ -364,7 +364,7 @@ public class MailService {
         mailDTO.setTemplateKey("CLAIM_TICKET_REJECTED_NOTIFY_CUSTOMER");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticket.getTicketId().toString());
+        dataVariables.put(TICKET_NUMBER, ticket.getFormattedTicketId());
         dataVariables.put(REASON, claimTicketRejectRequest.getReason());
         dataVariables.put("rejectedStatus", enumUtil.getLocalizedEnumValue(claimTicketRejectRequest.getRejectedStatus(), Locale.forLanguageTag(currentUser.getLangKey())));
         mailDTO.setDataVariables(dataVariables);
@@ -427,10 +427,10 @@ public class MailService {
         mailDTO.setTemplateKey("REPLY_TO_CUSTOMER_ON_TICKET_CONVERSATION");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticketDetail.get(TICKET_NUMBER));
+        dataVariables.put(TICKET_NUMBER, ticketDetail.get("formatedTicketNumber"));
         dataVariables.put(SENDER_NAME, ticketDetail.get(SENDER_NAME));
         dataVariables.put(MESSAGE_CONTENT, claimTicketRejectRequest.getMessage());
-        dataVariables.put("ticketUrl", userBaseUrl + "/my-account/");
+        dataVariables.put("ticketUrl", userBaseUrl + "/my-account?ticketId="+ticketDetail.get(TICKET_NUMBER));
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
 
@@ -445,7 +445,7 @@ public class MailService {
         mailDTO.setTemplateKey("SEND_MAIL_TO_TAGGED_USER_ON_CLAIM");
         Map<String, String> dataVariables = new HashMap<>();
         dataVariables.put(USERNAME, currentUser.getFirstName());
-        dataVariables.put(TICKET_NUMBER, ticketDetail.get(TICKET_NUMBER));
+        dataVariables.put(TICKET_NUMBER, ticketDetail.get("formatedTicketNumber"));
         dataVariables.put(PRIORITY, ticketDetail.get(PRIORITY));
         dataVariables.put(STATUS, ticketDetail.get(STATUS));
         dataVariables.put("taggedBy", ticketDetail.get("taggedBy"));

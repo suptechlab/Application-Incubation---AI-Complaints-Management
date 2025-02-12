@@ -144,7 +144,7 @@ public class UserClaimTicketService {
             ClaimTicket duplicateTicket = findDuplicateTicket(claimTicketRequest, currentUserId);
             if (duplicateTicket != null) {
                 responseDTO.setFoundDuplicate(true);
-                responseDTO.setDuplicateTicketId(duplicateTicket.getTicketId());
+                responseDTO.setDuplicateTicketId(duplicateTicket.getFormattedTicketId());
                 return responseDTO;
             }
         }
@@ -213,10 +213,9 @@ public class UserClaimTicketService {
         logFileAClaimTicketDetails(newClaimTicket, claimTicketWorkFlowDTO, userDTO, currentUserId);
 
         // Populate response
-        responseDTO.setNewTicketId(newClaimTicket.getTicketId());
+        responseDTO.setNewTicketId(newClaimTicket.getFormattedTicketId());
         responseDTO.setNewId(newClaimTicket.getId());
         responseDTO.setEmail(currentUser.getEmail());
-
         // Log activity and audit
         newClaimTicket.setClaimTicketDocuments(claimTicketDocuments);
         logActivityAndAudit(newClaimTicket, claimTicketRequest, requestInfo, currentUser);
@@ -873,9 +872,10 @@ public class UserClaimTicketService {
         LOG.info("New method Second instance claim filed for claim ticket {} by user {}", originalClaimId, currentUserId);
         ClaimTicketResponseDTO responseDTO = new ClaimTicketResponseDTO();
         responseDTO.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO!=null? claimTicketWorkFlowDTO.getId():null);
-        responseDTO.setNewTicketId(newClaimTicket.getTicketId());
+        responseDTO.setNewTicketId(newClaimTicket.getFormattedTicketId());
         responseDTO.setNewId(newClaimTicket.getId());
         responseDTO.setEmail(newClaimTicket.getUser().getEmail());
+
         return responseDTO;
     }
 
@@ -1186,7 +1186,7 @@ public class UserClaimTicketService {
         User fiAgent = ticket.getFiAgent();
 
         Map<String, String> ticketDetail = new HashMap<>();
-        ticketDetail.put("ticketNumber", ticket.getTicketId().toString());
+        ticketDetail.put("ticketNumber", ticket.getFormattedTicketId());
         ticketDetail.put("customerName", ticket.getUser().getFirstName());
 
         // Send email to FI Admin
@@ -1479,7 +1479,7 @@ public class UserClaimTicketService {
 
         ClaimTicketResponseDTO responseDTO = new ClaimTicketResponseDTO();
         responseDTO.setClaimTicketWorkFlowId(claimTicketWorkFlowDTO !=null ? claimTicketWorkFlowDTO.getId():null);
-        responseDTO.setNewTicketId(complaintTicket.getTicketId());
+        responseDTO.setNewTicketId(complaintTicket.getFormattedTicketId());
         responseDTO.setNewId(complaintTicket.getId());
         responseDTO.setEmail(complaintTicket.getUser().getEmail());
         return responseDTO;
@@ -1627,14 +1627,6 @@ public class UserClaimTicketService {
         context.setVariable("secondInstance", secondInstance);
         context.setVariable("complaint", complaint);
 
-//        ClassPathResource imageResource = new ClassPathResource("static/images/logo.png");
-//        String imagePath = imageResource.getFile().toURI().toString(); // Ensure absolute path
-//        context.setVariable("logo", imagePath);
-//
-//        ClassPathResource calendarLogo = new ClassPathResource("static/images/calendar_today.png");
-//        String calenderPath = calendarLogo.getFile().toURI().toString(); // Ensure absolute path
-//        context.setVariable("calenderPath", calenderPath);
-
         // Convert logo.png to Base64
         String imagePath = encodeImageToBase64("static/images/logo.png");
         context.setVariable("logo", "data:image/png;base64," + imagePath);
@@ -1648,7 +1640,7 @@ public class UserClaimTicketService {
     }
 
     private void setTicketDataForPDF(Map<String, Object> complaint, ClaimTicketDTO complaintClaim) {
-        complaint.put("claimId", complaintClaim.getTicketId());
+        complaint.put("claimId", complaintClaim.getFormattedTicketId());
         complaint.put("createdDate", DateUtil.formatDate(complaintClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
         complaint.put("resolveOnDate", DateUtil.formatDate(complaintClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
         complaint.put("instanceType", enumUtil.getLocalizedEnumValue(complaintClaim.getInstanceType(), LocaleContextHolder.getLocale()));

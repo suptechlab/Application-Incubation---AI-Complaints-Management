@@ -6,8 +6,8 @@ import lombok.Data;
 public class ClaimTicketResponseDTO {
     private Boolean checkDuplicate;
     private Boolean foundDuplicate;
-    private Long duplicateTicketId;
-    private Long newTicketId;
+    private String duplicateTicketId;
+    private String newTicketId;
     private Long newId;
     private String email;
     private Long claimTicketWorkFlowId;
