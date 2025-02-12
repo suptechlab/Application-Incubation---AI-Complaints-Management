@@ -2,8 +2,8 @@ import { adminApi } from "../utils/instance";
 const API_VERSION = process.env.REACT_APP_API_VERSION
 
 // GET ALL NOTIFICATIONS API
-export const handleGetNotifications = async () => {
-    return await adminApi.get(`/${API_VERSION}/notifications`);
+export const handleGetNotifications = async (params) => {
+    return await adminApi.get(`/${API_VERSION}/notifications`,{params});
 }
 // READ NOTIFICATION BY ID
 export const handleMarkNotificationById = async (notificationId) => {

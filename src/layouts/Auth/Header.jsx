@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Badge,
   Button,
@@ -37,22 +37,43 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
   const [notifications, setNotifications] = useState([]);
   const [notificationsCount, setNotificationCount] = useState(0);
 
+  const [totalNotificationCount, setTotalNotificationCount] = useState(0)
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const menuRef = useRef(null);
 
   // Default values to handle missing user data
   const { imageUrl = '', firstName = '' } = userData || {};
 
   // GET ALL NOTIFICATIONS
   const getAllNotifications = () => {
-    handleGetNotifications().then(response => {
-      setNotifications(response?.data)
-    }).catch((error) => {
-      if (error?.response?.data?.errorDescription) {
-        toast.error(error?.response?.data?.errorDescription);
-      } else {
-        toast.error(error?.message);
-      }
-    })
-  }
+    setLoading(true)
+    const params = {
+      page: currentPage ?? 0,
+      size: 15,
+      sort: 'notification.createdAt,desc'
+    }
+    handleGetNotifications(params)
+      .then((response) => {
+        setTotalNotificationCount(response.headers['x-total-count'])
+        setNotifications((prevNotifications) => {
+          const existingIds = new Set(prevNotifications.map((n) => n.notification.id));
+          const newNotifications = response?.data.filter((n) => !existingIds.has(n.notification.id));
+          return [...prevNotifications, ...newNotifications];
+        });
+      })
+      .catch((error) => {
+        if (error?.response?.data?.errorDescription) {
+          toast.error(error?.response?.data?.errorDescription);
+        } else {
+          toast.error(error?.message);
+        }
+      }).finally(() => {
+        setLoading(false)
+      });
+  };
 
   // READ SINGLE NOTIFICATION
   const readSingleNotification = (notificationData) => {
@@ -67,7 +88,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
 
 
     if (notification?.redirectUrl) {
-      navigate("/"+notification?.redirectUrl)
+      navigate("/" + notification?.redirectUrl)
     }
 
     // Update the notifications state
@@ -78,7 +99,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     setNotificationCount(unreadCount);
 
 
-    if(notification?.isRead === false){
+    if (notification?.isRead === false) {
       handleMarkNotificationById(id).then(response => {
         getAllNotifications()
       }).catch((error) => {
@@ -170,10 +191,25 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
       }
     })
   }
+  const handleScroll = () => {
+    if (menuRef.current) {
+      const bottom = menuRef.current.scrollHeight === menuRef.current.scrollTop + menuRef.current.clientHeight;
+
+      if (bottom && !loading && totalNotificationCount > notifications.length) {
+        // if (bottom && !loading) {
+        setCurrentPage((prevPage) => prevPage + 1);
+      }
+    }
+  };
+
 
   useEffect(() => {
-    noticationCountApi()
     getAllNotifications()
+  }, [currentPage])
+
+  // FOR UNREAD COUNT INTERVAL
+  useEffect(() => {
+    noticationCountApi()
     const intervalId = setInterval(() => {
       noticationCountApi();
     }, 60000); // Run every 1 minute
@@ -230,8 +266,11 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
             <Dropdown.Menu
               align="end"
               className="shadow-lg rounded-3 border-0 mt-3 theme-notification-menu"
+
             >
-              <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0">
+              <ul className="list-unstyled p-1 theme-custom-scrollbar overflow-auto m-0"
+                ref={menuRef}
+                onScroll={handleScroll}>
                 <li className="fs-14 d-flex align-items-center justify-content-between px-3 py-1 border-bottom mb-1 pb-2 border-secondary border-opacity-25 ">
                   {notifications?.length > 0 ? (
                     <>
@@ -318,10 +357,18 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                     </li>
                   ))
                 }
+                {
+                  loading &&
+                  <li  className="list-group-item d-flex align-items-center">
+                  <div className="w-100 px-3 py-1">
+                    <div className="placeholder col-8 bg-secondary"></div>
+                    <div className="placeholder col-11 bg-secondary mt-2"></div>
+                    <div className="placeholder col-6 bg-secondary mt-2"></div>
+                  </div>
+                </li>
+                }
+               
 
-
-                {/* {
-               } */}
               </ul>
             </Dropdown.Menu>
           </Dropdown>
