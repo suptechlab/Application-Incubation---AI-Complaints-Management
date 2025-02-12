@@ -113,7 +113,6 @@ const Header = ({ layout }) => {
     );
 
     if (notification?.redirectUrl) {
-      console.log(notification?.redirectUrl)
       navigate("/" + notification?.redirectUrl)
     }
 
@@ -231,8 +230,6 @@ const Header = ({ layout }) => {
     }
   };
 
-  console.log({total : totalNotificationCount})
-  console.log({list : notifications.length})
   const handleScroll = () => {
     if (menuRef.current) {
       const bottom = menuRef.current.scrollHeight === menuRef.current.scrollTop + menuRef.current.clientHeight;

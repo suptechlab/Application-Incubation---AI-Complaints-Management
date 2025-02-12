@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import DownloadPdf from "../pages/helpdesk/downloadpdf/DownloadPdf";
+import SurveyForm from "../pages/surveyForm";
 const Layout = lazy(() => import("../components/layout/Layout"));
 const Home = lazy(() => import("../pages/home"));
 
@@ -15,6 +16,10 @@ export const PublicRoutes = [
       {
         path: "/download-ticket-pdf/:id",
         element: <DownloadPdf />,
+      },
+      {
+        path: "/survey-form",
+        element: <SurveyForm />,
       },
       {
         path: "*",
