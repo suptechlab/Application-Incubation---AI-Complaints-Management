@@ -31,6 +31,7 @@
     <include file="config/liquibase/changelog/1738324527078_notification_schema.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1738647732706_notification_template_master_load.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1739180073841_load_province_city_data.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1739268015503_template_variable_schema_and_data.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->

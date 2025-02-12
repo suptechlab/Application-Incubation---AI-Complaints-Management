@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1739268218537" author="matellio">
+    <createTable tableName="template_variable">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="keyword" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="language" type="VARCHAR(10)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="meaning" type="VARCHAR(250)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="usage" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- Load data into tables -->
+    <loadData
+      file="config/liquibase/data/template_keyword.csv"
+      separator=","
+      tableName="template_variable">
+      <column name="id" type="numeric"/>
+      <column name="keyword" type="string"/>
+      <column name="language" type="string"/>
+      <column name="meaning" type="string"/>
+      <column name="usage" type="string"/>
+    </loadData>
+    <!-- Update sequences based on current max ID -->
+    <sql>
+      SELECT setval('template_variable_id_seq', (SELECT MAX(id) FROM template_variable), true);
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>

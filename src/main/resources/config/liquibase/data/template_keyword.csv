@@ -1,0 +1,73 @@
+id,keyword,language,meaning,usage
+1,username,en,Users first name,Used to personalize the message for the recipient.
+2,ticketNumber,en,Claim ticket ID,Identifies the unique claim ticket.
+3,assignedUser,en,Assigned agent,Displays the name of the agent assigned to the claim.
+4,status,en,Claim ticket status,Displays the localized status of the claim ticket.
+5,closedStatus,en,Closed ticket status,Displays the localized closed status of the claim.
+6,rejectedStatus,en,Rejected ticket status,Displays the localized rejected status of the claim.
+7,priority,en,Claim priority,Shows the priority level of the claim ticket.
+8,instanceType,en,Instance type,Specifies whether the claim is a first or second instance.
+9,instanceComment,en,Instance comment,Additional comments for second instance claims.
+10,claimType,en,Claim type,Specifies the type of claim being filed.
+11,claimSubType,en,Claim sub-type,Specifies the sub-category of the claim.
+12,razonSocial,en,Organization name,Name of the organization related to the claim.
+13,ruc,en,Organization RUC,Unique identifier for the organization.
+14,reason,en,Status comment,Reason provided for status updates.
+15,customerName,en,Customer's name,Name of the user who raised the claim.
+16,customerEmail,en,Customer's email,Email address of the user who raised the claim.
+17,assignedDate,en,Assignment date,Date when the ticket was assigned.
+18,createdDate,en,Claim creation date,Date when the claim was created.
+19,secondInstanceFiledDate,en,Second instance filed date,Date when the second instance was filed.
+20,complaintFiledDate,en,Complaint filed date,Date when the complaint was filed.
+21,resolveOnDate,en,Resolution date,Expected resolution date of the claim.
+22,slaBreachDate,en,SLA breach date,Date when the SLA was breached.
+23,slaRemainingDays,en,SLA remaining days,Remaining days before SLA breach.
+24,fiAgentName,en,FI agent name,Name of the first-instance agent assigned to the claim.
+25,sepsAgentName,en,SEPS agent name,Name of the SEPS agent assigned to the claim.
+26,agentName,en,Assigned agent name,Dynamically assigned based on instance type.
+27,userTicketUrl,en,User ticket URL,URL for the user to view the ticket.
+28,adminTicketUrl,en,Admin ticket URL,URL for the admin to view the ticket.
+29,url,en,User account URL,Direct URL to the user’s claim ticket.
+30,createdBy,en,Created by,User who created the claim ticket.
+31,updatedBy,en,Updated by,User who last updated the claim ticket.
+32,previousInstance,en,Previous instance type,The instance type of the previous claim.
+33,previousStatus,en,Previous claim status,The last known status of the claim before update.
+34,previousPriority,en,Previous claim priority,The previous priority level of the claim.
+35,previousSlaDate,en,Previous SLA date,The SLA date before any extensions.
+36,reasonSlaDateExtension,en,Reason for SLA extension,Explanation for extending the SLA deadline.
+37,username,es,Nombre del usuario,Utilizado para personalizar el mensaje para el destinatario.
+38,ticketNumber,es,ID del reclamo,Identifica el reclamo de manera única.
+39,assignedUser,es,Agente asignado,Muestra el nombre del agente asignado al reclamo.
+40,status,es,Estado del reclamo,Muestra el estado localizado del reclamo.
+41,closedStatus,es,Estado cerrado,Muestra el estado cerrado localizado del reclamo.
+42,rejectedStatus,es,Estado rechazado,Muestra el estado rechazado localizado del reclamo.
+43,priority,es,Prioridad del reclamo,Muestra el nivel de prioridad del reclamo.
+44,instanceType,es,Tipo de instancia,Especifica si el reclamo es de primera o segunda instancia.
+45,instanceComment,es,Comentario de instancia,Comentarios adicionales para reclamos de segunda instancia.
+46,claimType,es,Tipo de reclamo,Especifica el tipo de reclamo presentado.
+47,claimSubType,es,Subtipo de reclamo,Especifica la subcategoría del reclamo.
+48,razonSocial,es,Nombre de la organización,Nombre de la organización relacionada con el reclamo.
+49,ruc,es,RUC de la organización,Identificador único de la organización.
+50,reason,es,Comentario del estado,Razón proporcionada para actualizaciones de estado.
+51,customerName,es,Nombre del cliente,Nombre del usuario que presentó el reclamo.
+52,customerEmail,es,Correo electrónico del cliente,Correo del usuario que presentó el reclamo.
+53,assignedDate,es,Fecha de asignación,Fecha en que se asignó el reclamo.
+54,createdDate,es,Fecha de creación,Fecha en que se creó el reclamo.
+55,secondInstanceFiledDate,es,Fecha de segunda instancia,Fecha en que se presentó la segunda instancia.
+56,complaintFiledDate,es,Fecha de presentación de la queja,Fecha en que se presentó la queja.
+57,resolveOnDate,es,Fecha de resolución,Fecha esperada de resolución del reclamo.
+58,slaBreachDate,es,Fecha de incumplimiento del SLA,Fecha en que se incumplió el SLA.
+59,slaRemainingDays,es,Días restantes del SLA,Días restantes antes del incumplimiento del SLA.
+60,fiAgentName,es,Nombre del agente FI,Nombre del agente de primera instancia asignado al reclamo.
+61,sepsAgentName,es,Nombre del agente SEPS,Nombre del agente SEPS asignado al reclamo.
+62,agentName,es,Nombre del agente asignado,Asignado dinámicamente según el tipo de instancia.
+63,userTicketUrl,es,URL del reclamo del usuario,URL para que el usuario vea el reclamo.
+64,adminTicketUrl,es,URL del reclamo del administrador,URL para que el administrador vea el reclamo.
+65,url,es,URL de la cuenta del usuario,Enlace directo al reclamo del usuario.
+66,createdBy,es,Creado por,Usuario que creó el reclamo.
+67,updatedBy,es,Actualizado por,Usuario que actualizó el reclamo por última vez.
+68,previousInstance,es,Tipo de instancia previa,El tipo de instancia del reclamo anterior.
+69,previousStatus,es,Estado anterior del reclamo,Último estado conocido del reclamo antes de la actualización.
+70,previousPriority,es,Prioridad anterior del reclamo,Nivel de prioridad anterior del reclamo.
+71,previousSlaDate,es,Fecha del SLA anterior,Fecha del SLA antes de cualquier extensión.
+72,reasonSlaDateExtension,es,Razón de la extensión del SLA,Explicación para extender la fecha límite del SLA.

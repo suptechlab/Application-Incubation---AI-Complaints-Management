@@ -4,10 +4,8 @@ import com.seps.admin.aop.permission.PermissionCheck;
 import com.seps.admin.enums.EmailUserTypeEnum;
 import com.seps.admin.enums.TemplateTypeEnum;
 import com.seps.admin.service.TemplateMasterService;
-import com.seps.admin.service.dto.DropdownListDTO;
-import com.seps.admin.service.dto.RequestInfo;
+import com.seps.admin.service.dto.*;
 import com.seps.admin.service.dto.ResponseStatus;
-import com.seps.admin.service.dto.TemplateMasterDTO;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -159,6 +157,12 @@ public class TemplateMasterResource {
     public ResponseEntity<List<DropdownListDTO>> listActiveTemplatesForWorkflow(@RequestParam(required = false) EmailUserTypeEnum userType,
                                                                                 @RequestParam(required = false) Long organizationId) {
         List<DropdownListDTO> templatesList = service.listActiveTemplatesForWorkFlow(userType, organizationId);
+        return ResponseEntity.ok(templatesList);
+    }
+
+    @GetMapping("/keyword-listing")
+    public ResponseEntity<List<TemplateVariableDTO>> listKeywordsForTemplates(@RequestParam(required = false) Long templateId) {
+        List<TemplateVariableDTO> templatesList = service.listKeywordMapping(templateId);
         return ResponseEntity.ok(templatesList);
     }
 }
