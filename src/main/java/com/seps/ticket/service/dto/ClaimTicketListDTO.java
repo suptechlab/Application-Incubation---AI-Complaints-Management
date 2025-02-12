@@ -55,4 +55,5 @@ public class ClaimTicketListDTO {
     private ChannelOfEntryEnum channelOfEntry;
     private Boolean slaPopup;
     private Double claimAmount;
+    private String formattedTicketId;
 }

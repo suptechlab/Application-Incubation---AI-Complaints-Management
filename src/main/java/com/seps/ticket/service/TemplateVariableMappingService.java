@@ -50,7 +50,7 @@ public class TemplateVariableMappingService {
 
         // Add mappings based on provided ClaimTicketDTO and User
         variableMap.put("username", sendToUser.getFirstName());
-        variableMap.put("ticketNumber", String.valueOf(claimTicketDTO.getTicketId()));
+        variableMap.put("ticketNumber", claimTicketDTO.getFormattedTicketId());
         variableMap.put("assignedUser", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getName() : "Unassigned");
 
         // Localized enum values
@@ -93,7 +93,7 @@ public class TemplateVariableMappingService {
         // URLs
         variableMap.put("userTicketUrl", this.userBaseUrl + "/my-account?ticketId=" + claimTicketDTO.getTicketId());
         variableMap.put("adminTicketUrl", jHipsterProperties.getMail().getBaseUrl() + "/tickets/view/" + claimTicketDTO.getId());
-        variableMap.put("url", this.userBaseUrl + "/my-account/" + claimTicketDTO.getTicketId());
+        variableMap.put("url", this.userBaseUrl + "/my-account?ticketId=" + claimTicketDTO.getTicketId());
 
         // Audit details
         variableMap.put("createdBy", claimTicketDTO.getCreatedByUser() != null ? claimTicketDTO.getCreatedByUser().getName() : "System");
@@ -147,7 +147,7 @@ public class TemplateVariableMappingService {
 
         // Add mappings based on provided ClaimTicketDTO and User
         variableMap.put("username", sendToUser.getFirstName());
-        variableMap.put("ticketNumber", String.valueOf(claimTicketDTO.getTicketId()));
+        variableMap.put("ticketNumber", claimTicketDTO.getFormattedTicketId());
         variableMap.put("assignedUser", claimTicketDTO.getFiAgent() != null ? claimTicketDTO.getFiAgent().getFirstName() : "Unassigned");
 
         // Localized enum values
