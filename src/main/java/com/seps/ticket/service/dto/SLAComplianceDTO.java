@@ -56,4 +56,5 @@ public class SLAComplianceDTO {
     private String slaCompliance;
     private String slaBreachReason;
     private Double claimAmount;
+    private String formattedTicketId;
 }

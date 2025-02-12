@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -239,4 +241,18 @@ public class ClaimTicket {
     @Column(name = "claim_amount")
     private Double claimAmount;
 
+    @Transient  // Not a database field
+    public String getFormattedTicketId() {
+        String year = String.valueOf(getCreatedYear());
+        String claimTypeCode = (claimType != null) ? String.format("%03d", claimType.getId()) : "000";
+        return String.format("R-ESFPS-%s-%s-%s", year, claimTypeCode, ticketId);
+    }
+
+    // Get year from createdAt
+    public Integer getCreatedYear() {
+        if (createdAt == null) {
+            return null;
+        }
+        return LocalDateTime.ofInstant(createdAt, ZoneId.systemDefault()).getYear();
+    }
 }

@@ -173,7 +173,7 @@ public class ClaimTicketService {
             ClaimTicket duplicateTicket = findDuplicateTicket(claimTicketRequest, existUser.getId());
             if (duplicateTicket != null) {
                 responseDTO.setFoundDuplicate(true);
-                responseDTO.setDuplicateTicketId(duplicateTicket.getTicketId());
+                responseDTO.setDuplicateTicketId(duplicateTicket.getFormattedTicketId());
                 return responseDTO;
             }
         }
@@ -254,7 +254,7 @@ public class ClaimTicketService {
         claimTicketOTPRepository.deleteByEmail(email);
 
         // Populate response
-        responseDTO.setNewTicketId(newClaimTicket.getTicketId());
+        responseDTO.setNewTicketId(newClaimTicket.getFormattedTicketId());
         responseDTO.setNewId(newClaimTicket.getId());
         responseDTO.setEmail(claimUser.getEmail());
         responseDTO.setFoundDuplicate(false);
@@ -411,7 +411,7 @@ public class ClaimTicketService {
     private void logAudit(ClaimTicket newClaimTicket, CreateClaimTicketRequest claimTicketRequest, RequestInfo requestInfo, User currentUser) {
         Map<String, String> auditMessageMap = new HashMap<>();
         Map<String, Object> auditData = new HashMap<>();
-        String plainTicketId = String.valueOf(newClaimTicket.getTicketId());
+        String plainTicketId = newClaimTicket.getFormattedTicketId();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String auditMessage = messageSource.getMessage("audit.log.claim.ticket.created",
                 new Object[]{currentUser.getEmail(), plainTicketId}, Locale.forLanguageTag(language.getCode()));
@@ -609,7 +609,7 @@ public class ClaimTicketService {
                 Row row = sheet.createRow(rowIdx++);
 
                 row.createCell(ExcelHeaderClaimTicketEnum.ID.ordinal()).setCellValue(data.getId());
-                row.createCell(ExcelHeaderClaimTicketEnum.TICKET_ID.ordinal()).setCellValue(data.getTicketId());
+                row.createCell(ExcelHeaderClaimTicketEnum.TICKET_ID.ordinal()).setCellValue(data.getFormattedTicketId());
                 row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
                 row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
                 row.createCell(ExcelHeaderClaimTicketEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
@@ -684,7 +684,7 @@ public class ClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.ticket.sla.comment",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId()), claimTicketSlaCommentRequest.getSlaComment()}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), ticket.getFormattedTicketId(), claimTicketSlaCommentRequest.getSlaComment()}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
 
@@ -769,7 +769,7 @@ public class ClaimTicketService {
         Map<String, String> auditMessageMap = new HashMap<>();
         Arrays.stream(LanguageEnum.values()).forEach(language -> {
             String messageAudit = messageSource.getMessage("audit.log.claim.ticket.update",
-                new Object[]{currentUser.getEmail(), String.valueOf(ticket.getTicketId())}, Locale.forLanguageTag(language.getCode()));
+                new Object[]{currentUser.getEmail(), ticket.getFormattedTicketId()}, Locale.forLanguageTag(language.getCode()));
             auditMessageMap.put(language.getCode(), messageAudit);
         });
 
@@ -861,12 +861,12 @@ public class ClaimTicketService {
     }
 
     private void setTicketDataForPDF(Map<String, Object> complaint, ClaimTicketDTO complaintClaim) {
-        complaint.put("claimId", complaintClaim.getTicketId());
+        complaint.put("claimId", complaintClaim.getFormattedTicketId());
         complaint.put("createdDate", DateUtil.formatDate(complaintClaim.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
         complaint.put("resolveOnDate", DateUtil.formatDate(complaintClaim.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
         complaint.put("instanceType", enumUtil.getLocalizedEnumValue(complaintClaim.getInstanceType(), LocaleContextHolder.getLocale()));
         complaint.put("closedStatus", enumUtil.getLocalizedEnumValue(complaintClaim.getClosedStatus(), LocaleContextHolder.getLocale()));
-        complaint.put("previousTicket", complaintClaim.getPreviousTicket() != null ? "#"+ complaintClaim.getPreviousTicket().getTicketId(): "");
+        complaint.put("previousTicket", complaintClaim.getPreviousTicket() != null ? "#"+ complaintClaim.getPreviousTicket().getFormattedTicketId(): "");
         complaint.put("statusComment", complaintClaim.getStatusComment() != null ? complaintClaim.getStatusComment() : "");
         List<HashMap<String, Object>> complaintClaimConversion = getConversionActivity(complaintClaim);
         complaint.put("conversation", complaintClaimConversion);

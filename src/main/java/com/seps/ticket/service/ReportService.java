@@ -164,7 +164,7 @@ public class ReportService {
      */
     private void createRows(ClaimTicketListDTO data, Row row) {
         row.createCell(ExcelHeaderClaimTicketReportEnum.ID.ordinal()).setCellValue(data.getId());
-        row.createCell(ExcelHeaderClaimTicketReportEnum.TICKET_ID.ordinal()).setCellValue(data.getTicketId());
+        row.createCell(ExcelHeaderClaimTicketReportEnum.TICKET_ID.ordinal()).setCellValue(data.getFormattedTicketId());
         row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
         row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
         row.createCell(ExcelHeaderClaimTicketReportEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
@@ -329,7 +329,7 @@ public class ReportService {
      */
     private void createSlaRows(ClaimTicket data, Row row) {
         row.createCell(ExcelHeaderSlaComplianceReportEnum.ID.ordinal()).setCellValue(data.getId());
-        row.createCell(ExcelHeaderSlaComplianceReportEnum.TICKET_ID.ordinal()).setCellValue(data.getTicketId());
+        row.createCell(ExcelHeaderSlaComplianceReportEnum.TICKET_ID.ordinal()).setCellValue(data.getFormattedTicketId());
         row.createCell(ExcelHeaderSlaComplianceReportEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
         row.createCell(ExcelHeaderSlaComplianceReportEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
         row.createCell(ExcelHeaderSlaComplianceReportEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());

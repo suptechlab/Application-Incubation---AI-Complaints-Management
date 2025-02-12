@@ -64,6 +64,7 @@ public class UserClaimTicketDTO {
     private UserClaimTicketDTO previousTicket; // Add this field for mapping the previous ticket
     private Boolean canCreateInstance;
     private Double claimAmount;
+    private String formattedTicketId;
 
     // Getters and Setters
 
