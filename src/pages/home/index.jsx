@@ -51,9 +51,9 @@ const Home = () => {
                   <div className="fw-bold text-uppercase pt-1">
                     {t("ANY_DOUBTS")} 
                   </div>
-                  <h1 className="fs-4 fw-bold text-uppercase">
+                  {/* <h1 className="fs-4 fw-bold text-uppercase">
                     {t("FILE_CLAIM_OR_INQUIRE")}
-                  </h1>
+                  </h1> */}
                   <p className="small fw-medium pb-1">
                    {t("FILE_CLAIM_DESCRIPTION")}
                   </p>

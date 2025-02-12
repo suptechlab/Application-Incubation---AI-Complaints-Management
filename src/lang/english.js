@@ -14,8 +14,7 @@ export const englishLang = {
   "LOGOUT": "Logout",
   "ACCOUNT_SETUP": "Account Setup",
   "FILL_FORM": "Fill the below form to create your account then you will be redirected to file a claim.",
-  "ID": "ID",
-  "VERIFICATION": "Verification",
+  "ID_VERIFICATION": "ID Verification",
   "PERSONAL": "Personal",
   "LOGIN_INFO": "Login Info",
   "BACK": "Back",
@@ -56,6 +55,7 @@ export const englishLang = {
   "SUCCESS_TITLE": "Success!",
   "ACCOUNT_SETUP_SUCCESS": "Your Account is Set Up",
   "ACCOUNT_CREATION_MESSAGE": "Your account has been successfully created. Details have been sent to your email",
+  "ACCOUNT_CREATION_MESSAGE_2":"Los detalles de su registro han sido enviados al correo electrónico",
   "FILE_CLAIM_NOW": "File a Claim Now",
   "MY_ACCOUNT": "My Account",
   "BASIC_INFORMATION": "Basic Information",
@@ -165,5 +165,7 @@ export const englishLang = {
   "UNREAD_NOTIFICATIONS":"Unread Notifications",
   "MARK_ALL_AS_READ" :"Mark all as read",
   "CLEAR_ALL" : "Clear all",
-  "CLEAR":"Clear"
+  "CLEAR":"Clear",
+  "PRIVACY_TEXT_P1":"Autorizo de manera libre, específica, informada e inequívoca a la Superintendencia de Economía Popular y Solidaria, para que realice el tratamiento de mis datos personales, conforme a lo establecido en la Ley Orgánica de Protección de Datos Personales de Ecuador.",
+  "PRIVACY_TEXT_P2":"Entiendo que mis datos serán utilizados en la gestión del presente reclamo, y que tengo derecho a acceder, rectificar y cancelar mis datos en cualquier momento; por lo tanto, esta autorización es válida hasta que decida revocarla, lo cual puedo hacer mediante una solicitud escrita dirigida a la Superintendencia de Economía Popular y Solidaria.",
 }

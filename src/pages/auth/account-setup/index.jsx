@@ -39,14 +39,14 @@ const AccountSetupModal = ({ handleBack, handleFormSubmit }) => {
     const stepData = [
         {
             id: 1,
-            stepTitle: <>{t("ID")}<br />{t("VERIFICATION")}</>,
+            stepTitle: <>{t("ID_VERIFICATION")}</>,
             stepCurrent: activeTab === 0,
             stepCompleted: activeTab === 1,
             stepClickHandler: () => setActiveTab(0),
         },
         {
             id: 2,
-            stepTitle: <>{t("PERSONAL")} &amp;<br />{t("LOGIN_INFO")}</>,
+            stepTitle: <>{t("PERSONAL_INFORMATION")}</>,
             stepCurrent: activeTab === 1,
             stepCompleted: isPersonalInfoSubmitted,
             stepClickHandler: () => setActiveTab(1),

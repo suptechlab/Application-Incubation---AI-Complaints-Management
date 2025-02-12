@@ -37,7 +37,7 @@ const IdVerificationTab = ({ isSubmitted, setNewAccountData, newAccountData }) =
                 setNewAccountData((prev) => ({ ...prev, identificacion: values?.nationalID, individualDactilar: values?.fingerprintCode }))
                 setIsFormSubmitted(true)
             } else {
-                toast.error(t("FINGERPRINT_NOT_REQUIRED"))
+                toast.error(t("FINGERPRINT_NOT_VERIFIED"))
             }
             actions.setSubmitting(false);
         } else {

@@ -44,7 +44,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                         <Row className="gx-4">
                             <Col lg={6}>
                                 <ReactSelect
-                                    label={t("PRIORITY_CARE_GROUP")}
+                                    label={t("PRIORITY_CARE_GROUP")+"*"}
                                     error={formikProps.errors.priorityCareGroup }
                                     options={[
                                         { label: t("SELECT"), value: "" },

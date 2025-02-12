@@ -1,39 +1,17 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const PrivacyData = () => {
+    const { t } = useTranslation()
     return (
         <React.Fragment>
             <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                bibendum nibh vel volutpat condimentum. Nullam nec libero leo.
-                Donec augue felis, varius viverra tortor non, dictum hendrerit
-                purus. Cras aliquam id orci pharetra malesuada. enim elit
-                volutpat velit, eu faucibus erat metus at diam. Integer vitae
-                nisl et le eleifend mollis.
+                {t('PRIVACY_TEXT_P1')}
             </p>
             <p>
-                Cras aliquam id orci pharetra malesuada. Aliquam nec mattis
-                augue, art aliquam quam. In eget efficitur , sem facilisis veh
-                vestibulum, enim elit volutpat velit, eu faucibus erat metus at
-                diam. Integer vitae nisl et le eleifend aliquam quam. In eget
-                efficitur , sem facilisis veh vestibulum, mollis.Lorem ipsum
-                dolor sit amet, consectetur adipiscing elit. Sed bibendum nibh
-                vel volutpat condimentum. Nullam nec libero leo. Donec augue
-                felis, varius viverra tortor non, dictum hendrerit purus. Cras
-                aliquam id orci pharetra malesuada. enim elit volutpat velit, eu
-                faucibus erat metus at diam. Integer vitae nisl et le eleifend
-                mollis.
+              {t('PRIVACY_TEXT_P2')}
             </p>
-            <p>
-                Cras aliquam id orci pharetra malesuada. Aliquam nec mattis
-                augue, art aliquam quam. In eget efficitur , sem facilisis veh
-                vestibulum, enim elit volutpat velit, eu faucibus erat metus at
-                diam. Integer vitae nisl et le eleifend aliquam quam. In eget
-                efficitur , sem facilisis veh vestibulum, mollis.Nullam nec
-                libero leo. Donec augue felis, varius viverra tortor non, dictum
-                hendrerit purus. Cras aliquam id orci pharetra malesuada. enim
-                elit volutpat velit,
-            </p>
+
         </React.Fragment>
     )
 }

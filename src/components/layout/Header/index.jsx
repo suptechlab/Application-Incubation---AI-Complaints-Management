@@ -83,11 +83,11 @@ const Header = ({ layout }) => {
         if (notificationListApi.fulfilled.match(result)) {
           // setNotifications(result?.payload?.) 
           setTotalNotificationCount(result?.payload?.headers['x-total-count'])
-        setNotifications((prevNotifications) => {
-          const existingIds = new Set(prevNotifications.map((n) => n.notification.id));
-          const newNotifications = result?.payload?.data?.filter((n) => !existingIds.has(n.notification.id));
-          return [...prevNotifications, ...newNotifications];
-        });
+          setNotifications((prevNotifications) => {
+            const existingIds = new Set(prevNotifications.map((n) => n.notification.id));
+            const newNotifications = result?.payload?.data?.filter((n) => !existingIds.has(n.notification.id));
+            return [...prevNotifications, ...newNotifications];
+          });
 
         } else {
           console.error("Verification error:", result.error.message);
@@ -95,7 +95,7 @@ const Header = ({ layout }) => {
       })
       .catch(error => {
         console.error("Error during file claim submission:", error);
-      }).finally(()=>{
+      }).finally(() => {
         setLoading(false)
       });
   }
@@ -113,7 +113,6 @@ const Header = ({ layout }) => {
     );
 
     if (notification?.redirectUrl) {
-      console.log(notification?.redirectUrl)
       navigate("/" + notification?.redirectUrl)
     }
 
@@ -230,9 +229,6 @@ const Header = ({ layout }) => {
       console.error("Error fetching notification count:", error);
     }
   };
-
-  console.log({total : totalNotificationCount})
-  console.log({list : notifications.length})
   const handleScroll = () => {
     if (menuRef.current) {
       const bottom = menuRef.current.scrollHeight === menuRef.current.scrollTop + menuRef.current.clientHeight;
@@ -257,7 +253,9 @@ const Header = ({ layout }) => {
   }, []);
 
   useEffect(() => {
-    getAllNotifications()
+    if (isLoggedIn) {
+      getAllNotifications()
+    }
   }, [currentPage])
 
   return (
@@ -391,15 +389,15 @@ const Header = ({ layout }) => {
                     ))
                   }
                   {
-                  loading &&
-                  <li  className="list-group-item d-flex align-items-center">
-                  <div className="w-100 px-3 py-1">
-                    <div className="placeholder col-8 bg-secondary"></div>
-                    <div className="placeholder col-11 bg-secondary mt-2"></div>
-                    <div className="placeholder col-6 bg-secondary mt-2"></div>
-                  </div>
-                </li>
-                }
+                    loading &&
+                    <li className="list-group-item d-flex align-items-center">
+                      <div className="w-100 px-3 py-1">
+                        <div className="placeholder col-8 bg-secondary"></div>
+                        <div className="placeholder col-11 bg-secondary mt-2"></div>
+                        <div className="placeholder col-6 bg-secondary mt-2"></div>
+                      </div>
+                    </li>
+                  }
                 </ul>
               </Dropdown.Menu>
             </Dropdown>
