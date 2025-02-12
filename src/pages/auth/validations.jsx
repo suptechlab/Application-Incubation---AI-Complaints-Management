@@ -91,11 +91,11 @@ export const ClaimDetailsFormSchema = yup.object({
   precedents: yup
     .string()
     .required(msg.precedentsRequired)
-    .max(1024, msg.precedentsMaxLength),
+    .max(5000, msg.precedentsMaxLength),
   specificPetition: yup
     .string()
     .required(msg.specificPetitionRequired)
-    .max(1024, msg.specificPetitionMaxLength),
+    .max(5000, msg.specificPetitionMaxLength),
   attachments: yup
     .string()
     .label(msg.attachments),

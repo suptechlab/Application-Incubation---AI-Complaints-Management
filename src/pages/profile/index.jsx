@@ -139,7 +139,7 @@ const ProfileModal = ({ handleShow, handleClose }) => {
                         <Modal.Body className="text-break small pt-2">
                             <Row className="gx-4">
                                 <Col xs={12}>
-                                    <CommonViewData label="Name" value={user?.name} />
+                                    <CommonViewData label={t("NAME")} value={user?.name} />
                                 </Col>
                                 <Col xs={12}>
                                     <Stack
@@ -201,7 +201,7 @@ const ProfileModal = ({ handleShow, handleClose }) => {
                                         id="phoneNumber"
                                         label={t("PHONE_NUMBER") + '*'}
                                         name="phoneNumber"
-                                        type="number"
+                                        type="integer"
                                         error={formikProps.errors.phoneNumber}
                                         onBlur={formikProps.handleBlur}
                                         onChange={formikProps.handleChange}

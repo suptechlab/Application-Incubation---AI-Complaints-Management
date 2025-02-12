@@ -34,9 +34,8 @@ export const messages = {
     attachmentsLabel: 'Attachments',
     firstInstanceTicketRequired: 'First instance complaint ticket is required.',
     commentsRequired: 'Comments are required.',
-    firstInstanceTicketRequired: '',
-    precedentsMaxLength: 'Precedents must not exceed 1024 characters.',
-    specificPetitionMaxLength: 'Specific Petition must not exceed 1024 characters.'
+    precedentsMaxLength: 'Precedents must not exceed 5000 characters.',
+    specificPetitionMaxLength: 'Specific Petition must not exceed 5000 characters.'
   },
   es: {
     agreePrivacy: 'Debes aceptar la política de privacidad',
@@ -63,8 +62,8 @@ export const messages = {
     organizationRequired: 'Se requiere el nombre de la entidad',
     claimTypeRequired: 'Se requiere el tipo de reclamación',
     claimSubTypeRequired: 'Se requiere el subtipo de reclamación',
-    precedentsRequired: 'Se requieren precedentes',
-    specificPetitionRequired: 'Se requiere una petición específica',
+    precedentsRequired: 'Se requieren antecedentes',
+    specificPetitionRequired: 'Se requiere una petición concreta',
     maximumLimit100: 'Se ha excedido el límite máximo de 100 caracteres',
     maximumLimit1024: 'Se ha excedido el límite máximo de 1024 caracteres',
     maximumLimit15: 'Se ha excedido el límite máximo de 15 caracteres',
@@ -74,7 +73,7 @@ export const messages = {
     firstInstanceTicketRequired: 'Se requiere ticket de denuncia de primera instancia.',
     commentsRequired: 'Se requieren comentarios.',
     secondInstanceTicketRequired: 'Se requiere ticket de reclamo de 2da instancia.',
-    precedentsMaxLength: 'Los precedentes no deben exceder los 1024 caracteres.',
-    specificPetitionMaxLength: 'La petición específica no debe exceder los 1024 caracteres.'
+    precedentsMaxLength: 'Los precedentes no deben exceder los 5000 caracteres.',
+    specificPetitionMaxLength: 'La petición específica no debe exceder los 5000 caracteres.'
   },
 };
