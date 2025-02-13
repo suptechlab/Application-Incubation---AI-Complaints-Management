@@ -359,7 +359,7 @@ const ViewClaim = ({ claimModalView, handleShow, handleClose, selectedRow }) => 
                             <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
 
                                 <Modal.Title as="h4" className="fw-bold d-inline-flex align-items-center flex-wrap gap-2">
-                                    {t("TICKET_ID")}: #{claimTicketData?.ticketId}{" "}
+                                    {t("TICKET_ID")}: #{claimTicketData?.formattedTicketId}{" "}
                                     <span
                                         className={`text-nowrap bg-opacity-25 fs-14 fw-semibold px-3 py-1 rounded-pill ${getStatusClass(
                                             claimTicketData?.instanceType
