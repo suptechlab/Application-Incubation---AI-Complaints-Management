@@ -15,7 +15,7 @@ import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState, setLoading }) => {
+const TicketViewHeader = ({ title, ticketData={}, setIsGetActivityLogs, getTicketData, permissionState={}, setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -307,7 +307,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                 getTicketData={getTicketData}
             />
             <CloseTicketModal
-                ticketId={ticketData?.id}
+                ticketId={ticketData?.id ?? ""}
                 modal={closeTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
@@ -315,7 +315,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                 getTicketData={getTicketData}
             />
             <RejectTicketModal
-                ticketId={ticketData?.id}
+                ticketId={ticketData?.id ?? ""}
                 modal={rejectTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
@@ -327,7 +327,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
 };
 
 TicketViewHeader.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.any.isRequired,
     ticketData: PropTypes.object, // Assuming ticketData is an object, adjust based on the actual structure
     setIsGetActivityLogs: PropTypes.func.isRequired,
     getTicketData: PropTypes.func.isRequired,
@@ -342,11 +342,11 @@ TicketViewHeader.propTypes = {
     // })),
 };
 
-TicketViewHeader.defaultProps = {
-    // actions: [],
-    ticketData: null, // Set default value for ticketData if needed
-    permissionState: null, // Set default value for permissionState if needed
-    // setIsGetActivityLogs:null,
-};
+// TicketViewHeader.defaultProps = {
+//     // actions: [],
+//     ticketData: null, // Set default value for ticketData if needed
+//     permissionState: null, // Set default value for permissionState if needed
+//     // setIsGetActivityLogs:null,
+// };
 
 export default TicketViewHeader;

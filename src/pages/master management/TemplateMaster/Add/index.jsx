@@ -15,10 +15,13 @@ import {
   getTemplateMaster,
   templateDetailForCopy,
   templateDropdownList,
+  templateKeywordListing,
 } from "../../../../services/templateMaster.service";
 import Loader from "../../../../components/Loader";
 import PageHeader from "../../../../components/PageHeader";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
+import AppTooltip from "../../../../components/tooltip";
+import { IoInformationCircle } from "react-icons/io5";
 
 const AddTemplate = () => {
 
@@ -80,7 +83,29 @@ const AddTemplate = () => {
     })
   }
 
+
+  const getTemplateKeywordList = (templateId) => {
+
+    const params = templateId ? { templateId } : {};
+
+    templateKeywordListing(params)
+      .then((response) => {
+        console.log(response)
+        if (response?.data) {
+          setVariableList(response?.data)
+        } else {
+          setVariableList([])
+        }
+
+      })
+      .catch((error) => {
+        console.error("Error get during to fetch", error);
+      });
+  }
+
+
   useEffect(() => {
+    getTemplateKeywordList()
     getTemplateDropdownList()
   }, [])
 
@@ -98,11 +123,12 @@ const AddTemplate = () => {
           templateId: templateId,
         })
 
-        if (response?.data?.supportedVariables) {
-          setVariableList(response?.data?.supportedVariables.split(","))
-        } else {
-          setVariableList([])
-        }
+        getTemplateKeywordList(templateId)
+        // if (response?.data?.supportedVariables) {
+        //   setVariableList(response?.data?.supportedVariables.split(","))
+        // } else {
+        //   setVariableList([])
+        // }
 
       }
     }).catch((error) => {
@@ -274,7 +300,7 @@ const AddTemplate = () => {
                         <Button
                           type="button"
                           variant="outline-dark"
-                          // onClick={toggle}
+                          onClick={() => { navigate('/template-master') }}
                           className="custom-min-width-85"
                         >
                           {t("CANCEL")}
@@ -295,20 +321,25 @@ const AddTemplate = () => {
               <Col lg="4">
                 <Card>
                   <Card.Header className="border-0">
-                    <p className="mb-0 fs-18 fw-semibold">Keyword List</p>
+                    <p className="mb-0 fs-18 fw-semibold">{t('KEYWORD_LIST')}</p>
                   </Card.Header>
 
                   <Card.Body>
                     <ul className="variable-list ps-0">
                       {
-                        variableList?.map((variable, index) => (
-                          <li key={index + 1} className="text-primary mb-2 fs-16"><GoCheckCircleFill size={20} className="me-2" /> {variable}</li>
+                        variableList?.map((keyword, index) => (
+                          <li key={index + 1} className={`${keyword?.isUse ? 'text-orange' : 'text-primary'} mb-2 fs-16`}>
+                            <AppTooltip title={keyword?.usage} placement="top">
+                              <span>
+                                <IoInformationCircle size={20} className="me-2" />
+                              </span>
+                            </AppTooltip>
+                            {keyword.keyword}</li>
                         ))
                       }
                     </ul>
                   </Card.Body>
                 </Card>
-
               </Col>
             </Row>
 

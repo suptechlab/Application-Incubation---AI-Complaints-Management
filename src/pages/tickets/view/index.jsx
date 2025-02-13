@@ -602,7 +602,7 @@ const TicketsView = () => {
                     <Col xs="auto">
                       <Image
                         className="object-fit-cover rounded-circle"
-                        src={profileImage ?? defaultAvatar}
+                        src={profileImage && profileImage!=="" ? profileImage : defaultAvatar}
                         width={36}
                         height={36}
                         alt={ticketData?.user?.name}

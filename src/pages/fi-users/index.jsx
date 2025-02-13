@@ -53,11 +53,14 @@ export default function FIUserList() {
       statusModule: false,
       addModule: false,
       editModule: false,
+      importModule: false,
     };
     if (currentUser === "SYSTEM_ADMIN") {
       updatedPermissions.statusModule = true;
       updatedPermissions.addModule = true;
       updatedPermissions.editModule = true;
+      updatedPermissions.importModule = true
+
     } else {
       const permissionArr = permissions['FI User'] ?? [];
 
@@ -71,6 +74,9 @@ export default function FIUserList() {
 
       if (["FI_STATUS_CHANGE_CREATE_BY_SEPS", "FI_STATUS_CHANGE_CREATE_BY_FI"].some(permission => permissionArr.includes(permission))) {
         updatedPermissions.statusModule = true;
+      }
+      if (["FI_USER_IMPORT_BY_SEPS","FI_USER_IMPORT_BY_FI"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.importModule = true;
       }
 
     }
@@ -312,15 +318,24 @@ export default function FIUserList() {
     };
   }, [queryClient]);
 
-  const actions = permissionsState?.addModule
-    ? [{
+  const actions = [];
+
+  if (permissionsState?.importModule) {
+    actions.push({
       label: t("IMPORT FI USERS"),
       to: "/fi-users/import",
       variant: "outline-dark",
       disabled: false
-    },
-    { label: t("ADD NEW"), to: "/fi-users/add", variant: "warning" },]
-    : [];
+    });
+  }
+  
+  if (permissionsState?.addModule) {
+    actions.push({
+      label: t("ADD NEW"),
+      to: "/fi-users/add",
+      variant: "warning"
+    });
+  }
   return (
     <React.Fragment>
       <Loader isLoading={loading} />

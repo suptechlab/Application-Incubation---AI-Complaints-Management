@@ -186,7 +186,7 @@ const routes = [
     element: <ChangePassword />,
     isPrivate: true,
     layoutType: "Auth",
-    module : 'change_password'
+    module: 'change_password'
   },
   {
     path: "/profile",
@@ -201,9 +201,9 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
     module: "SEPS User",
-    permissions: ["SEPS_USER_CREATE_BY_SEPS", "SEPS_USER_UPDATE_BY_SEPS", "SEPS_USER_STATUS_CHANGE_BY_SEPS"]
+    permissions: ["SEPS_USER_CREATE_BY_SEPS", "SEPS_USER_UPDATE_BY_SEPS", "SEPS_USER_STATUS_CHANGE_BY_SEPS", "SEPS_USER_IMPORT_BY_SEPS"]
   },
- 
+
   {
     path: "/users/add",
     element: <AddUserPage isEdit={false} />,
@@ -226,9 +226,9 @@ const routes = [
     isPrivate: true,
     module: "SEPS User",
     layoutType: "Auth",
-    permissions: ["SEPS_USER_CREATE_BY_SEPS"]
+    permissions: ["SEPS_USER_IMPORT_BY_SEPS"]
   },
-  
+
   // {
   //   path: "/users/import",
   //   element: <ImportSEPSUser isEdit={false} />,
@@ -237,24 +237,30 @@ const routes = [
   //   layoutType: "Auth",
   //   permissions: ["SEPS_USER_CREATE_BY_SEPS"]
   // },
-  
+
   {
     path: "/role-rights",
     element: <RoleRightsList />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Role & Rights",
+    permissions: ["ROLE_AND_RIGHT_CREATE_BY_SEPS", "ROLE_AND_RIGHT_UPDATE_BY_SEPS", "ROLE_AND_RIGHT_STATUS_CHANGE_BY_SEPS"]
   },
   {
     path: "/role-rights/add",
     element: <AddEditRoleRights isEdit={false} />,
     isPrivate: true,
     layoutType: "Auth",
+    module: "Role & Rights",
+    permissions: ["ROLE_AND_RIGHT_CREATE_BY_SEPS"]
   },
   {
     path: "/role-rights/edit/:id",
     element: <AddEditRoleRights isEdit={true} />,
     isPrivate: true,
+    module: "Role & Rights",
     layoutType: "Auth",
+    permissions: ["ROLE_AND_RIGHT_UPDATE_BY_SEPS"]
   },
   {
     path: "/fi-users",
@@ -276,7 +282,7 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
     module: "FI User",
-    permissions: ["FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI"]
+    permissions: ["FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI", "FI_USER_IMPORT_BY_SEPS", "FI_USER_IMPORT_BY_FI"]
   },
   {
     path: "/fi-users/edit/:id",
@@ -292,7 +298,7 @@ const routes = [
     isPrivate: true,
     module: "FI User",
     layoutType: "Auth",
-    permissions: ["FI_USER_CREATE_BY_SEPS", "FI_USER_CREATE_BY_FI"]
+    permissions: ["FI_USER_IMPORT_BY_SEPS", "FI_USER_IMPORT_BY_FI"]
   },
   {
     path: "/reports/audit-trail",
@@ -316,7 +322,7 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
     module: "Reports",
-    permissions: ["SLA_COMPLIANCE"]
+    permissions: ["SLA_COMPLIANCE", "SLA_COMPLIANCE_BY_FI"]
   },
   {
     path: "/reports/claim-overview",
@@ -324,7 +330,7 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
     module: "Reports",
-    permissions: ["CLAIM_OVERVIEW_REPORT"]
+    permissions: ["CLAIM_OVERVIEW_REPORT", "CLAIM_OVERVIEW_REPORT_BY_FI"]
   },
   {
     path: "*",
@@ -362,7 +368,9 @@ const routes = [
       "TICKET_REPLY_TO_INTERNAL_FI",
       "TICKET_REPLY_TO_INTERNAL_SEPS",
       "TICKET_INTERNAL_NOTE_FI",
-      "TICKET_INTERNAL_NOTE_SEPS"
+      "TICKET_INTERNAL_NOTE_SEPS",
+      "TICKET_VIEW_ALL_SEPS",
+      "TICKET_VIEW_ALL_FI"
     ]
   },
   {
@@ -390,7 +398,9 @@ const routes = [
       "TICKET_REPLY_TO_INTERNAL_FI",
       "TICKET_REPLY_TO_INTERNAL_SEPS",
       "TICKET_INTERNAL_NOTE_FI",
-      "TICKET_INTERNAL_NOTE_SEPS"
+      "TICKET_INTERNAL_NOTE_SEPS",
+      "TICKET_VIEW_ALL_SEPS",
+      "TICKET_VIEW_ALL_FI"
     ]
   },
   {

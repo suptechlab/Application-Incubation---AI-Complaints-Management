@@ -12,10 +12,12 @@ import ReactSelect from "../../../../components/ReactSelect";
 import {
   editTemplateMaster,
   getTemplateMaster,
+  templateKeywordListing,
 } from "../../../../services/templateMaster.service";
 import Loader from "../../../../components/Loader";
 import PageHeader from "../../../../components/PageHeader";
-import { GoCheckCircleFill } from "react-icons/go";
+import { IoInformationCircle } from "react-icons/io5";
+import AppTooltip from "../../../../components/tooltip";
 
 const EditTemplate = () => {
   const { t } = useTranslation();
@@ -52,13 +54,29 @@ const EditTemplate = () => {
             userType: response?.data?.userType ?? ""
           });
 
-          if (response?.data?.supportedVariables) {
-            setVariableList(response?.data?.supportedVariables.split(","))
+          // if (response?.data?.supportedVariables) {
+          //   setVariableList(response?.data?.supportedVariables.split(","))
+          // } else {
+          //   setVariableList([])
+          // }
+
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error get during to fetch", error);
+        });
+
+
+
+      templateKeywordListing(id)
+        .then((response) => {
+          console.log(response)
+          if (response?.data) {
+            setVariableList(response?.data)
           } else {
             setVariableList([])
           }
 
-          setLoading(false);
         })
         .catch((error) => {
           console.error("Error get during to fetch", error);
@@ -206,6 +224,7 @@ const EditTemplate = () => {
                           content={values?.content}
                           error={errors?.content}
                           touched={touched?.content}
+                          height="315"
                           handleBlur={handleBlur}
                           handleChange={(value) => {
                             setFieldValue("content", value === "<p><br></p>" ? "" : value);
@@ -215,7 +234,7 @@ const EditTemplate = () => {
                           <Button
                             type="button"
                             variant="outline-dark"
-                            // onClick={toggle}
+                            onClick={() => { navigate('/template-master') }}
                             className="custom-min-width-85"
                           >
                             {t("CANCEL")}
@@ -233,17 +252,22 @@ const EditTemplate = () => {
                   )}
                 </Formik>
               </Col>
-              <Col lg="4">
-                <Card>
-                  <Card.Header className="border-0">
-                    <p className="mb-0 fs-18 fw-semibold">Keyword List</p>
+              <Col lg="4" >
+                <Card >
+                  <Card.Header className="border-0 ">
+                    <p className="mb-0 fs-18 fw-semibold">{t("KEYWORD_LIST")}</p>
                   </Card.Header>
-
-                  <Card.Body>
+                  <Card.Body className="h-100 overflow-auto">
                     <ul className="variable-list ps-0">
                       {
-                        variableList?.map((variable, index) => (
-                          <li key={index + 1} className="text-primary mb-2 fs-16"><GoCheckCircleFill size={20} className="me-2" /> {variable}</li>
+                        variableList?.map((keyword, index) => (
+                          <li key={index + 1} className={`${keyword?.isUse ? 'text-orange' :'text-primary'} mb-2 fs-16`}>
+                            <AppTooltip title={keyword?.usage} placement="top">
+                              <span>
+                                <IoInformationCircle size={20} className="me-2" />
+                              </span>
+                            </AppTooltip>
+                            {keyword.keyword}</li>
                         ))
                       }
                     </ul>

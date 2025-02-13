@@ -36,11 +36,13 @@ export default function UserList() {
       statusModule: false,
       addModule: false,
       editModule: false,
+      importModule : false
     };
     if (currentUser === "SYSTEM_ADMIN") {
       updatedPermissions.statusModule = true;
       updatedPermissions.addModule = true;
       updatedPermissions.editModule = true;
+      updatedPermissions.importModule = true;
     } else {
       const permissionArr = permissions['SEPS User'] ?? [];
       if (permissionArr.includes("SEPS_USER_CREATE_BY_SEPS")) {
@@ -51,6 +53,9 @@ export default function UserList() {
       }
       if (permissionArr.includes("SEPS_USER_STATUS_CHANGE_BY_SEPS")) {
         updatedPermissions.statusModule = true;
+      }
+      if (permissionArr.includes("SEPS_USER_IMPORT_BY_SEPS")) {
+        updatedPermissions.importModule = true;
       }
     }
 
@@ -261,17 +266,21 @@ export default function UserList() {
     };
   }, [queryClient]);
 
-  const actions = permissionsState?.addModule
-    ? [
-      {
-        label: t("IMPORT_SEPS_USERS"),
-        to: "/users/import",
-        variant: "outline-dark",
-        disabled: false
-      }
-      ,
-      { label: t('ADD NEW'), to: "/users/add", variant: "warning" }]
-    : [];
+  const actions = [];
+
+  if (permissionsState?.importModule) {
+    actions.push( {
+      label: t("IMPORT_SEPS_USERS"),
+      to: "/users/import",
+      variant: "outline-dark",
+      disabled: false
+    });
+  }
+  
+  if (permissionsState?.addModule) {
+    actions.push(  { label: t('ADD NEW'), to: "/users/add", variant: "warning" });
+  }
+
 
   return (
     <React.Fragment>
