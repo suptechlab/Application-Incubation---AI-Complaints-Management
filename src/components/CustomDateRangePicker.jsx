@@ -16,10 +16,11 @@ const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleCh
         placeholderText={placeholder}
         selected={startDate}
         onChange={handleChange}
+        showMonthYearPicker
         selectsRange={selectsRange}
         startDate={tempDateRange[0]}
         endDate={tempDateRange[1]}
-        dateFormat="YYYY-MM-dd"
+        dateFormat="YYYY-MM"
         showDatePicker
         isClearable
         showIcon
