@@ -342,3 +342,13 @@ input:-webkit-autofill:active {
         --bs-border-width: 1px;
     }
 }
+.sidebar-card{
+    max-height: 75vh;
+    width: 300px;
+    @include below-md(){
+        width: 100%;
+        margin-top:1rem;
+    }
+}
+
+// className="custom-width-280 mw-100 max-height-75"

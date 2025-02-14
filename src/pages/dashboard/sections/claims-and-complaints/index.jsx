@@ -16,6 +16,7 @@ import { MasterDataContext } from '../../../../contexts/masters.context'
 import { convertToLabelValue } from '../../../../services/ticketmanagement.service'
 import toast from 'react-hot-toast'
 import PropTypes from "prop-types"
+import { AuthenticationContext } from '../../../../contexts/authentication.context'
 
 const ClaimsAndComplaints = ({ setLoading }) => {
     const location = useLocation();
@@ -28,12 +29,13 @@ const ClaimsAndComplaints = ({ setLoading }) => {
     });
 
     const { masterData } = useContext(MasterDataContext)
+    const { currentUser } = useContext(AuthenticationContext)
 
     const [sorting, setSorting] = React.useState([]);
     const [filter, setFilter] = React.useState({
         search: "",
         claimTicketStatus: "",
-        instanceType:"",
+        instanceType: "",
         startDate: null,
         endDate: null
     });
@@ -175,7 +177,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
             case 'REJECTED':
                 return 'bg-custom-danger text-custom-danger';
             default:
-                return 'bg-body text-body';
+                return 'bg-secondary text-body';
         }
     };
     // Handle Attachments Button
@@ -308,23 +310,26 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                             gap={2}
                             className="flex-wrap"
                         >
-                            <div className="custom-min-width-180 flex-grow-1 flex-md-grow-0">
-                                <ReactSelect
-                                    wrapperClassName="mb-0"
-                                    class="form-select "
-                                    placeholder={t("SELECT")}
-                                    id="instanceType"
-                                    onChange={(event) => {
-                                        setFilter({
-                                            ...filter,
-                                            instanceType: event.target.value,
-                                        });
-                                    }}
-                                    value={filter?.instanceType ?? ''}
-                                    size="sm"
-                                    options={instanceType ?? []}
-                                />
-                            </div>
+                            {
+                                currentUser !== 'FI_USER' &&
+                                <div className="custom-min-width-180 flex-grow-1 flex-md-grow-0">
+                                    <ReactSelect
+                                        wrapperClassName="mb-0"
+                                        class="form-select "
+                                        placeholder={t("ALL_INSTANCE")}
+                                        id="instanceType"
+                                        onChange={(event) => {
+                                            setFilter({
+                                                ...filter,
+                                                instanceType: event.target.value,
+                                            });
+                                        }}
+                                        value={filter?.instanceType ?? ''}
+                                        size="sm"
+                                        options={instanceType ?? []}
+                                    />
+                                </div>
+                            }
                             <Button
                                 type="button"
                                 variant='warning'
@@ -333,7 +338,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                                 onClick={handleDownload}
                                 disabled={isDownloading ?? false}
                             >
-                                {t("EXPORT TO CSV")}
+                                {t("EXPORT TO EXCEL")}
                             </Button>
                         </Stack>
                     </Stack>

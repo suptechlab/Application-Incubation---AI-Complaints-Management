@@ -8,6 +8,7 @@ import ReactSelect from "../../components/ReactSelect";
 import { convertToLabelValue } from "../../services/ticketmanagement.service";
 import { getOrganizationList } from "../../services/teamManagment.service";
 import toast from "react-hot-toast";
+import { AuthenticationContext } from "../../contexts/authentication.context";
 
 const FilterModal = ({ modal, toggle, filter, setFilter }) => {
 
@@ -15,6 +16,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
   const { t } = useTranslation()
 
   const { masterData } = useContext(MasterDataContext)
+  const { currentUser } = useContext(AuthenticationContext)
 
   const [instanceTypeOptions, setInstanceTypeOptions] = useState([])
   const [organizationOptions, setOrganizationOptions] = useState([])
@@ -113,6 +115,9 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
         <Form>
           <Modal.Body className="text-break py-0">
             <Row>
+            {
+              currentUser !== "FI_USER" && 
+
               <Col sm={12} lg={6}>
                 <ReactSelect
                   label={t("INSTANCE_TYPE")}
@@ -137,6 +142,8 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
                   touched={touched.instanceType}
                 />
               </Col>
+            }
+              
               <Col sm={12} lg={6}>
                 <ReactSelect
                   label={t("ORGANIZATION")}

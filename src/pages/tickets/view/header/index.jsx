@@ -16,7 +16,7 @@ import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 import { IoMdDownload } from "react-icons/io";
 
-const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTicketData, permissionState, setLoading }) => {
+const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTicketData, permissionState = {}, setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -76,7 +76,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
             case 'ASSIGNED':
                 return 'bg-warning';
             default:
-                return 'bg-body';
+                return 'bg-secondary';
         }
     };
 
@@ -294,18 +294,29 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                             </div>
                         }
                         {
-                            (permissionState?.dateExtPermission === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED" && ticketData?.slaBreachDate !== null)) ?
-                                <Button
-                                    type="submit"
-                                    variant='warning'
-                                    onClick={handleDateExtensionClick}
-                                >
-                                    {t("DATE_EXTENSION")}
-                                </Button> : ""
+                            permissionState?.dateExtPermission === true &&
+                            (
+                                (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
+                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
+
+                            <Button
+                                type="submit"
+                                variant='warning'
+                                onClick={handleDateExtensionClick}
+                            >
+                                {t("DATE_EXTENSION")}
+                            </Button>
                         }
                        
                         {
-                            (permissionState?.statusModule === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
+                            (permissionState?.statusModule === true
+                                &&  (
+                                (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
+                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED"))) ?
                                 <Dropdown>
                                     <Dropdown.Toggle
                                         id="ticket-detail-status"
@@ -355,7 +366,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                 getTicketData={getTicketData}
             />
             <CloseTicketModal
-                ticketId={ticketData?.id}
+                ticketId={ticketData?.id ?? ""}
                 modal={closeTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setCloseTicketModalShow(false)}
@@ -363,7 +374,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
                 getTicketData={getTicketData}
             />
             <RejectTicketModal
-                ticketId={ticketData?.id}
+                ticketId={ticketData?.id ?? ""}
                 modal={rejectTicketModalShow}
                 setSelectedStatus={setSelectedStatus}
                 toggle={() => setRejectTicketModalShow(false)}
@@ -375,7 +386,7 @@ const TicketViewHeader = ({ title = "", ticketData, setIsGetActivityLogs, getTic
 };
 
 TicketViewHeader.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.any.isRequired,
     ticketData: PropTypes.object, // Assuming ticketData is an object, adjust based on the actual structure
     setIsGetActivityLogs: PropTypes.func.isRequired,
     getTicketData: PropTypes.func.isRequired,
@@ -390,11 +401,11 @@ TicketViewHeader.propTypes = {
     // })),
 };
 
-TicketViewHeader.defaultProps = {
-    // actions: [],
-    ticketData: null, // Set default value for ticketData if needed
-    permissionState: null, // Set default value for permissionState if needed
-    // setIsGetActivityLogs:null,
-};
+// TicketViewHeader.defaultProps = {
+//     // actions: [],
+//     ticketData: null, // Set default value for ticketData if needed
+//     permissionState: null, // Set default value for permissionState if needed
+//     // setIsGetActivityLogs:null,
+// };
 
 export default TicketViewHeader;

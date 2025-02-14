@@ -37,3 +37,9 @@ export const fetchModulesAndPermissions = async (userType) => {
 export const getRolesDropdownData = async (userType) =>{
     return await adminApi.get(`/${API_VERSION}/roles/dropdown/${userType}`);
 }
+
+
+// UPDATE ROLE AND RIGHT STATUS
+export const roleRightsStatusChanges = async (id,status) => {
+  return await adminApi.patch(`/${API_VERSION}/roles/${id}/status?status=${status}`);
+}
