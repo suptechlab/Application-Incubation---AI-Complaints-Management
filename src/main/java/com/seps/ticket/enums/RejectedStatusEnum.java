@@ -4,8 +4,8 @@ import com.seps.ticket.component.EnumWithDescription;
 
 public enum RejectedStatusEnum implements EnumWithDescription {
     DUPLICATE("enum.duplicate"),
-    MISSING_INFORMATION("enum.missing.information"),
-    EXPIRED("enum.expired");
+    MISSING_INFORMATION("enum.missing.information");
+    //EXPIRED("enum.expired");
 
     private final String key;
 

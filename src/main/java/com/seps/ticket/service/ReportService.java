@@ -6,6 +6,7 @@ import com.seps.ticket.component.EnumUtil;
 import com.seps.ticket.config.Constants;
 import com.seps.ticket.domain.*;
 import com.seps.ticket.enums.ClaimTicketStatusEnum;
+import com.seps.ticket.enums.InstanceTypeEnum;
 import com.seps.ticket.enums.SlaComplianceEnum;
 import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketEnum;
 import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketReportEnum;
@@ -56,7 +57,7 @@ public class ReportService {
     private final UserService userService;
     private final ClaimTicketMapper claimTicketMapper;
     private final EnumUtil enumUtil;
-
+    private final RoleService roleService;
     /**
      * Constructs a new instance of ReportService with the required dependencies.
      *
@@ -65,11 +66,12 @@ public class ReportService {
      * @param claimTicketMapper     mapper for converting claim ticket entities to DTOs
      * @param enumUtil              utility for localizing enums
      */
-    public ReportService(ClaimTicketRepository claimTicketRepository, UserService userService, ClaimTicketMapper claimTicketMapper, EnumUtil enumUtil) {
+    public ReportService(ClaimTicketRepository claimTicketRepository, UserService userService, ClaimTicketMapper claimTicketMapper, EnumUtil enumUtil, RoleService roleService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.claimTicketMapper = claimTicketMapper;
         this.enumUtil = enumUtil;
+        this.roleService = roleService;
     }
 
     /**
@@ -102,12 +104,15 @@ public class ReportService {
         User currentUser = userService.getCurrentUser();
         List<String> authority = currentUser.getAuthorities().stream().map(Authority::getName).toList();
         if (authority.contains(AuthoritiesConstants.FI)) {
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_FI");
             filterRequest.setOrganizationId(currentUser.getOrganization().getId());
-            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
+            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) && permissetSet.isEmpty()) {
                 filterRequest.setFiAgentId(currentUser.getId());
             }
+            filterRequest.setInstanceType(InstanceTypeEnum.FIRST_INSTANCE);
         } else {
-            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_SEPS");
+            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) && permissetSet.isEmpty()) {
                 filterRequest.setSepsAgentId(currentUser.getId());
             }
         }

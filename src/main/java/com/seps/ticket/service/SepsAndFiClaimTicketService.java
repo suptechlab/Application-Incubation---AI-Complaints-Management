@@ -180,6 +180,7 @@ public class SepsAndFiClaimTicketService {
             if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) && permissetSet.isEmpty()) {
                 fiAgentId = currentUser.getId();
             }
+            filterRequest.setInstanceType(InstanceTypeEnum.FIRST_INSTANCE);
         } else {
             Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_SEPS");
             if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) && permissetSet.isEmpty()) {
@@ -666,6 +667,8 @@ public class SepsAndFiClaimTicketService {
 
         ClaimTicketActivityLog activityLog = createExtendDateActivityLog(currentUser, ticket, newSlaDate, reason);
         ticket.setSlaBreachDate(newSlaDate);
+        ticket.setIsSlaExtended(true);
+        ticket.setDateWhenSlaExtended(Instant.now());
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -755,13 +758,15 @@ public class SepsAndFiClaimTicketService {
         List<ClaimStatusCountProjection> projections;
         if (authority.contains(AuthoritiesConstants.FI)) {
             Long organizationId = currentUser.getOrganization().getId();
-            if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
-                projections = claimTicketRepository.countClaimsByStatusAndTotalFiAgentAndOrganizationId(null, organizationId);
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_FI");
+            if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) || !permissetSet.isEmpty()) {
+                projections = claimTicketRepository.countClaimsByStatusAndTotalFiAgentAndOrganizationId(null, organizationId, InstanceTypeEnum.FIRST_INSTANCE);
             } else {
-                projections = claimTicketRepository.countClaimsByStatusAndTotalFiAgentAndOrganizationId(userId, organizationId);
+                projections = claimTicketRepository.countClaimsByStatusAndTotalFiAgentAndOrganizationId(userId, organizationId, InstanceTypeEnum.FIRST_INSTANCE);
             }
         } else {
-            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_SEPS");
+            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) && permissetSet.isEmpty()) {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalSEPS(userId);
             } else {
                 projections = claimTicketRepository.countClaimsByStatusAndTotalSEPS(null);
@@ -1051,7 +1056,11 @@ public class SepsAndFiClaimTicketService {
         ticket.setStatus(ClaimTicketStatusEnum.REJECTED);
         ticket.setRejectedStatus(claimTicketRejectRequest.getRejectedStatus());
         ticket.setStatusComment(claimTicketRejectRequest.getReason());
+        ticket.setResolvedOn(Instant.now());
         ticket.setSlaPopup(null);
+        if (ticket.getSlaBreachDate() == null) {
+            ticket.setSlaBreachDate(LocalDate.now());
+        }
         ticket.setUpdatedBy(currentUser.getId());
 
         // Save the updated ticket
@@ -1654,11 +1663,18 @@ public class SepsAndFiClaimTicketService {
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
+            if (!ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+            }
         } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
+            if (ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+            }
         }
+
         if (ticket.getStatus().equals(status)) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_ALREADY_IN_STATUS, new String[]{enumUtil.getLocalizedEnumValue(status, LocaleContextHolder.getLocale())}, null);
         }

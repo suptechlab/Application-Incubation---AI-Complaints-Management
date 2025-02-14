@@ -56,4 +56,6 @@ public class ClaimTicketListDTO {
     private Boolean slaPopup;
     private Double claimAmount;
     private String formattedTicketId;
+    private Long previousTicketId;
+    private Long remainingDaysOfSla;
 }

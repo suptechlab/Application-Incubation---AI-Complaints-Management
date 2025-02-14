@@ -101,4 +101,16 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="1739519826766" author="matellio">
+    <!-- Add claim_amount column to claim_ticket table -->
+    <addColumn tableName="claim_ticket">
+      <column name="is_sla_extended" type="boolean" remarks="When sla extended mark true" defaultValueBoolean="false">
+        <constraints nullable="true"/>
+      </column>
+      <column name="date_when_sla_extended" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

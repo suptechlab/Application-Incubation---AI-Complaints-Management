@@ -241,6 +241,12 @@ public class ClaimTicket {
     @Column(name = "claim_amount")
     private Double claimAmount;
 
+    @Column(name = "is_sla_extended")
+    private Boolean isSlaExtended;
+
+    @Column(name = "date_when_sla_extended")
+    private Instant dateWhenSlaExtended;
+
     @Transient  // Not a database field
     public String getFormattedTicketId() {
         String year = String.valueOf(getCreatedYear());
@@ -254,5 +260,22 @@ public class ClaimTicket {
             return null;
         }
         return LocalDateTime.ofInstant(createdAt, ZoneId.systemDefault()).getYear();
+    }
+
+    @Transient
+    public Long getRemainingDaysOfSla(){
+        if (slaBreachDate == null) {
+            return null; // Return null if SLA breach date is not set
+        }
+        // If ticket is closed or rejected, check the resolved date
+        if ((status == ClaimTicketStatusEnum.CLOSED || status == ClaimTicketStatusEnum.REJECTED) && resolvedOn != null) {
+            long daysUntilResolution = LocalDate.ofInstant(resolvedOn, ZoneId.systemDefault())
+                .until(slaBreachDate)
+                .getDays();
+            return Math.max(daysUntilResolution, 0);
+        }
+
+        long remainingDays = LocalDate.now().until(slaBreachDate).getDays();
+        return Math.max(remainingDays, 0);
     }
 }
