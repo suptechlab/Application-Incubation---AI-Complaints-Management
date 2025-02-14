@@ -24,7 +24,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
     useEffect(() => {
         if (masterData?.closedStatus) {
             const closeStatus = convertToLabelValue(masterData?.closedStatus)
-            setSubStatus(closeStatus)
+            const filteredOptions = closeStatus.filter(option => option.value !== "CLOSE_WITH_EXPIRED");
+
+            setSubStatus(filteredOptions)
         }
     }, [masterData])
 

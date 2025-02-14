@@ -402,16 +402,47 @@ const TicketsView = () => {
       },
       ...createCommonFields(instanceData, true),
       createAttachmentField(instanceType, position),
-      {
-        label: t("PRECEDENTS"),
-        value: instanceData?.precedents,
-        colProps: { xs: 12, className: "py-2" },
-      },
-      {
-        label: t("SPECIFIC_PETITION"),
-        value: instanceData?.specificPetition ?? "N/A",
-        colProps: { xs: 12 },
-      },
+
+      ...(instanceType === "COMPAINT" || instanceType === "FIRST_INSTANCE"
+        ? [
+            {
+              label: t("PRECEDENTS"),
+              value: instanceData?.precedents,
+              colProps: { xs: 12, className: "py-2" },
+            },
+            {
+              label: t("SPECIFIC_PETITION"),
+              value: instanceData?.specificPetition ?? "N/A",
+              colProps: { xs: 12 },
+            },
+          ]
+        : []),
+    
+      ...(instanceType === "SECOND_INSTANCE"
+        ? [
+            {
+              label: t("COMMENT"),
+              value: instanceData?.secondInstanceComment,
+              colProps: { xs: 12, className: "py-2" },
+            },
+          ]
+        : []),
+      // {
+      //   label: t("PRECEDENTS"),
+      //   value: instanceData?.precedents,
+      //   colProps: { xs: 12, className: "py-2" },
+      // },
+      // {
+      //   label: t("SPECIFIC_PETITION"),
+      //   value: instanceData?.specificPetition ?? "N/A",
+      //   colProps: { xs: 12 },
+      // },
+
+      // {
+      //   label: t("COMMENT"),
+      //   value: instanceData?.secondInstanceComment,
+      //   colProps: { xs: 12, className: "py-2" },
+      // },
     ];
 
     const buildSections = () => {

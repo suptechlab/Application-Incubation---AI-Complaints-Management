@@ -112,7 +112,7 @@ const EditTemplate = () => {
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
             <Row>
-              <Col lg="8">
+              <Col md>
                 <Formik
                   initialValues={initialValues}
                   enableReinitialize={true}
@@ -252,8 +252,8 @@ const EditTemplate = () => {
                   )}
                 </Formik>
               </Col>
-              <Col lg="4" >
-                <Card >
+              <Col md="auto" >
+                <Card className="sidebar-card">
                   <Card.Header className="border-0 ">
                     <p className="mb-0 fs-18 fw-semibold">{t("KEYWORD_LIST")}</p>
                   </Card.Header>

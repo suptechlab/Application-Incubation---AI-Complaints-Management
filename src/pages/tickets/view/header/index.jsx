@@ -15,7 +15,7 @@ import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 
-const TicketViewHeader = ({ title, ticketData={}, setIsGetActivityLogs, getTicketData, permissionState={}, setLoading }) => {
+const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTicketData, permissionState = {}, setLoading }) => {
 
     const { t } = useTranslation();
 
@@ -77,7 +77,7 @@ const TicketViewHeader = ({ title, ticketData={}, setIsGetActivityLogs, getTicke
             case 'ASSIGNED':
                 return 'bg-warning';
             default:
-                return 'bg-body';
+                return 'bg-secondary';
         }
     };
 
@@ -246,18 +246,29 @@ const TicketViewHeader = ({ title, ticketData={}, setIsGetActivityLogs, getTicke
                             </div>
                         }
                         {
-                            (permissionState?.dateExtPermission === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED" && ticketData?.slaBreachDate !== null)) ?
-                                <Button
-                                    type="submit"
-                                    variant='warning'
-                                    onClick={handleDateExtensionClick}
-                                >
-                                    {t("DATE_EXTENSION")}
-                                </Button> : ""
+                            permissionState?.dateExtPermission === true &&
+                            (
+                                (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
+                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
+
+                            <Button
+                                type="submit"
+                                variant='warning'
+                                onClick={handleDateExtensionClick}
+                            >
+                                {t("DATE_EXTENSION")}
+                            </Button>
                         }
 
                         {
-                            (permissionState?.statusModule === true && (selectedStatus !== "CLOSED" && selectedStatus !== "REJECTED")) ?
+                            (permissionState?.statusModule === true
+                                &&  (
+                                (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
+                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED"))) ?
                                 <Dropdown>
                                     <Dropdown.Toggle
                                         id="ticket-detail-status"
