@@ -165,5 +165,6 @@ export const spanishLang = {
   "UNREAD_NOTIFICATIONS": "Notificaciones no leídas",
   "MARK_ALL_AS_READ": "Marcar todo como leído",
   "CLEAR_ALL": "Borrar todo",
-  "CLEAR": "despejado"
+  "CLEAR": "despejado",
+  "MULTIPLE_ATTACHMENTS_UPLOADED_COMPLAINT":"Puede cargar varios archivos, si desea añadir documentación que respalde la denuncia"
 }

@@ -168,4 +168,5 @@ export const englishLang = {
   "CLEAR":"Clear",
   "PRIVACY_TEXT_P1":"Autorizo de manera libre, específica, informada e inequívoca a la Superintendencia de Economía Popular y Solidaria, para que realice el tratamiento de mis datos personales, conforme a lo establecido en la Ley Orgánica de Protección de Datos Personales de Ecuador.",
   "PRIVACY_TEXT_P2":"Entiendo que mis datos serán utilizados en la gestión del presente reclamo, y que tengo derecho a acceder, rectificar y cancelar mis datos en cualquier momento; por lo tanto, esta autorización es válida hasta que decida revocarla, lo cual puedo hacer mediante una solicitud escrita dirigida a la Superintendencia de Economía Popular y Solidaria.",
+  "MULTIPLE_ATTACHMENTS_UPLOADED_COMPLAINT":"You can upload multiple files if you wish to add supporting documentation for the complaint."
 }

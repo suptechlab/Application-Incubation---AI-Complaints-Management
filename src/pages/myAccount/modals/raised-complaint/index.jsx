@@ -197,7 +197,7 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
-                                            <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_MSG")}</span>
+                                            <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_COMPLAINT")}</span>
                                         </div>
                                         {files.length > 0 && (
                                             <Stack direction='horizontal' gap={2} className="mt-2">
