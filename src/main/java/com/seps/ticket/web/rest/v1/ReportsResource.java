@@ -48,7 +48,7 @@ public class ReportsResource {
         }
     )
     @GetMapping("/claim-overview")
-    @PermissionCheck({"CLAIM_OVERVIEW_REPORT"})
+    @PermissionCheck({"CLAIM_OVERVIEW_REPORT","CLAIM_OVERVIEW_REPORT_BY_FI"})
     public ResponseEntity<List<ClaimTicketListDTO>> getClaimOverviewReport(Pageable pageable,
                                                                               @ModelAttribute ClaimTicketFilterRequest filterRequest) {
         Page<ClaimTicketListDTO> page = reportService.listClaimOverview(pageable, filterRequest);
@@ -67,7 +67,7 @@ public class ReportsResource {
         }
     )
     @GetMapping("/claim-overview/download")
-    @PermissionCheck({"CLAIM_OVERVIEW_REPORT"})
+    @PermissionCheck({"CLAIM_OVERVIEW_REPORT","CLAIM_OVERVIEW_REPORT_BY_FI"})
     public ResponseEntity<byte[]> getDownloadClaimOverviewReport(@ModelAttribute ClaimTicketFilterRequest filterRequest) throws IOException {
         ByteArrayInputStream in = reportService.getDownloadClaimOverviewData(filterRequest);
         HttpHeaders headers = new HttpHeaders();
@@ -91,7 +91,7 @@ public class ReportsResource {
         }
     )
     @GetMapping("/sla-report")
-    @PermissionCheck({"SLA_COMPLIANCE"})
+    @PermissionCheck({"SLA_COMPLIANCE","SLA_COMPLIANCE_BY_FI"})
     public ResponseEntity<List<SLAComplianceDTO>> getSlaReport(Pageable pageable,
                                                                            @ModelAttribute ClaimTicketFilterRequest filterRequest) {
         Page<SLAComplianceDTO> page = reportService.listSlaComplianceData(pageable, filterRequest);
@@ -110,7 +110,7 @@ public class ReportsResource {
         }
     )
     @GetMapping("/sla-report/download")
-    @PermissionCheck({"SLA_COMPLIANCE"})
+    @PermissionCheck({"SLA_COMPLIANCE","SLA_COMPLIANCE_BY_FI"})
     public ResponseEntity<byte[]> getSlaReportDownload(@ModelAttribute ClaimTicketFilterRequest filterRequest) throws IOException {
         ByteArrayInputStream in = reportService.getDownloadSlaComplianceData(filterRequest);
         HttpHeaders headers = new HttpHeaders();
@@ -138,7 +138,7 @@ public class ReportsResource {
         }
     )
     @GetMapping("/sla-report/average-resolution-time")
-    @PermissionCheck({"SLA_COMPLIANCE"})
+    @PermissionCheck({"SLA_COMPLIANCE","SLA_COMPLIANCE_BY_FI"})
     public ResponseEntity<Map<String, Object>> getAverageResolutionTime(@ModelAttribute ClaimTicketFilterRequest filterRequest) {
         Map<String, Object> data = reportService.getAverageResolutionTimeData(filterRequest);
         return ResponseEntity.ok(data);
