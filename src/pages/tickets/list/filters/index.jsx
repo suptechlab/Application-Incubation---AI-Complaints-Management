@@ -184,7 +184,7 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                         </Button> : */}
 
                 {
-                    currentUser === "FI_AGENT" &&
+                    currentUser === "FI_USER" &&
                     <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                         <ReactSelect
                             wrapperClassName="mb-0"
@@ -211,7 +211,7 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                 }
 
                 {
-                    currentUser !== "FI_AGENT" &&
+                    currentUser !== "FI_USER" &&
                     <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                         <ReactSelect
                             wrapperClassName="mb-0"
@@ -230,7 +230,8 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                         />
                     </div>
                 }
-                <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+                {
+                    currentUser !== "FI_USER" && <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect
                         wrapperClassName="mb-0"
                         class="form-select "
@@ -247,6 +248,8 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                         value={filter?.instanceType}
                     />
                 </div>
+                }
+                
 
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect

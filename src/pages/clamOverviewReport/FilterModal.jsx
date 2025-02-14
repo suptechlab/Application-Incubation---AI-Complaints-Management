@@ -11,10 +11,14 @@ import { claimSubTypeDropdownList, claimTypesDropdownList } from "../../services
 import { getOrganizationList } from "../../services/teamManagment.service";
 import { convertToLabelValue } from "../../services/ticketmanagement.service";
 import { getAgentList } from "../../services/ticketWorkflow.service";
+import { AuthenticationContext } from "../../contexts/authentication.context";
 
-const FilterModal = ({ modal, toggle, filter,setFilter }) => {
+const FilterModal = ({ modal, toggle, filter, setFilter }) => {
 
   const { t } = useTranslation();
+
+  const { currentUser } = useContext(AuthenticationContext)
+
   // const [fileName, setFileName] = useState("");
 
   const { masterData } = useContext(MasterDataContext)
@@ -198,7 +202,7 @@ const FilterModal = ({ modal, toggle, filter,setFilter }) => {
             label: item.name
           }));
           setFiAgentOptions(dropdownData)
-        }else{
+        } else {
           setFiAgentOptions([])
         }
       }).catch((error) => {
@@ -216,7 +220,7 @@ const FilterModal = ({ modal, toggle, filter,setFilter }) => {
             label: item.name
           }));
           setSepsAgentOptions(dropdownData)
-        }else{
+        } else {
           setSepsAgentOptions([])
         }
       }).catch((error) => {
@@ -278,10 +282,10 @@ const FilterModal = ({ modal, toggle, filter,setFilter }) => {
         initialValues={{
           instanceType: filter?.instanceType ?? "",
           organizationId: filter?.organizationId ?? "",
-          fiAgentId: filter?.fiAgentId ??  "",
+          fiAgentId: filter?.fiAgentId ?? "",
           sepsAgentId: filter?.sepsAgentId ?? "",
           claimTypeId: filter?.claimTypeId ?? "",
-          claimSubTypeId: filter?.claimSubTypeId ??  "",
+          claimSubTypeId: filter?.claimSubTypeId ?? "",
           closedStatus: filter?.closedStatus ?? "",
           rejectedStatus: filter?.rejectedStatus ?? "",
           provinceId: filter?.provinceId ?? "",
@@ -289,7 +293,7 @@ const FilterModal = ({ modal, toggle, filter,setFilter }) => {
           customerType: filter?.customerType ?? "",
           priorityCareGroup: filter?.priorityCareGroup ?? "",
           source: filter?.source ?? "",
-          channelOfEntry: filter?.channelOfEntry ??""
+          channelOfEntry: filter?.channelOfEntry ?? ""
         }}
         enableReinitialize={true}
         onSubmit={handleSubmit}
@@ -308,30 +312,34 @@ const FilterModal = ({ modal, toggle, filter,setFilter }) => {
           <Form>
             <Modal.Body className="text-break py-0">
               <Row>
-                <Col sm={6} lg={4}>
-                  <ReactSelect
-                    label={t("INSTANCE_TYPE")}
-                    error={errors.instanceType}
-                    options={[
-                      { label: t("SELECT"), value: "" },
-                      ...instanceTypeOptions.map((group) => ({
-                        label: group.label,
-                        value: group.value,
-                      })),
-                    ]}
-                    value={values.instanceType}
-                    onChange={(option) => {
-                      setFieldValue(
-                        "instanceType",
-                        option?.target?.value ?? ""
-                      );
-                    }}
-                    name="instanceType"
-                    className={touched.instanceType && errors.instanceType ? "is-invalid" : ""}
-                    onBlur={handleBlur}
-                    touched={touched.instanceType}
-                  />
-                </Col>
+                {
+                  currentUser !== "FI_USER" &&
+                  <Col sm={6} lg={4}>
+                    <ReactSelect
+                      label={t("INSTANCE_TYPE")}
+                      error={errors.instanceType}
+                      options={[
+                        { label: t("SELECT"), value: "" },
+                        ...instanceTypeOptions.map((group) => ({
+                          label: group.label,
+                          value: group.value,
+                        })),
+                      ]}
+                      value={values.instanceType}
+                      onChange={(option) => {
+                        setFieldValue(
+                          "instanceType",
+                          option?.target?.value ?? ""
+                        );
+                      }}
+                      name="instanceType"
+                      className={touched.instanceType && errors.instanceType ? "is-invalid" : ""}
+                      onBlur={handleBlur}
+                      touched={touched.instanceType}
+                    />
+                  </Col>
+                }
+
                 <Col sm={6} lg={4}>
                   <ReactSelect
                     label={t("ORGANIZATION")}

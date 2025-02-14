@@ -45,6 +45,7 @@ export const NavItems = () => {
           menuName: t("ROLES AND RIGHTS LIST"),
           title: t("ROLES AND RIGHTS LIST"),
           path: "/role-rights",
+          moduleName:'Role & Rights',
           permissions: [], // No specific permission required for admin
           disabled: false,
         },

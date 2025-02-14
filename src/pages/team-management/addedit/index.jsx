@@ -1,5 +1,5 @@
 import { Formik, Form as FormikForm } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row, Stack, Table } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,7 @@ import ReactSelect from "../../../components/ReactSelect";
 import AppTooltip from "../../../components/tooltip";
 import { assignUserIntoTeam, getOrganizationList, getTeamMemberList, handleAddUser, handleDeleteUserFromTeam, handleGetUserById, handleUpdateUser } from "../../../services/teamManagment.service";
 import { validationSchema } from "../../../validations/teamManagement.validation";
+import { AuthenticationContext } from "../../../contexts/authentication.context";
 
 export default function TeamManagementAddEdit() {
     const [loading, setLoading] = useState(false);
@@ -20,11 +21,15 @@ export default function TeamManagementAddEdit() {
     const { id } = useParams();
     const isEdit = !!id;
     const { t } = useTranslation();
+
+
+    const {currentUser} = useContext(AuthenticationContext)
+
     const [initialValues, setInitialValues] = useState({
         teamName: "",
         description: "",
         entityId: "",
-        entityType: "FI"
+        entityType: currentUser ==='FI_USER' ? "FI" :"SEPS"
     });
     const [entityIdArr, setEntityIdArr] = useState([]);
     const [organizationArr, setOrganizationArr] = useState([]);
@@ -35,7 +40,6 @@ export default function TeamManagementAddEdit() {
     const [newTeamMember, setNewTeamMember] = useState([]);
     const [userData, setUserData] = useState([]);
     const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
-
 
 
     //  Handle Assign Button Click
@@ -231,6 +235,9 @@ export default function TeamManagementAddEdit() {
                                     className="d-flex flex-column h-100"
                                 >
                                     <Row>
+
+                                    {
+                                        currentUser === 'SEPS_USER' &&
                                         <Col xs={12} className="mb-3">
                                             <div className='status-radio'>
                                                 <div className='mb-1 fs-14'>{t('USER TYPE')}</div>
@@ -275,6 +282,8 @@ export default function TeamManagementAddEdit() {
                                                 </Stack>
                                             </div>
                                         </Col>
+                                    }
+                                       
                                         {
                                             showEntityOrgId ?
                                                 <Col sm={6} lg={4}>

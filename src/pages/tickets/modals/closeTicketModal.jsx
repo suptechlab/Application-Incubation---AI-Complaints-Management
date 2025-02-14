@@ -12,7 +12,7 @@ import { ticketCloseValidation } from "../../../validations/ticketsManagement.va
 import PropTypes from "prop-types"
 import { MdOutlineMailOutline } from "react-icons/md";
 
-const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
+const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
     const { masterData } = useContext(MasterDataContext)
@@ -24,7 +24,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
     useEffect(() => {
         if (masterData?.closedStatus) {
             const closeStatus = convertToLabelValue(masterData?.closedStatus)
-            setSubStatus(closeStatus)
+            const filteredOptions = closeStatus.filter(option => option.value !== "CLOSE_WITH_EXPIRED");
+
+            setSubStatus(filteredOptions)
         }
     }, [masterData])
 
@@ -244,7 +246,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGet
 CloseTicketModal.propTypes = {
     modal: PropTypes.bool.isRequired, // modal is a boolean (required)
     toggle: PropTypes.func.isRequired, // toggle is a function (required)
-    ticketId: PropTypes.string.isRequired, // ticketId is a string (required)
+    ticketId: PropTypes.any.isRequired, // ticketId is a string (required)
     setSelectedStatus: PropTypes.func.isRequired, // setSelectedStatus is a function (required)
     setIsGetActivityLogs: PropTypes.func.isRequired, // setIsGetActivityLogs is a function (required)
     getTicketData: PropTypes.func.isRequired, // getTicketData is a function (required)

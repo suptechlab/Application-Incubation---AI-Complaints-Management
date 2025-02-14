@@ -11,7 +11,7 @@ import { validateFile } from "../../../utils/commonutils";
 import { ticketRejectValidation } from "../../../validations/ticketsManagement.validation";
 import PropTypes from "prop-types"
 
-const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
+const RejectTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
     const { t } = useTranslation();
     const { masterData } = useContext(MasterDataContext)
 
@@ -193,7 +193,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId, setSelectedStatus, setIsGe
 RejectTicketModal.propTypes = {
     modal: PropTypes.bool.isRequired, // modal is a boolean (required)
     toggle: PropTypes.func.isRequired, // toggle is a function (required)
-    ticketId: PropTypes.string.isRequired, // ticketId is a string (required)
+    ticketId: PropTypes.any.isRequired, // ticketId is a string (required)
     setSelectedStatus: PropTypes.func.isRequired, // setSelectedStatus is a function (required)
     setIsGetActivityLogs: PropTypes.func.isRequired, // setIsGetActivityLogs is a function (required)
     getTicketData: PropTypes.func.isRequired, // getTicketData is a function (required)

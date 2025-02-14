@@ -1,5 +1,5 @@
 import { Form, Formik } from "formik";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Card, Stack } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -14,13 +14,16 @@ import {
 import { validateFile } from "../../../../../utils/commonutils";
 import { validationSchema } from "../../../../../validations/ticketsManagement.validation";
 import MentionEditor from "../../../../../components/MentionEditor";
-const ReplyTab = ({ ticketId, setIsGetActivityLogs, ticketData, getTicketData, currentTab,permissionState }) => {
+import { AuthenticationContext } from "../../../../../contexts/authentication.context";
+const ReplyTab = ({ ticketId, setIsGetActivityLogs, ticketData, getTicketData, currentTab, permissionState }) => {
 
     const { t } = useTranslation()
 
     const [sendReplyModalShow, setSendReplyModalShow] = useState(false);
     const [loading, setLoading] = useState(false);
     const [submitAction, setSubmitAction] = useState(""); // Track which button is clicked
+
+    const { currentUser } = useContext(AuthenticationContext)
 
     // Handle Submit
     const handleSubmit = (values, actions) => {
@@ -46,7 +49,7 @@ const ReplyTab = ({ ticketId, setIsGetActivityLogs, ticketData, getTicketData, c
                     setSendReplyModalShow(false); // Close modal after success
                 }
                 actions.resetForm()
-                if (values.attachment){
+                if (values.attachment) {
                     getTicketData()
                 }
                 setIsGetActivityLogs((prev) => !prev)
@@ -89,11 +92,11 @@ const ReplyTab = ({ ticketId, setIsGetActivityLogs, ticketData, getTicketData, c
                         name="message"
                         height="100"
                         ticketId={ticketId}
-                        value ={values?.message ?? ''}
-                        error ={errors?.message}
+                        value={values?.message ?? ''}
+                        error={errors?.message}
                         touched={touched?.message}
                         handleBlur={handleBlur}
-                        handleChange={(event)=>{setFieldValue("message",event.target.value)}}
+                        handleChange={(event) => { setFieldValue("message", event.target.value) }}
                     />
                     {/* <SunEditorReact
                         wrapperClassName="mb-0 editor-for-tab-view overflow-hidden"
@@ -165,27 +168,43 @@ const ReplyTab = ({ ticketId, setIsGetActivityLogs, ticketData, getTicketData, c
                                         className="flex-wrap justify-content-between justify-content-sm-end flex-fill"
                                     >
 
+                                        {
 
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="outline-dark"
-                                            onClick={() => {
-                                                if (values.message === '') {
-                                                    // Set an error for the message field
-                                                    setFieldError("message", t("MESSAGE_REQUIRED"));
-                                                    setFieldTouched("message", true);
-                                                } else {
-                                                    setSubmitAction("customer");
-                                                    setSendReplyModalShow(true); // Show modal first
-                                                }
-                                            }}
-                                            disabled={(permissionState?.replyToCustomerPermission !== true || loading || !isTicketNotClosedOrRejected)}
-                                        >
-                                            {loading && submitAction === "customer"
-                                                ? t("SENDING")
-                                                : t("REPLY_TO_CUSTOMER")}
-                                        </Button>
+                                            permissionState?.replyToCustomerPermission === true
+                                            &&
+
+                                            ((currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE')
+
+                                                ||
+                                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))))
+
+
+
+                                            &&
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline-dark"
+                                                onClick={() => {
+                                                    if (values.message === '') {
+                                                        // Set an error for the message field
+                                                        setFieldError("message", t("MESSAGE_REQUIRED"));
+                                                        setFieldTouched("message", true);
+                                                    } else {
+                                                        setSubmitAction("customer");
+                                                        setSendReplyModalShow(true); // Show modal first
+                                                    }
+                                                }}
+                                                disabled={(loading || !isTicketNotClosedOrRejected)}
+                                            >
+                                                {loading && submitAction === "customer"
+                                                    ? t("SENDING")
+                                                    : t("REPLY_TO_CUSTOMER")}
+                                            </Button>
+                                        }
+
+
 
                                         <Button
                                             type="submit"

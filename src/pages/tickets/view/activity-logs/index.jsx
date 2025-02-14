@@ -56,8 +56,7 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState, activityLo
           const text = activity?.activityDetails?.text || ""; // Safely extract text
          
           const attachments = activity?.attachmentUrl?.attachments?.length ? activity.attachmentUrl.attachments : [];
-          const imageUrl = activity?.performedBy == userData?.id ? profileImage ?? defaultAvatar : defaultAvatar
-
+          const imageUrl = (activity?.performedBy && profileImage && profileImage!=="") == userData?.id ?   profileImage : defaultAvatar 
           // Replace mentions in the text
           const updatedText = replaceMentions(text);
           const containsHTML = isHTML(updatedText);

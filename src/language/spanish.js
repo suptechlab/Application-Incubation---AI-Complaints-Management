@@ -379,5 +379,6 @@ export const spanishLang = {
     "UNREAD_NOTIFICATIONS": "Notificaciones no leídas",
     "MARK_ALL_AS_READ": "Marcar todo como leído",
     "CLEAR_ALL": "Borrar todo",
-    "CLEAR": "despejado"
+    "CLEAR": "despejado",
+    "KEYWORD_LIST":"Lista de palabras clave"
 } 

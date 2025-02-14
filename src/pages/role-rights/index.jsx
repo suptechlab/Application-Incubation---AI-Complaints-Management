@@ -1,8 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import qs from "qs";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
-import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { MdEdit } from "react-icons/md";
 import { useLocation } from "react-router-dom";
@@ -11,9 +10,12 @@ import DataGridActions from "../../components/DataGridActions";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
 import {
-  handleGetRoleRights
+  handleGetRoleRights,
+  roleRightsStatusChanges
 } from "../../services/rolerights.service"; // Update the import to include delete function
-import { handleStatusChangeState } from "../../services/user.service";
+import { AuthenticationContext } from "../../contexts/authentication.context";
+import toast from "react-hot-toast";
+import Toggle from "../../components/Toggle";
 
 export default function RoleRightsList() {
 
@@ -32,6 +34,65 @@ export default function RoleRightsList() {
   });
 
   const [loading, setLoading] = useState(true);
+
+
+  const { currentUser, permissions = {} } = useContext(AuthenticationContext)
+  // PERMISSIONS work
+
+  const [permissionsState, setPermissionsState] = React.useState({
+    statusModule: false,
+    addModule: false,
+    editModule: false,
+  });
+
+  useEffect(() => {
+    const updatedPermissions = {
+      statusModule: false,
+      addModule: false,
+      editModule: false,
+    };
+    if (currentUser === "SYSTEM_ADMIN") {
+      updatedPermissions.statusModule = true;
+      updatedPermissions.addModule = true;
+      updatedPermissions.editModule = true;
+    } else {
+      const permissionArr = permissions['Role & Rights'] ?? [];
+
+      if (["ROLE_AND_RIGHT_CREATE_BY_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.addModule = true;
+      }
+
+      if (["ROLE_AND_RIGHT_STATUS_CHANGE_BY_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.statusModule = true;
+      }
+
+      if (["ROLE_AND_RIGHT_UPDATE_BY_SEPS"].some(permission => permissionArr.includes(permission))) {
+        updatedPermissions.editModule = true;
+      }
+
+    }
+
+    setPermissionsState(updatedPermissions);
+  }, [permissions, currentUser]);
+
+
+  // STATUS UPDATE FUNCTION
+  const changeStatus = async (id, currentStatus) => {
+    setLoading(true)
+    roleRightsStatusChanges(id, !currentStatus).then(response => {
+      toast.success(t("STATUS UPDATED"));
+      dataQuery.refetch();
+    }).catch((error) => {
+      if (error?.response?.data?.errorDescription) {
+        toast.error(error?.response?.data?.errorDescription);
+      } else {
+        toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+      }
+    }).finally(() => {
+      setLoading(false)
+    })
+  };
+
   const dataQuery = useQuery({
     queryKey: ["data", pagination, sorting, filter],
     queryFn: async () => {
@@ -109,38 +170,60 @@ export default function RoleRightsList() {
         header: () => t('ROLE & RIGHTS'),
         enableSorting: false,
       },
-      {
-        id: "actions",
-        isAction: true,
-        cell: (rowData) => (
-          <DataGridActions
-            controlId="role-rights"
-            rowData={rowData}
-            customButtons={[
-              {
-                name: "edit",
-                enabled: true,
-                type: "link",
-                title: "Edit",
-                icon: <MdEdit size={18} />,
-              }
-            ]}
-          />
-        ),
-        header: () => <div className="text-center">{t('ACTIONS')}</div>,
-        size: "100",
-      },
+      ...(permissionsState?.statusModule
+        ? [
+          {
+            cell: (info) => {
+              return (
+                <Toggle
+                  tooltip={info?.row?.original?.status ? t("ACTIVE") : t("INACTIVE")}
+                  id={`status-${info?.row?.original?.id}`}
+                  key={"status"}
+                  name="status"
+                  value={info?.row?.original?.status}
+                  checked={info?.row?.original?.status}
+                  onChange={() => changeStatus(info?.row?.original?.id, info?.row?.original?.status)}
+                />
+              )
+            },
+            id: "status",
+            header: () => t("STATUS"),
+            size: '80'
+          },] : []),
+      ...(permissionsState?.editModule
+        ? [
+          {
+            id: "actions",
+            isAction: true,
+            cell: (rowData) => (
+              <DataGridActions
+                controlId="role-rights"
+                rowData={rowData}
+                customButtons={[
+                  {
+                    name: "edit",
+                    enabled: true,
+                    type: "link",
+                    title: "Edit",
+                    icon: <MdEdit size={18} />,
+                  }
+                ]}
+              />
+            ),
+            header: () => <div className="text-center">{t('ACTIONS')}</div>,
+            size: "100",
+          }] : []),
     ],
-    []
+    [permissionsState]
   );
 
   useEffect(() => {
     if (Object.values(filter).some(value => value)) {
       setPagination({
-          pageIndex: 0,
-          pageSize: 10,
+        pageIndex: 0,
+        pageSize: 10,
       });
-  }
+    }
   }, [filter]);
 
   // TO REMOVE CURRENT DATA ON COMPONENT UNMOUNT
@@ -150,6 +233,14 @@ export default function RoleRightsList() {
     };
   }, [queryClient]);
 
+  const actions = permissionsState?.addModule
+    ? [
+      { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" }
+    ]
+    : [];
+
+
+
   return (
     <React.Fragment>
 
@@ -158,9 +249,7 @@ export default function RoleRightsList() {
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
         <PageHeader
           title={t('ROLE & RIGHTS')}
-          actions={[
-            { label: t('ADD NEW'), to: "/role-rights/add", variant: "warning" },
-          ]}
+          actions={actions}
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">

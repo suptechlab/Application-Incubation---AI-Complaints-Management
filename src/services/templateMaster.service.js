@@ -42,3 +42,8 @@ export const templateDetailForCopy = async (id) => {
   return await adminApi.get(`/v1/templates/${id}/for-copy`);
 }
 
+// GET TEMPLATE DETAIL FOR COPY
+export const templateKeywordListing = async (templateId) => {
+  const params = templateId ? { templateId } : {};
+  return await adminApi.get(`/v1/templates/keyword-listing`, { params });
+};

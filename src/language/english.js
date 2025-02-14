@@ -383,5 +383,6 @@ export const englishLang = {
     "UNREAD_NOTIFICATIONS":"Unread Notifications",
     "MARK_ALL_AS_READ" :"Mark all as read",
     "CLEAR_ALL" : "Clear all",
-    "CLEAR":"Clear"
+    "CLEAR":"Clear",
+    "KEYWORD_LIST":"Keyword List"
 }

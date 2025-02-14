@@ -163,7 +163,7 @@ const TicketsTaggedList = ({ selectedTab }) => {
             case 'REJECTED':
                 return 'bg-custom-danger text-custom-danger';
             default:
-                return 'bg-body text-body';
+                return 'bg-secondary text-body';
         }
     };
 
