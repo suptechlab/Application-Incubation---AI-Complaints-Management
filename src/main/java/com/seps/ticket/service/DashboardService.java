@@ -96,6 +96,7 @@ public class DashboardService {
             .map(Authority::getName)
             .toList();
 
+        InstanceTypeEnum instanceType = null;
         // If FI authority, adjust organization ID
         if (authority.contains(AuthoritiesConstants.FI)) {
             organizationId = currentUser.getOrganization().getId();
@@ -103,6 +104,7 @@ public class DashboardService {
             if (currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
                 userId = null; // FI Admin sees all claims for the organization
             }
+            instanceType =  InstanceTypeEnum.FIRST_INSTANCE;
         } else if (authority.contains(AuthoritiesConstants.SEPS) && currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
             userId = null; // SEPS Admin sees all claims for the organization
         } else if(authority.contains(AuthoritiesConstants.ADMIN)){
@@ -110,10 +112,10 @@ public class DashboardService {
         }
 
         DashboardDTO dashboardDTO = new DashboardDTO();
-        dashboardDTO.setClaimStatusCount(this.countClaimsByStatusAndTotal(organizationId, startInstant, endInstant, userId, isSeps));
-        dashboardDTO.setCloseClaimStatusCount(this.countClaimsByClosedStatusAndTotal(organizationId, startInstant, endInstant, userId, isSeps));
-        dashboardDTO.setSlaAdherenceGraph(this.slaAdherenceGraphSet(organizationId, startInstant, endInstant, userId, isSeps));
-        dashboardDTO.setAverageResolutionTime(this.getAverageResolutionTime(organizationId, startInstant, endInstant, userId, isSeps));
+        dashboardDTO.setClaimStatusCount(this.countClaimsByStatusAndTotal(organizationId, startInstant, endInstant, userId, isSeps, instanceType));
+        dashboardDTO.setCloseClaimStatusCount(this.countClaimsByClosedStatusAndTotal(organizationId, startInstant, endInstant, userId, isSeps, instanceType));
+        dashboardDTO.setSlaAdherenceGraph(this.slaAdherenceGraphSet(organizationId, startInstant, endInstant, userId, isSeps, instanceType));
+        dashboardDTO.setAverageResolutionTime(this.getAverageResolutionTime(organizationId, startInstant, endInstant, userId, isSeps, instanceType));
         return dashboardDTO;
     }
 
@@ -128,11 +130,11 @@ public class DashboardService {
      * @return {@link ClaimStatusCountResponseDTO} containing counts by status and the total count.
      */
     @Transactional
-    public ClaimStatusCountResponseDTO countClaimsByStatusAndTotal(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps) {
+    public ClaimStatusCountResponseDTO countClaimsByStatusAndTotal(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps, InstanceTypeEnum instanceType) {
 
         // Fetch data using the repository method
         List<ClaimStatusCountProjection> projections = claimTicketRepository.countClaimsByFilters(
-            userId, organizationId, startDate, endDate, isSeps);
+            userId, organizationId, startDate, endDate, isSeps, instanceType);
 
         ClaimStatusCountResponseDTO result = new ClaimStatusCountResponseDTO();
 
@@ -165,11 +167,11 @@ public class DashboardService {
      * @return {@link CloseClaimStatusCountResponseDTO} containing counts by closed status and the total count.
      */
     @Transactional
-    public CloseClaimStatusCountResponseDTO countClaimsByClosedStatusAndTotal(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps) {
+    public CloseClaimStatusCountResponseDTO countClaimsByClosedStatusAndTotal(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps, InstanceTypeEnum instanceType) {
 
         // Fetch data using the repository method
         List<CloseClaimStatusCountProjection> projections = claimTicketRepository.countClosedClaimsByFilters(
-            userId, organizationId, startDate, endDate, isSeps, ClaimTicketStatusEnum.CLOSED);
+            userId, organizationId, startDate, endDate, isSeps, ClaimTicketStatusEnum.CLOSED, instanceType);
 
         CloseClaimStatusCountResponseDTO result = new CloseClaimStatusCountResponseDTO();
 
@@ -211,13 +213,14 @@ public class DashboardService {
      * @return {@link PieChartDTO} containing the SLA adherence data for pie chart visualization.
      */
     @Transactional
-    public PieChartDTO slaAdherenceGraphSet(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps) {
+    public PieChartDTO slaAdherenceGraphSet(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps, InstanceTypeEnum instanceType) {
 
         List<InstanceTypeEnum> instanceTypes = Arrays.asList(InstanceTypeEnum.FIRST_INSTANCE, InstanceTypeEnum.SECOND_INSTANCE, InstanceTypeEnum.COMPLAINT);
+        List<InstanceTypeEnum> instanceTypesOne = List.of(InstanceTypeEnum.FIRST_INSTANCE);
 
         // Fetch data using the repository method
         SlaAdherenceDataProjection projections = claimTicketRepository.getClaimSlaAdherence(
-            userId, organizationId, startDate, endDate, isSeps, ClaimTicketStatusEnum.CLOSED, instanceTypes);
+            userId, organizationId, startDate, endDate, isSeps, List.of(ClaimTicketStatusEnum.CLOSED, ClaimTicketStatusEnum.REJECTED), instanceType!=null ? instanceTypesOne: instanceTypes);
 
         List<String> labels = new ArrayList<>();
         labels.add(messageSource.getMessage("graph.sla.on.time.claims", null, LocaleContextHolder.getLocale()));
@@ -250,12 +253,12 @@ public class DashboardService {
      * @param isSeps         a boolean indicating whether to filter by SEPS agents
      *                       ({@code true} for SEPS agents, {@code false} for FI agents).
      * @return the average resolution time in days as a {@link Double}. Returns {@code null} if no tickets match the filters.
-     * @see ClaimTicketRepository#getAvgResolutionTime(Long, Long, Instant, Instant, boolean, ClaimTicketStatusEnum)
+     *
      */
     @Transactional
-    public Double getAverageResolutionTime(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps){
+    public Double getAverageResolutionTime(Long organizationId, Instant startDate, Instant endDate, Long userId, boolean isSeps, InstanceTypeEnum instanceType){
         // Fetch data using the repository method
         return claimTicketRepository.getAvgResolutionTime(
-            userId, organizationId, startDate, endDate, isSeps, ClaimTicketStatusEnum.CLOSED);
+            userId, organizationId, startDate, endDate, isSeps, List.of(ClaimTicketStatusEnum.CLOSED, ClaimTicketStatusEnum.REJECTED), instanceType);
     }
 }

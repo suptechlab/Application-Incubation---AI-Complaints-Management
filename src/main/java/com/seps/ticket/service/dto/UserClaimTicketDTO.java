@@ -65,6 +65,7 @@ public class UserClaimTicketDTO {
     private Boolean canCreateInstance;
     private Double claimAmount;
     private String formattedTicketId;
+    private Boolean isConversationAvailable;
 
     // Getters and Setters
 

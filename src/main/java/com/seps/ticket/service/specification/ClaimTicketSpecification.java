@@ -295,7 +295,8 @@ public class ClaimTicketSpecification {
                 }
             }
             predicates.add(root.get("slaBreachDate").isNotNull());
-            predicates.add(criteriaBuilder.equal(root.get("status"), ClaimTicketStatusEnum.CLOSED));
+            // Include both CLOSED and REJECTED statuses
+            predicates.add(root.get("status").in(ClaimTicketStatusEnum.CLOSED, ClaimTicketStatusEnum.REJECTED));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
