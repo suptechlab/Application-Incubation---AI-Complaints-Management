@@ -153,7 +153,7 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "  AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organization_id = :organizationId) " +
         "  AND (COALESCE(:startDate, NULL) IS NULL OR ct.created_at >= :startDate) " +
         "  AND (COALESCE(:endDate, NULL) IS NULL OR ct.created_at <= :endDate) " +
-        "  AND (COALESCE(:instanceType, NULL) IS NULL OR ct.instanceType = :instanceType) " +
+        "  AND (COALESCE(:instanceType, NULL) IS NULL OR ct.instance_type = :instanceType) " +
         "  AND ct.resolved_on IS NOT NULL " +
         "  AND ct.status IN :status",
         nativeQuery = true)
