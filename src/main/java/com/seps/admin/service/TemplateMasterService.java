@@ -384,20 +384,20 @@ public class TemplateMasterService {
             : Constants.DEFAULT_LANGUAGE; // Default language
 
         List<TemplateVariable> templateVariables = templateVariableRepository.findAllByLanguage(language);
-        TemplateMaster template = repository.findById(templateId).orElse(null);
 
-        if (template != null) {
-            String content = template.getContent(); // Get the template content
-
-            return templateVariables.stream().map(variable -> {
-                TemplateVariableDTO dto = templateVariableMapper.toDTO(variable);
-                String formattedKeyword = "{{" + variable.getKeyword() + "}}"; // Format keyword to match template format
-                dto.setIsUse(content.contains(formattedKeyword)); // Check if the formatted keyword exists in content
-                return dto;
-            }).toList();
-
-        } else {
-            return templateVariables.stream().map(templateVariableMapper::toDTO).toList();
+        if (templateId != null) {
+            TemplateMaster template = repository.findById(templateId).orElse(null);
+            if(template!=null) {
+                String content = template.getContent(); // Get the template content
+                return templateVariables.stream().map(variable -> {
+                    TemplateVariableDTO dto = templateVariableMapper.toDTO(variable);
+                    String formattedKeyword = "{{" + variable.getKeyword() + "}}"; // Format keyword to match template format
+                    dto.setIsUse(content.contains(formattedKeyword)); // Check if the formatted keyword exists in content
+                    return dto;
+                }).toList();
+            }
         }
+        return templateVariables.stream().map(templateVariableMapper::toDTO).toList();
+
     }
 }
