@@ -463,7 +463,15 @@ public class UserClaimTicketService {
         User currentUser = userService.getCurrentUser();
         Long userId = currentUser.getId();
         return claimTicketRepository.findAll(ClaimTicketSpecification.byFilter(year, userId), pageable)
-            .map(userClaimTicketMapper::toUserClaimTicketDTO);
+            .map(claimData -> {
+                UserClaimTicketDTO dto = userClaimTicketMapper.toUserClaimTicketDTO(claimData);
+                long count = claimTicketActivityLogService.getConversationCount(claimData.getId());
+                dto.setIsConversationAvailable(false);
+                if(count > 0){
+                    dto.setIsConversationAvailable(true);
+                }
+                return dto;
+            });
     }
 
     /**

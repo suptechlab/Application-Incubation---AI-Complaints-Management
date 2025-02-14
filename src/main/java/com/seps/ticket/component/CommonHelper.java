@@ -94,7 +94,7 @@ public class CommonHelper {
             return ""; // Return an empty string if the amount is null
         }
 
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-ES"));
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
         return formatter.format(amount);
     }
 

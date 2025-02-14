@@ -53,9 +53,11 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "FROM ClaimTicket ct " +
         "WHERE organizationId = :organizationId " +
         "AND (:userId IS NULL OR ct.fiAgentId = :userId) " +
+        "AND (:instanceType IS NULL OR ct.instanceType = :instanceType) " +
         "GROUP BY ct.status")
     List<ClaimStatusCountProjection> countClaimsByStatusAndTotalFiAgentAndOrganizationId(@Param("userId") Long userId,
-                                                                                         @Param("organizationId") Long organizationId);
+                                                                                         @Param("organizationId") Long organizationId,
+                                                                                         @Param("instanceType") InstanceTypeEnum instanceType);
 
     Optional<ClaimTicket> findByIdAndUserIdAndInstanceType(Long claimTicketId, Long currentUserId, InstanceTypeEnum instanceTypeEnum);
 
@@ -85,12 +87,14 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organizationId = :organizationId) " +
         "AND (COALESCE(:startDate, NULL) IS NULL OR ct.createdAt >= :startDate) " +
         "AND (COALESCE(:endDate, NULL) IS NULL OR ct.createdAt <= :endDate) " +
+        "AND (COALESCE(:instanceType, NULL) IS NULL OR ct.instanceType = :instanceType) " +
         "GROUP BY ct.status")
     List<ClaimStatusCountProjection> countClaimsByFilters(@Param("userId") Long userId,
                                                           @Param("organizationId") Long organizationId,
                                                           @Param("startDate") Instant startDate,
                                                           @Param("endDate") Instant endDate,
-                                                          @Param("isSeps") boolean isSeps);
+                                                          @Param("isSeps") boolean isSeps,
+                                                          @Param("instanceType") InstanceTypeEnum instanceType);
 
     @Query("SELECT new com.seps.ticket.service.projection.CloseClaimStatusCountProjection(ct.closedStatus, COUNT(ct)) " +
         "FROM ClaimTicket ct " +
@@ -101,13 +105,15 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "AND (COALESCE(:startDate, NULL) IS NULL OR ct.createdAt >= :startDate) " +
         "AND (COALESCE(:endDate, NULL) IS NULL OR ct.createdAt <= :endDate) " +
         "AND ct.status = :closeStatus " +
+        "AND (COALESCE(:instanceType, NULL) IS NULL OR ct.instanceType = :instanceType) " +
         "GROUP BY ct.closedStatus")
     List<CloseClaimStatusCountProjection> countClosedClaimsByFilters(@Param("userId") Long userId,
                                                                      @Param("organizationId") Long organizationId,
                                                                      @Param("startDate") Instant startDate,
                                                                      @Param("endDate") Instant endDate,
                                                                      @Param("isSeps") boolean isSeps,
-                                                                     @Param("closeStatus") ClaimTicketStatusEnum closeStatus);
+                                                                     @Param("closeStatus") ClaimTicketStatusEnum closeStatus,
+                                                                     @Param("instanceType") InstanceTypeEnum instanceType);
 
 
     @Query("SELECT new com.seps.ticket.service.projection.SlaAdherenceDataProjection( " +
@@ -121,14 +127,14 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "  AND (COALESCE(:startDate, NULL) IS NULL OR ct.createdAt >= :startDate) " +
         "  AND (COALESCE(:endDate, NULL) IS NULL OR ct.createdAt <= :endDate) " +
         "  AND ct.instanceType IN :instanceType " +
-        "  AND ct.status = :status")
+        "  AND ct.status IN :status")
     SlaAdherenceDataProjection getClaimSlaAdherence(
         @Param("userId") Long userId,
         @Param("organizationId") Long organizationId,
         @Param("startDate") Instant startDate,
         @Param("endDate") Instant endDate,
         @Param("isSeps") boolean isSeps,
-        @Param("status") ClaimTicketStatusEnum status,
+        @Param("status") List<ClaimTicketStatusEnum> status,
         @Param("instanceType") List<InstanceTypeEnum> instanceType);
 
 
@@ -147,22 +153,9 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         "  AND (COALESCE(:organizationId, NULL) IS NULL OR ct.organization_id = :organizationId) " +
         "  AND (COALESCE(:startDate, NULL) IS NULL OR ct.created_at >= :startDate) " +
         "  AND (COALESCE(:endDate, NULL) IS NULL OR ct.created_at <= :endDate) " +
-//        "  AND (COALESCE(:startDate, NULL) IS NULL OR " +
-//        "       COALESCE(" +
-//        "           CASE " +
-//        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
-//        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
-//        "               ELSE ct.created_at " +
-//        "           END, ct.created_at) >= :startDate) " +
-//        "  AND (COALESCE(:endDate, NULL) IS NULL OR " +
-//        "       COALESCE(" +
-//        "           CASE " +
-//        "               WHEN ct.instance_type = 1 THEN ct.second_instance_filed_at " +
-//        "               WHEN ct.instance_type = 2 THEN ct.complaint_filed_at " +
-//        "               ELSE ct.created_at " +
-//        "           END, ct.created_at) <= :endDate) " +
+        "  AND (COALESCE(:instanceType, NULL) IS NULL OR ct.instanceType = :instanceType) " +
         "  AND ct.resolved_on IS NOT NULL " +
-        "  AND ct.status = :status",
+        "  AND ct.status IN :status",
         nativeQuery = true)
     Double getAvgResolutionTime(
         @Param("userId") Long userId,
@@ -170,7 +163,8 @@ public interface ClaimTicketRepository extends JpaRepository<ClaimTicket, Long> 
         @Param("startDate") Instant startDate,
         @Param("endDate") Instant endDate,
         @Param("isSeps") boolean isSeps,
-        @Param("status") ClaimTicketStatusEnum status);
+        @Param("status") List<ClaimTicketStatusEnum> status,
+        @Param("instanceType") InstanceTypeEnum instanceType);
 
     List<ClaimTicket> findAll(Specification<ClaimTicket> claimTicketSpecification);
 

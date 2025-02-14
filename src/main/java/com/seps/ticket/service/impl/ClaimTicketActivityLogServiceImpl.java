@@ -41,6 +41,11 @@ public class ClaimTicketActivityLogServiceImpl implements ClaimTicketActivityLog
         return repository.findAllByTicketIdAndActivityTypeIn(ticketId, activityTypes, pageable)
             .map(activity -> mapToDTO(activity, locale));
     }
+    @Override
+    public long getConversationCount(Long ticketId) {
+        List<String> activityTypes = List.of(ClaimTicketActivityEnum.CUSTOMER_REPLY.name(), ClaimTicketActivityEnum.REPLY_CUSTOMER.name());
+        return repository.countByTicketIdAndActivityTypeIn(ticketId, activityTypes);
+    }
 
     @Override
     public List<ClaimTicketActivityLogDTO> getAllActivities(Long ticketId) {

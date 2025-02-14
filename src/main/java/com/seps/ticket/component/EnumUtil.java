@@ -43,7 +43,7 @@ public class EnumUtil {
      */
     public <E extends Enum<E> & EnumWithDescription> Map<String, String> enumToLocalizedMap(Class<E> enumClass, Locale locale) {
         return Stream.of(enumClass.getEnumConstants())
-            .sorted(Comparator.comparing(Enum::name)) // Sort by enum name
+            .sorted(Comparator.comparing(Enum::ordinal)) // Sort by enum name
             .collect(Collectors.toMap(
                 Enum::name,
                 e -> messageSource.getMessage(e.getDescription(), null, locale),

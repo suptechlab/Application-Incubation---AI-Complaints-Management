@@ -11,6 +11,7 @@ import com.seps.ticket.domain.Authority;
 import com.seps.ticket.domain.ClaimTicket;
 import com.seps.ticket.domain.User;
 import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketEnum;
+import com.seps.ticket.enums.excel.header.ExcelHeaderClaimTicketSepsEnum;
 import com.seps.ticket.repository.*;
 import com.seps.ticket.security.AuthoritiesConstants;
 import com.seps.ticket.service.dto.ClaimTicketListDTO;
@@ -92,8 +93,9 @@ public class ClaimTicketService {
     private final ClaimTicketActivityLogService claimTicketActivityLogService;
     private final NotificationService notificationService;
     private final TemplateVariableMappingService templateVariableMappingService;
+    private final RoleService roleService;
 
-    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder, ClaimTicketActivityLogService claimTicketActivityLogService, NotificationService notificationService, TemplateVariableMappingService templateVariableMappingService) {
+    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder, ClaimTicketActivityLogService claimTicketActivityLogService, NotificationService notificationService, TemplateVariableMappingService templateVariableMappingService, RoleService roleService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.userClaimTicketMapper = userClaimTicketMapper;
@@ -107,6 +109,7 @@ public class ClaimTicketService {
         this.claimTicketActivityLogService = claimTicketActivityLogService;
         this.notificationService = notificationService;
         this.templateVariableMappingService = templateVariableMappingService;
+        this.roleService = roleService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -580,13 +583,20 @@ public class ClaimTicketService {
             .toList();
         Long fiAgentId = null;
         Long sepsAgentId = null;
+        boolean isSeps = true;
         if (authority.contains(AuthoritiesConstants.FI)) {
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_FI");
             filterRequest.setOrganizationId(currentUser.getOrganization().getId());
-            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN)) {
+            if (!currentUser.hasRoleSlug(Constants.RIGHTS_FI_ADMIN) && permissetSet.isEmpty()) {
                 fiAgentId = currentUser.getId();
             }
-        } else if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN)) {
-            sepsAgentId = currentUser.getId();
+            isSeps = false;
+            filterRequest.setInstanceType(InstanceTypeEnum.FIRST_INSTANCE);
+        } else{
+            Set<Permission> permissetSet = roleService.getUserPermissions(currentUser.getId(), "TICKET_VIEW_ALL_SEPS");
+            if (authority.contains(AuthoritiesConstants.SEPS) && !currentUser.hasRoleSlug(Constants.RIGHTS_SEPS_ADMIN) && permissetSet.isEmpty()) {
+                sepsAgentId = currentUser.getId();
+            }
         }
 
         List<ClaimTicketListDTO> claimAndComplaintsList = claimTicketRepository.findAll(ClaimTicketSpecification.bySepsFiFilter(filterRequest, fiAgentId, sepsAgentId)).stream()
@@ -595,40 +605,93 @@ public class ClaimTicketService {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Claim and Complaints");
 
-            // Header
-            Row headerRow = sheet.createRow(0);
-
-            for (ExcelHeaderClaimTicketEnum header : ExcelHeaderClaimTicketEnum.values()) {
-                // Use ordinal() to determine the column index
-                Cell cell = headerRow.createCell(header.ordinal());
-                cell.setCellValue(enumUtil.getLocalizedEnumValue(header, LocaleContextHolder.getLocale()));
-            }
-            // Data
-            int rowIdx = 1;
-            for (ClaimTicketListDTO data : claimAndComplaintsList) {
-                Row row = sheet.createRow(rowIdx++);
-
-                row.createCell(ExcelHeaderClaimTicketEnum.ID.ordinal()).setCellValue(data.getId());
-                row.createCell(ExcelHeaderClaimTicketEnum.TICKET_ID.ordinal()).setCellValue(data.getFormattedTicketId());
-                row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
-                row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
-                row.createCell(ExcelHeaderClaimTicketEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
-                row.createCell(ExcelHeaderClaimTicketEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
-                row.createCell(ExcelHeaderClaimTicketEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
-                row.createCell(ExcelHeaderClaimTicketEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() != null ? data.getUser().getName() : "");
-                row.createCell(ExcelHeaderClaimTicketEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName() : "");
-                row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName() : "");
-                row.createCell(ExcelHeaderClaimTicketEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
-                row.createCell(ExcelHeaderClaimTicketEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
-                row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_AMOUNT.ordinal()).setCellValue(CommonHelper.formatAmount(data.getClaimAmount()));
-
-            }
-            // Auto-size columns
-            for (ExcelHeaderClaimTicketEnum header : ExcelHeaderClaimTicketEnum.values()) {
-                sheet.autoSizeColumn(header.ordinal());
+            if(isSeps){
+                sepsReportExportDashboard(sheet, claimAndComplaintsList);
+            }else {
+                fiReportExportDashboard(sheet, claimAndComplaintsList);
             }
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
+        }
+    }
+
+    private void fiReportExportDashboard(Sheet sheet, List<ClaimTicketListDTO> claimAndComplaintsList) {
+        // Header
+        Row headerRow = sheet.createRow(0);
+
+        for (ExcelHeaderClaimTicketEnum header : ExcelHeaderClaimTicketEnum.values()) {
+            // Use ordinal() to determine the column index
+            Cell cell = headerRow.createCell(header.ordinal());
+            cell.setCellValue(enumUtil.getLocalizedEnumValue(header, LocaleContextHolder.getLocale()));
+        }
+        // Data
+        int rowIdx = 1;
+        for (ClaimTicketListDTO data : claimAndComplaintsList) {
+            Row row = sheet.createRow(rowIdx++);
+
+            row.createCell(ExcelHeaderClaimTicketEnum.ID.ordinal()).setCellValue(data.getId());
+            row.createCell(ExcelHeaderClaimTicketEnum.TICKET_ID.ordinal()).setCellValue(data.getFormattedTicketId());
+            row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
+            row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
+            row.createCell(ExcelHeaderClaimTicketEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
+            row.createCell(ExcelHeaderClaimTicketEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
+            row.createCell(ExcelHeaderClaimTicketEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() != null ? data.getUser().getName() : "");
+            row.createCell(ExcelHeaderClaimTicketEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName() : "");
+            row.createCell(ExcelHeaderClaimTicketEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName() : "");
+            row.createCell(ExcelHeaderClaimTicketEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
+            row.createCell(ExcelHeaderClaimTicketEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+            row.createCell(ExcelHeaderClaimTicketEnum.CLAIM_AMOUNT.ordinal()).setCellValue(CommonHelper.formatAmount(data.getClaimAmount()));
+            if(data.getPreviousTicketId()!=null) {
+                ClaimTicket previousClaim = claimTicketRepository.findById(data.getPreviousTicketId()).orElse(null);
+                row.createCell(ExcelHeaderClaimTicketEnum.REFERENCE_TICKET_ID.ordinal()).setCellValue(previousClaim!=null ? previousClaim.getFormattedTicketId() : "");
+            }else{
+                row.createCell(ExcelHeaderClaimTicketEnum.REFERENCE_TICKET_ID.ordinal()).setCellValue("");
+            }
+
+        }
+        // Auto-size columns
+        for (ExcelHeaderClaimTicketEnum header : ExcelHeaderClaimTicketEnum.values()) {
+            sheet.autoSizeColumn(header.ordinal());
+        }
+    }
+
+    private void sepsReportExportDashboard(Sheet sheet, List<ClaimTicketListDTO> claimAndComplaintsList) {
+        // Header
+        Row headerRow = sheet.createRow(0);
+
+        for (ExcelHeaderClaimTicketSepsEnum header : ExcelHeaderClaimTicketSepsEnum.values()) {
+            // Use ordinal() to determine the column index
+            Cell cell = headerRow.createCell(header.ordinal());
+            cell.setCellValue(enumUtil.getLocalizedEnumValue(header, LocaleContextHolder.getLocale()));
+        }
+        // Data
+        int rowIdx = 1;
+        for (ClaimTicketListDTO data : claimAndComplaintsList) {
+            Row row = sheet.createRow(rowIdx++);
+
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.ID.ordinal()).setCellValue(data.getId());
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.TICKET_ID.ordinal()).setCellValue(data.getFormattedTicketId());
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.CLAIM_TYPE.ordinal()).setCellValue(data.getClaimType().getName());
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.CLAIM_SUB_TYPE.ordinal()).setCellValue(data.getClaimSubType().getName());
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.FI_ENTITY.ordinal()).setCellValue(data.getOrganization().getRazonSocial());
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.SLA_DATE.ordinal()).setCellValue(DateUtil.formatDate(data.getSlaBreachDate(), LocaleContextHolder.getLocale().getLanguage()));
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getStatus(), LocaleContextHolder.getLocale()));
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.CUSTOMER_NAME.ordinal()).setCellValue(data.getUser() != null ? data.getUser().getName() : "");
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.FI_AGENT.ordinal()).setCellValue(data.getFiAgent() != null ? data.getFiAgent().getName() : "");
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.SEPS_AGENT.ordinal()).setCellValue(data.getSepsAgent() != null ? data.getSepsAgent().getName() : "");
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.INSTANCE_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getInstanceType(), LocaleContextHolder.getLocale()));
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.CREATED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getCreatedAt(), LocaleContextHolder.getLocale().getLanguage()));
+            row.createCell(ExcelHeaderClaimTicketSepsEnum.CLAIM_AMOUNT.ordinal()).setCellValue(CommonHelper.formatAmount(data.getClaimAmount()));
+            if(data.getPreviousTicketId()!=null) {
+                ClaimTicket previousClaim = claimTicketRepository.findById(data.getPreviousTicketId()).orElse(null);
+                row.createCell(ExcelHeaderClaimTicketSepsEnum.REFERENCE_TICKET_ID.ordinal()).setCellValue(previousClaim!=null ? previousClaim.getFormattedTicketId() : "");
+            }else{
+                row.createCell(ExcelHeaderClaimTicketSepsEnum.REFERENCE_TICKET_ID.ordinal()).setCellValue("");
+            }
+        }
+        // Auto-size columns
+        for (ExcelHeaderClaimTicketSepsEnum header : ExcelHeaderClaimTicketSepsEnum.values()) {
+            sheet.autoSizeColumn(header.ordinal());
         }
     }
 

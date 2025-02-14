@@ -1,6 +1,7 @@
 package com.seps.ticket.service.dto;
 
 import com.seps.ticket.enums.*;
+import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.ToString;
 
@@ -75,4 +76,7 @@ public class ClaimTicketDTO {
     private ClaimTicketDTO previousTicket; // Add this field for mapping the previous ticket
     private Double claimAmount;
     private String formattedTicketId;
+    private Long remainingDaysOfSla;
+    private Boolean isSlaExtended;
+    private Instant dateWhenSlaExtended;
 }
