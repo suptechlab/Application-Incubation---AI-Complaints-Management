@@ -1,17 +1,16 @@
 import { Formik, Form as FormikForm } from "formik";
 import React, { useState } from "react";
 import { Button, Card, Col, Row, Stack } from "react-bootstrap";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { MdOutlineSimCardDownload } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
+import sepsUsersFile from "../../assets/samplefiles/SEPS_USERS.xlsx";
 import FormInput from "../../components/FormInput";
 import Loader from "../../components/Loader";
 import PageHeader from "../../components/PageHeader";
-import { fiImportValidationSchema, validationSchema } from "../../validations/fiUsers.validation";
-import fiUserFile from "../../assets/samplefiles/FI_USERS.xlsx"
-import { handleImportFiUsersApi } from "../../services/fiusers.services";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
 import { handleImportSepsUsersApi } from "../../services/user.service";
+import { fiImportValidationSchema } from "../../validations/fiUsers.validation";
 
 const ImportSEPSUser = () => {
 
@@ -85,7 +84,7 @@ const ImportSEPSUser = () => {
 
   const handleSampleFileDownload = () => {
     // Define the URL of the sample file
-    const fileUrl = fiUserFile; // Replace with your file URL
+    const fileUrl = sepsUsersFile; // Replace with your file URL
     const fileName = "SEPS_USERS.xlsx"; // Replace with the desired file name
 
     // Create an anchor element

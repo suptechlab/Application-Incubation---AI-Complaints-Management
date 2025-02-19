@@ -50,6 +50,8 @@ const SlaReminderModal = ({ showModal, ticketData ,toggle,getTicketData}) => {
     })
   }
 
+
+
   return (
     <Modal
       show={showModal}
@@ -63,6 +65,7 @@ const SlaReminderModal = ({ showModal, ticketData ,toggle,getTicketData}) => {
       size="sm"
     >
       <Modal.Header className='pb-0' closeButton></Modal.Header>
+     
       <Modal.Body className="text-break pt-3">
         <div className='text-center'>
           <div className='mb-3' aria-label='Success Launch Icon'><TbBellRingingFilled className='text-primary' size='50' /></div>
@@ -70,7 +73,7 @@ const SlaReminderModal = ({ showModal, ticketData ,toggle,getTicketData}) => {
           <h6 className='fw-semibold'>
             {t('SLA_BREACH_NOTICE', {
               ticketId: ticketData?.ticketId,
-              days: ticketData?.slaBreachDate ? calculateDaysDifference(ticketData?.slaBreachDate) : '0',
+              days: ticketData?.remainingDaysOfSla ? (ticketData?.remainingDaysOfSla).toString() : '0',
             })}
           </h6>
         </div>

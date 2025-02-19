@@ -13,7 +13,6 @@ import PageHeader from "../../components/PageHeader";
 import AppTooltip from "../../components/tooltip";
 import { MasterDataContext } from "../../contexts/masters.context";
 import { claimOverviewReportApi, downloadClaimOverviewReportApi } from "../../services/reports.services";
-import { calculateDaysDifference } from "../../utils/commonutils";
 import ListFilters from "./ListFilters";
 
 const ClaimOverviewReport = () => {
@@ -113,13 +112,17 @@ const ClaimOverviewReport = () => {
         ),
       },
       {
-        accessorFn: (row) => row?.slaBreachDate,
+        accessorFn: (row) => row?.remainingDaysOfSla,
         id: "slaBreachDate",
         header: () => "SLA",
         enableSorting: true,
-        cell: ({ row }) => (
-          <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
-        )
+        cell: (rowData) => {
+          const remainingDays = rowData?.row?.original?.remainingDaysOfSla;
+      
+          return remainingDays !== null && remainingDays !== undefined
+              ? <span>{remainingDays + " " + (remainingDays > 1 ? t("DAYS") : t("DAY"))}</span>
+              : null;
+      }
       },
       {
         accessorFn: (row) => row?.priority,
