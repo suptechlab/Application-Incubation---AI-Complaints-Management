@@ -19,6 +19,7 @@ import ActivityLogs from './activity-logs';
 import TicketViewHeader from './header';
 import TicketTabsSection from './tabs';
 
+
 const TicketsView = () => {
 
   const { currentUser, permissions = {}, profileImage } = useContext(AuthenticationContext);

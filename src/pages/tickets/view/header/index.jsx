@@ -39,7 +39,7 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
     const handleSelect = (status) => {
         const actions = {
             CLOSE: () => setCloseTicketModalShow(true),
-            REJECT: () => setRejectTicketModalShow(true),
+            REJECTED: () => setRejectTicketModalShow(true),
             IN_PROGRESS: () => handleTicketStatusChange('IN_PROGRESS'),
             PENDING: () => handleTicketStatusChange('PENDING')
         };
@@ -60,7 +60,7 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
             (ticketData?.instanceType === 'FIRST_INSTANCE' && currentUser === 'FI_USER') ||
             ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
                 (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN'))
-        ) ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
+        ) ? [{ label: t('REJECT'), value: 'REJECTED' }] : []),
         { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
         { label: t('PENDING'), value: 'PENDING' }];
     const getStatusClass = (status) => {

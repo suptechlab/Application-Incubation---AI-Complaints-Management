@@ -31,7 +31,10 @@ const ClaimsAndComplaints = ({ setLoading }) => {
     const { masterData } = useContext(MasterDataContext)
     const { currentUser } = useContext(AuthenticationContext)
 
-    const [sorting, setSorting] = React.useState([]);
+    const [sorting, setSorting] = React.useState([ {
+        "id": "createdAt",
+        "desc": true
+    }]);
     const [filter, setFilter] = React.useState({
         search: "",
         claimTicketStatus: "",
@@ -190,7 +193,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
             {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => t("TICKET_ID"),
+                header: () => t("TICKET_NO"),
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>

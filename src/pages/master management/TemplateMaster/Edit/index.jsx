@@ -60,17 +60,18 @@ const EditTemplate = () => {
           //   setVariableList([])
           // }
 
-          setLoading(false);
+         
         })
         .catch((error) => {
           console.error("Error get during to fetch", error);
+        }).finally(()=>{
+          setLoading(false);
         });
 
 
 
       templateKeywordListing(id)
         .then((response) => {
-          console.log(response)
           if (response?.data) {
             setVariableList(response?.data)
           } else {
@@ -80,7 +81,9 @@ const EditTemplate = () => {
         })
         .catch((error) => {
           console.error("Error get during to fetch", error);
-        });
+        }).finally(()=>{
+          setLoading(false);
+        });;
     }
   }, [id]);
 

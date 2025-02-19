@@ -58,8 +58,8 @@ const TicketsTaggedList = ({ selectedTab }) => {
 
     const [sorting, setSorting] = React.useState([
         {
-            "id": "slaBreachDate",
-            "asc": true
+            "id": "createdAt",
+            "desc": true
         }
     ]);
     const [filter, setFilter] = React.useState({
