@@ -10,7 +10,6 @@ import AppTooltip from '../../../../components/tooltip'
 import DashboardListFilters from './filters'
 import { downloadClaimAndComplaints, getClaimsandComplaints } from '../../../../services/dashboard.service'
 import { useTranslation } from 'react-i18next'
-import { calculateDaysDifference } from '../../../../utils/commonutils'
 import moment from 'moment'
 import { MasterDataContext } from '../../../../contexts/masters.context'
 import { convertToLabelValue } from '../../../../services/ticketmanagement.service'
@@ -31,7 +30,10 @@ const ClaimsAndComplaints = ({ setLoading }) => {
     const { masterData } = useContext(MasterDataContext)
     const { currentUser } = useContext(AuthenticationContext)
 
-    const [sorting, setSorting] = React.useState([]);
+    const [sorting, setSorting] = React.useState([ {
+        "id": "createdAt",
+        "desc": true
+    }]);
     const [filter, setFilter] = React.useState({
         search: "",
         claimTicketStatus: "",
@@ -190,7 +192,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
             {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => t("TICKET_ID"),
+                header: () => t("TICKET_NO"),
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
@@ -224,6 +226,16 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 ),
             },
             {
+                accessorFn: (row) => row?.createdByUser?.name,
+                id: "claimFiledBy",
+                header: () => t("CLAIM_FILED_BY"),
+                enableSorting: true,
+                cell: ({ row }) => (
+                    row?.original?.createdByUser?.name
+                       
+                ),
+            },
+            {
                 accessorFn: (row) => row?.claimType?.name,
                 id: "claimType",
                 header: () => t("CLAIM TYPE"),
@@ -236,20 +248,18 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 enableSorting: true,
             },
             {
-                accessorFn: (row) => row?.fiAgent?.name,
-                id: "fiAgent",
-                header: () => t("FI_ENTITY"),
-                enableSorting: true,
-            },
-            {
-                accessorFn: (row) => row?.slaBreachDate,
+                accessorFn: (row) => row?.remainingDaysOfSla,
                 id: "slaBreachDate",
-                header: () => t("SLA"),
+                header: () => "SLA",
                 enableSorting: true,
-                cell: ({ row }) => (
-                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
-                )
-            },
+                cell: (rowData) => {
+                    const remainingDays = rowData?.row?.original?.remainingDaysOfSla;
+                
+                    return remainingDays !== null && remainingDays !== undefined
+                        ? <span>{remainingDays + " " + (remainingDays > 1 ? t("DAYS") : t("DAY"))}</span>
+                        : 'N/A';
+                }
+              },
             {
                 accessorFn: (row) => row?.instanceType,
                 id: "instanceType",
@@ -278,6 +288,12 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                     </span>
                 ),
             },
+            {
+                accessorFn: (row) => row?.fiAgent?.name,
+                id: "fiAgent",
+                header: () => t("FI_ENTITY"),
+                enableSorting: true,
+            }
         ],
         [masterData]
     );

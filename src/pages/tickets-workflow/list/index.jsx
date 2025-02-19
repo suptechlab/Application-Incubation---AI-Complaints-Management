@@ -34,7 +34,12 @@ export default function TicketWorkFlowList() {
         pageSize: params.limit ? parseInt(params.limit) : 10,
     });
 
-    const [sorting, setSorting] = React.useState([]);
+    const [sorting, setSorting] = React.useState([
+        {
+            "id": "title",
+            "asc": true
+        }
+    ]);
 
     const [filter, setFilter] = React.useState({
         search: "",

@@ -9,7 +9,6 @@ import ReactSelect from '../../../../components/ReactSelect';
 import { AuthenticationContext } from '../../../../contexts/authentication.context';
 import { MasterDataContext } from '../../../../contexts/masters.context';
 import { agentListingApi, agentTicketToFIagent, agentTicketToSEPSagent, downloadTicketDetails, ticketStatusChange } from '../../../../services/ticketmanagement.service';
-import { calculateDaysDifference } from '../../../../utils/commonutils';
 import AddAttachmentsModal from '../../modals/addAttachmentsModal';
 import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
@@ -32,14 +31,14 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
     const [selectedAgent, setSelectedAgent] = useState(null)
     const [closeTicketModalShow, setCloseTicketModalShow] = useState(false)
     const [rejectTicketModalShow, setRejectTicketModalShow] = useState(false)
-    const [isDownloading,setDownloading] = useState(false)
+    const [isDownloading, setDownloading] = useState(false)
 
     // const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
     const handleSelect = (status) => {
         const actions = {
             CLOSE: () => setCloseTicketModalShow(true),
-            REJECT: () => setRejectTicketModalShow(true),
+            REJECTED: () => setRejectTicketModalShow(true),
             IN_PROGRESS: () => handleTicketStatusChange('IN_PROGRESS'),
             PENDING: () => handleTicketStatusChange('PENDING')
         };
@@ -50,19 +49,38 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
     // The color class based on the status
     // const statusOptions = ['CLOSED', 'IN_PROGRESS', 'NEW', 'REJECTED', 'ASSIGNED'];
 
-    const statusOptions = [
-        ...((permissionState?.closePermission === true &&
-            ((ticketData?.instanceType === 'FIRST_INSTANCE' && ticketData?.fiAgentId !== null && currentUser === 'FI_USER') ||
-                (((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
-                    (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN')) && ticketData?.sepsAgentId !== null)))
-            ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
-        ...((permissionState?.rejectPermission === true &&
-            (ticketData?.instanceType === 'FIRST_INSTANCE' && currentUser === 'FI_USER') ||
-            ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
-                (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN'))
-        ) ? [{ label: t('REJECT'), value: 'REJECT' }] : []),
-        { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
-        { label: t('PENDING'), value: 'PENDING' }];
+    const statusOptions = selectedStatus === 'NEW' ?
+        (
+            (permissionState?.rejectPermission === true &&
+                ((ticketData?.instanceType === 'FIRST_INSTANCE' && currentUser === 'FI_USER') ||
+                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
+                        (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN'))))
+                ? [{ label: t('REJECT'), value: 'REJECTED' }]
+                : []
+        )
+
+        : [
+            // CLOSE
+            ...((permissionState?.closePermission === true &&
+                ((ticketData?.instanceType === 'FIRST_INSTANCE' && ticketData?.fiAgentId !== null && currentUser === 'FI_USER') ||
+                    (((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
+                        (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN')) && ticketData?.sepsAgentId !== null)))
+                ? [{ label: t('CLOSE'), value: 'CLOSE' }] : []),
+
+
+            // REJECT
+            ...((permissionState?.rejectPermission === true &&
+                (ticketData?.instanceType === 'FIRST_INSTANCE' && currentUser === 'FI_USER') ||
+                ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT') &&
+                    (currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN'))
+            ) ? [{ label: t('REJECT'), value: 'REJECTED' }] : []),
+
+
+            { label: t('IN_PROGRESS'), value: 'IN_PROGRESS' },
+            { label: t('PENDING'), value: 'PENDING' }];
+
+
+
     const getStatusClass = (status) => {
         switch (status) {
             case 'CLOSED':
@@ -166,7 +184,7 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
         getAgentDropdownListing()
     }, [])
 
-    const daysDifference = calculateDaysDifference(ticketData?.slaBreachDate);
+    const daysDifference = ticketData?.remainingDaysOfSla;
     const isSlaBreachDateValid = ticketData?.slaBreachDate && !isNaN(daysDifference);
     const renderBadge = (bgColor, textColor, message) => (
         <Badge
@@ -178,47 +196,47 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
         </Badge>
     );
     // DOWNLOAD CLAIM TYPES LIST
-     const handleTicketDetailsDownload = () => {
+    const handleTicketDetailsDownload = () => {
         setDownloading(true)
         toast.loading(t("DOWNLOAD_IN_PROGRESS"), { id: "downloading", isLoading: isDownloading })
         downloadTicketDetails(ticketData?.id).then(response => {
-          if (response?.data) {
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const blobUrl = window.URL.createObjectURL(blob);
+            if (response?.data) {
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const blobUrl = window.URL.createObjectURL(blob);
 
-            toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
+                toast.success(t("DOWNLOAD_SUCCESSFUL"), { id: "downloading" })
 
 
-            const tempLink = document.createElement('a');
-            tempLink.href = blobUrl;
-            tempLink.setAttribute('download', 'ticket_details.pdf');
+                const tempLink = document.createElement('a');
+                tempLink.href = blobUrl;
+                tempLink.setAttribute('download', 'ticket_details.pdf');
 
-            // Append the link to the document body before clicking it
-            document.body.appendChild(tempLink);
+                // Append the link to the document body before clicking it
+                document.body.appendChild(tempLink);
 
-            tempLink.click();
+                tempLink.click();
 
-            // Clean up by revoking the Blob URL
-            window.URL.revokeObjectURL(blobUrl);
+                // Clean up by revoking the Blob URL
+                window.URL.revokeObjectURL(blobUrl);
 
-            // Remove the link from the document body after clicking
-            document.body.removeChild(tempLink);
-          } else {
-            throw new Error(t("EMPTY RESPONSE"));
-          }
+                // Remove the link from the document body after clicking
+                document.body.removeChild(tempLink);
+            } else {
+                throw new Error(t("EMPTY RESPONSE"));
+            }
         }).catch((error) => {
-          if (error?.response?.data?.errorDescription) {
-            toast.error(error?.response?.data?.errorDescription);
-          } else {
-            toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
-          }
-          toast.dismiss("downloading");
+            if (error?.response?.data?.errorDescription) {
+                toast.error(error?.response?.data?.errorDescription);
+            } else {
+                toast.error(error?.message ?? t("STATUS UPDATE ERROR"));
+            }
+            toast.dismiss("downloading");
         }).finally(() => {
-          // Ensure the loading toast is dismissed
-          // toast.dismiss("downloading");
-          setDownloading(false)
+            // Ensure the loading toast is dismissed
+            // toast.dismiss("downloading");
+            setDownloading(false)
         });
-      }
+    }
 
     return (
         <React.Fragment>
@@ -262,15 +280,16 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
                             onClick={handleTicketDetailsDownload}
                             className="btn btn-outline-dark"
                         >
-                           <IoMdDownload size={18}/> {t("DOWNLOAD_TICKET_DETAILS")}
+                            <IoMdDownload size={18} /> {t("DOWNLOAD_TICKET_DETAILS")}
                         </Button>
                         {
                             permissionState?.assignPermission === true &&
                             (
                                 (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
                                 ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
-                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
-                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
+                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT')))
+
+                            ) && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED") &&
                             <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
                                     wrapperClassName="mb-0"
@@ -294,12 +313,11 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
                             </div>
                         }
                         {
-                            permissionState?.dateExtPermission === true &&
-                            (
-                                (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
+                            (permissionState?.dateExtPermission === true && ticketData?.slaBreachDate !== null) &&
+                            ((currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
                                 ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
-                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
-                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) &&
+                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT')))) &&
+                            (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED") &&
 
                             <Button
                                 type="submit"
@@ -309,14 +327,16 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
                                 {t("DATE_EXTENSION")}
                             </Button>
                         }
-                       
+
+
                         {
-                            (permissionState?.statusModule === true
-                                &&  (
-                                (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE') ||
-                                ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
-                                    ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT'))) &&
-                                (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED"))) ?
+                            (permissionState?.statusModule === true && statusOptions?.length > 0
+                                && (
+                                    (currentUser === 'FI_USER' && ticketData?.instanceType === 'FIRST_INSTANCE')
+                                    ||
+                                    ((currentUser === 'SEPS_USER' || currentUser === 'SYSTEM_ADMIN') &&
+                                        ((ticketData?.instanceType === 'SECOND_INSTANCE' || ticketData?.instanceType === 'COMPLAINT')))
+                                ) && (ticketData?.status !== "CLOSED" && ticketData?.status !== "REJECTED")) ?
                                 <Dropdown>
                                     <Dropdown.Toggle
                                         id="ticket-detail-status"
@@ -327,15 +347,16 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
                                     </Dropdown.Toggle>
 
                                     <Dropdown.Menu>
-                                        {statusOptions?.map((status) => (
-                                            <Dropdown.Item
-                                                key={status?.value}
-                                                className={`small ${selectedStatus === status ? 'active' : ''}`}
-                                                onClick={() => handleSelect(status?.value)}
-                                            >
-                                                {status?.label}
-                                            </Dropdown.Item>
-                                        ))}
+                                        {
+                                            statusOptions?.filter(status => status?.value !== selectedStatus)?.map((status) => (
+                                                <Dropdown.Item
+                                                    key={status?.value}
+                                                    className={`small ${selectedStatus === status ? 'active' : ''}`}
+                                                    onClick={() => handleSelect(status?.value)}
+                                                >
+                                                    {status?.label}
+                                                </Dropdown.Item>
+                                            ))}
                                     </Dropdown.Menu>
                                 </Dropdown> :
 

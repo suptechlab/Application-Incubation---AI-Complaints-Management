@@ -28,7 +28,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setI
         setLoading(true)
         const formData = new FormData();
         formData.append("reason", values.reason);
-        formData.append("closeSubStatus", values.closeSubStatus);
+        formData.append("rejectedStatus", values.rejectedStatus);
         if (values.attachments) {
             formData.append("attachments[0]", values.attachments);
         }

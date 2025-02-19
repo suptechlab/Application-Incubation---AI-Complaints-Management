@@ -13,7 +13,6 @@ import AppTooltip from "../../../../components/tooltip";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
 import { MasterDataContext } from "../../../../contexts/masters.context";
 import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTaggedTicketList } from "../../../../services/ticketmanagement.service";
-import { calculateDaysDifference } from "../../../../utils/commonutils";
 import AttachmentsModal from "../../modals/attachmentsModal";
 import TicketsListFilters from "../filters/index";
 
@@ -58,8 +57,8 @@ const TicketsTaggedList = ({ selectedTab }) => {
 
     const [sorting, setSorting] = React.useState([
         {
-            "id": "slaBreachDate",
-            "asc": true
+            "id": "createdAt",
+            "desc": true
         }
     ]);
     const [filter, setFilter] = React.useState({
@@ -292,14 +291,18 @@ const TicketsTaggedList = ({ selectedTab }) => {
                 enableSorting: false,
             },
             {
-                accessorFn: (row) => row?.slaBreachDate,
+                accessorFn: (row) => row?.remainingDaysOfSla,
                 id: "slaBreachDate",
                 header: () => "SLA",
                 enableSorting: true,
-                cell: ({ row }) => (
-                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
-                )
-            },
+                cell: (rowData) => {
+                  const remainingDays = rowData?.row?.original?.remainingDaysOfSla;
+              
+                  return remainingDays !== null && remainingDays !== undefined
+                      ? <span>{remainingDays + " " + (remainingDays > 1 ? t("DAYS") : t("DAY"))}</span>
+                      : null;
+              }
+              },
             {
                 accessorFn: (row) => row?.instanceType,
                 id: "instanceType",
@@ -414,26 +417,26 @@ const TicketsTaggedList = ({ selectedTab }) => {
         switch (currentUser) {
             case 'FI_USER':
                 if (userData?.roles[0]?.name === 'Fi Admin') {
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 } else { // FI AGENT
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 }
 
                 break; // Use `break` to avoid executing further cases
 
             case 'SEPS_USER':
                 if (userData?.roles[0]?.name === 'Seps Admin') {
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 } else {
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 }
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 break;
         }
 

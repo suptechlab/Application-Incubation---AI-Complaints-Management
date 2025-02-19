@@ -23,22 +23,22 @@ export default function TeamManagementAddEdit() {
     const { t } = useTranslation();
 
 
-    const {currentUser} = useContext(AuthenticationContext)
+    const { currentUser, userData } = useContext(AuthenticationContext)
 
     const [initialValues, setInitialValues] = useState({
         teamName: "",
         description: "",
-        entityId: "",
-        entityType: currentUser ==='FI_USER' ? "FI" :"SEPS"
+        entityId: currentUser === 'FI_USER' ? userData?.organizationId : '',
+        entityType: currentUser === 'FI_USER' ? "FI" : "SEPS"
     });
     const [entityIdArr, setEntityIdArr] = useState([]);
     const [organizationArr, setOrganizationArr] = useState([]);
     const [selectedRow, setSelectedRow] = useState();
     const [deleteShow, setDeleteShow] = useState(false);
     const [deleteId, setDeleteId] = useState();
-    const [showEntityOrgId, setShowEntityOrgId] = useState(true); // if FI then only show
+    const [showEntityOrgId, setShowEntityOrgId] = useState(currentUser === 'FI_USER' ? true : false); // if FI then only show
     const [newTeamMember, setNewTeamMember] = useState([]);
-    const [userData, setUserData] = useState([]);
+    const [teamData, setTeamData] = useState([]);
     const [selectedMember, setSelectedMember] = useState(null); // To hold the selected member
 
 
@@ -71,7 +71,7 @@ export default function TeamManagementAddEdit() {
                 let payload = {
                     userIds: [selectedMember?.value]
                 }
-                assignUserIntoTeam(userData?.id, payload);
+                assignUserIntoTeam(teamData?.id, payload);
                 setLoading(false);
             } catch (error) {
                 const errorMessage = error.response?.data?.detail;
@@ -116,11 +116,12 @@ export default function TeamManagementAddEdit() {
         }
     }
 
-    const getUserDetails = async (userId) => {
+
+    const getTeamDetails = async (userId) => {
         setLoading(true);
         try {
             const response = await handleGetUserById(userId);
-            setUserData(response.data);
+            setTeamData(response.data);
             setInitialValues({
                 teamName: response.data?.teamName ?? "",
                 description: response.data?.description ?? "",
@@ -143,7 +144,7 @@ export default function TeamManagementAddEdit() {
 
     useEffect(() => {
         if (isEdit && id) {
-            getUserDetails(id);
+            getTeamDetails(id);
         } else {
             getTeamMemberLists("FI");
             getOrganizationLists("FI");
@@ -194,8 +195,8 @@ export default function TeamManagementAddEdit() {
             setNewTeamMember((prev) => prev.filter((member) => member.userId !== deleteId));
             setLoading(true);
             try {
-                await handleDeleteUserFromTeam(userData?.id, deleteId);
-                await getTeamMemberLists(userData?.entityType);
+                await handleDeleteUserFromTeam(teamData?.id, deleteId);
+                await getTeamMemberLists(teamData?.entityType);
                 setLoading(false);
             } catch (error) {
                 const errorMessage = error.response?.data?.errorDescription;
@@ -236,54 +237,54 @@ export default function TeamManagementAddEdit() {
                                 >
                                     <Row>
 
-                                    {
-                                        currentUser === 'SEPS_USER' &&
-                                        <Col xs={12} className="mb-3">
-                                            <div className='status-radio'>
-                                                <div className='mb-1 fs-14'>{t('USER TYPE')}</div>
-                                                <Stack direction="horizontal" gap={3} className="flex-wrap">
-                                                    <Form.Check
-                                                        className="me-3 me-lg-4"
-                                                        id="entityType"
-                                                        name="entityType"
-                                                        value="SEPS"
-                                                        checked={values.entityType === 'SEPS'}
-                                                        onBlur={handleBlur}
-                                                        onChange={() => {
-                                                            setFieldValue("entityType", "SEPS");
-                                                            setShowEntityOrgId(false);
-                                                            getTeamMemberLists("SEPS");
-                                                            setNewTeamMember([]);
-                                                            setFieldValue("teamMemberId", "");
-                                                        }}
-                                                        type="radio"
-                                                        label={t('SEPS USER')}
-                                                        disabled={isEdit}
-                                                    />
-                                                    <Form.Check
-                                                        className="me-3 me-lg-4"
-                                                        id="entityTypeFi"
-                                                        name="entityType"
-                                                        value="FI"
-                                                        checked={values.entityType === 'FI'}
-                                                        onBlur={handleBlur}
-                                                        onChange={() => {
-                                                            setFieldValue("entityType", "FI");
-                                                            setShowEntityOrgId(true);
-                                                            getOrganizationLists("FI");
-                                                            getTeamMemberLists("FI");
-                                                            setNewTeamMember([]);
-                                                            setFieldValue("teamMemberId", "");
-                                                        }}
-                                                        type="radio"
-                                                        label={t('FI USER')}
-                                                        disabled={isEdit}
-                                                    />
-                                                </Stack>
-                                            </div>
-                                        </Col>
-                                    }
-                                       
+                                        {
+                                            currentUser !== 'FI_USER' &&
+                                            <Col xs={12} className="mb-3">
+                                                <div className='status-radio'>
+                                                    <div className='mb-1 fs-14'>{t('USER TYPE')}</div>
+                                                    <Stack direction="horizontal" gap={3} className="flex-wrap">
+                                                        <Form.Check
+                                                            className="me-3 me-lg-4"
+                                                            id="entityType"
+                                                            name="entityType"
+                                                            value="SEPS"
+                                                            checked={values.entityType === 'SEPS'}
+                                                            onBlur={handleBlur}
+                                                            onChange={() => {
+                                                                setFieldValue("entityType", "SEPS");
+                                                                setShowEntityOrgId(false);
+                                                                getTeamMemberLists("SEPS");
+                                                                setNewTeamMember([]);
+                                                                setFieldValue("teamMemberId", "");
+                                                            }}
+                                                            type="radio"
+                                                            label={t('SEPS USER')}
+                                                            disabled={isEdit}
+                                                        />
+                                                        <Form.Check
+                                                            className="me-3 me-lg-4"
+                                                            id="entityTypeFi"
+                                                            name="entityType"
+                                                            value="FI"
+                                                            checked={values.entityType === 'FI'}
+                                                            onBlur={handleBlur}
+                                                            onChange={() => {
+                                                                setFieldValue("entityType", "FI");
+                                                                setShowEntityOrgId(true);
+                                                                getOrganizationLists("FI");
+                                                                getTeamMemberLists("FI");
+                                                                setNewTeamMember([]);
+                                                                setFieldValue("teamMemberId", "");
+                                                            }}
+                                                            type="radio"
+                                                            label={t('FI USER')}
+                                                            disabled={isEdit}
+                                                        />
+                                                    </Stack>
+                                                </div>
+                                            </Col>
+                                        }
+
                                         {
                                             showEntityOrgId ?
                                                 <Col sm={6} lg={4}>
@@ -301,6 +302,7 @@ export default function TeamManagementAddEdit() {
                                                         name="entityId"
                                                         onBlur={handleBlur}
                                                         touched={touched.entityId}
+                                                        disabled={currentUser === 'FI_USER'}
                                                     />
                                                 </Col>
                                                 : ''

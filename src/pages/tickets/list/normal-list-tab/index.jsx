@@ -14,7 +14,6 @@ import AppTooltip from "../../../../components/tooltip";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
 import { MasterDataContext } from "../../../../contexts/masters.context";
 import { agentTicketToFIagent, agentTicketToSEPSagent, handleGetTicketList, ticketOverviewAPI } from "../../../../services/ticketmanagement.service";
-import { calculateDaysDifference } from "../../../../utils/commonutils";
 import AttachmentsModal from "../../modals/attachmentsModal";
 import TicketsListFilters from "../filters/index";
 import { TbBellRingingFilled } from "react-icons/tb";
@@ -325,14 +324,18 @@ const TicketsNormalList = ({ selectedTab }) => {
                 enableSorting: false,
             },
             {
-                accessorFn: (row) => row?.slaBreachDate,
+                accessorFn: (row) => row?.remainingDaysOfSla,
                 id: "slaBreachDate",
                 header: () => "SLA",
                 enableSorting: true,
-                cell: ({ row }) => (
-                    <span>{row?.original?.slaBreachDate ? calculateDaysDifference(row?.original?.slaBreachDate) + " " + t('DAYS') : 'N/A'}</span>
-                )
-            },
+                cell: (rowData) => {
+                    const remainingDays = rowData?.row?.original?.remainingDaysOfSla;
+                
+                    return remainingDays !== null && remainingDays !== undefined
+                        ? <span>{remainingDays + " " + (remainingDays > 1 ? t("DAYS") : t("DAY"))}</span>
+                        : 'N/A';
+                }
+              },
             {
                 accessorFn: (row) => row?.instanceType,
                 id: "instanceType",

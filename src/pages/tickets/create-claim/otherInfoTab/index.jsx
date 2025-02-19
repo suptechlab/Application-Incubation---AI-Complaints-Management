@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { Button, Card, Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import CommonFormikComponent from "../../../../components/CommonFormikComponent";
@@ -9,6 +9,7 @@ import { useMasterData } from '../../../../contexts/masters.context';
 import { convertToLabelValue } from '../../../../services/ticketmanagement.service';
 import { getOrganizationList } from '../../../../services/teamManagment.service';
 import { organizationListData } from '../../../../services/claimcreate.services';
+import { AuthenticationContext } from '../../../../contexts/authentication.context';
 
 const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }) => {
 
@@ -20,6 +21,8 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
     const [organizationList, setOrganizationList] = useState([]);
     const [entityTypes, setEntityTypes] = useState([])
 
+    const {currentUser,userData} = useContext(AuthenticationContext)
+
 
     const { t } = useTranslation()
 
@@ -27,8 +30,9 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
     const initialValues = {
         priorityCareGroup: '',
         customerType: '',
-        organizationId: '',
-        entitysTaxID: '',
+        organizationId:currentUser=== 'FI_USER'? userData?.organization?.id : '',
+        entitysTaxID: currentUser=== 'FI_USER'? userData?.organization?.ruc : '',
+        entityType:currentUser=== 'FI_USER'? userData?.organization?.tipoOrganizacion : ''
     };
 
     const getEntitynameList = useCallback(async () => {
@@ -150,7 +154,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                                             label={t("ENTITY_NAME")}
                                             error={formikProps.errors.organizationId}
                                             options={organizationList}
-                                            value={formikProps.values.organizationId}
+                                            value={currentUser==='FI_USER' ? userData?.organization?.id :  formikProps.values.organizationId}
                                             onChange={(option) => {
                                                 const selectedUnit = organizationList.find(
                                                     (unit) => unit.value === option?.target?.value
@@ -176,6 +180,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoading }
                                                     ? "is-invalid"
                                                     : ""
                                             }
+                                            disabled={currentUser==='FI_USER'}
                                             onBlur={formikProps.handleBlur}
                                             touched={formikProps.touched.organizationId}
                                         />

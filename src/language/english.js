@@ -250,6 +250,7 @@ export const englishLang = {
     "CONSUMER_INFO": "Consumer Info",
     "ENTER_EXTENDED_DATE": "Enter Extended Date",
     "DAYS": "Days",
+    "DAY":"Day",
     "ALL_PRIORITY": "All Priority",
     "CHANNEL_OF_ENTRY": "Channel of entry",
     "ENTITY_TYPE": "Entity Type",

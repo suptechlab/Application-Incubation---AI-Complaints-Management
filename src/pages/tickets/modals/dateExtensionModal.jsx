@@ -88,7 +88,8 @@ const DateExtensionModal = ({ modal, toggle, ticketData,getTicketData }) => {
                                 placeholder={t("SELECT")}
                                 selected={values?.date}
                                 onChange={(date) => setFieldValue("date", date)}
-                                isBackDateBlocked={true}
+                                minDate={ticketData?.slaBreachDate}
+                                // isBackDateBlocked={true}
                             />
                         </Modal.Body>
                         <Modal.Footer className="pt-0">
