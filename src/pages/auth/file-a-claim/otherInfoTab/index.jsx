@@ -17,7 +17,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
     // Initial Values
     const initialValues = {
-        priorityCareGroup: '',
+        priorityCareGroup: 'NONE',
         customerType: '',
         organizationId: '',
         entitysTaxID: '',

@@ -63,6 +63,11 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
     // Handle Other Info Submit
     const handleOtherInfoSubmit = (values, actions) => {
         setActiveTab(2)
+      
+        if(values?.priorityCareGroup===''){
+            // NONE
+            values.priorityCareGroup = "NONE"
+        }
         setFileClaimValues((prev) => ({ ...prev, ...values }))
         setIsOtherInfoSubmitted(true);
         actions.setSubmitting(false);

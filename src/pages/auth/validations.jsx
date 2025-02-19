@@ -32,7 +32,7 @@ export const PersonalInfoTabSchema = yup.object({
     .required(msg.countryCodeRequired),
   phoneNumber: yup
     .string()
-    .matches(/^\d{10}$/, msg?.phoneNumberMustBeDigits)
+    .matches(/^\d{9}$/, msg?.phoneNumberMustBeDigits)
     // .matches(/^[1-9][\s-]?\d{9,14}$/, msg.phoneNumberMustBeValid)
     .required(msg.phoneNumberRequired),
   email: yup
@@ -58,9 +58,9 @@ export const BasicInfoFormSchema = yup.object({
   countryCode: yup.string()
     .matches(/^\+\d{1,4}$/, msg.countryCodeMustBeValid)
     .max(5, msg.countryCodeMaxLength),
-  phoneNumber: yup.string()
-    .matches(/^\d+$/, msg.phoneNumberMustBeDigits)
-    .max(15, msg.phoneNumberMaxLength),
+  phoneNumber: yup
+    .string(),
+    // .matches(/^\d{9}$/, msg?.phoneNumberMustBeDigits),
   provinceId: yup
     .string()
     .required(msg.provinceRequired),
@@ -70,9 +70,9 @@ export const BasicInfoFormSchema = yup.object({
 });
 
 export const OtherInfoFormSchema = yup.object({
-  priorityCareGroup: yup
-    .string()
-    .required(msg.priorityCareGroupRequired),
+  // priorityCareGroup: yup
+  //   .string()
+  //   .required(msg.priorityCareGroupRequired),
   customerType: yup
     .string()
     .required(msg.customerTypeRequired),

@@ -7,5 +7,5 @@ export const profileFormValidationSchema = yup.object({
   phoneNumber: yup
   .string()
   .nullable() // Allow null or undefined values
-  .matches(/^\d{10}$/, msg?.phoneNumberMustBeDigits) // Validate format
+  .matches(/^\d{9}$/, msg?.phoneNumberMustBeDigits) // Validate format
 });

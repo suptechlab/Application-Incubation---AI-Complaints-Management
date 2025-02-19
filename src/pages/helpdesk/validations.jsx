@@ -10,7 +10,7 @@ export const PrivacyFormSchema = yup.object({
 
 export const ChatBotFormSchema = yup.object({
   message: yup.string().nullable()
-    .max(1024, msg.maxLengthExceeded),
+    .max(5000, msg.maxLengthExceeded),
 });
 
 export const ChatLoginFormSchema = yup.object({
