@@ -39,7 +39,7 @@ const ChatBotForm = () => {
     // Initial Values
     const initialValues = {
         message: '',
-        suggestion:''
+        suggestion: ''
     };
 
     const { queryError } = useSelector((state) => state.helpDeskSlice);
@@ -401,9 +401,21 @@ const ChatBotForm = () => {
                         }
                     }
                     setBotSuggestions(botSuggestion)
+
+                    // Replace **bold text** with <strong> tags
+                    let formattedMessage = item.text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+                    // Convert URLs to anchor tags
+                    formattedMessage = formattedMessage.replace(
+                        /(https?:\/\/[^\s]+)/g,
+                        '<a href="$1" target="_blank">$1</a>'
+                    );
+
+                 
+
                     return {
                         id: prevChatData.length + index + 1,
-                        message: <>{item.text}</>,
+                        message: <span dangerouslySetInnerHTML={{ __html: formattedMessage }} />,
                         userMode: false,
                         botViewMode: true,
                         recipient_id: item.recipient_id,
@@ -611,6 +623,7 @@ const ChatBotForm = () => {
                                             <div
                                                 className={`fw-medium my-auto rounded ${userMode ? 'bg-body-tertiary text-start' : 'bg-warning bg-opacity-10'} ${botViewMode ? 'bg-white' : 'p-2'}`}
                                             >
+
                                                 {message}
                                                 {hasButtons && botReview && botReview.length > 0 && (
                                                     <Stack
@@ -715,7 +728,8 @@ const ChatBotForm = () => {
                                         ref={fileInputRef} // Reference to the file input
                                         name="attachments"
                                         id="attachments"
-                                        accept="image/png, image/jpeg, image/jpg"
+                                        accept="image/jpeg,image/jpg,image/png,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf"
+                                        // accept="image/png, image/jpeg, image/jpg"
                                         className="h-100 hiddenText opacity-0 position-absolute start-0 top-0 w-100 z-n1"
                                         type="file"
                                         multiple={true}
