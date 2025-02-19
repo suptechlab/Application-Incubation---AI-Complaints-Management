@@ -49,8 +49,9 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             SELECT tm.user.id
             FROM TeamMember tm
         )
+        AND (COALESCE(:organizationId, NULL) IS NULL OR u.organizationId = :organizationId)
         AND a.name = :role
         AND u.activated = true
     """)
-    List<User> findUsersNotAssignedToTeamByRole(@Param("role") String role);
+    List<User> findUsersNotAssignedToTeamByRole(@Param("role") String role, @Param("organizationId") Long organizationId);
 }
