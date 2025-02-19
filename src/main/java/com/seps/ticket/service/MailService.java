@@ -733,4 +733,15 @@ public class MailService {
         mailDTO.setDataVariables(dataVariables);
         this.sendDynamicContentEmail(mailDTO);
     }
+
+    @Async
+    public void sendSurveyForm(ClaimTicketDTO ticketDetail, User user) {
+        MailDTO mailDTO = new MailDTO();
+        mailDTO.setTemplateKey("CLAIM_SURVEY_FORM_EMAIL");
+        mailDTO.setTo(user.getEmail());
+        mailDTO.setLocale(user.getLangKey());
+        mailDTO.setIsStatic(true);
+        mailDTO.setDataVariables(templateVariableMappingService.mapVariables(ticketDetail, user));
+        sendDynamicContentEmail(mailDTO);
+    }
 }
