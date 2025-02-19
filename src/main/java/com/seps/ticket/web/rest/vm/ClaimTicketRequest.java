@@ -51,10 +51,10 @@ public class ClaimTicketRequest {
     @NotNull
     private Long claimSubTypeId;
     @NotBlank
-    @Size(max = 1024)
+    @Size(max = 5000)
     private String precedents;
     @NotBlank
-    @Size(max = 1024)
+    @Size(max = 5000)
     private String specificPetition;
     // Getters and Setters
     private Boolean checkDuplicate = true;

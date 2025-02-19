@@ -31,18 +31,19 @@ public class TemplateVariableMappingService {
     private final ClaimTicketPriorityLogRepository priorityLogRepository;
     private final ClaimTicketStatusLogRepository statusLogRepository;
     private final ClaimTicketActivityLogRepository claimTicketActivityLogRepository;
-
+    private final SurveyService surveyService;
     @Value("${website.user-base-url:test}")
     private String userBaseUrl;
 
 
-    public TemplateVariableMappingService(EnumUtil enumUtil, JHipsterProperties jHipsterProperties, ClaimTicketInstanceLogRepository instanceLogRepository, ClaimTicketPriorityLogRepository priorityLogRepository, ClaimTicketStatusLogRepository statusLogRepository, ClaimTicketActivityLogRepository claimTicketActivityLogRepository) {
+    public TemplateVariableMappingService(EnumUtil enumUtil, JHipsterProperties jHipsterProperties, ClaimTicketInstanceLogRepository instanceLogRepository, ClaimTicketPriorityLogRepository priorityLogRepository, ClaimTicketStatusLogRepository statusLogRepository, ClaimTicketActivityLogRepository claimTicketActivityLogRepository, SurveyService surveyService) {
         this.enumUtil = enumUtil;
         this.jHipsterProperties = jHipsterProperties;
         this.instanceLogRepository = instanceLogRepository;
         this.priorityLogRepository = priorityLogRepository;
         this.statusLogRepository = statusLogRepository;
         this.claimTicketActivityLogRepository = claimTicketActivityLogRepository;
+        this.surveyService = surveyService;
     }
 
     public Map<String, String> mapVariables(ClaimTicketDTO claimTicketDTO, User sendToUser) {
@@ -138,7 +139,11 @@ public class TemplateVariableMappingService {
             variableMap.put("previousSlaDate", "N/A");
             variableMap.put("reasonSlaDateExtension", "N/A");
         }
-
+        variableMap.put("surveyLink", "N/A");
+        if(claimTicketDTO.getStatus().equals(ClaimTicketStatusEnum.CLOSED)){
+            String surveyLink = surveyService.generateSurveyLink(claimTicketDTO.getUserId(), claimTicketDTO.getId());
+            variableMap.put("surveyLink", surveyLink);
+        }
         return variableMap;
     }
 

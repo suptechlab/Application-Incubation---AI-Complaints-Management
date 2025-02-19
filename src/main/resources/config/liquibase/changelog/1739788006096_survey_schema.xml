@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.11.xsd">
+
+  <changeSet id="1739789524414" author="matellio">
+    <createTable tableName="survey">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="user_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="ticket_id" type="BIGINT"/>
+      <column name="token" type="varchar(255)"/>
+      <column name="ease_of_finding_info" type="INTEGER"/>
+      <column name="provided_formats" type="INTEGER"/>
+      <column name="response_clarity" type="INTEGER"/>
+      <column name="attention_time" type="INTEGER"/>
+      <column name="completed" type="BOOLEAN" defaultValueBoolean="false"/>
+      <column name="comment" type="text"/>
+      <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="survey"
+                             baseColumnNames="user_id"
+                             referencedTableName="jhi_user"
+                             referencedColumnNames="id"
+                             constraintName="fk_survey_user"/>
+  </changeSet>
+
+  <changeSet id="1739958360415" author="matellio">
+    <!-- Add completed_at column to survey table -->
+    <addColumn tableName="survey">
+      <column name="completed_at" type="timestamp">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="1739963128834" author="matellio">
+    <!-- Load data into tables -->
+    <loadData
+      file="config/liquibase/data/new_feb_template_master.csv"
+      separator=","
+      tableName="template_master">
+      <column name="template_key" type="string"/>
+      <column name="template_name" type="string"/>
+      <column name="template_type" type="string"/>
+      <column name="subject" type="string"/>
+      <column name="content" type="string"/>
+      <column name="supported_variables" type="string"/>
+      <column name="status" type="boolean"/>
+      <column name="created_by" type="numeric"/>
+      <column name="created_at" type="timestamp"/>
+      <column name="updated_by" type="numeric"/>
+      <column name="updated_at" type="timestamp"/>
+      <column name="is_general" type="boolean"/>
+      <column name="organization_id" type="numeric"/>
+      <column name="user_type" type="numeric"/>
+      <column name="is_static" type="boolean"/>
+    </loadData>
+
+    <!-- Update sequences based on current max ID -->
+    <sql>
+      SELECT setval('template_master_id_seq', (SELECT MAX(id) FROM template_master), true);
+    </sql>
+  </changeSet>
+</databaseChangeLog>

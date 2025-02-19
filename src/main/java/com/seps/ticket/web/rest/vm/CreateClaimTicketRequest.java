@@ -62,11 +62,11 @@ public class CreateClaimTicketRequest {
     private Long claimSubTypeId;
 
     @NotBlank
-    @Size(max = 1024)
+    @Size(max = 5000)
     private String precedents;
 
     @NotBlank
-    @Size(max = 1024)
+    @Size(max = 5000)
     private String specificPetition;
 
     // Getters and Setters

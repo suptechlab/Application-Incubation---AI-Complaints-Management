@@ -24,7 +24,7 @@ public class SecondInstanceRequest {
     private Long id;
 
     @NotBlank
-    @Size(max = 1024)
+    @Size(max = 5000)
     private String comment;
 
     @MultipleFilesCondition(
