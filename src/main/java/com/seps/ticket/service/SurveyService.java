@@ -47,19 +47,20 @@ public class SurveyService {
     }
 
     public String generateSurveyLink(Long userId, Long ticketId) {
-        Optional<Survey> existingSurvey = surveyRepository.findByUserId(userId);
+        return surveyRepository.findByUserId(userId)
+                .filter(Survey::getCompleted)  // If completed, return existing token
+                .map(survey -> userBaseUrl + "?token=" + survey.getToken())
+                .orElseGet(() -> createNewSurvey(userId, ticketId));
+    }
 
-        if (existingSurvey.isPresent() && Boolean.TRUE.equals(existingSurvey.get().getCompleted())) {
-            return userBaseUrl + "?token=" + existingSurvey.get().getToken();
-        }
-
+    private String createNewSurvey(Long userId, Long ticketId) {
         String token = UUID.randomUUID().toString();
-        Survey survey = existingSurvey.orElse(new Survey());
-        survey.setTicketId(ticketId);
-        survey.setUserId(userId);
-        survey.setToken(token);
-        survey.setCompleted(false);
-        surveyRepository.save(survey);
+        Survey newSurvey = new Survey();
+        newSurvey.setTicketId(ticketId);
+        newSurvey.setUserId(userId);
+        newSurvey.setToken(token);
+        newSurvey.setCompleted(false);
+        surveyRepository.save(newSurvey);
 
         return userBaseUrl + "?token=" + token;
     }
