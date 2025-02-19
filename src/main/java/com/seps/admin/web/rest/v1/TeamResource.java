@@ -1,7 +1,6 @@
 package com.seps.admin.web.rest.v1;
 
 import com.seps.admin.aop.permission.PermissionCheck;
-import com.seps.admin.enums.EmailUserTypeEnum;
 import com.seps.admin.enums.TeamEntityTypeEnum;
 import com.seps.admin.service.TeamService;
 import com.seps.admin.service.dto.*;
@@ -111,9 +110,11 @@ public class TeamResource {
     })
     @GetMapping("/members/{entityType}")
     @PermissionCheck({"TEAMS_CREATE_BY_SEPS","TEAMS_CREATE_BY_FI","TEAMS_UPDATED_BY_SEPS","TEAMS_UPDATED_BY_FI"})
-    public ResponseEntity<List<TeamDTO.MemberDropdownDTO>> getAllMember(@Valid @PathVariable TeamEntityTypeEnum entityType) {
+    public ResponseEntity<List<TeamDTO.MemberDropdownDTO>> getAllMember(
+        @Valid @PathVariable TeamEntityTypeEnum entityType,
+        @RequestParam(value = "organizationId", required = false) Long organizationId) {
         log.debug("REST request to get all Members");
-        List<TeamDTO.MemberDropdownDTO> members = teamService.findAllMembers(entityType);
+        List<TeamDTO.MemberDropdownDTO> members = teamService.findAllMembers(entityType, organizationId);
         return ResponseEntity.ok(members);
     }
 

@@ -13,7 +13,7 @@ public class TeamSpecification {
     private TeamSpecification() {
     }
 
-    public static Specification<Team> byFilter(String search, Boolean status) {
+    public static Specification<Team> byFilter(String search, Boolean status, Long organizationId) {
         return (root, query, criteriaBuilder) -> {
             // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
@@ -34,7 +34,9 @@ public class TeamSpecification {
                     criteriaBuilder.equal(root.get("status"), status)
                 );
             }
-
+            if(organizationId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("entityId"), organizationId));
+            }
             // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

@@ -129,17 +129,17 @@ public class TeamService {
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
+        Team team = new Team();
         if(authority.contains(AuthoritiesConstants.SEPS)){
             teamDTO.setEntityType(TeamEntityTypeEnum.SEPS);
+            if(teamDTO.getEntityType().equals(TeamEntityTypeEnum.FI)) {
+                OrganizationDTO organization = organizationService.getOrganizationById(teamDTO.getEntityId());
+                team.setEntityId(organization.getId());
+            }
         }
         if(authority.contains(AuthoritiesConstants.FI)){
             teamDTO.setEntityType(TeamEntityTypeEnum.FI);
-        }
-
-        Team team = new Team();
-        if(teamDTO.getEntityType().equals(TeamEntityTypeEnum.FI)) {
-            OrganizationDTO organization = organizationService.getOrganizationById(teamDTO.getEntityId());
-            team.setEntityId(organization.getId());
+            team.setEntityId(currentUser.getOrganizationId());
         }
 
         validatePersonAssignToTeam(teamDTO.getTeamMembers(),teamDTO.getEntityType());
@@ -150,7 +150,6 @@ public class TeamService {
         team.setDescription(teamDTO.getDescription());
         team.setEntityType(teamDTO.getEntityType().name());
         team.setCreatedBy(currentUser.getId());
-        team.setEntityId(teamDTO.getEntityId());
         team.setStatus(true);
 
         Team savedTeam = teamRepository.save(team);
@@ -402,7 +401,7 @@ public class TeamService {
     }
 
     @Transactional(readOnly = true)
-    public List<TeamDTO.MemberDropdownDTO> findAllMembers(TeamEntityTypeEnum entityType) {
+    public List<TeamDTO.MemberDropdownDTO> findAllMembers(TeamEntityTypeEnum entityType, Long organizationId) {
         User currentUser = userService.getCurrentUser();
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
@@ -413,10 +412,14 @@ public class TeamService {
         if (authority.contains(AuthoritiesConstants.FI) ||
             (authority.contains(AuthoritiesConstants.ADMIN) && entityType.equals(TeamEntityTypeEnum.FI))) {
             userRole = AuthoritiesConstants.FI;
+
+        }
+        if (authority.contains(AuthoritiesConstants.FI)){
+            organizationId =  currentUser.getOrganizationId();
         }
 
         // Fetch users not assigned to a team by role
-        List<User> users = userRepository.findUsersNotAssignedToTeamByRole(userRole);
+        List<User> users = userRepository.findUsersNotAssignedToTeamByRole(userRole, organizationId);
 
         // Map User entities to MemberDropdownDTO
         return users.stream()
@@ -563,7 +566,16 @@ public class TeamService {
     }
 
     public Page<TeamListDTO> listTeams(Pageable pageable, String search, Boolean status) {
-        return teamRepository.findAll(TeamSpecification.byFilter(search, status), pageable)
+        User currentUser = userService.getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        Long organizationId =  null;
+        // Determine the user role
+        if (authority.contains(AuthoritiesConstants.FI)){
+            organizationId =  currentUser.getOrganizationId();
+        }
+        return teamRepository.findAll(TeamSpecification.byFilter(search, status, organizationId), pageable)
             .map(teamMapper::toTeamListDTO);
     }
 
