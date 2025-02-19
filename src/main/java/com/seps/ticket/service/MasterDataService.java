@@ -124,8 +124,11 @@ public class MasterDataService {
         masterData.put("emailUserType", enumUtil.enumToLocalizedMap(EmailUserTypeEnum.class, locale));
 
         // Adding localized data for ChannelOfEntryEnum enum
-        masterData.put("channelOfEntry", enumUtil.enumToLocalizedMap(ChannelOfEntryEnum.class, locale));
-
+        masterData.put("channelOfEntry", enumUtil.createFilteredEnumMap(
+            ChannelOfEntryEnum.values(),
+            locale,
+            new ChannelOfEntryEnum[]{ChannelOfEntryEnum.WEB,ChannelOfEntryEnum.CHAT,ChannelOfEntryEnum.WHATSAPP,ChannelOfEntryEnum.FACEBOOK,ChannelOfEntryEnum.INSTAGRAM}
+        ));
         // Adding localized data for SlaComplianceEnum enum
         masterData.put("SlaCompliance", enumUtil.enumToLocalizedMap(SlaComplianceEnum.class, locale));
 

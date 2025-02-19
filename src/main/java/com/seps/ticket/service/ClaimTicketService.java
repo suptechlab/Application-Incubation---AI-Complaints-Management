@@ -94,8 +94,9 @@ public class ClaimTicketService {
     private final NotificationService notificationService;
     private final TemplateVariableMappingService templateVariableMappingService;
     private final RoleService roleService;
-
-    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder, ClaimTicketActivityLogService claimTicketActivityLogService, NotificationService notificationService, TemplateVariableMappingService templateVariableMappingService, RoleService roleService) {
+    private final SurveyService surveyService;
+    private final MailService mailService;
+    public ClaimTicketService(ClaimTicketRepository claimTicketRepository, UserService userService, UserClaimTicketMapper userClaimTicketMapper, AuditLogService auditLogService, Gson gson, MessageSource messageSource, ClaimTicketMapper claimTicketMapper, ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository, ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository, EnumUtil enumUtil, UserRepository userRepository, ExternalAPIService externalAPIService, AuthorityRepository authorityRepository, PersonaRepository personaRepository, UserClaimTicketService userClaimTicketService, ClaimTicketOTPRepository claimTicketOTPRepository, PasswordEncoder passwordEncoder, ClaimTicketActivityLogService claimTicketActivityLogService, NotificationService notificationService, TemplateVariableMappingService templateVariableMappingService, RoleService roleService, SurveyService surveyService, MailService mailService) {
         this.claimTicketRepository = claimTicketRepository;
         this.userService = userService;
         this.userClaimTicketMapper = userClaimTicketMapper;
@@ -110,6 +111,8 @@ public class ClaimTicketService {
         this.notificationService = notificationService;
         this.templateVariableMappingService = templateVariableMappingService;
         this.roleService = roleService;
+        this.surveyService = surveyService;
+        this.mailService = mailService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -1075,6 +1078,8 @@ public class ClaimTicketService {
         User customer = userService.getUserById(ticket.getUserId());
         Map<String, String> variables = templateVariableMappingService.mapNotificationVariables(ticket, customer);
         notificationService.sendNotification("TICKET_CLOSED_CUSTOMER_NOTIFICATION", variables.get(Constants.CUSTOMER_TICKET_URL_TEXT), List.of(customer.getId()), variables);
+        ClaimTicketDTO claimTicketDto = claimTicketMapper.toDTO(ticket);
+        mailService.sendSurveyForm(claimTicketDto, customer);
 
     }
 
