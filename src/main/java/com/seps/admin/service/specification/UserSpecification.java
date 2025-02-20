@@ -2,6 +2,7 @@ package com.seps.admin.service.specification;
 
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.UserStatusEnum;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -25,7 +26,7 @@ public class UserSpecification {
      * @param roleId
      * @return the combined {@link Specification} with applied filters
      */
-    public static Specification<User> byFilter(String search, UserStatusEnum status, List<String> authorities, Long roleId) {
+    public static Specification<User> byFilter(String search, UserStatusEnum status, List<String> authorities, Long roleId, Long organizationId) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             // Filter by search term (e.g., name, email, department) with OR condition
@@ -33,8 +34,12 @@ public class UserSpecification {
                 Predicate namePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), "%" + search.toLowerCase() + "%");
                 Predicate emailPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + search.toLowerCase() + "%");
                 Predicate departmentPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("department")), "%" + search.toLowerCase() + "%");
+
+                // Concatenating phoneCode and phoneNumber before applying the search filter
+                Expression<String> fullPhoneNumber = criteriaBuilder.concat(criteriaBuilder.concat(root.get("countryCode"), ""), root.get("phoneNumber"));
+                Predicate phonePredicate = criteriaBuilder.like(criteriaBuilder.lower(fullPhoneNumber), "%" + search.toLowerCase() + "%");
                 // Combine name, email, and department with OR
-                predicates.add(criteriaBuilder.or(namePredicate, emailPredicate, departmentPredicate));
+                predicates.add(criteriaBuilder.or(namePredicate, emailPredicate, departmentPredicate, phonePredicate));
             }
             // Filter by status
             if (status != null) {
@@ -48,6 +53,9 @@ public class UserSpecification {
             if (roleId != null) {
                 Join<Object, Object> userRoles = root.join("roles", JoinType.INNER);
                 predicates.add(criteriaBuilder.equal(userRoles.get("id"), roleId));
+            }
+            if (organizationId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("organizationId"), organizationId));
             }
             // Combine all predicates with 'and'
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
