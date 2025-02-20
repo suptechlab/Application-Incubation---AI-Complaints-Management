@@ -120,8 +120,9 @@ public class FIUserResource {
     public ResponseEntity<List<FIUserDTO>> listFIUsers(Pageable pageable,
                                                        @RequestParam(value = "search", required = false) String search,
                                                        @Parameter(description = "Filter by status") @RequestParam(required = false) UserStatusEnum status,
-                                                       @Parameter(description = "Filter by role") @RequestParam(required = false) Long roleId) {
-        Page<FIUserDTO> page = userService.listFIUsers(pageable, search, status, roleId);
+                                                       @Parameter(description = "Filter by role") @RequestParam(required = false) Long roleId,
+                                                       @Parameter(description = "Filter by organizationId") @RequestParam(required = false) Long organizationId) {
+        Page<FIUserDTO> page = userService.listFIUsers(pageable, search, status, roleId, organizationId);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
