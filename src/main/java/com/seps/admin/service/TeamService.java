@@ -363,7 +363,7 @@ public class TeamService {
         List<String> authority = currentUser.getAuthorities().stream()
             .map(Authority::getName)
             .toList();
-        if(authority.contains(AuthoritiesConstants.SEPS)){
+        /*if(authority.contains(AuthoritiesConstants.SEPS)){
             return teamRepository.findByIdAndEntityType(teamId,TeamEntityTypeEnum.SEPS.toString())
                 .orElseThrow(() -> new CustomException(
                     Status.BAD_REQUEST,
@@ -371,7 +371,8 @@ public class TeamService {
                     null,
                     null
                 ));
-        } else if (authority.contains(AuthoritiesConstants.FI)){
+        } else */
+        if (authority.contains(AuthoritiesConstants.FI)){
             FIUserDTO fiUserDTO = userMapper.userToFIUserDTO(currentUser);
             return teamRepository.findByIdAndEntityIdAndEntityType(teamId,fiUserDTO.getOrganization().getId(),TeamEntityTypeEnum.FI.toString())
                 .orElseThrow(() -> new CustomException(
