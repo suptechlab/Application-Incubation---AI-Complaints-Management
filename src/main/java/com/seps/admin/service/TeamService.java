@@ -410,7 +410,7 @@ public class TeamService {
         // Determine the user role
         String userRole = AuthoritiesConstants.SEPS;
         if (authority.contains(AuthoritiesConstants.FI) ||
-            (authority.contains(AuthoritiesConstants.ADMIN) && entityType.equals(TeamEntityTypeEnum.FI))) {
+            ((authority.contains(AuthoritiesConstants.ADMIN) ||authority.contains(AuthoritiesConstants.SEPS))&& entityType.equals(TeamEntityTypeEnum.FI))) {
             userRole = AuthoritiesConstants.FI;
 
         }
