@@ -121,3 +121,5 @@ google:
 
 website:
   chatbot-base-url: https://api-stg-suptech.seps.gob.ec/chatbot
+  chatbot-base-url: https://adminapi-suptechdev.seps.gob.ec/chatbot
+  api-key: 3n9Xz+1J6hQG3D2NqZldnA0PbJlVa3YZb2JkTkgYjP0=
