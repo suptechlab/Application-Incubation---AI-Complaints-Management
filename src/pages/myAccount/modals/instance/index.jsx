@@ -33,7 +33,7 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
 
     //Handle File Change
     const handleFileChange = (event) => {
-        const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB in bytes
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB in bytes
         const MAX_FILE_COUNT = 3; // Maximum number of files allowed
 
         if (event.target.files) {
