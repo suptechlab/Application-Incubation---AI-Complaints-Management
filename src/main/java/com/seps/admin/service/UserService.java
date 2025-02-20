@@ -248,7 +248,7 @@ public class UserService {
     public Page<SEPSUserDTO> listSEPSUsers(Pageable pageable, String search, UserStatusEnum status, Long roleId) {
         List<String> authorities = new ArrayList<>();
         authorities.add(AuthoritiesConstants.SEPS);
-        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities, roleId), pageable)
+        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities, roleId, null), pageable)
             .map(userMapper::userToSEPSUserDTO);
     }
 
@@ -433,10 +433,17 @@ public class UserService {
      * @return a paginated list of FI users matching the search and status criteria
      */
     @Transactional(readOnly = true)
-    public Page<FIUserDTO> listFIUsers(Pageable pageable, String search, UserStatusEnum status, Long roleId) {
+    public Page<FIUserDTO> listFIUsers(Pageable pageable, String search, UserStatusEnum status, Long roleId, Long organizationId) {
         List<String> authorities = new ArrayList<>();
         authorities.add(AuthoritiesConstants.FI);
-        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities, roleId), pageable)
+        User currentUser = getCurrentUser();
+        List<String> authority = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        if (authority.contains(AuthoritiesConstants.FI)) {
+            organizationId = currentUser.getOrganizationId();
+        }
+        return userRepository.findAll(UserSpecification.byFilter(search, status, authorities, roleId, organizationId), pageable)
             .map(userMapper::userToFIUserDTO);
     }
 
