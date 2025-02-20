@@ -130,11 +130,12 @@ public class TeamService {
             .map(Authority::getName)
             .toList();
         Team team = new Team();
-        if(authority.contains(AuthoritiesConstants.SEPS)){
-            teamDTO.setEntityType(TeamEntityTypeEnum.SEPS);
+        if(authority.contains(AuthoritiesConstants.SEPS) || authority.contains(AuthoritiesConstants.ADMIN)){
             if(teamDTO.getEntityType().equals(TeamEntityTypeEnum.FI)) {
                 OrganizationDTO organization = organizationService.getOrganizationById(teamDTO.getEntityId());
                 team.setEntityId(organization.getId());
+            }else{
+                teamDTO.setEntityType(TeamEntityTypeEnum.SEPS);
             }
         }
         if(authority.contains(AuthoritiesConstants.FI)){
