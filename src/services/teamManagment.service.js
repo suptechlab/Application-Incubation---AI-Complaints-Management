@@ -7,8 +7,8 @@ export const getOrganizationList = async () => {
     return await adminApi.get(`/${API_VERSION}/organization/list`)
 }
 
-export const getTeamMemberList = async (entityType) => {
-    return await adminApi.get(`/${API_VERSION}/teams/members/${entityType}`)
+export const getTeamMemberList = async (entityType,params) => {
+    return await adminApi.get(`/${API_VERSION}/teams/members/${entityType}`,{params})
 }
 
 export const handleAddUser = async (data) => {

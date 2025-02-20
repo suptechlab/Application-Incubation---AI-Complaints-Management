@@ -163,12 +163,18 @@ export default function TeamManagementList() {
                 header: () => t('DESCRIPTION'),
                 enableSorting: true,
             },
-            {
+            ...(currentUser !=='FI_USER' ? [{
                 accessorFn: (row) => row.entityType ?? t('N/A'),
                 id: "entityType",
                 header: () => t('ASSOCIATION'),
                 enableSorting: true,
-            },
+            },] : []),
+            // {
+            //     accessorFn: (row) => row.entityType ?? t('N/A'),
+            //     id: "entityType",
+            //     header: () => t('ASSOCIATION'),
+            //     enableSorting: true,
+            // },
             ...(permissionsState?.statusModule
                 ? [
                     {
