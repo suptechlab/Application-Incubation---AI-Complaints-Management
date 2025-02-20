@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function RadioInput({ label, options, name, value, onChange, wrapperClassName = 'mb-3' }) {
+export default function RadioInput({ label, options, name, value, onChange, error,touched,wrapperClassName = 'mb-3' }) {
     return (
         <div className={wrapperClassName}>
             {label && <label className='mb-1 fs-14'>{label}</label>}
@@ -21,6 +21,7 @@ export default function RadioInput({ label, options, name, value, onChange, wrap
                         </label>
                     </div>
                 ))}
+                {error && touched ? <div className="form-text text-danger small">{error}</div> : null}
             </div>
         </div>
     );

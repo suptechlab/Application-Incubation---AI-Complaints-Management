@@ -34,9 +34,9 @@ export const messages = {
     attachmentsLabel: 'Attachments',
     firstInstanceTicketRequired: 'First instance complaint ticket is required.',
     commentsRequired: 'Comments are required.',
-    firstInstanceTicketRequired: '',
     precedentsMaxLength: 'Precedents must not exceed 1024 characters.',
-    specificPetitionMaxLength: 'Specific Petition must not exceed 1024 characters.'
+    specificPetitionMaxLength: 'Specific Petition must not exceed 1024 characters.',
+    satisfactionRequiredMsg : 'This field is required.'
   },
   es: {
     agreePrivacy: 'Debes aceptar la política de privacidad',
@@ -75,6 +75,7 @@ export const messages = {
     commentsRequired: 'Se requieren comentarios.',
     secondInstanceTicketRequired: 'Se requiere ticket de reclamo de 2da instancia.',
     precedentsMaxLength: 'Los precedentes no deben exceder los 1024 caracteres.',
-    specificPetitionMaxLength: 'La petición específica no debe exceder los 1024 caracteres.'
+    specificPetitionMaxLength: 'La petición específica no debe exceder los 1024 caracteres.',
+    satisfactionRequiredMsg : 'Este campo es obligatorio.'
   },
 };

@@ -18,7 +18,7 @@ export const PublicRoutes = [
         element: <DownloadPdf />,
       },
       {
-        path: "/survey-form",
+        path: "/satisfaction-survey",
         element: <SurveyForm />,
       },
       {
