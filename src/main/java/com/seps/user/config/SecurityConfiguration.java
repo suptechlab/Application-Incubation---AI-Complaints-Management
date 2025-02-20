@@ -38,6 +38,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/v1/dpa/accept")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/v1/chatbot/query")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/v1/inquiry")).permitAll()
                     .requestMatchers(mvc.pattern("/api/v1/masters/**")).permitAll()
                     .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/v1/notifications/**")).hasAuthority(AuthoritiesConstants.USER)

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1740026862826" author="matellio">
+    <createTable tableName="inquiry">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="user_id" type="bigint"/>
+      <column name="sender_id" type="varchar(255)"/>
+      <column name="user_name" type="varchar(255)"/>
+      <column name="inquiry_resolved" type="boolean" defaultValueBoolean="false"/>
+      <column name="inquiry_redirect" type="boolean" defaultValueBoolean="false"/>
+      <column name="inquiry_channel" type="varchar(50)"/>
+      <column name="ease_of_finding" type="integer"/>
+      <column name="formats_provided" type="integer"/>
+      <column name="clarity_response" type="integer"/>
+      <column name="attention_time" type="integer"/>
+      <column name="inquiry_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+    </createTable>
+  </changeSet>
+
+</databaseChangeLog>
