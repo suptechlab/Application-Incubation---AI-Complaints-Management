@@ -107,5 +107,9 @@ public class UserService {
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CURRENT_USER_NOT_FOUND, null, null));
     }
 
+    @Transactional
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 
 }

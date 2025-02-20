@@ -16,6 +16,7 @@
     <include file="config/liquibase/changelog/1731929370955_load_inquiry_data.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1732516164482_load_claim_and_claim_sub_type_data.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/1735818478573_alter_jhi_user_table_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/1740026794060_create_inquiry_schema.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
