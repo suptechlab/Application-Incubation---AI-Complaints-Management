@@ -327,7 +327,7 @@ export const englishLang = {
     "WEB": "Web",
     "CHATBOT": "Chatbot",
     "ALLOWED_IMAGE_TYPES_ERROR_MESSAGE": "Allowed image file extensions are .jpg, .jpeg and .png.",
-    "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "Image size must not exceed 2.5 MB.",
+    "ALLOWED_IMAGE_SIZE_ERROR_MESSAGE": "Image size must not exceed 2 MB.",
     "PROVIDE_SLA_COMMENT": "Provide SLA Comment",
     "FIRST_INSTANCE_CLAIM_DETAILS": "First Instance claim details",
     "COMPLAINT_DETAILS": "Complaint Details",

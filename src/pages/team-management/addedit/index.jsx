@@ -83,15 +83,16 @@ export default function TeamManagementAddEdit() {
         setNewTeamMember((prev) => [...prev, newMember]);
     };
 
-    const getTeamMemberLists = async (type) => {
+    const getTeamMemberLists = async (type,orgId) => {
         setLoading(true);
+        const params ={organizationId : orgId}
         try {
-            await getTeamMemberList(type).then((response) => {
+            await getTeamMemberList(type,params).then((response) => {
                 const formattedData = response.data.map((item) => ({
                     label: item.name,
                     value: item.id
                 }));
-                setEntityIdArr([...formattedData]);
+                setEntityIdArr([{value:'',label:t('SELECT')},...formattedData]);
                 setLoading(false);
             });
         } catch (error) {
@@ -131,11 +132,18 @@ export default function TeamManagementAddEdit() {
             setNewTeamMember(response.data?.members);
             if (response.data?.entityType === 'FI') {
                 setShowEntityOrgId(true);
+
+                await getTeamMemberLists('FI',response.data?.entityId);
+                await getOrganizationLists(response.data?.entityType);
             } else {
                 setShowEntityOrgId(false);
+                await getTeamMemberLists(response.data?.entityType);
             }
-            await getTeamMemberLists(response.data?.entityType);
-            await getOrganizationLists(response.data?.entityType);
+
+           
+            
+            
+           
             setLoading(false);
         } catch (error) {
             setLoading(false);
@@ -145,9 +153,11 @@ export default function TeamManagementAddEdit() {
     useEffect(() => {
         if (isEdit && id) {
             getTeamDetails(id);
-        } else {
-            getTeamMemberLists("FI");
+        } else if(currentUser === 'FI_USER'){
+            getTeamMemberLists("FI" , userData?.organization?.id);
             getOrganizationLists("FI");
+        }else{
+            getTeamMemberLists("SEPS");
         }
     }, [id, isEdit]);
 
@@ -196,7 +206,13 @@ export default function TeamManagementAddEdit() {
             setLoading(true);
             try {
                 await handleDeleteUserFromTeam(teamData?.id, deleteId);
-                await getTeamMemberLists(teamData?.entityType);
+
+                if(teamData?.entityType === 'FI'){
+                    await getTeamMemberLists(teamData?.entityType,teamData?.entityId); 
+                }else{
+                    await getTeamMemberLists(teamData?.entityType);
+                }
+                
                 setLoading(false);
             } catch (error) {
                 const errorMessage = error.response?.data?.errorDescription;
@@ -272,7 +288,7 @@ export default function TeamManagementAddEdit() {
                                                                 setFieldValue("entityType", "FI");
                                                                 setShowEntityOrgId(true);
                                                                 getOrganizationLists("FI");
-                                                                getTeamMemberLists("FI");
+                                                              
                                                                 setNewTeamMember([]);
                                                                 setFieldValue("teamMemberId", "");
                                                             }}
@@ -298,11 +314,18 @@ export default function TeamManagementAddEdit() {
                                                                 "entityId",
                                                                 option?.target?.value.toString() ?? ""
                                                             );
+
+                                                            if(option?.target?.value.toString() !== values?.entityId){
+                                                                getTeamMemberLists("FI",option?.target?.value);
+                                                                setNewTeamMember([]);
+                                                                setFieldValue("teamMemberId", "");
+                                                            }
+                                                            
                                                         }}
                                                         name="entityId"
                                                         onBlur={handleBlur}
                                                         touched={touched.entityId}
-                                                        disabled={currentUser === 'FI_USER'}
+                                                        disabled={currentUser === 'FI_USER' || isEdit}
                                                     />
                                                 </Col>
                                                 : ''
