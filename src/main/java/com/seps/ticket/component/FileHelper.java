@@ -21,7 +21,7 @@ public class FileHelper {
 
     // Enum for different File Types
     public enum FileType {
-        CLAIM_TICKET_DOCUMENTS("document", null, new String[]{IMAGE_JPEG, IMAGE_JPG, IMAGE_PNG, PDF, DOC, DOCX, RTF, TEXT_PLAIN}, 1024 * 1.0); // 1MB
+        CLAIM_TICKET_DOCUMENTS("document", null, new String[]{IMAGE_JPEG, IMAGE_JPG, IMAGE_PNG, PDF, DOC, DOCX, RTF, TEXT_PLAIN}, 1024 * 10.1); // 1MB
         private final String folderPath;
         private final String thumbnailFolderPath;
         private final String[] validMimeTypes;
