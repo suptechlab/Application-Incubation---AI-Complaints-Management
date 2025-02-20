@@ -95,8 +95,8 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
     <Formik
       initialValues={{
         instanceType: filter?.instanceType ?? "",
-        organizationId : filter?.organizationId ?? "",
-        claimTicketPriority : filter?.claimTicketPriority ?? ""
+        organizationId: filter?.organizationId ?? "",
+        claimTicketPriority: filter?.claimTicketPriority ?? ""
       }}
       enableReinitialize={true}
       onSubmit={handleSubmit}
@@ -114,76 +114,76 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
       }) => (
         <Form>
           <Modal.Body className="text-break py-0">
-            <Row>
             {
-              currentUser !== "FI_USER" && 
+              currentUser !== "FI_USER" &&
+              <Row>
+                <Col sm={12} lg={6}>
+                  <ReactSelect
+                    label={t("INSTANCE_TYPE")}
+                    error={errors.instanceType}
+                    options={[
+                      { label: t("SELECT"), value: "" },
+                      ...instanceTypeOptions.map((group) => ({
+                        label: group.label,
+                        value: group.value,
+                      })),
+                    ]}
+                    value={values.instanceType}
+                    onChange={(option) => {
+                      setFieldValue(
+                        "instanceType",
+                        option?.target?.value ?? ""
+                      );
+                    }}
+                    name="instanceType"
+                    className={touched.instanceType && errors.instanceType ? "is-invalid" : ""}
+                    onBlur={handleBlur}
+                    touched={touched.instanceType}
+                  />
+                </Col>
 
-              <Col sm={12} lg={6}>
-                <ReactSelect
-                  label={t("INSTANCE_TYPE")}
-                  error={errors.instanceType}
-                  options={[
-                    { label: t("SELECT"), value: "" },
-                    ...instanceTypeOptions.map((group) => ({
-                      label: group.label,
-                      value: group.value,
-                    })),
-                  ]}
-                  value={values.instanceType}
-                  onChange={(option) => {
-                    setFieldValue(
-                      "instanceType",
-                      option?.target?.value ?? ""
-                    );
-                  }}
-                  name="instanceType"
-                  className={touched.instanceType && errors.instanceType ? "is-invalid" : ""}
-                  onBlur={handleBlur}
-                  touched={touched.instanceType}
-                />
-              </Col>
+                <Col sm={12} lg={6}>
+                  <ReactSelect
+                    label={t("ORGANIZATION")}
+                    error={errors.organizationId}
+                    options={[
+                      { label: t("SELECT"), value: "" },
+                      ...organizationOptions.map((group) => ({
+                        label: group.label,
+                        value: group.value,
+                      })),
+                    ]}
+                    value={values.organizationId}
+                    onChange={(option) => {
+                      setFieldValue(
+                        "organizationId",
+                        option?.target?.value ?? ""
+                      );
+                    }}
+                    // onChange={(option) => {
+                    //   const newOrganizationId = option?.target?.value ?? "";
+
+                    //   // Update the organizationId field
+                    //   setFieldValue("organizationId", newOrganizationId);
+
+
+                    // }}
+
+                    name="organizationId"
+                    className={touched.organizationId && errors.organizationId ? "is-invalid" : ""}
+                    onBlur={handleBlur}
+                    touched={touched.organizationId}
+                  />
+                </Col>
+              </Row>
             }
-              
-              <Col sm={12} lg={6}>
-                <ReactSelect
-                  label={t("ORGANIZATION")}
-                  error={errors.organizationId}
-                  options={[
-                    { label: t("SELECT"), value: "" },
-                    ...organizationOptions.map((group) => ({
-                      label: group.label,
-                      value: group.value,
-                    })),
-                  ]}
-                  value={values.organizationId}
-                  onChange={(option) => {
-                    setFieldValue(
-                      "organizationId",
-                      option?.target?.value ?? ""
-                    );
-                  }}
-                  // onChange={(option) => {
-                  //   const newOrganizationId = option?.target?.value ?? "";
 
-                  //   // Update the organizationId field
-                  //   setFieldValue("organizationId", newOrganizationId);
-
-
-                  // }}
-
-                  name="organizationId"
-                  className={touched.organizationId && errors.organizationId ? "is-invalid" : ""}
-                  onBlur={handleBlur}
-                  touched={touched.organizationId}
-                />
-              </Col>
-            </Row>
             <Row>
               <Col sm={12} lg={6}>
                 <ReactSelect
                   wrapperClassName="mb-0"
                   class="form-select"
-                  label ={t("PRIORITY")}
+                  label={t("PRIORITY")}
                   placeholder={t("PRIORITY")}
                   id="claimTicketPriority"
                   options={[
@@ -194,7 +194,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
                     }, ...priorityOptions
                   ]}
                   onChange={(e) => {
-                    setFieldValue("claimTicketPriority",e.target.value);
+                    setFieldValue("claimTicketPriority", e.target.value);
                   }}
                   value={values?.claimTicketPriority}
                 />

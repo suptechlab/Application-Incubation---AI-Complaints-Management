@@ -54,26 +54,33 @@ const EditTemplate = () => {
             userType: response?.data?.userType ?? ""
           });
 
-          // if (response?.data?.supportedVariables) {
+          // if (response?.data?.templateType ==='NOTIFICATION'&& response?.data?.supportedVariables) {
           //   setVariableList(response?.data?.supportedVariables.split(","))
           // } else {
           //   setVariableList([])
           // }
 
-         
+
         })
         .catch((error) => {
           console.error("Error get during to fetch", error);
-        }).finally(()=>{
+        }).finally(() => {
           setLoading(false);
         });
-
 
 
       templateKeywordListing(id)
         .then((response) => {
           if (response?.data) {
-            setVariableList(response?.data)
+
+            if(initialValues?.templateType === 'NOTIFICATION'){
+              const keywordData = response?.data?.filter((keyword)=>keyword?.isUse === true)
+              setVariableList(keywordData)
+            }else{
+              setVariableList(response?.data)
+            }
+            
+           
           } else {
             setVariableList([])
           }
@@ -81,9 +88,12 @@ const EditTemplate = () => {
         })
         .catch((error) => {
           console.error("Error get during to fetch", error);
-        }).finally(()=>{
+        }).finally(() => {
           setLoading(false);
-        });;
+        });
+
+
+
     }
   }, [id]);
 
@@ -264,13 +274,13 @@ const EditTemplate = () => {
                     <ul className="variable-list ps-0">
                       {
                         variableList?.map((keyword, index) => (
-                          <li key={index + 1} className={`${keyword?.isUse ? 'text-orange' :'text-primary'} mb-2 fs-16`}>
+                          <li key={index + 1} className={`${keyword?.isUse ? 'text-orange' : 'text-primary'} mb-2 fs-16`}>
                             <AppTooltip title={keyword?.usage} placement="top">
                               <span>
                                 <IoInformationCircle size={20} className="me-2" />
                               </span>
                             </AppTooltip>
-                            {keyword.keyword}</li>
+                            {keyword?.keyword ?? ''}</li>
                         ))
                       }
                     </ul>

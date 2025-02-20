@@ -385,5 +385,8 @@ export const englishLang = {
     "MARK_ALL_AS_READ" :"Mark all as read",
     "CLEAR_ALL" : "Clear all",
     "CLEAR":"Clear",
-    "KEYWORD_LIST":"Keyword List"
+    "KEYWORD_LIST":"Keyword List",
+    "MESSAGE" :"Message",
+    "SLA_COMPLIANCE" :"SLA Compliance",
+    "SUB_STATUS" :"Sub Status"
 }

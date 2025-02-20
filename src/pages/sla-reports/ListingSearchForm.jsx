@@ -120,23 +120,28 @@ const ListingSearchForm = ({ filter, setFilter }) => {
             <ReactSelect
               wrapperClassName="mb-0"
               placeholder={t("CLAIM TYPE")}
-              options={[{ label: t('SELECT'), value: '' }, ...claimTypes]}
+              options={[{ label: t('CLAIM_TYPE'), value: '' }, ...claimTypes]}
               size="sm"
               onChange={handleClaimTypeChange}
               value={filter?.claimTypeId}
             />
           </div>
-          <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-            <ReactSelect
-              wrapperClassName="mb-0"
-              placeholder={t("CLAIM SUB TYPE")}
-              options={claimSubTypes}
-              size="sm"
-              onChange={(selectedOption) => updateFilter("claimSubTypeId", selectedOption?.target?.value || "")}
-              value={filter?.claimSubTypeId ?? ''}
-              isDisabled={!filter.claimTypeId}
-            />
-          </div>
+
+          {
+            filter?.claimTypeId &&
+            <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
+              <ReactSelect
+                wrapperClassName="mb-0"
+                placeholder={t("CLAIM SUB TYPE")}
+                options={[{ label: t('CLAIM SUB TYPE'), value: '' }, ...claimSubTypes]}
+                size="sm"
+                onChange={(selectedOption) => updateFilter("claimSubTypeId", selectedOption?.target?.value || "")}
+                value={filter?.claimSubTypeId ?? ''}
+                isDisabled={!filter.claimTypeId}
+              />
+            </div>
+          }
+
           <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
             <ReactSelect
               wrapperClassName="mb-0"
@@ -161,6 +166,11 @@ const ListingSearchForm = ({ filter, setFilter }) => {
                 if (startDate && endDate) {
                   updateFilter("startDate", moment(startDate).format("YYYY-MM-DD"));
                   updateFilter("endDate", moment(endDate).format("YYYY-MM-DD"));
+                } else {
+                  setFilter((prevFilters) => {
+                    const { startDate, endDate, ...restFilters } = prevFilters;
+                    return { ...restFilters };
+                  });
                 }
               }}
               startDate={filter.startDate || null}

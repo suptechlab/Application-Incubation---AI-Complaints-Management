@@ -181,7 +181,7 @@ const AddTemplate = () => {
                             <ReactSelect
                               error={errors?.templateType}
                               options={templateTypeOption ?? []}
-                              value={values.templateType}
+                              value={'EMAIL'}
                               onChange={(option) => {
                                 setFieldValue('templateType', option.target.value);
                               }}
@@ -191,6 +191,7 @@ const AddTemplate = () => {
                                 } `}
                               onBlur={handleBlur}
                               touched={touched?.templateType}
+                              disabled={true}
                             />
                           </Col>
                           <Col lg={6}>
@@ -324,7 +325,7 @@ const AddTemplate = () => {
                     <p className="mb-0 fs-18 fw-semibold">{t('KEYWORD_LIST')}</p>
                   </Card.Header>
 
-                  <Card.Body>
+                  <Card.Body className="h-100 overflow-auto">
                     <ul className="variable-list ps-0">
                       {
                         variableList?.map((keyword, index) => (

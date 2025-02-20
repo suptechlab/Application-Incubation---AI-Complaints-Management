@@ -16,6 +16,7 @@ import {
 import { AuthenticationContext } from "../../contexts/authentication.context";
 import toast from "react-hot-toast";
 import Toggle from "../../components/Toggle";
+import ListingSearchForm from "../../components/ListingSearchForm";
 
 export default function RoleRightsList() {
 
@@ -169,7 +170,7 @@ export default function RoleRightsList() {
         id: "userType",
         header: () => t('ROLE & RIGHTS'),
         enableSorting: false,
-      },
+      },  
       ...(permissionsState?.statusModule
         ? [
           {
@@ -253,7 +254,7 @@ export default function RoleRightsList() {
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
-            {/* <ListingSearchFormUsers filter={filter} setFilter={setFilter} /> */}
+            <ListingSearchForm filter={filter} setFilter={setFilter} />
             <CommonDataTable
               columns={columns}
               dataQuery={dataQuery}

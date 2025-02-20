@@ -263,6 +263,23 @@ const SLAComplianceReport = () => {
         cell: (({ row }) => (
           <span>{row?.original?.slaBreachDays + " " + t("DAYS")}</span>
         )),
+      },
+      {
+        accessorFn: (row) => row?.slaCompliance,
+        id: "slaCompliance",
+        header: () => t("SLA_COMPLIANCE"),
+        enableSorting: false,
+
+      },
+
+      {
+        accessorFn: (row) => row?.slaCompliance,
+        id: "slaCompliance",
+        header: () => t("SUB_STATUS"),
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span>{row?.original?.status === 'CLOSED' ? masterData?.closedStatus[row?.original?.closedStatus] : masterData?.rejectedStatus[row?.original?.rejectedStatus]}</span>
+        )
 
       },
       {
@@ -271,13 +288,7 @@ const SLAComplianceReport = () => {
         header: () => t("STATUS"),
         size: "100",
         cell: (rowData) => (
-          rowData?.row?.original?.status === 'CLOSED' ? <AppTooltip title={masterData?.closedStatus[rowData?.row?.original?.closedStatus]}>
-            <span
-              className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
-            >
-              {masterData?.claimTicketStatus[rowData.row.original.status]}
-            </span>
-          </AppTooltip> : <span
+          <span
             className={`text-nowrap bg-opacity-10 custom-font-size-12 fw-semibold px-2 py-1 rounded-pill ${getStatusClass(rowData.row.original.status)}`}
           >
             {masterData?.claimTicketStatus[rowData.row.original.status]}

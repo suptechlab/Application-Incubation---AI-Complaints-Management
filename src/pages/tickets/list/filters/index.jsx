@@ -12,7 +12,7 @@ import { claimTypesDropdownList } from "../../../../services/claimSubType.servic
 import { agentListingApi, convertToLabelValue } from "../../../../services/ticketmanagement.service";
 import { LuFilterX } from "react-icons/lu";
 
-const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, clearTableSelection, permissionsState }) => {
+const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, clearTableSelection, permissionsState ,isTaggedList}) => {
 
     const { currentUser } = useContext(AuthenticationContext);
 
@@ -32,16 +32,17 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
     const handleDateFilterChange = ([newStartDate, newEndDate]) => {
         setTempDateRange([newStartDate, newEndDate]);
 
+
         // Update filter state only if both dates are selected
-        if (newStartDate && newEndDate) {
+        if ((newStartDate && newEndDate )) {
             setFilter({
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
-                endDate: moment(newEndDate).format("YYYY-MM-DD")
+                endDate: moment(newEndDate).endOf('month').format("YYYY-MM-DD")
             });
-        } else {
-            setFilter({
-                startDate: '',
-                endDate: ''
+        } else if(filter?.startDate && filter?.endDate){
+            setFilter((prevFilters) => {
+                const { startDate, endDate, ...restFilters } = prevFilters;
+                return { ...restFilters };
             });
         }
     };
@@ -139,17 +140,17 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                         search: "",
                         status: "",
                         claimTypeId: "",
-                        instanceType:"",
-                        claimTicketPriority:"",
-                        claimTicketStatus:"",
-                        startDate:null,
-                        endDate :null
+                        instanceType: "",
+                        claimTicketPriority: "",
+                        claimTicketStatus: "",
+                        startDate: null,
+                        endDate: null
                     })
                 }}>
                     <LuFilterX size={18} />  {t("RESET")}
                 </Button>
                 {
-                    permissionsState?.assignPermission === true ?
+                    !isTaggedList && permissionsState?.assignPermission === true ?
                         <div className="custom-min-width-120 flex-grow-1 flex-md-grow-0">
                             <ReactSelect
                                 wrapperClassName="mb-0"
@@ -232,24 +233,24 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                 }
                 {
                     currentUser !== "FI_USER" && <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
-                    <ReactSelect
-                        wrapperClassName="mb-0"
-                        class="form-select "
-                        placeholder={t("INSTANCE_TYPE")}
-                        id="floatingSelect"
-                        size="sm"
-                        options={instanceTypeDropdown ?? []}
-                        onChange={(e) => {
-                            setFilter({
-                                ...filter,
-                                instanceType: e.target.value,
-                            });
-                        }}
-                        value={filter?.instanceType}
-                    />
-                </div>
+                        <ReactSelect
+                            wrapperClassName="mb-0"
+                            class="form-select "
+                            placeholder={t("INSTANCE_TYPE")}
+                            id="floatingSelect"
+                            size="sm"
+                            options={instanceTypeDropdown ?? []}
+                            onChange={(e) => {
+                                setFilter({
+                                    ...filter,
+                                    instanceType: e.target.value,
+                                });
+                            }}
+                            value={filter?.instanceType}
+                        />
+                    </div>
                 }
-                
+
 
                 <div className="custom-min-width-160 flex-grow-1 flex-md-grow-0">
                     <ReactSelect

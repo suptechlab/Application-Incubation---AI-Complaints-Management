@@ -172,6 +172,11 @@ const AuditLogs = () => {
         header: () => t("ACTIVITY TYPE"),
       },
       {
+        accessorFn: (row) => row.message,
+        id: "message",
+        header: () => t("MESSAGE"),
+      },
+      {
         accessorFn: (row) => row.ipAddress,
         id: "ipAddress",
         header: () => t("IP ADDRESS/LOCATION"),
