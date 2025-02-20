@@ -40,6 +40,7 @@ const EndPoint = {
   DELETE_SINGLE_NOTIFICATION : `/${version}/notifications`,
   DELETE_ALL_NOTIFICATIONS : `/${version}/notifications/delete/all`,
   NOTIFICATION_COUNT : `/${version}/notifications/count`,
+  SATISFACTION_SURVEY_API : `/${version}/survey/submit`
 };
 
 export default EndPoint;

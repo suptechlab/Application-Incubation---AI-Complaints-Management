@@ -229,6 +229,7 @@ const Header = ({ layout }) => {
       console.error("Error fetching notification count:", error);
     }
   };
+
   const handleScroll = () => {
     if (menuRef.current) {
       const bottom = menuRef.current.scrollHeight === menuRef.current.scrollTop + menuRef.current.clientHeight;

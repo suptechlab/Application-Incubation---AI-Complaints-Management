@@ -166,5 +166,10 @@ export const spanishLang = {
   "MARK_ALL_AS_READ": "Marcar todo como leído",
   "CLEAR_ALL": "Borrar todo",
   "CLEAR": "despejado",
-  "MULTIPLE_ATTACHMENTS_UPLOADED_COMPLAINT":"Puede cargar varios archivos, si desea añadir documentación que respalde la denuncia"
+  "MULTIPLE_ATTACHMENTS_UPLOADED_COMPLAINT":"Puede cargar varios archivos, si desea añadir documentación que respalde la denuncia",
+  "CLAIM_SURVEY_QUE_1": 'La facilidad para encontrar información del servicio en la web de la SEPS',
+  "CLAIM_SURVEY_QUE_2": 'Los formatos proporcionados por esta Superintendencia para la prestación de su servicio',
+  "CLAIM_SURVEY_QUE_3": 'La claridad en la respuesta a su requerimiento',
+  "CLAIM_SURVEY_QUE_4": 'El tiempo de atención a su requerimiento',
+  "SATISFACTION_SURVEY": "Encuesta de Satisfacción"
 }
