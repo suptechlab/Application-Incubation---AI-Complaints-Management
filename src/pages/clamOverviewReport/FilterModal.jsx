@@ -17,7 +17,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
 
   const { t } = useTranslation();
 
-  const { currentUser } = useContext(AuthenticationContext)
+  const { currentUser, userData } = useContext(AuthenticationContext)
 
   // const [fileName, setFileName] = useState("");
 
@@ -237,7 +237,13 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
     getClaimTypeDropdownList()
     getOrganizationDropdownList()
     getProvinceDropdownList()
-    getAgentDropdownListing()
+
+    if (currentUser === 'FI_USER') {
+      getAgentDropdownListing(userData?.organizationId)
+    } else {
+      getAgentDropdownListing()
+    }
+
   }, [])
 
 
@@ -281,7 +287,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
       <Formik
         initialValues={{
           instanceType: filter?.instanceType ?? "",
-          organizationId: filter?.organizationId ?? "",
+          organizationId: currentUser === 'FI_USER' ? userData?.organizationId : filter?.organizationId ?? "",
           fiAgentId: filter?.fiAgentId ?? "",
           sepsAgentId: filter?.sepsAgentId ?? "",
           claimTypeId: filter?.claimTypeId ?? "",
@@ -351,7 +357,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
                         value: group.value,
                       })),
                     ]}
-                    value={values.organizationId}
+                    value={currentUser === 'FI_USER' ? userData?.organizationId : values.organizationId}
                     // onChange={(option) => {
                     //   setFieldValue(
                     //     "organizationId",
@@ -381,6 +387,7 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
                     className={touched.organizationId && errors.organizationId ? "is-invalid" : ""}
                     onBlur={handleBlur}
                     touched={touched.organizationId}
+                    disabled={currentUser === 'FI_USER'}
                   />
                 </Col>
                 <Col sm={6} lg={4}>

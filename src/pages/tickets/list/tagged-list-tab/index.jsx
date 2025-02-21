@@ -462,6 +462,7 @@ const TicketsTaggedList = ({ selectedTab }) => {
                             ticketArr={ticketIdsArr}
                             clearTableSelection={clearTableSelection}
                             permissionsState={permissionsState}
+                            isTaggedList={true}
                         />
                         <CommonDataTable
                             columns={columns}

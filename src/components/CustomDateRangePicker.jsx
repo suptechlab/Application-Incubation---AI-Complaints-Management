@@ -4,9 +4,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import { MdDateRange, MdOutlineCalendarToday } from "react-icons/md";
 import "./datepicker.scss";
 import { es } from 'date-fns/locale/es';
+import moment from "moment";
 registerLocale('es', es)
 
 const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleChange, startDate, endDate, tempDateRange, selectsRange, placeholder, size, disabled,maxDate }) => {
+
+
+  const onDateChange = (dates) => {
+    handleChange(dates);
+  };
 
   return (
     <div className={wrapperClassName || ''}>
@@ -15,11 +21,11 @@ const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleCh
        locale="es"
         placeholderText={placeholder}
         selected={startDate}
-        onChange={handleChange}
+        onChange={onDateChange}
         showMonthYearPicker
         selectsRange={selectsRange}
         startDate={tempDateRange[0]}
-        endDate={tempDateRange[1]}
+        endDate={endDate}
         dateFormat="YYYY-MM"
         showDatePicker
         isClearable
@@ -29,7 +35,10 @@ const CustomDateRangePicker = ({ wrapperClassName = 'mb-3 pb-1', label, handleCh
         className={`form-control ${size === 'sm' ? 'form-control-sm' : ''}`}
         disabled={disabled}
         portalId="root"
-        maxDate={maxDate}
+        // readOnly // Prevents manual typing
+        onKeyDown={(e) => e.preventDefault()} // Blocks keypress events
+        // maxDate={maxDate}
+        maxDate={new Date()}// FUTURE DATE CAN NOT BE SELECT
       />
     </div>
   );

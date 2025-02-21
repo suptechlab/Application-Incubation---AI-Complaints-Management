@@ -32,9 +32,9 @@ const TotalClaimsSection = ({ setLoading }) => {
         if (newStartDate && newEndDate) {
             setFilters({
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
-                endDate: moment(newEndDate).format("YYYY-MM-DD")
+                endDate: moment(newEndDate).endOf('month').format("YYYY-MM-DD")
             });
-        } else {
+        } else if(filters?.startDate && filters?.endDate){
             setFilters((prevFilters) => {
                 const { startDate, endDate, ...restFilters } = prevFilters;
                 return { ...restFilters };
@@ -117,7 +117,7 @@ const TotalClaimsSection = ({ setLoading }) => {
                         className="flex-wrap "
                     >
                         {
-                            currentUser === "SEPS_USER" &&
+                            currentUser !== "FI_USER" &&
                             <div className="custom-max-width-320 custom-min-width-160 flex-grow-1 flex-md-grow-0">
                                 <ReactSelect
                                     wrapperClassName="mb-0"

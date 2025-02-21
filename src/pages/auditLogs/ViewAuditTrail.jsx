@@ -25,6 +25,9 @@ const ViewAuditTrail = () => {
       });
   }, [id]);
 
+
+  console.log(data)
+
   // View Top Data
   const viewTopData = [
     {
@@ -45,6 +48,10 @@ const ViewAuditTrail = () => {
       label: t("IP ADDRESS/LOCATION"),
       value: data?.ipAddress,
     },
+    // {
+    //   label: t("MESSAGE"),
+    //   value: data?.message['es'],
+    // },
   ];
 
   return (
@@ -59,6 +66,9 @@ const ViewAuditTrail = () => {
                 <CommonViewData label={item.label} value={item.value} />
               </Col>
             ))}
+            <Col sm={12} lg={6} >
+                <CommonViewData label={t('MESSAGE')} value={data?.message?.es} />
+              </Col>
             <Col xs={12} className="pt-1">
               <h6 className="fw-semibold">{t("AUDIT DETAILS")}</h6>
               <AuditTable

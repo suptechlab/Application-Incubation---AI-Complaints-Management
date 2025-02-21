@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Stack } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { MdOutlineFilterAlt } from "react-icons/md";
@@ -9,9 +9,17 @@ import ReactSelect from "../../components/ReactSelect";
 import AppTooltip from "../../components/tooltip";
 import FilterModal from "./FilterModal";
 import { LuFilterX } from "react-icons/lu";
+import { AuthenticationContext } from "../../contexts/authentication.context";
+import { MasterDataContext } from "../../contexts/masters.context";
+import { convertToLabelValue } from "../../services/ticketmanagement.service";
 
 const ListFilters = ({ filter, setFilter, }) => {
     const { t } = useTranslation();
+
+    const {currentUser , userData} = useContext(AuthenticationContext)
+
+    const { masterData } = useContext(MasterDataContext)
+    const [priorityOptions, setPriorityOptions] = useState([])
 
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
 
@@ -19,6 +27,12 @@ const ListFilters = ({ filter, setFilter, }) => {
 
     // Temporary state to hold the selected dates
     const [tempDateRange, setTempDateRange] = useState([null, null]);
+
+    useEffect(() => {
+
+        const priorityOpt = convertToLabelValue(masterData?.claimTicketPriority ?? {})
+        setPriorityOptions(priorityOpt)
+    }, [masterData])
 
     const handleDateFilterChange = ([newStartDate, newEndDate]) => {
         setTempDateRange([newStartDate, newEndDate]);
@@ -28,7 +42,12 @@ const ListFilters = ({ filter, setFilter, }) => {
             setFilter({
                 ...filter,
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
-                endDate: moment(newEndDate).format("YYYY-MM-DD")
+                endDate: moment(newEndDate).endOf('month').format("YYYY-MM-DD")
+            });
+        }else if(filter?.startDate && filter?.endDate){
+            setFilter((prevFilters) => {
+                const { startDate, endDate, ...restFilters } = prevFilters;
+                return { ...restFilters };
             });
         }
     };
@@ -68,7 +87,7 @@ const ListFilters = ({ filter, setFilter, }) => {
                         startDate: null,
                         endDate: null,
                         instanceType: "",
-                        organizationId: "",
+                        organizationId: currentUser === 'FI_USER' ? userData?.organizationId : "",
                         fiAgentId: "",
                         sepsAgentId: "",
                         claimTypeId: "",
@@ -99,18 +118,7 @@ const ListFilters = ({ filter, setFilter, }) => {
                                 value: "",
                                 class: "label-class",
                             },
-                            {
-                                label: t("LOW"),
-                                value: "LOW",
-                            },
-                            {
-                                label: t("MEDIUM"),
-                                value: "MEDIUM",
-                            },
-                            {
-                                label: t("HIGH"),
-                                value: "HIGH",
-                            }
+                            ...priorityOptions
                         ]}
                         onChange={(e) => {
                             setFilter({

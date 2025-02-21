@@ -34,7 +34,8 @@ export default function FIUserList() {
   const [filter, setFilter] = React.useState({
     search: "",
     status: "",
-    roleId: ""
+    roleId: "",
+    organizationId:""
   });
 
   const [loading, setLoading] = useState(false);
@@ -201,19 +202,23 @@ export default function FIUserList() {
         },
         size: "120",
       },
-      {
-        accessorFn: (row) => row?.entityName,
-        id: "entityName",
-        header: () => t("ENTITY NAME"),
-        enableSorting: false,
-        cell: (info) => {
-          return (
-            <span>
-              {info.row.original.organization?.razonSocial ? info?.row?.original?.organization?.razonSocial : "N/A"}
-            </span>
-          );
-        },
-      },
+
+      ...(
+        currentUser !=='FI_USER' ? [{
+          accessorFn: (row) => row?.entityName,
+          id: "entityName",
+          header: () => t("ENTITY NAME"),
+          enableSorting: false,
+          cell: (info) => {
+            return (
+              <span>
+                {info.row.original.organization?.razonSocial ? info?.row?.original?.organization?.razonSocial : "N/A"}
+              </span>
+            );
+          },
+        }]:[]
+      ),
+      
       {
         accessorFn: (row) => row?.roles?.name,
         id: "role",
