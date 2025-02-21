@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 const FileSuccesModal = ({ handleShow, handleClose, handleFormSubmit, fileClaimData }) => {
     const {t} = useTranslation()
+
     return (
         <Modal
             show={handleShow}
@@ -27,8 +28,8 @@ const FileSuccesModal = ({ handleShow, handleClose, handleFormSubmit, fileClaimD
                     </div>
                     <p className='lh-sm small mb-4 pt-1'>
                         {t('CLAIM_SUCCESS_EMAIL')}
-                        <Link to={`mainto:email ${fileClaimData.email}`} className='text-decoration-none'>
-                            {fileClaimData.email}
+                        <Link to={`mainto:email ${fileClaimData?.email}`} className='text-decoration-none'>
+                            {fileClaimData?.email}
                         </Link>.
                     </p>
                     <Button

@@ -411,7 +411,7 @@ const ChatBotForm = () => {
                         '<a href="$1" target="_blank">$1</a>'
                     );
 
-                 
+
 
                     return {
                         id: prevChatData.length + index + 1,
@@ -775,14 +775,15 @@ const ChatBotForm = () => {
                                                         value={formikProps.values.message || ""}
                                                         autoComplete="off"
                                                         readOnly={isLoading}
-                                                    // isTextarea={true}
+                                                        isTextarea={true}
+                                                        autoResize={true}
                                                     // rows={1}
                                                     />
                                                     <Button
                                                         type="submit"
                                                         variant="link"
                                                         aria-label='Send Message'
-                                                        className='p-2 theme-flip-x link-dark position-absolute top-0 end-0 z-1'
+                                                        className='p-2 theme-flip-x link-dark position-absolute bottom-0 me-3 end-0 z-1'
                                                         readOnly={isLoading}
                                                     >
                                                         <MdKeyboardBackspace size={24} />
