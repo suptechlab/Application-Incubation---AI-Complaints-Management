@@ -7,6 +7,8 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.Set;
 
+import static com.seps.ticket.component.CommonHelper.capitalizeCustom;
+
 @Data
 @ToString
 public class UserDTO {
@@ -26,4 +28,9 @@ public class UserDTO {
     private Instant fingerprintVerifiedAt;
     private Set<String> authorities;
     private Set<RoleDTO> roles;
+
+    // Custom setter for `name`
+    public void setName(String name) {
+        this.name = capitalizeCustom(name);
+    }
 }

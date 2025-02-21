@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.util.Set;
 
+import static com.seps.ticket.component.CommonHelper.capitalizeCustom;
+
 @Data
 public class FIUserDTO {
     private Long id;
@@ -21,4 +23,9 @@ public class FIUserDTO {
     private OrganizationDTO organization;
     private Set<String> authorities;
     private Set<RoleDTO> roles;
+
+    // Custom setter for `name`
+    public void setName(String name) {
+        this.name = capitalizeCustom(name);
+    }
 }
