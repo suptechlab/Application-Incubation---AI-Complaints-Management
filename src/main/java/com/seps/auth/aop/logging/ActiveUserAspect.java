@@ -23,7 +23,7 @@ public class ActiveUserAspect {
     }
 
     // Pointcut for all methods inside @RestController that are not public APIs
-    @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
+    @Pointcut("within(@org.springframework.web.bind.annotation.RestController *) && !within(com.seps.auth.web.rest.PublicController)")
     public void restControllerMethods() {
         // Pointcut for all REST controllers except public APIs
     }
