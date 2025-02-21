@@ -71,8 +71,8 @@ public class RoleService {
     public List<RoleDTO> findRolesWithPermissions(List<Long> roleIds) {
         log.debug("Request to get Roles: {}", roleIds);
 
-        // Fetch all roles by their IDs
-        List<Role> roles = roleRepository.findAllById(roleIds);
+        // Fetch roles by IDs where status is true
+        List<Role> roles = roleRepository.findByIdInAndStatusTrue(roleIds);
 
         if (roles.isEmpty()) {
             return List.of(); // Return an empty list if no roles are found
