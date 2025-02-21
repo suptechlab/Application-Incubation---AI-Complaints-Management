@@ -285,6 +285,12 @@ const TicketsTaggedList = ({ selectedTab }) => {
                 enableSorting: true,
             },
             {
+                accessorFn: (row) => row?.organization?.razonSocial,
+                id: "entity",
+                header: () => t("ENTITY NAME"),
+                enableSorting: false,
+            },
+            {
                 accessorFn: (row) => row?.user?.name,
                 id: "consumerName",
                 header: () => t("CONSUMER_NAME"),
@@ -307,7 +313,7 @@ const TicketsTaggedList = ({ selectedTab }) => {
                 accessorFn: (row) => row?.instanceType,
                 id: "instanceType",
                 header: () => t("INSTANCE_TYPE"),
-                enableSorting: false,
+                enableSorting: true,
                 cell: ({ row }) => (
                     <span>{(row?.original?.instanceType && masterData?.instanceType) && masterData?.instanceType[row?.original?.instanceType]}</span>
                 )
@@ -426,17 +432,17 @@ const TicketsTaggedList = ({ selectedTab }) => {
 
             case 'SEPS_USER':
                 if (userData?.roles[0]?.name === 'Seps Admin') {
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType","entity", "agentName", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 } else {
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType","entity", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 }
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "entity","agentName", "claimFiledBy", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "remainingDaysOfSla", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType","entity", "agentName", "remainingDaysOfSla", "instanceType", "priority", "status"];
                 break;
         }
 

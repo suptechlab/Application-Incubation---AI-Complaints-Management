@@ -309,7 +309,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                 accessorFn: (row) => row?.createdByUser?.name,
                 id: "claimFiledBy",
                 header: () => t("CLAIM_FILED_BY"),
-                enableSorting: true,
+                enableSorting: false,
             },
             {
                 accessorFn: (row) => row?.organization?.razonSocial,
@@ -340,7 +340,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                 accessorFn: (row) => row?.instanceType,
                 id: "instanceType",
                 header: () => t("INSTANCE_TYPE"),
-                enableSorting: false,
+                enableSorting: true,
                 cell: ({ row }) => (
                     <span>{(row?.original?.instanceType && masterData?.instanceType) && masterData?.instanceType[row?.original?.instanceType]}</span>
                 )
@@ -495,17 +495,17 @@ const TicketsNormalList = ({ selectedTab }) => {
            
             case 'SEPS_USER':
                 if(userData?.roles[0]?.name === 'Seps Admin'){
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType","entity", "agentName", "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
                 }else{
-                    selectedColumns = ["ticketId", "createdAt", "claimType", "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
+                    selectedColumns = ["ticketId", "createdAt", "claimType", "entity","claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
                 }
                 break;
             case 'SYSTEM_ADMIN':
-                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName" , "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "entity" ,"agentName" , "claimFiledBy",  "slaBreachDate", "instanceType", "priority", "status"];
                 break;
             default:
                 // Fallback to default columns (assumes `FIAdminColumns` is predefined elsewhere)
-                selectedColumns = ["ticketId", "createdAt", "claimType", "agentName", "slaBreachDate", "instanceType", "priority", "status"];
+                selectedColumns = ["ticketId", "createdAt", "claimType", "entity","agentName", "slaBreachDate", "instanceType", "priority", "status"];
                 break;
         }
 

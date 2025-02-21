@@ -100,13 +100,13 @@ const ClaimOverviewReport = () => {
         // accessorFn: (row) => row?.claimType,
         id: "claimType",
         header: () => t("CLAIM TYPE"),
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         accessorFn: (row) => row?.fiAgent,
         id: "fiAgent",
         header: () => t("FI_AGENT"),
-        enableSorting: false,
+        enableSorting: true,
         cell: ({ row }) => (
           <span>{row?.original?.fiAgent?.name}</span>
         ),

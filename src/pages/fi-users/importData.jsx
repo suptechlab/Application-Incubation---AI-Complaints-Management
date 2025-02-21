@@ -33,6 +33,7 @@ const ImportFIUser = () => {
     if (file) {
       setFileName(file.name);
       setFieldValue('browseFile', file)
+      event.target.value = ''
     } else {
       setFileName("");
     }
@@ -64,7 +65,10 @@ const ImportFIUser = () => {
         if (error?.response?.status === 400) {
 
           const errorData = error?.response?.data?.join('\n')
-          setInitialValues({ browseFile: '', description: errorData })
+          // setInitialValues({ browseFile : '', description: errorData })
+          actions.resetForm({ values: { browseFile: '', description: errorData } });
+          setFileName('')
+          // setInitialValues((prev)=>({ ...prev, description: errorData }))
         }
         else if (error?.response?.data?.errorDescription) {
           toast.error(error.response.data.errorDescription);
@@ -179,7 +183,7 @@ const ImportFIUser = () => {
                         onBlur={handleBlur}
                         onChange={handleChange}
                         touched={touched?.description}
-                        rows={7}
+                        rows={12}
                         type="text"
                         disabled={true}
                         value={values?.description || ""}

@@ -75,7 +75,7 @@ const TotalClaimsSection = ({ setLoading }) => {
                     value: data?.id
                 }
             })
-            setOrgList([{ label: t('SELECT'), value: '' }, ...orgListData])
+            setOrgList([{ label: t('ALL_ENTITIES'), value: '' }, ...orgListData])
         }).catch((error) => {
             if (error?.response?.data?.errorDescription) {
                 toast.error(error?.response?.data?.errorDescription);
@@ -122,7 +122,7 @@ const TotalClaimsSection = ({ setLoading }) => {
                                 <ReactSelect
                                     wrapperClassName="mb-0"
                                     className="form-select "
-                                    placeholder={t("SELECT")}
+                                    placeholder={t("ALL_ENTITIES")}
                                     id="organizationId"
                                     size="sm"
                                     onChange={(event) => {

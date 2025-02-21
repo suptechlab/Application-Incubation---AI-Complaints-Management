@@ -146,6 +146,7 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                         startDate: null,
                         endDate: null
                     })
+                    setTempDateRange([null,null])
                 }}>
                     <LuFilterX size={18} />  {t("RESET")}
                 </Button>
@@ -277,7 +278,7 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                             tempDateRange={tempDateRange}
                             handleChange={handleDateFilterChange}
                             startDate={filter?.startDate ?? null}
-                            endDate={filter?.endDate}
+                            endDate={filter?.endDate ?? null}
                             selectsRange={true}
                             placeholder={t("SELECT_DATE_RANGE")}
                             size="sm"
@@ -286,6 +287,7 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
                     </div>
                 </Stack>
             </Stack>
+
         </div>
 
     );

@@ -229,7 +229,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 accessorFn: (row) => row?.createdByUser?.name,
                 id: "claimFiledBy",
                 header: () => t("CLAIM_FILED_BY"),
-                enableSorting: true,
+                enableSorting: false,
                 cell: ({ row }) => (
                     row?.original?.createdByUser?.name
                        
@@ -293,6 +293,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 id: "fiAgent",
                 header: () => t("FI_ENTITY"),
                 enableSorting: true,
+                size:"210"
             }
         ],
         [masterData]

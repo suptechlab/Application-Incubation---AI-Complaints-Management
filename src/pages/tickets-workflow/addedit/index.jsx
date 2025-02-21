@@ -1697,6 +1697,7 @@ export default function TicketWorkFlowAddEdit() {
                                                 type="submit"
                                                 variant="warning"
                                                 className="custom-min-width-85"
+                                                disabled={formikProps?.isSubmitting}
                                             >
                                                 {isEdit ? t('UPDATE') : t('SUBMIT')}
                                             </Button>

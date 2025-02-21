@@ -6,6 +6,7 @@ import { AuthenticationContext } from "../contexts/authentication.context";
 const PublicRoute = ({ element }) => {
     const { isAuthenticated } = useContext(AuthenticationContext);
 
+
     const location = useLocation()
     if (isAuthenticated) {
         const allowedPages = ["/login", "/forgot-password", "/reset-password" ];

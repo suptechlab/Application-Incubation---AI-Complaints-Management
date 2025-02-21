@@ -101,6 +101,7 @@ const ListFilters = ({ filter, setFilter, }) => {
                         source: "",
                         channelOfEntry: ""
                     })
+                    setTempDateRange([null,null])
                 }}>
                     <LuFilterX size={18} />  {t("RESET")}
                 </Button>

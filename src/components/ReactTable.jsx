@@ -12,7 +12,7 @@ import DataGridPagination from "./Datagridpagination";
 import "./ReactTable.scss";
 import PropTypes from 'prop-types';
 import { useTranslation } from "react-i18next";
-
+import { GoInbox } from "react-icons/go";
 export default function ReactTable({
   columns,
   dataQuery,
@@ -27,11 +27,10 @@ export default function ReactTable({
   const location = useLocation();
   const defaultData = React.useMemo(() => [], []);
 
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   // Assuming dataQuery contains headers in its response
   const totalRecords = dataQuery?.data?.headers?.["x-total-count"] ?? 0;
-
 
   const { data } = dataQuery;
 
@@ -68,7 +67,7 @@ export default function ReactTable({
       asc: t("SORT_ASCENDING"),
       desc: t("SORT_DESCENDING"),
     };
-    
+
     return sortingTitles[nextOrder] || t("CLEAR_SORT");
   };
 
@@ -109,11 +108,11 @@ export default function ReactTable({
   // }, [sorting, pagination]);
   React.useEffect(() => {
     let params = new URLSearchParams(location.search);
-  
+
     // Always update page and limit
     params.set("page", pagination.pageIndex + 1);
     params.set("limit", pagination.pageSize);
-  
+
     // Update sorting if available
     if (sorting.length > 0) {
       const sortParams = sorting
@@ -123,7 +122,7 @@ export default function ReactTable({
     } else {
       params.delete("sortBy"); // Remove if no sorting
     }
-  
+
     // Navigate with updated params
     navigate(`${location.pathname}?${params.toString()}`);
   }, [sorting, pagination]);
@@ -168,8 +167,6 @@ export default function ReactTable({
             </tr>
           ))}
         </thead>
-
-
         <tbody>
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
@@ -189,6 +186,15 @@ export default function ReactTable({
             </tr>
           ))}
         </tbody>
+
+        {(!dataQuery?.isFetching && !data?.isLoading && tableData?.length === 0) && <tbody>
+          <tr>
+            <td colSpan={table.getAllColumns().length} className="text-center text-muted">
+              <GoInbox size={50} className="text-secondary" />
+              <p className="mt-1"> {t("NO_DATA")}</p>
+            </td>
+          </tr>
+        </tbody>}
       </BTable>
 
       {/* Conditionally render pagination based on showPagination prop */}
