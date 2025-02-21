@@ -165,11 +165,12 @@ const TemplateMaster = () => {
         id: "templateType",
         header: () => t("TEMPLATE TYPE"),
       },
-      {
+      ...(currentUser !== 'FI_USER' ? [  {
         accessorFn: (row) => row?.userType,
         id: "userType",
         header: () => t("USER TYPE"),
-      },
+      }]:[]),
+    
       ...(permissionsState?.statusModule
         ? [{
           // accessorFn: (row) => row.status ? "Active" : "Inactive",
