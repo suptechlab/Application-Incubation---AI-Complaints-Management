@@ -39,7 +39,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/v1/transcripts/send")).permitAll()
-                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/v1/user/claim-tickets/*/ticket-detail-pdf-downloaapid")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/v1/user/claim-tickets/*/ticket-detail-pdf-download")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/v1/survey/submit")).permitAll()
                     .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()

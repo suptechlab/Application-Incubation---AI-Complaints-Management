@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 @Tag(name = "Transcripts", description = "Operations related to Transcripts APIs.")
 public class TranscriptResource {
 
-    public static final String RECIPIENT = "seps-operator@yopmail.com";
+    public static final String RECIPIENT = "mibew.suptech@seps.gob.ec";
     private final MailService mailService;
     private final MessageSource messageSource;
 
