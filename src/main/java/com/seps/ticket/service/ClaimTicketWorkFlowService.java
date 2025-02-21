@@ -307,7 +307,14 @@ public class ClaimTicketWorkFlowService {
     public Page<ClaimTicketWorkFlowDTO> listClaimTicketWorkFlows(Pageable pageable, String search, Boolean status, Long organizationId) {
         User currentUser = userService.getCurrentUser();
         organizationId = validateOrganizationAccess(currentUser, organizationId);
-        return claimTicketWorkFlowRepository.findAll(ClaimTicketWorkFlowSpecification.byFilter(search, status, organizationId), pageable).map(claimTicketWorkFlowMapper::mapEntityToDTO);
+        List<String> authorities = currentUser.getAuthorities().stream()
+            .map(Authority::getName)
+            .toList();
+        InstanceTypeEnum instanceType = null;
+        if (authorities.contains(AuthoritiesConstants.FI)) {
+            instanceType = InstanceTypeEnum.FIRST_INSTANCE;
+        }
+        return claimTicketWorkFlowRepository.findAll(ClaimTicketWorkFlowSpecification.byFilter(search, status, organizationId, instanceType), pageable).map(claimTicketWorkFlowMapper::mapEntityToDTO);
     }
 
     /**

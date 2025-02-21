@@ -1,6 +1,7 @@
 package com.seps.ticket.service.specification;
 
 import com.seps.ticket.domain.ClaimTicketWorkFlow;
+import com.seps.ticket.enums.InstanceTypeEnum;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -14,7 +15,7 @@ public class ClaimTicketWorkFlowSpecification {
 
     }
 
-    public static Specification<ClaimTicketWorkFlow> byFilter(String search, Boolean status, Long organizationId) {
+    public static Specification<ClaimTicketWorkFlow> byFilter(String search, Boolean status, Long organizationId, InstanceTypeEnum instanceType) {
         return (root, query, criteriaBuilder) -> {
             // Create a list to hold all predicates (conditions)
             List<Predicate> predicates = new ArrayList<>();
@@ -38,6 +39,11 @@ public class ClaimTicketWorkFlowSpecification {
             if (organizationId != null) {
                 predicates.add(
                     criteriaBuilder.equal(root.get("organizationId"), organizationId)
+                );
+            }
+            if(instanceType != null){
+                predicates.add(
+                    criteriaBuilder.equal(root.get("instanceType"), instanceType)
                 );
             }
             // Combine all predicates with 'and'
