@@ -1,7 +1,6 @@
 package com.seps.ticket.service.dto;
 
 import com.seps.ticket.enums.*;
-import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.ToString;
 
