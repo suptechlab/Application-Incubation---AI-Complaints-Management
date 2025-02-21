@@ -210,7 +210,7 @@ const ClaimChat = ({ handleShow, handleClose, selectedRow }) => {
         >
             <Modal.Header closeButton className="border-bottom">
                 <Modal.Title as="h4" className="fw-bold">
-                    {t('CLAIM')} ID: #{`${selectedRow?.ticketId}`}
+                    {t("TICKET_ID")}: #{selectedRow?.formattedTicketId}{" "}
                 </Modal.Title>
             </Modal.Header>
             <CommonFormikComponent

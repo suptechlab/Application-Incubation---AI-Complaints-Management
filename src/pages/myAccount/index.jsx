@@ -249,17 +249,20 @@ export default function MyAccount() {
                   <FiDownload size={24} />
                 </Button>
               </AppTooltip>
+
               <AppTooltip title={t("VIEW")}>
-                <Button
-                  variant="link"
-                  onClick={() => handleShowModal(info.row.original)}
-                  className='p-0 border-0 lh-sm text-body'
-                  aria-label={t("VIEW")}
-                >
-                  <MdOutlineVisibility size={24} />
-                </Button>
-              </AppTooltip>
-              <AppTooltip title={t("CHAT")}>
+                  <Button
+                    variant="link"
+                    onClick={() => handleShowModal(info.row.original)}
+                    className='p-0 border-0 lh-sm text-body'
+                    aria-label={t("VIEW")}
+                  >
+                    <MdOutlineVisibility size={24} />
+                  </Button>
+                </AppTooltip>
+              {
+                info.row.original.isConversationAvailable &&
+                <AppTooltip title={t("CHAT")}>
                 <Button
                   variant="link"
                   onClick={() => handleTicketModal(info.row.original)}
@@ -276,6 +279,9 @@ export default function MyAccount() {
                   </Badge> */}
                 </Button>
               </AppTooltip>
+              }
+
+              
               {instanceButton && (
                 <Stack direction='horizontal' gap={2}>
                   {instanceButton}
