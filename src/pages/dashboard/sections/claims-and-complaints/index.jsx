@@ -247,6 +247,12 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                 header: () => t("CLAIM SUB TYPE"),
                 enableSorting: true,
             },
+            ...(currentUser !=='FI_USER' ? [{
+                accessorFn: (row) => row?.organization?.razonSocial ?? t('N/A'),
+                id: "entity",
+                header: () => t('ENTITY NAME'),
+                enableSorting: false,
+            },] : []),
             {
                 accessorFn: (row) => row?.remainingDaysOfSla,
                 id: "slaBreachDate",
