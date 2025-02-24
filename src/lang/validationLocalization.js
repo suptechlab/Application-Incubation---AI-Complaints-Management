@@ -54,7 +54,7 @@ export const messages = {
     countryCodeMustBeValid: 'El código del país debe ser un código de marcación internacional válido (por ejemplo, +1, +91)',
     phoneNumberRequired: 'Se requiere el número de teléfono',
     phoneNumberMustBeValid: 'El número de teléfono debe ser válido',
-    phoneNumberMustBeDigits: 'El número de teléfono solo debe contener 10 dígitos',
+    phoneNumberMustBeDigits: 'El número de teléfono solo debe contener 9 dígitos',
     genderRequired: 'Se requiere el género',
     provinceRequired: 'Se requiere la provincia de residencia',
     cityRequired: 'Se requiere el cantón de residencia',
