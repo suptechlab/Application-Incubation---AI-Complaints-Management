@@ -29,7 +29,7 @@ const SearchForm = ({ filter, setFilter }) => {
     if (newStartDate && newEndDate) {
       setFilter({
         startDate: moment(newStartDate).format("YYYY-MM-DD"),
-        endDate: moment(newEndDate).endOf('month').format("YYYY-MM-DD")
+        endDate: moment(newEndDate).format("YYYY-MM-DD")
       });
     }else if(filter?.startDate && filter?.endDate){
       setFilter((prevFilters) => {
@@ -106,7 +106,7 @@ const SearchForm = ({ filter, setFilter }) => {
               tempDateRange={tempDateRange}
               handleChange={handleDateFilterChange}
               startDate={filter?.startDate ?? null}
-              endDate={filter?.endDate}
+              endDate={filter?.endDate ?? null}
               selectsRange={true}
               placeholder={t("SELECT_DATE_RANGE")}
               size="sm"

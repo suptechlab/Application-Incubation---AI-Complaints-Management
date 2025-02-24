@@ -37,7 +37,7 @@ const TicketsListFilters = ({ filter, setFilter, handleTicketAssign, ticketArr, 
         if ((newStartDate && newEndDate )) {
             setFilter({
                 startDate: moment(newStartDate).format("YYYY-MM-DD"),
-                endDate: moment(newEndDate).endOf('month').format("YYYY-MM-DD")
+                endDate: moment(newEndDate).format("YYYY-MM-DD")
             });
         } else if(filter?.startDate && filter?.endDate){
             setFilter((prevFilters) => {
