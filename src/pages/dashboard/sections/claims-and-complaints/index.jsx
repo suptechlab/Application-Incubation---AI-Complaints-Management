@@ -291,7 +291,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
             {
                 accessorFn: (row) => row?.fiAgent?.name,
                 id: "fiAgent",
-                header: () => t("FI_ENTITY"),
+                header: () => t("AGENT"),
                 enableSorting: true,
                 size:"210"
             }
