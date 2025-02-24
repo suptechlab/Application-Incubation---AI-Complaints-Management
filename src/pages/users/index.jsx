@@ -72,7 +72,10 @@ export default function UserList() {
     pageSize: params.limit ? parseInt(params.limit) : 10,
   });
 
-  const [sorting, setSorting] = React.useState([]);
+  const [sorting, setSorting] = React.useState([ {
+    "id": "createdDate",
+    "desc": true
+  }]);
 
   const [filter, setFilter] = React.useState({
     search: "",
@@ -163,7 +166,7 @@ export default function UserList() {
         accessorFn: (row) => row?.name,
         id: "firstName",
         header: () => t('NAME'),
-        enableSorting: false,
+        enableSorting: true,
       },
       {
         accessorFn: (row) => row?.roles,
@@ -213,7 +216,7 @@ export default function UserList() {
                       info?.row?.original?.status === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE'
                     )
                   }
-                  tooltip="Activo / Bloquear"
+                  tooltip={t('STATUS')}
                 />
               );
             },
@@ -235,7 +238,7 @@ export default function UserList() {
                   name: "edit",
                   enabled: true,
                   type: "link",
-                  title: "Edit",
+                  title: t("EDIT"),
                   icon: <MdEdit size={18} />,
                 },
               ]}

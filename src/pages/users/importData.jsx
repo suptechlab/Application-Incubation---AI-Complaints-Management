@@ -33,6 +33,7 @@ const ImportSEPSUser = () => {
     if (file) {
       setFileName(file.name);
       setFieldValue('browseFile',file)
+      event.target.value = ''
     } else {
       setFileName("");
     }
@@ -63,9 +64,9 @@ const ImportSEPSUser = () => {
       })
       .catch((error) => {
         if (error?.response?.status === 400) {
-
           const errorData = error?.response?.data?.join('\n')
-          setInitialValues({ browseFile: '', description: errorData })
+          actions.resetForm({ values: { browseFile: '', description: errorData } });
+          // setInitialValues({ browseFile: '', description: errorData })
           setFileName("");
         }
         else if (error?.response?.data?.errorDescription) {
@@ -81,6 +82,8 @@ const ImportSEPSUser = () => {
       });
   };
 
+
+  console.log(initialValue)
 
   const handleSampleFileDownload = () => {
     // Define the URL of the sample file

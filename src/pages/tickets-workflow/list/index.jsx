@@ -160,7 +160,7 @@ export default function TicketWorkFlowList() {
                     accessorFn: (row) => row?.organization?.razonSocial,
                     id: "organizationId",
                     header: () => t('ENTITY NAME'),
-                    enableSorting: false,
+                    // enableSorting: true,
                     cell: ({ row }) => {
                         return <span>{row?.original?.organization?.razonSocial}</span>
                     }

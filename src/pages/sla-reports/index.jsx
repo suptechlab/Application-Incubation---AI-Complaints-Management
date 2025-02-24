@@ -245,8 +245,8 @@ const SLAComplianceReport = () => {
         enableSorting: true,
       },
       {
-        accessorFn: (row) => row?.slaDueDate,
-        id: "slaDueDate",
+        accessorFn: (row) => row?.slaBreachDate,
+        id: "slaBreachDate",
         header: () => t("SLA_DUE_DATE"),
         enableSorting: true,
         cell: ({ row }) => (

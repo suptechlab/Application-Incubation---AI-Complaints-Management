@@ -82,6 +82,7 @@ const DashboardListFilters = ({ filter, setFilter }) => {
                             startDate: null,
                             endDate: null
                         })
+                        setTempDateRange([null,null])
                     }}>
                         <LuFilterX size={18} />  {t("RESET")}
                     </Button>

@@ -388,5 +388,6 @@ export const englishLang = {
     "KEYWORD_LIST":"Keyword List",
     "MESSAGE" :"Message",
     "SLA_COMPLIANCE" :"SLA Compliance",
-    "SUB_STATUS" :"Sub Status"
+    "SUB_STATUS" :"Sub Status",
+    "NO_DATA":"No Data"
 }

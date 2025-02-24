@@ -113,6 +113,7 @@ const ListingSearchForm = ({ filter, setFilter }) => {
               organizationId: "",
               claimTicketPriority: ""
             })
+            setTempDateRange([null,null])
           }}>
             <LuFilterX size={18} />  {t("RESET")}
           </Button>

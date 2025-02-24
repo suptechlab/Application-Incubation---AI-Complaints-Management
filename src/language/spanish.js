@@ -196,7 +196,7 @@ export const spanishLang = {
     "DAYS_REMAINING": "Días restantes",
     "TICKET_ID": "Ticket",
     "CREATION_DATE": "Fecha de creación",
-    "CLAIM_FILED_BY": "Nombre del reclamante",
+    "CLAIM_FILED_BY": "Ticket presentado por",
     "PRIORITY": "Prioridad",
     "FI_AGENT": "Agente FI",
     "NEW_TICKETS": "Nuevos Tickets",
@@ -259,12 +259,12 @@ export const spanishLang = {
     "EMAIL_VERIFICATION": "Verificación de Correo Electrónico",
     "INSTANCE_TYPE": "Tipo de instancia",
     "ADD_INTERNAL_NOTE": "Agregar nota interna",
-    "COMPLAINT": "Queja",
+    "COMPLAINT": "Denuncia",
     "NO_ATTACHMENT": "No hay ningún archivo adjunto incluido.",
     "TICKET_CLOSE_STATUS": "Estado de cierre del ticket",
     "TICKET_REJECT_STATUS": "Estado de rechazo del ticket",
     "ATTACHMENT": "Adjunto",
-    "BROWSE": "Buscar",
+    "BROWSE": "subir archivo",
     "REASON": "Razón",
     "SUB-STATUS": "Subestado",
     "OF": 'De',
@@ -383,5 +383,7 @@ export const spanishLang = {
     "KEYWORD_LIST":"Lista de palabras clave",
     "MESSAGE" :"Mensaje",
     "SLA_COMPLIANCE" :"Cumplimiento de SLA",
-    "SUB_STATUS" :"Subestado"
+    "SUB_STATUS" :"Subestado",
+    "USING_SEPS_ACTIVE_DIRECTORY":"Usando el Directorio Activo SEPS",
+    "NO_DATA":"Sin datos"
 } 

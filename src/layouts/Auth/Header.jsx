@@ -29,7 +29,7 @@ import "./header.scss";
 import moment from "moment/moment";
 
 export default function Header({ isActiveSidebar, toggleSidebarButton }) {
-  const { logout, userData, profileImage } = useContext(AuthenticationContext);
+  const { isAuthenticated,logout, userData, profileImage } = useContext(AuthenticationContext);
   const { t } = useTranslation();
 
   const navigate = useNavigate()
@@ -204,17 +204,23 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
 
 
   useEffect(() => {
-    getAllNotifications()
-  }, [currentPage])
+
+    if(isAuthenticated){
+      getAllNotifications()
+    }
+   
+  }, [currentPage,isAuthenticated])
 
   // FOR UNREAD COUNT INTERVAL
   useEffect(() => {
-    noticationCountApi()
-    const intervalId = setInterval(() => {
-      noticationCountApi();
-    }, 60000); // Run every 1 minute
-    return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [])
+    if(isAuthenticated){
+      noticationCountApi()
+      const intervalId = setInterval(() => {
+        noticationCountApi();
+      }, 60000); // Run every 1 minute
+      return () => clearInterval(intervalId); // Cleanup on unmount
+    }
+  }, [isAuthenticated])
 
   return (
     <Navbar
