@@ -358,7 +358,7 @@ export const spanishLang = {
     "YES_FILE_CLAIM": "Sí, presentar mi reclamo",
     "NO_FILE_MY_CLAIM": " No, déjame verificar el reclamo existente",
     "SUCCESS_LAUNCH_ICON": "Icono de Lanzamiento de Éxito",
-    "SUCCESS": "¡Éxito!",
+    "SUCCESS": "¡Felicidades!",
     "CLAIM_HAS_BEEN_FILED": "Se ha presentado la reclamación",
     "TICKET_NO": "Número de Ticket",
     "CLAIM_SUCCESS_EMAIL": "Su reclamación se ha presentado con éxito. Los detalles se han enviado a su correo electrónico",
