@@ -290,9 +290,9 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                     onChange={handleFileChange}
                                                 />
                                             </div>
-                                            {/* <span className="opacity-75">Multiple attachment can be uploaded.</span> */}
+                                           
                                         </div>
-
+                                        <p className="opacity-75">{t('OPTIONAL')}</p>
                                         {files.length > 0 && (
                                             <Stack direction='horizontal' gap={2} className="mt-2">
                                                 {files.map((file, index) => (
@@ -311,6 +311,8 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                                 ))}
                                             </Stack>
                                         )}
+
+                                     
                                     </Col>
                                     <Col xs={12}>
                                         <Stack direction="horizontal" gap={2} className="mb-3 flex-wrap">

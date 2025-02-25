@@ -569,13 +569,13 @@ const TicketsView = () => {
           setLoading={setLoading}
         />
 
-        <div className='d-flex flex-column flex-grow-1 mh-100 overflow-x-hidden pb-3'>
-          <Row className='h-100 gy-3 gy-lg-0 gx-3'>
-            {loading && loading === true ? <Col lg={6} className="placeholder-glow h-100">
-              <div className="placeholder" style={{ width: '100%', height: '100%' }}></div>
+        <div className='pb-3'>
+          <Row className='gy-3 gy-lg-0 gx-3'>
+            {loading && loading === true ? <Col lg={6} className="placeholder-glow custom-min-height-200">
+              <div className="placeholder w-100 h-100"></div>
             </Col> :
-              <Col lg={6} className='mh-100 d-flex flex-column'>
-                <Card className="border-0 shadow h-100 custom-min-height-200 overflow-auto">
+              <Col lg={6}>
+                <Card className="border-0 shadow custom-min-height-200">
                   <Card.Body>
                     <Row>
                       {topSectionData?.map((item, index) => (
@@ -589,7 +589,7 @@ const TicketsView = () => {
                 {/* SECOND INSTANCE DETAILS */}
                 {
                   (ticketData?.previousTicket) &&
-                  <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                  <Card className="border-0 card custom-min-height-200 mt-3 shadow">
                     <Card.Body className='mh-100'>
                       <h5 className='custom-font-size-18 fw-semibold mb-3'>
                         {t({
@@ -611,7 +611,7 @@ const TicketsView = () => {
                 {/* COMPLAINT DETAILS */}
                 {
                   (bottomSectionData && bottomSectionData?.length > 0) &&
-                  <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+                  <Card className="border-0 card custom-min-height-200 mt-3 shadow">
                     <Card.Body className='mh-100'>
                       <h5 className='custom-font-size-18 fw-semibold mb-3'>{t("FIRST_INSTANCE_CLAIM_DETAILS")}</h5>
                       <Row>
@@ -626,7 +626,7 @@ const TicketsView = () => {
                 }
               </Col>
             }
-            <Col lg={6} className='mh-100 d-flex flex-column'>
+            <Col lg={6}>
               <Card className="border-0 shadow">
                 <Card.Header className='bg-body border-0 py-3'>
                   {/* REPLY SECTION */}

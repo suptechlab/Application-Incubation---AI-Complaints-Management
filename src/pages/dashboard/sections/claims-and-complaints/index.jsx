@@ -192,7 +192,7 @@ const ClaimsAndComplaints = ({ setLoading }) => {
             {
                 accessorFn: (row) => row?.ticketId,
                 id: "ticketId",
-                header: () => t("TICKET_NO"),
+                header: () => t("TICKET"),
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
