@@ -91,22 +91,22 @@ const routes = [
       "CLAIM_SUB_TYPE_STATUS_CHANGE_FI"
     ],
   },
-  {
-    path: "/inquiry-type",
-    element: <InquiryType />,
-    isPrivate: true,
-    layoutType: "Auth",
-    module: "Inquiry Type Master",
-    permissions: ["INQUIRY_TYPE_CREATE", "INQUIRY_TYPE_UPDATE", "INQUIRY_TYPE_STATUS_CHANGE"],
-  },
-  {
-    path: "/inquiry-subtype",
-    element: <InquirySubtype />,
-    isPrivate: true,
-    layoutType: "Auth",
-    module: "Inquiry Sub Type Master",
-    permissions: ["INQUIRY_SUB_TYPE_CREATE", "INQUIRY_SUB_TYPE_UPDATE", "INQUIRY_SUB_TYPE_STATUS_CHANGE"],
-  },
+  // {
+  //   path: "/inquiry-type",
+  //   element: <InquiryType />,
+  //   isPrivate: true,
+  //   layoutType: "Auth",
+  //   module: "Inquiry Type Master",
+  //   permissions: ["INQUIRY_TYPE_CREATE", "INQUIRY_TYPE_UPDATE", "INQUIRY_TYPE_STATUS_CHANGE"],
+  // },
+  // {
+  //   path: "/inquiry-subtype",
+  //   element: <InquirySubtype />,
+  //   isPrivate: true,
+  //   layoutType: "Auth",
+  //   module: "Inquiry Sub Type Master",
+  //   permissions: ["INQUIRY_SUB_TYPE_CREATE", "INQUIRY_SUB_TYPE_UPDATE", "INQUIRY_SUB_TYPE_STATUS_CHANGE"],
+  // },
   {
     path: "/province-master",
     element: <ProvinceMaster />,

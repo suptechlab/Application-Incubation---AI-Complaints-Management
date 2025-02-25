@@ -9,6 +9,7 @@ import moment from "moment";
 import { downloadFile, getIconForFile, isHTML } from "../../../../utils/commonutils";
 import { useTranslation } from "react-i18next";
 import { AuthenticationContext } from "../../../../contexts/authentication.context";
+import { GoInbox } from "react-icons/go";
 const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState, activityLoading, setActivityLoading }) => {
 
   const [ticketActivity, setTicketActivity] = useState([])
@@ -44,7 +45,7 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState, activityLo
       return `<span class='text-primary'>${name}</span>`;
     });
   }
-  
+
 
   // GET TICKET DETAILS
   const getTicketActivityLogs = () => {
@@ -54,9 +55,9 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState, activityLo
       if (response?.data) {
         const logData = response?.data?.map((activity, index) => {
           const text = activity?.activityDetails?.text || ""; // Safely extract text
-         
+
           const attachments = activity?.attachmentUrl?.attachments?.length ? activity.attachmentUrl.attachments : [];
-          const imageUrl = (activity?.performedBy && profileImage && profileImage!=="") == userData?.id ?   profileImage : defaultAvatar 
+          const imageUrl = (activity?.performedBy && profileImage && profileImage !== "") == userData?.id ? profileImage : defaultAvatar
           // Replace mentions in the text
           const updatedText = replaceMentions(text);
           const containsHTML = isHTML(updatedText);
@@ -202,14 +203,14 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState, activityLo
     });
   }
 
-  return <Card className="border-0 card custom-min-height-200 flex-grow-1 mh-100 mt-3 overflow-auto shadow">
+  return <Card className="border-0 card custom-min-height-200 mt-3 shadow">
 
     {
-      activityLoading && activityLoading === true ? <div className="placeholder-glow h-100">
-        <div className="placeholder" style={{ width: '100%', height: '100%' }}></div>
+      activityLoading && activityLoading === true ? <div className="placeholder-glow custom-min-height-200">
+        <div className="placeholder custom-min-height-200 w-100 h-100"></div>
       </div> : <Card.Body className='py-0'>
         <ListGroup variant="flush">
-          {ticketActivity.map((reply) => (
+          {ticketActivity?.length > 0 ? ticketActivity.map((reply) => (
             <ListGroup.Item key={reply.id} className='py-3'>
               <Row className='g-2'>
                 <Col xs="auto">
@@ -264,7 +265,8 @@ const ActivityLogs = ({ ticketId, isGetActivityLogs, permissionState, activityLo
                 </Col>
               </Row>
             </ListGroup.Item>
-          ))}
+          )) : <div className="d-flex justify-content-center align-items-center flex-column custom-min-height-200"> <GoInbox size={50} className="text-secondary" />
+            <p className="mt-1"> {t("NO_DATA")}</p></div>}
         </ListGroup>
       </Card.Body>
     }
