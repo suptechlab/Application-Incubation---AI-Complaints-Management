@@ -10,6 +10,8 @@ import lombok.Data;
 import java.time.Instant;
 import java.util.Set;
 
+import static com.seps.admin.component.CommonHelper.capitalizeCustom;
+
 @Data
 public class FIUserDTO {
     private Long id;
@@ -45,4 +47,9 @@ public class FIUserDTO {
     @NotBlank
     private String ruc;
     private OrganizationDTO organization;
+
+    // Custom setter for `name`
+    public void setName(String name) {
+        this.name = capitalizeCustom(name);
+    }
 }
