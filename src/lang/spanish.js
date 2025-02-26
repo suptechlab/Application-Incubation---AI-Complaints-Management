@@ -82,7 +82,7 @@ export const spanishLang = {
   "OTHER_INFO": "Otra información",
   "CLAIM_FORM_DESCRIPTION": "Llene la información que se pide a continuación a fin de completar el formulario de su reclamo. Recuerde que los campos marcados con (*) son obligatorios.",
   "RECENT_ACTIVITY": "Actividad reciente",
-  "TICKET_ID": "Ticket",
+  "TICKET_ID": "ID del Ticket",
   "CLAIM_SUB_TYPE": "Subtipo de Reclamo",
   "CREATED_ON": "Fecha de creación",
   "RESOLVED_ON": "Fecha de atención",
