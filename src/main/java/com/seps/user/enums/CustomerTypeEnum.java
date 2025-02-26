@@ -10,8 +10,8 @@ public enum CustomerTypeEnum implements EnumWithDescription {
     REPRESENTATIVE_ASSEMBLY("customer.type.representative.assembly"),
     STRATEGIC_STAFF("customer.type.strategic.staff"),
     FINANCIAL_USER_CLIENT("customer.type.financial.user.client"),
-    MEMBER_COMMUNITY_ORGANIZATION("customer.type.member.community.organization"),
-    SUBSIDIARY_INTEGRATION_ORGANIZATION("customer.type.subsidiary.integration.organization"),
+    //MEMBER_COMMUNITY_ORGANIZATION("customer.type.member.community.organization"),
+    //SUBSIDIARY_INTEGRATION_ORGANIZATION("customer.type.subsidiary.integration.organization"),
     INTERESTED_THIRD_PARTY("customer.type.interested.third.party");
 
     private final String key;
