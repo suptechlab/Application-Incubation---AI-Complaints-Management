@@ -777,6 +777,7 @@ const ChatBotForm = () => {
                                                         readOnly={isLoading}
                                                         isTextarea={true}
                                                         autoResize={true}
+                                                        submitFunction = {formikProps?.handleSubmit}
                                                     // rows={1}
                                                     />
                                                     <Button
