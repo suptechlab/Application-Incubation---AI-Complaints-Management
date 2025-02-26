@@ -194,7 +194,7 @@ export const spanishLang = {
     "ADD_NEW_CLAIM": "Agregar Nueva Reclamación",
     "INFO_CARDS": "Tarjetas Informativas",
     "DAYS_REMAINING": "Días restantes",
-    "TICKET_ID": "Ticket",
+    "TICKET_ID": "ID del Ticket",
     "CREATION_DATE": "Fecha de creación",
     "CLAIM_FILED_BY": "Reclamo presentado por",
     "PRIORITY": "Prioridad",
