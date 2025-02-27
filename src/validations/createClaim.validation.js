@@ -25,8 +25,8 @@ export const BasicInfoFormSchema = yup.object({
 
   countryCode: yup.string(),
 
-  phoneNumber: yup.string()
-    .max(10, msg.phoneNumberInvalid),
+  phoneNumber: yup.string().matches(/^\d{9}$/, msg.phoneNumberInvalid)
+    .max(9, msg.phoneNumberInvalid),
 
   provinceId: yup
     .string()

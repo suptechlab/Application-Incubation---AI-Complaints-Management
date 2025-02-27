@@ -77,29 +77,29 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
 
   // READ SINGLE NOTIFICATION
   const readSingleNotification = (notificationData) => {
-    const { id, notification } = notificationData
+    const { id, notification ,isRead } = notificationData
 
 
-    const updatedNotifications = notifications.map(notification =>
-      notification.id === id
-        ? { ...notification, isRead: true }
-        : notification
-    );
+   
 
+    if (isRead === false) {
+      const updatedNotifications = notifications.map(notification =>
+        notification.id === id
+          ? { ...notification, isRead: true }
+          : notification
+      );
+  
+  
+   
+      // Update the notifications state
+      setNotifications(updatedNotifications);
+  
+      // Update the notification count: subtract 1 if there's any unread notification
+      // const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+      // setNotificationCount(unreadCount);
+      setNotificationCount(prev =>  prev-1);
 
-    if (notification?.redirectUrl) {
-      navigate("/" + notification?.redirectUrl)
-    }
-
-    // Update the notifications state
-    setNotifications(updatedNotifications);
-
-    // Update the notification count: subtract 1 if there's any unread notification
-    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
-    setNotificationCount(unreadCount);
-
-
-    if (notification?.isRead === false) {
+      
       handleMarkNotificationById(id).then(response => {
         getAllNotifications()
       }).catch((error) => {
@@ -110,6 +110,12 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
         }
       })
     }
+
+
+    if (notification?.redirectUrl) {
+      navigate("/" + notification?.redirectUrl)
+    }
+
   }
 
   // READ ALL NOTIFICATIONS
@@ -135,7 +141,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
   }
 
   // READ SINGLE NOTIFICATION
-  const deleteSingleNotification = (notificationId) => {
+  const deleteSingleNotification = (notificationId,isRead) => {
     // Remove the notification with the specified id
     const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
 
@@ -143,8 +149,11 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
     setNotifications(updatedNotifications);
 
     // Update the notification count based on remaining unread notifications
-    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
-    setNotificationCount(unreadCount);
+    // const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    // setNotificationCount(unreadCount);
+    if(isRead === false){
+      setNotificationCount(prev =>  prev-1);
+    }
 
     handleDeleteNotification(notificationId).then(response => {
       getAllNotifications()
@@ -306,8 +315,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                   notifications.map((notification) => (
                     <li key={notification?.notification?.id} className='my-1'
                     >
-                      {
-                        !notification?.isRead ?
+                      {/* {
+                        !notification?.isRead ? */}
                           <button
                             className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
                             type="button"
@@ -322,7 +331,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                                 <Button variant="link" className="link-danger p-0 border-0"
                                   onClick={(e) => {
                                     e.stopPropagation(); // Prevent parent click event
-                                    deleteSingleNotification(notification.id);
+                                    deleteSingleNotification(notification.id,notification.isRead);
                                   }}>
                                   <MdClose
                                     size={20}
@@ -334,7 +343,7 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                             <p className={`fs-14 mb-0 lh-sm ${notification?.isRead && 'text-secondary'}`}>{notification?.notification?.message}</p>
                             <small className="text-muted">{moment(notification?.notification?.createdAt).fromNow()}</small>
                           </button>
-                          :
+                          {/* {/* :
                           <div
                             className="text-wrap px-3 py-1 w-100 border-0 bg-transparent text-start"
                           >
@@ -357,8 +366,8 @@ export default function Header({ isActiveSidebar, toggleSidebarButton }) {
                             </Stack>
                             <p className={`fs-14 mb-0 lh-sm ${notification?.isRead && 'text-secondary'}`}>{notification?.notification?.message}</p>
                             <small className="text-muted">{moment(notification?.notification?.createdAt).fromNow()}</small>
-                          </div>
-                      }
+                          </div> 
+                      } */}
 
                     </li>
                   ))

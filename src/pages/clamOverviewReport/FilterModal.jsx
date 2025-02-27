@@ -476,30 +476,34 @@ const FilterModal = ({ modal, toggle, filter, setFilter }) => {
                   />
                 </Col>
 
-                <Col sm={6} lg={4}>
-                  <ReactSelect
-                    label={t("SEPS_AGENT")}
-                    error={errors.sepsAgentId}
-                    options={[
-                      { label: t("SELECT"), value: "" },
-                      ...sepsAgentOptions.map((group) => ({
-                        label: group.label,
-                        value: group.value,
-                      })),
-                    ]}
-                    value={values.sepsAgentId}
-                    onChange={(option) => {
-                      setFieldValue(
-                        "sepsAgentId",
-                        option?.target?.value ?? ""
-                      );
-                    }}
-                    name="sepsAgentId"
-                    className={touched.sepsAgentId && errors.sepsAgentId ? "is-invalid" : ""}
-                    onBlur={handleBlur}
-                    touched={touched.sepsAgentId}
-                  />
-                </Col>
+                {
+                  currentUser !== "FI_USER" &&
+                  <Col sm={6} lg={4}>
+                    <ReactSelect
+                      label={t("SEPS_AGENT")}
+                      error={errors.sepsAgentId}
+                      options={[
+                        { label: t("SELECT"), value: "" },
+                        ...sepsAgentOptions.map((group) => ({
+                          label: group.label,
+                          value: group.value,
+                        })),
+                      ]}
+                      value={values.sepsAgentId}
+                      onChange={(option) => {
+                        setFieldValue(
+                          "sepsAgentId",
+                          option?.target?.value ?? ""
+                        );
+                      }}
+                      name="sepsAgentId"
+                      className={touched.sepsAgentId && errors.sepsAgentId ? "is-invalid" : ""}
+                      onBlur={handleBlur}
+                      touched={touched.sepsAgentId}
+                    />
+                  </Col>
+                }
+
                 <Col sm={6} lg={4}>
                   <ReactSelect
                     label={t("PROVINCE")}

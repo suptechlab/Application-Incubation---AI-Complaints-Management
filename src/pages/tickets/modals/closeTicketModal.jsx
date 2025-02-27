@@ -153,7 +153,6 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
                                 onBlur={handleBlur}
                                 touched={touched.closeSubStatus}
                             />
-
                             {
                                 (values?.closeSubStatus === 'CLOSED_IN_FAVOR_OF_CONSUMER' || values?.closeSubStatus === 'CLOSED_IN_PARTIAL_FAVOR_OF_CONSUMER') &&
                                 <FormInput
