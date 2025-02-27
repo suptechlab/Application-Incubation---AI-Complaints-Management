@@ -102,29 +102,23 @@ const Header = ({ layout }) => {
 
   // READ SINGLE NOTIFICATION
   const handleReadSingleNotification = (notificationData) => {
-    const { id, notification } = notificationData
+    const { id, notification, isRead } = notificationData
+
+    if (isRead === false) {
+      const updatedNotifications = notifications.map(notification =>
+        notification.id === id
+          ? { ...notification, isRead: true }
+          : notification
+      );
+
+      // Update the notifications state
+      setNotifications(updatedNotifications);
+
+      // Update the notification count: subtract 1 if there's any unread notification
+      // const unreadCount = updatedNotifications setNotificationCount(prev =>  prev-1);.filter(n => !n.isRead).length;
+      setNotificationCount(prev => prev - 1);
 
 
-
-    const updatedNotifications = notifications.map(notification =>
-      notification.id === id
-        ? { ...notification, isRead: true }
-        : notification
-    );
-
-    if (notification?.redirectUrl) {
-      navigate("/" + notification?.redirectUrl)
-    }
-
-    // Update the notifications state
-    setNotifications(updatedNotifications);
-
-    // Update the notification count: subtract 1 if there's any unread notification
-    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
-    setNotificationCount(unreadCount);
-
-
-    if (notification?.isRead === false) {
       dispatch(readSingleNotification(id))
         .then(result => {
           if (readSingleNotification.fulfilled.match(result)) {
@@ -136,6 +130,10 @@ const Header = ({ layout }) => {
         .catch(error => {
           console.error("Error during file claim submission:", error);
         });
+    }
+
+    if (notification?.redirectUrl) {
+      navigate("/" + notification?.redirectUrl)
     }
 
   }
@@ -167,7 +165,7 @@ const Header = ({ layout }) => {
   }
 
   // DELETE SINGLE NOTIFICATION
-  const handleDeleteSingleNotification = (notificationId) => {
+  const handleDeleteSingleNotification = (notificationId, isRead) => {
     // Remove the notification with the specified id
     const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
 
@@ -175,8 +173,15 @@ const Header = ({ layout }) => {
     setNotifications(updatedNotifications);
 
     // Update the notification count based on remaining unread notifications
-    const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
-    setNotificationCount(unreadCount);
+    // const unreadCount = updatedNotifications.filter(n => !n.isRead).length;
+    // setNotificationCount(unreadCount);
+
+
+
+    if (isRead === false) {
+      setNotificationCount(prev => prev - 1);
+    }
+
 
     dispatch(deleteSingleNotification(notificationId))
       .then(result => {
@@ -373,7 +378,7 @@ const Header = ({ layout }) => {
                               <Button variant="link" className="link-danger p-0 border-0"
                                 onClick={(e) => {
                                   e.stopPropagation(); // Prevent parent click event
-                                  handleDeleteSingleNotification(notification.id);
+                                  handleDeleteSingleNotification(notification.id, notification?.isRead);
                                 }}>
                                 <MdClose
                                   size={20}

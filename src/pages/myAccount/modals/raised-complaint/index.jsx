@@ -86,6 +86,7 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
             toast.success(t('COMPLAINT_RAISED_SUCCES'));
             setLoading(false);
             setFileSuccesModalShow(true)
+            setFileClaimResponse(result?.payload?.data)
             handleCloseModal();
             actions.setSubmitting(false);
         } else {

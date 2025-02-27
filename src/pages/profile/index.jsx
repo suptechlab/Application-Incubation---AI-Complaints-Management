@@ -207,21 +207,9 @@ const ProfileModal = ({ handleShow, handleClose }) => {
                                         onChange={formikProps.handleChange}
                                         touched={formikProps.touched.phoneNumber}
                                         value={formikProps.values.phoneNumber || ""}
+                                        maxLength={9}
                                     />
                                 </Col>
-                                {/* <Col xs={12}>
-                                    <FormInputBox
-                                        id="phoneNumber"
-                                        label={t("Phone Number")}
-                                        name="phoneNumber"
-                                        type="text"
-                                        error={formikProps.errors.phoneNumber}
-                                        onBlur={formikProps.handleBlur}
-                                        onChange={formikProps.handleChange}
-                                        touched={formikProps.touched.phoneNumber}
-                                        value={formikProps.values.phoneNumber || ""}
-                                    />
-                                </Col> */}
                             </Row>
                         </Modal.Body>
                         <Modal.Footer className="border-top">

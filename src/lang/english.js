@@ -118,7 +118,7 @@ export const englishLang = {
   "SUCCESS": "Success!",
   "CLAIM_HAS_BEEN_FILED": "Claim has been filed",
   "TICKET_NO": "Ticket No.",
-  "CLAIM_SUCCESS_EMAIL": "Your claim has been successfully filed. Details have been sent to your email",
+  "CLAIM_SUCCESS_EMAIL": "Your claim has been successfully filed. Details have been sent to your email. ",
   "MY_ACCOUNT_AREA": "My Account Area",
   "ATTACHMENTS": "Attachments",
   "ATTACHMENTS_SENT_BY_ENTITY": "Attachments send by Entity",

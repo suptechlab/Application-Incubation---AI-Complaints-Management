@@ -169,6 +169,7 @@ const PersonalInfoTab = ({ isSubmitted, setNewAccountData, isFormSubmitted, setI
                 onChange={formikProps.handleChange}
                 touched={formikProps.touched.phoneNumber}
                 value={formikProps.values.phoneNumber || ""}
+                maxLength ={9}
               />
             </Col>
             <Col xs={12}>

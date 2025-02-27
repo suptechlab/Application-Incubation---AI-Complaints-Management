@@ -27,7 +27,7 @@ const FileSuccesModal = ({ handleShow, handleClose, handleFormSubmit, fileClaimD
                         {t('TICKET_NO')} {fileClaimData?.foundDuplicate === true ? fileClaimData?.duplicateTicketId : fileClaimData?.newTicketId}
                     </div>
                     <p className='lh-sm small mb-4 pt-1'>
-                        {t('CLAIM_SUCCESS_EMAIL')}
+                        {t('CLAIM_SUCCESS_EMAIL')} 
                         <Link to={`mainto:email ${fileClaimData?.email}`} className='text-decoration-none'>
                             {fileClaimData?.email}
                         </Link>.
