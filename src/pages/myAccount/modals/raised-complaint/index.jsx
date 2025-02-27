@@ -180,8 +180,8 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
                                         />
                                     </Col>
                                     <Col xs={12} className="mb-3">
-                                        <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
-                                            <div className="overflow-hidden position-relative z-1 flex-shrink-0">
+                                        <div className="theme-upload-cover d-inline-flex align-items-center gap-3 flex-wrap">
+                                            <div className="overflow-hidden position-relative z-1 flex-shrink-0 mw-100 ">
                                                 <label
                                                     htmlFor="files"
                                                     className="btn btn-secondary"
@@ -201,7 +201,7 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
                                             <span className='custom-font-size-12 fw-medium'>{t("MULTIPLE_ATTACHMENTS_UPLOADED_COMPLAINT")}</span>
                                         </div>
                                         {files.length > 0 && (
-                                            <Stack direction='horizontal' gap={2} className="mt-2">
+                                            <Stack direction='horizontal' gap={2} className="mt-2 flex-wrap">
                                                 {files.map((file, index) => (
                                                     <Badge key={index} className="d-inline-flex align-items-center gap-2 text-info px-3" pill bg='secondary-subtle'>
                                                         <span>{file.name}</span>
