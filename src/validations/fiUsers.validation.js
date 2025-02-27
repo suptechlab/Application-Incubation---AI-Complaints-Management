@@ -9,7 +9,7 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().email(msg.emailInvalid).required(msg.emailRequired),
   phoneNumber: Yup.string()
     .nullable()
-    .matches(/^\d{10}$/, msg.phoneNumberInvalid)
+    .matches(/^\d{9}$/, msg.phoneNumberInvalid)
     .notRequired(),
   countryCode: Yup.string()
     .nullable()

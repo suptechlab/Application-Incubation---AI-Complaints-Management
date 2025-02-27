@@ -347,8 +347,9 @@ export default function FIUserAddEdit() {
                             onBlur={handleBlur}
                             onChange={handleChange}
                             touched={touched?.phoneNumber}
-                            type="text"
+                            type="integer"
                             value={values?.phoneNumber || ""}
+                            maxLength={9}
                           />
                         </Col>
                       </Row>

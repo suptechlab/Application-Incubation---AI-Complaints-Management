@@ -260,12 +260,13 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                                         autoComplete="off"
                                                         id="phoneNumber"
                                                         name="phoneNumber"
-                                                        type="number"
+                                                        type="integer"
                                                         error={formikProps.errors.phoneNumber}
                                                         onBlur={formikProps.handleBlur}
                                                         onChange={formikProps.handleChange}
                                                         touched={formikProps.touched.phoneNumber}
                                                         value={formikProps.values.phoneNumber || ""}
+                                                        maxLength= {9}
                                                     />
                                                 </Col>
                                             </Row>
