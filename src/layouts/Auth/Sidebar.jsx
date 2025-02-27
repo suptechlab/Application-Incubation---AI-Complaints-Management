@@ -6,7 +6,7 @@ import {
   MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-
+import { BiSolidDashboard } from "react-icons/bi";
 import { NavItems } from "./NavItems";
 import "./sidebar.scss";
 import { AuthenticationContext } from "../../contexts/authentication.context";
@@ -203,6 +203,28 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                   </Nav.Item>
                 );
               })}
+
+
+              <Nav.Item as="li">
+                <Nav.Link
+                  key={'powerBi'}
+                  id={'powerBi'}
+                  as="a"
+                  href={'https://user-suptechdev.seps.gob.ec/'} // Use href for external links
+                  target="_blank" // Open in a new tab
+                  rel="noopener noreferrer" // Security best practice
+                  className={`align-items-center d-flex px-0 sidebarLink rounded `}
+                 
+                >
+                  <span className="py-1 text-center min-w-44 sidebarIcon">
+                    <BiSolidDashboard/>
+                  </span>
+                  <span className="hideInSmallSidebar text-wrap lh-sm">
+                    POWER BI DASHBOARD
+                  </span>
+                </Nav.Link>
+              </Nav.Item>
+
             </Nav>
           </div>
         </div>
