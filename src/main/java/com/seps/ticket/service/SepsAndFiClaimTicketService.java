@@ -1416,7 +1416,7 @@ public class SepsAndFiClaimTicketService {
     private void sendReplyEmail(ClaimTicket ticket, ClaimTicketReplyRequest claimTicketRejectRequest, String activityType, User currentUser, List<User> taggedUserList) {
         Map<String, String> ticketDetail = new HashMap<>();
         ticketDetail.put("formatedTicketNumber", ticket.getFormattedTicketId());
-        ticketDetail.put("ticketNumber", ticket.getFormattedTicketId());
+        ticketDetail.put("ticketNumber", ticket.getTicketId().toString());
         ticketDetail.put("senderName", currentUser.getFirstName());
         ticketDetail.put("messageContent", updateMessage(claimTicketRejectRequest.getMessage()));
         ticketDetail.put("id", ticket.getId().toString());
