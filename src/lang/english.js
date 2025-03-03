@@ -70,7 +70,7 @@ export const englishLang = {
   "PRIORITY_CARE_GROUP": "Priority care group*",
   "CUSTOMER_TYPE": "Customer Type",
   "ENTITY_NAME": "Entity Name",
-  "ENTITYS_TAX_ID": "Entity's Tax ID (RUC)",
+  "ENTITYS_TAX_ID": "RUC",
   "CLAIM_DETAILS": "Claim Details",
   "CLAIM_TYPE": "Claim Type",
   "CLAIM_SUBTYPE": "Claim Subtype",
@@ -169,5 +169,6 @@ export const englishLang = {
   "CLAIM_SURVEY_QUE_2": 'The formats provided by this Superintendency for the provision of its service',
   "CLAIM_SURVEY_QUE_3": 'Clarity in the response to your request',
   "CLAIM_SURVEY_QUE_4": 'The attention time to your request',
-  "SATISFACTION_SURVEY": 'Satisfaction Survey'
+  "SATISFACTION_SURVEY": 'Satisfaction Survey',
+  "DOWNLOAD_SUCCESSFUL":"Download successful"
 }

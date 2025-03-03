@@ -167,5 +167,6 @@ export const spanishLang = {
   "CLAIM_SURVEY_QUE_2": 'Los formatos proporcionados por esta Superintendencia para la prestación de su servicio',
   "CLAIM_SURVEY_QUE_3": 'La claridad en la respuesta a su requerimiento',
   "CLAIM_SURVEY_QUE_4": 'El tiempo de atención a su requerimiento',
-  "SATISFACTION_SURVEY": "Encuesta de Satisfacción"
+  "SATISFACTION_SURVEY": "Encuesta de Satisfacción",
+  "DOWNLOAD_SUCCESSFUL":"Descargar exitosa"
 }
