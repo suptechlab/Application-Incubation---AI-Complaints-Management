@@ -1,5 +1,6 @@
 package com.seps.ticket.service.dto;
 
+import com.seps.ticket.domain.Survey;
 import com.seps.ticket.enums.*;
 import lombok.Data;
 import lombok.ToString;
@@ -78,4 +79,5 @@ public class ClaimTicketDTO {
     private Long remainingDaysOfSla;
     private Boolean isSlaExtended;
     private Instant dateWhenSlaExtended;
+    private Survey survey;
 }
