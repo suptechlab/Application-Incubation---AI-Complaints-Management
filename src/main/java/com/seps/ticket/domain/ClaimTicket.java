@@ -247,6 +247,10 @@ public class ClaimTicket {
     @Column(name = "date_when_sla_extended")
     private Instant dateWhenSlaExtended;
 
+    @ManyToOne
+    @JoinColumn(name = "id", referencedColumnName = "ticket_id", insertable = false, updatable = false)
+    private Survey survey;
+
     @Transient  // Not a database field
     public String getFormattedTicketId() {
         String year = String.valueOf(getCreatedYear());
