@@ -20,6 +20,8 @@ import InstanceModal from './modals/instance';
 import RaisedComplaintModal from './modals/raised-complaint';
 import { FiDownload } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import infographicImage from '../../assets/images/seps-infographic.jpg'
+
 export default function MyAccount() {
 
   const { t } = useTranslation()
@@ -371,6 +373,9 @@ export default function MyAccount() {
     <React.Fragment>
       <Loader isLoading={loading} />
       <div className="d-flex flex-column flex-grow-1 p-3 pageContainer">
+        <div className='text-center pb-3'>
+          <img src={infographicImage} alt="infographic-image" className='img-fluid'/>
+        </div>
         <div className="pb-2">
           <PageHeader
             title={t("MY_ACCOUNT")}
