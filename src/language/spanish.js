@@ -391,4 +391,5 @@ export const spanishLang = {
     "CLAIM_SURVEY_QUE_3": 'La claridad en la respuesta a su requerimiento.',
     "CLAIM_SURVEY_QUE_4": 'El tiempo de atención a su requerimiento.',
     "SATISFACTION_SURVEY": "Encuesta de Satisfacción",
+    "POWER_BI_DASHBOARD": "Panel de Power BI"
 } 
