@@ -14,6 +14,8 @@ import CloseTicketModal from '../../modals/closeTicketModal';
 import DateExtensionModal from '../../modals/dateExtensionModal';
 import RejectTicketModal from '../../modals/rejectTicketModal';
 import { IoMdDownload } from "react-icons/io";
+import TicketRatingModal from '../../modals/ticketRatingModal';
+import { FaStar } from "react-icons/fa";
 
 const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTicketData, permissionState = {}, setLoading }) => {
 
@@ -32,6 +34,8 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
     const [closeTicketModalShow, setCloseTicketModalShow] = useState(false)
     const [rejectTicketModalShow, setRejectTicketModalShow] = useState(false)
     const [isDownloading, setDownloading] = useState(false)
+
+    const [showRatingModal , setShowRatingModal] = useState(false)
 
     // const [loading, setLoading] = useState(false)
     // Function to handle dropdown item selection
@@ -274,6 +278,16 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
                         >
                             {t("BACK")}
                         </button>
+
+                        {
+                            ticketData?.survey?.completed === true &&   <button
+                            onClick={()=>setShowRatingModal(true)}
+                            className="btn btn-outline-dark custom-min-width-85"
+                        >
+                           <FaStar size={16} className='mb-1 text-orange'/> {t("SATISFACTION_SURVEY")}
+                        </button>
+                        }
+                      
                         <Button
                             type="button"
                             variant='outline-primary'
@@ -401,6 +415,11 @@ const TicketViewHeader = ({ title, ticketData = {}, setIsGetActivityLogs, getTic
                 toggle={() => setRejectTicketModalShow(false)}
                 setIsGetActivityLogs={setIsGetActivityLogs}
                 getTicketData={getTicketData}
+            />
+             <TicketRatingModal
+                ticketData={ticketData}
+                modal={showRatingModal}
+                toggle={() => setShowRatingModal(false)}
             />
         </React.Fragment>
     );

@@ -6,15 +6,16 @@ import {
   MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-
+import { BiSolidDashboard } from "react-icons/bi";
 import { NavItems } from "./NavItems";
 import "./sidebar.scss";
 import { AuthenticationContext } from "../../contexts/authentication.context";
 import { filterNavItemsByModules } from "../../utils/permissionUtils";
+import { t } from "i18next";
 
 const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
 
-  const { authorities = [], modules = [], isLoading } = useContext(AuthenticationContext);
+  const { authorities = [], modules = [], isLoading, currentUser } = useContext(AuthenticationContext);
   const navItemsArr = NavItems();
   const [navItems, setNavItems] = useState([]);
 
@@ -203,6 +204,31 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                   </Nav.Item>
                 );
               })}
+
+
+              {
+                currentUser === 'SEPS_USER' && <Nav.Item as="li">
+                  <Nav.Link
+                    key={'powerBi'}
+                    id={'powerBi'}
+                    as="a"
+                    href={'https://app.powerbi.com/groups/119609e4-6743-42dd-a56a-5841d23641b9/reports/24beb84d-1e23-46af-bebb-c2e545d035d4?pbi_source=desktop'} // Use href for external links
+                    target="_blank" // Open in a new tab
+                    rel="noopener noreferrer" // Security best practice
+                    className={`align-items-center d-flex px-0 sidebarLink rounded `}
+
+                  >
+                    <span className="py-1 text-center min-w-44 sidebarIcon">
+                      <BiSolidDashboard />
+                    </span>
+                    <span className="hideInSmallSidebar text-wrap lh-sm">
+                      {t('POWER_BI_DASHBOARD')}
+                    </span>
+                  </Nav.Link>
+                </Nav.Item>
+
+              }
+
             </Nav>
           </div>
         </div>
