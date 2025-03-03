@@ -296,7 +296,6 @@ public class MailService {
         context.setVariable("subject", subject);
         context.setVariable("content", content);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
-        
 
         context.setVariable("headerLeftNewImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-left-new.png");
         context.setVariable("headerMidImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-mid.png");
