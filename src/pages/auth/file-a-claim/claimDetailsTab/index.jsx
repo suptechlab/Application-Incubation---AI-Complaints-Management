@@ -234,7 +234,8 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                     touched={formikProps.touched.agreeDeclarations}
                                     error={formikProps.errors.agreeDeclarations}
                                     type="checkbox"
-                                    label={t("AGREE_DECLARATIONS")}
+                                    label={<>{t("AGREE_DECLARATIONS")}<Link to="/terms-conditions" target='_blank' className='text-decoration-none'> {t("TERMS_CONDITIONS")}  </Link> </>}
+                                    // label={t("AGREE_DECLARATIONS")}
                                 />
                             </Col>
                         </Row>

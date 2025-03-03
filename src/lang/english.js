@@ -77,7 +77,7 @@ export const englishLang = {
   "PRECEDENTS": "Precedents",
   "SPECIFIC_PETITION": "Specific Petition",
   "UPLOAD_OPTIONAL_ATTACHMENTS": "Upload Optional Attachments",
-  "AGREE_DECLARATIONS": "I agreed on all the declarations and conditions.",
+  "AGREE_DECLARATIONS": "I agreed on all the declarations and conditions. For more details, please refer to the ",
   "BASIC_INFO": "Basic Info",
   "OTHER_INFO": "Other Info",
   "CLAIM_FORM_DESCRIPTION": "Fill the claim form below and save the claim reference number for future discussions.",
@@ -165,10 +165,11 @@ export const englishLang = {
   "PRIVACY_TEXT_P1":"Autorizo de manera libre, específica, informada e inequívoca a la Superintendencia de Economía Popular y Solidaria, para que realice el tratamiento de mis datos personales, conforme a lo establecido en la Ley Orgánica de Protección de Datos Personales de Ecuador.",
   "PRIVACY_TEXT_P2":"Entiendo que mis datos serán utilizados en la gestión del presente reclamo, y que tengo derecho a acceder, rectificar y cancelar mis datos en cualquier momento; por lo tanto, esta autorización es válida hasta que decida revocarla, lo cual puedo hacer mediante una solicitud escrita dirigida a la Superintendencia de Economía Popular y Solidaria.",
   "MULTIPLE_ATTACHMENTS_UPLOADED_COMPLAINT":"You can upload multiple files if you wish to add supporting documentation for the complaint.",
-  "CLAIM_SURVEY_QUE_1": 'The ease of finding service information on the SEPS website',
-  "CLAIM_SURVEY_QUE_2": 'The formats provided by this Superintendency for the provision of its service',
-  "CLAIM_SURVEY_QUE_3": 'Clarity in the response to your request',
-  "CLAIM_SURVEY_QUE_4": 'The attention time to your request',
+  "CLAIM_SURVEY_QUE_1": 'The ease of finding service information on the SEPS website.',
+  "CLAIM_SURVEY_QUE_2": 'The formats provided by this Superintendency for the provision of its service.',
+  "CLAIM_SURVEY_QUE_3": 'Clarity in the response to your request.',
+  "CLAIM_SURVEY_QUE_4": 'The attention time to your request.',
   "SATISFACTION_SURVEY": 'Satisfaction Survey',
-  "DOWNLOAD_SUCCESSFUL":"Download successful"
+  "DOWNLOAD_SUCCESSFUL":"Download successful",
+  "TERMS_CONDITIONS" :"Terms and conditions"
 }

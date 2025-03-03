@@ -14,6 +14,7 @@ import { fileRaiseComplaintForm } from '../../../../redux/slice/fileClaimSlice';
 import { useDispatch } from 'react-redux';
 import Loader from '../../../../components/Loader';
 import FileSuccesModal from '../../../auth/file-a-claim/file-success';
+import { Link } from 'react-router-dom';
 
 const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
 
@@ -230,7 +231,7 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
                                             touched={formikProps.touched.agreeDeclarations}
                                             error={formikProps.errors.agreeDeclarations}
                                             type="checkbox"
-                                            label={t("AGREE_DECLARATIONS")}
+                                            label={<>{t("AGREE_DECLARATIONS")}<Link to="/terms-conditions" target='_blank' className='text-decoration-none'> {t("TERMS_CONDITIONS")}  </Link> </>}
                                         />
                                     </Col>
                                 </Row>

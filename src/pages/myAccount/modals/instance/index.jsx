@@ -13,6 +13,7 @@ import Loader from '../../../../components/Loader';
 import { MdClose } from 'react-icons/md';
 import AppTooltip from '../../../../components/tooltip';
 import FileSuccesModal from '../../../auth/file-a-claim/file-success';
+import { Link } from 'react-router-dom';
 
 const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
 
@@ -210,7 +211,7 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
                                             touched={formikProps.touched.agreeDeclarations}
                                             error={formikProps.errors.agreeDeclarations}
                                             type="checkbox"
-                                            label={t("AGREE_DECLARATIONS")}
+                                            label={<>{t("AGREE_DECLARATIONS")}<Link to="/terms-conditions" target='_blank' className='text-decoration-none'> {t("TERMS_CONDITIONS")}  </Link> </>}
                                         />
                                     </Col>
                                 </Row>
