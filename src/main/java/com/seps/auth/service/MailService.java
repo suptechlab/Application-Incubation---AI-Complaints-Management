@@ -9,9 +9,13 @@ import com.seps.auth.suptech.service.ExternalAPIService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -21,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -64,6 +69,31 @@ public class MailService {
 
     @Value("${website.user-base-url:test}")
     private String userBaseUrl;
+
+
+//    private static final String HEADER_LEFT_IMAGE;
+//    private static final String HEADER_MID_IMAGE;
+//    private static final String HEADER_RIGHT_IMAGE;
+//    private static final String FOOTER_BG_IMAGE;
+//    private static final String INSTAGRAM_IMAGE;
+//    private static final String TWITTER_IMAGE;
+//    private static final String FACEBOOK_IMAGE;
+//    private static final String LINKEDIN_IMAGE;
+//    private static final String YOUTUBE_IMAGE;
+//    private static final String FLICKR_IMAGE;
+
+//    static {
+//        HEADER_LEFT_IMAGE = encodeImageToBase64("static/images/header-left-new.png");
+//        HEADER_MID_IMAGE = encodeImageToBase64("static/images/header-mid.png");
+//        HEADER_RIGHT_IMAGE = encodeImageToBase64("static/images/header-right.png");
+//        FOOTER_BG_IMAGE = encodeImageToBase64("static/images/footer-bg.png");
+//        INSTAGRAM_IMAGE = encodeImageToBase64("static/images/instagram.png");
+//        TWITTER_IMAGE = encodeImageToBase64("static/images/twitter.png");
+//        FACEBOOK_IMAGE = encodeImageToBase64("static/images/facebook.png");
+//        LINKEDIN_IMAGE = encodeImageToBase64("static/images/linkedin.png");
+//        YOUTUBE_IMAGE = encodeImageToBase64("static/images/youtube.png");
+//        FLICKR_IMAGE = encodeImageToBase64("static/images/flicker.png");
+//    }
 
     public MailService(
         JHipsterProperties jHipsterProperties,
@@ -266,7 +296,34 @@ public class MailService {
         context.setVariable("subject", subject);
         context.setVariable("content", content);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+
+        context.setVariable("headerLeftNewImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-left-new.png");
+        context.setVariable("headerMidImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-mid.png");
+        context.setVariable("headerRightImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-right.png");
+        context.setVariable("footerBgImage", jHipsterProperties.getMail().getBaseUrl() + "/images/footer-bg.png");
+        context.setVariable("instagramImage", jHipsterProperties.getMail().getBaseUrl() + "/images/instagram.png");
+        context.setVariable("twitterImage", jHipsterProperties.getMail().getBaseUrl() + "/images/twitter.png");
+        context.setVariable("facebookImage", jHipsterProperties.getMail().getBaseUrl() + "/images/facebook.png");
+        context.setVariable("linkedinImage", jHipsterProperties.getMail().getBaseUrl() + "/images/linkedin.png");
+        context.setVariable("youtubeImage", jHipsterProperties.getMail().getBaseUrl() + "/images/youtube.png");
+        context.setVariable("flickerImage", jHipsterProperties.getMail().getBaseUrl() + "/images/flicker.png");
         // Render the template
-        return templateEngine.process("mail/commonEmailTemplate", context);
+        return templateEngine.process("mail/commonEmailTemplateNew", context);
     }
+
+    private static String encodeImageToBase64(String imagePath) {
+        ClassPathResource resource = new ClassPathResource(imagePath);
+        try (InputStream inputStream = resource.getInputStream();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
 }
