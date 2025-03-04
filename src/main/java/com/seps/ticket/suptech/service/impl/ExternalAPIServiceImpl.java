@@ -1,5 +1,6 @@
 package com.seps.ticket.suptech.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seps.ticket.service.dto.MailDTO;
@@ -9,14 +10,14 @@ import com.seps.ticket.suptech.service.dto.PersonInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -115,8 +116,8 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
         }
     }
 
-    @Override
-    public PersonInfoDTO getPersonInfo(String identificacion) {
+    //@Override
+    public PersonInfoDTO getPersonInfoOld(String identificacion) {
         String url = "http://sca.seps.local/seps-consulta/consultaDinardap/obtenerInformacionPersona?identificacion=" + identificacion;
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
@@ -145,6 +146,80 @@ public class ExternalAPIServiceImpl implements ExternalAPIService {
             }
         } catch (Exception e) {
             throw new RuntimeException("An error occurred while calling the external API", e);
+        }
+    }
+
+    @Override
+    public PersonInfoDTO getPersonInfo(String identificacion) {
+        String url = "https://serviciosrest.seps.gob.ec/consultas-dinardap/publico/consultar-identificacion";
+
+        try {
+            LOG.debug("Requesting URL: {}", url);
+
+            // Set headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Create request entity with body
+            HttpEntity<String> entity = new HttpEntity<>(identificacion, headers);
+
+            // Send POST request
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+            LOG.debug("Response Status: {}, Headers: {}", response.getStatusCode(), response.getHeaders());
+            LOG.debug("Full Response: {}", response.getBody());
+
+            // Validate response content type
+            if (!response.getHeaders().getContentType().toString().contains("application/json")) {
+                LOG.error("Unexpected response format: {}", response.getBody());
+                throw new RuntimeException("Expected JSON response but received an unsupported format.");
+            }
+
+            // Parse JSON response
+            JsonNode jsonResponse;
+            try {
+                jsonResponse = objectMapper.readTree(response.getBody());
+            } catch (JsonProcessingException e) {
+                LOG.error("Error parsing JSON response: {}", response.getBody(), e);
+                throw new RuntimeException("Invalid JSON response from external API", e);
+            }
+
+            // Since there is no "status" field, directly check if required fields exist
+            if (jsonResponse.has("identificacion") && jsonResponse.get("identificacion") != null) {
+                // Map JSON to PersonInfoDTO
+                PersonInfoDTO personInfo = new PersonInfoDTO();
+                personInfo.setIdentificacion(jsonResponse.get("identificacion").asText());
+                personInfo.setNombreCompleto(jsonResponse.get("nombreCompleto").asText());
+                personInfo.setGenero(jsonResponse.get("sexo").asText());  // "sexo" instead of "genero"
+                personInfo.setLugarNacimiento(jsonResponse.get("lugarNacimiento").asText());
+                personInfo.setNacionalidad(jsonResponse.get("nacionalidad").asText());
+                // Convert fechaNacimiento to LocalDate
+                if (jsonResponse.has("fechaNacimiento") && !jsonResponse.get("fechaNacimiento").asText().isEmpty()) {
+                    String fechaNacimientoStr = jsonResponse.get("fechaNacimiento").asText();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    try {
+                        LocalDate fechaNacimiento = LocalDate.parse(fechaNacimientoStr, formatter);
+                        personInfo.setFechaNacimiento(fechaNacimiento);
+                    } catch (DateTimeParseException e) {
+                        LOG.error("Error parsing fechaNacimiento: {}", fechaNacimientoStr, e);
+                        //throw new RuntimeException("Invalid date format for fechaNacimiento: " + fechaNacimientoStr, e);
+                    }
+                }
+                return personInfo;
+            } else {
+                throw new PersonNotFoundException("Person with ID " + identificacion + " not found.");
+            }
+        } catch (HttpClientErrorException e) {
+            // Handle 4xx client errors
+            if (e.getStatusCode().is4xxClientError()) {
+                throw new PersonNotFoundException("Person with ID " + identificacion + " not found.");
+            } else {
+                LOG.error("API request failed with status: {}", e.getStatusCode());
+                throw new RuntimeException("API request failed with status: " + e.getStatusCode(), e);
+            }
+        } catch (Exception e) {
+            LOG.error("Unexpected error while calling external API", e);
+            throw new RuntimeException("An error occurred while calling the personal information API", e);
         }
     }
 }
