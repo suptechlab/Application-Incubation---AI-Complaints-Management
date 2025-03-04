@@ -61,9 +61,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
             .then((response) => {
                 setSelectedStatus('CLOSED');
                 setIsGetActivityLogs((prev) => !prev)
-                if (values.attachments) {
+              
                     getTicketData()
-                }
+               
                 toast.success(response?.data?.message);
                 toggle()
             })
