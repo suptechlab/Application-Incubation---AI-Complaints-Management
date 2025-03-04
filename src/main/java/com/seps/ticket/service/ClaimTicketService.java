@@ -220,6 +220,7 @@ public class ClaimTicketService {
             // new user gets initially a generated password
             newUser.setPassword(encryptedPassword);
             newUser.setFirstName(persona.getNombreCompleto());
+            newUser.setDateOfBirth(persona.getFechaNacimiento());
             newUser.setEmail(normalizeEmail);
             newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
             newUser.setActivated(true);
@@ -494,6 +495,7 @@ public class ClaimTicketService {
                 persona.setGenero(personInfoDTO.getGenero());
                 persona.setLugarNacimiento(personInfoDTO.getLugarNacimiento());
                 persona.setNacionalidad(personInfoDTO.getNacionalidad());
+                persona.setFechaNacimiento(personInfoDTO.getFechaNacimiento());
                 personaRepository.save(persona);
             }
             // Step 6: Add the user's email to the DTO if the user exists

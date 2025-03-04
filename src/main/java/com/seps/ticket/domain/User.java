@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -157,6 +158,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @BatchSize(size = 20)
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
 
     public Long getId() {
         return id;
@@ -427,6 +430,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     public boolean hasRoleSlug(String roleSlug) {
         return roles.stream()
             .anyMatch(role -> roleSlug.equalsIgnoreCase(role.getRoleSlug()));
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     // prettier-ignore

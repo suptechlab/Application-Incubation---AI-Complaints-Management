@@ -47,10 +47,9 @@ public class SurveyService {
     }
 
     public String generateSurveyLink(Long userId, Long ticketId) {
-        return surveyRepository.findByUserId(userId)
-                .filter(Survey::getCompleted)  // If completed, return existing token
-                .map(survey -> userBaseUrl + "/satisfaction-survey?token=" + survey.getToken())
-                .orElseGet(() -> createNewSurvey(userId, ticketId));
+        return surveyRepository.findByUserIdAndTicketId(userId, ticketId)
+            .map(survey -> userBaseUrl + "/satisfaction-survey?token=" + survey.getToken())
+            .orElseGet(() -> createNewSurvey(userId, ticketId));
     }
 
     private String createNewSurvey(Long userId, Long ticketId) {
