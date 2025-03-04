@@ -56,4 +56,12 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="1741083408200" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="date_of_birth" type="date" remarks="Date of birth of the person">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>
