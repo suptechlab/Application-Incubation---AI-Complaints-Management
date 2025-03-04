@@ -25,6 +25,7 @@ import TicketWorkFlowAddEdit from "../pages/tickets-workflow/addedit";
 import AddTemplate from "../pages/master management/TemplateMaster/Add/index";
 import EditTemplate from "../pages/master management/TemplateMaster/Edit/index";
 import ImportSEPSUser from "../pages/users/importData";
+import PowerBiDashboard from "../pages/powerBiDashboard";
 
 
 const AccountProfile = React.lazy(() => import("../pages/Profile"));
@@ -64,6 +65,13 @@ const routes = [
     permissions: ["DASHBOARD_VIEW_FI", "DASHBOARD_VIEW_SEPS"]
   },
 
+  {
+    path: "/dashboard/power-bi",
+    element: <PowerBiDashboard />,
+    isPrivate: true,
+    layoutType: "Auth",
+    module: "power-bi-dashboard",
+  },
   {
     path: "/claim-type",
     element: <ClaimType />,
