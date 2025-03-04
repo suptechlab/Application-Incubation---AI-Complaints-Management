@@ -49,7 +49,7 @@ public class SurveyService {
     public String generateSurveyLink(Long userId, Long ticketId) {
         return surveyRepository.findByUserId(userId)
                 .filter(Survey::getCompleted)  // If completed, return existing token
-                .map(survey -> userBaseUrl + "satisfaction-survey?token=" + survey.getToken())
+                .map(survey -> userBaseUrl + "/satisfaction-survey?token=" + survey.getToken())
                 .orElseGet(() -> createNewSurvey(userId, ticketId));
     }
 
@@ -62,6 +62,6 @@ public class SurveyService {
         newSurvey.setCompleted(false);
         surveyRepository.save(newSurvey);
 
-        return userBaseUrl + "satisfaction-survey?token=" + token;
+        return userBaseUrl + "/satisfaction-survey?token=" + token;
     }
 }
