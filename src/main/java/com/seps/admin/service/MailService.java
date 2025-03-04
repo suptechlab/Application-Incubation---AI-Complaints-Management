@@ -235,7 +235,18 @@ public class MailService {
         context.setVariable("subject", subject);
         context.setVariable("content", content);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+
+        context.setVariable("headerLeftNewImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-left-new.png");
+        context.setVariable("headerMidImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-mid.png");
+        context.setVariable("headerRightImage", jHipsterProperties.getMail().getBaseUrl() + "/images/header-right.png");
+        context.setVariable("footerBgImage", jHipsterProperties.getMail().getBaseUrl() + "/images/footer-bg.png");
+        context.setVariable("instagramImage", jHipsterProperties.getMail().getBaseUrl() + "/images/instagram.png");
+        context.setVariable("twitterImage", jHipsterProperties.getMail().getBaseUrl() + "/images/twitter.png");
+        context.setVariable("facebookImage", jHipsterProperties.getMail().getBaseUrl() + "/images/facebook.png");
+        context.setVariable("linkedinImage", jHipsterProperties.getMail().getBaseUrl() + "/images/linkedin.png");
+        context.setVariable("youtubeImage", jHipsterProperties.getMail().getBaseUrl() + "/images/youtube.png");
+        context.setVariable("flickerImage", jHipsterProperties.getMail().getBaseUrl() + "/images/flicker.png");
         // Render the template
-        return templateEngine.process("mail/commonEmailTemplate", context);
+        return templateEngine.process("mail/commonEmailTemplateNew", context);
     }
 }
