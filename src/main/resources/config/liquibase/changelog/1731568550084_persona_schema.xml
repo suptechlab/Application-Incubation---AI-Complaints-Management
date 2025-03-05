@@ -33,4 +33,11 @@
       </column>
     </createTable>
   </changeSet>
+  <changeSet id="1741083521512" author="matellio">
+    <addColumn tableName="persona">
+      <column name="fecha_nacimiento" type="date" remarks="Date of birth of the person">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

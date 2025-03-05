@@ -487,6 +487,7 @@ public class UserService {
                 persona.setGenero(personInfoDTO.getGenero());
                 persona.setLugarNacimiento(personInfoDTO.getLugarNacimiento());
                 persona.setNacionalidad(personInfoDTO.getNacionalidad());
+                persona.setFechaNacimiento(personInfoDTO.getFechaNacimiento());
                 personaRepository.save(persona);
             }
             return personInfoDTO;
@@ -549,6 +550,7 @@ public class UserService {
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
         newUser.setFirstName(persona.getNombreCompleto());
+        newUser.setDateOfBirth(persona.getFechaNacimiento());
         newUser.setEmail(normalizeEmail);
         newUser.setLangKey(Constants.DEFAULT_LANGUAGE);
         newUser.setActivated(true);

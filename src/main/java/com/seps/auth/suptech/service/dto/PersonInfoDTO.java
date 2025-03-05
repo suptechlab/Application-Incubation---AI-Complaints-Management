@@ -1,12 +1,15 @@
 package com.seps.auth.suptech.service.dto;
 
 
+import java.time.LocalDate;
+
 public class PersonInfoDTO {
     private String identificacion;
     private String nombreCompleto;
     private String genero;
     private String lugarNacimiento;
     private String nacionalidad;
+    private LocalDate fechaNacimiento;
 
     public String getIdentificacion() {
         return identificacion;
@@ -46,5 +49,13 @@ public class PersonInfoDTO {
 
     public void setNacionalidad(String nacionalidad) {
         this.nacionalidad = nacionalidad;
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 }

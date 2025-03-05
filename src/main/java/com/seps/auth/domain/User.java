@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -160,6 +161,8 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "external_document_id", length = 255)
     private String externalDocumentId;
 
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
 
     public Long getId() {
         return id;
@@ -416,6 +419,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setExternalDocumentId(String externalDocumentId) {
         this.externalDocumentId = externalDocumentId;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     @Override
