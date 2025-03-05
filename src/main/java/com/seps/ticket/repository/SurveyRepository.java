@@ -12,4 +12,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
     Optional<Survey> findByUserId(Long userId);
 
     Optional<Survey> findByToken(String token);
+
+    Optional<Survey> findByUserIdAndTicketId(Long userId, Long ticketId);
 }

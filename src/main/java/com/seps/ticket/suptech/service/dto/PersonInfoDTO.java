@@ -1,6 +1,8 @@
 package com.seps.ticket.suptech.service.dto;
 
 
+import java.time.LocalDate;
+
 public class PersonInfoDTO {
     private String identificacion;
     private String nombreCompleto;
@@ -8,6 +10,7 @@ public class PersonInfoDTO {
     private String lugarNacimiento;
     private String nacionalidad;
     private String existUserEmail;
+    private LocalDate fechaNacimiento;
 
     public String getIdentificacion() {
         return identificacion;
@@ -52,4 +55,12 @@ public class PersonInfoDTO {
     public String getExistUserEmail() {return existUserEmail;}
 
     public void setExistUserEmail(String existUserEmail) {this.existUserEmail = existUserEmail;}
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
 }
