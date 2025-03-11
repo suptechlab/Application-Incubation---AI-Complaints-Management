@@ -9,11 +9,6 @@ const PowerBiDashboard = () => {
 
   const { currentUser ,userData} = useContext(AuthenticationContext);
 
-  console.log(userData?.organization)
-
-  // userData?.organization
-
-  //
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
@@ -29,17 +24,19 @@ const PowerBiDashboard = () => {
       </Stack>
     </div>
 
+    {/* https://app.powerbi.com/reportEmbed?reportId=b83fa707-b117-4372-b076-67efca7fbd58&autoAuth=true&ctid=4f84ae42-57aa-48c2-b366-4dc5dfce353c */}
+
     {
       currentUser !== 'FI_USER' ? 
       <iframe
       title="PowerBiDashboard"
       id="reportFrame"
-      src="https://app.powerbi.com/reportEmbed?reportId=b83fa707-b117-4372-b076-67efca7fbd58&autoAuth=true&ctid=4f84ae42-57aa-48c2-b366-4dc5dfce353c" height="600pt" width="100%"
+      src="https://app.powerbi.com/reportEmbed?reportId=ee6f4d84-c752-4ef9-9a79-564302e0e16e&autoAuth=true&ctid=c05e11e5-706c-4cef-ba5e-18eedbf10037" height="600pt" width="100%"
       style={{ width: '100%', height: '100%', border: 'none', border: "1px solid #ccc" }}
     /> :  <iframe
       title="PowerBiDashboard"
       id="reportFrame"
-      src= {`https://app.powerbi.com/reportEmbed?reportId=b83fa707-b117-4372-b076-67efca7fbd58&autoAuth=true&ctid=4f84ae42-57aa-48c2-b366-4dc5dfce353c&filter=Claims/entity eq '${userData?.organization?.razonSocial}'`}
+      src= {`https://app.powerbi.com/reportEmbed?reportId=ee6f4d84-c752-4ef9-9a79-564302e0e16e&autoAuth=true&ctid=c05e11e5-706c-4cef-ba5e-18eedbf10037&filter=Claims/entity eq '${userData?.organization?.razonSocial}'`}
       style={{ width: '100%', height: '100%', border: 'none', border: "1px solid #ccc" }}
     />
     }
