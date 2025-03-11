@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { Button, Stack } from 'react-bootstrap';
+import { Button, Image, Stack } from 'react-bootstrap';
 import { MdChatBubbleOutline, MdOutlineVisibility } from 'react-icons/md';
 import DataTable from '../../components/common/DataTable';
 
@@ -374,7 +374,7 @@ export default function MyAccount() {
       <Loader isLoading={loading} />
       <div className="d-flex flex-column flex-grow-1 p-3 pageContainer">
         <div className='text-center pb-3'>
-          <img src={infographicImage} alt="infographic-image" className='img-fluid'/>
+          <Image src={infographicImage} alt="infographic-image" className='w-100' fluid/>
         </div>
         <div className="pb-2">
           <PageHeader
