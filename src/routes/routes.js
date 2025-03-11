@@ -66,7 +66,7 @@ const routes = [
   },
 
   {
-    path: "/dashboard/power-bi",
+    path: "/dashboard-power-bi",
     element: <PowerBiDashboard />,
     isPrivate: true,
     layoutType: "Auth",
