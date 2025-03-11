@@ -182,7 +182,7 @@ export const NavItems = () => {
       menuName: t("POWER_BI_DASHBOARD"),
       title: t("POWER_BI_DASHBOARD"),
       menuIcon: <MdSchema size={20} />,
-      path: "/dashboard/power-bi",
+      path: "/dashboard-power-bi",
       roleName: "admin",
       moduleName : "power-bi-dashboard",
       disabled: false,
