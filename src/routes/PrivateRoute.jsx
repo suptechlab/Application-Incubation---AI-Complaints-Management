@@ -14,7 +14,7 @@ const PrivateRoute = ({ element, moduleName = "", route_permissions = [] }) => {
     // Bypass permission check for SYSTEM_ADMIN
     const isSuperAdmin = currentUser === "SYSTEM_ADMIN";
     // Bypass profile page without authentication or permission check
-    if (isAuthenticated && (moduleName === "profile" || moduleName === "Dashboard" || moduleName === 'change_password')) {
+    if (isAuthenticated && (moduleName === "profile" || moduleName === "Dashboard" || moduleName === 'change_password' || moduleName==='power-bi-dashboard')) {
         return element; // Allow access to profile page regardless of authentication or permissions
     }
 

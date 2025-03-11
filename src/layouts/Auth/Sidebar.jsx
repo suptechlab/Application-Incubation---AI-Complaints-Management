@@ -125,9 +125,98 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                   path,
                   subMenu,
                   disabled,
+                  moduleName
                 } = elem;
                 return (
                   <Nav.Item as="li" key={id}>
+                    {!subMenu && (
+                      <Nav.Link
+                        key={menuName}
+                        id={id}
+                        as={NavLink}
+                        to={path}
+                        className={`align-items-center d-flex px-0 sidebarLink rounded ${disabled ? "disabled" : ""
+                          }`}
+                        onClick={handleNavLinkClick}
+                      >
+                        <span className="py-1 text-center min-w-44 sidebarIcon">
+                          {menuIcon}
+                        </span>
+                        <span className="hideInSmallSidebar text-wrap lh-sm">{title}</span>
+                      </Nav.Link>
+                    )}
+
+                    {subMenu && (
+                      <Nav.Link
+                        key={menuName}
+                        as={Button}
+                        variant="link"
+                        onClick={() => handleSubmenu(id)}
+                        className={`align-items-center d-flex px-0 sidebarLink rounded w-100 text-white ${isSubMenuOpen === id ? "active" : ""
+                          } ${disabled ? "disabled" : ""}`}
+                      >
+                        <span className="py-1 text-center min-w-44 sidebarIcon">
+                          {menuIcon}
+                        </span>
+                        <span className="hideInSmallSidebar text-wrap text-start lh-sm">
+                          {title}
+                        </span>
+                        <span className="ms-auto sub-menu-arrow">
+                          {isSubMenuOpen === id ? (
+                            <MdOutlineKeyboardArrowDown size={20} />
+                          ) : (
+                            <MdOutlineKeyboardArrowRight size={20} />
+                          )}
+                        </span>
+                      </Nav.Link>
+                    )}
+
+                    {isSubMenuOpen === id && subMenu && (
+                      <Nav as="ul" className="flex-column p-0">
+                        {subMenu?.map((subItems) => (
+                          <Nav.Item as="li" key={subItems.id}>
+                            <Nav.Link
+                              key={subItems.menuName}
+                              as={NavLink}
+                              to={subItems.path}
+                              className={`align-items-center d-flex px-0 sidebarLink rounded ${subItems.disabled ? "disabled" : ""
+                                }`}
+                            >
+                              <span className="py-1 text-center min-w-44 sidebarIcon d-none ps-1">
+                                {subItems.menuIcon}
+                              </span>
+                              <span className="hideInSmallSidebar text-wrap lh-sm">
+                                {subItems.menuName}
+                              </span>
+                            </Nav.Link>
+                          </Nav.Item>
+                        ))}
+                      </Nav>
+                    )}
+
+                    {/* {moduleName && currentUser === "SEPS-USER" && (
+                      <Nav.Link
+                        key="powerBi"
+                        id="powerBi"
+                        as="Link"
+                        to="/dashboard/power-bi"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="align-items-center d-flex px-0 sidebarLink rounded"
+                      >
+                        <span className="py-1 text-center min-w-44 sidebarIcon">
+                          <BiSolidDashboard />
+                        </span>
+                        <span className="hideInSmallSidebar text-wrap lh-sm">
+                          {t("POWER_BI_DASHBOARD")}
+                        </span>
+                      </Nav.Link>
+                    )} */}
+                  </Nav.Item>
+                 
+                );
+              })}
+ {/* <Nav.Item as="li" key={id}>
                     {!subMenu && (
                       <Nav.Link
                         key={menuName}
@@ -201,18 +290,35 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                         })}
                       </Nav>
                     )}
-                  </Nav.Item>
-                );
-              })}
 
+                    {moduleName ==='power-bi-dashboard' && currentUser === "SEPS_USER" && (
+                      <Nav.Link
+                        key="powerBi"
+                        id="powerBi"
+                        as="Link"
+                        to="/dashboard/power-bi"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="align-items-center d-flex px-0 sidebarLink rounded"
+                      >
+                        <span className="py-1 text-center min-w-44 sidebarIcon">
+                          <BiSolidDashboard />
+                        </span>
+                        <span className="hideInSmallSidebar text-wrap lh-sm">
+                          {t("POWER_BI_DASHBOARD")}
+                        </span>
+                      </Nav.Link>
+                    )}
+                  </Nav.Item> */}
 
-              {
+              {/* {
                 currentUser === 'SEPS_USER' && <Nav.Item as="li">
                   <Nav.Link
                     key={'powerBi'}
                     id={'powerBi'}
-                    as="a"
-                    href={'https://app.powerbi.com/groups/119609e4-6743-42dd-a56a-5841d23641b9/reports/24beb84d-1e23-46af-bebb-c2e545d035d4?pbi_source=desktop'} // Use href for external links
+                    as="Link"
+                    // href={'https://app.powerbi.com/groups/119609e4-6743-42dd-a56a-5841d23641b9/reports/24beb84d-1e23-46af-bebb-c2e545d035d4?pbi_source=desktop'} // Use href for external links
+                    to="/dashboard/power-bi"
                     target="_blank" // Open in a new tab
                     rel="noopener noreferrer" // Security best practice
                     className={`align-items-center d-flex px-0 sidebarLink rounded `}
@@ -227,7 +333,7 @@ const Sidebar = ({ isActiveSidebar, toggleSidebarButton }) => {
                   </Nav.Link>
                 </Nav.Item>
 
-              }
+              } */}
 
             </Nav>
           </div>
