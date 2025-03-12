@@ -1,17 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Col, Row, Stack } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { MdConfirmationNumber, MdHourglassEmpty, MdPending, MdTaskAlt } from "react-icons/md";
+import { AuthenticationContext } from '../contexts/authentication.context';
 
 
 const InfoCards = ({claimStatsData , rowClassName = 'g-3 g-lg-4' }) => {
   const {t} = useTranslation()
+
+  const {userData} = useContext(AuthenticationContext)
+
+  const isFiAdmin = userData?.roles[0]?.name === 'Fi Admin';
   const cardsData = [
     {
       bgColor: 'bg-primary',
       Icon: <MdConfirmationNumber size={24} />,
-      title: t('NEW_TICKETS'), 
-      value: claimStatsData?.countsByStatus?.NEW,
+      title: isFiAdmin ? t('ASSIGNED_TICKETS') : t('NEW_TICKETS'),
+      value: isFiAdmin 
+        ? claimStatsData?.countsByStatus?.ASSIGNED 
+        : claimStatsData?.countsByStatus?.NEW,
       colProps: { sm: 6, lg: 3 }
     },
     {

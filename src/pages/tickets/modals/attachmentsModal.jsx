@@ -105,7 +105,7 @@ const AttachmentsModal = ({ modal, toggle, ticketData, currentInstance, permissi
 
                                 {
                                     permissionState?.downloadPermission === true &&
-                                    <AppTooltip title="Download">
+                                    <AppTooltip title={t('DOWNLOAD')}>
                                         <button
                                             // to={item.dowlnloadUrl}
                                             onClick={() => handleAttachmentDownload(item)}

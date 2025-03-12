@@ -326,7 +326,9 @@ const ClaimsAndComplaints = ({ setLoading }) => {
                         className="flex-wrap my-1"
                     >
                         <div className="fw-semibold fs-4 mb-0 me-auto">
-                            {t("CLAIM_AND_COMPLAINTS")}
+
+                        
+                            {currentUser !=='FI_USER' ?  t("CLAIM_AND_COMPLAINTS"):t("CLAIMS")}
                         </div>
                         <Stack
                             direction="horizontal"
