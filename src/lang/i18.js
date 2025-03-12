@@ -8,8 +8,9 @@ import { getLocalStorage } from '../utils/storage';
 
 
 
-const userLanguage = getLocalStorage('lang')  ? getLocalStorage('lang') : 'es';
-// const userLanguage = "es";
+// const userLanguage = getLocalStorage('lang')  ? getLocalStorage('lang') : 'es';
+
+const userLanguage = "es";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next

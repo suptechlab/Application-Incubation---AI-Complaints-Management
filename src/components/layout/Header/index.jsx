@@ -410,7 +410,7 @@ const Header = ({ layout }) => {
           }
 
 
-          <Dropdown className={`${!isLoggedIn ? 'd-none' : ''} ms-md-4`}>
+          <Dropdown className={`${!isLoggedIn ? 'd-none' : ''} ms-3 ms-md-4`}>
             <Dropdown.Toggle
               variant="link"
               id="dropdown-profile"

@@ -228,14 +228,14 @@ const FileClaimModal = ({ handleShow, handleClose }) => {
             >
                 <Modal.Header closeButton className="align-items-start pb-2 pt-3 pe-3">
                     <div className="flex-fill pt-1">
-                        <Row className="g-0">
+                        <Row className='gy-0'>
                             <Col lg={6}>
                                 <Modal.Title as="h4" className="fw-bold">
                                     {t("FILE_A_CLAIM")}
                                 </Modal.Title>
                                 <p className="small">{t("CLAIM_FORM_DESCRIPTION")}</p>
                             </Col>
-                            <Col lg="auto" className="ms-auto mb-2 mb-sm-0">
+                            <Col lg={6} className="ms-auto mb-2 mb-sm-0">
                                 <div className="text-end">
                                     <StepsProgress stepData={stepData} />
                                 </div>
