@@ -3,6 +3,7 @@ package com.seps.user.service;
 import com.seps.user.repository.ClaimSubTypeRepository;
 import com.seps.user.service.dto.DropdownListDTO;
 import com.seps.user.service.mapper.ClaimSubTypeMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,7 @@ public class ClaimSubTypeService {
      */
     @Transactional(readOnly = true)
     public List<DropdownListDTO> listActiveClaimSubTypesById(Long claimType) {
-        return claimSubTypeRepository.findAllByStatusAndClaimTypeId(true, claimType)
+        return claimSubTypeRepository.findAllByStatusAndClaimTypeId(true, claimType, Sort.by(Sort.Direction.ASC, "name"))
             .stream()
             .map(claimSubTypeMapper::toDropDownDTO)
             .toList();

@@ -3,6 +3,7 @@ package com.seps.user.service;
 import com.seps.user.repository.CityRepository;
 import com.seps.user.service.dto.DropdownListDTO;
 import com.seps.user.service.mapper.CityMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,7 @@ public class CityService {
 
 
     public List<DropdownListDTO> listActiveCityByProvinceId(Long provinceId) {
-        return cityRepository.findAllByStatusAndProvinceId(true, provinceId)
+        return cityRepository.findAllByStatusAndProvinceId(true, provinceId, Sort.by(Sort.Direction.ASC, "name"))
             .stream()
             .map(cityMapper::toDropDownDTO)
             .toList();
