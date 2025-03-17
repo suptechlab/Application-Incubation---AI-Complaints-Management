@@ -655,7 +655,8 @@ public class SepsAndFiClaimTicketService {
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
                     new String[]{ticketId.toString()}, null));
         }
-        if (ticket.getFiAgentId() == null) {
+        if (ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE) && ticket.getFiAgentId() == null ||
+            !ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE) && ticket.getSepsAgentId() == null) {
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_ASSIGNED, null, null);
         }
         // Validate the new SLA date
