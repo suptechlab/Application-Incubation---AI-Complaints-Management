@@ -3,6 +3,7 @@ package com.seps.user.service;
 import com.seps.user.repository.ProvinceRepository;
 import com.seps.user.service.dto.DropdownListDTO;
 import com.seps.user.service.mapper.ProvinceMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class ProvinceService {
      * @return a list of DropdownListDTO containing active provinces
      */
     public List<DropdownListDTO> listActiveProvince() {
-        return provinceRepository.findAllByStatus(true)
+        return provinceRepository.findAllByStatus(true, Sort.by(Sort.Direction.ASC, "name"))
             .stream()
             .map(provinceMapper::toDropDownDTO)
             .toList();
