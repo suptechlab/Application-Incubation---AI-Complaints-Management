@@ -48,7 +48,6 @@ export default function AuthenticationProvider({ children }) {
     }, [])
 
     const logout = () => {
-        console.log("LOGOUT CALLING......")
         removeLocalStorage("access_token")
         removeLocalStorage("refresh_token")
         setIsAuthenticated(false)

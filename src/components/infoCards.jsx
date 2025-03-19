@@ -10,7 +10,7 @@ const InfoCards = ({claimStatsData , rowClassName = 'g-3 g-lg-4' }) => {
 
   const {userData} = useContext(AuthenticationContext)
 
-  const isFiAdmin = userData?.roles[0]?.name === 'Fi Admin';
+  const isFiAdmin =  userData?.roles &&  userData?.roles?.length > 0 && userData?.roles[0]?.name === 'Fi Admin';
   const cardsData = [
     {
       bgColor: 'bg-primary',
