@@ -1,6 +1,7 @@
 package com.seps.admin.repository;
 
 import com.seps.admin.domain.Authority;
+import com.seps.admin.domain.Role;
 import com.seps.admin.domain.User;
 import com.seps.admin.enums.UserStatusEnum;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -54,4 +55,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         AND u.activated = true
     """)
     List<User> findUsersNotAssignedToTeamByRole(@Param("role") String role, @Param("organizationId") Long organizationId);
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r = :role")
+    long countUsersByRole(@Param("role") Role role);
 }
