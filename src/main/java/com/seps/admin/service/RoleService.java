@@ -209,7 +209,7 @@ public class RoleService {
     @Transactional(readOnly = true)
     public List<DropdownListDTO> findAll(UserTypeEnum userType) {
         log.debug("Request to get all Roles");
-        return roleRepository.findByUserTypeAndDeletedFalse(userType.toString()).stream()
+        return roleRepository.findByUserTypeAndDeletedFalseAndStatusTrue(userType.toString()).stream()
             .map(roleMapper::toDropDownDTO)
             .toList();
     }
@@ -384,6 +384,12 @@ public class RoleService {
         Role entity = roleRepository.findById(id)
             .orElseThrow(() -> new CustomException(Status.NOT_FOUND, SepsStatusCode.ROLE_NOT_FOUND,
                 new String[]{id.toString()}, null));
+        if (Boolean.FALSE.equals(status)) { // Trying to disable the role
+            long assignedUsersCount = userRepository.countUsersByRole(entity);
+            if (assignedUsersCount > 0) {
+                throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.ROLE_ASSIGNED_DO_NOT_TO_DISABLED, null, null);
+            }
+        }
         Map<String, Object> oldData = new HashMap<>();
         oldData.put("Name", entity.getName());
         oldData.put("Description", entity.getDescription());

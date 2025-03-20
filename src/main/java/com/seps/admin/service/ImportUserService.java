@@ -407,6 +407,12 @@ public class ImportUserService {
                         validateRole(Constants.RIGHTS_SEPS_ADMIN, i, errors, locale);
                     } else if (userDTO.getRole().equals("AGENT")) {
                         validateRole(Constants.RIGHTS_SEPS_AGENT, i, errors, locale);
+                    } else if (userDTO.getRole().equals("SEPS_SUPERADMIN_IT")) {
+                        validateRole(Constants.RIGHTS_SEPS_SUPER_ADMIN_IT, i, errors, locale);
+                    } else if (userDTO.getRole().equals("SEPS_ANALYTIC_ADMIN")) {
+                        validateRole(Constants.RIGHTS_SEPS_ANALYTIC_ADMIN, i, errors, locale);
+                    } else if (userDTO.getRole().equals("SEPS_ANALYTIC_AGENT")) {
+                        validateRole(Constants.RIGHTS_SEPS_ANALYTIC_AGENT, i, errors, locale);
                     } else {
                         String roleMessage = getLocalizedMessage("role.not.found", locale, null);
                         errors.add("Row " + (i + 1) + ":" + roleMessage);
