@@ -44,7 +44,8 @@ public enum SepsStatusCode implements StatusType {
     MEMBER_NOT_FOUND_IN_TEAM(20045, "member.not.found.in.team"),
     UNAUTHORIZED_ACCESS(200046, "unauthorized.access"),
     TEMPLATE_ALREADY_EXISTS(200047, "template.email.already.exist"),
-    FILE_STORAGE_ERROR(20048, "file.storage.error");
+    FILE_STORAGE_ERROR(20048, "file.storage.error"),
+    ROLE_ASSIGNED_DO_NOT_TO_DISABLED(20049, "role.is.assigned.do.not.disabled");
 
     private final int code;
 
