@@ -186,13 +186,13 @@ public class ReportService {
         row.createCell(ExcelHeaderClaimTicketReportEnum.CUSTOMER_TYPE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getCustomerType(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.PRIORITY.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getPriority(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.SLA_BREACH_DAYS.ordinal()).setCellValue(data.getSlaBreachDays() != null ? data.getSlaBreachDays().toString() : "");
-        row.createCell(ExcelHeaderClaimTicketReportEnum.ASSIGNED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getAssignedAt(), LocaleContextHolder.getLocale().getLanguage()));
+        //row.createCell(ExcelHeaderClaimTicketReportEnum.ASSIGNED_AT.ordinal()).setCellValue(DateUtil.formatDate(data.getAssignedAt(), LocaleContextHolder.getLocale().getLanguage()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.CLOSED_STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getClosedStatus(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.REJECTED_STATUS.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getRejectedStatus(), LocaleContextHolder.getLocale()));
-        row.createCell(ExcelHeaderClaimTicketReportEnum.RESOLVED_ON.ordinal()).setCellValue(DateUtil.formatDate(data.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
+        //row.createCell(ExcelHeaderClaimTicketReportEnum.RESOLVED_ON.ordinal()).setCellValue(DateUtil.formatDate(data.getResolvedOn(), LocaleContextHolder.getLocale().getLanguage()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.CREATED_BY_USER.ordinal()).setCellValue(data.getCreatedByUser() != null ? data.getCreatedByUser().getName() : "");
-        row.createCell(ExcelHeaderClaimTicketReportEnum.SECOND_INSTANCE_COMMENT.ordinal()).setCellValue(data.getSecondInstanceComment() != null ? data.getSecondInstanceComment() : "");
-        row.createCell(ExcelHeaderClaimTicketReportEnum.SOURCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getSource(), LocaleContextHolder.getLocale()));
+        //row.createCell(ExcelHeaderClaimTicketReportEnum.SECOND_INSTANCE_COMMENT.ordinal()).setCellValue(data.getSecondInstanceComment() != null ? data.getSecondInstanceComment() : "");
+        //row.createCell(ExcelHeaderClaimTicketReportEnum.SOURCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getSource(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.CHANNEL_OF_ENTRY.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(data.getChannelOfEntry(), LocaleContextHolder.getLocale()));
         row.createCell(ExcelHeaderClaimTicketReportEnum.CLAIM_AMOUNT.ordinal())
             .setCellValue(CommonHelper.formatAmount(data.getClaimAmount()));
@@ -369,14 +369,14 @@ public class ReportService {
         long actualResolutionTimeInDays = duration.toDays();
 
         row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_DURATION_IN_DAYS.ordinal()).setCellValue(slaDurationInDays);
-        row.createCell(ExcelHeaderSlaComplianceReportEnum.ACTUAL_RESOLUTION_DAYS.ordinal()).setCellValue(actualResolutionTimeInDays);
-        row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_BREACH_REASON.ordinal()).setCellValue("");
+        //row.createCell(ExcelHeaderSlaComplianceReportEnum.ACTUAL_RESOLUTION_DAYS.ordinal()).setCellValue(actualResolutionTimeInDays);
+        /*row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_BREACH_REASON.ordinal()).setCellValue("");
         if (actualResolutionTimeInDays <= slaDurationInDays) {
-            row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_COMPLIANCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(SlaComplianceEnum.COMPLIANT, LocaleContextHolder.getLocale()));
+            //row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_COMPLIANCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(SlaComplianceEnum.COMPLIANT, LocaleContextHolder.getLocale()));
         } else {
-            row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_COMPLIANCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(SlaComplianceEnum.NON_COMPLIANT, LocaleContextHolder.getLocale()));
+            //row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_COMPLIANCE.ordinal()).setCellValue(enumUtil.getLocalizedEnumValue(SlaComplianceEnum.NON_COMPLIANT, LocaleContextHolder.getLocale()));
             row.createCell(ExcelHeaderSlaComplianceReportEnum.SLA_BREACH_REASON.ordinal()).setCellValue(data.getStatusComment());
-        }
+        }*/
     }
 
     /**
