@@ -345,7 +345,7 @@ public class UserService {
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.FI).ifPresent(authorities::add);
         Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.PENDING, UserStatusEnum.ACTIVE, UserStatusEnum.BLOCKED);
-        if (userRepository.findOneByIdentificacionAndAuthoritiesInAndStatusIn(identificacion, authorities, requiredStatuses).isPresent()) {
+        if (userRepository.findOneByIdentificacionAndOrganizationIdAndAuthoritiesInAndStatusIn(identificacion, organization.getId(), authorities, requiredStatuses).isPresent()) {
             LOG.warn("User with identificacion {} already exists.", identificacion);
             throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FI_USER_ALREADY_EXIST, new String[]{identificacion}, null);
         }
