@@ -123,7 +123,7 @@ public class ImportUserService {
                     validateIdentificacion(userDTO.getIdentificacion(), i, errors);
                     validateRuc(userDTO.getRuc(), i, errors, currentUser);
                     //Validate Email
-                    validateEmail(userDTO.getEmail(), i, userDTO.getIdentificacion(), authorities, requiredStatuses, errors, locale);
+                    validateEmail(userDTO.getEmail(), i, userDTO.getIdentificacion(), authorities, requiredStatuses, errors, locale, userDTO.getRuc());
                     if (userDTO.getRole().equals("ADMIN")) {
                         validateRole(Constants.RIGHTS_FI_ADMIN, i, errors, locale);
                     } else if (userDTO.getRole().equals("AGENT")) {
@@ -156,16 +156,16 @@ public class ImportUserService {
     }
 
     private void validateEmail(String email, int rowNum, String identificacion, Set<Authority> authorities,
-                               Set<UserStatusEnum> requiredStatuses, List<String> errors, Locale locale) {
+                               Set<UserStatusEnum> requiredStatuses, List<String> errors, Locale locale, String ruc) {
         if (userRepository.findOneByEmailIgnoreCase(email).isPresent()) {
             String message = getLocalizedMessage("email.already.used", locale);
             errors.add("Row " + (rowNum + 1) + ":" + message);
         }
-        if (userRepository.findOneByIdentificacionAndAuthoritiesInAndStatusIn(identificacion, authorities, requiredStatuses).isPresent()) {
+        Organization organization = organizationRepository.findByRuc(ruc).orElse(null);
+        if (organization != null && userRepository.findOneByIdentificacionAndOrganizationIdAndAuthoritiesInAndStatusIn(identificacion, organization.getId(), authorities, requiredStatuses).isPresent()) {
             String message = getLocalizedMessage("fi.user.already.exist", locale, new String[]{identificacion});
             errors.add("Row " + (rowNum + 1) + ":" + message);
         }
-
     }
 
     private ImportUserDTO mapRowToDTO(Row row) {
@@ -227,7 +227,7 @@ public class ImportUserService {
             }
             // Check if FI user with given identificacion already exists with specific authorities and statuses
             Set<UserStatusEnum> requiredStatuses = Set.of(UserStatusEnum.PENDING, UserStatusEnum.ACTIVE, UserStatusEnum.BLOCKED);
-            if (userRepository.findOneByIdentificacionAndAuthoritiesInAndStatusIn(identificacion, authorities, requiredStatuses).isPresent()) {
+            if (userRepository.findOneByIdentificacionAndOrganizationIdAndAuthoritiesInAndStatusIn(identificacion, organization.getId(), authorities, requiredStatuses).isPresent()) {
                 LOG.warn("User with identificacion {} already exists.", identificacion);
                 throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.FI_USER_ALREADY_EXIST, new String[]{identificacion}, null);
             }
