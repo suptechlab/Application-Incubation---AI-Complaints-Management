@@ -35,8 +35,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findOneWithAuthoritiesById(Long id);
 
     // Check if a user exists with the given identificacion, authorities, and status
-    Optional<User> findOneByIdentificacionAndAuthoritiesInAndStatusIn(
-        String identificacion, Set<Authority> authorities, Set<UserStatusEnum> statuses
+    Optional<User> findOneByIdentificacionAndOrganizationIdAndAuthoritiesInAndStatusIn(
+        String identificacion, Long organizationId, Set<Authority> authorities, Set<UserStatusEnum> statuses
     );
 
     @Query("SELECT u.id FROM User u JOIN u.authorities a WHERE a.name = :role")
