@@ -66,6 +66,7 @@ export default function AuthenticationProvider({ children }) {
             navigate("/otp", { state: { username, otpToken } })
         }).catch((error) => {
             toast.error(error.response.data.errorDescription);
+            throw error;  // Propagate the error
         })
     }
 

@@ -39,11 +39,27 @@ export default function Login() {
         values.username = values.email
         values.recaptchaToken = captcha !== '' ? captcha : '' 
         delete values.email;
+      
 
-        await login({ ...values });
-        reCaptchaRef.current.reset();
-        actions.setSubmitting(false);
-        setCaptcha('')
+        // await login({ ...values });
+
+        // reCaptchaRef.current.reset();
+        // actions.setSubmitting(false);
+        // setCaptcha('')
+        try {
+            await login({ ...values });
+            reCaptchaRef.current.reset();
+            actions.setSubmitting(false);
+            setCaptcha('');
+        } catch (error) {
+            actions.resetForm({
+                values: {
+                    email: "",
+                    password: "",
+                    rememberMe: values?.rememberMe, // Preserve rememberMe value
+                }
+            });
+        }
     };
 
     useEffect(() => {
@@ -120,9 +136,8 @@ export default function Login() {
                                                     type="text"
                                                     value={values.email || ""}
                                                 />
-
                                                 <FormInput
-                                                    autoComplete="current-password"
+                                                    autoComplete="new"
                                                     error={errors.password}
                                                     id="password"
                                                     key={"password"}
