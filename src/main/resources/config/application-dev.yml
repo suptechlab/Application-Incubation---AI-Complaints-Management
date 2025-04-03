@@ -121,3 +121,6 @@ external-api:
   email-base-url: https://serviciosrest.seps.gob.ec
   email-from: sender@seps.gob.ec
   email-service-enable: false
+
+mibew:
+  recipient-email: mibew.suptech@seps.gob.ec

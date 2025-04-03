@@ -646,10 +646,11 @@ public class SepsAndFiClaimTicketService {
         // Find the ticket by ID
         ClaimTicket ticket;
         if (authority.contains(AuthoritiesConstants.FI)) {
-            Long organizationId = currentUser.getOrganization().getId();
+            throw new CustomException(Status.BAD_REQUEST, SepsStatusCode.YOU_NOT_AUTHORIZED_TO_PERFORM, null, null);
+            /*Long organizationId = currentUser.getOrganization().getId();
             ticket = claimTicketRepository.findByIdAndOrganizationId(ticketId, organizationId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
-                    new String[]{ticketId.toString()}, null));
+                    new String[]{ticketId.toString()}, null));*/
         } else {
             ticket = claimTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.CLAIM_TICKET_NOT_FOUND,
