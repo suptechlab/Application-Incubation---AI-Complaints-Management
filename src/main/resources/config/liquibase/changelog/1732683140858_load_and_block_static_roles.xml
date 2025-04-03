@@ -149,5 +149,23 @@
       separator=","
       tableName="permissions"/>
   </changeSet>
+  <changeSet id="1743580627515" author="matellio">
+    <delete  catalogName="cat" schemaName="public"
+             tableName="role_permissions">
+      <where>permission_id IN (79)</where>
+    </delete>
+    <delete  catalogName="cat" schemaName="public"
+             tableName="permissions">
+      <where>id IN (79)</where>
+    </delete>
+    <loadData
+      file="config/liquibase/data/modules6.csv"
+      separator=","
+      tableName="modules"/>
+    <loadData
+      file="config/liquibase/data/permissions8.csv"
+      separator=","
+      tableName="permissions"/>
+  </changeSet>
 
 </databaseChangeLog>
