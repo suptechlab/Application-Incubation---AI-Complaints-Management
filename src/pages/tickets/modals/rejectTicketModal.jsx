@@ -11,7 +11,7 @@ import { validateFile } from "../../../utils/commonutils";
 import { ticketRejectValidation } from "../../../validations/ticketsManagement.validation";
 import PropTypes from "prop-types"
 
-const RejectTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
+const RejectTicketModal = ({ modal, toggle, ticketId = "", setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
     const { t } = useTranslation();
     const { masterData } = useContext(MasterDataContext)
 
@@ -155,13 +155,25 @@ const RejectTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setI
                                             }}
                                         />
                                     </div>
-                                    {values?.attachments && (
+                                    <div>
+                                        {values?.attachments && (
+                                            <span
+                                                // target="_blank"
+                                                // to="/fi-users/import"
+                                                className="text-decoration-none small mw-100 text-break"
+                                            >
+                                                {values.attachments.name}
+                                            </span>
+                                        )}
+                                        {touched?.attachments && errors?.attachments && <span className="form-text text-danger mw-100 text-break">{errors?.attachments}</span>}
+                                    </div>
+                                    {/* {values?.attachments && (
                                         <span
                                             className="text-decoration-none small mw-100 text-break"
                                         >
                                             {values.attachments.name}
                                         </span>
-                                    )}
+                                    )} */}
                                 </div>
                             </Col>
                         </Modal.Body>
@@ -197,6 +209,6 @@ RejectTicketModal.propTypes = {
     setSelectedStatus: PropTypes.func.isRequired, // setSelectedStatus is a function (required)
     setIsGetActivityLogs: PropTypes.func.isRequired, // setIsGetActivityLogs is a function (required)
     getTicketData: PropTypes.func.isRequired, // getTicketData is a function (required)
-  };
+};
 
 export default RejectTicketModal;

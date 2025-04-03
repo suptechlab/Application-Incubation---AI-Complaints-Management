@@ -21,14 +21,17 @@ export const ticketCloseValidation = Yup.object({
     .required(msg.closeSubStatusRequired),
   reason: Yup.string()
     .required(msg.reasonRequired),
+
+  attachments: Yup.string()
+    .required(msg.fileRequired),
   // claimAmount: Yup.number()
   //   .required(msg.reasonRequired),
 
   claimAmount: Yup.number()
     .when('closeSubStatus', {
       is: (value) => value === 'CLOSED_IN_FAVOR_OF_CONSUMER' || value === 'CLOSED_IN_PARTIAL_FAVOR_OF_CONSUMER',  // Check if 'CLOSED' is part of the string
-      then:(schema) => schema.required(msg.amountRequired),
-      otherwise:(schema)=> schema.notRequired(),
+      then: (schema) => schema.required(msg.amountRequired),
+      otherwise: (schema) => schema.notRequired(),
     }),
 });
 
@@ -38,6 +41,8 @@ export const ticketRejectValidation = Yup.object({
     .required(msg.rejectSubStatusRequired),
   reason: Yup.string()
     .required(msg.reasonRequired),
+  attachments: Yup.string()
+    .required(msg.fileRequired),
 });
 
 

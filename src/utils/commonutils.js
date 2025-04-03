@@ -55,7 +55,7 @@ export const capitalizeFirstLetter =(str = '') => {
 }
 // VALIDATE FILE
 export const validateFile = (file) => {
-  const MAX_FILE_SIZE_MB = 1;
+  const MAX_FILE_SIZE_MB = 10;
 
   // if (!file) {
   //   return msg.noFileSelected;
