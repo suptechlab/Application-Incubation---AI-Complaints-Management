@@ -255,7 +255,13 @@ public class ClaimTicket {
     public String getFormattedTicketId() {
         String year = String.valueOf(getCreatedYear());
         String claimTypeCode = (claimType != null) ? String.format("%03d", claimType.getId()) : "000";
-        return String.format("R-ESFPS-%s-%s-%s", year, claimTypeCode, ticketId);
+        if(instanceType.equals(InstanceTypeEnum.FIRST_INSTANCE)) {
+            return String.format("R-ESFPS-%s-%s-%s", year, claimTypeCode, ticketId);
+        }else if(instanceType.equals(InstanceTypeEnum.SECOND_INSTANCE)) {
+            return String.format("R-SEPS-%s-%s-%s", year, claimTypeCode, ticketId);
+        }else{
+            return String.format("D-SEPS-%s-%s-%s", year, claimTypeCode, ticketId);
+        }
     }
 
     // Get year from createdAt
