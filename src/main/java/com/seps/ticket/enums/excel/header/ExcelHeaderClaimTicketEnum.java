@@ -14,11 +14,10 @@ public enum ExcelHeaderClaimTicketEnum implements EnumWithDescription {
     SLA_DATE("excel.header.slaDate"),
     STATUS("excel.header.status"),
     FI_AGENT("excel.header.fiAgent"),
-    SEPS_AGENT("excel.header.sepsAgent"),
+
     INSTANCE_TYPE("excel.header.instanceType"),
     //SECOND_INSTANCE_CREATED_AT("excel.header.secondInstanceCreatedAt"),
     //COMPLAINT_CREATED_AT("excel.header.complaintCreatedAt"),
-    REFERENCE_TICKET_ID("excel.header.reference.ticket.id")
     ;
 
     private final String key;
