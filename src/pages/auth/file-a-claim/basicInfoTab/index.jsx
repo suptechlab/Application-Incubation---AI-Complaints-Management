@@ -17,7 +17,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
     const dispatch = useDispatch()
 
     const { user } = useSelector((state) => state?.authSlice)
-    const { province_list } = useSelector((state) => state?.masterSlice)
+    const { province_list,priority_care_group } = useSelector((state) => state?.masterSlice)
     const formattedCountryCodes = countryCodes.map(country => ({
         value: country?.value,
         label: country?.value
@@ -35,9 +35,10 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
         name: user?.name ?? '',
         gender: user?.gender ?? '',
         countryCode: user?.countryCode ?? '+593',
-        phoneNumber:user?.phoneNumber ?? '',
+        phoneNumber: user?.phoneNumber ?? '',
         provinceId: '',
         cityId: '',
+        priorityCareGroup: 'NONE',
     };
     // Handle Submit Handler
     const handleSubmit = (values, actions) => {
@@ -180,7 +181,35 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                                     </Col>
                                 </Row>
                             </Col>
-                            <Col lg={6}></Col>
+                            <Col lg={6}>
+                                <ReactSelect
+                                    label={t("PRIORITY_CARE_GROUP") + "*"}
+                                    error={formikProps.errors.priorityCareGroup}
+                                    options={[
+                                        { label: t("SELECT"), value: "" },
+                                        ...priority_care_group.map((group) => ({
+                                            label: group.label, // Ensure group has a `label` property
+                                            value: group.value, // Ensure group has a `value` property
+                                        })),
+                                    ]}
+                                    value={formikProps.values.priorityCareGroup}
+                                    onChange={(option) => {
+                                        formikProps.setFieldValue(
+                                            "priorityCareGroup",
+                                            option?.target?.value ?? ""
+                                        );
+                                    }}
+                                    name="priorityCareGroup"
+                                    className={
+                                        formikProps.touched.priorityCareGroup &&
+                                            formikProps.errors.priorityCareGroup
+                                            ? "is-invalid"
+                                            : ""
+                                    }
+                                    onBlur={formikProps.handleBlur}
+                                    touched={formikProps.touched.priorityCareGroup}
+                                />
+                            </Col>
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("PROVINCE_OF_RESIDENCE") + '*'}
@@ -202,7 +231,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
 
                                         if (option?.target?.value && option?.target?.value !== "") {
                                             // formikProps.setFieldTouched("cityId", false);
-                                            if(option?.target?.value !== formikProps?.values?.provinceId){
+                                            if (option?.target?.value !== formikProps?.values?.provinceId) {
                                                 formikProps.setFieldValue("cityId", ""); // Reset cityId
                                                 getCityList(option?.target?.value);
                                             }
@@ -217,7 +246,7 @@ const BasicInfoTab = ({ handleFormSubmit, setIsLoading }) => {
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("CANTON_OF_RESIDENCE") + '*'}
-                                    error={formikProps?.errors?.cityId }
+                                    error={formikProps?.errors?.cityId}
                                     options={[
                                         { label: t("SELECT"), value: "" },
                                         ...cityList.map((group) => ({

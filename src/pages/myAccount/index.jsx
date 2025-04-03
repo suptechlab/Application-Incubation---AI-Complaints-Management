@@ -34,7 +34,10 @@ export default function MyAccount() {
   const dispatch = useDispatch()
 
   const [loading, setLoading] = useState(false)
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([{
+    "id": "createdAt",
+    "asc": true
+  }]);
   const [filter, setFilter] = useState({
     search: '',
   });
@@ -45,7 +48,6 @@ export default function MyAccount() {
   const [raisedComplaintModalShow, setRaisedComplaintModalShow] = useState(false);
   const [isDownloading, setDownloading] = useState(false)
   const { instance_types, masterData } = useSelector((state) => state?.masterSlice);
-
 
   const handleShowModal = (row) => {
     setSelectedRow(row);
@@ -145,7 +147,7 @@ export default function MyAccount() {
   // TABLE COLUMNS
   const columns = React.useMemo(
     () => [
-      { accessorFn: (row) => row.ticketId, id: 'ticketId', header: t("TICKET_ID"), enableSorting: false },
+      { accessorFn: (row) => row.formattedTicketId, id: 'formattedTicketId', header: t("TICKET_ID"), enableSorting: false },
       {
         accessorFn: (row) => row.entity_name,
         id: 'entity_name',
@@ -253,37 +255,37 @@ export default function MyAccount() {
               </AppTooltip>
 
               <AppTooltip title={t("VIEW")}>
-                  <Button
-                    variant="link"
-                    onClick={() => handleShowModal(info.row.original)}
-                    className='p-0 border-0 lh-sm text-body'
-                    aria-label={t("VIEW")}
-                  >
-                    <MdOutlineVisibility size={24} />
-                  </Button>
-                </AppTooltip>
+                <Button
+                  variant="link"
+                  onClick={() => handleShowModal(info.row.original)}
+                  className='p-0 border-0 lh-sm text-body'
+                  aria-label={t("VIEW")}
+                >
+                  <MdOutlineVisibility size={24} />
+                </Button>
+              </AppTooltip>
               {
                 info.row.original.isConversationAvailable &&
                 <AppTooltip title={t("CHAT")}>
-                <Button
-                  variant="link"
-                  onClick={() => handleTicketModal(info.row.original)}
-                  className='p-0 border-0 lh-sm text-body position-relative'
-                  aria-label={t("CHAT")}
-                // disabled={['CLOSED', 'REJECTED'].includes(info?.row?.original?.status)}
-                >
-                  <MdChatBubbleOutline size={24} />
-                  {/* <Badge
+                  <Button
+                    variant="link"
+                    onClick={() => handleTicketModal(info.row.original)}
+                    className='p-0 border-0 lh-sm text-body position-relative'
+                    aria-label={t("CHAT")}
+                  // disabled={['CLOSED', 'REJECTED'].includes(info?.row?.original?.status)}
+                  >
+                    <MdChatBubbleOutline size={24} />
+                    {/* <Badge
                     bg="danger"
                     className="border border-white custom-font-size-12 fw-semibold ms-n1 p-1 position-absolute rounded-pill start-100 top-0 translate-middle custom-min-width-22"
                   >
                     2 <span className="visually-hidden">{t("UNREAD_CHAT")}</span>
                   </Badge> */}
-                </Button>
-              </AppTooltip>
+                  </Button>
+                </AppTooltip>
               }
 
-              
+
               {instanceButton && (
                 <Stack direction='horizontal' gap={2}>
                   {instanceButton}
@@ -374,7 +376,7 @@ export default function MyAccount() {
       <Loader isLoading={loading} />
       <div className="d-flex flex-column flex-grow-1 p-3 pageContainer">
         <div className='text-center pb-3'>
-          <Image src={infographicImage} alt="infographic-image" className='w-100' fluid/>
+          <Image src={infographicImage} alt="infographic-image" className='w-100' fluid />
         </div>
         <div className="pb-2">
           <PageHeader

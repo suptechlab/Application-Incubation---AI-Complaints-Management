@@ -246,17 +246,29 @@ const Header = ({ layout }) => {
     }
   };
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     getNotificationCount();
+  //     const intervalId = setInterval(() => {
+  //       getNotificationCount();
+  //     }, 60000); // Run every 1 minute
+  //     return () => clearInterval(intervalId); // Cleanup on unmount
+  //   } 
 
+  // }, []);
+  useEffect(() => {
     if (isLoggedIn) {
       getNotificationCount();
       const intervalId = setInterval(() => {
         getNotificationCount();
       }, 60000); // Run every 1 minute
-      return () => clearInterval(intervalId); // Cleanup on unmount
+  
+      return () => clearInterval(intervalId); // Cleanup when isLoggedIn changes or on unmount
     }
-
-  }, []);
+  
+    return () => {}; // Ensures cleanup when isLoggedIn is false
+  }, [isLoggedIn]); // Added isLoggedIn as a dependency
+  
 
   useEffect(() => {
     if (isLoggedIn) {

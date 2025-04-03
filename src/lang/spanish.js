@@ -117,9 +117,9 @@ export const spanishLang = {
   "TOO_MANY_FILES": "No se pueden cargar más de 3 archivos.",
   "SUCCESS_LAUNCH_ICON": "Icono de Lanzamiento de Éxito",
   "SUCCESS": "¡Felicidades!",
-  "CLAIM_HAS_BEEN_FILED": "Se ha creado su reclamo",
-  "TICKET_NO": "Número de Ticket",
-  "CLAIM_SUCCESS_EMAIL": "Su cuenta ha sido creada con éxito. Ahora puede presentar reclamos en contra de las entidades del sector Financiero Popular y Solidario. ",
+  "CLAIM_HAS_BEEN_FILED": "Se ha registrado con éxito su reclamo",
+  "TICKET_NO": "Su número de ticket es",
+  "CLAIM_SUCCESS_EMAIL": "Los detalles se han enviado a su correo electrónico ",
   "MY_ACCOUNT_AREA": "Mi cuenta",
   "ATTACHMENTS": "Adjuntos",
   "ATTACHMENTS_SENT_BY_ENTITY": "Agregar archivo adjunto",
@@ -170,4 +170,6 @@ export const spanishLang = {
   "SATISFACTION_SURVEY": "Encuesta de Satisfacción",
   "DOWNLOAD_SUCCESSFUL": "Descargar exitosa",
   "TERMS_CONDITIONS": "Términos y condiciones",
+  "HELPER_TEXT_PRECEDENTS" : "Cuéntenos a detalle lo ocurrido",
+  "HELPER_TEXT_SPECIFIC_PETITION":"Describa puntualmente que requiere de la entidad financiera"
 }

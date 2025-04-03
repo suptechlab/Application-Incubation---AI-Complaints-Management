@@ -163,6 +163,7 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
                                             onChange={formikProps.handleChange}
                                             touched={formikProps.touched.precedents}
                                             value={formikProps.values.precedents || ""}
+                                            helperText ={t("HELPER_TEXT_PRECEDENTS")}
                                         />
                                     </Col>
                                     <Col xs={12}>
@@ -178,6 +179,7 @@ const RaisedComplaintModal = ({ handleShow, selectedRow, handleClose }) => {
                                             onChange={formikProps.handleChange}
                                             touched={formikProps.touched.specificPetition}
                                             value={formikProps.values.specificPetition || ""}
+                                            helperText ={t("HELPER_TEXT_SPECIFIC_PETITION")}
                                         />
                                     </Col>
                                     <Col xs={12} className="mb-3">

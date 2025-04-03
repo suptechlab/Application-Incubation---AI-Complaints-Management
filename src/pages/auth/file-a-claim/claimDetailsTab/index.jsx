@@ -155,7 +155,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                             <Col xs={12}>
                                 <FormInputBox
                                     id="precedents"
-                                    label={t("PRECEDENTS")}
+                                    label={t("PRECEDENTS") }
                                     name="precedents"
                                     type="text"
                                     as="textarea"
@@ -165,6 +165,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                     onChange={formikProps.handleChange}
                                     touched={formikProps.touched.precedents}
                                     value={formikProps.values.precedents || ""}
+                                    helperText={t("HELPER_TEXT_PRECEDENTS")}
                                 />
                             </Col>
                             <Col xs={12}>
@@ -180,6 +181,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                     onChange={formikProps.handleChange}
                                     touched={formikProps.touched.specificPetition}
                                     value={formikProps.values.specificPetition || ""}
+                                    helperText={t("HELPER_TEXT_SPECIFIC_PETITION")}
                                 />
                             </Col>
                             <Col xs={12} className="mb-3">
@@ -235,7 +237,7 @@ const ClaimDetailsTab = ({ backButtonClickHandler, handleFormSubmit, setIsLoadin
                                     error={formikProps.errors.agreeDeclarations}
                                     type="checkbox"
                                     label={<>{t("AGREE_DECLARATIONS")}<Link to="/terms-conditions" target='_blank' className='text-decoration-none'> {t("TERMS_CONDITIONS")}  </Link> </>}
-                                    // label={t("AGREE_DECLARATIONS")}
+                                // label={t("AGREE_DECLARATIONS")}
                                 />
                             </Col>
                         </Row>

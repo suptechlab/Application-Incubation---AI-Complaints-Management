@@ -17,7 +17,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
 
     // Initial Values
     const initialValues = {
-        priorityCareGroup: 'NONE',
+        // priorityCareGroup: 'NONE',
         customerType: '',
         organizationId: '',
         entitysTaxID: '',
@@ -42,7 +42,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                             </h5>
                         </Stack>
                         <Row className="gx-4">
-                            <Col lg={6}>
+                            {/* <Col lg={6}>
                                 <ReactSelect
                                     label={t("PRIORITY_CARE_GROUP")+"*"}
                                     error={formikProps.errors.priorityCareGroup }
@@ -70,7 +70,7 @@ const OtherInfoTab = ({ backButtonClickHandler, handleFormSubmit }) => {
                                     onBlur={formikProps.handleBlur}
                                     touched={formikProps.touched.priorityCareGroup}
                                 />
-                            </Col>
+                            </Col> */}
                             <Col lg={6}>
                                 <ReactSelect
                                     label={t("CUSTOMER_TYPE") + '*'}
