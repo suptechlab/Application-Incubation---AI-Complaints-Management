@@ -282,7 +282,7 @@ const ViewClaim = ({ claimModalView, handleShow, handleClose, selectedRow }) => 
             condition: claimTicketData?.instanceType !== 'SECOND_INSTANCE'
         },
         {
-            label: t('COMMENTS'),
+            label: t('SPECIFIC_PETITION'),
             value: claimTicketData?.secondInstanceComment ?? t('N/A'),
             colProps: { xs: 12 },
             condition: claimTicketData?.instanceType === 'SECOND_INSTANCE'
