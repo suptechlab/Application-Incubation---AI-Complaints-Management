@@ -8,15 +8,15 @@ import { AuthenticationContext } from '../contexts/authentication.context';
 const InfoCards = ({claimStatsData , rowClassName = 'g-3 g-lg-4' }) => {
   const {t} = useTranslation()
 
-  const {userData} = useContext(AuthenticationContext)
+  const {currentUser, userData} = useContext(AuthenticationContext)
 
-  const isFiAdmin =  userData?.roles &&  userData?.roles?.length > 0 && userData?.roles[0]?.name === 'Fi Admin';
+  const isFiAgent = currentUser==='FI_USER' && userData?.roles &&  userData?.roles?.length > 0 && userData?.roles[0]?.name !== 'Fi Admin';
   const cardsData = [
     {
       bgColor: 'bg-primary',
       Icon: <MdConfirmationNumber size={24} />,
-      title: isFiAdmin ? t('ASSIGNED_TICKETS') : t('NEW_TICKETS'),
-      value: isFiAdmin 
+      title: isFiAgent ? t('ASSIGNED_TICKETS') : t('NEW_TICKETS'),
+      value: isFiAgent 
         ? claimStatsData?.countsByStatus?.ASSIGNED 
         : claimStatsData?.countsByStatus?.NEW,
       colProps: { sm: 6, lg: 3 }

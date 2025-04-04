@@ -457,7 +457,7 @@ const TicketsView = () => {
             value: ticketData?.organization?.razonSocial,
             colProps: { xs: 6, className: "py-2" },
           },
-          createAttachmentField("FIRST_I6NSTANCE", 'TOP'),
+          createAttachmentField("FIRST_INSTANCE", 'TOP'),
           {
             label: t("PRECEDENTS"),
             value: ticketData?.precedents,
