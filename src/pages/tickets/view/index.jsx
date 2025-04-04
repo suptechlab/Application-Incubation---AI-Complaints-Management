@@ -479,7 +479,7 @@ const TicketsView = () => {
           },
           createAttachmentField("SECOND_INSTANCE", "TOP"),
           {
-            label: t("COMMENT"),
+            label: t("SPECIFIC_PETITION"),
             value: ticketData?.secondInstanceComment,
             colProps: { xs: 12, className: "py-2" },
           },
