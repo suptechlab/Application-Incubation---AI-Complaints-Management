@@ -20,7 +20,7 @@ export default function FormInputBox({ label, touched, error, isTextarea, wrappe
     return (
         <div className={wrapperClassName || ''}>
             {label ? <label className='mb-1 fs-14' htmlFor={rest.id}>{label}
-                <AppTooltip
+               {helperText && <AppTooltip
                     title={helperText}
                 >
                     <Button
@@ -30,7 +30,7 @@ export default function FormInputBox({ label, touched, error, isTextarea, wrappe
                     >
                         <FiInfo size={16} />
                     </Button>
-                </AppTooltip>
+                </AppTooltip>}
             </label> : ""}
 
             {isTextarea ? (
