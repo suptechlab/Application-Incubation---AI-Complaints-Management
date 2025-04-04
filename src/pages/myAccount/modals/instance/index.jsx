@@ -148,7 +148,7 @@ const InstanceModal = ({ handleShow, selectedRow, handleClose }) => {
                                     <Col xs={12}>
                                         <FormInputBox
                                             id="comments"
-                                            label={t("COMMENTS")}
+                                            label={t("SPECIFIC_PETITION")}
                                             name="comments"
                                             type="text"
                                             as="textarea"

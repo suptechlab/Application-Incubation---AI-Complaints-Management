@@ -11,7 +11,7 @@ export const SecondInstanceFormSchema = yup.object({
 
     comments: yup
         .string()
-        .required(msg.commentsRequired),
+        .required(msg.specificPetitionRequired),
 
     agreeDeclarations: yup
         .boolean()
