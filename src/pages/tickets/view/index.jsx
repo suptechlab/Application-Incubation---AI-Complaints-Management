@@ -422,7 +422,7 @@ const TicketsView = () => {
       ...(instanceType === "SECOND_INSTANCE"
         ? [
             {
-              label: t("COMMENT"),
+              label: t("SPECIFIC_PETITION"),
               value: instanceData?.secondInstanceComment,
               colProps: { xs: 12, className: "py-2" },
             },
