@@ -70,7 +70,7 @@ export default function AuthenticationProvider({ children }) {
         })
     }
 
-    const OtpVerify = async (data,actions) => {
+    const OtpVerify = async (data, actions) => {
 
         handleVerifyOtp(data).then((response) => {
             if (response?.data?.id_token) {
@@ -80,7 +80,7 @@ export default function AuthenticationProvider({ children }) {
                 // GET USER INFO AND SET IT INTO LOCALSTORAGE
                 handleAccountDetails()
                 navigate("/dashboard");
-             
+
 
             } else {
                 toast.error(response?.data?.message);
@@ -90,7 +90,7 @@ export default function AuthenticationProvider({ children }) {
 
         }).catch((error) => {
             toast.error(error?.response?.data?.errorDescription ?? error?.message);
-        }).finally(()=>{
+        }).finally(() => {
             actions.setSubmitting(false)
         })
     }
@@ -151,8 +151,7 @@ export default function AuthenticationProvider({ children }) {
                 // handleImageDownload()
             })
             .catch((error) => {
-                console.error("Error fetching account details:", error);
-                if (error?.response?.status === '401') {
+                if (error?.response?.status == '401') {
                     toast.error(t("SESSION_EXPIRED"));
                     logout();
                 }

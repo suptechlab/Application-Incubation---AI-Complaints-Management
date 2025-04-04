@@ -12,7 +12,7 @@ import { ticketCloseValidation } from "../../../validations/ticketsManagement.va
 import PropTypes from "prop-types"
 import { MdOutlineMailOutline } from "react-icons/md";
 
-const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
+const CloseTicketModal = ({ modal, toggle, ticketId = "", setSelectedStatus, setIsGetActivityLogs, getTicketData }) => {
 
     const { t } = useTranslation();
     const { masterData } = useContext(MasterDataContext)
@@ -51,7 +51,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
         const formData = new FormData();
         formData.append("reason", values.reason);
         formData.append("closeSubStatus", values.closeSubStatus);
-        if (values.claimAmount && values?.claimAmount !==''){
+        if (values.claimAmount && values?.claimAmount !== '') {
             formData.append("claimAmount", values.claimAmount);
         }
         if (values.attachments) {
@@ -61,9 +61,9 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
             .then((response) => {
                 setSelectedStatus('CLOSED');
                 setIsGetActivityLogs((prev) => !prev)
-              
-                    getTicketData()
-               
+
+                getTicketData()
+
                 toast.success(response?.data?.message);
                 toggle()
             })
@@ -92,7 +92,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
             enforceFocus={false}
         >
             <Modal.Header className="pb-3">
-                <Modal.Title as="h4" className="fw-semibold"><MdOutlineMailOutline className="text-primary" size={20}/> {t("TICKET_CLOSE_STATUS")}  </Modal.Title>
+                <Modal.Title as="h4" className="fw-semibold"><MdOutlineMailOutline className="text-primary" size={20} /> {t("TICKET_CLOSE_STATUS")}  </Modal.Title>
             </Modal.Header>
             <Formik
                 initialValues={{
@@ -172,7 +172,7 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
                             }
                             <Col xs={12} className="mb-3 pb-1">
                                 <div className="mb-1 fs-14">{t("ATTACHMENT")}</div>
-                                <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
+                                <div className="theme-upload-cover">
                                     <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
                                             htmlFor="attachments"
@@ -205,15 +205,18 @@ const CloseTicketModal = ({ modal, toggle, ticketId="", setSelectedStatus, setIs
                                             }}
                                         />
                                     </div>
-                                    {values?.attachments && (
-                                        <span
-                                            // target="_blank"
-                                            // to="/fi-users/import"
-                                            className="text-decoration-none small mw-100 text-break"
-                                        >
-                                            {values.attachments.name}
-                                        </span>
-                                    )}
+                                    <div>
+                                        {values?.attachments && (
+                                            <span
+                                                // target="_blank"
+                                                // to="/fi-users/import"
+                                                className="text-decoration-none small mw-100 text-break"
+                                            >
+                                                {values.attachments.name}
+                                            </span>
+                                        )}
+                                        {touched?.attachments && errors?.attachments && <span className="form-text text-danger mw-100 text-break">{errors?.attachments}</span>}
+                                    </div>
                                 </div>
                             </Col>
                         </Modal.Body>
@@ -249,5 +252,5 @@ CloseTicketModal.propTypes = {
     setSelectedStatus: PropTypes.func.isRequired, // setSelectedStatus is a function (required)
     setIsGetActivityLogs: PropTypes.func.isRequired, // setIsGetActivityLogs is a function (required)
     getTicketData: PropTypes.func.isRequired, // getTicketData is a function (required)
-  };
+};
 export default CloseTicketModal;
