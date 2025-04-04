@@ -129,7 +129,7 @@ const RejectTicketModal = ({ modal, toggle, ticketId = "", setSelectedStatus, se
                             />
                             <Col xs={12} className="mb-3 pb-1">
                                 <div className="mb-1 fs-14">{t("ATTACHMENT")}</div>
-                                <div className="theme-upload-cover d-inline-flex align-items-center gap-3">
+                                <div className="theme-upload-cover gap-3">
                                     <div className="overflow-hidden position-relative z-1 flex-shrink-0">
                                         <label
                                             htmlFor="attachments"
