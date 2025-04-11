@@ -399,5 +399,6 @@ export const englishLang = {
     "CLAIM_SURVEY_QUE_3": 'Clarity in the response to your request',
     "CLAIM_SURVEY_QUE_4": 'The attention time to your request',
     "SATISFACTION_SURVEY": 'Satisfacción del cliente',
-    "POWER_BI_DASHBOARD":"Power Bi Dashboard"
+    "POWER_BI_DASHBOARD":"Power Bi Dashboard",
+    "SEARCH_BY_NAME_EMAIL" :"Search by name or email"
 }

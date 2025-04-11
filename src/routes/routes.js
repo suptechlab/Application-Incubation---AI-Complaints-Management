@@ -70,7 +70,8 @@ const routes = [
     element: <PowerBiDashboard />,
     isPrivate: true,
     layoutType: "Auth",
-    module: "power-bi-dashboard",
+    module: "Power BI Analysis Tool",
+    permissions:["POWER_BI_ANALYSIS_SEPS"]
   },
   {
     path: "/claim-type",

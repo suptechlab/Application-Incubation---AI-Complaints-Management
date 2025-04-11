@@ -170,7 +170,7 @@ export default function RoleRightsList() {
         id: "userType",
         header: () => t('ROLE & RIGHTS'),
         enableSorting: false,
-      },  
+      },
       ...(permissionsState?.statusModule
         ? [
           {
@@ -254,7 +254,8 @@ export default function RoleRightsList() {
         />
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
-            <ListingSearchForm filter={filter} setFilter={setFilter} />
+            <ListingSearchForm filter={filter} setFilter={setFilter}
+              searchPlaceholder={t('SEARCH_BY_NAME_EMAIL')} />
             <CommonDataTable
               columns={columns}
               dataQuery={dataQuery}
