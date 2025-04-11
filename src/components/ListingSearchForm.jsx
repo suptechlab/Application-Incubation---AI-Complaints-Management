@@ -5,19 +5,19 @@ import FormInput from "../components/FormInput";
 import ReactSelect from "./ReactSelect";
 import { LuFilterX } from "react-icons/lu";
 
-const ListingSearchForm = ({ filter, setFilter, hideFilter ,searchPlaceholder}) => {
+const ListingSearchForm = ({ filter, setFilter, hideFilter}) => {
 
   const { t } = useTranslation();
   return (
     <div className="theme-card-header header-search mb-3">
       <Stack direction="horizontal" gap={2} className="flex-wrap">
-        <div className={`${searchPlaceholder? 'custom-width-250' : 'custom-width-200'} flex-grow-1 flex-sm-grow-0 me-auto`}>
+        <div className={"custom-width-200 flex-grow-1 flex-sm-grow-0 me-auto"}>
           <FormInput
             wrapperClassName="mb-0"
             id="search"
             key={"search"}
             name="search"
-            placeholder={searchPlaceholder? searchPlaceholder : t("SEARCH")}
+            placeholder={t("SEARCH")}
             type="text"
             size="sm"
             onChange={(event) => {

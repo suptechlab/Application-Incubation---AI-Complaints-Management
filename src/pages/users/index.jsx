@@ -297,7 +297,7 @@ export default function UserList() {
           : ''}
         <Card className="border-0 flex-grow-1 d-flex flex-column shadow">
           <Card.Body className="d-flex flex-column">
-            <ListingSearchFormUsers filter={filter} setFilter={setFilter} />
+            <ListingSearchFormUsers filter={filter} setFilter={setFilter} searchPlaceholder={t('SEARCH_BY_NAME_EMAIL')} />
             <CommonDataTable
               columns={columns}
               dataQuery={dataQuery}
