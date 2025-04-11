@@ -243,7 +243,7 @@ export const spanishLang = {
     "ATTACHMENT DOWNLOADED": "Adjunto descargado",
     "DOWNLOAD_IN_PROGRESS": "Descarga en progreso",
     "DOWNLOAD_ERROR": "Error de descarga",
-    "DOWNLOAD" :"Descargar",
+    "DOWNLOAD": "Descargar",
     "REPLIES": "Respuestas",
     "CONSUMER_INFO": "Información del Usuario",
     "ENTER_EXTENDED_DATE": "Ingrese Fecha Extendida",
@@ -394,5 +394,6 @@ export const spanishLang = {
     "CLAIM_SURVEY_QUE_3": 'La claridad en la respuesta a su requerimiento.',
     "CLAIM_SURVEY_QUE_4": 'El tiempo de atención a su requerimiento.',
     "SATISFACTION_SURVEY": "Encuesta de Satisfacción",
-    "POWER_BI_DASHBOARD": "Panel de Power BI"
+    "POWER_BI_DASHBOARD": "Panel de Power BI",
+    "SEARCH_BY_NAME_EMAIL": "Buscar por nombre o correo electrónico"
 } 

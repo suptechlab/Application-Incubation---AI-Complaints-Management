@@ -33,7 +33,7 @@ export const filterNavItemsByModules = (navItems, modules) => {
     return items
       .filter((item) => {
         // Check if any of the subMenu or the parent menu itself should be included
-        const isParentVisible = moduleNames.includes(item.moduleName)  || item.default === true || item.moduleName==='power-bi-dashboard';
+        const isParentVisible = moduleNames.includes(item.moduleName)  || item.default === true ;
 
         // Check if any of the subMenu items' moduleName matches
         const filteredSubMenu = item.subMenu?.filter((subItem) =>
