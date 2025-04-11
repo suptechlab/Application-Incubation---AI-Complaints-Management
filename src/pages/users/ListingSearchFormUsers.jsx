@@ -7,7 +7,7 @@ import { getRolesDropdownData } from "../../services/rolerights.service";
 import toast from "react-hot-toast";
 import { LuFilterX } from "react-icons/lu";
 import AppTooltip from "../../components/tooltip";
-const ListingSearchFormUsers = ({ filter, setFilter }) => {
+const ListingSearchFormUsers = ({ filter, setFilter,searchPlaceholder }) => {
   const { t } = useTranslation();
 
   const [rolesDropdownData, setRolesDropdownData] = useState([])
@@ -40,13 +40,13 @@ const ListingSearchFormUsers = ({ filter, setFilter }) => {
   return (
     <div className="theme-card-header header-search mb-3">
       <Stack direction="horizontal" gap={2} className="flex-wrap">
-        <div className="custom-width-200 flex-grow-1 flex-sm-grow-0 me-auto">
+        <div className={`${searchPlaceholder? 'custom-width-250' : 'custom-width-200'} flex-grow-1 flex-sm-grow-0 me-auto`}>
           <FormInput
             wrapperClassName="mb-0"
             id="search"
             key={"search"}
             name="search"
-            placeholder={t("SEARCH")}
+            placeholder={searchPlaceholder? searchPlaceholder : t("SEARCH")}
             type="text"
             size="sm"
             onChange={(event) => {
