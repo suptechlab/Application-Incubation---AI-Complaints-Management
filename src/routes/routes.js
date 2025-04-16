@@ -71,7 +71,7 @@ const routes = [
     isPrivate: true,
     layoutType: "Auth",
     module: "Power BI Analysis Tool",
-    permissions:["POWER_BI_ANALYSIS_SEPS"]
+    permissions:["POWER_BI_ANALYSIS_SEPS","POWER_BI_ANALYSIS_FI"]
   },
   {
     path: "/claim-type",

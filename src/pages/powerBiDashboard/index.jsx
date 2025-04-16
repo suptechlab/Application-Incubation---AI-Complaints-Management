@@ -9,7 +9,7 @@ const PowerBiDashboard = () => {
 
   const { currentUser ,userData} = useContext(AuthenticationContext);
 
-  const powerBiLink = "https://app.powerbi.com/reportEmbed?reportId=0963bf23-e58c-4a19-b4fd-41674ba4089a&autoAuth=true&ctid=c05e11e5-706c-4cef-ba5e-18eedbf10037"
+  const powerBiLink = "https://app.powerbi.com/reportEmbed?reportId=52b8eb4e-5d0a-4261-bd8d-dcc8515b7bab&autoAuth=true&ctid=c05e11e5-706c-4cef-ba5e-18eedbf10037"
 
 
 
