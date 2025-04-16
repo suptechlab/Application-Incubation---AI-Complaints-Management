@@ -168,4 +168,15 @@
       tableName="permissions"/>
   </changeSet>
 
+  <changeSet id="1744780060337" author="matellio">
+    <loadData
+      file="config/liquibase/data/modules7.csv"
+      separator=","
+      tableName="modules"/>
+    <loadData
+      file="config/liquibase/data/permissions9.csv"
+      separator=","
+      tableName="permissions"/>
+  </changeSet>
+
 </databaseChangeLog>
