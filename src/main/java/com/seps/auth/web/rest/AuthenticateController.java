@@ -241,7 +241,7 @@ public class AuthenticateController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         // Step 7: Generate a JWT token for the authenticated user using the createToken method.
         // The token is configured to be used with "remember me" settings if applicable.
-        String jwt = this.createToken(authentication, true);
+        String jwt = this.createToken(authentication, user.isRememberMeFlag());
         // Step 8: Set the JWT token in HTTP headers for the response.
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
@@ -328,7 +328,7 @@ public class AuthenticateController {
      *         </ul>
      */
     @PostMapping("/send-login-otp")
-    public ResponseEntity<OtpResponse> sendLoginOtp(@Valid @RequestBody LoginOtpDTO dto,HttpServletRequest request){
+    public ResponseEntity<OtpResponse> sendLoginOtp(@Valid @RequestBody LoginOtpDTO dto, HttpServletRequest request){
         String clientIp = request.getRemoteAddr();
         // Verify reCAPTCHA
         if (!userService.isRecaptchaValid(dto.getRecaptchaToken())) {
@@ -340,7 +340,7 @@ public class AuthenticateController {
         userService.validateAccount(account);
         String login=account.getLogin();
         // Retrieve user, update OTP, and send via email
-        User user=userService.updateUserOtpInfo(login);
+        User user=userService.updateUserOtpInfo(login, dto.isRememberMe());
         mailService.sendLoginOtpEmail(user);
         // Log the successful login attempt
         userService.saveLoginLog(user,UserService.INITIATED, clientIp);
@@ -357,7 +357,7 @@ public class AuthenticateController {
         userService.validateAccount(account);
         String login=account.getLogin();
         // Retrieve user, update OTP, and send via email
-        User user=userService.updateUserOtpInfo(login);
+        User user=userService.updateUserOtpInfo(login, dto.isRememberMe());
         mailService.sendLoginOtpEmail(user);
         // Log the successful login attempt
         userService.saveLoginLog(user,UserService.INITIATED, clientIp);
@@ -387,7 +387,7 @@ public class AuthenticateController {
 
             userService.validateAccount(user);
             // Update user OTP and send email
-            User user1=userService.updateUserOtpInfo(user.getLogin());
+            User user1=userService.updateUserOtpInfo(user.getLogin(), loginVM.isRememberMe());
             mailService.sendLoginOtpEmail(user1);
             // Log successful login attempt
             userService.saveLoginLog(user1, UserService.INITIATED, clientIp);

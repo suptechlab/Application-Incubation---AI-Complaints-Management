@@ -359,7 +359,7 @@ public class UserService {
         return authorityRepository.findAll().stream().map(Authority::getName).toList();
     }
 
-    public User updateUserOtpInfo(String username) {
+    public User updateUserOtpInfo(String username, Boolean rememberMe) {
         User user = userRepository.findOneByLogin(username)
             .orElseThrow(() -> new CustomException(Status.BAD_REQUEST, SepsStatusCode.USER_NOT_FOUND, null, null));
         // Generate OTP data using OtpService
@@ -372,6 +372,7 @@ public class UserService {
         user.setOtpCodeExpirationTime(otpExpirationTime);
         user.setOtpToken(otpToken);
         user.setOtpTokenExpirationTime(otpTokenExpirationTime);
+        user.setRememberMeFlag(rememberMe);
         // Save user with updated OTP information
         return userRepository.save(user);
     }
