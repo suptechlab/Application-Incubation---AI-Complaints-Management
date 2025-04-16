@@ -8,7 +8,7 @@ public class LoginChatbotOtpDTO {
     @Email
     @NotBlank
     private String email;
-    private boolean rememberMe;
+    private boolean rememberMe =  false;
 
     public String getEmail() {
         return email;

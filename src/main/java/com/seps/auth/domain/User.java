@@ -164,6 +164,9 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Column(name = "remember_me_flag")
+    private boolean rememberMeFlag = false;
+
     public Long getId() {
         return id;
     }
@@ -444,6 +447,14 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
+    }
+
+    public boolean isRememberMeFlag() {
+        return rememberMeFlag;
+    }
+
+    public void setRememberMeFlag(boolean rememberMeFlag) {
+        this.rememberMeFlag = rememberMeFlag;
     }
 
     // prettier-ignore
