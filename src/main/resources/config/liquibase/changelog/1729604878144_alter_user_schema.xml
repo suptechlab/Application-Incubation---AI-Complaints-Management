@@ -64,4 +64,12 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="1744781004683" author="matellio">
+    <addColumn tableName="jhi_user">
+      <column name="remember_me_flag" type="boolean" defaultValueBoolean="false" remarks="When user mark true remember me flag token generate for 30 day, temp column">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>
