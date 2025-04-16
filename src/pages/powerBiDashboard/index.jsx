@@ -9,6 +9,8 @@ const PowerBiDashboard = () => {
 
   const { currentUser ,userData} = useContext(AuthenticationContext);
 
+  const powerBiLink = "https://app.powerbi.com/reportEmbed?reportId=52b8eb4e-5d0a-4261-bd8d-dcc8515b7bab&autoAuth=true&ctid=c05e11e5-706c-4cef-ba5e-18eedbf10037"
+
 
 
   return <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
@@ -31,12 +33,12 @@ const PowerBiDashboard = () => {
       <iframe
       title="PowerBiDashboard"
       id="reportFrame"
-      src="https://app.powerbi.com/reportEmbed?reportId=ee6f4d84-c752-4ef9-9a79-564302e0e16e&autoAuth=true&ctid=c05e11e5-706c-4cef-ba5e-18eedbf10037" height="600pt" width="100%"
+      src={powerBiLink} height="600pt" width="100%"
       style={{ width: '100%', height: '100%', border: 'none', border: "1px solid #ccc" }}
     /> :  <iframe
       title="PowerBiDashboard"
       id="reportFrame"
-      src= {`https://app.powerbi.com/reportEmbed?reportId=ee6f4d84-c752-4ef9-9a79-564302e0e16e&autoAuth=true&ctid=c05e11e5-706c-4cef-ba5e-18eedbf10037&filter=Claims/entity eq '${userData?.organization?.razonSocial}'`}
+      src= {`${powerBiLink}&filter=Claims/entity eq '${userData?.organization?.razonSocial}'`}
       style={{ width: '100%', height: '100%', border: 'none', border: "1px solid #ccc" }}
     />
     }
