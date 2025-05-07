@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,6 +53,11 @@ public class SurveyService {
             .orElseGet(() -> createNewSurvey(userId, ticketId));
     }
 
+    public String getGeneratedSurveyLink(Long userId, Long ticketId) {
+        return surveyRepository.findByUserIdAndTicketId(userId, ticketId)
+            .map(survey -> userBaseUrl + "/satisfaction-survey?token=" + survey.getToken())
+            .orElse("N/A");
+    }
     private String createNewSurvey(Long userId, Long ticketId) {
         String token = UUID.randomUUID().toString();
         Survey newSurvey = new Survey();
@@ -59,7 +65,7 @@ public class SurveyService {
         newSurvey.setUserId(userId);
         newSurvey.setToken(token);
         newSurvey.setCompleted(false);
-        surveyRepository.save(newSurvey);
+        surveyRepository.saveAndFlush(newSurvey);
 
         return userBaseUrl + "/satisfaction-survey?token=" + token;
     }
