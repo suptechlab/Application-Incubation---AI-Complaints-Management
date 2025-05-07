@@ -1040,6 +1040,7 @@ public class ClaimTicketService {
         if(ticket == null) {
             return;
         }
+        surveyService.generateSurveyLink(ticket.getUserId(),ticket.getId());
         if(ticket.getInstanceType().equals(InstanceTypeEnum.FIRST_INSTANCE)){
             List<User> fiAdmin = userService.getUserListByRoleSlug(ticket.getOrganizationId(), Constants.RIGHTS_FI_ADMIN);
             // Send email to FI Admin

@@ -141,7 +141,7 @@ public class TemplateVariableMappingService {
         }
         variableMap.put("surveyLink", "N/A");
         if(claimTicketDTO.getStatus().equals(ClaimTicketStatusEnum.CLOSED)){
-            String surveyLink = surveyService.generateSurveyLink(claimTicketDTO.getUserId(), claimTicketDTO.getId());
+            String surveyLink = surveyService.getGeneratedSurveyLink(claimTicketDTO.getUserId(), claimTicketDTO.getId());
             variableMap.put("surveyLink", surveyLink);
         }
         return variableMap;
@@ -197,7 +197,11 @@ public class TemplateVariableMappingService {
         // Audit details
         variableMap.put("createdBy", claimTicketDTO.getCreatedByUser() != null ? claimTicketDTO.getCreatedByUser().getFirstName() : "System");
         variableMap.put("updatedBy", claimTicketDTO.getUpdatedByUser() != null ? claimTicketDTO.getUpdatedByUser().getFirstName() : "System");
-
+        variableMap.put("surveyLink", "N/A");
+        if(claimTicketDTO.getStatus().equals(ClaimTicketStatusEnum.CLOSED)){
+            String surveyLink = surveyService.getGeneratedSurveyLink(claimTicketDTO.getUserId(), claimTicketDTO.getId());
+            variableMap.put("surveyLink", surveyLink);
+        }
         return variableMap;
     }
 }
