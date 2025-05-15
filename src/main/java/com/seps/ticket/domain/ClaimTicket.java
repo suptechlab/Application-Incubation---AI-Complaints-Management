@@ -251,8 +251,13 @@ public class ClaimTicket {
     @JoinColumn(name = "id", referencedColumnName = "ticket_id", insertable = false, updatable = false)
     private Survey survey;
 
-    @Transient  // Not a database field
+    @Column(name = "formatted_ticket_id")
+    private String formattedTicketId;
+
     public String getFormattedTicketId() {
+        if (formattedTicketId != null && !formattedTicketId.isEmpty()) {
+            return formattedTicketId;
+        }
         String year = String.valueOf(getCreatedYear());
         String claimTypeCode = (claimType != null) ? String.format("%03d", claimType.getId()) : "000";
         if(instanceType.equals(InstanceTypeEnum.FIRST_INSTANCE)) {
