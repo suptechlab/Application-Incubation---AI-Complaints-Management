@@ -79,7 +79,7 @@ public class UserClaimTicketService {
     private final UserRepository userRepository;
     private final ClaimTicketAssignLogRepository claimTicketAssignLogRepository;
     private final TempDocumentService tempDocumentService;
-
+    private final TicketNumberService ticketNumberService;
     public UserClaimTicketService(ProvinceRepository provinceRepository, CityRepository cityRepository,
                                   OrganizationRepository organizationRepository, ClaimTypeRepository claimTypeRepository,
                                   ClaimSubTypeRepository claimSubTypeRepository, ClaimTicketRepository claimTicketRepository,
@@ -88,7 +88,7 @@ public class UserClaimTicketService {
                                   ClaimTicketDocumentRepository claimTicketDocumentRepository, ClaimTicketStatusLogRepository claimTicketStatusLogRepository,
                                   ClaimTicketInstanceLogRepository claimTicketInstanceLogRepository, ClaimTicketPriorityLogRepository claimTicketPriorityLogRepository,
                                   EnumUtil enumUtil, ClaimTicketActivityLogService claimTicketActivityLogService, MailService mailService,
-                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, TempDocumentService tempDocumentService) {
+                                  ClaimTicketWorkFlowService claimTicketWorkFlowService, UserRepository userRepository, ClaimTicketAssignLogRepository claimTicketAssignLogRepository, TempDocumentService tempDocumentService, TicketNumberService ticketNumberService) {
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
         this.organizationRepository = organizationRepository;
@@ -99,6 +99,7 @@ public class UserClaimTicketService {
         this.userClaimTicketMapper = userClaimTicketMapper;
         this.auditLogService = auditLogService;
         this.tempDocumentService = tempDocumentService;
+        this.ticketNumberService = ticketNumberService;
         this.gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .create();
@@ -350,6 +351,7 @@ public class UserClaimTicketService {
         newClaimTicket.setCanCreateInstance(true);
         newClaimTicket.setSource(claimTicketRequest.getSource() != null ? claimTicketRequest.getSource() : SourceEnum.WEB);
         newClaimTicket.setChannelOfEntry(claimTicketRequest.getChannelOfEntry() !=null ? claimTicketRequest.getChannelOfEntry(): ChannelOfEntryEnum.WEB);
+        newClaimTicket.setFormattedTicketId(ticketNumberService.generateTicket(Constants.FIRST_INSTANCE_PREFIX,claimType.getId(),null));
         return newClaimTicket;
     }
 
@@ -801,6 +803,7 @@ public class UserClaimTicketService {
         newClaimTicket.setCreatedByUser(currentUser);
         newClaimTicket.setSecondInstanceComment(secondInstanceRequest.getComment());
         newClaimTicket.setPreviousTicketId(originalClaimId);
+        newClaimTicket.setFormattedTicketId(ticketNumberService.generateTicket(Constants.SECOND_INSTANCE_PREFIX,originalClaimTicket.getClaimType().getId(),originalClaimTicket.getFormattedTicketId()));
         newClaimTicket.setSource(secondInstanceRequest.getSource() != null ? secondInstanceRequest.getSource() : SourceEnum.WEB);
         newClaimTicket.setChannelOfEntry(secondInstanceRequest.getChannelOfEntry() !=null ? secondInstanceRequest.getChannelOfEntry(): ChannelOfEntryEnum.WEB);
         newClaimTicket.setCanCreateInstance(true);
@@ -1403,6 +1406,7 @@ public class UserClaimTicketService {
         complaintTicket.setStatus(ClaimTicketStatusEnum.NEW);
         complaintTicket.setCreatedByUser(currentUser);
         complaintTicket.setPreviousTicketId(originalClaimId);
+        complaintTicket.setFormattedTicketId(ticketNumberService.generateTicket(Constants.COMPLAINT_INSTANCE_PREFIX,originalClaimTicket.getClaimType().getId(),originalClaimTicket.getFormattedTicketId()));
         complaintTicket.setSource(complaintRequest.getSource() != null ? complaintRequest.getSource() : SourceEnum.WEB);
         complaintTicket.setChannelOfEntry(complaintRequest.getChannelOfEntry() != null ? complaintRequest.getChannelOfEntry() : ChannelOfEntryEnum.WEB);
         complaintTicket.setCanCreateInstance(false);

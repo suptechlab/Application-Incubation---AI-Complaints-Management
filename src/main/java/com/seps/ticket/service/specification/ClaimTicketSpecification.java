@@ -88,6 +88,11 @@ public class ClaimTicketSpecification {
                 criteriaBuilder.function("CONCAT", String.class, criteriaBuilder.literal("#"), root.get("ticketId")), "%" + filterRequest.getSearch() + "%"
             );
 
+            // Filter by formated
+            Predicate formateddTicketIdPredicate = criteriaBuilder.like(
+                criteriaBuilder.lower(root.get("formattedTicketId")), "%" + filterRequest.getSearch().toLowerCase() + "%"
+            );
+
             // Concatenate firstName and lastName, then filter by the concatenated value
             Join<Object, Object> user = root.join("user", JoinType.LEFT);
             Predicate userNamePredicate = criteriaBuilder.like(
@@ -101,7 +106,7 @@ public class ClaimTicketSpecification {
             );
 
             // Add both predicates as OR conditions
-            predicates.add(criteriaBuilder.or(ticketIdPredicate, userNamePredicate));
+            predicates.add(criteriaBuilder.or(ticketIdPredicate, userNamePredicate, formateddTicketIdPredicate));
         }
     }
 
