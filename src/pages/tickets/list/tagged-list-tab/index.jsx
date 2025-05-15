@@ -245,7 +245,7 @@ const TicketsTaggedList = ({ selectedTab }) => {
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
                             {"#" + row?.original?.formattedTicketId}
                         </Link>
-                        {row?.original?.haveClaimTicketDocuments && <MdAttachFile size={16} />}
+                        {row?.original?.haveClaimTicketDocuments && <span><MdAttachFile size={16} /></span>}
 
 
                         {/* <AppTooltip title="Attachments">

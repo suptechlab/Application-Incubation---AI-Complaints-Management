@@ -73,7 +73,7 @@ const ClaimOverviewReport = () => {
         cell: ({ row }) => (
           <Stack direction="horizontal" gap={2}>
             <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.formattedTicketId}</Link>
-            {row?.original?.haveClaimTicketDocuments && <MdAttachFile size={16} />}
+            {row?.original?.haveClaimTicketDocuments &&  <span><MdAttachFile size={16} /></span>}
           </Stack>
         ),
       },
