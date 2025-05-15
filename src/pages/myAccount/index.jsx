@@ -36,7 +36,7 @@ export default function MyAccount() {
   const [loading, setLoading] = useState(false)
   const [sorting, setSorting] = useState([{
     "id": "createdAt",
-    "asc": true
+    "desc": true
   }]);
   const [filter, setFilter] = useState({
     search: '',
