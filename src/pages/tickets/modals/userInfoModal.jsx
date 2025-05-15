@@ -14,7 +14,7 @@ const UserInfoModal = ({ userData, modal, toggle,masterData }) => {
     const InfoModalData = [
         {
           label: t("NATIONAL_ID"),
-          value: userData?.ticketId ?? '',
+          value: userData?.formattedTicketId ?? '',
           colProps: { sm: 6, lg: 4 },
         },
         {

@@ -66,13 +66,13 @@ const ClaimOverviewReport = () => {
     () => [
 
       {
-        accessorFn: (row) => row?.ticketId,
-        id: "ticketId",
+        accessorFn: (row) => row?.formattedTicketId,
+        id: "formattedTicketId",
         header: () => t("TICKET_ID"),
         enableSorting: false,
         cell: ({ row }) => (
           <Stack direction="horizontal" gap={2}>
-            <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.ticketId}</Link>
+            <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>{"#" + row?.original?.formattedTicketId}</Link>
             {row?.original?.haveClaimTicketDocuments && <MdAttachFile size={16} />}
           </Stack>
         ),

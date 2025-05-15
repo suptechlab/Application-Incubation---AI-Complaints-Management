@@ -72,7 +72,7 @@ const SlaReminderModal = ({ showModal, ticketData ,toggle,getTicketData}) => {
           <h2 className='fw-bold'>{t('REMINDER')}</h2>
           <h6 className='fw-semibold'>
             {t('SLA_BREACH_NOTICE', {
-              ticketId: ticketData?.ticketId,
+              ticketId: ticketData?.formattedTicketId,
               days: ticketData?.remainingDaysOfSla ? (ticketData?.remainingDaysOfSla).toString() : '0',
             })}
           </h6>

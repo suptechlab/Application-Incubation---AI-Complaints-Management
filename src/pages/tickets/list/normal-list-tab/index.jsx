@@ -259,7 +259,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                 },
             },
             {
-                accessorFn: (row) => row?.ticketId,
+                accessorFn: (row) => row?.formattedTicketId,
                 id: "ticketId",
                 header: () => t("TICKET_ID"),
                 enableSorting: true,
@@ -270,7 +270,7 @@ const TicketsNormalList = ({ selectedTab }) => {
                             <TbBellRingingFilled className="ring text-primary" size={18} />
                         }
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
-                            {"#" + row?.original?.ticketId}
+                            {"#" + row?.original?.formattedTicketId}
                         </Link>
                         {row?.original?.haveClaimTicketDocuments && <MdAttachFile size={16} />}
 
