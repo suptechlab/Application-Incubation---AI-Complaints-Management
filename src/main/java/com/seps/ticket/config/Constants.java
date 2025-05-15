@@ -28,6 +28,9 @@ public final class Constants {
     public static final Integer SLA_POPUP_OPEN_DAYS = 2;
     public static final String ADMIN_TICKET_URL_TEXT = "adminTicketUrl";
     public static final String CUSTOMER_TICKET_URL_TEXT = "userTicketUrl";
+    public static final String FIRST_INSTANCE_PREFIX = "R-ESFPS";
+    public static final String SECOND_INSTANCE_PREFIX = "R-SEPS";
+    public static final String COMPLAINT_INSTANCE_PREFIX = "D-SEPS";
     private Constants() {
     }
 }

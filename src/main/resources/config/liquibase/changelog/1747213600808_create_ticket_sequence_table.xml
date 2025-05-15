@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="1747213624810" author="matellio">
+    <createTable tableName="ticket_sequence">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="prefix" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="year" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_number" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="ticket_sequence" columnNames="prefix, year" constraintName="uk_ticket_seq_prefix_year"/>
+  </changeSet>
+
+  <changeSet id="1747219565434" author="matellio">
+    <!-- Add formatted_ticket_id column to claim_ticket table -->
+    <addColumn tableName="claim_ticket">
+      <column name="formatted_ticket_id" type="VARCHAR(100)" remarks="Formated Ticket number">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
+</databaseChangeLog>
