@@ -236,16 +236,16 @@ const TicketsTaggedList = ({ selectedTab }) => {
                 },
             },
             {
-                accessorFn: (row) => row?.ticketId,
+                accessorFn: (row) => row?.formattedTicketId,
                 id: "ticketId",
                 header: () => t("TICKET_ID"),
                 enableSorting: true,
                 cell: ({ row }) => (
                     <Stack direction="horizontal" gap={2}>
                         <Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
-                            {"#" + row?.original?.ticketId}
+                            {"#" + row?.original?.formattedTicketId}
                         </Link>
-                        {row?.original?.haveClaimTicketDocuments && <MdAttachFile size={16} />}
+                        {row?.original?.haveClaimTicketDocuments && <span><MdAttachFile size={16} /></span>}
 
 
                         {/* <AppTooltip title="Attachments">

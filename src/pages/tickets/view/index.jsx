@@ -398,7 +398,7 @@ const TicketsView = () => {
     const createInstanceFields = (instanceData, instanceType, position) => [
       {
         label: t("TICKET_ID"),
-        value: <Link target='_blank' to={`/tickets/view/${instanceData?.id}`} className=''>#{instanceData?.ticketId}</Link>,
+        value: <Link target='_blank' to={`/tickets/view/${instanceData?.id}`} className=''>#{instanceData?.formattedTicketId}</Link>,
         colProps: { xs: 6, className: "py-2" },
       },
       ...createCommonFields(instanceData, true),
@@ -560,7 +560,7 @@ const TicketsView = () => {
       <div className="d-flex flex-column pageContainer p-3 h-100 overflow-auto">
 
         <TicketViewHeader
-          title={"#" + ticketData?.ticketId && ticketData?.ticketId !== undefined ? ticketData?.ticketId : ''}
+          title={"#" + ticketData?.formattedTicketId && ticketData?.formattedTicketId !== undefined ? ticketData?.formattedTicketId : ''}
           ticketData={ticketData}
           setIsGetActivityLogs={setIsGetActivityLogs}
           getTicketData={getTicketDetails}

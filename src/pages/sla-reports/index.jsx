@@ -213,12 +213,12 @@ const SLAComplianceReport = () => {
   const columns = React.useMemo(
     () => [
       {
-        accessorFn: (row) => row?.ticketId,
-        id: "ticketId",
+        accessorFn: (row) => row?.formattedTicketId,
+        id: "formattedTicketId",
         header: () => t("TICKET_ID"),
         enableSorting: true,
         cell: ({ row }) => (<Link className="text-decoration-none fw-semibold" to={`/tickets/view/${row?.original?.id}`}>
-          {"#" + row?.original?.ticketId}
+          {"#" + row?.original?.formattedTicketId}
         </Link>)
       },
       {
