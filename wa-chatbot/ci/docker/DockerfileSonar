@@ -1,0 +1,12 @@
+FROM gradle:jdk11-openj9 as backend-compiler
+LABEL mantainer="Cristian.Freire@seps.gob.ec"
+WORKDIR /app
+COPY . .
+
+ARG SEPS_MAVEN_USER_ARG
+ARG SEPS_MAVEN_PASSWORD_ARG
+
+ENV SEPS_MAVEN_USER=$SEPS_MAVEN_USER_ARG
+ENV SEPS_MAVEN_PASSWORD=$SEPS_MAVEN_PASSWORD_ARG
+
+RUN gradle sonarqube -D'sonar.qualitygate.wait=true'  || return 0

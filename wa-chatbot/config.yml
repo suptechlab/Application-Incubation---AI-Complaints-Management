@@ -1,0 +1,72 @@
+# The config recipe.
+# This configuration defines the setup for the Rasa assistant.
+# Refer to https://rasa.com/docs/rasa/model-configuration/ for details.
+recipe: default.v1
+assistant_id: sepes_assistant  # Unique identifier for your assistant.
+
+language: es  # Language of the assistant. Change to 'en' for English.
+
+pipeline:
+  - name: WhitespaceTokenizer  # Splits text into tokens based on whitespace.
+    case_sensitive: false  # Ensures all input is treated in lowercase
+  - name: RegexFeaturizer  # Generates features using regular expressions.
+  - name: LexicalSyntacticFeaturizer  # Adds syntactic and lexical features to improve classification.
+  - name: CountVectorsFeaturizer  # Converts text into numeric features for ML models.
+  - name: CountVectorsFeaturizer  # Character-based featurizer for better text representation.
+    analyzer: "char_wb"
+    min_ngram: 1
+    max_ngram: 4
+  - name: DIETClassifier  # Handles intent classification and entity extraction.
+    epochs: 150  # Increased epochs for better training.
+    constrain_similarities: true
+    model_confidence: softmax  # Improved confidence calibration.
+    batch_strategy: balanced
+    learning_rate: 0.002
+  - name: EntitySynonymMapper  # Normalizes entity variants to a standard form.
+  - name: ResponseSelector  # Enables retrieval-based responses.
+    epochs: 100
+  - name: FallbackClassifier  # Provides fallback handling when predictions are uncertain.
+    threshold: 0.3  # Increased threshold to reduce fallback sensitivity.
+    ambiguity_threshold: 0.15  # Lower ambiguity sensitivity to prevent unnecessary fallbacks.
+
+rasa:
+  circuit_breaker_threshold: 50  # Reduced to prevent infinite fallback loops earlier.
+
+policies:
+  - name: MemoizationPolicy  # Memorizes exact matches from training stories.
+    max_history: 5  # Number of previous dialogue turns to consider.
+  - name: AugmentedMemoizationPolicy  # Adds capacity for partial matches in dialogue.
+    max_history: 10
+  - name: RulePolicy  # Handles rules like fallbacks and specific responses.
+    core_fallback_threshold: 0.4  # Fallback threshold for core policies.
+    core_fallback_action_name: "action_default_fallback"  # Custom fallback action.
+    enable_fallback_prediction: true
+  - name: TEDPolicy  # Transformer-based policy for flexible dialogue management.
+    max_history: 20  # Increased history for better context understanding.
+    epochs: 150  # Increased epochs for better policy training.
+    constrain_similarities: true
+    model_confidence: softmax  # Improved confidence calibration.
+    priority: 4  # Priority level to override other policies if needed.
+  - name: UnexpecTEDIntentPolicy  # Handles unexpected intents for out-of-distribution inputs.
+    max_history: 5
+    epochs: 100  # Increased epochs for better recognition of unexpected intents.
+    model_confidence: softmax
+    uncertainty_threshold: 0.2
+
+fallbacks:
+  nlu_fallback: true  # Enables NLU fallback handling.
+  default_fallback_intent_name: "nlu_fallback"  # Default fallback intent name.
+  fallback_core_action_name: "action_default_fallback"  # Core fallback action name.
+  fallback_threshold: 0.3  # Adjusted threshold for less sensitive fallback.
+
+training:
+  core:
+    epochs: 100  # Training iterations for Core.
+  nlu:
+    epochs: 75  # Increased epochs for better NLU performance.
+
+# Notes:
+# 1. Ensure 'action_default_fallback' is implemented in your actions.py file.
+# 2. Consider retraining the NLU model with more diverse examples to reduce fallback triggers.
+# 3. Use the Rasa X 'nlu log' feature to review fallback cases and improve the training data.
+# 4. Automated end-to-end conversation tests are recommended to validate conversation flows.

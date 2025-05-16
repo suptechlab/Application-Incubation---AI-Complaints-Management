@@ -1,0 +1,854 @@
+version: '3.1'
+intents:
+- accept_data_protection
+- decline_data_protection
+- greet
+- select_inquiry_option
+- select_claim_option
+- rag_inquiry_faq
+- end_query      
+- satisfaction
+- inform
+- input_repeated_character
+- input_single_character
+- input_typo
+- input_space_or_empty
+- select_existing_user
+- select_new_user
+- user_agree
+- upload_attachment
+- affirm_file_upload
+- deny_file_upload
+- file_a_claim
+- raise_a_second_instance
+- raise_a_complaint
+- select_ticket
+- select_second_instance_ticket_id
+- provide_ticket_status
+- select_status_ticket_id
+- information_structure_issue 
+- regular_inquiry
+- download_pdf
+- select_status_ticket_id_pdf
+- claim_menu_next
+- claim_ticket_next
+- claim_ticket_status_next
+- claim_complaint_ticket_next
+- second_instance_next_ticket
+- change_email
+
+
+entities:
+- name
+- satisfied
+- ease_of_finding
+- formats_provided
+- clarity_response
+- attention_time 
+- satisfaction
+- ticket_id
+- complaint_ticket_id
+- status_ticket_id
+- claim_reference_id
+- status_ticket_id_pdf
+- file_path
+- mime_type
+- caption
+
+slots:
+  data_protection_accepted:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: from_intent
+        intent: accept_data_protection
+        value: true
+      - type: from_intent
+        intent: decline_data_protection
+        value: false
+
+  menu_shown:
+    type: bool
+    initial_value: false
+    influence_conversation: true
+    mappings:
+      - type: custom
+
+
+  name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: provide_user_details_form
+            requested_slot: name
+
+  satisfied:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: satisfied
+
+  ease_of_finding:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: feedback_survey_form
+            requested_slot: ease_of_finding
+
+  formats_provided:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: feedback_survey_form
+            requested_slot: formats_provided
+
+  clarity_response:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: feedback_survey_form
+            requested_slot: clarity_response
+
+  attention_time:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: feedback_survey_form
+            requested_slot: attention_time
+
+  user_email:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: user_login_form
+            requested_slot: user_email
+
+  user_otp:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: user_login_form
+            requested_slot: user_otp
+
+
+  user_otp_token:
+    type: text
+    mappings:
+      - type: custom
+
+  id_token:
+    type: text
+    mappings:
+      - type: custom
+
+
+  activation_status:
+    type: bool
+    initial_value: false
+    mappings:
+      - type: custom
+
+  new_user_national_id:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: user_registration_form
+            requested_slot: new_user_national_id
+
+  new_user_fingerprint:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: user_registration_form
+            requested_slot: new_user_fingerprint
+  
+  new_user_fingerprint_valid:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  phone_number:
+    type: text
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: phone_number_form
+            requested_slot: phone_number
+
+  phone_number_required:
+    type: bool
+    initial_value: false
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  new_user_email:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: verify_email_form
+            requested_slot: new_user_email
+
+  new_user_otp:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: verify_email_form
+            requested_slot: new_user_otp
+
+  new_user_registered:
+    type: bool
+    influence_conversation: false  # Do not directly influence the conversation
+    mappings:
+      - type: custom  # Will be set manually in the action
+
+  claim_national_id:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  claim_full_name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  claim_email:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  claim_country_code:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  claim_phone_number:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  claim_gender:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  accept_terms:
+    type: bool
+    mappings:
+      - type: from_intent
+        intent: user_agree
+        value: true
+
+  accept_terms_second_instance:
+    type: bool
+    mappings:
+      - type: from_intent
+        intent: user_agree
+        value: true
+
+  accept_terms_complaint:
+    type: bool
+    mappings:
+      - type: from_intent
+        intent: user_agree
+        value: true
+
+  checkDuplicate:
+    type: bool
+    initial_value: false
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  ticket_id:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: ticket_id
+
+  complaint_antecedentes:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: complaint_claim_details_form
+            requested_slot: complaint_antecedentes
+
+  complaint_peticion_especifica:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: complaint_claim_details_form
+            requested_slot: complaint_peticion_especifica
+
+
+  second_instance_claim_comments:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: second_instance_claim_comments_form
+            requested_slot: second_instance_claim_comments
+
+  claim_reference_id:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: custom  
+
+  complaint_reference_id:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: custom  
+
+
+  complaint_ticket_id:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: complaint_ticket_id
+
+  status_ticket_id:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: status_ticket_id
+
+
+  flow_type:
+    type: categorical
+    values:
+      - claim
+      - complaint
+      - second_instance
+    influence_conversation: true  # Use this slot to influence predictions  
+    mappings:
+      - type: from_intent
+        intent: file_a_claim
+        value: claim
+      - type: from_intent
+        intent: raise_a_complaint
+        value: complaint
+      - type: from_intent
+        intent: raise_a_second_instance
+        value: second_instance
+
+  fallback_count:
+    type: any
+    initial_value: 0
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  file_upload_required:
+    type: bool
+    initial_value: false
+    influence_conversation: false
+    mappings:
+      - type: from_intent
+        intent: affirm_file_upload
+        value: true
+      - type: from_intent
+        intent: deny_file_upload
+        value: false
+
+  end_of_journey:
+    type: bool
+    initial_value: false
+    influence_conversation: false
+    mappings:
+    - type: custom  
+
+  handoff_requested:
+    type: bool
+    influence_conversation: false
+    mappings:
+    - type: custom  
+
+  pdf_ticket_id:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: status_ticket_id_pdf
+
+  inquiry_redirect:
+    type: bool
+    initial_value: false
+    influence_conversation: false
+    mappings:
+    - type: custom  
+
+  inquiry_resolved:
+    type: bool
+    initial_value: false
+    influence_conversation: false
+    mappings:
+    - type: custom  
+
+  should_continue_query:
+    type: bool
+    initial_value: true
+    influence_conversation: true
+    mappings:
+    - type: custom  
+
+  is_authenticated:
+    type: bool
+    initial_value: false  # Default to unauthenticated
+    influence_conversation: true  # Affects conversation flow
+    mappings:
+    - type: custom    
+
+  last_ticket_action:
+    type: any
+    initial_value: null
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  ticket_page:
+    type: any
+    initial_value: 1
+    influence_conversation: false
+    mappings:
+    - type: custom      
+
+  ticket_list:
+    type: any
+    initial_value: []
+    influence_conversation: false
+    mappings:
+    - type: custom  
+
+
+  file_path:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  mime_type:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom    
+
+  caption:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom    
+
+  complaint_attachments:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+responses:
+  utter_greet:
+  - text: ¡Hola! Soy SEPS Bot, tu asistente virtual.
+
+  utter_ask_data_protection_options:
+    - text: |
+        ¿Autoriza el uso y procesamiento de sus datos personales de acuerdo con la normativa legal vigente? 
+        Por favor seleccione una opción válida: 
+      buttons:
+        - title: Aceptar
+          payload: /accept_data_protection
+        - title: No aceptar
+          payload: /decline_data_protection
+
+  utter_ask_name:
+    - text: Por favor, proporcione su nombre y apellido.
+
+  # utter_ask_email:
+  # - text: Por favor, proporcione su dirección de correo electrónico. 
+
+  utter_processing_error:
+  - text: Hubo un problema al procesar su respuesta. Por favor, inténtelo de nuevo.
+
+  utter_menu_options:
+    - text: "Estas son las opciones disponibles:"
+      buttons:
+        - title: "Reclamo"
+          payload: "/select_claim_option"
+        - title: "Consulta"
+          payload: "/select_inquiry_option"
+
+  utter_ask_satisfaction:
+    - text: "¿Está satisfecho con el servicio?"
+      buttons:
+        - title: "😀 Sí"
+          payload: '/satisfaction{"satisfied": "true"}'
+        - title: "😞 No"
+          payload: '/satisfaction{"satisfied": "false"}'
+
+  utter_ask_ease_of_finding:
+    - text: "¿Cómo calificaría la facilidad de encontrar información sobre el servicio?"
+      custom:
+        list:
+          header: "Calificación de Facilidad de Información"
+          body: "Seleccione una calificación del 1 al 5"
+          options:
+            - title: "1 ⭐ Muy Malo"
+              payload: '/inform{{"ease_of_finding": "1"}}'
+            - title: "2 ⭐ Malo"
+              payload: '/inform{{"ease_of_finding": "2"}}'
+            - title: "3 ⭐ Promedio"
+              payload: '/inform{{"ease_of_finding": "3"}}'
+            - title: "4 ⭐ Bueno"
+              payload: '/inform{{"ease_of_finding": "4"}}'
+            - title: "5 ⭐ Excelente"
+              payload: '/inform{{"ease_of_finding": "5"}}'
+
+  utter_ask_formats_provided:
+    - text: "¿Cómo calificaría los formatos proporcionados por nuestro servicio?"
+      custom:
+        list:
+          header: "Calificación de Formatos"
+          body: "Seleccione una calificación del 1 al 5"
+          options:
+            - title: "1 ⭐ Muy Malo"
+              payload: '/inform{{"formats_provided": "1"}}'
+            - title: "2 ⭐ Malo"
+              payload: '/inform{{"formats_provided": "2"}}'
+            - title: "3 ⭐ Promedio"
+              payload: '/inform{{"formats_provided": "3"}}'
+            - title: "4 ⭐ Bueno"
+              payload: '/inform{{"formats_provided": "4"}}'
+            - title: "5 ⭐ Excelente"
+              payload: '/inform{{"formats_provided": "5"}}'
+
+  utter_ask_clarity_response:
+    - text: "¿Cómo calificaría la claridad de nuestra respuesta?"
+      custom:
+        list:
+          header: "Calificación de Claridad"
+          body: "Seleccione una calificación del 1 al 5"
+          options:
+            - title: "1 ⭐ Muy Malo"
+              payload: '/inform{{"clarity_response": "1"}}'
+            - title: "2 ⭐ Malo"
+              payload: '/inform{{"clarity_response": "2"}}'
+            - title: "3 ⭐ Promedio"
+              payload: '/inform{{"clarity_response": "3"}}'
+            - title: "4 ⭐ Bueno"
+              payload: '/inform{{"clarity_response": "4"}}'
+            - title: "5 ⭐ Excelente"
+              payload: '/inform{{"clarity_response": "5"}}'
+
+  utter_ask_attention_time:
+    - text: "¿Cómo calificaría el tiempo de atención recibido?"
+      custom:
+        list:
+          header: "Calificación de Tiempo de Atención"
+          body: "Seleccione una calificación del 1 al 5"
+          options:
+            - title: "1 ⭐ Muy Malo"
+              payload: '/inform{{"attention_time": "1"}}'
+            - title: "2 ⭐ Malo"
+              payload: '/inform{{"attention_time": "2"}}'
+            - title: "3 ⭐ Promedio"
+              payload: '/inform{{"attention_time": "3"}}'
+            - title: "4 ⭐ Bueno"
+              payload: '/inform{{"attention_time": "4"}}'
+            - title: "5 ⭐ Excelente"
+              payload: '/inform{{"attention_time": "5"}}'
+
+  utter_feedback_thank_you:
+    - text: |
+        ¡Gracias por su retroalimentación! Sus respuestas nos ayudan a mejorar nuestros servicios.
+
+
+  utter_no_input_detected:
+    - text: "Parece que no introdujo ningún texto. Por favor, intente nuevamente."
+
+  utter_default:
+    - text: "Lo siento, no entendí tu mensaje. ¿Puedes intentar reformularlo?"
+
+  utter_fallback:
+    - text: "No estoy seguro de lo que necesitas. ¿Te puedo ayudar en algo más específico?"
+
+  utter_wait_message:
+    - text: "Por favor, espere un momento."
+
+  utter_single_character_warning:
+    - text: "¿Podrías proporcionar más información, por favor?"
+
+  utter_typo_warning:
+    - text: "No estoy seguro de entender. ¿Podrías ser más claro?"
+
+  utter_repeated_character_warning:
+    - text: "Parece que se repitieron caracteres. ¿Podrías verificar tu entrada?"
+
+##################################Claims##############################################
+  utter_account_menu:
+    - text: "¿Eres un usuario existente o nuevo?"
+      buttons:
+        - title: "👤 Existente"
+          payload: "/select_existing_user"
+        - title: "🆕 Nuevo"
+          payload: "/select_new_user"
+
+  utter_ask_user_email:
+    - text: "Por favor, proporciona tu dirección de correo electrónico para continuar."
+
+  utter_ask_user_otp:
+    - text: "✅ Se ha enviado un OTP a su correo electrónico. Revise su bandeja de entrada e ingréselo para continuar."
+
+  utter_thank_you_phone_number:
+    - text: "Gracias por enviar su número de teléfono: {phone_number}."
+
+  utter_setup_account:
+    - text: "Para presentar un reclamo, primero debe crear una cuenta como nuevo usuario."
+
+  utter_ask_new_user_national_id:
+  - text: "Por favor, proporcione su número de documento de identidad."  
+
+  utter_ask_new_user_fingerprint:
+    - text: "Por favor, proporcione su código dactilar para verificación."
+
+  utter_nationalid_fingerprint_verification:
+    - text: "La verificación se está procesando con el número de documento de identidad: {new_user_national_id} y el código dactilar: {new_user_fingerprint}."
+
+  utter_ask_phone_number:
+    - text: "Por favor, proporciona tu número de teléfono."
+
+  utter_ask_new_user_email:
+    - text: "Por favor, ingrese una dirección de correo electrónico válida."  
+
+  utter_ask_new_user_otp:
+    - text: "Por favor, ingresa el código OTP enviado a tu correo electrónico."
+
+  utter_ask_upload_attachment_with_buttons:
+    - text: "¿Deseas cargar un archivo?"
+      buttons:
+        - title: "📂 Sí, subir"
+          payload: "/affirm_file_upload"
+        - title: "🚫 No, omitir"
+          payload: "/deny_file_upload"
+
+  utter_file_upload_instructions:
+    - text: "Por favor, carga el archivo ahora. Formatos permitidos: pdf, doc, docx, txt, jpeg, jpg, png."
+
+  utter_file_upload_status:
+    - text: "El archivo se ha cargado correctamente. ¿Quieres continuar?"
+
+  utter_confirm_agreement:
+    - text: Gracias por aceptar los términos✅. Estamos presentando la segunda instancia 📄.
+ 
+  utter_ask_accept_terms:
+    - text: "He leido y acepto los términos y condiciones: https://webportal-stg-suptech.seps.gob.ec/terms-conditions" 
+      buttons:
+        - title: "✅ Sí, acepto"
+          payload: "/user_agree"
+
+  utter_ask_accept_terms_second_instance:
+    - text: "He leido y acepto los términos y condiciones: https://webportal-stg-suptech.seps.gob.ec/terms-conditions"
+      buttons:
+        - title: "✅ Sí, acepto"
+          payload: "/user_agree"
+
+  utter_ask_accept_terms_complaint:
+    - text: "He leido y acepto los términos y condiciones: https://webportal-stg-suptech.seps.gob.ec/terms-conditions"
+      buttons:
+        - title: "✅ Sí, acepto"
+          payload: "/user_agree"
+
+
+  utter_ask_file_metadata:
+    - text: "Por favor, suba un archivo o proporcione la información del archivo (nombre, fuente, ruta)."
+
+  utter_file_upload_success:
+    - text: "¡El archivo se procesó correctamente: {uploaded_file}!"
+
+  utter_file_upload_failure:
+    - text: "Hubo un problema al procesar su archivo. Intente nuevamente más tarde."
+
+  utter_disagreement_message:
+    - text: "Entendido. No podemos proceder sin tu acuerdo."
+
+  utter_ask_agreement:
+    - text: "Por favor, acepte los términos y condiciones."
+
+  utter_upload_optional_attachment:
+    - text: "Por favor, sube un archivo si deseas incluir información adicional. Esto es opcional, así que si no es necesario, puedes continuar."
+
+  utter_claim_menu:
+    - text: "¿Desea realizar otra acción?"
+      buttons:
+        - title: "📝 Primera instancia"
+          payload: "/file_a_claim"
+        - title: "📜 Segunda Instancia"
+          payload: "/raise_a_second_instance"
+        - title: "➡️ Más Opciones"
+          payload: "/claim_menu_next"
+
+  utter_claim_menu_next:
+    - text: "📌 Más opciones:"
+      buttons:
+        - title: "📢 Denuncia"
+          payload: "/raise_a_complaint"
+        - title: "📄 Ticket Estado"
+          payload: "/provide_ticket_status"
+        - title: "📥 Descargar PDF"
+          payload: "/download_pdf"
+
+
+  utter_ask_second_instance_claim_comments:
+    - text: "Por favor, proporcione su comentario (máximo 4000 caracteres)."
+
+  utter_raise_a_complaint:
+    - text: "Por supuesto, cuéntame más sobre tu queja."
+
+  utter_ask_complaint_antecedentes:
+    - text: "Por favor, proporcione los antecedentes (máximo 4000 caracteres)."
+
+  utter_ask_complaint_peticion_especifica:
+    - text: "Por favor, petición concreta(máximo 4000 caracteres)."
+
+  utter_skip_upload:
+    - text: "¡No hay problema! Puede continuar sin subir ningún documento."
+
+
+  utter_continue_with_bot:
+    - text: "Está bien, continuaré ayudándote. ¿En qué más te puedo asistir?"  
+
+  utter_ask_issue_type:
+    - text: "¿Qué acción desea realizar?"
+      buttons:
+        - title: "🗣️ Agente en vivo"
+          payload: "/regular_inquiry"
+        - title: "📄 Estructura info"
+          payload: "/information_structure_issue"
+
+
+forms:
+  provide_user_details_form:
+    required_slots:
+      - name
+      # - email
+
+  feedback_survey_form:
+    required_slots:
+      - ease_of_finding
+      - formats_provided
+      - clarity_response
+      - attention_time
+
+  user_login_form:
+    required_slots:
+      - user_email
+      - user_otp
+
+  user_registration_form:
+    required_slots:
+      - new_user_national_id
+      - new_user_fingerprint
+
+  phone_number_form:
+    required_slots:
+      - phone_number
+
+  verify_email_form:
+    required_slots:
+      - new_user_email
+      - new_user_otp
+
+  user_agree_second_instance_form:
+    required_slots:
+      - accept_terms_second_instance
+
+  user_agree_complaint_form:
+    required_slots:
+      - accept_terms_complaint
+
+  second_instance_claim_comments_form:
+    required_slots:
+      - second_instance_claim_comments
+
+  complaint_claim_details_form:
+      required_slots:
+        - complaint_antecedentes
+        - complaint_peticion_especifica
+
+actions:
+- action_set_data_protection_accepted
+- action_extract_and_check_token
+- validate_provide_user_details_form
+- action_handle_inquiry
+- action_answer_with_rag
+- action_check_satisfaction
+- action_handle_satisfaction
+- action_redirect_to_collection_center
+- action_default_fallback
+- action_handle_fallback
+- action_end_conversation
+- validate_user_login_form
+- action_submit_user_login_form
+- validate_user_registration_form
+- validate_phone_number_form
+- validate_verify_email_form
+- validate_user_agree_claim_form
+- action_handle_file_upload
+- action_file_claim
+- action_register_user
+- action_fetch_claim_reference
+- action_fetch_tickets
+- validate_second_instance_claim_comments_form
+- action_file_second_instance
+- validate_complaint_details_form
+- action_fetch_complaint_tickets
+- action_fetch_complaint_reference
+- action_file_complaint
+- action_fetch_ticket_ids_status
+- action_show_ticket_details_status
+- action_proceed_with_claim
+- action_reset_all_slots_except_token
+- action_reset_all_slots
+- action_set_end_of_journey_false
+- action_human_agent_handoff
+- action_resume_conversation
+- action_handle_metadata
+- action_fetch_ticket_ids_status_pdf_download
+- action_download_pdf
+- action_send_inquiry_datapoints
+- action_redirect_file_first_claim
+- action_reset_email
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: false

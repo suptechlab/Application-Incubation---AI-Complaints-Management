@@ -1,0 +1,494 @@
+version: "3.1"
+
+rules:
+
+  - rule: Greet the user and check menu
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+
+  # - rule: greet user at conversation start
+  #   conversation_start: true
+  #   steps:
+  #     - intent: greet
+  #     - action: utter_greet
+  #     - action: utter_menu_options
+
+  - rule: Handle inquiry menu selection
+    steps:
+      - intent: select_inquiry_option
+      - action: provide_user_details_form
+      - active_loop: provide_user_details_form      
+
+  - rule: Collect user details form and display menu
+    condition:
+      - active_loop: provide_user_details_form
+    steps:
+      - action: provide_user_details_form
+      - active_loop: null
+      # - action: utter_thank_you
+
+  - rule: Handle RAG inquiry FAQs
+    steps:
+      - intent: rag_inquiry_faq
+      - action: action_answer_with_rag
+  #     - slot_was_set:
+  #         - should_continue_query: true  # Ensure correct slot name
+          
+  # - rule: Handle user selecting continue
+  #   steps:
+  #     - intent: continue_query
+  #     - action: action_answer_with_rag
+
+
+  # - rule: Handle user selecting continue
+  #   steps:
+  #     - intent: continue_query
+  #     - action: action_answer_with_rag  # Directly answer, no action_listen
+
+  - rule: Handle user selecting end query
+    steps:
+      - intent: end_query
+      - action: action_check_satisfaction
+
+
+  # - rule: Handle RAG inquiry FAQs
+  #   steps:
+  #     - intent: rag_inquiry_faq
+  #     - action: action_answer_with_rag
+  #     - slot_was_set:
+  #         - continue_query: true
+  #     - action: action_listen  # Bot listens for more queries
+
+  # - rule: Handle user selecting continue
+  #   steps:
+  #     - intent: continue_query
+  #     - action: action_listen
+  #     - action: action_answer_with_rag
+
+  # - rule: Handle user selecting end query
+  #   steps:
+  #     - intent: end_query
+  #     - action: action_check_satisfaction
+
+  - rule: Handle satisfaction - satisfied
+    steps:
+      - action: action_check_satisfaction
+      - intent: satisfaction
+        entities:
+          - satisfied: "true"
+      - action: action_handle_satisfaction
+
+  - rule: Handle satisfaction - not satisfied
+    steps:
+      - intent: satisfaction
+        entities:
+          - satisfied: "false"
+      - action: utter_ask_issue_type    
+
+  - rule: Form submission
+    condition:
+      - active_loop: feedback_survey_form
+    steps:
+      - action: feedback_survey_form
+      - active_loop: null
+      - action: action_send_inquiry_datapoints
+      - action: utter_feedback_thank_you      
+      - action: utter_menu_options
+      
+#####################claim####################################
+ # Rule: Handle Claims Menu Selection
+  - rule: Handle claims menu selection
+    steps:
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+
+  # Rule: Handle data protection acceptance
+  - rule: Handle data protection acceptance
+    steps:
+      - intent: accept_data_protection
+      - action: action_set_data_protection_accepted
+      - action: utter_account_menu      
+
+  # Rule: Handle data protection decline
+  - rule: Handle data protection decline
+    steps:
+      - intent: decline_data_protection
+      - action: action_set_data_protection_accepted
+      - action: action_end_conversation
+
+  # Rule: Activate User Login Form when selecting an existing user
+  - rule: Select existing user and activate login form
+    steps:
+      - intent: select_existing_user
+      - action: user_login_form
+      - active_loop: user_login_form
+
+  # Rule: Verify OTP after Resend
+  - rule: Verify OTP 
+    condition:
+      - active_loop: user_login_form
+    steps:
+      - action: user_login_form
+      - active_loop: user_login_form
+
+### New User Selection
+  # Rule: Handle New User Selection
+  - rule: Handle new user selection
+    steps:
+      - intent: select_new_user
+      - action: utter_setup_account
+      - action: user_registration_form
+      - active_loop: user_registration_form
+
+  # Rule: Handle New User Selection
+  - rule: Handle new user selection
+    steps:
+      - intent: select_new_user
+      - action: utter_setup_account
+      - action: user_registration_form
+      - active_loop: user_registration_form
+
+  # Rule: Deactivate User Login Form
+  - rule: Deactivate user registration form
+    condition:
+      - active_loop: user_registration_form
+    steps:
+      - action: user_registration_form
+      - active_loop: null
+      - action: utter_nationalid_fingerprint_verification
+      - action: phone_number_form
+      - active_loop: phone_number_form
+
+  - rule: Collect phone number
+    condition:
+      - active_loop: phone_number_form
+    steps:
+      - action: phone_number_form
+      - active_loop: null
+      - action: utter_thank_you_phone_number 
+      - action: verify_email_form    
+      - active_loop: verify_email_form   
+
+  - rule: Deactivate new user login form
+    condition:
+      - active_loop: verify_email_form
+    steps:
+      - action: verify_email_form
+      - active_loop: null
+      - action: action_register_user
+      - action: action_redirect_file_first_claim
+      - slot_was_set:
+          - end_of_journey: true  # <<< Set the slot here >>>
+      - action: utter_claim_menu
+      
+  - rule: Deactivate user login form
+    condition:
+      - active_loop: user_login_form
+    steps:
+      - action: user_login_form
+      - active_loop: null
+      - action: utter_claim_menu
+
+  - rule: File a Claim
+    steps:
+      - intent: file_a_claim
+      - action: action_redirect_file_first_claim
+      - slot_was_set:
+        - end_of_journey: true
+      - action: utter_claim_menu
+      
+  ######################################################################
+  #                   SECOND INSTANCE FLOW
+  ######################################################################
+  - rule: user starts second instance
+    steps:
+      - intent: raise_a_second_instance
+      - slot_was_set:
+        - flow_type: "second_instance"
+      - action: action_fetch_tickets
+
+  - rule: select first instance ticket
+    condition:
+      - slot_was_set:
+        - flow_type: "second_instance"
+    steps:
+      - intent: select_ticket
+      - action: action_fetch_claim_reference
+      - action: second_instance_claim_comments_form
+      - active_loop: second_instance_claim_comments_form
+
+
+  - rule: submit second instance claim form
+    condition:
+      - active_loop: second_instance_claim_comments_form
+      - slot_was_set:
+        - flow_type: "second_instance"
+    steps:
+      - action: second_instance_claim_comments_form
+      - active_loop: null
+      - action: utter_ask_upload_attachment_with_buttons
+
+  # Handle file upload (second instance)
+  - rule: check file upload (second_instance)
+    condition:
+      - slot_was_set:
+        - flow_type: "second_instance"
+    steps:
+      - intent: affirm_file_upload
+      - action: utter_file_upload_instructions
+      - action: action_handle_file_upload 
+
+
+  # Handle file upload (complaint)
+  - rule: handle file upload (second_instance)
+    condition:
+      - slot_was_set:
+        - flow_type: "second_instance"
+    steps:
+      - intent: upload_attachment
+      - action: action_handle_metadata
+      - action: utter_ask_accept_terms  # ask claim terms
+
+  - rule: skip file upload (second instance)
+    condition:
+      - slot_was_set:
+        - flow_type: "second_instance"
+    steps:
+      - intent: deny_file_upload
+      - action: utter_skip_upload
+      - action: utter_ask_accept_terms_second_instance
+
+  # Start second instance agreement form
+  - rule: start second instance agreement form
+    condition:
+      - slot_was_set:
+        - flow_type: "second_instance"
+    steps:
+      - intent: user_agree
+      - action: user_agree_second_instance_form
+      - active_loop: user_agree_second_instance_form
+
+  # Fill second instance agreement form
+  - rule: fill second instance agreement form
+    condition:
+      - active_loop: user_agree_second_instance_form
+      - slot_was_set:
+        - flow_type: "second_instance"
+    steps:
+      - action: user_agree_second_instance_form
+      - active_loop: null
+      - action: utter_confirm_agreement
+      - action: action_file_second_instance
+      - slot_was_set:
+        - end_of_journey: true
+      - action: utter_claim_menu
+
+  ######################################################################
+  #                      COMPLAINT FLOW
+  ######################################################################
+  - rule: user starts complaint flow
+    steps:
+      - intent: raise_a_complaint
+      - slot_was_set:
+        - flow_type: "complaint"
+      - action: action_fetch_complaint_tickets
+
+  - rule: select second instance ticket (complaint)
+    condition:
+      - slot_was_set:
+        - flow_type: "complaint"
+    steps:
+      - intent: select_second_instance_ticket_id
+      - action: action_fetch_complaint_reference
+      - action: complaint_claim_details_form
+      - active_loop: complaint_claim_details_form
+
+  - rule: submit complaint claim form
+    condition:
+      - active_loop: complaint_claim_details_form
+      - slot_was_set:
+        - flow_type: "complaint"
+    steps:
+      - action: complaint_claim_details_form
+      - active_loop: null
+      - action: utter_ask_upload_attachment_with_buttons
+
+  - rule: check file upload (complaint)
+    condition:
+      - slot_was_set:
+        - flow_type: "complaint"
+    steps:
+      - intent: affirm_file_upload
+      - action: utter_file_upload_instructions
+      - action: action_handle_file_upload 
+
+
+  # Handle file upload (complaint)
+  - rule: handle file upload (complaint)
+    condition:
+      - slot_was_set:
+        - flow_type: "complaint"
+    steps:
+      - intent: upload_attachment
+      - action: action_handle_metadata
+      - action: utter_ask_accept_terms  # ask claim terms
+
+
+  - rule: skip file upload (complaint)
+    condition:
+      - slot_was_set:
+        - flow_type: "complaint"
+    steps:
+      - intent: deny_file_upload
+      - action: utter_skip_upload
+      - action: utter_ask_accept_terms_complaint
+
+  # Start complaint agreement form
+  - rule: start complaint agreement form
+    condition:
+      - slot_was_set:
+        - flow_type: "complaint"
+    steps:
+      - intent: user_agree
+      - action: user_agree_complaint_form
+      - active_loop: user_agree_complaint_form
+
+  # Fill complaint agreement form
+  - rule: fill complaint agreement form
+    condition:
+      - active_loop: user_agree_complaint_form
+      - slot_was_set:
+        - flow_type: "complaint"
+    steps:
+      - action: user_agree_complaint_form
+      - active_loop: null
+      - action: utter_confirm_agreement
+      - action: action_file_complaint
+      - slot_was_set:
+        - end_of_journey: true
+      - action: utter_claim_menu
+
+  ######################## select ticket id for status #####################################
+  - rule: select ticket id  
+    steps:
+      - intent: provide_ticket_status
+      - action: action_fetch_ticket_ids_status
+
+  - rule: select ticket status
+    steps:
+      - intent: select_status_ticket_id
+      - action: action_show_ticket_details_status
+      - slot_was_set:
+        - end_of_journey: true
+      - action: utter_claim_menu
+
+
+  ##################### Fallback ######################################
+  - rule: Handle unrecognized input with action_handle_fallback
+    steps:
+      - intent: nlu_fallback
+      - action: action_handle_fallback
+
+  - rule: Handle empty or space-only input
+    steps:
+      - intent: input_space_or_empty
+      - action: utter_wait_message
+
+  - rule: Handle single-character inputs
+    steps:
+      - intent: input_single_character
+      - action: utter_single_character_warning
+
+  - rule: Handle typo inputs
+    steps:
+      - intent: input_typo
+      - action: utter_typo_warning
+
+  - rule: Handle repeated characters
+    steps:
+      - intent: input_repeated_character
+      - action: utter_repeated_character_warning
+
+
+
+  - rule: Reset slots for new journey
+    condition:
+      - slot_was_set:
+          - end_of_journey: true
+    steps:
+      - action: action_reset_all_slots_except_token
+      - action: action_set_end_of_journey_false
+
+
+########################### PDF Download ########################
+  - rule: select ticket id  
+    steps:
+      - intent: download_pdf
+      - action: action_fetch_ticket_ids_status_pdf_download
+
+  - rule: select ticket status
+    steps:
+      - intent: select_status_ticket_id_pdf
+      - action: action_download_pdf
+      - slot_was_set:
+        - end_of_journey: true
+      - action: utter_claim_menu
+
+
+
+  - rule: Show Claim Menu Next (Second Page)
+    steps:
+      - intent: claim_menu_next
+      - action: utter_claim_menu_next
+
+  - rule: Fetch and show ticket IDs as WhatsApp buttons
+    steps:
+      - intent: claim_ticket_next
+      - action: action_fetch_ticket_ids_status_pdf_download  
+
+  - rule: Fetch and show status ticket IDs as WhatsApp buttons
+    steps:
+      - intent: claim_ticket_status_next
+      - action: action_fetch_ticket_ids_status  
+
+  - rule: Fetch complaint tickets
+    steps:
+      - intent: claim_complaint_ticket_next
+      - action: action_fetch_complaint_tickets
+
+  - rule: Fetch second instance tickets
+    steps:
+      - intent: second_instance_next_ticket
+      - action: action_fetch_tickets
+
+      
+
+  # 📌 Rule 1: Allow user to change email
+  - rule: Allow user to change email
+    condition:
+      - active_loop: user_login_form
+    steps:
+      - intent: change_email
+      - action: action_reset_email  # Clears previous email before restarting
+      - action: user_login_form
+      - active_loop: user_login_form
+
+  # 🔐 Rule 2: Verify OTP
+  - rule: Verify OTP
+    condition:
+      - active_loop: user_login_form
+    steps:
+      - action: user_login_form
+      - active_loop: user_login_form
+
+  # # 🔄 Rule 3: Resend OTP
+  # - rule: Resend OTP
+  #   condition:
+  #     - active_loop: user_login_form
+  #   steps:
+  #     - intent: resend_otp
+  #     - action: action_resend_user_otp
+  #     - action: user_login_form
+  #     - active_loop: user_login_form

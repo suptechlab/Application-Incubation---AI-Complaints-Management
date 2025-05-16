@@ -1,0 +1,146 @@
+version: "3.1"
+
+stories:
+  # Story: User declines data protection
+  - story: User declines data protection
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: decline_data_protection
+      - action: action_set_data_protection_accepted
+      - action: action_end_conversation
+
+  - story: User asks multiple queries and is satisfied
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_inquiry_option
+      - action: provide_user_details_form
+      - active_loop: provide_user_details_form
+      - action: provide_user_details_form
+      - active_loop: null
+      - intent: rag_inquiry_faq
+      - action: action_answer_with_rag
+      - intent: end_query
+      - action: action_check_satisfaction
+
+      # Handling user satisfaction and feedback
+      - intent: satisfaction
+        entities:
+          - entity: satisfied
+            value: "true"
+      - action: action_handle_satisfaction
+      - active_loop: feedback_survey_form
+      - action: feedback_survey_form
+      - active_loop: null
+      - action: action_send_inquiry_datapoints
+      - action: utter_feedback_thank_you
+      - action: utter_menu_options
+
+  - story: User asks multiple queries and is not satisfied
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - action: utter_menu_options
+
+      - intent: select_inquiry_option
+      - action: provide_user_details_form
+      - active_loop: provide_user_details_form
+      - action: provide_user_details_form
+      - active_loop: null
+
+      - intent: rag_inquiry_faq
+      - action: action_answer_with_rag
+      - intent: end_query
+      - action: action_check_satisfaction
+
+      # Handling dissatisfaction and branching to issue resolution
+      - intent: satisfaction
+        entities:
+          - entity: satisfied
+            value: "false"
+      - action: action_handle_satisfaction
+      - action: utter_ask_issue_type
+
+  # Branch 1: Information Structure Issue (for multiple queries)
+  - story: User with multiple queries has an information structure issue
+    steps:
+      - intent: information_structure_issue
+      - action: action_redirect_to_collection_center
+      - action: action_send_inquiry_datapoints      
+      - action: utter_menu_options
+
+  # Branch 2: Regular Inquiry with Live Agent Handoff (for multiple queries)
+  - story: User with multiple queries wants a live agent
+    steps:
+      - intent: regular_inquiry
+      - action: action_human_agent_handoff
+      - slot_was_set:
+          - handoff_requested: true
+      - action: action_send_inquiry_datapoints          
+      # - action: utter_feedback_thank_you
+      - action: utter_menu_options
+
+#######################################Claims##############################################
+  
+  - story:  user files the claim check duplicate and proceed with duplicate with file 
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: accept_data_protection
+      - action: action_set_data_protection_accepted
+      - action: utter_account_menu
+      - intent: select_existing_user
+      - action: user_login_form
+      - active_loop: user_login_form
+      - action: user_login_form  
+      - active_loop: null
+      - action: utter_claim_menu
+      - intent: file_a_claim
+      - action: action_redirect_file_first_claim      
+      - slot_was_set:
+          - end_of_journey: true
+      - action: utter_claim_menu
+
+
+  - story: User accepts data protection and makes a claim as a new user
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: accept_data_protection
+      - action: action_set_data_protection_accepted
+  
+      - action: utter_account_menu
+      - intent: select_new_user
+      - action: utter_setup_account
+      - action: user_registration_form
+      - active_loop: user_registration_form
+      - action: user_registration_form  # The form processes the submission
+      - active_loop: null
+      - action: utter_nationalid_fingerprint_verification
+      - action: phone_number_form
+      - active_loop: phone_number_form
+      - action: phone_number_form
+      - active_loop: null
+      - action: utter_thank_you_phone_number
+      - action: verify_email_form  
+      - active_loop: verify_email_form   
+      - action: verify_email_form
+      - active_loop: null
+      - action: action_register_user      # register user 
+      - action: action_redirect_file_first_claim
+      - slot_was_set:
+          - end_of_journey: true  # <<< Set the slot here >>>
+      - action: utter_claim_menu
+
+
