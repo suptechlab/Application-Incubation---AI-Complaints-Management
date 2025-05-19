@@ -1,0 +1,21 @@
+# Ignore Git metadata
+.git/
+
+# Ignore Rasa cache directory
+.rasa/
+
+# Ignore Qodo project metadata
+.qodo/
+
+# Ignore VS Code settings
+.vscode/
+
+# Optional: Python cache and general temp/log files
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.tmp
+.env
+.DS_Store
+.qodo

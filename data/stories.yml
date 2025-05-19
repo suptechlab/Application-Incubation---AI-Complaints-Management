@@ -1,0 +1,479 @@
+version: "3.1"
+
+stories:
+  # Story: User declines data protection
+  - story: User declines data protection
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: decline_data_protection
+      - action: action_set_data_protection_accepted
+      - action: action_end_conversation
+
+  - story: User asks multiple queries and is satisfied
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_inquiry_option
+      - action: provide_user_details_form
+      - active_loop: provide_user_details_form
+      - action: provide_user_details_form
+      - active_loop: null
+      - intent: rag_inquiry_faq
+      - action: action_answer_with_rag
+
+      # # Handling multiple queries
+      # - slot_was_set:
+      #     - should_continue_query: true
+      # - intent: continue_query
+      # - action: action_answer_with_rag
+
+      # - slot_was_set:
+      #     - should_continue_query: true
+      # - intent: continue_query
+      # - action: action_answer_with_rag
+
+      # - slot_was_set:
+      #     - should_continue_query: false
+      - intent: end_query
+      - action: action_check_satisfaction
+
+      # Handling user satisfaction and feedback
+      - intent: satisfaction
+        entities:
+          - entity: satisfied
+            value: "true"
+      - action: action_handle_satisfaction
+      - active_loop: feedback_survey_form
+      - action: feedback_survey_form
+      - active_loop: null
+      - action: action_send_inquiry_datapoints
+      - action: utter_feedback_thank_you
+      - action: utter_menu_options
+
+  - story: User asks multiple queries and is not satisfied
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - action: utter_menu_options
+
+      - intent: select_inquiry_option
+      - action: provide_user_details_form
+      - active_loop: provide_user_details_form
+      - action: provide_user_details_form
+      - active_loop: null
+
+      - intent: rag_inquiry_faq
+      - action: action_answer_with_rag
+
+      # Handling multiple queries
+      # - slot_was_set:
+      #     - should_continue_query: true
+      # - intent: continue_query
+      # - action: action_answer_with_rag
+
+      # - slot_was_set:
+      #     - should_continue_query: true
+      # - intent: continue_query
+      # - action: action_answer_with_rag
+
+      # - slot_was_set:
+      #     - should_continue_query: false
+      - intent: end_query
+      - action: action_check_satisfaction
+
+      # Handling dissatisfaction and branching to issue resolution
+      - intent: satisfaction
+        entities:
+          - entity: satisfied
+            value: "false"
+      - action: action_handle_satisfaction
+      - action: utter_ask_issue_type
+
+  # Branch 1: Information Structure Issue (for multiple queries)
+  - story: User with multiple queries has an information structure issue
+    steps:
+      - intent: information_structure_issue
+      - action: action_redirect_to_collection_center
+      - action: action_send_inquiry_datapoints      
+      - action: utter_menu_options
+
+  # Branch 2: Regular Inquiry with Live Agent Handoff (for multiple queries)
+  - story: User with multiple queries wants a live agent
+    steps:
+      - intent: regular_inquiry
+      - action: action_human_agent_handoff
+      - slot_was_set:
+          - handoff_requested: true
+      - action: action_send_inquiry_datapoints          
+      - action: utter_feedback_thank_you
+      - action: utter_menu_options
+
+#######################################Claims##############################################
+  - story: Web login user file claim 
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: accept_data_protection
+      - action: action_set_data_protection_accepted
+      - action: action_extract_and_check_token
+      - slot_was_set:
+          - is_authenticated: true
+      # - action: utter_account_menu
+      # - intent: select_existing_user
+      # - action: user_login_form
+      # - active_loop: user_login_form
+      # - action: user_login_form  
+      # - active_loop: null
+      - action: utter_claim_menu
+      - intent: file_a_claim
+      - action: action_fetch_basic_user_info
+      - action: action_handle_province_and_canton  
+      - intent: select_province
+      - action: action_handle_province_and_canton
+      - intent: select_canton
+      - action: action_handle_province_and_canton
+      - action: action_fetch_and_select_priority_care_group_options 
+      - intent: set_priority_care_group
+      - action: action_fetch_and_select_customer_type_options
+      - intent: set_customer_type
+      - action: action_fetch_organization_list
+      - intent: request_organization_list
+      - action: action_fetch_organization_list
+      - intent: select_organization
+      - action: action_select_organization
+      - action: action_handle_claim
+      - intent: select_claim_type
+      - action: action_handle_claim
+      - intent: select_claim_subtype
+      - action: action_handle_claim
+      - action: claim_form
+      - active_loop: claim_form
+      - intent: provide_claim_details
+      - action: claim_form
+      - active_loop: claim_form
+      - action: claim_form
+      - active_loop: null
+      # - action: action_submit_claim_details
+      - action: utter_claim_info_submit
+      - action: utter_ask_upload_attachment_with_buttons     
+      - slot_was_set:
+        - flow_type: "claim"
+      - intent: affirm_file_upload
+      - action: utter_file_upload_instructions
+      - action: action_handle_file_upload      
+      - slot_was_set:
+        - flow_type: "claim"
+      - intent: upload_attachment
+      - action: action_handle_metadata
+      - action: utter_ask_accept_terms  
+      - slot_was_set:
+        - flow_type: "claim"
+      - intent: user_agree
+      - action: user_agree_claim_form
+      - active_loop: user_agree_claim_form
+      - slot_was_set:
+        - flow_type: "claim"
+      - action: user_agree_claim_form
+      - active_loop: null
+      - action: utter_confirm_agreement
+      - action: action_file_claim 
+      # - intent: proceed_with_claim
+      # - action: action_proceed_with_claim
+      # - slot_was_set:
+      #     - end_of_journey: true 
+      # - action: utter_claim_menu
+
+  - story:  Web not login user file a aclim 
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: accept_data_protection
+      - action: action_set_data_protection_accepted
+      - action: action_extract_and_check_token
+      - slot_was_set:
+          - is_authenticated: false
+      - action: utter_account_menu
+      - intent: select_existing_user
+      - action: user_login_form
+      - active_loop: user_login_form
+      - action: user_login_form  
+      - active_loop: null
+      - action: utter_claim_menu
+      - intent: file_a_claim
+      - action: action_fetch_basic_user_info
+      - action: action_handle_province_and_canton  
+      - intent: select_province
+      - action: action_handle_province_and_canton
+      - intent: select_canton
+      - action: action_handle_province_and_canton
+      - action: action_fetch_and_select_priority_care_group_options 
+      - intent: set_priority_care_group
+      - action: action_fetch_and_select_customer_type_options
+      - intent: set_customer_type
+      - action: action_fetch_organization_list
+      - intent: request_organization_list
+      - action: action_fetch_organization_list
+      - intent: select_organization
+      - action: action_select_organization
+      - action: action_handle_claim
+      - intent: select_claim_type
+      - action: action_handle_claim
+      - intent: select_claim_subtype
+      - action: action_handle_claim
+      - action: claim_form
+      - active_loop: claim_form
+      - intent: provide_claim_details
+      - action: claim_form
+      - active_loop: claim_form
+      - action: claim_form
+      - active_loop: null
+      - action: utter_claim_info_submit
+      - action: utter_ask_upload_attachment_with_buttons     
+      - slot_was_set:
+        - flow_type: "claim"
+      - intent: affirm_file_upload
+      - action: utter_file_upload_instructions
+      - action: action_handle_file_upload      
+      - slot_was_set:
+        - flow_type: "claim"
+      - intent: upload_attachment
+      - action: action_handle_metadata
+      - action: utter_ask_accept_terms  
+      - slot_was_set:
+        - flow_type: "claim"
+      - intent: user_agree
+      - action: user_agree_claim_form
+      - active_loop: user_agree_claim_form
+      - slot_was_set:
+        - flow_type: "claim"
+      - action: user_agree_claim_form
+      - active_loop: null
+      - action: utter_confirm_agreement
+      - action: action_file_claim   
+
+  - story: user proceeds with a duplicate claim
+    steps:
+      - intent: proceed_with_claim  # This is triggered if the claim is a duplicate
+      - action: action_proceed_with_claim
+      - slot_was_set:
+          - end_of_journey: true
+      - action: utter_claim_menu
+
+  # - story: User registers and files a claim
+  #   steps:
+  #     - intent: greet
+  #     - action: utter_greet 
+  #     - action: utter_menu_options
+  #     - intent: select_claim_option
+  #     - action: utter_ask_data_protection_options
+  #     - intent: accept_data_protection
+  #     - action: action_set_data_protection_accepted
+  #     - action: action_extract_and_check_token
+  #     - slot_was_set:
+  #         - is_authenticated: false      
+  #     - action: utter_account_menu
+  #     - intent: select_new_user
+  #     - action: utter_setup_account
+  #     - action: user_registration_form
+  #     - active_loop: user_registration_form
+  #     - action: user_registration_form  # The form processes the submission
+  #     - active_loop: null
+  #     - action: utter_nationalid_fingerprint_verification
+  #     - action: phone_number_form
+  #     - active_loop: phone_number_form
+  #     - action: phone_number_form
+  #     - active_loop: null
+  #     - action: utter_thank_you_phone_number
+  #     - action: verify_email_form  
+  #     - active_loop: verify_email_form   
+  #     - action: verify_email_form
+  #     - active_loop: null
+  #     - action: action_register_user  # Ensure user is registered
+  #     # - slot_was_set:
+  #     #     - is_authenticated: true  # ✅ FIX: Set authentication to true after registration  
+  #     - action: utter_claim_menu  # ✅ FIX: Prompt user to proceed with claim after registration to avoid fallback
+  #     - intent: file_a_claim
+  #     - action: action_fetch_basic_user_info
+  #     - action: action_handle_province_and_canton  
+  #     - intent: select_province
+  #     - action: action_handle_province_and_canton
+  #     - intent: select_canton
+  #     - action: action_handle_province_and_canton
+  #     - action: action_fetch_and_select_priority_care_group_options 
+  #     - intent: set_priority_care_group
+  #     - action: action_fetch_and_select_customer_type_options
+  #     - intent: set_customer_type
+  #     - action: action_fetch_organization_list
+  #     - intent: request_organization_list
+  #     - action: action_fetch_organization_list
+  #     - intent: select_organization
+  #     - action: action_select_organization
+  #     - action: action_handle_claim
+  #     - intent: select_claim_type
+  #     - action: action_handle_claim
+  #     - intent: select_claim_subtype
+  #     - action: action_handle_claim
+  #     - action: claim_form
+  #     - active_loop: claim_form
+  #     - intent: provide_claim_details
+  #     - action: claim_form
+  #     - active_loop: claim_form
+  #     - action: claim_form
+  #     - active_loop: null  # ✅ FIX: Ensures smooth form transition after user input
+  #     - action: utter_claim_info_submit
+  #     - action: utter_ask_upload_attachment_with_buttons     
+  #     - slot_was_set:
+  #         - flow_type: "claim"
+  #     - intent: affirm_file_upload
+  #     - action: utter_file_upload_instructions
+  #     - action: action_handle_file_upload      
+  #     - slot_was_set:
+  #         - flow_type: "claim"
+  #     - intent: upload_attachment
+  #     - action: action_handle_metadata
+  #     - action: utter_ask_accept_terms  
+  #     - slot_was_set:
+  #         - flow_type: "claim"
+  #     - intent: user_agree
+  #     - action: user_agree_claim_form
+  #     - active_loop: user_agree_claim_form
+  #     - slot_was_set:
+  #         - flow_type: "claim"
+  #     - action: user_agree_claim_form
+  #     - active_loop: null  # ✅ FIX: Ensures proper termination of user agreement form
+  #     - action: utter_confirm_agreement
+  #     - action: action_file_claim 
+
+  - story: User registers and files a claim
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: accept_data_protection
+      - action: action_set_data_protection_accepted
+      - action: action_extract_and_check_token
+      - slot_was_set:
+          - is_authenticated: false      
+      - action: utter_account_menu
+      - intent: select_new_user
+      - action: utter_setup_account
+      - action: user_registration_form
+      - active_loop: user_registration_form
+      - action: user_registration_form  # The form processes the submission
+      - active_loop: null
+      - action: utter_nationalid_fingerprint_verification
+      - action: phone_number_form
+      - active_loop: phone_number_form
+      - action: phone_number_form
+      - active_loop: null
+      - action: utter_thank_you_phone_number
+      - action: verify_email_form  
+      - active_loop: verify_email_form   
+      - action: verify_email_form
+      - active_loop: null
+      - action: action_register_user  # Ensures user is registered
+      - slot_was_set:
+          - registration_success: true  # ✅ Ensures only successful registrations proceed
+      - action: utter_claim_menu_new_user  ##utter_claim_menu  # ✅ Proceeds only if registration is successful
+      - intent: file_a_claim
+      - action: action_fetch_basic_user_info
+      - action: action_handle_province_and_canton  
+      - intent: select_province
+      - action: action_handle_province_and_canton
+      - intent: select_canton
+      - action: action_handle_province_and_canton
+      - action: action_fetch_and_select_priority_care_group_options 
+      - intent: set_priority_care_group
+      - action: action_fetch_and_select_customer_type_options
+      - intent: set_customer_type
+      - action: action_fetch_organization_list
+      - intent: request_organization_list
+      - action: action_fetch_organization_list
+      - intent: select_organization
+      - action: action_select_organization
+      - action: action_handle_claim
+      - intent: select_claim_type
+      - action: action_handle_claim
+      - intent: select_claim_subtype
+      - action: action_handle_claim
+      - action: claim_form
+      - active_loop: claim_form
+      - intent: provide_claim_details
+      - action: claim_form
+      - active_loop: claim_form
+      - action: claim_form
+      - active_loop: null  # ✅ FIX: Ensures smooth form transition after user input
+      - action: utter_claim_info_submit
+      - action: utter_ask_upload_attachment_with_buttons     
+      - slot_was_set:
+          - flow_type: "claim"
+      - intent: affirm_file_upload
+      - action: utter_file_upload_instructions
+      - action: action_handle_file_upload      
+      - slot_was_set:
+          - flow_type: "claim"
+      - intent: upload_attachment
+      - action: action_handle_metadata
+      - action: utter_ask_accept_terms  
+      - slot_was_set:
+          - flow_type: "claim"
+      - intent: user_agree
+      - action: user_agree_claim_form
+      - active_loop: user_agree_claim_form
+      - slot_was_set:
+          - flow_type: "claim"
+      - action: user_agree_claim_form
+      - active_loop: null  # ✅ FIX: Ensures proper termination of user agreement form
+      - action: utter_confirm_agreement
+      - action: action_file_claim 
+
+
+  - story: User registration fails
+    steps:
+      - intent: greet
+      - action: utter_greet 
+      - action: utter_menu_options
+      - intent: select_claim_option
+      - action: utter_ask_data_protection_options
+      - intent: accept_data_protection
+      - action: action_set_data_protection_accepted
+      - action: action_extract_and_check_token
+      - slot_was_set:
+          - is_authenticated: false      
+      - action: utter_account_menu
+      - intent: select_new_user
+      - action: utter_setup_account
+      - action: user_registration_form
+      - active_loop: user_registration_form
+      - action: user_registration_form  # The form processes the submission
+      - active_loop: null
+      - action: utter_nationalid_fingerprint_verification
+      - action: phone_number_form
+      - active_loop: phone_number_form
+      - action: phone_number_form
+      - active_loop: null
+      - action: utter_thank_you_phone_number
+      - action: verify_email_form  
+      - active_loop: verify_email_form   
+      - action: verify_email_form
+      - active_loop: null
+      - action: action_register_user  # Ensures user is registered
+      - slot_was_set:
+          - registration_success: false  # ✅ If registration fails, do not proceed
+      - action: utter_registration_failed  # ✅ Notify user of failure instead of proceeding    
+      - slot_was_set:
+        - end_of_journey: true
+      - action: utter_account_menu          
