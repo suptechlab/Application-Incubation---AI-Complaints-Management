@@ -1,0 +1,192 @@
+global:
+  appVersion: 1.5.0-SNAPSHOT
+  name: ms-chatbot-service
+deployment:
+  # Default values for deployment.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+  namespace: suptech
+  replicaCount: 1
+
+  image:
+    registry: nexus.seps.gob.ec:4000
+    repository: ms-chatbot-service
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  containerPorts:
+    http:
+      port: 5005
+      protocol: TCP
+    https:
+      disabled: true
+
+#  livenessProbe:
+#    httpGet:
+#      path: /management/health
+#      port: 8080
+#    initialDelaySeconds: 20
+#    periodSeconds: 180
+#    timeoutSeconds: 21
+#  readinessProbe:
+#    httpGet:
+#      path: /management/health
+#      port: 8080
+#    initialDelaySeconds: 20
+#    periodSeconds: 180
+#    timeoutSeconds: 21
+
+  imagePullSecrets:
+    - seps-regcred
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 5005
+    targetPort: 5005
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    hosts:
+      - host: api-stg-suptech.seps.gob.ec
+        paths:
+          - path: /chatbot(/|$)(.*)
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: seps-cert
+        hosts:
+          - api-stg-suptech.seps.gob.ec
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    requests:
+      cpu: 1m
+      memory: 1024Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  envVars:
+#    logging.level.root: INFO
+#    JAVA_TOOL_OPTIONS: -Xms256m -Xmx512m
+    TZ: America/Guayaquil
+    # Variable to localize the id_rsa, and connect to ftp server
+  # SFTP_PATH_PRIVATE_KEY: /home/.ssh/id_rsa
+
+  configmap:
+    enabled: false
+#    name: env
+#    data:
+#      - key: SEPS_JDBC_URL
+#        value: change_me
+#      - key: SEPS_JDBC_USER
+#        value: change_me
+
+  configMaps:
+    env: #name of configmap
+      environment: #set items like environment variables
+        items:
+          SLACK_TOKEN:
+            envVarName: SLACK_TOKEN
+          SLACK_CHANNEL:
+            envVarName: SLACK_CHANNEL
+          SPRING_DATASOURCE_USERNAME:
+            envVarName: SPRING_DATASOURCE_USERNAME
+          SPRING_LIQUIBASE_URL:
+            envVarName: SPRING_LIQUIBASE_URL
+          CHATBOT_DB_TYPE:
+            envVarName: CHATBOT_DB_TYPE
+          CHATBOT_DIALECT:
+            envVarName: CHATBOT_DIALECT
+          CHATBOT_DB_SCHEMA:
+            envVarName: CHATBOT_DB_SCHEMA
+          POSTGRES_PORT:
+            envVarName: POSTGRES_PORT
+          AUTH_BASE_URL:
+            envVarName: AUTH_BASE_URL            
+          USER_BASE_URL:
+            envVarName: USER_BASE_URL
+          COLLECTION_CENTER_URL:
+            envVarName: COLLECTION_CENTER_URL
+          ACTION_SERVER_URL:
+            envVarName: ACTION_SERVER_URL 
+
+
+    # env:
+  #   envVarName: env
+  #      volume: # set items like file in volume
+  #        mountPath: /var/smx/env/
+  #        items:
+  #          ID_RSA:
+  #            filePath: id_rsa_config
+  #            fileMode: 644
+
+  secrets:
+    seps-secrets:
+      environment: # Items set like environment variable
+        items:
+          # JASYPT_ENCRYPTOR_PASSWORD:
+          #   envVarName: jasypt.encryptor.password
+          SPRING_DATASOURCE_PASSWORD:
+            envVarName: SPRING_DATASOURCE_PASSWORD
+          OPENAI_API_KEY:
+            envVarName: OPENAI_API_KEY
+          CHATBOT_DATASOURCE_URL:
+            envVarName: CHATBOT_DATASOURCE_URL  
+      # Mount a file id_rsa to connect a ftp server
+  #      volume: # Items set like file in volume
+  #        mountPath: /home/.ssh/
+  #        items:
+  #          id-rsa:
+  #            filePath: id_rsa
+  #            fileMode: 644
+
+  persistence:
+    enabled: false
+    path: /var/seps/archivos/base
+    storageclass: managed-nfs-storage
+    size: 1Gi

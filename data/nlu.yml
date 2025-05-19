@@ -1,0 +1,1953 @@
+version: "3.1"
+nlu:
+- intent: greet
+  examples: |
+    - hola
+    - buenos días
+    - buenas tardes
+    - buenas noches
+    - hola, ¿cómo estás?
+    - qué tal
+    - hola asistente
+    - hola SEPS Bot
+    - hola, ¿qué tal?
+    - ¿Cómo te va?
+    - ¡Hola amigo!
+    - Saludos
+    - ¡Buenas!
+    - ¿Qué hay de nuevo?
+    
+- intent: accept_data_protection
+  examples: |
+    - acepto
+    - estoy de acuerdo
+    - sí, acepto los términos
+    - claro, acepto
+    - por supuesto, acepto
+    - doy mi consentimiento
+    - está bien, acepto
+    - no hay problema, estoy de acuerdo
+    - seguro, acepto
+    - me parece bien
+    - no hay inconveniente, acepto
+    - acepto sin problemas
+
+- intent: decline_data_protection
+  examples: |
+    - rechazo
+    - no estoy de acuerdo
+    - no, no acepto los términos
+    - no, rechazo
+    - me niego
+    - no aceptaré
+    - no me siento cómodo con eso
+    - no, no estoy de acuerdo
+    - no consiento
+    - no, no me parece bien
+    - prefiero no aceptar
+    - no quiero aceptar
+
+
+# - intent: provide_name
+#   examples: |
+#     - Mi nombre es [Juan Pérez](name)
+#     - Soy [María López](name)
+#     - [Ana García](name)
+#     - [Carlos Martínez](name)
+#     - [Lucía Fernández](name)
+#     - Me llamo [Pedro Sánchez](name)
+#     - Puedes llamarme [Luis Gómez](name)
+#     - Soy [Clara Torres](name)
+#     - Me llamo [David Morales](name)
+#     - Mi nombre es [José Álvarez](name)
+#     - Soy [Elena Gutiérrez](name)
+#     - [Sofía Castro](name) aquí
+#     - [Miguel Ríos](name) es mi nombre
+#     - Llámame [Laura Ruiz](name)
+#     - [Andrés Vargas](name) es mi nombre
+#     - Me conocen como [Fernando Gil](name)
+#     - [Isabel Pérez](name) aquí presente
+#     - Llámame simplemente [Luisa](name)
+
+# - intent: provide_email
+#   examples: |
+#     - Mi correo es [juan.perez@example.com](email)
+#     - Puedes contactarme en [maria.lopez@dominio.com](email)
+#     - [ana.garcia@example.org](email) es mi correo
+#     - Este es mi correo: [carlos.martinez@gmail.com](email)
+#     - [lucia.fernandez@empresa.com](email)
+#     - Por favor envía los detalles a [pedro.sanchez@diario.com](email)
+#     - [luis.gomez@organizacion.com](email) es mi correo
+#     - Contáctame por [clara.torres@negocio.com](email)
+#     - Usa este correo: [david.morales@correo.com](email)
+#     - Mi dirección de correo es [jose.alvarez@institucion.com](email)
+#     - Envíame el reporte a [sofia.castro@servicio.com](email)
+#     - [miguel.rios@tecnologia.com](email)
+#     - Mi email de contacto es [felipe.lopez@correo.com](email)
+#     - [luz.martinez@universidad.edu](email) es mi email
+#     - Puedes escribirme a [manuel.vera@trabajo.org](email)
+#     - [gsdhumal@gmail.com](email)
+
+
+- intent: select_inquiry_option
+  examples: |
+    - Seleccionar opción de consulta
+    - Presionar botón de consulta
+    - Hacer clic en consulta
+    - Elegir la opción de consulta
+    - Tocar el botón de consulta
+    - Ir a la opción de consulta
+    - Abrir consulta
+    - Acceder a la sección de consultas
+    - Quiero hacer una consulta
+    - Dirígeme a consultas
+    - ¿Dónde puedo hacer una consulta?
+    - Necesito seleccionar consulta
+    - Abrir el menú de consultas
+    - Entrar a la opción de consulta disponible
+    - Estoy buscando la opción de consulta
+
+- intent: select_claim_option
+  examples: |
+    - Seleccionar opción de reclamación
+    - Presionar botón de reclamaciones
+    - Hacer clic en reclamaciones
+    - Elegir la opción de reclamaciones
+    - Tocar el botón de reclamaciones
+    - Ir a la opción de reclamaciones
+    - Abrir reclamaciones
+    - Acceder a la sección de reclamaciones
+    - Quiero presentar una reclamación
+    - Dirígeme a la opción de reclamaciones
+    - ¿Dónde puedo hacer una reclamación?
+    - Necesito seleccionar reclamaciones
+    - Abrir el menú de reclamaciones
+    - Entrar a la opción de reclamación disponible
+    - Estoy buscando la opción de reclamaciones
+
+- intent: satisfaction
+  examples: |
+    - [Satisfecho](satisfaction)
+    - [No Satisfecho](satisfaction)
+    - Estoy [satisfecho](satisfaction)
+    - No estoy [satisfecho](satisfaction)
+    - [Satisfecho](satisfaction), gracias
+    - No, estoy [no satisfecho](satisfaction)
+    - Me siento [satisfecho](satisfaction)
+    - No quedé [satisfecho](satisfaction)
+    - Todo estuvo [satisfecho](satisfaction)
+    - No estoy conforme, estoy [no satisfecho](satisfaction)
+    - Estoy completamente [satisfecho](satisfaction)
+    - Estoy muy [satisfecho](satisfaction) con el servicio
+    - No, no estoy para nada [satisfecho](satisfaction)
+    - Sí, estoy bastante [satisfecho](satisfaction)
+    - Me dejó con una sensación de [no satisfecho](satisfaction)
+    - Creo que pudo haber sido mejor, no estoy [satisfecho](satisfaction)
+    - Sí, mi experiencia fue [satisfecha](satisfaction)
+
+- intent: end_query
+  examples: |
+    - No tengo más preguntas
+    - No, eso es todo
+    - Estoy bien, gracias
+    - Eso es todo por ahora
+    - No, por el momento
+    - No, ya no
+    - No necesito nada más
+    - No, terminé
+    - Eso era todo lo que quería saber
+    - No hay más dudas de mi parte
+    - Gracias, no tengo más inquietudes
+    - Por ahora no tengo más consultas
+    - Ya no tengo más preguntas, gracias
+    - No hay nada más en lo que necesite ayuda
+    - No necesito más información
+    - Gracias por la ayuda, eso es todo
+
+
+
+# - intent: select_inquiry_type
+#   examples: |
+#     - Selecciono [Gobernanza Corporativa](inquiry_type)
+#     - Muéstrame [Gobernanza Corporativa](inquiry_type)
+#     - Elijo [Protección al Consumidor](inquiry_type)
+#     - Prefiero [Organizaciones No Lucrativas](inquiry_type)
+#     - Tipo de consulta: [Gobernanza Corporativa](inquiry_type)
+#     - Me interesa [Protección al Consumidor](inquiry_type)
+#     - Quiero información sobre [Organizaciones No Lucrativas](inquiry_type)
+
+# - intent: select_inquiry_subtype
+#   examples: |
+#     - Selecciono [Autoridades Ejecutivas](sub_inquiry_type)
+#     - Muéstrame [Autoridades Ejecutivas](sub_inquiry_type)
+#     - Elijo [Conflictos Internos](sub_inquiry_type)
+#     - Prefiero [Destrucción de Archivos](sub_inquiry_type)
+#     - Subtipo: [Autoridades Ejecutivas](sub_inquiry_type)
+#     - Quiero saber sobre [Conflictos Internos](sub_inquiry_type)
+#     - Necesito detalles de [Destrucción de Archivos](sub_inquiry_type)
+
+
+# - intent: continue_query
+#   examples: |
+#     - Sí
+#     - Claro
+#     - Por supuesto
+#     - Correcto
+#     - Sí, tengo otra pregunta
+#     - Sí, tengo más dudas
+#     - Sí, por favor
+#     - Sí, continúa
+#     - Claro que sí
+#     - Sí, quiero preguntar algo más
+#     - Adelante
+
+# - intent: inform
+#   examples: |
+#     - [true](satisfied)
+#     - [false](satisfied)
+#     - [sí](info_request)
+#     - [no](info_request)
+#     - [1](ease_of_finding)
+#     - [2](ease_of_finding)
+#     - [3](ease_of_finding)
+#     - [4](ease_of_finding)
+#     - [5](ease_of_finding)
+#     - [1](formats_provided)
+#     - [2](formats_provided)
+#     - [3](formats_provided)
+#     - [4](formats_provided)
+#     - [5](formats_provided)
+#     - [1](clarity_response)
+#     - [2](clarity_response)
+#     - [3](clarity_response)
+#     - [4](clarity_response)
+#     - [5](clarity_response)
+#     - [1](attention_time)
+#     - [2](attention_time)
+#     - [3](attention_time)
+#     - [4](attention_time)
+#     - [5](attention_time)
+#     - [1](satisfaction)
+#     - [2](satisfaction)
+#     - [3](satisfaction)
+#     - [4](satisfaction)
+#     - [5](satisfaction)
+#     - Encuentro la información [4](ease_of_finding)
+#     - Claridad del mensaje [3](clarity_response)
+
+- intent: select_existing_user
+  examples: |
+    - Soy un usuario existente
+    - Usuario existente
+    - Ya tengo una cuenta
+    - Soy un usuario recurrente
+    - Seleccionar usuario existente
+    - Tengo una cuenta
+    - Ya estoy registrado
+    - Cuenta existente
+    - Pertenezco a los usuarios existentes
+
+- intent: select_new_user
+  examples: |
+    - Soy un usuario nuevo
+    - Usuario nuevo
+    - Quiero registrarme
+    - No tengo una cuenta
+    - Soy un usuario por primera vez
+    - Seleccionar usuario nuevo
+    - Soy nuevo aquí
+    - No me he registrado aún
+    - Crear una cuenta nueva
+
+- intent: input_space_or_empty
+  examples: |
+    - ""
+    - " "
+    - "   "
+    - "\t"
+    - "\n"
+    - "\t\t\t"
+    - "\n\n"
+
+- intent: input_single_character
+  examples: |
+    - "a"
+    - "b"
+    - "1"
+    - "."
+    - ","
+    - "?"
+    - "!"
+    - "A"
+    - "Z"
+    - "/"
+    - "-"
+    - "+"
+    - "="
+    - ":"
+    - ";"
+    - "("
+    - ")"
+
+- intent: input_typo
+  examples: |
+    - "adss"
+    - "asf"
+    - "asdf"
+    - "fdsa"
+    - "jkl"
+    - "hgf"
+    - "mnb"
+    - "zxc"
+    - "qwe"
+    - "rty"
+    - "poi"
+    - "lkm"
+
+- intent: input_repeated_character
+  examples: |
+    - "aaaa"
+    - "bbbb"
+    - "1111"
+    - "...."
+    - "****"
+    - "????"
+    - "!!!!"
+    - "////"
+    - "++++"
+    - "===="
+    - "::::"
+    - ";;;;"
+
+#####claim#############################
+
+# - intent: account_user_email
+#   examples: |
+#     - Mi correo es [usuario@ejemplo.com](user_email)
+#     - Mi email es [nombre.apellido@dominio.com](user_email)
+#     - Puedes contactarme en [contacto@ejemplo.com](user_email)
+#     - Puedes escribirme a [correo@dominio.com](user_email)
+#     - Mi dirección de correo es [email@dominio.com](user_email)
+#     - Envíame un mensaje a [nombre@correo.com](user_email)
+#     - Mi email de contacto es [contacto@ejemplo.org](user_email)
+#     - Por favor, envíame un email a [usuario@dominio.com](user_email)
+#     - [usuario@ejemplo.com](user_email)
+#     - [correo@dominio.com](user_email)
+
+# - intent: account_user_otp
+#   examples: |
+#     - Mi OTP es [123456](user_otp)
+#     - El OTP es [654321](user_otp)
+#     - Aquí está el OTP: [445566](user_otp)
+#     - Código enviado a mí es [789789](user_otp)
+#     - Mi contraseña de un solo uso es [123123](user_otp)
+#     - Ingresa este OTP: [555555](user_otp)
+
+
+# - intent: provide_otp
+#   examples: |
+#     - El código OTP es [987654](user_otp)
+#     - Aquí está el código de verificación: [456123](user_otp)
+#     - Mi OTP es [321654](user_otp)
+#     - Código de un solo uso: [112233](user_otp)
+#     - Proporciona este OTP: [998877](user_otp)
+#     - Este es mi OTP: [667788](user_otp)
+#     - [987654](user_otp)
+#     - Mi código OTP es [654123](user_otp)
+#     - OTP [123456](user_otp), por favor
+#     - [654321](user_otp)
+#     - Código corto: [1234](user_otp)
+#     - Código largo: [1234567](user_otp)
+#     - Mi OTP: [123-456](user_otp)
+#     - OTP: [123 456](user_otp)
+#     - [876543](user_otp)
+
+# - intent: request_resend_otp
+#   examples: |
+#     - Reenviar OTP
+#     - No recibí el OTP
+#     - ¿Puedes reenviar el OTP?
+#     - Por favor, envía el OTP otra vez
+#     - Reenvía mi OTP
+#     - Necesito otro OTP
+#     - No llegó el OTP, envíalo otra vez
+#     - Intenta enviar el OTP una vez más
+
+# - intent: provide_national_id
+#   examples: |
+#     - Identificación nacional: [1712345678](new_user_national_id)
+#     - Mi identificación nacional: [1809876543](new_user_national_id)
+#     - Aquí está mi identificación nacional: [1701234567](new_user_national_id)
+#     - Número de identificación nacional: [1901234560](new_user_national_id)
+#     - Identificación nacional es [1708765432](new_user_national_id)
+#     - Esta es mi identificación nacional: [1901122334](new_user_national_id)
+#     - Te doy mi identificación nacional: [1712345678](new_user_national_id)
+#     - Proporciono mi identificación nacional: [1809876543](new_user_national_id)
+#     - La identificación nacional que tengo es [1701234567](new_user_national_id)
+#     - Compartiendo mi identificación nacional: [1901234560](new_user_national_id)
+#     - Mi identificación nacional es la siguiente: [1708765432](new_user_national_id)
+#     - La siguiente es mi identificación nacional: [1901122334](new_user_national_id)
+#     - Aquí tienes mi identificación nacional: [1712345678](new_user_national_id)
+#     - Te envío mi identificación nacional: [1809876543](new_user_national_id)
+#     - Identificación nacional que uso: [1701234567](new_user_national_id)
+#     - Aquí está la identificación nacional: [1901234560](new_user_national_id)
+#     - [1901234560](new_user_national_id)
+#     - [1701234567](new_user_national_id)
+
+
+# - intent: provide_fingerprint
+#   examples: |
+#     - Mi huella dactilar es [E3333I2222](new_user_fingerprint)
+#     - Código de huella dactilar: [D1234A5678](new_user_fingerprint)
+#     - Aquí está mi huella dactilar: [C9876B4321](new_user_fingerprint)
+#     - El código de mi huella dactilar es [F5555K9999](new_user_fingerprint)
+#     - Huella dactilar: [A1111B2222](new_user_fingerprint)
+#     - Esta es mi huella dactilar: [G1234H5678](new_user_fingerprint)
+#     - Te doy mi huella dactilar: [J9999K8888](new_user_fingerprint)
+#     - Compartiendo mi huella dactilar: [L1111M2222](new_user_fingerprint)
+#     - Proporciono mi huella dactilar: [N3333O4444](new_user_fingerprint)
+#     - Identificación de huella dactilar: [P5555Q6666](new_user_fingerprint)
+#     - Registro de huella dactilar: [Q7777R8888](new_user_fingerprint)
+#     - Mi huella digital es: [R2222S3333](new_user_fingerprint)
+#     - Aquí tienes mi huella dactilar: [S4444T5555](new_user_fingerprint)
+#     - Dato de huella dactilar: [T6666U7777](new_user_fingerprint)
+#     - La siguiente es mi huella dactilar: [U8888V9999](new_user_fingerprint)
+
+# - intent: provide_phone_number
+#   examples: |
+#     - Mi número de teléfono es [1234567890](phone_number)
+#     - Número de contacto: [9876543210](phone_number)
+#     - Puedes contactarme al [654987321](phone_number)
+#     - El número es [123456789](phone_number)
+#     - Llámame al [1122334455](phone_number)
+#     - Mi contacto es [9988776655](phone_number)
+#     - Aquí está mi número de teléfono: [111222333](phone_number)
+#     - Mi teléfono es [4455667788](phone_number)
+#     - Te doy mi número: [6677889900](phone_number)
+#     - Este es mi número de celular: [7788990011](phone_number)
+#     - Contacto disponible: [8899001122](phone_number)
+#     - Proporciono mi número de teléfono: [9900112233](phone_number)
+#     - Puedes llamarme al siguiente número: [1100223344](phone_number)
+#     - Aquí tienes mi número: [2233445566](phone_number)
+#     - Mi número de celular es [3344556677](phone_number)
+
+
+# - intent: provide_new_user_email
+#   examples: |
+#     - Mi correo electrónico es [test@example.com](new_user_email)
+#     - Es [user@domain.com](new_user_email)
+#     - Mi dirección de correo es [contact@site.com](new_user_email)
+#     - [hello@example.org](new_user_email) es mi correo electrónico
+#     - Puedes contactarme en [support@service.com](new_user_email)
+#     - Aquí tienes mi correo: [user123@mail.com](new_user_email)
+#     - Usa este correo: [myemail@provider.com](new_user_email)
+#     - Mi correo registrado es [account@web.com](new_user_email)
+#     - Correo de contacto: [person@domain.net](new_user_email)
+#     - Este es mi correo: [email123@site.org](new_user_email)
+#     - Mi correo para registro es [signup@portal.com](new_user_email)
+#     - Por favor, envía confirmación a [confirm@check.com](new_user_email)
+#     - El correo que uso es [primary@main.com](new_user_email)
+#     - Actualiza mi correo a [newmail@update.com](new_user_email)
+
+
+# - intent: provide_new_user_otp
+#   examples: |
+#     - Mi OTP es [123456](new_user_otp)
+#     - El código OTP es [654321](new_user_otp)
+#     - Recibí el OTP [987654](new_user_otp)
+#     - Ingresando OTP [246810](new_user_otp)
+#     - [112233](new_user_otp) es mi OTP
+#     - Aquí está mi OTP: [334455](new_user_otp)
+#     - Mi código OTP es [778899](new_user_otp)
+#     - Usa este OTP: [665544](new_user_otp)
+#     - El OTP recibido es [556677](new_user_otp)
+#     - Introducir OTP: [889900](new_user_otp)
+#     - OTP para verificar: [223344](new_user_otp)
+#     - Ingresa el OTP [112244](new_user_otp)
+#     - OTP para acceso: [998877](new_user_otp)
+#     - Aquí tienes mi OTP: [445566](new_user_otp)
+#     - Verifica con este OTP: [667788](new_user_otp)
+
+
+# - intent: provide_new_request_email_verification
+#   examples: |
+#     - Quiero verificar mi correo electrónico
+#     - Envíame un OTP para verificar mi correo
+#     - Iniciar el proceso de verificación de correo
+#     - Verifica mi dirección de correo electrónico
+#     - ¿Puedes enviarme un código de verificación por correo?
+
+- intent: select_province
+  examples: |
+    - Seleccioné la provincia [NAPO](province) con id [16](province_id)
+    - Mi provincia es [PICHINCHA](province) con id [12](province_id)
+    - Estoy viviendo en [PASTAZA](province) con id [18](province_id)
+    - Vivo en la provincia de [SUCUMBÍOS](province) identificada con el id [22](province_id)
+    - Estoy buscando información sobre [GUAYAS](province) con el código [10](province_id)
+    - Por favor, selecciona la provincia [MANABI](province) con id [14](province_id)
+    - La provincia donde resido es [CHIMBORAZO](province), y su id es [5](province_id)
+    - Escogí [GALÁPAGOS](province) con código de provincia [9](province_id)
+    - Mi provincia de preferencia es [SANTO DOMINGO DE LOS TSÁCHILAS](province), con el id [21](province_id)
+    - Favor seleccionar [EL ORO](province) cuyo id es [7](province_id)
+    - Quiero registrar la provincia [LOJA](province) con id [12](province_id)
+    - Estoy en la provincia [IMBABURA](province) identificada como [11](province_id)
+    - La provincia de [LOS RÍOS](province) con código [13](province_id) es mi elección
+    - Mi ubicación es [ESMERALDAS](province) con id [8](province_id)
+    - Prefiero la provincia [ZAMORA CHINCHIPE](province) con el identificador [24](province_id)
+    - La provincia seleccionada es [COTOPAXI](province) con el id [6](province_id)
+    - Vivo en [MORONA SANTIAGO](province) con el código de provincia [15](province_id)
+    - Estoy buscando datos sobre la provincia [ORELLANA](province) con id [17](province_id)
+    - Por favor agrega la provincia [AZUAY](province) con identificador [1](province_id)
+    - Mi elección es [SANTA ELENA](province) con id [20](province_id)
+
+
+- intent: select_canton
+  examples: |
+    - Seleccioné el cantón [QUITO](canton)
+    - Mi cantón es [GUAYAQUIL](canton)
+    - Estoy viviendo en el cantón [CUENCA](canton)
+    - Vivo en el cantón [AMBATO](canton)
+    - Por favor selecciona el cantón [LOJA](canton)
+    - Quiero registrar el cantón [ESMERALDAS](canton)
+    - Estoy en el cantón [IBARRA](canton)
+    - El cantón de [RIOBAMBA](canton) es mi elección
+    - Mi ubicación actual es el cantón [MANTA](canton)
+    - Prefiero el cantón [PORTOVIEJO](canton)
+    - Necesito información sobre el cantón [LATACUNGA](canton)
+    - Estoy considerando el cantón [SANTA ELENA](canton)
+    - Vivo cerca del cantón [MACHALA](canton)
+    - Quiero cambiar al cantón [ZAMORA](canton)
+    - Seleccione el cantón [TENA](canton) para mi registro
+    - Mi residencia está en el cantón [SALINAS](canton)
+    - Estoy buscando datos sobre el cantón [MILAGRO](canton)
+    - Elija el cantón [QUEVEDO](canton)
+    - Favor seleccionar el cantón [PUYO](canton)
+    - Estoy interesado en el cantón [BABAHOYO](canton)
+
+
+- intent: set_priority_care_group
+  examples: |
+    - Quiero seleccionar el grupo de atención prioritario {priorityCareGroup}
+    - Seleccionar el grupo de atención {priorityCareGroup}
+    - Mi grupo es {priorityCareGroup}
+    - Elijo el grupo {priorityCareGroup}
+    - Selecciono el grupo de atención prioritario {priorityCareGroup}
+    - Grupo {priorityCareGroup}
+    - Quiero elegir el grupo {priorityCareGroup}
+
+- intent: set_customer_type
+  examples: |
+    - Quiero seleccionar el tipo de cliente {customerType}
+    - Seleccionar el cliente {customerType}
+    - Soy un cliente {customerType}
+    - Elijo el tipo de cliente {customerType}
+    - Mi tipo de cliente es {customerType}
+    - Selecciono el cliente {customerType}
+    - Cliente {customerType}
+    - Quiero elegir el tipo de cliente {customerType}
+
+
+- intent: select_organization
+  examples: |
+    - Selecciono la organización [1](organization_selection) "COOPERATIVA DE AHORRO Y CREDITO POLICIA NACIONAL LIMITADA"
+    - Quiero elegir la organización [2](organization_selection) "COOPERATIVA DE AHORRO Y CREDITO SANTA MARIA DE LA MANGA DEL CURA LTDA"
+    - La organización que prefiero es [3](organization_selection) "COOPERATIVA DE AHORRO Y CREDITO DE LOS EMPLEADOS JUBILADOS Y EX-EMPLEADOS DEL BANCO CENTRAL DEL ECUADOR"
+    - Selecciono la opción [1](organization_selection)
+    - Elijo la organización con el nombre "COOPERATIVA DE AHORRO Y CREDITO POLICIA NACIONAL LIMITADA"
+    - Por favor, selecciona la organización [2](organization_selection)
+    - Mi elección es la organización [3](organization_selection)
+    - Prefiero la organización "COOPERATIVA DE AHORRO Y CREDITO SANTA MARIA DE LA MANGA DEL CURA LTDA"
+
+- intent: request_organization_list
+  examples: |
+    - Muéstrame la lista de organizaciones
+    - Necesito ver las organizaciones disponibles
+    - Por favor, dame la lista de organizaciones
+    - Quiero ver todas las organizaciones
+
+- intent: select_claim_type
+  examples: |
+    - Selecciono [Credit Portfolio](claim_type)
+    - Muéstrame [Public Obligations](claim_type)
+    - Elijo [Partner Contributions](claim_type)
+    - Prefiero [Unauthorized Collections](claim_type)
+    - Tipo de reclamo: [Credit Portfolio](claim_type)
+    - Me interesa [Public Obligations](claim_type)
+    - Quiero información sobre [Partner Contributions](claim_type)
+
+- intent: select_claim_subtype
+  examples: |
+    - Selecciono [Asset Allocation Due to Credit Operation Cancellation](sub_claim_type)
+    - Muéstrame [Asset Allocation Due to Credit Operation Cancellation](sub_claim_type)
+    - Elijo [Conflictos Internos](sub_claim_type)
+    - Prefiero [Destrucción de Archivos](sub_claim_type)
+    - Subtipo: [Asset Allocation Due to Credit Operation Cancellation](sub_claim_type)
+    - Quiero saber sobre [Conflictos Internos](sub_claim_type)
+    - Necesito detalles de [Destrucción de Archivos](sub_claim_type)
+
+# - intent: provide_antecedentes
+#   examples: |
+#     - El problema comenzó debido a [falta de pago](antecedentes).
+#     - Problemas anteriores incluyen [falta de comunicación](antecedentes).
+#     - Tuve un [retraso en el servicio](antecedentes).
+#     - Hubo un problema con [facturación incorrecta](antecedentes).
+#     - Nuestro equipo enfrentó [falta de respuesta](antecedentes) de su parte.
+#     - Me encontré con [dificultades técnicas](antecedentes) con el servicio.
+#     - [Cargos fraudulentos](antecedentes) en mi cuenta fueron el problema.
+#     - Mi principal problema fue [mala atención al cliente](antecedentes).
+
+# - intent: provide_peticion_especifica
+#   examples: |
+#     - Me gustaría [un reembolso](peticion_especifica).
+#     - Mi solicitud es por [una compensación](peticion_especifica).
+#     - ¿Puede proporcionar [una extensión](peticion_especifica)?
+#     - Necesito [un producto de reemplazo](peticion_especifica).
+#     - Por favor emita [una nueva factura](peticion_especifica).
+#     - Mi petición es [cancelar mi suscripción](peticion_especifica).
+#     - ¿Podría [escalar este problema a un gerente](peticion_especifica)?
+#     - Estoy solicitando [una disculpa formal](peticion_especifica).
+
+# - intent: accept_terms
+#   examples: |
+#     - Acepto los términos y condiciones.
+#     - Sí, estoy de acuerdo con los términos.
+#     - Estoy de acuerdo.
+#     - He leído y acepto el acuerdo del usuario.
+#     - Los términos son aceptables para mí.
+#     - Consiento proceder bajo los términos especificados.
+#     - Acepto.
+
+- intent: user_agree
+  examples: |
+    - De acuerdo
+    - Sí, estoy de acuerdo.
+    - Claro, procedamos.
+    - Sigamos adelante.
+    - Proceder.
+    - Estoy de acuerdo, continuemos.
+    - Adelante, estoy bien con eso.
+    - Está bien para mí.
+    - Me parece bien.
+    - Sí, continuemos con eso.
+    - Lo apruebo.
+    - Sin problemas, sigamos.
+    - Me parece una buena idea.
+    - Estoy de acuerdo con la decisión.
+    - Ok, avancemos.
+
+
+- intent: upload_attachment
+  examples: |
+    - Quiero subir un archivo.
+    - Aquí está mi archivo.
+    - Necesito cargar este archivo.
+    - Por favor procese este archivo.
+    - Cargue este documento.
+    - Subir este archivo.
+    - Necesito procesar este archivo.
+    - Quisiera cargar un archivo.
+    - Tengo un archivo para enviar.
+    - Me gustaría compartir este archivo.
+    - Adjuntar un archivo ahora.
+    - Voy a subir un documento.
+    - ¿Dónde puedo subir mi archivo?
+    - Permíteme cargar el archivo.
+    - Voy a adjuntar un documento importante.
+    - Necesito enviar un archivo ahora.
+
+# - intent: provide_file_metadata
+#   examples: |
+#     - El nombre del archivo es [document.pdf](file_name)
+#     - Aquí está la ruta: [C:/Users/Me/Documents/file.txt](file_path)
+#     - La fuente es [local](file_source)
+#     - Archivo de [https://example.com/file.zip](file_source)
+#     - Es un archivo local en [D:/Files/example.png](file_path)
+#     - Este archivo se llama [data.csv](file_name)
+#     - Estoy cargando un archivo llamado [presentation.pptx](file_name)
+#     - La dirección del archivo es [E:/Downloads/report.doc](file_path)
+#     - Proporcione el archivo de [https://shared.com/image.jpg](file_source)
+#     - Tengo un archivo en [C:/Temp/testfile.docx](file_path)
+
+
+- intent: provide_claim_details
+  examples: |
+    - Quiero proporcionar los detalles de mi reclamo
+    - Necesito registrar un reclamo
+    - Tengo que presentar un reclamo
+    - Deseo compartir los antecedentes y mi petición específica
+    - Quiero empezar con los detalles del reclamo
+    - Por favor, ayúdame a enviar mi reclamo
+    - Me gustaría explicar mi situación para el reclamo
+    - ¿Cómo puedo enviar los detalles del reclamo?
+    - Necesito ayuda con un reclamo
+    - Proporcionaré los detalles ahora
+
+- intent: affirm_file_upload
+  examples: |
+    - Claro
+    - Por supuesto
+    - Correcto
+    - Así es
+    - Estoy de acuerdo
+    - Exactamente
+    - Eso es
+    - Afirmativo
+    - Vale
+    - OK
+    - Seguro
+    - Perfecto
+    - Correcto
+    - Sin problema
+    - Sí, lo haré ahora
+    - Voy a subir el archivo
+    - Sí, dame un momento para subirlo
+    - De acuerdo, subiré el archivo
+    - Sí, procederé con la carga del archivo
+
+- intent: deny_file_upload
+  examples: |
+    - Prefiero no subir ningún archivo
+    - No quiero cargar archivos
+    - No tengo archivos para subir
+    - Ningún archivo por ahora
+    - No necesito subir ningún archivo
+    - No, gracias
+    - No, no es necesario
+    - No voy a subir nada en este momento
+    - No tengo nada que subir ahora mismo
+    - No por el momento, quizá más tarde
+    - No lo subiré ahora, lo haré después
+    - No veo la necesidad de subir un archivo
+    - No, no quiero compartir archivos
+    - No, no deseo adjuntar ningún documento
+
+- intent: file_a_claim
+  examples: |
+    - Quiero presentar mi primera reclamación
+    - Seleccionar opción para presentar mi primer reclamo
+    - Presentar una reclamación por primera vez
+    - Iniciar mi primera reclamación
+    - Quiero hacer mi primer reclamo
+    - Presionar el botón para presentar mi primera reclamación
+    - Elegir la opción de primera reclamación
+    - Tocar la opción de primer reclamo
+    - Abrir la opción para presentar mi primer reclamo
+    - Necesito registrar mi primera reclamación
+
+
+- intent: proceed_with_claim
+  examples: |
+    - Sí, quiero continuar con mi reclamación
+    - Quiero proceder con la reclamación
+    - Sí, presenta mi reclamación
+    - Procede con la reclamación
+    - Presenta la reclamación
+    - Estoy seguro, presenta la reclamación
+    - Continúa con la reclamación
+    - Sí, continúa con el proceso
+    - Presenta la solicitud
+    - Quiero seguir adelante con la reclamación
+
+- intent: check_existing_claim
+  examples: |
+    - No, déjame verificar la reclamación existente
+    - Quiero revisar los detalles de la reclamación
+    - Enséñame la reclamación actual
+    - Déjame comprobar la reclamación duplicada
+    - Muéstrame la reclamación existente
+    - Quiero ver la reclamación actual
+    - Ver los detalles de la reclamación
+
+- intent: raise_a_second_instance
+  examples: |
+    - Quiero elevar una segunda instancia
+    - Necesito abrir una segunda instancia
+    - Deseo presentar una segunda instancia
+    - Elevar a segunda instancia
+    - Iniciar una segunda instancia
+    - Presentar mi caso en segunda instancia
+    - ¿Cómo puedo elevar a segunda instancia?
+    - Quiero apelar en segunda instancia
+    - Solicitar revisión en segunda instancia
+    - Enviar mi reclamación a segunda instancia
+    - Proceder con una segunda instancia
+    - Necesito una segunda instancia para mi caso
+    - Llevar mi caso a segunda instancia
+    - Quiero continuar con segunda instancia
+    - Presentar recurso en segunda instancia
+
+
+- intent: raise_a_complaint
+  examples: |
+    - Quiero presentar una queja
+    - Necesito registrar una queja
+    - Deseo hacer una queja
+    - Registrar una queja
+    - Presentar una queja
+    - Quiero elevar una queja
+    - Necesito presentar una queja formal
+    - ¿Cómo puedo presentar una queja?
+    - Enviar una queja
+    - Elevar una queja oficial
+    - Me gustaría hacer una queja
+    - Quiero reportar una queja
+    - ¿Dónde puedo registrar una queja?
+    - Iniciar un proceso de queja
+    - Presentar una queja contra un servicio
+
+
+- intent: select_ticket
+  examples: |
+    - Selecciona el ticket con ID [173316265695371](ticket_id)
+    - Necesito acceder al ticket con ID [173316286146990](ticket_id)
+    - Quiero gestionar el ticket con ID [173316265695371](ticket_id)
+    - Por favor, abre el ticket con ID [173316286146990](ticket_id)
+    - Enséñame la información del ticket con ID [173316265695371](ticket_id)
+    - Encuentra el ticket con ID [173316286146990](ticket_id) en el sistema
+    - Necesito más detalles sobre el ticket con ID [173316265695371](ticket_id)
+    - ¿Cuáles son los datos del ticket con ID [173316286146990](ticket_id)?
+
+
+# - intent: provide_complaint_antecedentes
+#   examples: |
+#     - El problema comenzó cuando el servicio se retrasó.
+#     - Tuve este problema la semana pasada.
+#     - Los antecedentes están relacionados con un envío retrasado.
+#     - El problema comenzó después de que la transacción falló.
+#     - Ocurrió porque el sistema se bloqueó.
+#     - Esto sucedió debido a un error en el sistema.
+#     - El problema empezó tras la actualización del sistema.
+#     - Todo comenzó cuando mi pago fue rechazado.
+#     - La queja se debe a múltiples fallos en el servicio.
+#     - El inconveniente surgió después de la última facturación.
+#     - Tuve problemas desde que recibí un producto defectuoso.
+#     - El servicio dejó de funcionar después de la última actualización.
+#     - Este problema ha ocurrido varias veces antes.
+#     - Mi queja está relacionada con una falla constante del sistema.
+#     - El problema apareció después de que intenté cambiar mi contraseña.
+
+
+# - intent: provide_complaint_peticion_especifica
+#   examples: |
+#     - Quiero un reembolso por este problema.
+#     - Por favor, asegúrense de que esto no vuelva a suceder.
+#     - Mi petición específica es reemplazar el producto defectuoso.
+#     - Estoy solicitando una disculpa y una compensación.
+#     - Por favor, resuelvan este problema lo antes posible.
+#     - Exijo una solución inmediata a mi queja.
+#     - Necesito que corrijan este error cuanto antes.
+#     - Solicito un cambio del producto afectado.
+#     - Mi petición es que reparen el daño causado.
+#     - Espero una respuesta clara y rápida sobre esta situación.
+#     - Pido una compensación por los inconvenientes ocasionados.
+#     - Quiero una solución efectiva a este problema.
+#     - Necesito que restablezcan mi servicio sin costos adicionales.
+#     - Exijo un ajuste en mi factura debido a este error.
+#     - Quisiera una explicación detallada y una solución definitiva.
+
+# - intent: provide_second_instance_claim_comments
+#   examples: |
+#     - Quiero agregar comentarios adicionales a mi reclamación.
+#     - Tengo información adicional para mi reclamación en segunda instancia.
+#     - Aquí están mis comentarios sobre la segunda instancia.
+#     - Quisiera dar más detalles sobre mi caso.
+#     - Mis comentarios para esta reclamación son los siguientes.
+#     - Agregue esto como un comentario para mi caso de segunda instancia.
+#     - Estos son los detalles adicionales que quiero incluir.
+#     - Me gustaría actualizar la información con estos comentarios.
+#     - Por favor, registre los siguientes comentarios para mi segunda instancia.
+#     - Necesito que consideren esta información adicional para mi caso.
+
+- intent: select_second_instance_ticket_id
+  examples: |
+    - Dame la segunda instancia del ticket con ID [173316265695371](complaint_ticket_id)
+    - Necesito revisar la segunda instancia del ticket [173316286146990](complaint_ticket_id)
+    - Encuentra la segunda instancia del ticket con el ID [173316265695371](complaint_ticket_id)
+    - ¿Dónde puedo ver la segunda instancia del ticket [173316286146990](complaint_ticket_id)?
+    - Quiero trabajar en la segunda instancia del ticket con ID [173316265695371](complaint_ticket_id)
+    - Enséñame los detalles de la segunda instancia del ticket [173316286146990](complaint_ticket_id)
+    - Busca la segunda instancia para el ticket con ID [173316265695371](complaint_ticket_id)
+    - ¿Cuál es el estado de la segunda instancia del ticket [173316286146990](complaint_ticket_id)?
+
+
+- intent: provide_ticket_status
+  examples: |
+    - Quiero saber el estado de mi ticket
+    - ¿Cuál es el estado de mi ticket?
+    - Necesito verificar el estado de mi reclamación
+    - ¿Puedo consultar el estado de mi queja?
+    - Muéstrame el estado del ticket
+    - Quiero comprobar el progreso de mi caso
+    - ¿Qué pasó con mi ticket?
+    - Actualización sobre mi ticket
+    - ¿Cómo va mi reclamación?
+    - ¿Qué estatus tiene mi ticket?
+    - Estado del ticket, por favor
+    - ¿Me puedes decir el estado de mi ticket?
+    - Necesito saber sobre mi caso
+    - ¿Dónde puedo ver el estado de mi ticket?
+    - Consulta del estado del ticket
+    - Dime cómo está mi reclamación
+
+
+- intent: select_status_ticket_id
+  examples: |
+    - Dime el estado del ticket con ID [173316265695371](status_ticket_id)
+    - Necesito saber si el ticket con ID [173316286146990](status_ticket_id) está activo
+    - ¿Cuál es la situación del ticket con ID [173316265695371](status_ticket_id)?
+    - ¿Está en proceso el ticket con ID [173316286146990](status_ticket_id)?
+    - Quiero ver el progreso del ticket con ID [173316265695371](status_ticket_id)
+    - Muéstrame el estado actual del ticket con ID [173316286146990](status_ticket_id)
+    - ¿El ticket con ID [173316265695371](status_ticket_id) ha sido resuelto?
+    - Verifica si el ticket con ID [173316286146990](status_ticket_id) sigue abierto
+
+
+- intent: nlu_fallback
+  examples: |
+    - No entiendo
+    - ¿Podrías repetir eso?
+    - ¿Qué quieres decir?
+    - Lo siento, no entendí eso
+    - ¿Puedes decirlo de nuevo?
+    - No sé qué quieres decir
+    - No tengo idea
+    - Esto no tiene sentido
+    - No estoy seguro de lo que dices
+    - Estoy perdido
+    - Eso es confuso
+    - ¿Puedes aclararlo?
+
+
+# - intent: handoff_request 
+#   examples: |
+#     - ¿Puedo hablar con un asistente humano?
+#     - Quiero hablar con una persona real
+#     - Necesito asistencia humana
+#     - ¿Puedes transferirme a un agente?
+#     - Quiero ser transferido a un humano
+#     - Por favor, pásame con un humano
+#     - Necesito hablar con un agente humano
+#     - ¿Puedes conectarme con una persona?
+#     - Quisiera asistencia de un humano
+#     - Me gustaría hablar con un humano
+
+- intent: information_structure_issue
+  examples: |
+    - La información no está bien organizada
+    - El contenido es difícil de seguir
+    - Falta una estructura clara en el documento
+    - Los datos están dispersos y desordenados
+    - No hay una jerarquía clara en la información
+
+- intent: regular_inquiry
+  examples: |
+    - Quiero hablar con un agente en vivo
+    - Necesito asistencia de un humano, por favor
+    - ¿Puedo hablar con atención al cliente ahora?
+    - Prefiero comunicarme con una persona real
+    - Necesito soporte humano de inmediato
+    - ¿Hay un agente disponible para ayudarme?
+    - No quiero hablar con un bot, necesito un agente real
+    - Conéctame con un representante de servicio al cliente
+    - Quisiera asistencia en vivo para resolver mi problema
+    - ¿Me puedes transferir a un operador humano?
+
+# - intent: affirm_live_agent
+#   examples: |
+#     - Sí, quiero hablar con un agente
+#     - Sí, por favor transfíreme a un humano
+#     - Claro, pásame con un asistente humano
+#     - Sí, transfíreme a un humano
+#     - Quiero ser transferido
+#     - Sí, quiero hablar con una persona
+#     - Sí, necesito asistencia humana
+#     - Por favor, conéctame con un agente
+#     - Claro, quiero asistencia de un humano
+#     - Sí, pásame con una persona real
+
+# - intent: deny_live_agent
+#   examples: |
+#     - No, gracias
+#     - No quiero ser transferido
+#     - Prefiero seguir hablando contigo
+#     - No es necesario un asistente humano
+#     - No quiero hablar con una persona
+#     - No necesito asistencia humana
+#     - No, está bien
+#     - No, puedo seguir con el bot
+
+
+- intent: download_pdf
+  examples: |
+    - Quiero descargar el PDF
+    - Dame el PDF
+    - Descargar archivo PDF
+    - Necesito descargar un documento
+    - Envíame el PDF
+    - Descargar el archivo PDF
+    - Por favor, descárgame el PDF
+    - Necesito el documento PDF
+    - Descargar el archivo PDF
+    - Descargar el PDF
+    - Descargar el archivo PDF
+
+- intent: select_status_ticket_id_pdf
+  examples: |
+    - Descarga el PDF del estado del ticket con ID [173316265695371](status_ticket_id_pdf)
+    - Genera un reporte PDF del estado del ticket [173316286146990](status_ticket_id_pdf)
+    - Quiero ver el estado en PDF del ticket con ID [173316265695371](status_ticket_id_pdf)
+    - Necesito el documento PDF del ticket con ID [173316286146990](status_ticket_id_pdf)
+    - Descárgame el archivo en PDF del ticket [173316265695371](status_ticket_id_pdf)
+    - Obtén el PDF con detalles del ticket con ID [173316286146990](status_ticket_id_pdf)
+    - ¿Puedes proporcionarme el PDF del ticket [173316265695371](status_ticket_id_pdf)?
+    - Muestra el PDF con el resumen del ticket [173316286146990](status_ticket_id_pdf)
+    
+- intent: rag_inquiry_faq
+  examples: |
+    - ¿Cómo conozco el estado de un trámite?
+    - ¿Cómo puedo solicitar una reunión en la SEPS?
+    - ¿Cómo puedo conocer los servicios que presta la SEPS?
+    - ¿Cómo puedo realizar el pago de valores a la SEPS?
+    - ¿Cómo realizo la notificación de pago a la SEPS?
+    - ¿Cuáles son los requisitos para constituir una cooperativa de ahorro y crédito?
+    - ¿Cómo puedo saber si una cooperativa está controlada por la SEPS?
+    - ¿Cómo puedo obtener información de una organización de la EPS?
+    - ¿Cómo puedo conocer datos de contacto del liquidador de una entidad del sector financiero?
+    - ¿Cómo puedo conocer datos de contacto del liquidador de una organización del sector no financiero?
+    - ¿Cómo puedo ingresar documentos para un trámite en la SEPS?
+    - ¿Cuáles son los horarios de atención presencial de la SEPS?
+    - ¿Cómo solicito una certificación o copia certificada?
+    - Tengo una duda sobre los servicios de SEPS
+    - Necesito información adicional sobre su organización
+    - ¿Puedes ayudarme con una pregunta sobre SEPS?
+    - ¿Qué información puedo obtener de SEPS?
+    - ¿Cómo funciona el proceso de SEPS?
+    - ¿Dónde encuentro más detalles sobre SEPS?
+    - Quisiera saber más sobre los procedimientos de SEPS
+    - ¿Cómo puedo mejorar mi experiencia con SEPS?
+    - ¿Qué requisitos necesito para una cooperativa?
+    - ¿Cómo puedo hacer un trámite con SEPS en línea?
+    - ¿Qué tiempo toma un proceso en SEPS?
+    - ¿Cómo conozco el estado de un trámite?
+    - ¿Cómo puedo solicitar una reunión en la SEPS?
+    - ¿Cómo puedo conocer los servicios que presta la SEPS?
+    - ¿Cómo puedo realizar el pago de valores a la SEPS?
+    - ¿Cómo realizo la notificación de pago a la SEPS?
+    - ¿Cuáles son los requisitos para constituir una cooperativa de ahorro y crédito?
+    - ¿Cómo puedo saber si una cooperativa de ahorro y crédito está controlada por la SEPS?
+    - ¿Cómo puedo obtener información de una organización de la EPS?
+    - ¿Cómo puedo conocer datos de contacto del liquidador de una entidad del sector financiero popular y solidario?
+    - ¿Cómo puedo conocer datos de contacto del liquidador de una organización de la EPS?
+    - ¿Cómo puedo ingresar documentos para un trámite en la SEPS?
+    - ¿Cuáles son los horarios de atención presencial de la SEPS?
+    - ¿Cómo solicito una certificación o copia certificada?
+    - ¿Cómo obtengo una ficha informativa de directiva o existencia legal de una entidad del sector financiero popular y solidario?
+    - ¿Cómo obtengo una ficha informativa de directiva o existencia legal de una organización de la EPS?
+    - ¿Cuáles son los requisitos para registrar la directiva de una entidad del sector financiero popular y solidario?
+    - ¿Cómo realiza una organización de la EPS la salida voluntaria de socios o asociados?
+    - ¿Cómo realiza una organización de la EPS la salida voluntaria de socios o asociados fallecidos?
+    - ¿Cómo realizo el registro de ingreso de socios/asociados de una organización de la EPS?
+    - ¿Puedo desvincularme como socio o asociado de una organización de la EPS, siendo parte de la directiva de la organización de la EPS?
+    - ¿Qué hago si no estoy de acuerdo con un proceso de exclusión como socio/asociado de una organización de la EPS?
+    - ¿Cómo puedo consultar si consto registrado como socio/asociado de una Organización de la EPS?
+    - ¿El representante legal de una OEPS puede registrar su salida en calidad de socio de la organización, de manera directa a través del sistema?
+    - ¿Cómo registro la salida por exclusión de socios/asociados de una organización de la EPS?
+    - ¿Puedo registrar la salida de un socio/asociado que presentó la renuncia voluntaria hace más de 30 días, mediante el acceso a servicios electrónicos que mantiene el representante legal?
+    - ¿Cómo puedo solicitar mi salida en calidad de socio/asociado, si no puedo contactar a la organización o a sus directivos?
+    - ¿Cómo puedo obtener un listado de socios o comprobante de directiva de la organización que represento como Representante Legal?
+    - ¿Cuáles son los requisitos y el procedimiento para calificación de auditores?
+    - ¿Cómo realizo el registro de directiva ante la renuncia vocales o directivos de una organización de la EPS?
+    - ¿Cómo realizo el registro de directiva por fenecimiento de período una organización de la EPS?
+    - ¿Cómo se procede al registro de un representante legal en una organización de la EPS?
+    - ¿Cómo obtengo el acceso a servicios electrónicos para el rol de representante legal de una organización de la EPS?
+    - ¿Cómo obtengo la clave para remitir las estructuras de información (acopio) de las organizaciones de la EPS?
+    - ¿Cómo obtengo la clave para remitir las estructuras de información (acopio) de entidades del sector financiero popular y solidario?
+    - ¿Cuáles son los requisitos para constituir una organización de la EPS?
+    - ¿Cómo puedo actualizar datos de contacto de una organización de la EPS o entidad del sector financiero popular y solidario?
+    - ¿Cómo puedo verificar la información registrada en el sistema de la SEPS?
+    - ¿Cómo realizo la actualización de datos si olvidé mi contraseña de acceso a servicios electrónicos, y no puedo acceder al correo electrónico registrado para restablecer la contraseña de servicios electrónicos?
+    - ¿Cómo puedo conocer el estado de una solicitud de reserva de denominación?
+    - ¿Cómo puedo saber la razón de negación de una reserva de denominación?
+    - ¿La SEPS puede autorizar la prórroga en funciones de la directiva de las organizaciones de la EPS?
+    - ¿La directiva registrada en la SEPS puede actuar hasta que se elija y registre nueva directiva?
+    - ¿Qué es un reclamo?
+    - ¿Cuál es la diferencia entre un reclamo y una denuncia?
+    - ¿Cuál es el requisito para presentar un reclamo en contra de las organizaciones de la EPS y entidades del sector financiero popular y solidario?
+    - ¿Puedo interponer un reclamo en contra de una entidad bancaria, compañía, empresa, entre otros?
+    - ¿Qué debo hacer para no constar en el buró de crédito?
+    - ¿Puede presentar una tercera persona un reclamo en mi nombre?
+    - ¿Puedo interponer un reclamo en contra de entidades u organizaciones en liquidación?
+    - ¿Puedo ingresar un reclamo para llegar a un acuerdo de pago con una entidad financiera del sector financiero popular y solidario?
+    - ¿Puedo ingresar un reclamo en caso de ser ex socio o ex asociado?
+    - ¿Cómo me califico como oficial de cumplimiento de una entidad del sector financiero popular y solidario?
+    - ¿Cómo me califico como oficial de cumplimiento de una organización de la EPS?
+    - ¿Cómo puedo obtener la personalidad jurídica de una caja de ahorro?
+    - ¿Cómo hago el registro en la nómina de cajas de ahorros y caja comunales?
+    - ¿A qué se refiere el término vínculo común de una caja?
+    - ¿Cómo solucionar conflictos dentro de una caja de ahorro?
+    - ¿Puedo ser representante legal de una caja de ahorro y gerente de otra entidad del sector financiero popular y solidario al mismo tiempo?
+    - ¿Para presentar una denuncia en contra de una entidad del Sector Financiero Popular y Solidario, ante la SEPS; es necesario previamente acudir a un centro de mediación?
+    - ¿Cómo puedo conocer qué entidades están autorizadas para emitir garantías a favor de terceros?
+    - ¿Puede la SEPS disponer la convocatoria a elecciones en las organizaciones de la EPS y entidades del sector financiero popular y solidario?
+    - ¿Puede la SEPS disponer la convocatoria a elecciones en las organizaciones de la EPS?
+    - ¿Cómo puedo solicitar información no certificada para organizaciones de la EPS conforme a la ley de protección de datos personales?
+    - ¿Qué tipo de fundaciones deben registrarse en la SEPS?
+    - ¿Cuántos años de vida jurídica debe tener una fundación para registrarse en la SEPS como entidad de apoyo?
+    - ¿Cuáles son los requisitos para calificarme como perito avalador para las entidades del sector financiero popular y solidario?
+    - ¿Cuáles son los servicios auxiliares que deben calificarse en la SEPS, para ser ofrecidos a las entidades del sector financiero popular y solidario?
+    - ¿Qué es el reproceso de una estructura de información?
+    - ¿Qué es la administración de control de una estructura de información?
+    - ¿Qué es la segmentación de las entidades del sector financiero popular y solidario?
+    - ¿Cuándo se realiza la actualización de la segmentación de las entidades del sector financiero popular y solidario?
+    - ¿Cómo solicito una prórroga para el envío de estructuras de información?
+    - ¿Cuál es la fecha de corte para el reporte de una estructura de información?
+    - ¿Qué es la reestructuración de una operación crediticia?
+    - ¿Qué es la novación de una operación crediticia?
+    - ¿En qué plazo se debe implementar la norma de riesgo operativo?
+    - Quiero conocer el estado de un trámite.
+    - ¿Qué tipos de organizaciones supervisa la SEPS?
+    - ¿Qué tipos de organizaciones controla la SEPS?
+    - ¿Cuál es el objeto y finalidad de la LEY ORGÁNICA DE PROTECCIÓN DE DATOS PERSONALES?
+    - ¿Cuáles son las circunstancias en las que se prohíbe el tratamiento de datos según el artículo 26, capítulo IV (CATEGORÍAS ESPECIALES DE DATOS) de la LEY ORGÁNICA DE PROTECCIÓN DE DATOS PERSONALES?
+    - ¿Cuáles son las CATEGORÍAS ESPECIALES DE DATOS PERSONALES?
+    - ¿Cómo puedo obtener un listado de socios o comprobante de directiva de la organización que represento como Representante Legal?
+    - ¿Qué debo hacer para obtener un listado de socios o comprobante de directiva de la organización que represento como Representante Legal?
+    - ¿Cuáles son los requisitos para registrar la directiva de una entidad del sector financiero popular y solidario?
+    - ¿Puede presentar una tercera persona un reclamo en mi nombre?
+    - ¿Cómo puedo conocer el estado de un trámite?
+    - Deseo conocer el estado del trámite.
+    - ¿Cuál es la fecha límite para implementar el estándar de riesgo operativo?
+    - ¿Hasta qué fecha se debe completar la aplicación del estándar de riesgo operativo?
+    - ¿Cuál es el plazo máximo para la adopción del estándar de riesgo operativo?
+    - ¿Existe una fecha específica para finalizar la implementación del estándar de riesgo operativo?
+    - ¿Cuándo debe estar completamente en funcionamiento el estándar de riesgo operativo?
+    - ¿Cuál es el límite de tiempo establecido para cumplir con el estándar de riesgo operativo?
+    - ¿Para qué fecha se espera que el estándar de riesgo operativo esté en vigor?
+    - ¿Cuándo deben cumplir las entidades con la normativa de gestión integral de riesgos?
+    - ¿Cuáles son los plazos establecidos para la supervisión y control de riesgos financieros en las ESFPS?
+    - ¿Qué metodologías se utilizan para la supervisión de riesgos en el sector financiero popular y solidario?
+    - ¿Cómo se realiza el control del cumplimiento normativo en la gestión de riesgos operativos?
+    - ¿Qué informes deben presentar las entidades para demostrar el cumplimiento de los estándares de riesgo operativo?
+    - ¿Cuál es el objetivo del Código Orgánico Monetario y Financiero?
+    - ¿Qué funciones tiene la Junta de Política y Regulación Monetaria y Financiera?
+    - ¿Cuáles son las atribuciones de la Superintendencia de Economía Popular y Solidaria (SEPS)?
+    - ¿Qué normas de control puede dictar la SEPS?
+    - ¿Qué requisitos deben cumplir las entidades financieras populares y solidarias en términos contables?
+    - ¿Cómo regula la SEPS la constitución de provisiones de activos de riesgo?
+    - ¿Qué cambios se introdujeron en la normativa sobre gestión del riesgo de crédito en cooperativas de ahorro y crédito?
+    - ¿Qué es el Catálogo Único de Cuentas (CUC) y para qué se utiliza?
+    - ¿Cuáles son las principales modificaciones introducidas en el CUC en la Resolución SEPS-IGT-ISF-ITICA-IGJ-2018-052?
+    - ¿Qué entidades están obligadas a utilizar el CUC?
+    - ¿Qué cambios se realizaron en el grupo de ingresos del CUC?
+    - ¿Cómo se deben registrar las cuentas de orden deudoras en el CUC?
+    - ¿Qué modificaciones se realizaron en la cuenta de cartera comprada a entidades en liquidación?
+    - ¿Qué es la provisión diferida en cartera comprada?
+    - ¿Cómo se registran los activos adquiridos por procesos de fusión en el CUC?
+    - ¿Cuáles son las nuevas subcuentas creadas en el CUC para reflejar operaciones de compra de cartera?
+    - ¿Cómo se gestionan las primas y descuentos en la adquisición de cartera según el CUC?
+    - ¿Qué cambios se han introducido en la supervisión contable de cooperativas de ahorro y crédito?
+    - ¿Cómo deben reportar las entidades financieras sus estados contables a la SEPS?
+    - ¿Cómo se realiza la segmentación de entidades del sector financiero popular y solidario?
+    - ¿Qué criterios debe seguir una entidad para ajustar los valores contables de sus activos?
+    - ¿Cómo se gestionan los bienes adjudicados por pago y arrendamiento mercantil?
+    - ¿Qué disposiciones aplican a las entidades para la actualización de valores de mercado en inmuebles?
+    - ¿Cómo deben proceder las entidades financieras en caso de fusión o adquisición de activos?
+    - ¿Qué registros adicionales deben mantener las entidades sobre sus operaciones de crédito?
+    - ¿Cómo deben calcularse las provisiones específicas para cubrir riesgos de activos?
+    - ¿Cómo se clasifican las operaciones de cartera por vencer, refinanciadas y reestructuradas?
+    - ¿Qué disposiciones se aplican al registro de cartera de crédito de consumo prioritario?
+    - ¿Qué requisitos deben cumplir las entidades en la calificación de activos de riesgo?
+    - ¿Qué cambios se hicieron en la cuenta de créditos inmobiliarios por vencer?
+    - ¿Cómo afecta la normativa a la reclasificación de cartera de créditos vencidos?
+    - ¿Cómo deben calcularse los intereses devengados en cartera de crédito comprada?
+    - ¿Cómo deben las entidades registrar los ajustes a precios de mercado en sus activos?
+    - ¿Qué reglas deben seguir las entidades en el control del destino de los créditos otorgados?
+    - ¿Cuáles son los criterios para la reclasificación de créditos según su maduración?
+    - ¿Cómo deben reportar las entidades del sector financiero popular y solidario sus estructuras contables a la SEPS?
+    - ¿Qué procedimientos deben seguirse para modificar los registros contables en una entidad supervisada?
+    - ¿Cómo se manejan las cuentas de orden acreedoras en la normativa de SEPS?
+    - ¿Cuáles son los pasos para reportar información contable modificada?
+    - ¿Qué disposiciones rigen la actualización de segmentación de entidades supervisadas?
+    - ¿Cuáles son los plazos para la implementación de cambios normativos en el CUC?
+    - ¿Cómo se deben gestionar los activos improductivos y no utilizados por la institución?
+    - ¿Cómo se manejan los descuentos en la compra de cartera?
+    - ¿Qué reglas rigen la administración y control de estructuras de información financiera?
+    - ¿Qué procedimientos deben seguir las entidades para la liquidación de operaciones financieras?
+    - ¿Cómo pueden las entidades consultar dudas sobre la aplicación de la resolución SEPS-IGT-ISF-ITICA-IGJ-2018-052?
+    - ¿Cuáles son los mecanismos de contacto con la SEPS para aclarar normativas?
+    - ¿Cómo pueden las entidades solicitar revisión de sus registros contables ante la SEPS?
+    - ¿Cuáles son los plazos y requisitos para presentar una queja sobre la aplicación de regulaciones?
+    - ¿Dónde pueden las entidades consultar actualizaciones normativas publicadas por la SEPS?
+    - ¿Cómo se puede solicitar información sobre cambios en el Catálogo Único de Cuentas?
+    - ¿Qué mecanismos existen para impugnar decisiones de supervisión de la SEPS?
+    - ¿Qué es la normativa de control para la valoración de bienes inmuebles en entidades financieras populares y solidarias?
+    - ¿Cada cuánto tiempo deben ajustarse los valores de los bienes inmuebles registrados en los estados financieros?
+    - ¿Qué entidades están obligadas a realizar la revalorización de sus bienes inmuebles?
+    - ¿Cómo debe calcularse el valor de mercado de los inmuebles de una entidad financiera popular y solidaria?
+    - ¿Quiénes pueden realizar los avalúos técnicos de los bienes inmuebles?
+    - ¿Cómo se debe contabilizar un ajuste de valoración cuando el nuevo valor es mayor al registrado en libros?
+    - ¿Cómo se debe contabilizar una disminución en el valor de un activo inmueble?
+    - ¿Qué información debe incluir un informe de avalúo para la revalorización de bienes inmuebles?
+    - ¿Cuáles son las características del inmueble que deben ser documentadas en un avalúo?
+    - ¿Qué sucede si un bien ha sido sobrevaluado en el informe de valoración?
+    - ¿Cuándo se debe transferir el superávit de revaluación a resultados acumulados?
+    - ¿Cómo se debe registrar la depreciación acumulada de un activo revaluado?
+    - ¿Qué procedimiento debe seguirse si el activo ya había sido actualizado previamente en base a un avalúo?
+    - ¿Cómo se gestiona la afectación de cuentas cuando se produce una desvalorización de un bien inmueble?
+    - ¿Qué documentación debe presentarse a la SEPS luego de realizar el ajuste de valoración de bienes?
+    - ¿Cuáles son los pasos a seguir en caso de discrepancia entre el valor del perito y los índices oficiales de construcción?
+    - ¿Cómo se maneja el superávit por revaluación en el caso de uso del activo?
+    - ¿Cómo se registra la enajenación de un bien inmueble revaluado?
+    - ¿Las cuentas de terrenos y edificios pueden ser revalorizadas?
+    - ¿Qué entidad es responsable de la emisión de instructivos para la aplicación de la resolución sobre valoración de bienes?
+    - ¿Qué normativa rige la depreciación de activos en entidades del sector financiero popular y solidario?
+    - ¿Qué plazos tienen las entidades para reportar sus ajustes de valoración a la SEPS?
+    - ¿Hasta qué fecha pueden las entidades valorar sus bienes con peritos calificados por la Superintendencia de Bancos?
+    - ¿Desde cuándo entra en vigencia la normativa sobre valoración de bienes inmuebles en entidades supervisadas?
+    - ¿Cuál es la normativa para la apertura, traslado y cierre de oficinas de cooperativas de ahorro y crédito?
+    - ¿Qué cambios se realizaron en la resolución SEPS-IGT-ITICA-IGJ-2017-101 sobre oficinas de entidades financieras populares y solidarias?
+    - ¿Qué son las ventanillas de extensión de servicios?
+    - ¿Dónde pueden ubicarse las ventanillas de extensión de servicios?
+    - ¿Qué requisitos se deben cumplir para la apertura de ventanillas de extensión de servicios en instituciones privadas?
+    - ¿Cómo se justifica la apertura de una ventanilla de extensión de servicios?
+    - ¿Cuál es el radio de distancia permitido entre una ventanilla y la matriz, agencia o sucursal de la entidad financiera?
+    - ¿Qué normativa rige la apertura de ventanillas de entidades financieras de tipo cerrado?
+    - ¿Qué tipo de establecimientos pueden albergar ventanillas de entidades financieras de tipo cerrado?
+    - ¿Qué modificaciones se hicieron en la tabla de servicios autorizados en el artículo 12 de la norma?
+    - ¿Qué cambios se realizaron en la atención de pago de servicios básicos en ventanillas de entidades financieras?
+    - ¿Desde cuándo entró en vigencia la reforma a la normativa sobre oficinas de cooperativas de ahorro y crédito?
+    - ¿Dónde se puede consultar la normativa actualizada sobre apertura de oficinas de entidades financieras populares y solidarias?
+    - ¿Qué documentación se debe presentar a la SEPS para solicitar la apertura de una ventanilla de extensión de servicios?
+    - ¿Cómo afecta la reforma a la operatividad de agencias y sucursales de cooperativas de ahorro y crédito?
+    - ¿Qué implicaciones tiene la reforma para las asociaciones mutualistas de ahorro y crédito para la vivienda?
+    - ¿Cuáles son los criterios que la SEPS utiliza para autorizar nuevas ventanillas de servicio?
+    - ¿Qué normativa regula la administración del riesgo operativo en las entidades del sector financiero popular y solidario?
+    - Normativa sobre riesgo operativo
+    - Dime sobre administración de riesgo operativo
+    - Riesgo operativo y financiero, ¿qué hacer?
+    - ¿Cuáles son los objetivos de la norma de control para la administración del riesgo operativo y riesgo legal?
+    - Objetivos de la norma de control
+    - Riesgo legal, administración
+    - Reglas para riesgo operativo
+    - ¿A qué entidades se aplica la normativa de administración del riesgo operativo?
+    - Entidades afectadas por regulación de riesgo
+    - Quién sigue normativa de riesgo
+    - ¿Qué tipo de organizaciones están sujetas a la administración integral de riesgos según la SEPS?
+    - Organizaciones en administración de riesgo
+    - Regulación SEPS, ¿para quién?
+    - ¿Cómo deben las entidades identificar y gestionar los eventos de riesgo operativo?
+    - Identificación de eventos de riesgo
+    - Manejo de riesgos en entidades
+    - ¿Cuáles son los factores de riesgo operativo que deben ser evaluados por las entidades?
+    - Factores de riesgo operativo
+    - Riesgo operativo, evaluación
+    - ¿Qué mecanismos existen para mitigar el impacto del riesgo operativo?
+    - Cómo mitigar el riesgo operativo
+    - Métodos de reducción de riesgo
+    - ¿Cómo se clasifican los eventos de riesgo operativo?
+    - Clasificación de eventos de riesgo
+    - Tipos de riesgos operativos
+    - ¿Qué metodologías deben aplicar las entidades para la gestión del riesgo operativo?
+    - Métodos para gestionar riesgos
+    - ¿Qué es el mapa de calor en la gestión del riesgo operativo?
+    - Explica el mapa de calor
+    - Riesgos y mapas de calor
+    - ¿Cuáles son las responsabilidades del consejo de administración en la administración de riesgo operativo?
+    - Consejo de administración y riesgos
+    - Quién maneja los riesgos operativos
+    - ¿Cómo se debe documentar la matriz de riesgos en una entidad supervisada?
+    - Matriz de riesgos, documentación
+    - Documentación de riesgos
+    - ¿Qué pasos deben seguir las entidades para elaborar su manual de riesgo operativo?
+    - Pasos para manual de riesgos
+    - Cómo hacer manual de riesgo operativo
+    - ¿Qué medidas deben adoptar las entidades para garantizar la seguridad de la información en la administración del riesgo operativo?
+    - Seguridad en riesgo operativo
+    - Información y control de riesgos
+    - ¿Qué requisitos deben cumplir los proveedores de servicios tecnológicos según la normativa de la SEPS?
+    - Proveedores y normativa SEPS
+    - Regulación de proveedores de tecnología
+    - ¿Cómo deben gestionar las entidades los planes de continuidad del negocio?
+    - Planes de continuidad, gestión
+    - Continuidad del negocio y riesgos
+    - ¿Qué procesos deben documentarse en la administración del riesgo operativo?
+    - Documentar procesos de riesgo
+    - ¿Cuáles son los lineamientos para la selección de proveedores de servicios tecnológicos?
+    - Selección de proveedores tecnológicos
+    - Proveedores, reglas y control
+    - ¿Qué controles deben aplicar las entidades para garantizar la integridad de sus procesos operativos?
+    - Controles para procesos operativos
+    - Seguridad en procesos de riesgo
+    - ¿Cómo se maneja la supervisión del riesgo legal dentro de la administración integral de riesgos?
+    - Riesgo legal, cómo se supervisa
+    - Supervisión de riesgos legales
+    - ¿Qué es la normativa para la calificación y supervisión de servicios auxiliares del sector financiero popular y solidario?
+    - Normativa sobre servicios auxiliares financieros
+    - Quiero información sobre la regulación de servicios financieros auxiliares
+    - ¿Cuáles son los requisitos para calificar como servicio auxiliar del sistema financiero?
+    - ¿Cómo se obtiene la calificación de la Superintendencia de Economía Popular y Solidaria?
+    - Servicios auxiliares financieros, requisitos
+    - ¿Cómo se supervisan las compañías de servicios auxiliares del sector financiero?
+    - Reglas de control para servicios auxiliares
+    - ¿Qué regulaciones existen para empresas de software bancario y transaccional?
+    - Quiero detalles sobre empresas de software en el sector financiero
+    - ¿Cómo afectan las normas de control a las empresas de transporte de valores?
+    - Transporte de valores, requisitos
+    - Normativa para redes y cajeros automáticos
+    - ¿Qué establece la SEPS sobre redes y cajeros automáticos?
+    - ¿Cómo se controla la inversión de entidades financieras en empresas auxiliares?
+    - Regulaciones para inversiones en entidades auxiliares
+    - ¿Cómo se realiza la calificación de una empresa de servicios auxiliares?
+    - Procedimiento para calificación de empresas auxiliares
+    - ¿Qué documentación se requiere para la calificación de servicios auxiliares?
+    - Documentos para calificación de entidades auxiliares
+    - ¿Cómo se supervisa a una empresa calificada como servicio auxiliar financiero?
+    - Evaluación de entidades auxiliares del sector financiero
+    - ¿Qué pasa si una entidad auxiliar no cumple con la normativa?
+    - Sanciones por incumplimiento de normas financieras
+    - ¿Cuáles son las causales para perder la calificación de servicio auxiliar financiero?
+    - ¿Cómo se retira la calificación de un servicio auxiliar financiero?
+    - SEPS puede retirar calificaciones de servicios auxiliares
+    - ¿Qué tipo de auditorías deben realizar las entidades auxiliares?
+    - Auditoría en servicios auxiliares financieros
+    - ¿Qué medidas debe tomar una entidad auxiliar para garantizar la seguridad de sus servicios?
+    - Seguridad en empresas auxiliares del sistema financiero
+    - ¿Cómo afecta la normativa a las políticas de seguridad de la información?
+    - Protección de información en servicios auxiliares
+    - ¿Qué disposiciones establece la SEPS sobre la continuidad del negocio en entidades auxiliares?
+    - Continuidad operativa en empresas auxiliares
+    - ¿Cómo se documentan los procesos en entidades auxiliares financieras?
+    - Documentación de procesos en servicios auxiliares
+    - ¿Qué normativa regula la vinculación de personas con entidades del sector financiero popular y solidario?
+    - Vinculación de personas con entidades financieras
+    - Reglas sobre personas vinculadas en cooperativas
+    - ¿Cómo se determina la vinculación en cooperativas de ahorro y crédito?
+    - Criterios para determinar personas vinculadas
+    - ¿Qué tipos de vinculación existen según la SEPS?
+    - Explica los tipos de vinculación financiera
+    - ¿Qué prohibiciones tienen las entidades sobre operaciones con personas vinculadas?
+    - Reglas sobre operaciones con vinculados
+    - ¿Qué restricciones existen para personas vinculadas en el sistema financiero popular y solidario?
+    - Personas vinculadas, prohibiciones
+    - ¿Cómo afecta la vinculación en el acceso a créditos?
+    - ¿Cuáles son los límites de crédito para personas vinculadas?
+    - Cupos de crédito para vinculados
+    - ¿Qué sanciones pueden aplicarse a entidades que incumplan la normativa de vinculación?
+    - Multas por incumplir reglas de vinculación
+    - ¿Qué entidades deben cumplir la normativa de vinculación?
+    - Cooperativas y mutualistas, normativa de vinculación
+    - ¿Cómo se reportan operaciones con personas vinculadas?
+    - Reportes de operaciones vinculadas
+    - ¿Qué documentación debe presentar una entidad sobre sus vinculaciones?
+    - Documentación sobre vinculaciones financieras
+    - ¿Cómo se supervisa la vinculación en entidades del sector financiero popular y solidario?
+    - Supervisión de personas vinculadas
+    - ¿Cómo se pueden desvirtuar vinculaciones presuntivas?
+    - Proceso para desvirtuar una vinculación financiera
+    - ¿Cuáles son los pasos para eliminar una vinculación indebida?
+    - Eliminación de vinculación no justificada
+    - ¿Qué documentación se necesita para demostrar que no hay vinculación?
+    - Documentos para desvinculación financiera
+    - ¿Qué sucede si una persona no está de acuerdo con su vinculación?
+    - Cómo apelar una vinculación en cooperativas
+    - ¿Qué rol tiene la SEPS en la regulación de vinculaciones?
+    - Función de la SEPS en el control de vinculaciones
+    - ¿Qué normativa regula la segmentación de la cartera de crédito en el sistema financiero popular y solidario?
+    - Segmentación de cartera de crédito
+    - Quiero información sobre los cambios en la segmentación de crédito
+    - ¿Cómo se clasifican los créditos en el sistema financiero?
+    - Clasificación de créditos en el sector financiero
+    - ¿Qué tipos de crédito existen según la SEPS?
+    - Explica los tipos de crédito financiero
+    - ¿Cuáles son los segmentos de crédito aprobados por la normativa?
+    - Segmentos de crédito en entidades financieras
+    - ¿Cómo afecta la segmentación en la estructura contable?
+    - Ajustes contables por segmentación de créditos
+    - ¿Qué cambios hubo en el Catálogo Único de Cuentas respecto a créditos?
+    - Modificaciones en el Catálogo Único de Cuentas
+    - ¿Qué requisitos deben cumplir las entidades en la segmentación de créditos?
+    - Normas para segmentación de cartera
+    - ¿Cómo se manejan los créditos refinanciados y reestructurados?
+    - Diferencia entre crédito refinanciado y reestructurado
+    - ¿Cómo reportar la cartera de crédito de acuerdo con la nueva normativa?
+    - Reglas de reporte para cartera de crédito
+    - ¿Cuáles son las cuentas contables afectadas por la nueva segmentación?
+    - Cuentas modificadas en la segmentación de crédito
+    - ¿Qué sanciones pueden aplicarse por incumplimiento en la segmentación de créditos?
+    - Sanciones por incumplir reglas de segmentación
+    - ¿Qué cambios afectan a la cartera de crédito de consumo?
+    - Cambios en créditos de consumo según normativa
+    - ¿Cómo se regulan los créditos productivos en el sistema financiero popular y solidario?
+    - Reglas de crédito productivo en cooperativas
+    - ¿Qué requisitos deben cumplir los créditos de vivienda de interés social?
+    - Reglas para créditos de vivienda social
+    - ¿Cómo se controlan los microcréditos en el sistema financiero?
+    - Regulación de microcréditos
+    - ¿Cómo se implementan los ajustes en la segmentación de créditos?
+    - Implementación de segmentación de cartera de crédito
+    - ¿Qué normativa regula la segmentación de la cartera de crédito en el sistema financiero popular y solidario?
+    - Segmentación de cartera de crédito
+    - Cambios recientes en segmentación crediticia
+    - Normativa sobre créditos en cooperativas
+    - ¿Cómo se clasifican los créditos en el sistema financiero?
+    - Clasificación de créditos en el sector financiero
+    - Tipos de créditos según normativa SEPS
+    - ¿Cuáles son los segmentos de crédito aprobados por la normativa?
+    - Explica los segmentos de crédito
+    - ¿Cómo afecta la segmentación en la estructura contable?
+    - Efectos contables de la segmentación crediticia
+    - ¿Qué cambios hubo en el Catálogo Único de Cuentas respecto a créditos?
+    - Modificaciones en el Catálogo Único de Cuentas
+    - Ajustes recientes en normativa de créditos
+    - ¿Qué requisitos deben cumplir las entidades en la segmentación de créditos?
+    - Normas para segmentación de cartera
+    - ¿Cómo se manejan los créditos refinanciados y reestructurados?
+    - Diferencia entre crédito refinanciado y reestructurado
+    - Refinanciación y reestructuración de créditos
+    - ¿Cómo reportar la cartera de crédito de acuerdo con la nueva normativa?
+    - Reportes de cartera de crédito según SEPS
+    - ¿Cuáles son las cuentas contables afectadas por la nueva segmentación?
+    - Cuentas modificadas en la segmentación de crédito
+    - Cambios en contabilidad por normativa de crédito
+    - ¿Qué sanciones pueden aplicarse por incumplimiento en la segmentación de créditos?
+    - Sanciones por incumplir reglas de segmentación
+    - ¿Qué cambios afectan a la cartera de crédito de consumo?
+    - Impacto de normativa en créditos de consumo
+    - ¿Cómo se regulan los créditos productivos en el sistema financiero popular y solidario?
+    - Normas para créditos productivos en cooperativas
+    - Regulación de créditos empresariales
+    - ¿Qué requisitos deben cumplir los créditos de vivienda de interés social?
+    - Normas para crédito de vivienda social
+    - Requisitos para financiamiento de vivienda
+    - ¿Cómo se controlan los microcréditos en el sistema financiero?
+    - Regulación y control de microcréditos
+    - Microcréditos y requisitos de aprobación
+    - ¿Cómo se implementan los ajustes en la segmentación de créditos?
+    - Implementación de segmentación de cartera de crédito
+    - Pasos para aplicar cambios en segmentación financiera
+    - ¿Qué es el Código Orgánico Administrativo?
+    - Explicar los principios generales del COA.
+    - ¿Cuándo fue aprobado el Código Orgánico Administrativo?
+    - ¿Cómo se aplican los principios de eficacia y eficiencia en la administración pública?
+    - Hablar sobre la descentralización en el sector público.
+    - ¿Cuál es el objetivo del principio de transparencia?
+    - Quiero saber sobre la responsabilidad del Estado según el COA.
+    - ¿Cómo afecta el principio de buena fe a los servidores públicos?
+    - ¿Qué significa la interdicción de la arbitrariedad en las decisiones administrativas?
+    - Describir el proceso legislativo para aprobar el COA.
+    - ¿Cuáles son los derechos garantizados por la Constitución de Ecuador en relación con el COA?
+    - Necesito más información sobre la desconcentración administrativa.
+    - Ejemplos de cómo se garantiza la calidad en los servicios públicos.
+    - ¿Qué papel juega la Asamblea Nacional en el desarrollo del COA?
+    - ¿Cómo se asegura la participación ciudadana en cuestiones administrativas?
+    - Explicación del principio de planificación dentro del COA.
+    - ¿Qué mecanismos existen para evaluar la satisfacción del servicio público?
+    - Saber más sobre el principio de juridicidad en el COA.
+    - ¿Cómo se maneja la responsabilidad por acciones u omisiones de servidores públicos?
+    - Información sobre las disposiciones finales del COA.
+    - ¿Qué son actuaciones dilatorias en procedimientos administrativos?
+    - Evitar declaraciones falsas en los procedimientos administrativos.
+    - ¿Cuál es el deber de colaboración con las administraciones públicas?
+    - Facilitar informes e inspecciones a las administraciones públicas.
+    - ¿Cómo se identifica a personas no comparecientes con interés legítimo?
+    - Denunciar actos de corrupción ante la administración pública.
+    - ¿Cuál es el ámbito material de aplicación del Código?
+    - Relación jurídico administrativa entre personas y administraciones.
+    - ¿Qué incluye la actividad jurídica de las administraciones públicas?
+    - Impugnación de actos administrativos en vía administrativa.
+    - ¿Qué es la responsabilidad extracontractual del Estado?
+    - Procedimientos administrativos especiales para potestad sancionadora.
+    - ¿Cuándo se aplica la ejecución coactiva?
+    - Aplicación del Código a órganos y entidades del sector público.
+    - Administración pública central y sus componentes.
+    - Creación, reforma o supresión de órganos administrativos por el Presidente.
+    - Personalidad jurídica única del Estado ecuatoriano.
+    - Representación legal de las administraciones públicas.
+    - Competencias de los órganos administrativos básicos.
+    - Prohibición de duplicación de competencias administrativas.
+    - Régimen jurídico de los órganos colegiados de dirección.
+    - ¿Cómo se convoca a los miembros para una sesión del órgano colegiado?
+    - Proceso de convocatoria para sesiones.
+    - ¿Cuál es el tiempo de anticipación para una convocatoria?
+    - Requisitos para convocar una sesión.
+    - ¿Cuándo es válida una sesión extraordinaria?
+    - Excepciones para la instalación de sesiones.
+    - ¿Qué ocurre si el presidente no convoca una sesión requerida?
+    - Instalación en caso de urgencia excepcional.
+    - ¿Cómo se registra lo actuado en las sesiones?
+    - Registro y constancia de sesiones.
+    - ¿Qué debe incluir la razón final de una sesión?
+    - Uso de grabaciones digitales en sesiones.
+    - Contenido mínimo de un acta de sesión.
+    - ¿Qué debe contener el acta de una reunión?
+    - Aprobación de actas en sesiones.
+    - Aspectos principales que deben incluirse en un acta.
+    - ¿Cómo se registran los votos y sus motivaciones?
+    - Proceso para justificar un voto en contra.
+    - Derechos sobre la transcripción de intervenciones.
+    - ¿Qué es un voto particular y cómo se formula?
+    - Realización de sesiones por medios electrónicos.
+    - ¿Se pueden hacer reuniones virtuales del órgano colegiado?
+    - Uso de tecnología para llevar a cabo sesiones.
+    - Distribución de competencias en la administración pública.
+    - Alcance y ejercicio de competencias administrativas.
+    - ¿Qué determina la competencia de un órgano?
+    - Resolución de conflictos de competencia.
+    - Métodos para transferir competencias administrativas.
+    - Transferencia y delegación de competencias.
+    - ¿Qué es la avocación y cuándo se aplica?
+    - Casos que permiten descentralización y desconcentración.
+    - Proceso para delegar competencias administrativas.
+    - Delegación a órganos jerárquicamente dependientes.
+    - Ejemplos de delegación a sujetos privados.
+    - Efectos legales de la delegación.
+    - Elementos que debe contener una delegación.
+    - Especificaciones necesarias en el acto de delegación.
+    - Detalles sobre el plazo y condiciones en la delegación.
+    - Competencias que no pueden ser delegadas.
+    - Restricciones en la delegación administrativa.
+    - Excepciones a la regla general sobre delegación.
+    - Causas que extinguen una delegación.
+    - Procedimiento tras cambio del titular del órgano delegante.
+    - Extinción por revocación o cumplimiento del plazo.
+    - Delegación excepcional a sujetos privados.
+    - Criterios para la gestión excepcional por privados.
+    - Interés público y delegación excepcional.
+    - ¿Qué es la Ley Orgánica de Defensa del Consumidor?
+    - Definición de consumidor según la ley
+    - ¿Cuáles son los derechos del consumidor en Ecuador?
+    - Obligaciones de los proveedores según la ley
+    - ¿Cómo se define la publicidad engañosa?
+    - Prohibiciones sobre publicidad abusiva
+    - Normas sobre contratos de adhesión
+    - ¿Qué es un contrato de adhesión?
+    - Derecho de devolución y cambio
+    - ¿Qué prácticas se consideran especulación?
+    - Información básica comercial requerida
+    - ¿Cómo se regula la oferta de bienes y servicios?
+    - Definición de publicidad en el contexto legal
+    - ¿Qué es la publicidad abusiva?
+    - Diferencias entre publicidad engañosa y abusiva
+    - Regulación de servicios públicos domiciliarios
+    - ¿Qué son los servicios públicos domiciliarios?
+    - Roles de distribuidores y comerciantes
+    - Definición legal de productores o fabricantes
+    - Funciones y definición de importadores
+    - ¿Cuáles son los mecanismos para la defensa del consumidor?
+    - Mecanismos para reparación e indemnización por deficiencias
+    - ¿Cómo se protege a los consumidores contra la publicidad engañosa?
+    - Sanciones por violación de derechos del consumidor
+    - Protección contra adulteración de productos
+    - ¿Cómo garantiza el Estado la calidad de bienes y servicios?
+    - ¿Qué se entiende por información básica comercial?
+    - Requisitos para la información al consumidor
+    - Normativa sobre publicidad dirigida al consumidor
+    - Regulaciones sobre alteración de pesos y medidas
+    - Funciones del proveedor según la ley
+    - ¿Qué obligaciones tiene un proveedor con el consumidor?
+    - Diferencia entre productor y proveedor
+    - Rol del Defensor del Pueblo en protección al consumidor
+    - Funciones de la Defensoría Adjunta del Consumidor y Usuario
+    - ¿Qué requisitos deben cumplir los socios para ser electos como representantes?
+    - Requisitos para la calificación de idoneidad de vocales.
+    - ¿Cómo se regula la constitución de cooperativas de ahorro y crédito?
+    - Normas aplicables a asociaciones mutualistas de ahorro y crédito para vivienda.
+    - ¿Qué establece el artículo 62 del Código Orgánico Monetario y Financiero?
+    - Funciones de la Superintendencia de Economía Popular y Solidaria.
+    - ¿Qué es una caja central en el sector financiero popular y solidario?
+    - Detalles sobre las prohibiciones para miembros del directorio.
+    - ¿Cómo afecta el parentesco a los cargos en cooperativas?
+    - Proceso para registrar nombramientos en la Superintendencia.
+    - ¿Quién es Sofía Margarita Hernández Naranjo?
+    - Exigencias para la administración de entidades financieras populares.
+    - ¿Qué dice el artículo 258 sobre impedimentos en directorios?
+    - Normativa para la calificación de idoneidad.
+    - Resolución No. SEPS-IGS-IGT-IGJ-INSEPS-INSESF-INGINT-2024-001.
+    - ¿Cuál es el ámbito de aplicación de esta norma?
+    - Información sobre la Resolución Nro. PLE-CPCCS-T-O-081-13-08-2018.
+    - Artículo 461 del Código Orgánico Monetario y Financiero.
+    - ¿Qué regula el artículo 446 sobre cooperativas?
+    - Requisitos para ser gerente en cooperativas del sector financiero popular.
+    - ¿Cuáles son los requisitos para registrar representantes en la Asamblea?
+    - Documentación para cambios en representantes.
+    - ¿Cómo se designan los representantes principales y suplentes?
+    - Procedimiento para verificar idoneidad.
+    - ¿Qué requisitos deben cumplir los vocales electos?
+    - Documentos para el registro de asamblea.
+    - ¿Cuáles son los documentos requeridos para el registro en la SEPS?
+    - Requisitos para la calificación de vocales.
+    - Proceso para registrar gerentes en segmentos 1, 2 y 3.
+    - ¿Cómo se realiza la calificación de idoneidad de los vocales?
+    - Cursos necesarios para vocales de consejos.
+    - Impedimentos legales para ser vocal en consejos.
+    - Requisitos académicos excepcionales.
+    - Fecha efectiva del inicio de funciones de representantes.
+    - ¿Cuáles son las excepciones académicas para entidades cerradas?
+    - Restricciones por parentesco entre vocales y administradores.
+    - Requisitos de experiencia profesional para vocales.
+    - ¿Cuántos años de experiencia se requieren para ser gerente?
+    - Información sobre la experiencia necesaria para gerentes.
+    - ¿Qué títulos son válidos para ser gerente en una cooperativa?
+    - ¿Cuáles son las prohibiciones del Código Orgánico Monetario y Financiero?
+    - Proceso para comprobar documentación.
+    - Requisitos para ser vocal en consejos de administración.
+    - ¿Cómo se verifican los requisitos para gerentes?
+    - Proceso para presentar cambios de representantes a la SEPS.
+    - Documentación exigida para el cargo de gerente.
+    - Información sobre capacitación en economía popular y solidaria.
+    - Cursos requeridos para aspirar a cargos directivos.
+    - Regulaciones sobre las convocatorias y actas de elecciones.
+    - ¿Cuáles son los criterios para elegir gerentes y vocales?
+    - ¿Qué resolución se deroga con esta norma?
+    - Fecha de entrada en vigencia de la nueva norma.
+    - Información general sobre SEPS y sus funciones.
+    - ¿Qué establece el artículo 74 del Código Orgánico Monetario y Financiero?
+    - Regulación del sector financiero popular y solidario
+    - ¿Cómo afecta la Ley Orgánica de Economía Popular y Solidaria a las entidades financieras?
+    - Normativa sobre adquisición de bienes inmuebles
+    - ¿Cuáles son las atribuciones del Superintendente de Economía Popular y Solidaria?
+    - Provisiones para cooperativas de ahorro y crédito
+    - ¿Qué es la Norma de Control para autorizar la adquisición de bienes inmuebles?
+    - Facultades del Intendente General de Servicios e Inteligencia de la Información
+    - ¿Cuándo entra en vigencia una resolución de la SEPS?
+    - Publicación en el Registro Oficial
+    - ¿Qué implica derogar una resolución de la SEPS?
+    - ¿Cómo se simplifican los trámites administrativos según la SEPS?
+    - Procedimientos para entidades financieras populares y solidarias
+    - Responsabilidad del Intendente General de Desarrollo Organizacional
+    - Adquisición de bienes por entidades financieras
+    - ¿Quién es Gabriela Robalino Aguirre?
+    - Intendencia General de Servicios e Inteligencia de la Información
+    - Funciones del órgano regulador en el sistema financiero nacional
+    - Requisitos para el funcionamiento de entidades financieras populares
+    - ¿Qué establece el artículo 146 de la Ley Orgánica de Economía Popular y Solidaria?
+    - Cambios en la regulación financiera desde mayo 2021
+    - ¿Qué función tiene la Junta de Política y Regulación Financiera?
+    - Normas generales expedidas por la Superintendencia
+    - Impacto de las disposiciones legales en el sector financiero solidario
+    - Procedimientos para dictar normas de control en SEPS
+    - Procedimiento para publicar una resolución en SEPS
+    - ¿Cómo se comunica una resolución en SEPS?
+    - Publicación web de resoluciones por SEPS
+    - Documentación oficial firmada electrónicamente
+    - Cambios legislativos en el sector financiero solidario
+    - Impacto de las nuevas disposiciones en las cooperativas
+    - Estructura organizacional de la Superintendencia de Economía Popular y Solidaria
+    - Gestión organizacional por procesos en SEPS
+    - ¿Qué requisitos deben cumplir los socios para ser electos como representantes?
+    - Requisitos para la calificación de idoneidad de vocales.
+    - ¿Cómo se regula la constitución de cooperativas de ahorro y crédito?
+    - Normas aplicables a asociaciones mutualistas de ahorro y crédito para vivienda.
+    - ¿Qué establece el artículo 62 del Código Orgánico Monetario y Financiero?
+    - Funciones de la Superintendencia de Economía Popular y Solidaria.
+    - ¿Qué es una caja central en el sector financiero popular y solidario?
+    - Detalles sobre las prohibiciones para miembros del directorio.
+    - ¿Cómo afecta el parentesco a los cargos en cooperativas?
+    - Proceso para registrar nombramientos en la Superintendencia.
+    - ¿Quién es Sofía Margarita Hernández Naranjo?
+    - Exigencias para la administración de entidades financieras populares.
+    - ¿Qué dice el artículo 258 sobre impedimentos en directorios?
+    - Normativa para la calificación de idoneidad.
+    - Resolución No. SEPS-IGS-IGT-IGJ-INSEPS-INSESF-INGINT-2024-001.
+    - ¿Cuál es el ámbito de aplicación de esta norma?
+    - Información sobre la Resolución Nro. PLE-CPCCS-T-O-081-13-08-2018.
+    - Artículo 461 del Código Orgánico Monetario y Financiero.
+    - ¿Qué regula el artículo 446 sobre cooperativas?
+    - Requisitos para ser gerente en cooperativas del sector financiero popular.
+    - ¿Cuáles son los requisitos para registrar representantes en la Asamblea?
+    - Documentación para cambios en representantes.
+    - ¿Cómo se designan los representantes principales y suplentes?
+    - Procedimiento para verificar idoneidad.
+    - ¿Qué requisitos deben cumplir los vocales electos?
+    - Documentos para el registro de asamblea.
+    - ¿Cuáles son los documentos requeridos para el registro en la SEPS?
+    - Requisitos para la calificación de vocales.
+    - Proceso para registrar gerentes en segmentos 1, 2 y 3.
+    - ¿Cómo se realiza la calificación de idoneidad de los vocales?
+    - Cursos necesarios para vocales de consejos.
+    - Impedimentos legales para ser vocal en consejos.
+    - Requisitos académicos excepcionales.
+    - Fecha efectiva del inicio de funciones de representantes.
+    - ¿Cuáles son las excepciones académicas para entidades cerradas?
+    - Restricciones por parentesco entre vocales y administradores.
+    - Requisitos de experiencia profesional para vocales.
+    - ¿Cuántos años de experiencia se requieren para ser gerente?
+    - Información sobre la experiencia necesaria para gerentes.
+    - ¿Qué títulos son válidos para ser gerente en una cooperativa?
+    - ¿Cuáles son las prohibiciones del Código Orgánico Monetario y Financiero?
+    - Proceso para comprobar documentación.
+    - Requisitos para ser vocal en consejos de administración.
+    - ¿Cómo se verifican los requisitos para gerentes?
+    - Proceso para presentar cambios de representantes a la SEPS.
+    - Documentación exigida para el cargo de gerente.
+    - Información sobre capacitación en economía popular y solidaria.
+    - Cursos requeridos para aspirar a cargos directivos.
+    - Regulaciones sobre las convocatorias y actas de elecciones.
+    - ¿Cuáles son los criterios para elegir gerentes y vocales?
+    - ¿Qué resolución se deroga con esta norma?
+    - Fecha de entrada en vigencia de la nueva norma.
+    - Información general sobre SEPS y sus funciones.
+    - ¿Qué significa el principio de juridicidad?
+    - Explicación sobre el principio de igualdad.
+    - ¿Cómo se aplica el principio de imparcialidad en el sector público?
+    - Principio de motivación, ¿en qué consiste?
+    - ¿Cuáles son los principios de ética y probidad?
+    - ¿Qué es el principio de control?
+    - Involucramiento ciudadano en el control administrativo.
+    - ¿Cómo se ejerce el control en las entidades públicas?
+    - Funciones de los órganos de control.
+    - Participación ciudadana en la actividad administrativa.
+    - Derechos individuales en la administración pública.
+    - ¿Cómo se protegen los derechos de las personas?
+    - Protección del derecho a la intimidad.
+    - ¿Qué es el derecho fundamental a la buena administración pública?
+    - Acceso a servicios públicos.
+    - ¿Qué implica el debido procedimiento administrativo?
+    - Procedimiento para formular peticiones.
+    - Restricciones sobre requisitos formales en trámites.
+    - ¿Qué es el principio de tipicidad?
+    - Principio de irretroactividad, ¿cómo se aplica?
+    - Principio de lealtad institucional entre administraciones.
+    - Colaboración entre diferentes administraciones públicas.
+    - ¿Qué es la corresponsabilidad administrativa?
+    - Mecanismos de coordinación administrativa.
+    - Ejemplos de subsidiariedad en la administración pública.
+    - Deber general de solidaridad, ¿qué implica?
+    - Respeto al ordenamiento jurídico.
+    - Abstención de conductas abusivas del derecho.
+    - Cumplimiento del interés general sobre el particular.
+    - Rol ciudadano en la promoción del bien común.
+    - ¿Qué son actuaciones dilatorias en procedimientos administrativos?
+    - Evitar declaraciones falsas en los procedimientos administrativos.
+    - ¿Cuál es el deber de colaboración con las administraciones públicas?
+    - Facilitar informes e inspecciones a las administraciones públicas.
+    - ¿Cómo se identifica a personas no comparecientes con interés legítimo?
+    - Denunciar actos de corrupción ante la administración pública.
+    - ¿Cuál es el ámbito material de aplicación del Código?
+    - Relación jurídico administrativa entre personas y administraciones.
+    - ¿Qué incluye la actividad jurídica de las administraciones públicas?
+    - Impugnación de actos administrativos en vía administrativa.
+    - ¿Qué es la responsabilidad extracontractual del Estado?
+    - Procedimientos administrativos especiales para potestad sancionadora.
+    - ¿Cuándo se aplica la ejecución coactiva?
+    - Aplicación del Código a órganos y entidades del sector público.
+    - Administración pública central y sus componentes.
+    - Creación, reforma o supresión de órganos administrativos por el Presidente.
+    - Personalidad jurídica única del Estado ecuatoriano.
+    - Representación legal de las administraciones públicas.
+    - Competencias de los órganos administrativos básicos.
+    - Prohibición de duplicación de competencias administrativas.
+    - Régimen jurídico de los órganos colegiados de dirección.
+    - ¿Qué significa abstenerse de actuaciones dilatorias?
+    - Declaraciones falsas en procedimientos administrativos.
+    - Colaborar con las administraciones públicas, ¿cómo?
+    - Facilitar informes a las administraciones, requisitos.
+    - Identificación de personas con interés legítimo, proceso.
+    - Denuncias de corrupción ante autoridades públicas.
+    - Ámbito material del Código, ¿cuál es su alcance?
+    - Relaciones jurídicas administrativas, ¿en qué consisten?
+    - Actividad jurídica de la administración pública, ejemplos.
+    - Impugnación en vía administrativa, pasos a seguir.
+    - Responsabilidad extracontractual del Estado, definición.
+    - Procedimientos sancionadores especiales, características.
+    - Ejecución coactiva, ¿cuándo procede?
+    - Aplicación del Código en el sector público, detalles.
+    - Componentes de la administración pública central.
+    - Funciones del Presidente respecto a órganos administrativos.
+    - Personalidad jurídica del Estado ecuatoriano, explicación.
+    - Representación legal y jurisdiccional, diferencias.
+    - Competencias de los órganos administrativos, origen y ejercicio.
+    - Prohibición de duplicar competencias administrativas, excepciones.
+    - ¿Cómo se convoca a los miembros para una sesión del órgano colegiado?
+    - Proceso de convocatoria para sesiones.
+    - ¿Cuál es el tiempo de anticipación para una convocatoria?
+    - Requisitos para convocar una sesión.
+    - ¿Cuándo es válida una sesión extraordinaria?
+    - Excepciones para la instalación de sesiones.
+    - ¿Qué ocurre si el presidente no convoca una sesión requerida?
+    - Instalación en caso de urgencia excepcional.
+    - ¿Cómo se registra lo actuado en las sesiones?
+    - Registro y constancia de sesiones.
+    - ¿Qué debe incluir la razón final de una sesión?
+    - Uso de grabaciones digitales en sesiones.
+    - Contenido mínimo de un acta de sesión.
+    - ¿Qué debe contener el acta de una reunión?
+    - Aprobación de actas en sesiones.
+    - Aspectos principales que deben incluirse en un acta.
+    - ¿Cómo se registran los votos y sus motivaciones?
+    - Proceso para justificar un voto en contra.
+    - Derechos sobre la transcripción de intervenciones.
+    - ¿Qué es un voto particular y cómo se formula?
+    - Realización de sesiones por medios electrónicos.
+    - ¿Se pueden hacer reuniones virtuales del órgano colegiado?
+    - Uso de tecnología para llevar a cabo sesiones.
+    - Uso de tecnología para llevar a cabo sesiones.
+    - Distribución de competencias en la administración pública.
+    - Alcance y ejercicio de competencias administrativas.
+    - ¿Qué determina la competencia de un órgano?
+    - Resolución de conflictos de competencia.
+    - Métodos para transferir competencias administrativas.
+    - Transferencia y delegación de competencias.
+    - ¿Qué es la avocación y cuándo se aplica?
+    - Casos que permiten descentralización y desconcentración.
+    - Proceso para delegar competencias administrativas.
+    - Delegación a órganos jerárquicamente dependientes.
+    - Ejemplos de delegación a sujetos privados.
+    - Efectos legales de la delegación.
+    - Elementos que debe contener una delegación.
+    - Especificaciones necesarias en el acto de delegación.
+    - Detalles sobre el plazo y condiciones en la delegación.
+    - Competencias que no pueden ser delegadas.
+    - Restricciones en la delegación administrativa.
+    - Excepciones a la regla general sobre delegación.
+    - Causas que extinguen una delegación.
+    - Procedimiento tras cambio del titular del órgano delegante.
+    - Extinción por revocación o cumplimiento del plazo.
+    - Delegación excepcional a sujetos privados.
+    - Criterios para la gestión excepcional por privados.
+    - Interés público y delegación excepcional.
+    - ¿Qué implica la gestión delegada por autorización administrativa?
+    - Gestión delegada, ¿es un derecho exclusivo?
+    - Explícame la gestión delegada en proyectos de interés público.
+    - ¿Cómo se evalúa un proyecto de interés público para gestión delegada?
+    - ¿Quién define los riesgos en un proyecto de interés público?
+    - ¿Cómo se realiza la delegación de gestión por contrato?
+    - Selección del gestor privado, ¿cómo se efectúa?
+    - ¿Qué reglas rigen la delegación de gestión mediante contrato?
+    - Cuéntame sobre el concurso público para seleccionar gestores.
+    - Pliego de bases administrativas, ¿quién lo formula?
+    - ¿Qué pasa si la gestión es en sectores estratégicos?
+    - Participación pública en servicios estratégicos, ¿cómo se ajusta?
+    - Excepcionalidad en sectores estratégicos, ¿quién la califica?
+    - Gestión en servicios públicos, ¿qué normas aplican?
+    - ¿Qué es la avocación y cuándo se aplica?
+    - Procedimiento para avocación, ¿cómo se notifica?
+    - Avocación por el delegante, ¿qué significa?
+    - Diferencia entre suplencia y subrogación.
+    - Suplencia de competencias, ¿cómo se regula?
+    - Subrogación, ¿en qué casos se aplica?
+    - Define descentralización en la gestión del Estado.
+    - Desconcentración, ¿qué implica para la administración pública?
+    - Transferencia de competencias, ¿cómo se realiza?
+    - Resolución de conflictos de competencia, ¿quién decide?
+    - Procedimiento ante un conflicto de competencia, explícamelo.
+    - Competencia entre administraciones públicas, ¿cómo se resuelve?
+    - Causas para excusa y recusación, enuméralas.
+    - Procedimiento ante una excusa, ¿cómo se lleva a cabo?
+    - Recusación, ¿cuándo y cómo se presenta?
+    - ¿Cómo puedo conocer el estado de mi trámite?
+    - Estado actual de mi trámite.
+    - ¿Dónde puedo consultar mis trámites?
+    - ¿Qué segmentos pueden adquirir cartera?
+    - Segmentos autorizados para adquirir cartera.
+    - ¿Quiénes pueden adquirir cartera en el sistema financiero?
+    - Entidades autorizadas para compra de cartera.
+    - ¿Qué segmentos están permitidos para adquisición de cartera?
+    - ¿Cómo se realiza la evaluación previa a la adquisición de cartera?
+    - Evaluación previa a la compra de cartera.
+    - ¿Qué se debe evaluar antes de adquirir una cartera?
+    - Proceso de evaluación antes de la compra de cartera.
+    - ¿Cómo evaluar el riesgo antes de adquirir una cartera?
+    - ¿Cuál es el límite para la adquisición de cartera?
+    - Límite máximo para comprar cartera.
+    - ¿Hasta cuánto se puede adquirir en relación a la cartera bruta?
+    - Restricciones en el porcentaje de adquisición de cartera.
+    - Límites permitidos en la compra de cartera.
+    - Documentos necesarios para autorización de adquisición.
+    - ¿Qué documentos se necesitan para obtener autorización?
+    - Requisitos documentales para adquirir una cartera.
+    - Documentación requerida por la Superintendencia.
+    - ¿Qué papeles debo presentar para comprar una cartera?
+    - ¿Cuáles son las excepciones para adquirir una cartera?
+    - Excepciones en la compra de carteras.
+    - Entidades que no pueden adquirir carteras.
+    - Casos en los que no se puede comprar cartera.
+    - Restricciones específicas para adquisición de carteras.
+    - Reporte obligatorio a la Superintendencia.
+    - ¿Cómo reportar operaciones a la Superintendencia?
+    - Obligación de informar sobre adquisiciones a la Superintendencia.
+    - Proceso para reportar operaciones realizadas.
+    - Informar sobre adquisiciones al organismo de control.
+    - Sanciones por incumplir las normas de adquisición.
+    - ¿Qué pasa si no se cumplen las disposiciones normativas?
+    - Consecuencias del incumplimiento en adquisición de carteras.
+    - Posibles sanciones por violar las reglas establecidas.
+    - Revocación de autorización por incumplimiento normativo.
+    - Disposiciones generales sobre la resolución vigente.
+    - Normas generales sobre la adquisición de carteras.
+    - Detalles sobre las disposiciones finales y generales.
+    - Información sobre las disposiciones publicadas en el Registro Oficial.
+    - ¿Qué regula el Código Orgánico Monetario y Financiero?
+    - Explícame las funciones de la Superintendencia de Economía Popular y Solidaria.
+    - Normas de control de la SEPS.
+    - ¿Cuáles son las atribuciones de la Superintendencia?
+    - Funciones del intendente general técnico.
+    - ¿Qué establece el artículo 74 del Código Orgánico Monetario y Financiero?
+    - Responsabilidades del intendente general técnico.
+    - ¿Qué implica la supervisión in situ y extra situ?
+    - Métodos de control de la SEPS.
+    - ¿Cómo se realiza la valoración de bienes inmuebles por la SEPS?
+    - ¿Cómo se valoran los bienes inmuebles en el sector financiero popular y solidario?
+    - Reglas para valorar inmuebles en la SEPS.
+    - ¿Qué cambios se introdujeron en la valoración de bienes inmuebles?
+    - Ajustes en valoración de inmuebles.
+    - ¿Qué sucede si los bienes están sobrevaluados?
+    - Proceso para ajustar el valor de inmuebles.
+    - Documentación necesaria para valoración de inmuebles.
+    - Requisitos para ajuste del valor de inmuebles.
+    - Proceso de supervisión permanente por la SEPS.
+    - ¿Cómo se lleva a cabo la supervisión financiera por la SEPS?
+    - Supervisión basada en el perfil de riesgo.
+    - ¿Cuáles son los estándares internacionales observados en la supervisión?
+    - Importancia del control interno en entidades financieras.
+    - Evaluación del gobierno corporativo o cooperativo.
+    - Principios aplicados en la supervisión de entidades.
+    - Fecha de vigencia de la resolución SEPS-IGT-IGS-INR-INGINT-2022-0083.
+    - Publicación de resoluciones en el Registro Oficial.
+    - ¿Dónde se publica esta resolución?
+    - Vigencia de resoluciones emitidas por SEPS.
+    - Facultades del superintendente delegadas a otros funcionarios.
+    - ¿Qué facultades puede delegar el superintendente?
+    - Delegación de funciones dentro de la SEPS.
+    - Contenido y propósito de las disposiciones finales.
+    - Implementación y comunicación de resoluciones.
+    - ¿Cuándo entra en vigencia la resolución?
+    - Fecha de suscripción y publicación en Registro Oficial.
+    - Vigencia normativa desde su firma electrónica.
+    - Resolución vigente desde julio 2021 en SEPS.
+    - Publicación en página web institucional.
+    - Gestión presupuestaria para patrocinios judiciales en SEPS.
+    - ¿Cómo gestiona SEPS los espacios presupuestarios?
+    - Presupuesto necesario para requerimientos durante el ejercicio fiscal.
+    - Previsiones presupuestarias y su impacto en patrocinios.
+    - ¿Qué establece el artículo 309 de la Constitución de Ecuador sobre el sistema financiero?
+    - Explica la función de la Superintendencia de Economía Popular y Solidaria.
+    - ¿Qué es el sector financiero popular y solidario?
+    - Definición de cooperativas según la Alianza Cooperativa Internacional.
+    - Principios de la Ley Orgánica de Economía Popular y Solidaria.
+    - ¿Cuáles son las entidades que componen el sector financiero popular y solidario?
+    - ¿Cómo se regula la constitución de asociaciones mutualistas de ahorro y crédito para la vivienda?
+    - ¿Qué función cumple el Comité de Basilea en el contexto del buen gobierno corporativo?
+    - Buen gobierno corporativo en cooperativas, ¿qué implica?
+    - Norma de control emitida por SEPS en 2021.
+    - Importancia de la transparencia en el sector financiero popular y solidario.
+    - ¿Qué establece el artículo 74 del Código Orgánico Monetario y Financiero?
+    - Relación entre SEPS y el control del buen gobierno.
+    - ¿Qué aspectos cubre la resolución SEPS-IGT-IGS-IGJ-INSESF-INGINT-2021-019?
+    - Resolución Nro. PLE-CPCCS-T-O-081-13-08-2018, ¿cuál es su relevancia?
+    - Principios universales del cooperativismo, ¿cuáles son?
+    - Atribuciones del Intendente General Técnico según la SEPS.
+    - ¿Cómo protege SEPS los intereses de las personas socias?
+    - ¿Qué determina el artículo 163 del Código Orgánico Monetario y Financiero?
+    - Funciones del Consejo de Administración en una cooperativa.
+    - ¿Cuál es el propósito del Reglamento de Buen Gobierno?
+    - ¿Cómo se garantiza la igualdad de género en la gestión corporativa?
+    - ¿Qué responsabilidades tiene la Asamblea o Junta General?
+    - Procedimiento para elegir vocales en el Consejo de Administración.
+    - ¿Qué es el Comité de Gobierno y cuál es su función?
+    - ¿Cómo se asegura la transparencia en las decisiones del Consejo de Administración?
+    - ¿Qué aspectos debe incluir el Reglamento de Buen Gobierno?
+    - Requisitos para convocar una Asamblea o Junta General.
+    - ¿Cómo se promueve la participación equitativa de socios en las decisiones?
+    - Infracciones y sanciones en el Reglamento de Buen Gobierno.
+    - ¿Qué medidas se toman para asegurar la rendición de cuentas?

@@ -1,0 +1,26 @@
+services:
+  rasa:
+    image: rasa-app
+    container_name: rasa-container
+    env_file: .env
+    ports:
+      - "5005:5005"
+      - "5055:5055"
+    networks:
+      - rasa-network
+
+  postgres:
+    image: postgres
+    container_name: rasa-db
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5433:5432"   # <-- Local port 5433, Docker port 5432
+    networks:
+      - rasa-network
+
+networks:
+  rasa-network:
+    driver: bridge
